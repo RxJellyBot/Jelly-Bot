@@ -15,4 +15,3 @@
 # DRAFT: API Doc: https://getbootstrap.com/docs/4.3/components/scrollspy Design can be used for API Doc
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: Send gmail over django https://medium.com/@_christopher/how-to-send-emails-with-python-django-through-google-smtp-server-for-free-22ea6ea0fb8e
-
