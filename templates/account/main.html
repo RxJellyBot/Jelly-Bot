@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center" style="word-break: break-word;">{% trans "Account Info" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 pd-top">
+                <div class="card border-primary">
+                    <h5 class="card-header text-center text-primary">{% trans "API Key" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text text-center">
+                            <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                    data-target="#apiKey" aria-expanded="false" aria-controls="apiKey">
+                                {% trans "Click to display/hide" %}
+                            </button>
+                        </div>
+
+                        <div class="collapse" id="apiKey">
+                            <div class="card-text text-center" style="margin-top: 1rem;">
+                                <code style="font-size: 1.5rem;">{{ api_user_data.token.value }}</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 pd-top">
+                <div class="card border-dark">
+                    <h5 class="card-header text-center">{% trans "Google Account" %}</h5>
+                    <div class="card-body">
+                        <h3 class="card-text text-center">
+                            {{ api_user_data.email.value }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- DRAFT: (Low Priority) Customize 404.html 500.html 403.html 400.html to root template dir. -->

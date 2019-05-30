@@ -1,0 +1,51 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Contact" %}</h4>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a class="list-group-item list-group-item-action text-primary"
+                               href="http://line.me/ti/p/~RaenonX">{% trans "LINE" %}</a>
+                            <a class="list-group-item list-group-item-action text-primary">{% trans "Discord" %}:
+                                レノンクス#5487
+                            </a>
+                            <a class="list-group-item list-group-item-action text-primary"
+                               href="mailto:maplestory0710@gmail.com">{% trans "Email" %}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "System" %}</h4>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://github.com/RaenonX/Jelly-Bot-API">{% trans "GitHub Repository" %}</a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://www.heroku.com/">{% trans "Deployed on" %}&nbsp;<b>Heroku</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://www.python.org/">{% trans "Language" %}:&nbsp;<b>Python</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://www.djangoproject.com/">{% trans "Backend Framework" %}:&nbsp;<b>Django</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://getbootstrap.com/">{% trans "Frontend framework" %}:&nbsp;<b>Bootstrap</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://jquery.com/">{% trans "Frontend framework" %}:&nbsp;<b>jQuery</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://reactjs.org/">{% trans "Frontend framework" %}:&nbsp;<b>React.js</b></a>
+                            <a class="list-group-item list-group-item-action text-success"
+                               href="https://www.mongodb.com/cloud/atlas">{% trans "Database" %}:&nbsp;<b>MongoDB Atlas</b></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+{% endblock %}

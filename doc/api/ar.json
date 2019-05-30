@@ -1,0 +1,113 @@
+[
+  {
+    "endpoint": "api.ar.add",
+    "methods": [
+      {
+        "POST": {
+          "parameters": [
+            {
+              "key": "k", "name": "Keyword", "type": "String",
+              "limit": {"Length": {"num": 2000, "type": "max"}},
+              "required": true, "isFlag": false, "isParameter": true,
+              "description": "Keyword of the auto-reply connection."
+            },
+            {
+              "key": "kt", "name": "Keyword Type", "type": "#ContentType# (Integer)",
+              "required": false, "isFlag": false, "isParameter": true,
+              "description": "The type of the content of the keyword.",
+              "default": 1
+            },
+            {
+              "key": "r", "name": "Response", "type": "Array[String]",
+              "limit": {"Array": {"num": 5, "type": "max"}, "Length": {"num": 2000, "type": "max"}},
+              "required": true, "isFlag": false, "isParameter": true,
+              "description": "Response(s) of the auto-reply connection."
+            },
+            {
+              "key": "rt", "name": "Response Type", "type": "Array[#ContentType# (Integer)]",
+              "limit": {"Array": {"num": 5, "type": "max"}},
+              "required": false, "isFlag": false, "isParameter": true,
+              "description": "The type of the content of the responses.",
+              "default": 1
+            },
+            {
+              "key": "c", "name": "Channel Token", "type": "String",
+              "limit": {"Length": {"num": 32, "type": "exact"}},
+              "required": true, "isFlag": true, "isParameter": true,
+              "description": "Keyword of the auto-reply connection."
+            },
+            {
+              "key": "cr", "name": "Creator Token", "type": "String",
+              "required": true, "isFlag": false, "isParameter": true,
+              "description": "Keyword of the auto-reply connection."
+            },
+            {
+              "key": "p", "name": "Platform", "type": "#Platform# (Integer)",
+              "required": true, "isFlag": true, "isParameter": true,
+              "description": "Keyword of the auto-reply connection."
+            },
+            {
+              "key": "pr", "name": "Private", "type": "Boolean",
+              "required": false, "isFlag": true, "isParameter": false,
+              "description": "Keyword of the auto-reply connection.",
+              "default": false
+            },
+            {
+              "key": "pin", "name": "Pinned", "type": "Boolean",
+              "required": false, "isFlag": true, "isParameter": false,
+              "description": "Keyword of the auto-reply connection.",
+              "default": false
+            },
+            {
+              "key": "cd", "name": "Cool Down", "type": "Integer",
+              "required": false, "isFlag": true, "isParameter": false,
+              "description": "Keyword of the auto-reply connection.",
+              "default": 0
+            }
+          ],
+          "note": "The length of _Response Type_ will be tried match to be exactly the same of _Response_.",
+          "results": {
+            "success": [
+              {
+                "key": "keyword",
+                "type": "#ObjectId#",
+                "description": "The id of the keyword content."
+              },
+            ],
+            "failed": [
+              {
+                "key": "keyword",
+                "type": "#AutoReplyContentGetResult#",
+                "description": "The result returned when the system is getting the keyword content."
+              }
+            ],
+            "extra": {},
+            "possibleInfo": [
+              {
+                "code": 101,
+                "description": "Response type truncated."
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+]
+
+// DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)
+// DRAFT: Json API Doc - Add anchor for all parameters
+// DRAFT: Json API Doc - #(item_name)# will redirect to the page of specific thing (Indexing technique not determined)
+// DRAFT: Json API DOc - Return incompleted
+
+/*
+List of things to be redirected:
+Types:
+- ObjectId
+- AutoReplyContentType
+- Platform
+
+Results:
+- AutoReplyContentGetResult
+-
+*/

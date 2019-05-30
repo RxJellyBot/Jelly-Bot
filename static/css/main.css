@@ -1,0 +1,14 @@
+:root {
+    --nav-height: 4rem;
+    font-size: 15px;
+}
+
+nav {
+    min-height: var(--nav-height);
+}
+
+body {
+    font-family: "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
+    font-size: 1rem;
+    padding-top: var(--nav-height);
+}

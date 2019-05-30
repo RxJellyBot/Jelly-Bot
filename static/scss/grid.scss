@@ -1,0 +1,17 @@
+@import "../../lib/bootstrap/scss/functions";
+@import "../../lib/bootstrap/scss/variables";
+@import "../../lib/bootstrap/scss/mixins";
+@import "../../lib/bootstrap/scss/grid";
+
+@for $column from 1 through $grid-columns {
+  @each $breakpoint in map-keys($grid-breakpoints) {
+    $min: breakpoint-min(#{$breakpoint}, $grid-breakpoints);
+    @if $min {
+      @media (max-width: $min) {
+        .col-#{$breakpoint}-#{$column} {
+          padding-top: 1rem;
+        }
+      }
+    }
+  }
+}
