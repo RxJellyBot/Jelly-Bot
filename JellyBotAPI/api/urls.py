@@ -6,4 +6,5 @@ from .status import status_check
 urlpatterns = [
     url(r'status/', status_check, name='api.status'),
     url(r'ar/', include('JellyBotAPI.api.ar.urls')),
+    url(r'id/', include('JellyBotAPI.api.id.urls')),
 ]

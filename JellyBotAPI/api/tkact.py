@@ -9,7 +9,7 @@ class TokenProcessingView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
         return [param.TokenAction.TOKEN]
 
     def post(self, request, *args, **kwargs):
-        # INCOMPLETE: Get token and check required params
+        # INCOMPLETE: Token: Get token and check required params
 
         # request.session[keys.APIStatisticsCollection.API_ACTION] = APIAction.AR_ADD
         # request.session[keys.APIStatisticsCollection.DICT_PARAMS] = param_dict

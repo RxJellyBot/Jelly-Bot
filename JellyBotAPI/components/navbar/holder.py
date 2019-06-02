@@ -7,20 +7,32 @@ from .dropdown import NavDropdown, NavBaseItem
 class NavItemsHolder:
     def __init__(self, nav_items: Union[List[NavBaseItem], type(None)] = None):
         if nav_items is None:
-            self.nav_items = []
+            self._nav_items = []
         else:
-            self.nav_items = nav_items
+            self._nav_items = nav_items
 
-        self.active = None
+        self._active_item = None
 
     def __iter__(self):
         for item in self.nav_items:
             yield item
 
+    @property
+    def active_item(self):
+        return self._active_item
+
+    @active_item.setter
+    def active_item(self, value):
+        self._active_item = value
+
+    @property
+    def nav_items(self):
+        return self._nav_items
+
     def add_item(self, nav_item: NavFirstLevelItem):
         self.nav_items.append(nav_item)
         if nav_item.active:
-            self.active = nav_item
+            self._active_item = nav_item
 
     def to_html(self):
         dropdown_count = 0
@@ -40,10 +52,10 @@ class NavItemsHolder:
         return s
 
     def to_bread(self):
-        if self.active is not None:
+        if self.active_item is not None:
             s = '<ol class="breadcrumb">'
             lst = []
-            for node in self.active:
+            for node in self.active_item:
                 lst.append(node.to_bread())
             s += "".join(reversed(lst))
             s += '</ol>'

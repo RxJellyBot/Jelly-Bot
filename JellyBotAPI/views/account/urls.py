@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 
 from JellyBotAPI.views.account import AccountMainPageView
 
 
 urlpatterns = [
-    url(r'', AccountMainPageView.as_view(), name="account.main")
+    path('', AccountMainPageView.as_view(), name="account.main")
 ]

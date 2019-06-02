@@ -22,6 +22,9 @@ class AutoReplyConnectionManager(BaseCollection):
     def add(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
             platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyConnectionAddResult:
+
+        # TODO: Permission - Check if the user have the permission if pinned is true
+
         entry, ar_insert_outcome, ex, insert_result = \
             self.insert_one_data(
                 AutoReplyConnectionModel,

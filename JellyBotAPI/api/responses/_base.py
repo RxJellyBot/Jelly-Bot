@@ -1,9 +1,15 @@
 import abc
 
+from django.http import QueryDict
+
 from JellyBotAPI.api.static import result
 
 
 class BaseApiResponse:
+    @abc.abstractmethod
+    def __init__(self, param_dict: QueryDict):
+        raise NotImplementedError()
+
     @abc.abstractmethod
     def is_success(self) -> bool:
         raise NotImplementedError()

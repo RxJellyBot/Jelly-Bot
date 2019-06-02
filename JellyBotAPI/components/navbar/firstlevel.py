@@ -4,9 +4,21 @@ from ._base import NavBaseItem
 class NavFirstLevelItem(NavBaseItem):
     def __init__(self, label, active=False, parent=None, link=None):
         super().__init__(parent)
-        self.label = label
-        self.active = active
-        self.link = link
+        self._label = label
+        self._active = active
+        self._link = link
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def active(self):
+        return self._active
+
+    @property
+    def link(self):
+        return self._link
 
     def active_cls_str(self):
         return "active" if self.active else ""

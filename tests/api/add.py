@@ -43,7 +43,7 @@ class TestAddAutoReply(TestCase):
         self.assertTrue(result[r.SUCCESS])
         return result
 
-    def _test_add(self):
+    def test_add(self):
         result = self._add_("abc", "mno", "channel1", "user1", 1, "All New")
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
         self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_INSERTED)
@@ -60,7 +60,7 @@ class TestAddAutoReply(TestCase):
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
         self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_INSERTED)
 
-    def _test_lack_of_parameter(self):
+    def test_lack_of_parameter(self):
         response = c.post("/api/ar/add", {p.AutoReply.KEYWORD: "xx"})
 
         self.assertEqual(200, response.status_code)

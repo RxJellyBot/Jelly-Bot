@@ -8,7 +8,7 @@ nav {
 }
 
 body {
-    font-family: "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
+    font-family: "Segoe UI", "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
     font-size: 1rem;
     padding-top: var(--nav-height);
 }

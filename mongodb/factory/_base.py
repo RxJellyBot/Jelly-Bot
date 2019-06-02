@@ -68,11 +68,11 @@ class BaseCollection(Collection):
         else:
             return ret
 
-    def insert_one_data(self, model_cls, **model_args) -> tuple:
+    def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) -> tuple:
         """
 
         :param model_cls: The class for the data to be sealed.
-        :type model_cls: Type[Model]
+        :type model_cls:
         :param model_args: The arguments for the `Model` construction.
         :return: model (Model), outcome (InsertOutcome), ex(Exception or None), insert_result (InsertOneResult)
         """

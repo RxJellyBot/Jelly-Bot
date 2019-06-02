@@ -14,6 +14,7 @@ from ._base import BaseApiResponse
 
 class AutoReplyAddBaseResponse(BaseApiResponse):
     def __init__(self, param_dict: QueryDict):
+        super().__init__(param_dict)
         self._param_dict = {
             param.AutoReply.KEYWORD: param_dict.get(param.AutoReply.KEYWORD),
             param.AutoReply.KEYWORD_TYPE: param_dict.get(param.AutoReply.KEYWORD_TYPE),

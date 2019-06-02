@@ -16,7 +16,8 @@ class AutoReplyContentManager(BaseCollection):
                           name="Auto Reply Content Identity", unique=True)
 
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(AutoReplyContentModel, content=content, type=type_)
+        entry, outcome, ex, insert_result = self.insert_one_data(AutoReplyContentModel,
+                                                                 content=content.upper(), type=type_)
 
         if InsertOutcome.is_inserted(outcome):
             self.set_cache(AutoReplyContentModel.Content, (entry.content.value, entry.type.value), entry)
