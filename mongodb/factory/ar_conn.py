@@ -19,8 +19,8 @@ class AutoReplyConnectionManager(BaseCollection):
         self.create_index([(AutoReplyConnectionModel.KeywordID, 1), (AutoReplyConnectionModel.ResponsesIDs, 1)],
                           name="Auto Reply Connection Identity", unique=True)
 
-    def add(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
-            platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
+    def add_on_site(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
+                    platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyConnectionAddResult:
 
         # TODO: Permission - Check if the user have the permission if pinned is true

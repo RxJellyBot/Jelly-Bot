@@ -4,6 +4,7 @@ from django.template import Template, RequestContext
 
 from JellyBotAPI import keys
 from JellyBotAPI.views.nav import construct_nav
+from JellyBotAPI.api.static import result, param
 
 
 def render_template(request, template_name, context=None, content_type=None, status=None, using=None) -> HttpResponse:
@@ -14,6 +15,8 @@ def render_template(request, template_name, context=None, content_type=None, sta
     nav = construct_nav(request)
     context["nav_bar_html"] = nav.to_html()
     context["nav_bread"] = nav.to_bread()
+    context["static_keys_result"] = result
+    context["static_keys_param"] = param
 
     # Append necessary backend vars
     # TODO: Permission: Construct an array and import here for unlocking elements

@@ -8,12 +8,19 @@ from JellyBotAPI.api.static import result
 class BaseApiResponse:
     @abc.abstractmethod
     def __init__(self, param_dict: QueryDict):
-        raise NotImplementedError()
+        self.__param_dict = param_dict
+
+        self._err = dict()
+        self._data = dict()
+        self._flag = dict()
+        self._info = list()
+        self._result = None
 
     @abc.abstractmethod
     def is_success(self) -> bool:
-        raise NotImplementedError()
+        return len(self._err) == 0
 
+    # noinspection PyMethodMayBeStatic
     def _serialize_(self) -> dict:
         return dict()
 
@@ -21,8 +28,15 @@ class BaseApiResponse:
     def pre_process(self):
         pass
 
+    @abc.abstractmethod
+    def process_ifnoerror(self):
+        pass
+
     def to_dict(self) -> dict:
         self.pre_process()
+        if len(self._err) == 0:
+            self.process_ifnoerror()
+
         d = self._serialize_()
         d.update(**self.serialize_success())
         d.update(**self.serialize_failed())
@@ -41,3 +55,6 @@ class BaseApiResponse:
     # noinspection PyMethodMayBeStatic
     def serialize_extra(self) -> dict:
         return dict()
+
+    def param_dict(self) -> dict:
+        return self.__param_dict

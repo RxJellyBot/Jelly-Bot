@@ -6,7 +6,7 @@ from flags import APIAction
 
 
 class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    response_class = ChannelDataQueryResponse
+    get_response_class = ChannelDataQueryResponse
 
     def get_api_action(self):
         return APIAction.DATA_CHANNEL

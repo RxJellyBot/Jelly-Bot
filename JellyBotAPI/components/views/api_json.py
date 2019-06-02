@@ -9,37 +9,34 @@ from extutils.serializer import JellyBotAPISerializer
 
 class APIJsonResponseView(View):
     @property
-    def get_response_class(self) -> type:
-        return type(None)
+    def get_response_specified(self) -> bool:
+        return hasattr(self.__class__, "get_response_class")
 
     @property
-    def post_response_class(self) -> type:
-        return type(None)
+    def post_response_specified(self) -> bool:
+        return hasattr(self.__class__, "post_response_class")
 
-    # noinspection PyTypeChecker
     @property
     def allowed_response_classes(self) -> list:
         lst = []
-        if not issubclass(self.__class__.get_response_class, type(None)):
+        if self.get_response_specified:
             lst.append("GET")
 
-        if not issubclass(self.__class__.post_response_class, type(None)):
+        if self.post_response_specified:
             lst.append("POST")
 
         return lst
 
-    # noinspection PyCallingNonCallable, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        if issubclass(self.__class__.get_response_class, type(None)):
+        if not self.get_response_specified:
             return HttpResponseNotAllowed(self.allowed_response_classes)
         else:
             response_api = self.__class__.get_response_class(request.GET)
 
             return self.process_api_response(request, response_api, *args, **kwargs)
 
-    # noinspection PyCallingNonCallable, PyTypeChecker
     def post(self, request, *args, **kwargs):
-        if issubclass(self.__class__.post_response_class, type(None)):
+        if not self.post_response_specified:
             return HttpResponseNotAllowed(self.allowed_response_classes)
         else:
             response_api = self.__class__.post_response_class(request.POST)

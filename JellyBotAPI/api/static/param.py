@@ -1,3 +1,6 @@
+LOCAL_REFER = "lr"
+
+
 class _Common:
     CHANNEL_TOKEN = "c"
     USER_TOKEN = "u"

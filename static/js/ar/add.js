@@ -10,22 +10,34 @@ $(document).ready(function () {
     initLayout();
 });
 
+function initLayout() {
+    $("#respGroup1").removeClass("d-none");
+}
+
 // FIXME: Ajax get post result and display the feedback.
-// FIXME: Submit displayed value only
-// FIXME: If focus on submit btn and hit enter, the form will be submitted twice
 
 let responseCount = 1;
+let regId = "arToken";
 
 function initEvents() {
-    formSubmitHandle();
     propertySetting();
     responsesManaging();
     initTextArea();
     initRegSelection();
+    formSubmitHandle();
 }
 
-function initLayout() {
-    $("#respGroup1").removeClass("d-none");
+function regPanelSwitch() {
+    $("[data-btn-id]").addClass("d-none");
+    $("[data-btn-id=" + regId + "]").removeClass("d-none");
+}
+
+function regSubmitBtnControl() {
+    if (regId === "arChannel") {
+        checkChannelInfo();
+    } else {
+        $(".arSubmit").prop("disabled", false);
+    }
 }
 
 function propertySetting() {
@@ -91,27 +103,14 @@ function initTextArea() {
 
 function initRegSelection() {
     $("label.arRegister").change(function () {
-        let id = $(this).attr("id");
+        regId = $(this).attr("id");
 
-        regPanelSwitch(id);
-        regSubmitBtnControl(id);
+        regPanelSwitch();
+        regSubmitBtnControl();
     });
     $("#arChannelCheck").click(function () {
         checkChannelInfo();
     })
-}
-
-function regPanelSwitch(id) {
-    $("[data-btn-id]").addClass("d-none");
-    $("[data-btn-id=" + id + "]").removeClass("d-none");
-}
-
-function regSubmitBtnControl(id) {
-    if (id === "arChannel") {
-        checkChannelInfo();
-    } else {
-        $(".arSubmit").prop("disabled", false);
-    }
 }
 
 function formSubmitHandle() {
@@ -122,15 +121,16 @@ function formSubmitHandle() {
             pass = false;
         }
 
-        // TEMP
-        pass = false;
-
         if (!pass) {
             $("#submitFailed").removeClass("d-none").addClass("d-inline");
-            event.preventDefault();
         } else {
-            // FIXME: choose the way to submit
+            if (regId === "arToken" || regId === "arChannel") {
+                submitData(onSubmitCallback);
+            } else {
+                console.error(`The registration method ${regId} is not handled.`);
+            }
         }
+        event.preventDefault(); // Because of Ajax form submission
     })
 }
 
@@ -161,14 +161,18 @@ function checkChannelInfo() {
         let result = outcomeCode > 0;
         $(".arSubmit").prop("disabled", result);
 
-        let elem = $("#arChannelResult");
-        elem.removeClass("oi-check oi-x");
-        if (outcomeCode > 0) {
-            elem.addClass("oi-x");
+        let elem = $("#arChannelID");
+        elem.removeClass("is-valid is-invalid");
+        if (typeof outcomeCode !== "undefined" && outcomeCode < 0) {
+            elem.addClass("is-valid");
         } else {
-            elem.addClass("oi-check");
+            elem.addClass("is-invalid");
         }
     })
+}
+
+function onSubmitCallback(response) {
+    // FIXME: Not Completed
 }
 
 function reverseVal(str) {
