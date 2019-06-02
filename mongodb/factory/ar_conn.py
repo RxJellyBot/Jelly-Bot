@@ -12,7 +12,7 @@ DB_NAME = "ar"
 
 
 class AutoReplyConnectionManager(BaseCollection):
-    # DRAFT: (After Bridging) Cache (KW, CH - Flatten)
+    # DRAFT: AUto Reply - Cache (KW, CH - Flatten)
 
     def __init__(self):
         super().__init__(DB_NAME, "conn", AutoReplyContentModel.Content)

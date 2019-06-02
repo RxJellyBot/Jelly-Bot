@@ -5,7 +5,7 @@ from .exceptions import FieldReadOnly, FieldTypeMismatch, MaxLengthReachedError
 
 
 class ArrayField(BaseField):
-    def __init__(self, key, elem_type: type, arr: Iterable = None, allow_none=False, max_len=5, readonly=False):
+    def __init__(self, key, elem_type: type, arr: Iterable = None, allow_none=False, max_len=0, readonly=False):
         self._elem_type = elem_type
         self._max_len = max_len
         super().__init__(key, arr, allow_none, readonly=readonly)
@@ -25,7 +25,7 @@ class ArrayField(BaseField):
             raise FieldTypeMismatch(type(item), type(self.expected_types), self.key)
 
         if self._value is not None:
-            if len(self._value) > self._max_len:
+            if 0 < self._max_len < len(self._value):
                 raise MaxLengthReachedError(self._max_len)
             else:
                 self._value.append(item)

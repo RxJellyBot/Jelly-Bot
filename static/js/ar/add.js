@@ -8,12 +8,11 @@ $(function () {
 $(document).ready(function () {
     initEvents();
     initLayout();
-}).keypress(function (event) {
-    let keycode = (event.keyCode ? event.keyCode : event.which);
-    if (keycode == '13') {
-        $(".ar").submit();
-    }
 });
+
+// FIXME: Ajax get post result and display the feedback.
+// FIXME: Submit displayed value only
+// FIXME: If focus on submit btn and hit enter, the form will be submitted twice
 
 let responseCount = 1;
 
@@ -23,7 +22,6 @@ function initEvents() {
     responsesManaging();
     initTextArea();
     initRegSelection();
-    submitHandle();
 }
 
 function initLayout() {
@@ -82,7 +80,6 @@ function initTextArea() {
             $(this).find("[data-type=current]" + id).text(currentCount);
             progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
 
-
             if (percentage > 100) {
                 progBar.addClass("bg-danger");
             } else {
@@ -96,24 +93,44 @@ function initRegSelection() {
     $("label.arRegister").change(function () {
         let id = $(this).attr("id");
 
-        $("[data-btn-id]").addClass("d-none");
-        $("[data-btn-id=" + id + "]").removeClass("d-none");
+        regPanelSwitch(id);
+        regSubmitBtnControl(id);
     });
+    $("#arChannelCheck").click(function () {
+        checkChannelInfo();
+    })
 }
 
-function submitHandle() {
-    $(".arSubmit").click(function () {
-        $(".ar").submit();
-    })
+function regPanelSwitch(id) {
+    $("[data-btn-id]").addClass("d-none");
+    $("[data-btn-id=" + id + "]").removeClass("d-none");
+}
+
+function regSubmitBtnControl(id) {
+    if (id === "arChannel") {
+        checkChannelInfo();
+    } else {
+        $(".arSubmit").prop("disabled", false);
+    }
 }
 
 function formSubmitHandle() {
     $(".ar").submit(function (event) {
+        let pass = true;
+
         if (!validateForm()) {
-            event.preventDefault();
+            pass = false;
         }
 
-        // FIXME: Get submit method
+        // TEMP
+        pass = false;
+
+        if (!pass) {
+            $("#submitFailed").removeClass("d-none").addClass("d-inline");
+            event.preventDefault();
+        } else {
+            // FIXME: choose the way to submit
+        }
     })
 }
 
@@ -121,30 +138,37 @@ function validateForm() {
     let ret = true;
 
     // Validate content lengths
-    $(".txtarea-count:not(.d-none)").each(function () {
+    $(".content-check:not(.d-none)").each(function () {
         let txtArea = $(this).find("textarea");
         let ctLen = txtArea.val().length;
         let maxLen = parseFloat($(this).find("[data-type=progress][data-count=" + txtArea.attr("id") + "]").attr("aria-valuemax"));
 
-        if (maxLen < ctLen) {
+        if (maxLen < ctLen || ctLen === 0) {
             let elem = $(this).find(".tooltip-hide[data-toggle=tooltip]");
             elem.tooltip('enable').tooltip('show').tooltip('disable');
             ret = false;
         }
     });
 
-    // Validate Channel
-    // TODO: Add form - Validate Channel (js)
+    return ret;
+}
 
-    let xhr = new XMLHttpRequest();
+function checkChannelInfo() {
+    let arPlatVal = $("#arPlatform option:selected").val();
+    let arChannelID = $("#arChannelID").val();
 
+    checkChannelExistence(arPlatVal, arChannelID, function (outcomeCode) {
+        let result = outcomeCode > 0;
+        $(".arSubmit").prop("disabled", result);
 
-    // FIXME: Validate Form - All Valid will returns True
-    //
-
-
-    return false;
-    // TEMP: return ret;
+        let elem = $("#arChannelResult");
+        elem.removeClass("oi-check oi-x");
+        if (outcomeCode > 0) {
+            elem.addClass("oi-x");
+        } else {
+            elem.addClass("oi-check");
+        }
+    })
 }
 
 function reverseVal(str) {

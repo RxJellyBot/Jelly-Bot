@@ -9,11 +9,13 @@ class ChannelModel(Model):
 
     def _init_fields_(self, **kwargs):
         self.platform = PlatformField(ChannelModel.Platform)
-        self.token = TextField(ChannelModel.Token)
+        self.token = TextField(ChannelModel.Token, must_have_content=True)
         self.manager_oids = ArrayField(ChannelModel.ManagerRelationshipIDs, int)
 
 
 class ChannelManagerRelationshipModel(Model):
+    # TODO: Permission - PermissionLevel -> Permission config data Model?
+
     ChannelID = "c"
     UserID = "u"
     PermissionLevel = "p"

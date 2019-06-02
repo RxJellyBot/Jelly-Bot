@@ -17,10 +17,10 @@ class APIStatisticsManager(BaseCollection):
                           expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 
     def record_stats(self, api_action: APIAction, parameter: dict, response: dict, success: bool,
-                     path_info: str, path_info_full: str):
+                     org_param: dict, path_info: str, path_info_full: str):
         entry, outcome, ex, insert_result = self.insert_one_data(
             APIStatisticModel, api_action=api_action, parameter=parameter, response=response, success=success,
-            timestamp=datetime.now(), path_info=path_info, path_info_full=path_info_full)
+            timestamp=datetime.now(), path_info=path_info, path_info_full=path_info_full, org_param=org_param)
 
         return RecordAPIStatisticsResult(outcome, entry, ex)
 

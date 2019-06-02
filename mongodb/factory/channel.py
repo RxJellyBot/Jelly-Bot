@@ -2,7 +2,7 @@ from typing import Optional
 
 from flags import Platform
 from models import ChannelModel
-from mongodb.factory.results import InsertOutcome, ChannelRegistrationResult
+from mongodb.factory.results import InsertOutcome, GetOutcome, ChannelRegistrationResult, ChannelGetResult
 
 from ._base import BaseCollection
 
@@ -28,6 +28,22 @@ class ChannelManager(BaseCollection):
     def get_channel(self, platform: Platform, token: str) -> Optional[ChannelModel]:
         return self.get_cache(ChannelModel.Token, (platform, token), parse_cls=ChannelModel,
                               acquire_args=({ChannelModel.Token: token, ChannelModel.Platform: platform},))
+
+    def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
+        """
+        Insertion attempt not implemented.
+        """
+        if not isinstance(platform, Platform):
+            platform = Platform(platform)
+
+        model = self.get_channel(platform, token)
+
+        if model is not None:
+            outcome = GetOutcome.SUCCESS_CACHE_DB
+        else:
+            outcome = GetOutcome.FAILED_NOT_FOUND_ABORTED_INSERT
+
+        return ChannelGetResult(outcome, model)
 
 
 _inst = ChannelManager()

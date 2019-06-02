@@ -17,7 +17,7 @@ class AutoReplyContentManager(BaseCollection):
 
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
         entry, outcome, ex, insert_result = self.insert_one_data(AutoReplyContentModel,
-                                                                 content=content.upper(), type=type_)
+                                                                 content=content, type=type_)
 
         if InsertOutcome.is_inserted(outcome):
             self.set_cache(AutoReplyContentModel.Content, (entry.content.value, entry.type.value), entry)
@@ -28,7 +28,7 @@ class AutoReplyContentManager(BaseCollection):
         return self.get_cache(AutoReplyContentModel.Content, (content, type_),
                               acquire_args=({AutoReplyContentModel.Content: content,
                                              AutoReplyContentModel.ContentType: type_},),
-                              parse_cls=AutoReplyContentModel, acquire_auto=True)
+                              parse_cls=AutoReplyContentModel)
 
     def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True) \
             -> AutoReplyContentGetResult:

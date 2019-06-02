@@ -11,7 +11,8 @@ class TokenActionModel(Model):
     TOKEN_LENGTH = 10
 
     def _init_fields_(self, **kwargs):
-        self.token = TextField(TokenActionModel.Token, regex=fr"\w{{{TokenActionModel.TOKEN_LENGTH}}}")
+        self.token = TextField(TokenActionModel.Token, regex=fr"\w{{{TokenActionModel.TOKEN_LENGTH}}}",
+                               must_have_content=True)
         self.action = TokenActionField(TokenActionModel.ActionType)
         self.timestamp = DateTimeField(TokenActionModel.Timestamp)
         self.data = DictionaryField(TokenActionModel.Data)

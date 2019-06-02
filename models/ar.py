@@ -12,9 +12,11 @@ from .field import (
 class AutoReplyContentModel(Model):
     Content = "c"
     ContentType = "t"
+    CapsList = "cp"
 
     def _init_fields_(self, **kwargs):
-        self.content = TextField(AutoReplyContentModel.Content, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH)
+        self.content = TextField(AutoReplyContentModel.Content, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
+                                 allow_none=False, regex=r"\w+")
         self.type = AutoReplyContentTypeField(AutoReplyContentModel.ContentType)
 
 

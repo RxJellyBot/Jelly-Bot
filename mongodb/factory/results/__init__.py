@@ -5,6 +5,6 @@ from .user import (
     MixedUserRegistrationResult
 )
 from .ar import AutoReplyContentAddResult, AutoReplyConnectionAddResult, AutoReplyContentGetResult
-from .channel import ChannelRegistrationResult
+from .channel import ChannelRegistrationResult, ChannelGetResult
 from .statistics import RecordAPIStatisticsResult
 from .tkact import EnqueueTokenActionResult

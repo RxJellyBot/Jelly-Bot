@@ -6,6 +6,7 @@ class APIStatisticModel(Model):
     Timestamp = "t"
     APIAction = "a"
     Parameter = "p"
+    PathParameter = "pp"
     Response = "r"
     Success = "s"
     PathInfo = "pi"
@@ -15,6 +16,7 @@ class APIStatisticModel(Model):
         self.timestamp = DateTimeField(APIStatisticModel.Timestamp, allow_none=False)
         self.api_action = APIActionTypeField(APIStatisticModel.APIAction, allow_none=False)
         self.parameter = DictionaryField(APIStatisticModel.Parameter, allow_none=True)
+        self.path_parameter = DictionaryField(APIStatisticModel.PathParameter, allow_none=True)
         self.response = DictionaryField(APIStatisticModel.Response, allow_none=True)
         self.success = BooleanField(APIStatisticModel.Success, allow_none=True)
         self.path_info = TextField(APIStatisticModel.PathInfo, allow_none=False)

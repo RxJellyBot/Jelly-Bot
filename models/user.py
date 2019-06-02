@@ -30,7 +30,7 @@ class APIUserModel(Model):
 
     def _init_fields_(self, **kwargs):
         self.email = TextField(APIUserModel.Email, regex=r"^\w+@\w+", allow_none=False)
-        self.gid_id = TextField(APIUserModel.GoogleUniqueID, allow_none=False)
+        self.gid_id = TextField(APIUserModel.GoogleUniqueID, regex=r"\w+", allow_none=False, must_have_content=True)
         self.token = TextField(APIUserModel.APIToken,
                                regex=rf"^\w{{{APIUserModel.API_TOKEN_LENGTH}}}", allow_none=False)
 

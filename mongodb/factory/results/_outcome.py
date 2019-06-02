@@ -143,5 +143,8 @@ class GetOutcome(BaseOutcome):
     FAILED_NOT_FOUND_ATTEMPTED_INSERT = \
         1201, _("FAIL - Not Found, Attempted Insertion"), \
         _("The data was not found and the system has attempted to insert a new data but failed.")
+    FAILED_NOT_FOUND_ABORTED_INSERT = \
+        1202, _("FAIL - Not Found, Aborted Insertion"), \
+        _("The data was not found and the system did not attempt to insert a new data.")
     FAILED_NOT_EXECUTED = 1901, _("FAIL - Not Executed"), \
         _("The acquiring process had not been executed.")

@@ -44,15 +44,15 @@ class TestAddAutoReply(TestCase):
         return result
 
     def test_add(self):
-        result = self._add_("abc", "mno", "channel1", "user1", 1, "All New")
+        result = self._add_("ABC", "mno", "channel1", "user1", 1, "All New")
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
         self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_INSERTED)
 
-        result = self._add_("abc", "mno", "channel1", "user2", 1, "Diff CR")
+        result = self._add_("ABC", "mno", "channel1", "user2", 1, "Diff CR")
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
         self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
 
-        result = self._add_("abc", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
+        result = self._add_("ABC", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
         self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
 

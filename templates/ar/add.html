@@ -15,12 +15,12 @@
                     <div class="card border-primary mb-3">
                         <div class="card-header text-center">{% trans "Main Settings" %}</div>
                         <div class="card-body text-primary">
-                            <div class="form-group">
+                            <div class="form-group content-check">
 
                                 <h5 class="card-title">{% trans "Keyword" %}</h5>
                                 <label class="sr-only" for="arKeyword">{% trans "Keyword" %}</label>
                                 <p class="card-text">
-                                    <small>{% trans "The word to trigger the Auto-Reply module." %}</small>
+                                    <small>{% trans "The word to trigger the Auto-Reply module. Note that this is case-sensitive." %}</small>
                                 </p>
 
                                 <div class="txtarea-count">
@@ -34,15 +34,16 @@
                                     <div class="form-group row mt-1">
                                         <div class="col">
                                             <small>
-                                                <select id="arPlatform" class="form-control form-control-sm">
+                                                <select id="arKeywordType" class="form-control form-control-sm">
                                                     {% for cttype in contenttype_list %}
                                                         <option value="{{ cttype.code }}">{{ cttype.key }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </small>
                                         </div>
-                                        <div class="col text-right tooltip-hide" data-toggle="tooltip" data-placement="top"
-                                 title="{% trans "The length of the content too long." %}">
+                                        <div class="col text-right tooltip-hide" data-toggle="tooltip"
+                                             data-placement="top"
+                                             title="{% trans "The length of the content is invalid." %}">
                                             <small><span data-type="current"
                                                          data-count="arKeyword"></span>/{{ max_length }}
                                             </small>
@@ -54,7 +55,7 @@
                             <b class="d-none" id="respProp" data-max="{{ max_responses }}"></b>
 
                             {% for i in ""|ljust:max_responses %}
-                                <div class="form-group d-none" id="respGroup{{ forloop.counter }}">
+                                <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
 
                                     <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
                                     <label class="sr-only"
@@ -65,7 +66,7 @@
 
                                     <div class="txtarea-count">
                                         <textarea class="form-control" name="arReply" id="arReply{{ forloop.counter }}"
-                                              required></textarea>
+                                                  required></textarea>
                                         <div class="progress" style="height: 3px;">
                                             <div class="progress-bar" role="progressbar" aria-valuenow="0"
                                                  aria-valuemin="0" data-type="progress"
@@ -76,16 +77,19 @@
                                         <div class="form-group row mt-1">
                                             <div class="col">
                                                 <small>
-                                                    <select id="arPlatform" class="form-control form-control-sm">
+                                                    <select id="arReplyType{{ forloop.counter }}"
+                                                            class="form-control form-control-sm">
                                                         {% for cttype in contenttype_list %}
                                                             <option value="{{ cttype.code }}">{{ cttype.key }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </small>
                                             </div>
-                                            <div class="col text-right tooltip-hide" data-toggle="tooltip" data-placement="top"
-                                 title="{% trans "The length of the content too long." %}"">
-                                                <small><span data-type="current" data-count="arReply{{ forloop.counter }}"></span>/{{ max_length }}
+                                            <div class="col text-right tooltip-hide" data-toggle="tooltip"
+                                                 data-placement="top"
+                                                 title="{% trans "The length of the content is invalid." %}">
+                                                <small><span data-type="current"
+                                                             data-count="arReply{{ forloop.counter }}"></span>/{{ max_length }}
                                                 </small>
                                             </div>
                                         </div>
@@ -211,10 +215,21 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="arChannelID" class="sr-only">{% trans "Channel Token" %}</label>
                                         <div class="col">
+                                            <label for="arChannelID" class="sr-only">{% trans "Channel Token" %}</label>
                                             <input type="text" class="form-control" id="arChannelID"
                                                    placeholder="Input the Channel Token">
+                                        </div>
+                                    </div>
+                                    <div class="row text-right">
+                                        <div class="col align-self-end">
+                                            <span class="oi" id="arChannelResult"></span>
+                                        </div>
+                                        <div class="col align-self-end">
+                                            <button type="button"
+                                                    class="btn bg-light btn-outline-warning ml-2 text-dark"
+                                                    id="arChannelCheck">
+                                                <span style="font-family: monospace;">Check</span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -227,12 +242,42 @@
             <hr>
 
             <div class="text-right">
-                <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
+                <div class="col text-danger d-none" id="submitFailed">Recheck your inputs.</div>
+                <div class="col d-inline">
+                    <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
+                </div>
             </div>
         </form>
     </div>
 {% endblock %}
 
 {% block ex-script %}
+    <script type="text/javascript">
+        function checkChannelExistence(platVal, channel, fnOnLoad) {
+            let key = "{{ static_keys_result.RESULT }}.{{ static_keys_result.Results.OUTCOME }}";
+            let url = `{% url "api.id.channel" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}`;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.responseType = "json";
+            xhr.onload = function () {
+                fnOnLoad(xhr.response
+            .{{ static_keys_result.RESULT }}.{{ static_keys_result.Results.OUTCOME }})
+                ;
+            };
+            xhr.send();
+            {#xhr.send();#}
+            {##}
+            {#const response = fetch(url);#}
+            {#const json = response.json();#}
+            {##}
+            {#console.log("get json");#}
+            {#console.log(json);#}
+            {##}
+            {#let outcome = json[key];#}
+            {##}
+            {#return outcome < 0;#}
+        }
+    </script>
     <script src="{% static "js/ar/add.js" %}" type="text/javascript"></script>
 {% endblock %}
