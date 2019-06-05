@@ -33,7 +33,7 @@ class AutoReplyContentManager(BaseCollection):
     def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True) \
             -> AutoReplyContentGetResult:
         if not isinstance(type_, AutoReplyContentType):
-            type_ = AutoReplyContentType(type_)
+            type_ = AutoReplyContentType(int(type_))
 
         ret_entry = self._spec_get_cache_(content, type_)
         add_result = None

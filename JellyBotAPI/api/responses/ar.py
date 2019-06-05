@@ -5,7 +5,7 @@ from django.http import QueryDict
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from extutils import cast_keep_none
-from flags import AutoReplyContentType, TokenAction
+from flags import AutoReplyContentType, TokenAction, Platform
 from models import AutoReplyConnectionModel
 from mongodb.factory import (
     GetOutcome, InsertOutcome,
@@ -24,10 +24,9 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
             param.AutoReply.RESPONSE: param_dict.getlist(param.AutoReply.RESPONSE),
             param.AutoReply.RESPONSE_TYPE: param_dict.getlist(param.AutoReply.RESPONSE_TYPE),
             param.AutoReply.CREATOR_TOKEN: param_dict.get(param.AutoReply.CREATOR_TOKEN),
-            param.AutoReply.PLATFORM: cast_keep_none(param_dict.get(param.AutoReply.PLATFORM), bool),
             param.AutoReply.PRIVATE: cast_keep_none(param_dict.get(param.AutoReply.PRIVATE), bool),
             param.AutoReply.PINNED: cast_keep_none(param_dict.get(param.AutoReply.PINNED), bool),
-            param.AutoReply.COOLDOWN: param_dict.get(param.AutoReply.COOLDOWN, 0),
+            param.AutoReply.COOLDOWN: int(param_dict.get(param.AutoReply.COOLDOWN, 0)),
         }
 
         self._keyword = self._param_dict[param.AutoReply.KEYWORD]
@@ -35,10 +34,10 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         self._responses = self._param_dict[param.AutoReply.RESPONSE]
         self._response_types = self._param_dict[param.AutoReply.RESPONSE_TYPE]
         self._creator_token = self._param_dict[param.AutoReply.CREATOR_TOKEN]
-        self._platform = self._param_dict[param.AutoReply.PLATFORM]
         self._private = self._param_dict[param.AutoReply.PRIVATE]
         self._pinned = self._param_dict[param.AutoReply.PINNED]
         self._cooldown = self._param_dict[param.AutoReply.COOLDOWN]
+        self._is_local = bool(param_dict.get(param.LOCAL_REFER, False))
 
     def _handle_keyword(self):
         k = result.AutoReplyResponse.KEYWORD
@@ -81,20 +80,18 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         else:
             self._data[k] = resp_list
 
+    def get_user_model(self):
+        raise NotImplementedError()
+
     def _handle_creator_oid(self):
         k = result.AutoReplyResponse.CREATOR_OID
-        r = MixedUserManager.register_onplat(self._platform, self._creator_token)
+
+        r = self.get_user_model()
+
         if GetOutcome.is_success(r.outcome):
             self._data[k] = r.model.id.value
         else:
             self._err[k] = r.serialize()
-
-    def _handle_platform(self):
-        k = result.AutoReplyResponse.PLATFORM
-        if self._platform is None:
-            self._err[k] = None
-        else:
-            self._flag[k] = self._platform
 
     def _handle_pinned(self):
         k = result.AutoReplyResponse.PINNED
@@ -109,7 +106,6 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         self._flag[k] = self._cooldown
 
     def pre_process(self):
-        self._handle_platform()
         self._handle_keyword()
         self._handle_responses()
         self._handle_creator_oid()
@@ -130,8 +126,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         try:
             return super().is_success() and \
                    InsertOutcome.is_success(self._result.outcome) and \
-                   (self._creator_token is not None) and \
-                   (self._platform is not None)
+                   (self._creator_token is not None)
         except AttributeError:
             return False
 
@@ -144,8 +139,23 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
     def __init__(self, param_dict: QueryDict):
         super().__init__(param_dict)
         self._param_dict[param.AutoReply.CHANNEL_TOKEN] = param_dict.get(param.AutoReply.CHANNEL_TOKEN)
+        self._param_dict[param.AutoReply.PLATFORM] = param_dict.get(param.AutoReply.PLATFORM)
 
         self._channel_token = self._param_dict[param.AutoReply.CHANNEL_TOKEN]
+        self._platform = self._param_dict[param.AutoReply.PLATFORM]
+
+    def get_user_model(self):
+        if self._is_local:
+            return MixedUserManager.get_user_data_api_token(self._creator_token)
+        else:
+            return MixedUserManager.register_onplat(self._platform, self._creator_token)
+
+    def _handle_platform(self):
+        k = result.AutoReplyResponse.PLATFORM
+        if self._platform is None:
+            self._err[k] = None
+        else:
+            self._flag[k] = int(self._platform)
 
     def _handle_channel(self):
         k = result.AutoReplyResponse.CHANNEL
@@ -158,9 +168,10 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
         super().pre_process()
 
         self._handle_channel()
+        self._handle_platform()
 
     def process_ifnoerror(self):
-        self._result = AutoReplyConnectionManager.add_on_site(
+        self._result = AutoReplyConnectionManager.add_conn(
             self._data[result.AutoReplyResponse.KEYWORD],
             self._data[result.AutoReplyResponse.RESPONSES],
             self._data[result.AutoReplyResponse.CREATOR_OID],
@@ -171,10 +182,15 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
             self._flag[result.AutoReplyResponse.COOLDOWN_SEC])
 
     def is_success(self) -> bool:
-        return super().is_success() and (self._channel_token is not None)
+        return super().is_success() and \
+               (self._channel_token is not None) and \
+               (self._platform is not None)
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
+    def get_user_model(self):
+        return MixedUserManager.get_user_data_api_token(self._creator_token)
+
     def process_ifnoerror(self):
         self._result = TokenActionManager.enqueue_action_ar_add(
             TokenAction.AR_ADD, AutoReplyConnectionModel,

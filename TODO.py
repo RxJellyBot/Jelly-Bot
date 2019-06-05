@@ -26,5 +26,4 @@
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: Send gmail over django https://medium.com/@_christopher/how-to-send-emails-with-python-django-through-google-smtp-server-for-free-22ea6ea0fb8e
 # INCOMPLETE: Account: Logout on-site
-# FIXME: Auto Reply: Creator logged by API Token
-# FIXME: Auto Reply: Validate data depeneds on Content Type
+# FIXME: Auto Reply: Validate data depend on Content Type

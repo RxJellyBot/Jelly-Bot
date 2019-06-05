@@ -23,5 +23,4 @@ class AutoReplyAddTokenActionView(CsrfExemptMixin, APIStatisticsCollectMixin, Ch
         return APIAction.TOKEN_AR_ADD
 
     def mandatory_keys(self) -> list:
-        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE,
-                param.AutoReply.CREATOR_TOKEN, param.AutoReply.PLATFORM]
+        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE, param.AutoReply.CREATOR_TOKEN]

@@ -42,14 +42,14 @@ class BaseField:
         self.set_value(value)
 
     def set_value(self, value):
-        if not self.is_type_matched(value):
-            raise FieldTypeMismatch(type(value), self.expected_types)
-
-        if not self.is_value_valid(value):
-            raise FieldValueInvalid(value)
-
         if not isinstance(value, (self.desired_type, type(None))):
             value = self.cast_to_desired_type(value)
+
+        if not self.is_type_matched(value):
+            raise FieldTypeMismatch(self._key, type(value), self.expected_types)
+
+        if not self.is_value_valid(value):
+            raise FieldValueInvalid(self._key, value)
 
         self._value = value
 

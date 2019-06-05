@@ -21,7 +21,7 @@ class ChannelManager(BaseCollection):
         if InsertOutcome.is_inserted(outcome):
             self.set_cache(ChannelModel.Token, (platform, token), entry)
         elif InsertOutcome.data_found(outcome):
-            entry = self.get(platform, token)
+            entry = self.get_channel(platform, token)
 
         return ChannelRegistrationResult(outcome, entry, ex)
 

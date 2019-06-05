@@ -14,8 +14,6 @@ function initLayout() {
     $("#respGroup1").removeClass("d-none");
 }
 
-// FIXME: Ajax get post result and display the feedback.
-
 let responseCount = 1;
 let regId = "arToken";
 
@@ -122,13 +120,15 @@ function formSubmitHandle() {
         }
 
         if (!pass) {
-            $("#submitFailed").removeClass("d-none").addClass("d-inline");
+            hideAllSubmitMsg();
+            $("#inputFailed").removeClass("d-none").addClass("d-inline");
         } else {
             if (regId === "arToken" || regId === "arChannel") {
                 submitData(onSubmitCallback);
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
             }
+            $(".arSubmit").prop("disabled", true);
         }
         event.preventDefault(); // Because of Ajax form submission
     })
@@ -147,6 +147,7 @@ function validateForm() {
             let elem = $(this).find(".tooltip-hide[data-toggle=tooltip]");
             elem.tooltip('enable').tooltip('show').tooltip('disable');
             ret = false;
+            $("#arCode").text("-");
         }
     });
 
@@ -171,8 +172,31 @@ function checkChannelInfo() {
     })
 }
 
+function hideAllSubmitMsg() {
+    $("#inputFailed, #submitFailed, #submitSuccess").removeClass("d-inline").addClass("d-none");
+}
+
 function onSubmitCallback(response) {
-    // FIXME: Not Completed
+    $(".arSubmit").prop("disabled", false);
+
+    hideAllSubmitMsg();
+
+    if (response.success) {
+        $("#submitSuccess").removeClass("d-none").addClass("d-inline");
+        displayToken(response);
+
+        resetForm();
+    } else {
+        $("#submitFailed").removeClass("d-none").addClass("d-inline");
+    }
+    console.log(response);
+}
+
+function resetForm() {
+    // CLEAR all <textarea>
+    $(".content-check:not(.d-none)").find("textarea").each(function () {
+        $(this).val("");
+    });
 }
 
 function reverseVal(str) {

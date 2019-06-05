@@ -36,7 +36,7 @@
                                     <div class="form-group row mt-1">
                                         <div class="col">
                                             <small>
-                                                <select id="arKeywordType" class="form-control form-control-sm"
+                                                <select id="arKeywordType" class="form-control form-control-sm ar-type"
                                                         data-postkey="{{ static_keys_param.AutoReply.KEYWORD_TYPE }}">
                                                     {% for cttype in contenttype_list %}
                                                         <option value="{{ cttype.code }}">{{ cttype.key }}</option>
@@ -82,7 +82,7 @@
                                             <div class="col">
                                                 <small>
                                                     <select id="arReplyType{{ forloop.counter }}"
-                                                            class="form-control form-control-sm"
+                                                            class="form-control form-control-sm ar-type"
                                                             data-postkey="{{ static_keys_param.AutoReply.RESPONSE_TYPE }}">
                                                         {% for cttype in contenttype_list %}
                                                             <option value="{{ cttype.code }}">{{ cttype.key }}</option>
@@ -122,7 +122,7 @@
                                 <div class="w-100 card card-body btn btn-outline-success border-success btn-div disabled"
                                      data-input="arPinned">
                                     <input type="hidden" value="0" id="arPinned" name="arPinned"
-                                                            data-postkey="{{ static_keys_param.AutoReply.PINNED }}"/>
+                                           data-postkey="{{ static_keys_param.AutoReply.PINNED }}"/>
                                     <h5 class="card-title">{% trans "Pinned" %}</h5>
                                     <p class="card-text">
                                         <small>{% trans "If the module is pinned, it can only be overwritten by another pinned module." %}</small>
@@ -134,7 +134,7 @@
                                 <div class="w-100 card card-body btn btn-outline-success border-success btn-div"
                                      data-input="arPrivate">
                                     <input type="hidden" value="0" id="arPrivate" name="arPrivate"
-                                                            data-postkey="{{ static_keys_param.AutoReply.PRIVATE }}"/>
+                                           data-postkey="{{ static_keys_param.AutoReply.PRIVATE }}"/>
                                     <h5 class="card-title">{% trans "Private" %}</h5>
                                     <p class="card-text">
                                         <small>{% trans "The module can only be used and searched within its channel." %}</small>
@@ -161,7 +161,7 @@
                                             <input type="number" style="height: 1.5rem;"
                                                    class="form-control border-success" id="arCoolDown" value="0"
                                                    name="arCoolDown"
-                                                            data-postkey="{{ static_keys_param.AutoReply.COOL_DOWN }}"
+                                                   data-postkey="{{ static_keys_param.AutoReply.COOLDOWN }}"
                                                    required>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@
                                     </p>
                                     <div class="row">
                                         <div class="col"></div>
-                                        <div class="col-8 bg-light"><h3><code id="arToken"></code></h3></div>
+                                        <div class="col-8 bg-light"><h3><code id="arTokenReturn"></code></h3></div>
                                         <div class="col"></div>
                                     </div>
                                 </div>
@@ -217,7 +217,8 @@
                                         <div class="col">
                                             <select id="arPlatform" class="form-control">
                                                 {% for platform in platform_list %}
-                                                    <option value="{{ platform.code }}">{{ platform.key }}</option>
+                                                    <option value="{{ platform.code }}"
+                                                            data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">{{ platform.key }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -226,7 +227,8 @@
                                         <div class="col">
                                             <label for="arChannelID" class="sr-only">{% trans "Channel Token" %}</label>
                                             <input type="text" class="form-control" id="arChannelID"
-                                                   placeholder="Input the Channel Token">
+                                                   placeholder="Input the Channel Token"
+                                                   data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
                                         </div>
                                     </div>
                                     <div class="row text-right">
@@ -234,7 +236,8 @@
                                             <button type="button"
                                                     class="btn bg-light btn-outline-warning ml-2 text-dark"
                                                     id="arChannelCheck">
-                                                <span style="font-family: monospace;">Check</span></button>
+                                                <span style="font-family: monospace;">{% trans "Check" %}</span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -247,7 +250,14 @@
             <hr>
 
             <div class="text-right">
-                <div class="col text-danger d-none" id="submitFailed">Recheck your inputs.</div>
+                <div class="col text-danger d-none" id="inputFailed">{% trans "Recheck your inputs." %}</div>
+                <div class="col text-success d-none" id="submitSuccess">{% trans "Submission Succeed." %}</div>
+                <!-- INCOMPLETE: Add Form: Add link to Outcome Code explanation -->
+                <div class="col text-danger d-none" id="submitFailed">{% trans "Submission Failed." %}</div>
+                <div class="col d-inline">
+                    <span>{% trans "Code:" %}</span>
+                    <h5 class="d-inline"><code id="arCode">-</code></h5>
+                </div>
                 <div class="col d-inline">
                     <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
                 </div>
@@ -274,22 +284,33 @@
         function collectData() {
             let param = new URLSearchParams();
 
-            $(".txtarea-count:not(d-none)").find("textarea").each(function () {
+            // Attach KEYWORD and RESPONSES
+            $(".content-check:not(.d-none)").find("textarea").each(function () {
+                param.append($(this).data("postkey"), $(this).val());
+            })
+
+            // Attach KEYWORD TYPES and RESPONSE TYPES
+            $(".content-check:not(.d-none) .ar-type").each(function () {
                 param.append($(this).data("postkey"), $(this).val());
             })
 
             if (regId === "arChannel") {
-                $("#arChannelID, #arPlatform option:selected").find(function() {
+                // Attach CHANNEL_TOKEN
+                $("#arChannelID, #arPlatform option:selected").each(function () {
                     param.append($(this).data("postkey"), $(this).val());
                 });
             }
 
-            $("#arPrivate, #arPinned, #arCoolDown").find(function() {
+            // Attach PRIVATE, PIN, COOLDOWN
+            $("#arPrivate, #arPinned, #arCoolDown").each(function () {
                 param.append($(this).data("postkey"), $(this).val());
             })
 
-            // TEMP: Add Form - PENDING
-            {#CREATOR_TOKEN = _Common.USER_TOKEN#}
+            // Attach CREATOR_TOKEN flag
+            param.append("{{ static_keys_param.AutoReply.CREATOR_TOKEN }}", "{{ api_token }}");
+
+            // Attach LOCAL_REFER flag
+            param.append("{{ static_keys_param.LOCAL_REFER }}", "true");
 
             return param;
         }
@@ -305,8 +326,23 @@
             let xhr = new XMLHttpRequest();
             xhr.open("POST", url);
             xhr.responseType = "json";
-            xhr.onload = onLoadCallback(xhr.response);
+            xhr.onload = function () {
+                try {
+                    $("#arCode").text(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"])
+                } catch (error) {
+                    $("#arCode").text("-")
+                }
+
+                onLoadCallback(xhr.response);
+            }
             xhr.send(collectData());
+        }
+
+        function displayToken(response) {
+            if (response.hasOwnProperty("{{ static_keys_result.RESULT }}") &&
+                response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.Results.TOKEN }}")) {
+                $("#arTokenReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.TOKEN }}"]);
+            }
         }
     </script>
     <script src="{% static "js/ar/add.js" %}" type="text/javascript"></script>
