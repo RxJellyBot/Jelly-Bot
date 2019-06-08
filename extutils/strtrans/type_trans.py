@@ -17,7 +17,7 @@ def type_translation(type_: type):
     elif isinstance(type_, AutoReplyContentType):
         return _("Auto Reply Content Type")
     elif isinstance(type_, PermissionCategory):
-        return _("Permission Level")
+        return _("Permission Category")
     elif isinstance(type_, Platform):
         return _("Platform")
     elif isinstance(type_, datetime):
