@@ -10,6 +10,7 @@ from ttldict import TTLOrderedDict
 from extutils.flags import get_codec_options
 
 from models import Model
+from models.exceptions import PreserializationFailedError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid
 from mongodb.factory.results import InsertOutcome
 
@@ -112,6 +113,9 @@ class BaseCollection(Collection):
                 ex = e
             except DuplicateKeyError as e:
                 outcome = InsertOutcome.SUCCESS_DATA_EXISTS
+                ex = e
+            except PreserializationFailedError as e:
+                outcome = InsertOutcome.FAILED_PRE_SERIALIZE_FAILED
                 ex = e
             except Exception as e:
                 outcome = InsertOutcome.FAILED_INSERT_UNKNOWN

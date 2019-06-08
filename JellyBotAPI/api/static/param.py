@@ -7,6 +7,11 @@ class _Common:
     PLATFORM = "p"
 
 
+class Validation:
+    CONTENT = "c"
+    CONTENT_TYPE = "t"
+
+
 class AutoReply:
     KEYWORD = "k"
     KEYWORD_TYPE = "kt"

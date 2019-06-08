@@ -30,7 +30,7 @@ class AutoReplyContentManager(BaseCollection):
                                              AutoReplyContentModel.ContentType: type_},),
                               parse_cls=AutoReplyContentModel)
 
-    def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True) \
+    def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
         if not isinstance(type_, AutoReplyContentType):
             type_ = AutoReplyContentType(int(type_))

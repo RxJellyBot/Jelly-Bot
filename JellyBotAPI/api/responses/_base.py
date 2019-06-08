@@ -5,7 +5,7 @@ from django.http import QueryDict
 from JellyBotAPI.api.static import result
 
 
-class BaseApiResponse:
+class BaseApiResponse(abc.ABC):
     @abc.abstractmethod
     def __init__(self, param_dict: QueryDict):
         self.__param_dict = param_dict
@@ -56,5 +56,6 @@ class BaseApiResponse:
     def serialize_extra(self) -> dict:
         return dict()
 
+    @property
     def param_dict(self) -> dict:
         return self.__param_dict

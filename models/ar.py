@@ -1,8 +1,14 @@
+import urllib.request
+
 from bson import ObjectId
 
 from JellyBotAPI import SystemConfig
+from extutils import LineStickerManager
+from flags import AutoReplyContentType, PreserializationFailedReason
 
 from ._base import Model
+from .exceptions import PreserializationFailedError
+from .validators import AutoReplyValidators
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
     BooleanField, IntegerField, ArrayField, DateTimeField
@@ -12,12 +18,27 @@ from .field import (
 class AutoReplyContentModel(Model):
     Content = "c"
     ContentType = "t"
-    CapsList = "cp"
 
     def _init_fields_(self, **kwargs):
+        self.type = AutoReplyContentTypeField(AutoReplyContentModel.ContentType)
         self.content = TextField(AutoReplyContentModel.Content, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
                                  allow_none=False, regex=r"\w+")
-        self.type = AutoReplyContentTypeField(AutoReplyContentModel.ContentType)
+
+    # noinspection PyAttributeOutsideInit
+    def pre_serialize(self):
+        if self.type is None:
+            self.type = AutoReplyContentType.default()
+
+        if self.content.is_none():
+            raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_EMPTY)
+
+        valid = AutoReplyValidators.is_valid_content(self.type.value, self.content.value)
+
+        if not valid:
+            if self.type == AutoReplyContentType.IMAGE:
+                raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_NOT_IMAGE)
+            elif self.type == AutoReplyContentType.LINE_STICKER:
+                raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_NOT_LINE_STICKER)
 
 
 class AutoReplyConnectionModel(Model):

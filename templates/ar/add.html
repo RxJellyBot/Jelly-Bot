@@ -344,6 +344,21 @@
                 $("#arTokenReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.TOKEN }}"]);
             }
         }
+
+        function validateContent(type, content, fnOnLoad) {
+            let url = `{% url "api.ar.validate" %}?{{ static_keys_param.Validation.CONTENT }}=${content}&{{ static_keys_param.Validation.CONTENT_TYPE }}=${type}`
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.responseType = "json";
+            xhr.onload = function () {
+                let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+                let result = xhr.response.{{ static_keys_result.RESULT }} || false;
+
+                fnOnLoad(success, result);
+            };
+            xhr.send();
+        }
     </script>
     <script src="{% static "js/ar/add.js" %}" type="text/javascript"></script>
 {% endblock %}

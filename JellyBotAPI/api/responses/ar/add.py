@@ -5,14 +5,14 @@ from django.http import QueryDict
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from extutils import cast_keep_none
-from flags import AutoReplyContentType, TokenAction, Platform
+from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyConnectionModel
 from mongodb.factory import (
     GetOutcome, InsertOutcome,
     AutoReplyConnectionManager, AutoReplyContentManager, MixedUserManager, TokenActionManager
 )
 
-from ._base import BaseApiResponse
+from .._base import BaseApiResponse
 
 
 class AutoReplyAddBaseResponse(BaseApiResponse, ABC):

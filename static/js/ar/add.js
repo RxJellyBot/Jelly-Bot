@@ -3,7 +3,7 @@ $(function () {
     $('.tooltip-hide[data-toggle="tooltip"]').tooltip('disable');
 });
 
-// Show tooltips on content type change
+// OPTIMIZE: Dynamically generate input fields using javascript
 
 $(document).ready(function () {
     initEvents();
@@ -18,9 +18,9 @@ let responseCount = 1;
 let regId = "arToken";
 
 function initEvents() {
-    propertySetting();
-    responsesManaging();
-    initTextArea();
+    initProperties();
+    initResponsesSection();
+    initTextAreas();
     initRegSelection();
     formSubmitHandle();
 }
@@ -32,13 +32,13 @@ function regPanelSwitch() {
 
 function regSubmitBtnControl() {
     if (regId === "arChannel") {
-        checkChannelInfo();
+        validateChannelInfo();
     } else {
         $(".arSubmit").prop("disabled", false);
     }
 }
 
-function propertySetting() {
+function initProperties() {
     $(".btn-div").click(function () {
         if (!$(this).hasClass("disabled")) {
             let input_target = $("#" + $(this).data("input"));
@@ -52,7 +52,7 @@ function propertySetting() {
     });
 }
 
-function responsesManaging() {
+function initResponsesSection() {
     $(".arRespBtnAdd").click(function () {
         responseCount++;
 
@@ -75,8 +75,9 @@ function responsesManaging() {
     });
 }
 
-function initTextArea() {
+function initTextAreas() {
     $(".txtarea-count").each(function () {
+        let parent = $(this);
         let txtArea = $(this).find("textarea");
         let id = "[data-count=" + txtArea.attr("id") + "]";
         $(this).init(function () {
@@ -95,7 +96,29 @@ function initTextArea() {
             } else {
                 progBar.removeClass("bg-danger");
             }
+        });
+
+        txtArea.on("keyup change blur", function() {
+            validateTextArea(parent, txtArea);
+        });
+
+        $(this).find(".ar-type").change(function() {
+            validateTextArea(parent, txtArea);
         })
+    })
+}
+
+function validateTextArea(parent, txtArea) {
+    validateContent(parent.find(".ar-type option:selected").val(), txtArea.val(), function (success, result) {
+        hideAllValidClasses(txtArea);
+        let valid = success && result;
+
+        if (valid) {
+            txtArea.addClass("is-valid");
+        } else {
+            txtArea.addClass("is-invalid");
+        }
+        $(".arSubmit").prop("disabled", !valid);
     })
 }
 
@@ -107,7 +130,7 @@ function initRegSelection() {
         regSubmitBtnControl();
     });
     $("#arChannelCheck").click(function () {
-        checkChannelInfo();
+        validateChannelInfo();
     })
 }
 
@@ -154,7 +177,7 @@ function validateForm() {
     return ret;
 }
 
-function checkChannelInfo() {
+function validateChannelInfo() {
     let arPlatVal = $("#arPlatform option:selected").val();
     let arChannelID = $("#arChannelID").val();
 
@@ -174,6 +197,10 @@ function checkChannelInfo() {
 
 function hideAllSubmitMsg() {
     $("#inputFailed, #submitFailed, #submitSuccess").removeClass("d-inline").addClass("d-none");
+}
+
+function hideAllValidClasses(elem) {
+    elem.removeClass("is-invalid is-valid");
 }
 
 function onSubmitCallback(response) {
@@ -197,6 +224,10 @@ function resetForm() {
     $(".content-check:not(.d-none)").find("textarea").each(function () {
         $(this).val("");
     });
+
+    // Hide All
+    hideAllValidClasses();
+    hideAllSubmitMsg();
 }
 
 function reverseVal(str) {

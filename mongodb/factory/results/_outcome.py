@@ -42,6 +42,7 @@ class InsertOutcome(BaseOutcome):
             202 - Not Acknowledged
             203 - Not Found
             204 - Not Entry
+            205 - Preserialize Failed
 
         3xx - Problems related to the field of an model
             301 - Field Readonly
@@ -96,6 +97,9 @@ class InsertOutcome(BaseOutcome):
     FAILED_NOT_MODEL = \
         204, _("FAIL - Not Entry"), \
         _("The processed data is not in the shape of a data model.")
+    FAILED_PRE_SERIALIZE_FAILED = \
+        204, _("FAIL - Pre-serialization Failed"), \
+        _("The pre-serialization process failed.")
     FAILED_READONLY = \
         301, _("FAIL - Readonly"), \
         _("There are some fields that are being attempted to modify are read-only.")

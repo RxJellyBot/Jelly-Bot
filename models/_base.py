@@ -43,6 +43,12 @@ class Model:
         self.id = ObjectIDField(OID_KEY, oid)
 
     def pre_serialize(self):
+        """
+        Raise `PreserializationFailedError` if the process failed.
+
+        :exception: PreserializationFailedError
+        :return: None
+        """
         pass
 
     def serialize(self) -> dict:
