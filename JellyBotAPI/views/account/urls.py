@@ -1,8 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 
-from JellyBotAPI.views.account import AccountMainPageView
+from .main import AccountMainPageView
+from .control import AccountLogoutView
 
 
 urlpatterns = [
-    url(r'', AccountMainPageView.as_view(), name="account.main")
+    path('', AccountMainPageView.as_view(), name='account.main'),
+    path('logout', AccountLogoutView.as_view(), name='account.logout')
 ]

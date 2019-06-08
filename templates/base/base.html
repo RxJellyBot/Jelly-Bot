@@ -13,11 +13,14 @@
     <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}">
     <link rel="shortcut icon" href="{% static "favicon.ico" %}">
 
-    <title>{{ title|default:"?" }} | {% trans "Jelly Bot" %}</title>
+    <title>{{ title|default:"-" }} | {% trans "Jelly Bot" %}</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
           crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+          integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous"/>
 
     <link rel="stylesheet" href="{% static "css/grid.css" %}">
     <link rel="stylesheet" href="{% static "css/main.css" %}">
@@ -26,11 +29,11 @@
 </head>
 <body>
 {% block navbar %}
-    {% include "base/navbar.html" %}
+    {% include "components/navbar.html" %}
 {% endblock %}
 
 {% block navbread %}
-    {% include "base/navbread.html" %}
+    {% include "components/navbread.html" %}
 {% endblock %}
 
 <main role="main">
@@ -57,9 +60,12 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+
 <script type="text/javascript">
     $(document).ready(function () {
-        $(".{{ enable_if_logged_in }}").removeClass("disabled");
+        {% for cls in unlock_classes %}
+            $(".{{ cls }}").removeClass("disabled d-none").removeAttr("disabled").removeClass("{{ cls }}");
+        {% endfor %}
     });
 </script>
 

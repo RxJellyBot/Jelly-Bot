@@ -11,7 +11,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-6 pd-top">
+            <div class="col-md-6">
                 <div class="card border-primary">
                     <h5 class="card-header text-center text-primary">{% trans "API Key" %}</h5>
                     <div class="card-body">
@@ -30,12 +30,22 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 pd-top">
-                <div class="card border-dark">
+            <div class="col-md-6">
+                <div class="card border-dark mb-3">
                     <h5 class="card-header text-center">{% trans "Google Account" %}</h5>
                     <div class="card-body">
                         <h3 class="card-text text-center">
                             {{ api_user_data.email.value }}
+                        </h3>
+                    </div>
+                </div>
+                <div class="card border-danger pt-1">
+                    <h5 class="card-header text-center text-danger">{% trans "Controls" %}</h5>
+                    <div class="card-body">
+                        <h3 class="card-text text-center">
+                            <a class="btn btn-outline-danger" role="button" href="{% url "account.logout" %}">
+                                {% trans "Logout" %}
+                            </a>
                         </h3>
                     </div>
                 </div>

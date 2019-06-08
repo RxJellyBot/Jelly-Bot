@@ -42,7 +42,17 @@ class Model:
     def set_oid(self, oid: ObjectId):
         self.id = ObjectIDField(OID_KEY, oid)
 
+    def pre_serialize(self):
+        """
+        Raise `PreserializationFailedError` if the process failed.
+
+        :exception: PreserializationFailedError
+        :return: None
+        """
+        pass
+
     def serialize(self) -> dict:
+        self.pre_serialize()
         return {v.key: v.value for v in self.__dict__.values() if v.value}
 
     @classmethod

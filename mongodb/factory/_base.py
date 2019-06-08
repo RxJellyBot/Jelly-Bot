@@ -2,6 +2,7 @@ from typing import Union, List, Tuple, Type
 from bson.errors import InvalidDocument
 
 from django.conf import settings
+from pymongo.collation import Collation
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError
@@ -10,6 +11,7 @@ from ttldict import TTLOrderedDict
 from extutils.flags import get_codec_options
 
 from models import Model
+from models.exceptions import PreserializationFailedError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid
 from mongodb.factory.results import InsertOutcome
 
@@ -39,8 +41,9 @@ class BaseCollection(Collection):
 
         self._cache[cache_key][item_key] = item
 
-    def get_cache(self, cache_key, item_key, acquire_func=None, acquire_args: Tuple = None, acquire_auto=True,
-                  parse_cls=None):
+    def get_cache(self, cache_key, item_key, acquire_func=None, acquire_args: Tuple = None,
+                  acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False):
+        # OPTIMIZE: Local Cache case-insensitive getter
         if acquire_func is None:
             acquire_func = self.find_one
 
@@ -51,10 +54,16 @@ class BaseCollection(Collection):
             if not acquire_auto:
                 return None
 
+            if acquire_kw_args is None:
+                acquire_kw_args = {}
+
+            if case_insensitive:
+                acquire_kw_args["collation"] = Collation(locale='en', strength=1)
+
             if acquire_args is None:
-                data = acquire_func({cache_key: item_key})
+                data = acquire_func({cache_key: item_key}, **acquire_kw_args)
             else:
-                data = acquire_func(*acquire_args)
+                data = acquire_func(*acquire_args, **acquire_kw_args)
 
             if isinstance(data, Cursor):
                 data = list(data)
@@ -68,11 +77,11 @@ class BaseCollection(Collection):
         else:
             return ret
 
-    def insert_one_data(self, model_cls, **model_args) -> tuple:
+    def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) -> tuple:
         """
 
         :param model_cls: The class for the data to be sealed.
-        :type model_cls: Type[Model]
+        :type model_cls:
         :param model_args: The arguments for the `Model` construction.
         :return: model (Model), outcome (InsertOutcome), ex(Exception or None), insert_result (InsertOneResult)
         """
@@ -112,6 +121,9 @@ class BaseCollection(Collection):
                 ex = e
             except DuplicateKeyError as e:
                 outcome = InsertOutcome.SUCCESS_DATA_EXISTS
+                ex = e
+            except PreserializationFailedError as e:
+                outcome = InsertOutcome.FAILED_PRE_SERIALIZE_FAILED
                 ex = e
             except Exception as e:
                 outcome = InsertOutcome.FAILED_INSERT_UNKNOWN

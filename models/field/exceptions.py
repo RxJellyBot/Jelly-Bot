@@ -7,7 +7,7 @@ class FieldReadOnly(Exception):
 
 
 class FieldTypeMismatch(Exception):
-    def __init__(self, got: type, expected: Union[type, Tuple[type]] = None, field_name: str = None):
+    def __init__(self, key: str, got: type, expected: Union[type, Tuple[type]] = None, field_name: str = None):
         self._got_type = got
         self._expected_types = expected
         self._field_name = field_name
@@ -19,7 +19,7 @@ class FieldTypeMismatch(Exception):
         else:
             self._expected_name = " or ".join([t.__name__ for t in expected])
 
-        super().__init__(f"Field type mismatch. "
+        super().__init__(f"Field (Key: {key}) type mismatch. "
                          f"Expected: {self._expected_name}, Got: {got.__name__}")
 
     @property
@@ -36,9 +36,9 @@ class FieldTypeMismatch(Exception):
 
 
 class FieldValueInvalid(Exception):
-    def __init__(self, value):
+    def __init__(self, key, value):
         self._value = value
-        super().__init__(f"Invalid Field Value: {value}")
+        super().__init__(f"Invalid Field (Key: {key}) Value: {value}")
 
     @property
     def value(self) -> type:

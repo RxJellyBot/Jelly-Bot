@@ -1,4 +1,4 @@
-from flags import APIAction, AutoReplyContentType, TokenAction, Platform, PermissionLevel
+from flags import APIAction, AutoReplyContentType, TokenAction, Platform, PermissionCategory
 from .int import FlagField
 
 
@@ -11,7 +11,7 @@ class AutoReplyContentTypeField(FlagField):
 
 
 class PermissionLevelField(FlagField):
-    FLAG_TYPE = PermissionLevel
+    FLAG_TYPE = PermissionCategory
 
 
 class PlatformField(FlagField):

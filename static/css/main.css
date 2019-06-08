@@ -1,6 +1,13 @@
 :root {
     --nav-height: 4rem;
-    font-size: 15px;
+}
+
+a[id].anchor:before {
+  display: block;
+  content: " ";
+  margin-top: calc(var(--nav-height) * -1);
+  height: var(--nav-height);
+  visibility: hidden;
 }
 
 nav {
@@ -8,7 +15,7 @@ nav {
 }
 
 body {
-    font-family: "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
+    font-family: "Segoe UI", "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
     font-size: 1rem;
     padding-top: var(--nav-height);
 }

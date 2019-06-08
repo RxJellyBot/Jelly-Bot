@@ -55,6 +55,7 @@ class FlagCodeMixin(FlagMixin):
     def code(self):
         return self._code
 
+    # noinspection PyUnresolvedReferences
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code}>"
 
@@ -75,6 +76,7 @@ class FlagSingleMixin(FlagCodeMixin):
     def key(self):
         return self._key
 
+    # noinspection PyUnresolvedReferences
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key})>"
 
@@ -92,6 +94,7 @@ class FlagDoubleMixin(FlagSingleMixin):
     def description(self):
         return self._desc
 
+    # noinspection PyUnresolvedReferences
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key}) - {self._desc[:40]}>"
 

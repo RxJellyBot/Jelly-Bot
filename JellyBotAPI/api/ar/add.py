@@ -6,7 +6,7 @@ from flags import APIAction
 
 
 class AutoReplyAddView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    response_class = AutoReplyAddResponse
+    post_response_class = AutoReplyAddResponse
 
     def get_api_action(self):
         return APIAction.AR_ADD
@@ -17,11 +17,10 @@ class AutoReplyAddView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamete
 
 
 class AutoReplyAddTokenActionView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    response_class = AutoReplyAddTokenActionResponse
+    post_response_class = AutoReplyAddTokenActionResponse
 
     def get_api_action(self):
         return APIAction.TOKEN_AR_ADD
 
     def mandatory_keys(self) -> list:
-        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE,
-                param.AutoReply.CREATOR_TOKEN, param.AutoReply.PLATFORM]
+        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE, param.AutoReply.CREATOR_TOKEN]
