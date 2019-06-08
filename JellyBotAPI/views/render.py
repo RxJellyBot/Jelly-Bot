@@ -4,7 +4,7 @@ from django.template import Template, RequestContext
 
 from JellyBotAPI import keys
 from JellyBotAPI.views.nav import construct_nav
-from JellyBotAPI.api.static import result, param
+from JellyBotAPI.api.static import result, param, anchor
 
 
 def render_template(request, template_name, context=None, content_type=None, status=None, using=None) -> HttpResponse:
@@ -17,6 +17,7 @@ def render_template(request, template_name, context=None, content_type=None, sta
     context["nav_bread"] = nav.to_bread()
     context["static_keys_result"] = result
     context["static_keys_param"] = param
+    context["static_keys_anchor"] = anchor
 
     # Append vars
     context["api_token"] = request.COOKIES.get(keys.USER_TOKEN)

@@ -8,7 +8,6 @@ class TokenProcessingView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
     def mandatory_keys(self) -> list:
         return [param.TokenAction.TOKEN]
 
-    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post(self, request, *args, **kwargs):
         # INCOMPLETE: Token: Get token and check required params
 

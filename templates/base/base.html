@@ -13,7 +13,7 @@
     <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}">
     <link rel="shortcut icon" href="{% static "favicon.ico" %}">
 
-    <title>{{ title|default:"?" }} | {% trans "Jelly Bot" %}</title>
+    <title>{{ title|default:"-" }} | {% trans "Jelly Bot" %}</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
@@ -29,11 +29,11 @@
 </head>
 <body>
 {% block navbar %}
-    {% include "base/navbar.html" %}
+    {% include "components/navbar.html" %}
 {% endblock %}
 
 {% block navbread %}
-    {% include "base/navbread.html" %}
+    {% include "components/navbread.html" %}
 {% endblock %}
 
 <main role="main">

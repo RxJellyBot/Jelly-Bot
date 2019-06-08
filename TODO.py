@@ -28,11 +28,9 @@
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: Send gmail over django:
 #  https://medium.com/@_christopher/how-to-send-emails-with-python-django-through-google-smtp-server-for-free-22ea6ea0fb8e
-# INCOMPLETE: Account: Logout on-site
 # TODO: On site - API Key refresh
-# INCOMPLETE: Auto Reply: Case Insensitive Finding https://docs.mongodb.com/manual/core/index-case-insensitive/
-#  find().collation( { locale: 'en', strength: 1 } )
-
+# TODO: Auto Reply - Case Insensitive situation handling (example, ABC and aBc exists at the sametime) in the main intro
+#  page
 # DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)
 # DRAFT: Json API Doc - Add anchor for all parameters
 # DRAFT: Json API Doc - #(item_name)# will redirect to the page of specific thing (Indexing technique not determined)
@@ -46,4 +44,3 @@
 #
 # Results:
 # - AutoReplyContentGetResult
-# -

@@ -11,4 +11,5 @@ urlpatterns = [
     path('about/', AboutView.as_view(), name="page.about"),
     path('account/', include('JellyBotAPI.views.account.urls')),
     path('ar/', include('JellyBotAPI.views.ar.urls')),
+    path('doc/', include('JellyBotAPI.views.doc.urls')),
 ]

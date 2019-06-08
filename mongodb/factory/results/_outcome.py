@@ -138,7 +138,8 @@ class GetOutcome(BaseOutcome):
         return InsertOutcome.FAILED_NOT_EXECUTED
 
     SUCCESS_CACHE_DB = \
-        -2, _("OK - From Cache/DB"), _("The data was found.")
+        -2, _("OK - From Cache/DB"), \
+        _("The data was found.")
     SUCCESS_ADDED = \
         -1, _("OK - Inserted"), \
         _("The data was not found yet the data has been inserted to the database.")
@@ -148,5 +149,6 @@ class GetOutcome(BaseOutcome):
     FAILED_NOT_FOUND_ABORTED_INSERT = \
         1202, _("FAIL - Not Found, Aborted Insertion"), \
         _("The data was not found and the system did not attempt to insert a new data.")
-    FAILED_NOT_EXECUTED = 1901, _("FAIL - Not Executed"), \
+    FAILED_NOT_EXECUTED = \
+        1901, _("FAIL - Not Executed"), \
         _("The acquiring process had not been executed.")

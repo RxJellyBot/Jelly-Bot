@@ -170,7 +170,7 @@ function validateForm() {
             let elem = $(this).find(".tooltip-hide[data-toggle=tooltip]");
             elem.tooltip('enable').tooltip('show').tooltip('disable');
             ret = false;
-            $("#arCode").text("-");
+            updateArCode(null);
         }
     });
 
@@ -226,7 +226,9 @@ function resetForm() {
     });
 
     // Hide All
-    hideAllValidClasses();
+    $(".txtarea-count").each(function () {
+        hideAllValidClasses($(this).find("textarea"));
+    });
     hideAllSubmitMsg();
 }
 
@@ -237,6 +239,17 @@ function reverseVal(str) {
         return "1";
     } else {
         return str;
+    }
+}
+
+function updateArCode(code) {
+    let link = $("#arCodeLink");
+    link.attr("href", link.data("prefix") + code);
+
+    if (code) {
+        $("#arCode").text(code);
+    } else {
+        $("#arCode").text("-");
     }
 }
 

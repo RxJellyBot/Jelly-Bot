@@ -5,11 +5,9 @@
 {% block content %}
     {% csrf_token %}
     <div class="container">
-        <form class="enable-login needs-validation ar" novalidate>
+        <form class="enable-login needs-validation ar d-none" novalidate>
             <div class="row">
                 <div class="col-md-6">
-                    <!-- INCOMPLETE: Add Form: For form validation https://getbootstrap.com/docs/4.3/components/forms/#validation -->
-                    <!-- INCOMPLETE: Add Form: Class "enable-login" works or not? -->
                     <input type="hidden" id="response-count" value="1">
 
                     <div class="card border-primary mb-3">
@@ -36,7 +34,8 @@
                                     <div class="form-group row mt-1">
                                         <div class="col">
                                             <small>
-                                                <label for="arKeywordType" class="sr-only">{% trans "Keyword Type" %}</label>
+                                                <label for="arKeywordType"
+                                                       class="sr-only">{% trans "Keyword Type" %}</label>
                                                 <select id="arKeywordType" class="form-control form-control-sm ar-type"
                                                         data-postkey="{{ static_keys_param.AutoReply.KEYWORD_TYPE }}">
                                                     {% for cttype in contenttype_list %}
@@ -82,7 +81,8 @@
                                         <div class="form-group row mt-1">
                                             <div class="col">
                                                 <small>
-                                                <label for="arReplyType{{ forloop.counter }}" class="sr-only">{% trans "Response Type" %}</label>
+                                                    <label for="arReplyType{{ forloop.counter }}"
+                                                           class="sr-only">{% trans "Response Type" %}</label>
                                                     <select id="arReplyType{{ forloop.counter }}"
                                                             class="form-control form-control-sm ar-type"
                                                             data-postkey="{{ static_keys_param.AutoReply.RESPONSE_TYPE }}">
@@ -112,10 +112,46 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="card border-info mb-3">
+                        <div class="card-header text-center">{% trans "Notes" %}</div>
+                        <div class="card-body text-info">
+                            <h4 class="card-title">{% trans "Content Type" %}</h4>
+                            <p class="card-text">
+                                {% blocktrans trimmed %}
+                                    To let the content be valid, the content should be in the format described below
+                                    corresponds to the content type.
+                                {% endblocktrans %}
+                            </p>
+                            <h5 class="card-title">{% trans "Text" %}</h5>
+                            <p class="card-text">
+                                {% blocktrans %}
+                                    <small>Could be anything, but the <b>length cannot be over 2000.</b></small>
+                                {% endblocktrans %}
+                            </p>
+                            <h5 class="card-title">{% trans "Image" %}</h5>
+                            <p class="card-text">
+                                {% blocktrans trimmed %}
+                                    <small>The main MIME type should be <code>image</code>. In the other words, when you
+                                        open then link,
+                                        the browser should <b>just give you an image</b> not a web page.
+                                    </small>
+                                {% endblocktrans %}
+                            </p>
+                            <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
+                            <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
+                            <p class="card-text">
+                                {% blocktrans %}
+                                    <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits of number</b>.
+                                    </small>
+                                {% endblocktrans %}
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
-                    <!-- INCOMPLETE: Permission - Add `CLASS_KEY` to unlock when the user has mod+ -->
+                    <!-- TODO: Permission - Add `CLASS_KEY` to unlock when the user has mod+ -->
                     <div class="card border-success mb-3">
                         <div class="card-header text-center">{% trans "Properties" %}</div>
                         <div class="card-body text-success">
@@ -254,11 +290,11 @@
             <div class="text-right">
                 <div class="col text-danger d-none" id="inputFailed">{% trans "Recheck your inputs." %}</div>
                 <div class="col text-success d-none" id="submitSuccess">{% trans "Submission Succeed." %}</div>
-                <!-- INCOMPLETE: Add Form: Add link to Outcome Code explanation -->
                 <div class="col text-danger d-none" id="submitFailed">{% trans "Submission Failed." %}</div>
                 <div class="col d-inline">
-                    <span>{% trans "Code:" %}</span>
-                    <h5 class="d-inline"><code id="arCode">-</code></h5>
+                    <span><a href="{% url "page.doc.code.insert" %}">{% trans "Insert Outcome Code:" %}</a></span>
+                    <h5 class="d-inline"><a id="arCodeLink" data-prefix="{% url "page.doc.code.insert" %}#"><code
+                            id="arCode">-</code></a></h5>
                 </div>
                 <div class="col d-inline">
                     <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
@@ -330,9 +366,9 @@
             xhr.responseType = "json";
             xhr.onload = function () {
                 try {
-                    $("#arCode").text(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"])
+                    updateArCode(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
                 } catch (error) {
-                    $("#arCode").text("-")
+                    updateArCode(null);
                 }
 
                 onLoadCallback(xhr.response);
