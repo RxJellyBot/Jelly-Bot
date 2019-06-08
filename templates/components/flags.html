@@ -14,12 +14,12 @@
         {% for flag in flags %}
             <tr>
                 <th scope="row" class="text-center">
-                    <a id="{{ flag.code }}"></a>
+                    <a id="{{ flag.code }}" class="anchor"></a>
                     <a href="#{{ flag.code }}" class="text-dark">{{ flag.code }}</a>
                 </th>
                 <td>
                     <small>
-                        <a id="{{ flag.name }}"></a>
+                        <a id="{{ flag.name }}" class="anchor"></a>
                         <a href="#{{ flag.name }}" class="alert-link text-dark">{{ flag.name }}</a>
                     </small>
                 </td>
