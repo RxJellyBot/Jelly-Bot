@@ -1,9 +1,9 @@
 from django.views.generic.base import View, TemplateResponseMixin
 from django.utils.translation import gettext as _
 
-from components.mixin import LoginRequiredMixin
 from flags import Platform, AutoReplyContentType
 from JellyBotAPI.SystemConfig import AutoReply
+from JellyBotAPI.components.mixin import LoginRequiredMixin
 from JellyBotAPI.views.render import render_template
 
 
