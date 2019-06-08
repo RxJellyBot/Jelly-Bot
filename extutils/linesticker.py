@@ -2,10 +2,6 @@ import tempfile
 from typing import List
 
 import requests
-import json
-import os, sys, errno, shutil
-import zipfile
-import time
 
 from django.utils.translation import gettext_noop as _
 
@@ -46,7 +42,8 @@ class LineStickerManager:
     #     """
     #     act = LineStickerManager.get_download_action(sticker_content_type)
     #     if act is None:
-    #         raise ValueError(u"Url function and file extension of specified sticker type not handled. {}".format(repr(sticker_content_type)))
+    #         raise ValueError(u"Url function and file extension of specified sticker type not handled. {}".format(
+    #         repr(sticker_content_type)))
     #
     #     url_func, file_ext = act
     #
@@ -91,7 +88,8 @@ class LineStickerManager:
     #         time_consumed_dl = 0.0
     #         time_consumed_comp = 0.0
     #     else:
-    #         content_type_to_download = LineStickerType.ANIMATED if sticker_metadata.is_animated_sticker else LineStickerType.STATIC
+    #         content_type_to_download = LineStickerType.ANIMATED if sticker_metadata.is_animated_sticker else
+    #         LineStickerType.STATIC
     #
     #         _start = time.time()
     #         path_list = self._get_content(content_type_to_download, pack_id, stk_ids)

@@ -12,7 +12,7 @@ InstanceCheck:
 Typecast:
     Cast back from int
 """
-from main import FlagSingleEnum
+from .main import FlagSingleEnum
 
 
 class SpecEnum(FlagSingleEnum):
@@ -25,6 +25,10 @@ class SpecEnum(FlagSingleEnum):
 
 
 class SpecEnum2(FlagSingleEnum):
+    @staticmethod
+    def default():
+        return SpecEnum2.C
+
     C = (2, "K")
     D = (3, "V")
 

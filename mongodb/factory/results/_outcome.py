@@ -1,5 +1,3 @@
-from abc import ABC
-
 from django.utils.translation import gettext_noop as _
 
 from extutils.flags import FlagDoubleEnum

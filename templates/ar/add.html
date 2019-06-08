@@ -36,6 +36,7 @@
                                     <div class="form-group row mt-1">
                                         <div class="col">
                                             <small>
+                                                <label for="arKeywordType" class="sr-only">{% trans "Keyword Type" %}</label>
                                                 <select id="arKeywordType" class="form-control form-control-sm ar-type"
                                                         data-postkey="{{ static_keys_param.AutoReply.KEYWORD_TYPE }}">
                                                     {% for cttype in contenttype_list %}
@@ -81,6 +82,7 @@
                                         <div class="form-group row mt-1">
                                             <div class="col">
                                                 <small>
+                                                <label for="arReplyType{{ forloop.counter }}" class="sr-only">{% trans "Response Type" %}</label>
                                                     <select id="arReplyType{{ forloop.counter }}"
                                                             class="form-control form-control-sm ar-type"
                                                             data-postkey="{{ static_keys_param.AutoReply.RESPONSE_TYPE }}">

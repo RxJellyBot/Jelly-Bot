@@ -29,6 +29,7 @@ class ChannelManager(BaseCollection):
         return self.get_cache(ChannelModel.Token, (platform, token), parse_cls=ChannelModel,
                               acquire_args=({ChannelModel.Token: token, ChannelModel.Platform: platform},))
 
+    # noinspection PyArgumentList
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         """
         Insertion attempt not implemented.

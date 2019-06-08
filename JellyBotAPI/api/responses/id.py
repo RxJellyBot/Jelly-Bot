@@ -24,6 +24,7 @@ class ChannelDataQueryResponse(BaseApiResponse):
                self._platform is not None and \
                GetOutcome.is_success(self._result.outcome)
 
+    # noinspection PyArgumentList
     def _handle_platform(self):
         if self._platform is not None:
             self._platform = Platform(self._platform)

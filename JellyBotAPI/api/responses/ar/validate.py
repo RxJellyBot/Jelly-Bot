@@ -20,7 +20,7 @@ class ContentValidationResponse(BaseApiResponse):
 
         self._result = False
 
-    # noinspection PyBroadException
+    # noinspection PyBroadException,PyArgumentList
     def _handle_content_type(self):
         k = param.Validation.CONTENT_TYPE
 

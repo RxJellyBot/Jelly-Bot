@@ -7,7 +7,7 @@ from JellyBotAPI.views.render import render_template
 
 
 class AutoReplyAddView(View):
-    # noinspection PyUnusedLocal, PyMethodMayBeStatic
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic,PyTypeChecker
     def get(self, request, *args, **kwargs):
         return render_template(request, "ar/add.html", {"title": _("Add an Auto-Reply"),
                                                         "max_responses": AutoReply.MAX_RESPONSES,

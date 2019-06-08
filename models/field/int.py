@@ -40,6 +40,7 @@ class FlagField(IntegerField):
     def desired_type(self):
         return self._type
 
+    # noinspection PyCallingNonCallable
     def is_value_valid(self, value) -> bool:
         if isinstance(value, int):
             return self._type(value)

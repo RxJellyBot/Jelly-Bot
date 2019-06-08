@@ -1,6 +1,5 @@
 from .entry import NavEntry, NavFirstLevelItem
 from ._base import NavBaseItem
-from .divider import NavDivider
 
 
 class NavDropdown(NavFirstLevelItem):

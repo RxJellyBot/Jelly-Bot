@@ -27,6 +27,7 @@ class APIJsonResponseView(View):
 
         return lst
 
+    # noinspection PyUnresolvedReferences
     def get(self, request, *args, **kwargs):
         if not self.get_response_specified:
             return HttpResponseNotAllowed(self.allowed_response_classes)
@@ -35,6 +36,7 @@ class APIJsonResponseView(View):
 
             return self.process_api_response(request, response_api, *args, **kwargs)
 
+    # noinspection PyUnresolvedReferences
     def post(self, request, *args, **kwargs):
         if not self.post_response_specified:
             return HttpResponseNotAllowed(self.allowed_response_classes)

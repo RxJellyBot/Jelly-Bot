@@ -8,6 +8,7 @@ from mongodb.factory import InsertOutcome, APIStatisticsManager
 
 
 class APIStatisticsCollector(MiddlewareMixin):
+    # noinspection PyMethodMayBeStatic
     def process_response(self, request, response):
         api_action = request.session.pop(keys.APIStatisticsCollection.API_ACTION, APIAction.UNKNOWN)
         dict_response = request.session.pop(keys.APIStatisticsCollection.DICT_RESPONSE, None)

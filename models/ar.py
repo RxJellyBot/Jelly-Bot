@@ -1,9 +1,6 @@
-import urllib.request
-
 from bson import ObjectId
 
 from JellyBotAPI import SystemConfig
-from extutils import LineStickerManager
 from flags import AutoReplyContentType, PreserializationFailedReason
 
 from ._base import Model

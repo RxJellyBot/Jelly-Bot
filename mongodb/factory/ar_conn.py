@@ -6,6 +6,7 @@ from models import AutoReplyConnectionModel, AutoReplyContentModel
 from mongodb.factory.results import InsertOutcome, AutoReplyConnectionAddResult
 
 from ._base import BaseCollection
+# noinspection PyPep8Naming
 from .channel import _inst as ChannelManager
 
 DB_NAME = "ar"

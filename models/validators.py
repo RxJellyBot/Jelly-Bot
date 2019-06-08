@@ -6,6 +6,7 @@ from flags import AutoReplyContentType
 
 
 class AutoReplyValidators:
+    # noinspection PyArgumentList
     @staticmethod
     def is_valid_content(type_: AutoReplyContentType, content: Any) -> bool:
         if not isinstance(type_, AutoReplyContentType):
@@ -21,6 +22,7 @@ class AutoReplyValidators:
 
 
 class _BaseValidators:
+    # noinspection PyBroadException
     @staticmethod
     def is_content_image(content: Any) -> bool:
         try:
