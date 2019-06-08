@@ -17,12 +17,10 @@ Mapping with URL path parameter and GET parameter
     https://stackoverflow.com/a/150518
 """
 from django.contrib import admin
-from django.conf.urls import url
 from django.urls import path, include
 
 urlpatterns = [
-    url(r'', include('JellyBotAPI.views.urls')),
-    url(r'account/', include('JellyBotAPI.views.account.urls')),
-    url(r'api/', include('JellyBotAPI.api.urls')),
-    path(r'admin/', admin.site.urls)
+    path('', include('JellyBotAPI.views.urls')),
+    path('api/', include('JellyBotAPI.api.urls')),
+    path('admin/', admin.site.urls)
 ]

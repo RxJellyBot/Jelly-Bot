@@ -32,6 +32,16 @@ class OnSiteUserRegistrationResult(IdentityRegistrationResult):
         return d
 
 
+class GetOnSiteUserDataResult(ModelResult):
+    def __init__(self, outcome, model, exception=None):
+        """
+        :type outcome: GetOutcome
+        :type model: APIUserModel
+        :type exception: Optional[Exception]
+        """
+        super().__init__(outcome, model, exception)
+
+
 class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
     def __init__(self, outcome, model, exception=None):
         """

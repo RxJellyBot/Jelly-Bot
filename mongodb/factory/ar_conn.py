@@ -6,22 +6,26 @@ from models import AutoReplyConnectionModel, AutoReplyContentModel
 from mongodb.factory.results import InsertOutcome, AutoReplyConnectionAddResult
 
 from ._base import BaseCollection
+# noinspection PyPep8Naming
 from .channel import _inst as ChannelManager
 
 DB_NAME = "ar"
 
 
 class AutoReplyConnectionManager(BaseCollection):
-    # DRAFT: (After Bridging) Cache (KW, CH - Flatten)
+    # DRAFT: AUto Reply - Cache (KW, CH - Flatten)
 
     def __init__(self):
         super().__init__(DB_NAME, "conn", AutoReplyContentModel.Content)
         self.create_index([(AutoReplyConnectionModel.KeywordID, 1), (AutoReplyConnectionModel.ResponsesIDs, 1)],
                           name="Auto Reply Connection Identity", unique=True)
 
-    def add(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
-            platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
+    def add_conn(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
+                 platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyConnectionAddResult:
+
+        # TODO: Permission - Check if the user have the permission if pinned is true
+
         entry, ar_insert_outcome, ex, insert_result = \
             self.insert_one_data(
                 AutoReplyConnectionModel,
@@ -31,7 +35,7 @@ class AutoReplyConnectionManager(BaseCollection):
 
         channel = ChannelManager.get_channel(platform, channel_token)
 
-        def append_channel() -> InsertOutcome:
+        def local_append_channel() -> InsertOutcome:
             return self.append_channel(kw_oid, rep_oids, channel.id.value)
 
         if InsertOutcome.data_found(ar_insert_outcome):
@@ -39,11 +43,11 @@ class AutoReplyConnectionManager(BaseCollection):
                 reg_result = ChannelManager.register(platform, channel_token)
                 if InsertOutcome.data_found(reg_result.outcome):
                     channel = reg_result.model
-                    overall_outcome = append_channel()
+                    overall_outcome = local_append_channel()
                 else:
                     overall_outcome = InsertOutcome.FAILED_ON_REG_CHANNEL
             else:
-                overall_outcome = append_channel()
+                overall_outcome = local_append_channel()
         else:
             overall_outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
 

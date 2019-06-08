@@ -10,8 +10,8 @@ from mongodb.factory import MixedUserManager
 
 class AccountMainPageView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
-    def get(self, context, **response_kwargs):
-        u_data = MixedUserManager.get_user_data_api_token(self.request.COOKIES[keys.USER_TOKEN])
+    def get(self, request, *args, **kwargs):
+        u_data = MixedUserManager.get_user_data_api_token(self.request.COOKIES[keys.USER_TOKEN]).model
 
         return render_template(
             self.request, "account/main.html",  {"title": _("Account Home"), "api_user_data": u_data})

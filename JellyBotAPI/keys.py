@@ -2,7 +2,7 @@
 USER_TOKEN = "utoken"  # Storing API user token for on-site function use
 
 # FRONTEND CSS CLASS
-ENABLE_ON_LOGGED_IN = "enable-login"
+LOGGED_IN_ENABLE = "enable-login"
 
 
 # SESSION KEYS

@@ -23,4 +23,8 @@ function App() {
   );
 }
 
+// DRAFT: React Tutorial: https://reactjs.org/tutorial/tutorial.html#setup-for-the-tutorial
+// DRAFT: React to website: https://reactjs.org/docs/add-react-to-a-website.html
+// DRAFT: UI: https://material-ui.com/
+
 export default App;

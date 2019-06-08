@@ -72,7 +72,7 @@
                 "key": "keyword",
                 "type": "#ObjectId#",
                 "description": "The id of the keyword content."
-              },
+              }
             ],
             "failed": [
               {
@@ -94,20 +94,3 @@
     ]
   }
 ]
-
-// DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)
-// DRAFT: Json API Doc - Add anchor for all parameters
-// DRAFT: Json API Doc - #(item_name)# will redirect to the page of specific thing (Indexing technique not determined)
-// DRAFT: Json API DOc - Return incompleted
-
-/*
-List of things to be redirected:
-Types:
-- ObjectId
-- AutoReplyContentType
-- Platform
-
-Results:
-- AutoReplyContentGetResult
--
-*/

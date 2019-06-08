@@ -2,13 +2,15 @@ from typing import Optional
 
 from bson import ObjectId
 
+from extutils.gidentity import GoogleIdentityUserData
 from models import APIUserModel, OnPlatformUserModel, MixedUserModel
 
 from ._base import BaseCollection
 from ._mixin import GenerateTokenMixin
 from .results import (
-    InsertOutcome,
-    OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, MixedUserRegistrationResult
+    InsertOutcome, GetOutcome,
+    OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, MixedUserRegistrationResult,
+    GetOnSiteUserDataResult
 )
 
 DB_NAME = "user"
@@ -32,7 +34,7 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
     def get_user_data_google_id(self, goo_uid) -> Optional[APIUserModel]:
         return self.get_cache(APIUserModel.GoogleUniqueID, goo_uid, parse_cls=APIUserModel)
 
-    def register(self, id_data) -> OnSiteUserRegistrationResult:
+    def register(self, id_data: GoogleIdentityUserData) -> OnSiteUserRegistrationResult:
         token = None
         entry, outcome, ex, insert_result = \
             self.insert_one_data(APIUserModel, email=id_data.email, gid_id=id_data.uid, token=self.generate_hex_token())
@@ -104,8 +106,18 @@ class MixedUserManager(BaseCollection):
     def get_user_data_api_oid(self, api_oid: ObjectId) -> Optional[MixedUserModel]:
         return self.get_cache(MixedUserModel.APIUserID, api_oid, parse_cls=MixedUserModel)
 
-    def get_user_data_api_token(self, token: str) -> Optional[APIUserModel]:
-        return self._mgr_api.get_user_data_token(token)
+    def get_user_data_api_token(self, token: str) -> GetOnSiteUserDataResult:
+        entry = self._mgr_api.get_user_data_token(token)
+
+        if entry is None:
+            outcome = GetOutcome.FAILED_NOT_FOUND_ABORTED_INSERT
+        else:
+            outcome = GetOutcome.SUCCESS_CACHE_DB
+
+        return GetOnSiteUserDataResult(outcome, entry)
+
+    def is_api_user_exists(self, token: str) -> bool:
+        return GetOutcome.is_success(self.get_user_data_api_token(token).outcome)
 
     def get_user_data_on_plat_oid(self, onplat_oid: ObjectId) -> Optional[MixedUserModel]:
         return self.get_cache(MixedUserModel.OnPlatformUserIDs, onplat_oid, parse_cls=MixedUserModel)
@@ -156,7 +168,7 @@ class MixedUserManager(BaseCollection):
                                InsertOutcome.FAILED_ON_CONN_ONPLAT, InsertOutcome.FAILED_ON_REG_ONPLAT,
                                (platform, user_token), hint="OnPlatform", conn_arg_list=True)
 
-    def register_google(self, id_data) -> MixedUserRegistrationResult:
+    def register_google(self, id_data: GoogleIdentityUserData) -> MixedUserRegistrationResult:
         return self._register_(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_user_data_api_oid,
                                MixedUserModel.APIUserID, "api_oid",
                                InsertOutcome.FAILED_ON_CONN_API, InsertOutcome.FAILED_ON_REG_API,

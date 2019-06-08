@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path, include
 
 from JellyBotAPI.views.index import HomePageView
 from JellyBotAPI.views.regapi import RegisterAPIUserView
@@ -6,7 +6,10 @@ from JellyBotAPI.views.about import AboutView
 
 
 urlpatterns = [
-    url(r'^$', HomePageView.as_view(), name="page.home"),
-    url(r'^login/$', RegisterAPIUserView.as_view(), name="page.login"),
-    url(r'^about/$', AboutView.as_view(), name="page.about")
+    path('', HomePageView.as_view(), name="page.home"),
+    path('login/', RegisterAPIUserView.as_view(), name="page.login"),
+    path('about/', AboutView.as_view(), name="page.about"),
+    path('account/', include('JellyBotAPI.views.account.urls')),
+    path('ar/', include('JellyBotAPI.views.ar.urls')),
+    path('doc/', include('JellyBotAPI.views.doc.urls')),
 ]

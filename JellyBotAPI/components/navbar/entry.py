@@ -4,7 +4,11 @@ from .firstlevel import NavFirstLevelItem
 class NavEntry(NavFirstLevelItem):
     def __init__(self, label, link, disabled=False, active=False, parent=None):
         super().__init__(label, active, parent, link)
-        self.disabled = disabled
+        self._disabled = disabled
+
+    @property
+    def disabled(self):
+        return self._disabled
 
     def disabled_cls_str(self):
         return "disabled" if self.disabled else ""
