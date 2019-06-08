@@ -15,13 +15,13 @@ import sys
 
 from django.utils.translation import gettext_lazy as _
 
-##############################################################################
-# https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/          #
-# Check DEBUG, PRODUCTION keys is in a correct state                         #
-# Run "In Production" config to ensure runnable                              #
-# Run "py manage.py check --deploy" config to ensure no compiling bugs       #
-# Run "py manage.py makemessages -a" to create translation files             #
-##############################################################################
+###############################################################################################
+# https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/                           #
+# Check DEBUG, PRODUCTION keys is in a correct state                                          #
+# Run "In Production" config to ensure runnable                                               #
+# Run "py manage.py check --deploy" config to ensure no compiling bugs                        #
+# Run "py manage.py makemessages -a" to create translation files (compilemessages for *.mo)   #
+###############################################################################################
 
 # MAIN
 

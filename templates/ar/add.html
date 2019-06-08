@@ -184,7 +184,12 @@
                                 <div class="w-100 card card-body border-success text-center">
                                     <h5 class="card-title">{% trans "Cooldown (sec)" %}</h5>
                                     <p class="card-text">
-                                        <small>{% trans "Time duration for the module to be called again. 0 sec means no cool down." %}</small>
+                                        <small>
+                                            {% blocktrans %}
+                                                Time duration for the module to be called again. 0 sec means no cool down. <br>
+                                                The cooldown can be any integer while the slide bar only provides convenience to slide through 0 to 30.
+                                            {% endblocktrans %}
+                                        </small>
                                     </p>
                                     <div class="form-row">
                                         <div class="col-8">

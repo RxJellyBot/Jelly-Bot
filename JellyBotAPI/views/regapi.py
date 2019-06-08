@@ -30,7 +30,7 @@ class RegisterAPIUserView(View):
             elif result.outcome == InsertOutcome.FAILED_NOT_ACKNOWLEDGED:
                 s = _("New user data creation failed.")
             elif result.outcome == InsertOutcome.FAILED_NOT_SERIALIZABLE:
-                s = _("Wrong data has passed into the server.")
+                s = _("The data is unable to be passed into the server.")
             else:
                 s = _("An unknown error occurred during the new user data registration.")
         except IDIssuerIncorrect as ex1:
@@ -49,6 +49,6 @@ class RegisterAPIUserView(View):
             response.set_cookie(keys.USER_TOKEN, token)
 
         if s == RegisterAPIUserView.PASS_SIGNAL and token is None:
-            return simple_str_response(request, _(f"User token is null while login succeed.{s_contact}"))
+            return simple_str_response(request, _(f"User token is null however login succeed. {s_contact}"))
         else:
             return response

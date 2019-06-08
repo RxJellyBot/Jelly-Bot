@@ -93,7 +93,7 @@ class InsertOutcome(BaseOutcome):
         203, _("FAIL - Not Found"), \
         _("The condition to update/insert does not match any data in the database.")
     FAILED_NOT_MODEL = \
-        204, _("FAIL - Not Entry"), \
+        204, _("FAIL - Not Model"), \
         _("The processed data is not in the shape of a data model.")
     FAILED_PRE_SERIALIZE_FAILED = \
         204, _("FAIL - Pre-serialization Failed"), \
@@ -139,7 +139,7 @@ class GetOutcome(BaseOutcome):
 
     SUCCESS_CACHE_DB = \
         -2, _("OK - From Cache/DB"), \
-        _("The data was found.")
+        _("The data was found in either Cache or Database.")
     SUCCESS_ADDED = \
         -1, _("OK - Inserted"), \
         _("The data was not found yet the data has been inserted to the database.")
@@ -148,7 +148,7 @@ class GetOutcome(BaseOutcome):
         _("The data was not found and the system has attempted to insert a new data but failed.")
     FAILED_NOT_FOUND_ABORTED_INSERT = \
         1202, _("FAIL - Not Found, Aborted Insertion"), \
-        _("The data was not found and the system did not attempt to insert a new data.")
+        _("The data was not found and the system aborted to insert a new data.")
     FAILED_NOT_EXECUTED = \
         1901, _("FAIL - Not Executed"), \
         _("The acquiring process had not been executed.")
