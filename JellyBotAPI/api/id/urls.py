@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .channel import ChannelDataQueryView
 
 urlpatterns = [
-    url(r'ch$', ChannelDataQueryView.as_view(), name='api.id.channel')
+    path('ch', ChannelDataQueryView.as_view(), name='api.id.channel')
 ]

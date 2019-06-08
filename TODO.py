@@ -29,6 +29,7 @@
 # TODO: Send gmail over django:
 #  https://medium.com/@_christopher/how-to-send-emails-with-python-django-through-google-smtp-server-for-free-22ea6ea0fb8e
 # INCOMPLETE: Account: Logout on-site
+# TODO: On site - API Key refresh
 # INCOMPLETE: Auto Reply: Case Insensitive Finding https://docs.mongodb.com/manual/core/index-case-insensitive/
 #  find().collation( { locale: 'en', strength: 1 } )
 
