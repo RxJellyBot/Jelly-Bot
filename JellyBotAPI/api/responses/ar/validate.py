@@ -39,7 +39,8 @@ class ContentValidationResponse(BaseApiResponse):
     def is_success(self) -> bool:
         return self._content is not None and \
                len(self._content) > 0 and \
-               self._content_type is not None
+               self._content_type is not None and \
+               self._result
 
     def pre_process(self):
         self._handle_content_type()

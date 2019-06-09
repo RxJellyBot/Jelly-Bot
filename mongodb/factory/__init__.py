@@ -9,6 +9,5 @@ from .user import _inst as MixedUserManager
 # noinspection PyPep8Naming
 from .stats import _inst as APIStatisticsManager
 # noinspection PyPep8Naming
-from .tkact import _inst as TokenActionManager
+from .tkact import _inst as TokenActionManager, TokenActionRequiredKeys
 from .factory import MONGO_CLIENT
-from .results import GetOutcome, InsertOutcome

@@ -6,11 +6,12 @@ from .field import OID_KEY, ObjectIDField
 
 
 class Model:
-    def __init__(self, from_dict=False, **kwargs):
+    def __init__(self, from_dict=False, init_oid=True, **kwargs):
         self._init_fields_(**kwargs)
 
         if from_dict:
-            self.id = ObjectIDField()
+            if init_oid:
+                self.id = ObjectIDField()
             self._json_fill_in_(**kwargs)
         else:
             self._match_fields_(**kwargs)
@@ -53,7 +54,7 @@ class Model:
 
     def serialize(self) -> dict:
         self.pre_serialize()
-        return {v.key: v.value for v in self.__dict__.values() if v.value}
+        return {v.key: v.value for v in self.__dict__.values() if v.value is not None}
 
     @classmethod
     def parse(cls, dict_):

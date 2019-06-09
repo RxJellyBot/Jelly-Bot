@@ -8,6 +8,9 @@ RESULT = "result"
 REQUIRED = "required"
 
 
+# TODO: Restruct result keys to reduce the difficulty of building docs (re-categorize)
+
+
 class Results:
     EXCEPTION = "exception"
     OUTCOME = "outcome"
@@ -19,6 +22,7 @@ class Results:
     REG_RESULT = "regResult"
     CONN_OUTCOME = "connOutcome"
     INSERT_CONN_OUTCOME = "aConnOutcome"
+    LACKING_KEYS = "keysLack"
 
 
 class AutoReplyResponse:

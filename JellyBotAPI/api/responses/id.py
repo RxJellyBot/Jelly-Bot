@@ -3,7 +3,8 @@ from django.http import QueryDict
 from JellyBotAPI.api.static import param, result
 from extutils import cast_keep_none
 from flags import Platform
-from mongodb.factory import ChannelManager, GetOutcome
+from mongodb.factory import ChannelManager
+from mongodb.factory.results import GetOutcome
 
 from ._base import BaseApiResponse
 

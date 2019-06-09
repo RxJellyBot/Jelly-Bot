@@ -4,7 +4,8 @@ from django.utils.deprecation import MiddlewareMixin
 from JellyBotAPI import keys
 from JellyBotAPI.api.static import result
 from flags import APIAction
-from mongodb.factory import InsertOutcome, APIStatisticsManager
+from mongodb.factory import APIStatisticsManager
+from mongodb.factory.results import InsertOutcome
 
 
 class APIStatisticsCollector(MiddlewareMixin):

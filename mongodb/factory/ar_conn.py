@@ -23,7 +23,6 @@ class AutoReplyConnectionManager(BaseCollection):
     def add_conn(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
                  platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyConnectionAddResult:
-
         # TODO: Permission - Check if the user have the permission if pinned is true
 
         entry, ar_insert_outcome, ex, insert_result = \
@@ -52,6 +51,11 @@ class AutoReplyConnectionManager(BaseCollection):
             overall_outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
 
         return AutoReplyConnectionAddResult(overall_outcome, ar_insert_outcome, entry, ex)
+
+    def add_conn_by_model(self, model: AutoReplyConnectionModel) -> AutoReplyConnectionAddResult:
+        outcome, ex = self.insert_one_model(model, include_oid=False)
+
+        return AutoReplyConnectionAddResult(outcome, outcome, model, ex)
 
     def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> InsertOutcome:
         update_result = self.update_one(

@@ -11,9 +11,9 @@ class AutoReplyAddView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamete
     def get_api_action(self):
         return APIAction.AR_ADD
 
-    def mandatory_keys(self) -> list:
-        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE,
-                param.AutoReply.CHANNEL_TOKEN, param.AutoReply.CREATOR_TOKEN, param.AutoReply.PLATFORM]
+    def mandatory_keys(self) -> set:
+        return {param.AutoReply.KEYWORD, param.AutoReply.RESPONSE,
+                param.AutoReply.CHANNEL_TOKEN, param.AutoReply.CREATOR_TOKEN, param.AutoReply.PLATFORM}
 
 
 class AutoReplyAddTokenActionView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
@@ -22,5 +22,5 @@ class AutoReplyAddTokenActionView(CsrfExemptMixin, APIStatisticsCollectMixin, Ch
     def get_api_action(self):
         return APIAction.TOKEN_AR_ADD
 
-    def mandatory_keys(self) -> list:
-        return [param.AutoReply.KEYWORD, param.AutoReply.RESPONSE, param.AutoReply.CREATOR_TOKEN]
+    def mandatory_keys(self) -> set:
+        return {param.AutoReply.KEYWORD, param.AutoReply.RESPONSE, param.AutoReply.CREATOR_TOKEN}

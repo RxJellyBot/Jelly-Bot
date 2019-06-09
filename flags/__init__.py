@@ -5,7 +5,7 @@ from .permlv import PermissionCategory
 # noinspection PyUnresolvedReferences
 from .platforms import Platform
 # noinspection PyUnresolvedReferences
-from .tkact import TokenAction
+from .tkact import TokenAction, TokenActionCollationErrorCode
 # noinspection PyUnresolvedReferences
 from .apiact import APIAction
 # noinspection PyUnresolvedReferences

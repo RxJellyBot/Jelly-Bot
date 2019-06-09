@@ -133,6 +133,22 @@ class InsertOutcome(BaseOutcome):
 
 
 class GetOutcome(BaseOutcome):
+    """
+    Less than 0 - OK
+
+        -x - Miscellaneous
+            -2 - Already exists
+            -1 - Inserted
+
+    Greater than 0 - Failed
+
+        1xx - Problems related to the getting process
+            101 - Not Found, attempted insert
+            102 - Not Found, aborted insert
+
+        9xx - Problems related to execution
+            901 - Not executed
+    """
     @staticmethod
     def default():
         return InsertOutcome.FAILED_NOT_EXECUTED
@@ -144,11 +160,61 @@ class GetOutcome(BaseOutcome):
         -1, _("OK - Inserted"), \
         _("The data was not found yet the data has been inserted to the database.")
     FAILED_NOT_FOUND_ATTEMPTED_INSERT = \
-        1201, _("FAIL - Not Found, Attempted Insertion"), \
+        101, _("FAIL - Not Found, Attempted Insertion"), \
         _("The data was not found and the system has attempted to insert a new data but failed.")
     FAILED_NOT_FOUND_ABORTED_INSERT = \
-        1202, _("FAIL - Not Found, Aborted Insertion"), \
+        102, _("FAIL - Not Found, Aborted Insertion"), \
         _("The data was not found and the system aborted to insert a new data.")
     FAILED_NOT_EXECUTED = \
-        1901, _("FAIL - Not Executed"), \
+        901, _("FAIL - Not Executed"), \
         _("The acquiring process had not been executed.")
+
+
+class OperationOutcome(BaseOutcome):
+    """
+    Less than 0 - OK
+
+        -x - Miscellaneous
+            -1 - Operation Completed
+
+    Greater than 0 - Failed
+
+        1xx - Problems related to Token Action
+            101 - Token Not Found
+            102 - Keys Lacking
+            103 - Completion Error
+
+        9xx - Problems related to execution
+            901 - Not executed
+    """
+    @staticmethod
+    def default():
+        return OperationOutcome.FAILED_NOT_EXECUTED
+
+    SUCCESS_COMPLETED = \
+        -1, _("OK - Completed"), \
+        _("The operation was successfully completed.")
+    FAILED_TOKEN_NOT_FOUND = \
+        101, _("FAIL - Token Not Found"), \
+        _("No enqueued token action found using the specified token.")
+    FAILED_KEYS_LACKING = \
+        102, _("FAIL - Keys Lacking"), \
+        _("There are keys lacking so that the token action cannot be completed.")
+    FAILED_COMPLETION_FAILED = \
+        103, _("FAIL - Completion Failed"), \
+        _("The action completion was failed.")
+    FAILED_NO_COMPLETE_ACTION = \
+        104, _("FAIL - No Complete Action"), \
+        _("No complete action implemented yet for the provided action type.")
+    FAILED_COMPLETION_ERROR = \
+        105, _("FAIL - Completion Error"), \
+        _("An error occurred during action completion process.")
+    FAILED_TOKEN_EMPTY = \
+        106, _("FAIL - Empty Token"), \
+        _("The token is empty.")
+    FAILED_COLLATION_ERROR = \
+        107, _("FAIL - Collation Error"), \
+        _("An error occurred during parameter collation process.")
+    FAILED_NOT_EXECUTED = \
+        901, _("FAIL - Not Executed"), \
+        _("The operation had not been executed.")

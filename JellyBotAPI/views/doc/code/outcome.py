@@ -2,7 +2,7 @@ from django.views.generic.base import View
 from django.utils.translation import gettext as _
 
 from JellyBotAPI.views.render import render_template
-from mongodb.factory import InsertOutcome, GetOutcome
+from mongodb.factory.results import InsertOutcome, GetOutcome, OperationOutcome
 
 
 class InsertOutcomeCodeView(View):
@@ -17,3 +17,10 @@ class GetOutcomeCodeView(View):
     def get(self, request, *args, **kwargs):
         return render_template(request, "doc/code/get.html", {"title": _("Get Outcome Code"),
                                                               "flags": list(GetOutcome)})
+
+
+class OperationOutcomeCodeView(View):
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
+    def get(self, request, *args, **kwargs):
+        return render_template(request, "doc/code/ops.html", {"title": _("Operation Outcome Code"),
+                                                              "flags": list(OperationOutcome)})

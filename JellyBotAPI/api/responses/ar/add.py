@@ -8,9 +8,9 @@ from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyConnectionModel
 from mongodb.factory import (
-    GetOutcome, InsertOutcome,
     AutoReplyConnectionManager, AutoReplyContentManager, MixedUserManager, TokenActionManager
 )
+from mongodb.factory.results import GetOutcome, InsertOutcome
 
 from .._base import BaseApiResponse
 
@@ -192,7 +192,7 @@ class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
         return MixedUserManager.get_user_data_api_token(self._creator_token)
 
     def process_ifnoerror(self):
-        self._result = TokenActionManager.enqueue_action_ar_add(
+        self._result = TokenActionManager.enqueue_action(
             TokenAction.AR_ADD, AutoReplyConnectionModel,
             keyword_oid=self._data[result.AutoReplyResponse.KEYWORD],
             responses_oids=self._data[result.AutoReplyResponse.RESPONSES],

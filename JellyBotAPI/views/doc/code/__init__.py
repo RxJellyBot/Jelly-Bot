@@ -1,1 +1,1 @@
-from .outcome import InsertOutcomeCodeView, GetOutcomeCodeView
+from .outcome import InsertOutcomeCodeView, GetOutcomeCodeView, OperationOutcomeCodeView

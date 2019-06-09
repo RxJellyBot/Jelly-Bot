@@ -1,4 +1,4 @@
-from typing import Union, List, Tuple, Type
+from typing import Union, List, Tuple, Type, Optional
 from bson.errors import InvalidDocument
 
 from django.conf import settings
@@ -6,6 +6,7 @@ from pymongo.collation import Collation
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError
+from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
 from extutils.flags import get_codec_options
@@ -77,22 +78,48 @@ class BaseCollection(Collection):
         else:
             return ret
 
-    def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) -> tuple:
-        """
+    def insert_one_model(self, model: Model, include_oid=False) -> (InsertOutcome, Optional[Exception]):
+        ex = None
 
-        :param model_cls: The class for the data to be sealed.
-        :type model_cls:
-        :param model_args: The arguments for the `Model` construction.
-        :return: model (Model), outcome (InsertOutcome), ex(Exception or None), insert_result (InsertOneResult)
+        try:
+            if not include_oid and hasattr(model, "id"):
+                del model.id
+
+            insert_result = self.insert_one(model.serialize())
+            if insert_result.acknowledged:
+                model.set_oid(insert_result.inserted_id)
+                outcome = InsertOutcome.SUCCESS_INSERTED
+            else:
+                outcome = InsertOutcome.FAILED_NOT_ACKNOWLEDGED
+        except (AttributeError, InvalidDocument) as e:
+            outcome = InsertOutcome.FAILED_NOT_SERIALIZABLE
+            ex = e
+        except DuplicateKeyError as e:
+            outcome = InsertOutcome.SUCCESS_DATA_EXISTS
+            ex = e
+        except PreserializationFailedError as e:
+            outcome = InsertOutcome.FAILED_PRE_SERIALIZE_FAILED
+            ex = e
+        except Exception as e:
+            outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
+            ex = e
+
+        return outcome, ex
+
+    def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
+            -> (Model, InsertOutcome, Optional[Exception], InsertOneResult):
         """
-        entry = None
+        :param model_cls: The class for the data to be sealed.
+        :param model_args: The arguments for the `Model` construction.
+        """
+        model = None
         outcome: InsertOutcome = InsertOutcome.FAILED_NOT_EXECUTED
         ex = None
         insert_result = None
 
         try:
             if issubclass(model_cls, Model):
-                entry = model_cls(**model_args)
+                model = model_cls(**model_args)
             else:
                 outcome = InsertOutcome.FAILED_NOT_MODEL
         except FieldReadOnly as e:
@@ -108,28 +135,10 @@ class BaseCollection(Collection):
             outcome = InsertOutcome.FAILED_CONSTRUCT_UNKNOWN
             ex = e
 
-        if entry is not None:
-            try:
-                insert_result = self.insert_one(entry.serialize())
-                if insert_result.acknowledged:
-                    entry.set_oid(insert_result.inserted_id)
-                    outcome = InsertOutcome.SUCCESS_INSERTED
-                else:
-                    outcome = InsertOutcome.FAILED_NOT_ACKNOWLEDGED
-            except (AttributeError, InvalidDocument) as e:
-                outcome = InsertOutcome.FAILED_NOT_SERIALIZABLE
-                ex = e
-            except DuplicateKeyError as e:
-                outcome = InsertOutcome.SUCCESS_DATA_EXISTS
-                ex = e
-            except PreserializationFailedError as e:
-                outcome = InsertOutcome.FAILED_PRE_SERIALIZE_FAILED
-                ex = e
-            except Exception as e:
-                outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
-                ex = e
+        if model is not None:
+            outcome, ex = self.insert_one_model(model)
 
         if settings.DEBUG and not InsertOutcome.is_success(outcome):
             raise ex
 
-        return entry, outcome, ex, insert_result
+        return model, outcome, ex, insert_result

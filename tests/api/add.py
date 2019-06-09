@@ -6,7 +6,7 @@ import django
 from django.test import Client, TestCase
 
 from JellyBotAPI.api.static import result as r, param as p
-from mongodb.factory import InsertOutcome
+from mongodb.factory.results import InsertOutcome
 
 c = Client(enforce_csrf_checks=True)
 django.setup()

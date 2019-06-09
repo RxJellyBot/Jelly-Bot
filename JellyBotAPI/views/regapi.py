@@ -4,7 +4,8 @@ from django.views import View
 from JellyBotAPI import keys
 from JellyBotAPI.views.render import render_template, simple_str_response
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
-from mongodb.factory import MixedUserManager, InsertOutcome
+from mongodb.factory import MixedUserManager
+from mongodb.factory.results import InsertOutcome
 
 
 class RegisterAPIUserView(View):
