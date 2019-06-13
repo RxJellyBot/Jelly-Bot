@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
-from typing import Type
+from typing import Type, Generator
+
+from bson import ObjectId
 
 from flags import TokenAction, Platform, TokenActionCollationErrorCode
 from mongodb.factory import ChannelManager, AutoReplyConnectionManager
@@ -40,15 +42,20 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
         self.create_index(TokenActionModel.Timestamp,
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.TokenActionExpirySeconds)
 
-    def enqueue_action(self, token_action, data_cls: Type[Model], **data_kw_args):
+    def enqueue_action(self, creator: ObjectId, token_action: TokenAction, data_cls: Type[Model], **data_kw_args):
         token = self.generate_hex_token()
         now = datetime.now()
 
         entry, outcome, ex, insert_result = self.insert_one_data(
-            TokenActionModel,
+            TokenActionModel, creator_oid=creator,
             token=token, action=token_action, timestamp=now, data=data_cls(**data_kw_args).serialize())
 
         return EnqueueTokenActionResult(outcome, token, now + timedelta(seconds=Database.TokenActionExpirySeconds), ex)
+
+    def get_queued_actions(self, creator_oid: ObjectId) -> Generator:
+        csr = self.find({TokenActionModel.CreatorOID: creator_oid})
+        for dict_ in csr:
+            yield TokenActionModel(**dict_, from_db=True)
 
     def complete_action(self, token: str, token_args: dict):
         lacking_keys = set()
@@ -63,7 +70,7 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
             tk_model = self.find_one(cond_dict)
 
             if tk_model:
-                tk_model = TokenActionModel(from_dict=True, **tk_model)
+                tk_model = TokenActionModel(from_db=True, **tk_model)
                 required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action.value)
 
                 if required_keys == token_args.keys():
@@ -109,7 +116,7 @@ class TokenActionCompletor:
 
     @staticmethod
     def _token_ar_add(action_model: TokenActionModel, xparams: dict):
-        conn = AutoReplyConnectionModel(**action_model.data.value, from_dict=True, init_oid=False)
+        conn = AutoReplyConnectionModel(**action_model.data.value, from_db=True, init_oid=False)
         cnl = ChannelManager.register(xparams[param.AutoReply.PLATFORM], xparams[param.AutoReply.CHANNEL_TOKEN])
         success = InsertOutcome.is_success(cnl.outcome)
         if success:

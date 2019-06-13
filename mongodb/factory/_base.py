@@ -1,4 +1,5 @@
-from typing import Union, List, Tuple, Type, Optional
+from collections import Iterable
+from typing import Union, Tuple, Type, Optional, Iterable as TIterable
 from bson.errors import InvalidDocument
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from ttldict import TTLOrderedDict
 
 from extutils.flags import get_codec_options
 
+from JellyBotAPI.SystemConfig import Database
 from models import Model
 from models.exceptions import PreserializationFailedError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid
@@ -18,16 +20,16 @@ from mongodb.factory.results import InsertOutcome
 
 from .factory import MONGO_CLIENT
 
-CACHE_EXPIRATION_SECS = 172800
+CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 
 
 class BaseCollection(Collection):
-    def __init__(self, db_name, col_name, cache_keys: Union[str, List[str]] = None):
+    def __init__(self, db_name, col_name, cache_keys: Union[str, TIterable[str]] = None):
         self._db = MONGO_CLIENT.get_database(db_name)
         super().__init__(self._db, col_name, codec_options=get_codec_options())
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
         if cache_keys is not None:
-            if isinstance(cache_keys, list):
+            if isinstance(cache_keys, Iterable):
                 for k in cache_keys:
                     self.init_cache(k)
             else:
@@ -82,10 +84,7 @@ class BaseCollection(Collection):
         ex = None
 
         try:
-            if not include_oid and hasattr(model, "id"):
-                del model.id
-
-            insert_result = self.insert_one(model.serialize())
+            insert_result = self.insert_one(model.serialize(include_oid))
             if insert_result.acknowledged:
                 model.set_oid(insert_result.inserted_id)
                 outcome = InsertOutcome.SUCCESS_INSERTED

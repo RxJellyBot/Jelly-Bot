@@ -39,7 +39,6 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyConnectionModel(Model):
-    # TODO: AR_CONN UTILS - Add Connection on site
     # DRAFT: AR_CONN MOD - Exclude user function
 
     KeywordID = "k"

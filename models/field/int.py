@@ -18,6 +18,11 @@ class IntegerField(BaseField):
         return int
 
 
+class ColorIntField(IntegerField):
+    def is_value_valid(self, value) -> bool:
+        return super().is_value_valid(value) and 0 <= value <= 16777216
+
+
 class FlagField(IntegerField):
     FLAG_TYPE: FlagCodeEnum = None
 

@@ -228,7 +228,7 @@ function resetForm() {
     // Hide All
     $(".txtarea-count").each(function () {
         hideAllValidClasses($(this).find("textarea"));
-        $(this).find("[data-type=current]" + id).text(0);
+        $(this).find("[data-type=current]").text(0);
     });
     hideAllSubmitMsg();
 }

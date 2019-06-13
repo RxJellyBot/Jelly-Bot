@@ -1,26 +1,28 @@
+from JellyBotAPI.SystemConfig import ChannelConfig
 from models import Model
-from models.field import PlatformField, TextField, ArrayField, ObjectIDField, PermissionLevelField
+from models.field import PlatformField, TextField, DictionaryField, IntegerField, BooleanField
 
 
 class ChannelModel(Model):
     Platform = "p"
     Token = "t"
-    ManagerRelationshipIDs = "mgr"
+    Config = "c"
 
     def _init_fields_(self, **kwargs):
         self.platform = PlatformField(ChannelModel.Platform)
         self.token = TextField(ChannelModel.Token, must_have_content=True)
-        self.manager_oids = ArrayField(ChannelModel.ManagerRelationshipIDs, int)
+        self.config = DictionaryField(ChannelModel.Config)
 
 
-class ChannelManagerRelationshipModel(Model):
-    # TODO: Permission - PermissionLevel -> Permission config data Model?
+class ChannelConfigModel(Model):
+    # INCOMPLETE: Channel Config: Default value handling / auto missing field repairing
+    # INCOMPLETE: Channel Config: Turn on/off functions (Enable*) by votes if no mod/admin (% of 5 days active member)
 
-    ChannelID = "c"
-    UserID = "u"
-    PermissionLevel = "p"
+    VoteToPromoteMod = "vm"
+    VoteToPromoteAdmin = "va"
+    EnableAutoReply = "ar"
 
     def _init_fields_(self, **kwargs):
-        self.channel_oid = ObjectIDField(ChannelManagerRelationshipModel.ChannelID, readonly=False)
-        self.user_oid = ObjectIDField(ChannelManagerRelationshipModel.UserID, readonly=False)
-        self.permission = PermissionLevelField(ChannelManagerRelationshipModel.PermissionLevel)
+        self.vote_promo_mod = IntegerField(ChannelConfigModel.VoteToPromoteMod, ChannelConfig.VotesToPromoteMod)
+        self.vote_promo_admin = IntegerField(ChannelConfigModel.VoteToPromoteAdmin, ChannelConfig.VotesToPromoteAdmin)
+        self.enable_auto_reply = BooleanField(ChannelConfigModel.EnableAutoReply)

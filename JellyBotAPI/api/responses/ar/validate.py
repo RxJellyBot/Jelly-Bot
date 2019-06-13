@@ -1,5 +1,6 @@
 from django.http import QueryDict
 
+from extutils import is_empty_string
 from JellyBotAPI.api.static import param, result
 from flags import AutoReplyContentType
 from models.validators import AutoReplyValidators
@@ -37,9 +38,8 @@ class ContentValidationResponse(BaseApiResponse):
         self._data[k] = self._content
 
     def is_success(self) -> bool:
-        return self._content is not None and \
-               len(self._content) > 0 and \
-               self._content_type is not None and \
+        return not is_empty_string(self._content) and \
+               not is_empty_string(self._content_type) and \
                self._result
 
     def pre_process(self):

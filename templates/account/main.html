@@ -12,11 +12,11 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <div class="card border-primary">
+                <div class="card border-primary mb-3">
                     <h5 class="card-header text-center text-primary">{% trans "API Key" %}</h5>
                     <div class="card-body">
                         <div class="card-text text-center">
-                            <button class="btn btn-primary" type="button" data-toggle="collapse"
+                            <button class="btn btn-outline-primary" type="button" data-toggle="collapse"
                                     data-target="#apiKey" aria-expanded="false" aria-controls="apiKey">
                                 {% trans "Click to display/hide" %}
                             </button>
@@ -29,6 +29,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="card border-info">
+                    <h5 class="card-header text-center text-info">{% trans "Pending Token Actions" %}</h5>
+                    <div class="card-body">
+                        {% include "components/tkact.html" with tkact_list=tkact_list only %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-6">
                 <div class="card border-dark mb-3">
@@ -39,7 +45,7 @@
                         </h3>
                     </div>
                 </div>
-                <div class="card border-danger pt-1">
+                <div class="card border-danger">
                     <h5 class="card-header text-center text-danger">{% trans "Controls" %}</h5>
                     <div class="card-body">
                         <h3 class="card-text text-center">

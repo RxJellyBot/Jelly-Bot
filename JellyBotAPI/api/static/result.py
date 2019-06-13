@@ -8,7 +8,10 @@ RESULT = "result"
 REQUIRED = "required"
 
 
-# TODO: Restruct result keys to reduce the difficulty of building docs (re-categorize)
+# TODO: API Docs: Restruct result keys to reduce the difficulty of building docs (re-categorize)
+
+class _Common:
+    CREATOR = "creator"
 
 
 class Results:
@@ -28,9 +31,13 @@ class Results:
 class AutoReplyResponse:
     KEYWORD = "keyword"
     RESPONSES = "responses"
-    CREATOR_OID = "creator"
+    CREATOR_OID = _Common.CREATOR
     PLATFORM = "platform"
     CHANNEL = "channel"
     PRIVATE = "private"
     PINNED = "pinned"
     COOLDOWN_SEC = "cooldown"
+
+
+class TokenActionResponse:
+    CREATOR_OID = _Common.CREATOR

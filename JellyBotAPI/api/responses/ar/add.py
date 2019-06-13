@@ -2,6 +2,7 @@ from abc import ABC
 
 from django.http import QueryDict
 
+from extutils import is_empty_string
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from extutils import cast_keep_none
@@ -126,7 +127,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         try:
             return super().is_success() and \
                    InsertOutcome.is_success(self._result.outcome) and \
-                   (self._creator_token is not None)
+                   not is_empty_string(self._creator_token)
         except AttributeError:
             return False
 
@@ -183,7 +184,7 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
 
     def is_success(self) -> bool:
         return super().is_success() and \
-               (self._channel_token is not None) and \
+               not is_empty_string(self._channel_token) and \
                (self._platform is not None)
 
 
@@ -193,6 +194,7 @@ class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
 
     def process_ifnoerror(self):
         self._result = TokenActionManager.enqueue_action(
+            self._data[result.AutoReplyResponse.CREATOR_OID],
             TokenAction.AR_ADD, AutoReplyConnectionModel,
             keyword_oid=self._data[result.AutoReplyResponse.KEYWORD],
             responses_oids=self._data[result.AutoReplyResponse.RESPONSES],

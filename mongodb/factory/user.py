@@ -80,21 +80,12 @@ class OnPlatformIdentityManager(BaseCollection):
 
 
 class MixedUserManager(BaseCollection):
-    # TODO: ID_CONN / TOKEN - Connect API User and OnPlatform ID
+    # TODO: ID_CONN / TOKEN - Connect API User and OnPlatform ID - migrate() check:
+    #   - AutoReplyConnection.CreatorOID (ar.conn.cr)
+    #   - Channel.ManagerOIDs (channel.dict.mgr[])
+    #   - TokenAction.CreatorOID (tk_act.main.cr)
+    #   Then check if the old user.mix identity is removed or not
     # TODO: ID_CONN / TOKEN - Mixed User add user name on it - add user name db
-
-    # Changes:
-    #     Old: Insert active(parent) mix _id field
-    #     New: Insert inactive(child) mix _id field
-    #
-    #     Each time getting user data:
-    #         Check if active/inactive flag exists:
-    #             Parent exists: Get to the highest level _id and return
-    #
-    # When connecting:
-    #     Update all data bound on MixUserModel recursively
-    #
-    # User name -> Another collection and use oid to connect name in MixedUserModel
 
     def __init__(self):
         super().__init__(DB_NAME, "mix", [MixedUserModel.APIUserID, MixedUserModel.OnPlatformUserIDs])

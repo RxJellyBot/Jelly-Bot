@@ -23,7 +23,7 @@ def render_template(request, template_name, context=None, content_type=None, sta
     context["api_token"] = request.COOKIES.get(keys.USER_TOKEN)
 
     # Append necessary backend vars
-    # TODO: Permission: Construct an array and import here for unlocking elements
+    # INCOMPLETE: Permission: Construct an array and import here for unlocking elements
     context["unlock_classes"] = [keys.LOGGED_IN_ENABLE]
 
     return render(request, template_name, context, content_type, status, using)

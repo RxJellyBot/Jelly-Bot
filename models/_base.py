@@ -6,11 +6,16 @@ from .field import OID_KEY, ObjectIDField
 
 
 class Model:
-    def __init__(self, from_dict=False, init_oid=True, **kwargs):
+    def __init__(self, from_db=False, incl_oid=True, **kwargs):
+        """
+        :param from_db: `kwargs` comes from the database.
+        :param incl_oid: Include `_id` field when initializing. Omitted when `from_db` is False.
+        :param kwargs: Arguments for fields to be initialized.
+        """
         self._init_fields_(**kwargs)
 
-        if from_dict:
-            if init_oid:
+        if from_db:
+            if incl_oid:
                 self.id = ObjectIDField()
             self._json_fill_in_(**kwargs)
         else:
@@ -52,13 +57,17 @@ class Model:
         """
         pass
 
-    def serialize(self) -> dict:
+    def serialize(self, include_oid=True) -> dict:
         self.pre_serialize()
-        return {v.key: v.value for v in self.__dict__.values() if v.value is not None}
+        return {v.key: v.value for v in self.__dict__.values()
+                if v.value is not None and (include_oid or v.key != OID_KEY)}
 
     @classmethod
     def parse(cls, dict_):
-        return cls(from_dict=True, **dict_)
+        return cls(from_db=True, **dict_)
 
     def __repr__(self):
         return f"{self.__class__.__name__}: {self.serialize()}"
+
+    def __getattr__(self, item):
+        return None

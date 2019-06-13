@@ -64,10 +64,20 @@ def _construct_docs(current_path, parent):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
     docs_parent.add_item(nav_items_factory(
-        NavHeader, label=_("Code"), parent=docs_parent))
+        NavHeader, label=_("Outcome Code"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Get Outcome"), link=reverse("page.doc.code.get"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Insert Outcome"), link=reverse("page.doc.code.insert"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("Get Outcome"), link=reverse("page.doc.code.get"), parent=docs_parent))
+        NavEntry, current_path, label=_("Operation Outcome"), link=reverse("page.doc.code.ops"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavDivider, parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavHeader, label=_("Action Code"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("API Action"), link=reverse("page.doc.code.api"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Token Action"), link=reverse("page.doc.code.token"), parent=docs_parent))
 
     return docs_parent
