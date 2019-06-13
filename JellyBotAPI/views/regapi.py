@@ -13,7 +13,7 @@ class RegisterAPIUserView(View):
 
     # noinspection PyMethodMayBeStatic, PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        return render_template(request, "login.html", {"title": _("Login")})
+        return render_template(request, _("Login"), "login.html")
 
     # noinspection PyMethodMayBeStatic, PyUnusedLocal, PyBroadException
     def post(self, request, *args, **kwargs):
