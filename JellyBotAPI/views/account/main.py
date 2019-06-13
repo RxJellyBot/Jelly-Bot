@@ -15,6 +15,5 @@ class AccountMainPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         tkact_list = TokenActionManager.get_queued_actions(u_data.id.value)
 
         return render_template(
-            self.request, "account/main.html",  {"title": _("Account Home"),
-                                                 "api_user_data": u_data,
-                                                 "tkact_list": tkact_list})
+            self.request, _("Account Home"), "account/main.html", {"api_user_data": u_data,
+                                                                   "tkact_list": tkact_list})

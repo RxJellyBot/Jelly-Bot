@@ -2,13 +2,16 @@
 
 <div class="table-responsive">
     <table class="table table-hover table-striped table-light table-bordered">
-        <!-- FIXME: Adaptive flag table, display Short/Long Description only if needed -->
         <thead>
         <tr>
             <th scope="col">{% trans "Code" %}</th>
             <th scope="col">{% trans "Name" %}</th>
-            <th scope="col">{% trans "Short Description" %}</th>
-            <th scope="col">{% trans "Long Description" %}</th>
+            {% if has_key %}
+                <th scope="col">{% trans "Short Description" %}</th>
+            {% endif %}
+            {% if has_description %}
+                <th scope="col">{% trans "Long Description" %}</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -24,8 +27,14 @@
                         <a href="#{{ flag.name }}" class="alert-link text-dark">{{ flag.name }}</a>
                     </small>
                 </td>
-                <td>{{ flag.key }}</td>
-                <td><small>{{ flag.description }}</small></td>
+                {% if has_key %}
+                    <td>{{ flag.key }}</td>
+                {% endif %}
+                {% if has_description %}
+                    <td>
+                        <small>{{ flag.description }}</small>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

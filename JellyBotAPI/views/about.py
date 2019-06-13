@@ -7,4 +7,4 @@ from JellyBotAPI.views.render import render_template
 class AboutView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
-        return render_template(request, "about.html", {"title": _("About")})
+        return render_template(request, _("About"), "about.html")
