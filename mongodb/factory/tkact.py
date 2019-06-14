@@ -55,7 +55,8 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
     def get_queued_actions(self, creator_oid: ObjectId) -> Generator:
         csr = self.find({TokenActionModel.CreatorOID: creator_oid})
         for dict_ in csr:
-            yield TokenActionModel(**dict_, from_db=True)
+            o = TokenActionModel(**dict_, from_db=True)
+            yield o
 
     def complete_action(self, token: str, token_args: dict):
         lacking_keys = set()
