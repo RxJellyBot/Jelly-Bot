@@ -1,3 +1,6 @@
+from bson import ObjectId
+
+from extutils.custobj import Color
 from models import ChannelPermissionProfileModel
 
 from ._base import BaseCollection
@@ -11,6 +14,9 @@ class PermissionProfileManager(BaseCollection):
         self.create_index([(ChannelPermissionProfileModel.UserID, 1), (ChannelPermissionProfileModel.ChannelID, 1)],
                           name="Permission Profile Identity", unique=True)
 
+    def register_new(self, channel_id: ObjectId, user_id: ObjectId, name: str, color: Color):
+        pass
+    # FIXME: Starts HERE
     # INCOMPLETE: Create Mod/Admin Preset
     # INCOMPLETE: Check mod/admin promotable if the mod/admin to be demoted is the last
     # INCOMPLETE: Custom permission profile creation (name and color changable only)
