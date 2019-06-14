@@ -1,6 +1,6 @@
 from flags import PermissionCategory
 from models import Model
-from models.field import ObjectIDField, BooleanField, TextField, ColorIntField
+from models.field import ObjectIDField, BooleanField, TextField, ColorField
 
 
 class ChannelPermissionProfileModel(Model):
@@ -13,6 +13,6 @@ class ChannelPermissionProfileModel(Model):
         self.user_oid = ObjectIDField(ChannelPermissionProfileModel.UserID, readonly=False)
         self.channel_oid = ObjectIDField(ChannelPermissionProfileModel.ChannelID, readonly=False)
         self.name = TextField(ChannelPermissionProfileModel.Name)
-        self.color = ColorIntField(ChannelPermissionProfileModel.Color)
+        self.color = ColorField(ChannelPermissionProfileModel.Color)
         for perm_cat in PermissionCategory:
-            setattr(self, perm_cat.name, BooleanField(str(perm_cat.code)))
+            setattr(self, f"perm_{perm_cat.name}", BooleanField(f"_{perm_cat.code}"))
