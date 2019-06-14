@@ -1,26 +1,28 @@
 {% load i18n %}
 
 <div class="card-text text-center">
+    <div class="mb-3">
+        <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                data-target=".token-action" aria-expanded="false">
+            {% trans "Show/Hide All" %}
+        </button>
+    </div>
     {% for tkact in tkact_list %}
-        {% with token=tkact.token.value action=tkact.action.value.code %}
+        {% with token=tkact.token.value action=tkact.action.value ts=tkact.timestamp.value|date:'m-d h:i:s A' %}
             <div class="mb-3">
                 <button class="btn btn-outline-info" type="button" data-toggle="collapse"
-                        data-target="#{{ token }}" aria-expanded="false"
-                        aria-controls="{{ token }}">
-                <!-- FIXME: Cannot display creation/expiry date -->
-                <!-- FIXME: Collapse not working -->
-                <!-- FIXME: IMPORTANT: Starts from here -->
-                    {% blocktrans %}
-                        Created on {{ tkact.timestamp.value|date:"m-d h:i A" }}
+                        data-target="#_{{ token }}" aria-expanded="false" aria-controls="{{ token }}">
+                    {% blocktrans trimmed %}
+                        Created on {{ ts }}
                     {% endblocktrans %}
                 </button>
-                <div class="collapse" id="{{ token }}">
+                <div class="collapse token-action" id="_{{ token }}">
                     <div class="card-text text-center" style="margin-top: 1rem;">
-                        <p>{% trans "Token: " %}<code>{{ token }}</code></p>
+                        <span>{% trans "Token: " %}<code>{{ token }}</code></span>
                         <br>
-                        <p>{% trans "Action Code: " %}
-                            <a href="{% url "page.doc.code.api" %}#{{ action }}"><code>{{ action }}</code></a>
-                        </p>
+                        <span>{% trans "Action: " %}
+                            <a href="{% url "page.doc.code.api" %}#{{ action.code }}"><code>{{ action.key }}</code></a>
+                        </span>
                     </div>
                 </div>
             </div>
