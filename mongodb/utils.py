@@ -1,4 +1,4 @@
-from pymongo import InsertOne, ReplaceOne
+from pymongo import ReplaceOne
 from pymongo.errors import BulkWriteError
 
 from models import OID_KEY
@@ -12,15 +12,20 @@ class BulkWriteDataHolder:
 
     @property
     def holding_data(self) -> bool:
-        return len(self._reqs) > 0
+        return self.holded_count > 0
+
+    @property
+    def holded_count(self) -> int:
+        return len(self._reqs)
 
     def complete(self):
         if self.holding_data:
             try:
-                self._col.bulk_write(self._reqs, ordered=False)
+                return [oid for idx, oid in self._col.bulk_write(self._reqs, ordered=False).upserted_ids.items()]
             except BulkWriteError as e:
                 print("Error occurred during bulk writing:")
                 print("\n".join(f"{s['errmsg']}" for s in e.details["writeErrors"]))
+                return e.details["writeErrors"]
 
     def repsert_single(self, filter_, data):
         """

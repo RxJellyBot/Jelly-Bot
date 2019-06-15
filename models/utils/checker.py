@@ -1,3 +1,4 @@
+from multiprocessing import Process
 from typing import Optional
 
 from pymongo.collection import Collection
@@ -6,6 +7,7 @@ from JellyBotAPI.SystemConfig import Database
 from mongodb.utils import BulkWriteDataHolder
 from models import ModelDefaultValueExtension, OID_KEY
 from extutils.flags import FlagCodeEnum
+from extutils.gmail import MailSender
 
 from ..rpdata import PendingRepairDataModel
 
@@ -34,28 +36,39 @@ class ModelFieldChecker:
 
         if len(or_list) > 0:
             potential_repair_needed = col_inst.find({"$or": or_list})
-            required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst.full_name)
-            repaired_write_holder = BulkWriteDataHolder(col_inst, Database.BulkWriteCount)
 
             if potential_repair_needed.count() > 0:
+                required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst.full_name)
+                repaired_write_holder = BulkWriteDataHolder(col_inst, Database.BulkWriteCount)
+
                 print("\tScanning potential repair requiring data...")
 
-            repaired = ModelFieldChecker.scan_data(
-                col_inst, potential_repair_needed, required_write_holder, repaired_write_holder)
+                ModelFieldChecker.scan_data(
+                    col_inst, potential_repair_needed, required_write_holder, repaired_write_holder)
 
-            if len(repaired) > 0:
-                print("\tUpdating repaired data...")
-                repaired_write_holder.complete()
+                if repaired_write_holder.holding_data:
+                    print("\tUpdating repaired data to database...")
+                    repaired_write_holder.complete()
 
-            if required_write_holder.holding_data:
-                print("\tUpdating unrepaired data...")
-                required_write_holder.complete()
+                if required_write_holder.holding_data:
+                    print("\tUpdating manual repairments required database/Sending email notification...")
+
+                    result = required_write_holder.complete()
+
+                    Process(target=MailSender.send_email,
+                            args=(f"<b>{required_write_holder.holded_count} data</b> need manual repairments.<br>"
+                                  f"Data are originally stored in <code>{col_inst.full_name}</code>.<br>"
+                                  f"<br>"
+                                  f"Results list:<br><ul>"
+                                  f"{''.join(f'<li>{repr(r)}</li>' for r in result)}"
+                                  f"</ul>",),
+                            kwargs={
+                                "subject": "Jelly BOT API - Action Needed: Manual Data repairments required"}).start()
 
         print(f"Done scanning `{col_inst.full_name}`.")
 
     @staticmethod
     def scan_data(col_inst, potential_repair_needed, required_write_holder, repaired_write_holder):
-        repaired = []
         counter = {k: 0 for k in DataRepairResult}
 
         for data in potential_repair_needed:
@@ -69,10 +82,9 @@ class ModelFieldChecker:
 
         ModelFieldChecker.print_scanning_result(counter)
 
-        return repaired
-
     @staticmethod
-    def repair_single_data(col_inst: Collection, required_write_holder, data, default_dict) -> (DataRepairResult, Optional[dict]):
+    def repair_single_data(col_inst: Collection, required_write_holder, data, default_dict) -> (
+            DataRepairResult, Optional[dict]):
         changed = False
         missing = {}
 
@@ -96,7 +108,6 @@ class ModelFieldChecker:
                 PendingRepairDataModel(data=data, missing_keys=missing, incl_oid=False).serialize())
 
             col_inst.delete_one({OID_KEY: data[OID_KEY]})
-            # FIXME: remove from db, email notify
             return DataRepairResult.REQUIRED_MISSING, None
         else:
             return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, data if changed else None

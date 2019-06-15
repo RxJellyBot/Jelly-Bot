@@ -18,8 +18,6 @@
 # DRAFT: On site - Short URL: image update - store on-site url link
 # DRAFT: API Doc: https://getbootstrap.com/docs/4.3/components/scrollspy Design can be used for API Doc
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
-# TODO: Send gmail over django:
-#  https://medium.com/@_christopher/how-to-send-emails-with-python-django-through-google-smtp-server-for-free-22ea6ea0fb8e
 # TODO: On site - API Key refresh
 # DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)
 # DRAFT: Json API Doc - Add anchor for all parameters
