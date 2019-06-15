@@ -1,5 +1,6 @@
+from flags import APIAction as FlagAPIAction
 from models.field import BooleanField, DictionaryField, APIActionTypeField, DateTimeField, TextField
-from models import Model
+from models import Model, ModelDefaultValueExtension
 
 
 class APIStatisticModel(Model):
@@ -11,6 +12,17 @@ class APIStatisticModel(Model):
     Success = "s"
     PathInfo = "pi"
     PathInfoFull = "pf"
+
+    default_vals = (
+        (Timestamp, ModelDefaultValueExtension.Required),
+        (APIAction, FlagAPIAction.UNKNOWN),
+        (Parameter, None),
+        (PathParameter, None),
+        (Response, None),
+        (Success, False),
+        (PathInfo, ModelDefaultValueExtension.Required),
+        (PathInfoFull, ModelDefaultValueExtension.Required)
+    )
 
     def _init_fields_(self, **kwargs):
         self.timestamp = DateTimeField(APIStatisticModel.Timestamp, allow_none=False)

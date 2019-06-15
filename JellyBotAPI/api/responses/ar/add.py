@@ -27,7 +27,9 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
             param.AutoReply.CREATOR_TOKEN: param_dict.get(param.AutoReply.CREATOR_TOKEN),
             param.AutoReply.PRIVATE: cast_keep_none(param_dict.get(param.AutoReply.PRIVATE), bool),
             param.AutoReply.PINNED: cast_keep_none(param_dict.get(param.AutoReply.PINNED), bool),
-            param.AutoReply.COOLDOWN: int(param_dict.get(param.AutoReply.COOLDOWN, 0)),
+            param.AutoReply.COOLDOWN: int(
+                param_dict.get(param.AutoReply.COOLDOWN, AutoReplyConnectionModel.get_default_dict().get(
+                    AutoReplyConnectionModel.CoolDownSeconds))),
         }
 
         self._keyword = self._param_dict[param.AutoReply.KEYWORD]
@@ -42,7 +44,8 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
 
     def _handle_keyword(self):
         k = result.AutoReplyResponse.KEYWORD
-        r = AutoReplyContentManager.get_content(self._keyword, int(AutoReplyContentType.TEXT or self._keyword_type))
+        r = AutoReplyContentManager.get_content(self._keyword,
+                                                int(AutoReplyContentType.default() or self._keyword_type))
         if GetOutcome.is_success(r.outcome):
             self._data[k] = r.model.id.value
         else:
@@ -61,7 +64,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         type_len = len(self._response_types)
         diff = resp_len - type_len
         if diff > 0:
-            self._response_types = self._response_types + [AutoReplyContentType.TEXT] * diff
+            self._response_types = self._response_types + [AutoReplyContentType.default()] * diff
             self._info.append(info.AutoReply.RESPONSE_TYPES_LENGTHENED)
         elif diff < 0:
             self._response_types = self._response_types[:-diff]

@@ -11,8 +11,12 @@ DB_NAME = "stats"
 
 
 class APIStatisticsManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "api"
+    model_class = APIStatisticModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "api")
+        super().__init__()
         self.create_index(APIStatisticModel.Timestamp,
                           expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 

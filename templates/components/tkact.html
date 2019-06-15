@@ -8,12 +8,13 @@
         </button>
     </div>
     {% for tkact in tkact_list %}
-        {% with token=tkact.token.value action=tkact.action.value ts=tkact.timestamp.value|date:'m-d h:i:s A' %}
+        <!-- TODO: Account management - timezone handling (change the appearance of timezone https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#date -->
+        {% with token=tkact.token.value action=tkact.action.value ts=tkact.expire_time|date:'m-d h:i:s e' %}
             <div class="mb-3">
                 <button class="btn btn-outline-info" type="button" data-toggle="collapse"
                         data-target="#_{{ token }}" aria-expanded="false" aria-controls="{{ token }}">
                     {% blocktrans trimmed %}
-                        Created on {{ ts }}
+                        Expires on {{ ts }}
                     {% endblocktrans %}
                 </button>
                 <div class="collapse token-action" id="_{{ token }}">

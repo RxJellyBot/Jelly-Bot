@@ -11,11 +11,11 @@ from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
 from extutils.flags import get_codec_options
-
 from JellyBotAPI.SystemConfig import Database
 from models import Model
 from models.exceptions import PreserializationFailedError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid
+from models.utils import ModelFieldChecker
 from mongodb.factory.results import InsertOutcome
 
 from .factory import MONGO_CLIENT
@@ -24,16 +24,49 @@ CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 
 
 class BaseCollection(Collection):
-    def __init__(self, db_name, col_name, cache_keys: Union[str, TIterable[str]] = None):
-        self._db = MONGO_CLIENT.get_database(db_name)
-        super().__init__(self._db, col_name, codec_options=get_codec_options())
+    database_name: str = None
+    collection_name: str = None
+    model_class: type(Model) = None
+
+    @classmethod
+    def get_db_name(cls):
+        if cls.database_name is None:
+            raise AttributeError(f"Define `database_name` as class variable for {cls.__name__}.")
+        else:
+            return cls.database_name
+
+    @classmethod
+    def get_col_name(cls):
+        if cls.collection_name is None:
+            raise AttributeError(f"Define `collection_name` as class variable for {cls.__name__}.")
+        else:
+            return cls.collection_name
+
+    @classmethod
+    def get_model_cls(cls):
+        if cls.model_class is None:
+            raise AttributeError(f"Define `model_class` as class variable for {cls.__name__}.")
+        else:
+            return cls.model_class
+
+    def __init__(self, cache_keys: Union[str, TIterable[str]] = None):
+        # OPTIMIZE: BaseCollection.__init__ items becomes class vars
+        self._db = MONGO_CLIENT.get_database(self.__class__.get_db_name())
+        super().__init__(self._db, self.__class__.get_col_name(), codec_options=get_codec_options())
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
+        self._data_model = self.__class__.get_model_cls()
         if cache_keys is not None:
             if isinstance(cache_keys, Iterable):
                 for k in cache_keys:
                     self.init_cache(k)
             else:
                 self.init_cache(cache_keys)
+
+        ModelFieldChecker.check(self)
+
+    @property
+    def data_model(self):
+        return self._data_model
 
     def init_cache(self, cache_key):
         self._cache[cache_key] = {}
@@ -46,6 +79,7 @@ class BaseCollection(Collection):
 
     def get_cache(self, cache_key, item_key, acquire_func=None, acquire_args: Tuple = None,
                   acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False):
+        # OPTIMIZE: Modulize Cache
         # OPTIMIZE: Local Cache case-insensitive getter
         if acquire_func is None:
             acquire_func = self.find_one
@@ -110,6 +144,8 @@ class BaseCollection(Collection):
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.
+
+        :return: model, outcome, ex, insert_result
         """
         model = None
         outcome: InsertOutcome = InsertOutcome.FAILED_NOT_EXECUTED

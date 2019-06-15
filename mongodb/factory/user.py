@@ -20,8 +20,12 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
     token_length = APIUserModel.API_TOKEN_LENGTH
     token_key = APIUserModel.APIToken
 
+    database_name = DB_NAME
+    collection_name = "api"
+    model_class = APIUserModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "api", [APIUserModel.GoogleUniqueID, APIUserModel.APIToken])
+        super().__init__([APIUserModel.GoogleUniqueID, APIUserModel.APIToken])
         self.create_index(APIUserModel.GoogleUniqueID, unique=True, name="Google Identity Unique ID")
         self.create_index(APIUserModel.APIToken, unique=True, name="Jelly Bot API Token")
 
@@ -54,8 +58,12 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
 
 
 class OnPlatformIdentityManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "onplat"
+    model_class = OnPlatformUserModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "onplat", OnPlatformUserModel.UserToken)
+        super().__init__(OnPlatformUserModel.UserToken)
         self.create_index([(OnPlatformUserModel.Platform, 1), (OnPlatformUserModel.UserToken, 1)],
                           unique=True, name="Compound - Identity")
 
@@ -82,13 +90,18 @@ class OnPlatformIdentityManager(BaseCollection):
 class MixedUserManager(BaseCollection):
     # TODO: ID_CONN / TOKEN - Connect API User and OnPlatform ID - migrate() check:
     #   - AutoReplyConnection.CreatorOID (ar.conn.cr)
+    #   - AutoReplyConnection.ExcludedOIDs (ar.conn.e[])
+    #   - ChannelPermissionProfile.UserID (channel.perm.u)
     #   - Channel.ManagerOIDs (channel.dict.mgr[])
     #   - TokenAction.CreatorOID (tk_act.main.cr)
     #   Then check if the old user.mix identity is removed or not
     # TODO: ID_CONN / TOKEN - Mixed User add user name on it - add user name db
+    database_name = DB_NAME
+    collection_name = "mix"
+    model_class = MixedUserModel
 
     def __init__(self):
-        super().__init__(DB_NAME, "mix", [MixedUserModel.APIUserID, MixedUserModel.OnPlatformUserIDs])
+        super().__init__([MixedUserModel.APIUserID, MixedUserModel.OnPlatformUserIDs])
         self._mgr_api = APIUserManager()
         self._mgr_onplat = OnPlatformIdentityManager()
         self.create_index(MixedUserModel.APIUserID, unique=True, sparse=True, name="API User OID")

@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from ._base import Model
+from ._base import Model, ModelDefaultValueExtension
 from .exceptions import InvalidModelError
 from .field import PlatformField, TextField, ArrayField, ObjectIDField
 
@@ -8,6 +8,11 @@ from .field import PlatformField, TextField, ArrayField, ObjectIDField
 class MixedUserModel(Model):
     APIUserID = "api"
     OnPlatformUserIDs = "op"
+
+    default_vals = (
+        (APIUserID, ModelDefaultValueExtension.Optional),
+        (OnPlatformUserIDs, ModelDefaultValueExtension.Optional)
+    )
 
     def _init_fields_(self, **kwargs):
         self.onplat_oids = ArrayField(MixedUserModel.OnPlatformUserIDs, ObjectId, allow_none=True)
@@ -26,6 +31,12 @@ class APIUserModel(Model):
     GoogleUniqueID = "goo_id"
     APIToken = "t"
 
+    default_vals = (
+        (Email, ModelDefaultValueExtension.Required),
+        (GoogleUniqueID, ModelDefaultValueExtension.Required),
+        (APIToken, ModelDefaultValueExtension.Required)
+    )
+
     API_TOKEN_LENGTH = 32
 
     def _init_fields_(self, **kwargs):
@@ -38,6 +49,11 @@ class APIUserModel(Model):
 class OnPlatformUserModel(Model):
     UserToken = "t"
     Platform = "p"
+
+    default_vals = (
+        (UserToken, ModelDefaultValueExtension.Required),
+        (Platform, ModelDefaultValueExtension.Required)
+    )
 
     def _init_fields_(self, **kwargs):
         self.token = TextField(OnPlatformUserModel.UserToken)

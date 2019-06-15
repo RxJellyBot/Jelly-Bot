@@ -3,7 +3,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 from JellyBotAPI import keys
 from JellyBotAPI.api.static import result
-from flags import APIAction
+from models import APIStatisticModel
 from mongodb.factory import APIStatisticsManager
 from mongodb.factory.results import InsertOutcome
 
@@ -11,11 +11,18 @@ from mongodb.factory.results import InsertOutcome
 class APIStatisticsCollector(MiddlewareMixin):
     # noinspection PyMethodMayBeStatic
     def process_response(self, request, response):
-        api_action = request.session.pop(keys.APIStatisticsCollection.API_ACTION, APIAction.UNKNOWN)
-        dict_response = request.session.pop(keys.APIStatisticsCollection.DICT_RESPONSE, None)
-        dict_params = request.session.pop(keys.APIStatisticsCollection.DICT_PARAMS, None)
+        _default_dict = APIStatisticModel.get_default_dict()
+
+        api_action = request.session.pop(keys.APIStatisticsCollection.API_ACTION,
+                                         _default_dict.get(APIStatisticModel.APIAction))
+        dict_response = request.session.pop(keys.APIStatisticsCollection.DICT_RESPONSE,
+                                            _default_dict.get(APIStatisticModel.Response))
+        dict_params = request.session.pop(keys.APIStatisticsCollection.DICT_PARAMS,
+                                          _default_dict.get(APIStatisticModel.Parameter))
         success = request.session.pop(keys.APIStatisticsCollection.SUCCESS,
-                                      False if dict_params is None else dict_params.get(result.SUCCESS, False))
+                                      _default_dict.get(
+                                          APIStatisticModel.Success) if dict_params is None else dict_params.get(
+                                          result.SUCCESS, _default_dict.get(APIStatisticModel.Success)))
         collect = request.session.pop(keys.APIStatisticsCollection.COLLECT, False)
 
         path_params = None
