@@ -83,7 +83,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'JellyBotAPI.components.middleware.APIStatisticsCollector'
+    'JellyBotAPI.components.middleware.APIStatisticsCollector',
+    'JellyBotAPI.components.middleware.TimezoneActivator'
 ]
 
 ROOT_URLCONF = 'JellyBotAPI.urls'

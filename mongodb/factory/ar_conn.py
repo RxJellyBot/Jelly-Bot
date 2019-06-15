@@ -14,9 +14,12 @@ DB_NAME = "ar"
 
 class AutoReplyConnectionManager(BaseCollection):
     # DRAFT: Auto Reply - Cache (KW, CH - Flatten)
+    database_name = DB_NAME
+    collection_name = "conn"
+    model_class = AutoReplyConnectionModel
 
     def __init__(self):
-        super().__init__(DB_NAME, "conn", AutoReplyContentModel.Content)
+        super().__init__(AutoReplyContentModel.Content)
         self.create_index([(AutoReplyConnectionModel.KeywordID, 1), (AutoReplyConnectionModel.ResponsesIDs, 1)],
                           name="Auto Reply Connection Identity", unique=True)
 

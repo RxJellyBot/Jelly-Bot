@@ -1,4 +1,10 @@
-from models import Model
+from datetime import timedelta, datetime
+from typing import Optional
+
+from django.utils.timezone import get_current_timezone
+
+from JellyBotAPI import SystemConfig
+from models import Model, ModelDefaultValueExtension
 from models.field import TextField, TokenActionField, DateTimeField, DictionaryField, ObjectIDField
 
 
@@ -9,6 +15,14 @@ class TokenActionModel(Model):
     Timestamp = "t"
     Data = "d"
 
+    default_vals = (
+        (CreatorOID, ModelDefaultValueExtension.Required),
+        (Token, ModelDefaultValueExtension.Required),
+        (ActionType, ModelDefaultValueExtension.Required),
+        (Timestamp, ModelDefaultValueExtension.Required),
+        (Data, None)
+    )
+
     TOKEN_LENGTH = 10
 
     def _init_fields_(self, **kwargs):
@@ -18,3 +32,11 @@ class TokenActionModel(Model):
         self.action = TokenActionField(TokenActionModel.ActionType)
         self.timestamp = DateTimeField(TokenActionModel.Timestamp)
         self.data = DictionaryField(TokenActionModel.Data)
+
+    @property
+    def expire_time(self) -> Optional[datetime]:
+        if self.timestamp and not self.timestamp.is_none():
+            return self.timestamp.value.replace(tzinfo=get_current_timezone()) + \
+                   timedelta(seconds=SystemConfig.Database.TokenActionExpirySeconds)
+        else:
+            return None

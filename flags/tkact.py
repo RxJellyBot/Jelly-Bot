@@ -17,7 +17,7 @@ class TokenAction(FlagSingleEnum):
     def default():
         return TokenAction.UNKNOWN
 
-    UNKNOWN = -1, _("Unknown token action")
+    UNKNOWN = -1, _("Unknown")
 
     CONNECT_API_TO_ONPLAT = 101, _("API -> OnPlat")
     CONNECT_ONPLAT_TO_API = 102, _("OnPlat -> API")

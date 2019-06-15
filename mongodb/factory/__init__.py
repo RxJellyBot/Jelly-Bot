@@ -1,3 +1,6 @@
+from .factory import MONGO_CLIENT
+# noinspection PyPep8Naming
+from .rpdata import _inst as PendingRepairDataManager
 # noinspection PyPep8Naming
 from .ar_conn import _inst as AutoReplyConnectionManager
 # noinspection PyPep8Naming
@@ -10,4 +13,3 @@ from .user import _inst as MixedUserManager
 from .stats import _inst as APIStatisticsManager
 # noinspection PyPep8Naming
 from .tkact import _inst as TokenActionManager, TokenActionRequiredKeys
-from .factory import MONGO_CLIENT

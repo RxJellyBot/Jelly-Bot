@@ -3,7 +3,7 @@ from django.http import QueryDict
 from extutils import is_empty_string
 from JellyBotAPI.api.static import param, result
 from flags import AutoReplyContentType
-from models.validators import AutoReplyValidators
+from models.utils import AutoReplyValidators
 
 from .._base import BaseApiResponse
 

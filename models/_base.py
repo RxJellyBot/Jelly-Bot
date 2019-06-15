@@ -1,4 +1,6 @@
 import abc
+from typing import Tuple
+
 from bson import ObjectId
 
 from .exceptions import InvalidModelError
@@ -6,6 +8,14 @@ from .field import OID_KEY, ObjectIDField
 
 
 class Model:
+    default_vals: Tuple
+
+    @classmethod
+    def get_default_dict(cls) -> dict:
+        if not cls.default_vals:
+            raise ValueError(f"Default values not defined in the Model class. ({cls.__name__})")
+        return {k: v for k, v in cls.default_vals}
+
     def __init__(self, from_db=False, incl_oid=True, **kwargs):
         """
         :param from_db: `kwargs` comes from the database.
@@ -71,3 +81,12 @@ class Model:
 
     def __getattr__(self, item):
         return None
+
+    @classmethod
+    def model_keys(cls) -> dict:
+        return {k: v for k, v in cls.__dict__.items() if k[0].isupper() and isinstance(v, str) and v.islower()}
+
+
+class ModelDefaultValueExtension:
+    Required = object()
+    Optional = object()

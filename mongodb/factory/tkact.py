@@ -36,15 +36,19 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
     token_length = TokenActionModel.TOKEN_LENGTH
     token_key = TokenActionModel.Token
 
+    database_name = DB_NAME
+    collection_name = "main"
+    model_class = TokenActionModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "main")
+        super().__init__()
         self.create_index(TokenActionModel.Token, name="Token", unique=True)
         self.create_index(TokenActionModel.Timestamp,
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.TokenActionExpirySeconds)
 
     def enqueue_action(self, creator: ObjectId, token_action: TokenAction, data_cls: Type[Model], **data_kw_args):
         token = self.generate_hex_token()
-        now = datetime.now()
+        now = datetime.utcnow()
 
         entry, outcome, ex, insert_result = self.insert_one_data(
             TokenActionModel, creator_oid=creator,

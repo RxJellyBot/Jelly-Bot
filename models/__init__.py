@@ -1,7 +1,9 @@
 # noinspection PyUnresolvedReferences
 from .field import OID_KEY
 # noinspection PyUnresolvedReferences
-from ._base import Model
+from ._base import Model, ModelDefaultValueExtension
+# noinspection PyUnresolvedReferences
+from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import AutoReplyConnectionModel, AutoReplyContentModel
 # noinspection PyUnresolvedReferences

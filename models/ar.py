@@ -1,20 +1,27 @@
+from typing import Tuple
+
 from bson import ObjectId
 
 from JellyBotAPI import SystemConfig
 from flags import AutoReplyContentType, PreserializationFailedReason
 
-from ._base import Model
+from ._base import Model, ModelDefaultValueExtension
 from .exceptions import PreserializationFailedError
-from .validators import AutoReplyValidators
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
     BooleanField, IntegerField, ArrayField, DateTimeField
 )
+from .utils import AutoReplyValidators
 
 
 class AutoReplyContentModel(Model):
     Content = "c"
     ContentType = "t"
+
+    default_vals = (
+        (Content, ModelDefaultValueExtension.Required),
+        (ContentType, AutoReplyContentType.default())
+    )
 
     def _init_fields_(self, **kwargs):
         self.type = AutoReplyContentTypeField(AutoReplyContentModel.ContentType)
@@ -53,6 +60,20 @@ class AutoReplyConnectionModel(Model):
     ExcludeUserIDs = "e"
     ChannelIDs = "ch"
 
+    default_vals = (
+        (KeywordID, ModelDefaultValueExtension.Required),
+        (ResponsesIDs, ModelDefaultValueExtension.Required),
+        (CreatorUserID, ModelDefaultValueExtension.Required),
+        (Pinned, False),
+        (Disabled, False),
+        (Private, False),
+        (CoolDownSeconds, 0),
+        (CalledCount, 0),
+        (LastUsed, DateTimeField.none_obj()),
+        (ExcludeUserIDs, []),
+        (ChannelIDs, []),
+    )
+
     def _init_fields_(self, **kwargs):
         self.keyword_oid = ObjectIDField(AutoReplyConnectionModel.KeywordID, readonly=True)
         self.responses_oids = \
@@ -74,8 +95,16 @@ class AutoReplyConnectionModel(Model):
 
 class AutoReplyBundle(Model):
     Name = "n"
-    TagIDs = "t"
+    TagIDs = "t"  # TODO: AR_CONN UTILS - Create model for tags
     ConnectionIDs = "c"
+
+    @property
+    def default_vals(self) -> Tuple:
+        return (
+            (AutoReplyBundle.Name, None),
+            (AutoReplyBundle.TagIDs, []),
+            (AutoReplyBundle.ConnectionIDs, None)
+        )
 
     # TODO: AR_CONN UTILS - Bundle to copy a set of auto reply connections
     def _init_fields_(self, **kwargs):
