@@ -13,3 +13,7 @@ class Database:
 class ChannelConfig:
     VotesToPromoteMod = 7
     VotesToPromoteAdmin = 20
+
+
+class Email:
+    DefaultSubject = "Email Notification from Jelly BOT"
