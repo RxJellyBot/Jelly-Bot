@@ -1,26 +1,49 @@
-from models import Model
-from models.field import PlatformField, TextField, ArrayField, ObjectIDField, PermissionLevelField
+from JellyBotAPI.SystemConfig import ChannelConfig
+from models.field import PlatformField, TextField, ModelField, IntegerField, BooleanField
+
+
+from ._mixin import CreateDefaultMixin
+from ._base import Model, ModelDefaultValueExtension
+
+
+class ChannelConfigModel(CreateDefaultMixin, Model):
+    # INCOMPLETE: Channel Config - Turn on/off functions (Enable*) by votes if no mod/admin (% of 5 days active member)
+
+    VoteToPromoteMod = "vm"
+    VoteToPromoteAdmin = "va"
+    EnableAutoReply = "ar"
+    EnableCreateRole = "cro"
+
+    default_vals = (
+        (VoteToPromoteMod, True),
+        (VoteToPromoteAdmin, True),
+        (EnableAutoReply, True),
+        (EnableCreateRole, True)
+    )
+
+    def _init_fields_(self, **kwargs):
+        self.vote_promo_mod = IntegerField(ChannelConfigModel.VoteToPromoteMod, ChannelConfig.VotesToPromoteMod)
+        self.vote_promo_admin = IntegerField(ChannelConfigModel.VoteToPromoteAdmin, ChannelConfig.VotesToPromoteAdmin)
+        self.enable_auto_reply = BooleanField(ChannelConfigModel.EnableAutoReply)
+        self.enable_create_role = BooleanField(ChannelConfigModel.EnableCreateRole)
 
 
 class ChannelModel(Model):
     Platform = "p"
     Token = "t"
-    ManagerRelationshipIDs = "mgr"
+    Config = "c"
+
+    default_vals = (
+        (Platform, ModelDefaultValueExtension.Required),
+        (Token, ModelDefaultValueExtension.Required),
+        (Config, ChannelConfigModel.create_default().serialize())
+    )
+
+    dict_models = (
+        (Config, ChannelConfigModel),
+    )
 
     def _init_fields_(self, **kwargs):
         self.platform = PlatformField(ChannelModel.Platform)
         self.token = TextField(ChannelModel.Token, must_have_content=True)
-        self.manager_oids = ArrayField(ChannelModel.ManagerRelationshipIDs, int)
-
-
-class ChannelManagerRelationshipModel(Model):
-    # TODO: Permission - PermissionLevel -> Permission config data Model?
-
-    ChannelID = "c"
-    UserID = "u"
-    PermissionLevel = "p"
-
-    def _init_fields_(self, **kwargs):
-        self.channel_oid = ObjectIDField(ChannelManagerRelationshipModel.ChannelID, readonly=False)
-        self.user_oid = ObjectIDField(ChannelManagerRelationshipModel.UserID, readonly=False)
-        self.permission = PermissionLevelField(ChannelManagerRelationshipModel.PermissionLevel)
+        self.config = ModelField(ChannelModel.Config, ChannelConfigModel)

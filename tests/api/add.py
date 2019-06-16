@@ -6,22 +6,17 @@ import django
 from django.test import Client, TestCase
 
 from JellyBotAPI.api.static import result as r, param as p
-from mongodb.factory import InsertOutcome
+from mongodb.factory.results import InsertOutcome
 
 c = Client(enforce_csrf_checks=True)
 django.setup()
 
 
 class TestAddAutoReply(TestCase):
+    # TODO: Test: Mocking MongoDB Backend setting
     # @classmethod
     # def setUpTestData(cls) -> None:
-    #     MONGO_CLIENT.get_database("user").get_collection("onplat").delete_many({})
-    #     MONGO_CLIENT.get_database("user").get_collection("api").delete_many({})
-    #     MONGO_CLIENT.get_database("user").get_collection("mix").delete_many({})
-    #     MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
-    #     MONGO_CLIENT.get_database("ar").get_collection("conn").delete_many({})
-    #     MONGO_CLIENT.get_database("ar").get_collection("ctnt").delete_many({})
-    #     MONGO_CLIENT.get_database("stats").get_collection("api").delete_many({})
+    #     pass
 
     def _add_(self, kw, rep, channel, creator, platform, additional_msg=None):
         data = {
@@ -43,7 +38,7 @@ class TestAddAutoReply(TestCase):
         self.assertTrue(result[r.SUCCESS])
         return result
 
-    def _test_add(self):
+    def test_add(self):
         # TODO: Test AR: Add test-cleaning work
         result = self._add_("ABC", "mno", "channel1", "user1", 1, "All New")
         self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)

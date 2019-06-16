@@ -16,5 +16,7 @@ class JellyBotAPISerializer(DjangoJSONEncoder):
             return repr(o)
         elif isinstance(o, FlagCodeMixin):
             return int(o)
+        elif isinstance(o, set):
+            return list(o)
         else:
             return super().default(o)

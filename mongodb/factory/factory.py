@@ -4,7 +4,6 @@ import pymongo
 
 from mongodb.exceptions import MongoURLNotFoundException
 
-
 _url = os.environ.get("MONGO_URL")
 if _url is None:
     raise MongoURLNotFoundException()

@@ -1,11 +1,18 @@
-# COOKIES KEYS
+# Cookies Keys
 USER_TOKEN = "utoken"  # Storing API user token for on-site function use
 
-# FRONTEND CSS CLASS
-LOGGED_IN_ENABLE = "enable-login"
+
+# Frontend CSS Class
+class Css:
+    LOGGED_IN_ENABLE = "enable-login"
 
 
-# SESSION KEYS
+# Param Dict Filter
+class ParamDictFilter:
+    Filter1 = "x-"
+
+
+# Session Keys
 class APIStatisticsCollection:
     API_ACTION = "-stats-api-action"
     DICT_PARAMS = "-stats-param-dict"

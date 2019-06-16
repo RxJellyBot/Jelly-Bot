@@ -59,7 +59,7 @@ class BaseField:
 
     @classmethod
     def none_obj(cls):
-        raise ValueError(f"Implement none_obj property for {cls}.")
+        raise ValueError(f"None object not implemented for {cls}.")
 
     def is_none(self) -> bool:
         if self._allow_none:

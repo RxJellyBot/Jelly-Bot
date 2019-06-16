@@ -5,11 +5,13 @@
     <div class="jumbotron">
         <div class="container">
             <h1 class="display-3 text-center">{% trans "JELLYBOT" %}</h1>
-            <p>{% blocktrans %}
-                This website extends the traditional <b>auto-reply based/chatting group assistant bot</b> to
-                be a web application which the content can be controlled using RESTful API with the
-                assistance of the existing web pages.
-                {% endblocktrans %}</p>
+            <p>
+                {% blocktrans trimmed %}
+                    This website extends the traditional <b>auto-reply based/chatting group assistant bot</b> to
+                    be a web application which the content can be controlled using RESTful API with the
+                    assistance of the existing web pages.
+                {% endblocktrans %}
+            </p>
         </div>
     </div>
 
@@ -19,7 +21,8 @@
                 <h2>{% trans "Auto Reply" %}</h2>
                 <p>{% trans "Reply the corresponding contents based on what has been received by the BOT using API." %}</p>
                 <p>{% trans "The keyword and the response can be either a picture, texts or any supported types." %}</p>
-                <p><a class="btn btn-primary" href="{% url "page.ar.main" %}" role="button">{% trans "More Details" %} &raquo;</a></p>
+                <p><a class="btn btn-primary" href="{% url "page.ar.main" %}" role="button">{% trans "More Details" %}
+                    &raquo;</a></p>
             </div>
             <div class="col-md-4">
                 <h2>{% trans "(Preserve)" %}</h2>

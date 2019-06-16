@@ -1,19 +1,29 @@
 from django.views.generic.base import View
 from django.utils.translation import gettext as _
 
-from JellyBotAPI.views.render import render_template
-from mongodb.factory import InsertOutcome, GetOutcome
+from JellyBotAPI.views.render import render_flag_table
+from mongodb.factory.results import InsertOutcome, GetOutcome, OperationOutcome, UpdateOutcome
 
 
 class InsertOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_template(request, "doc/code/insert.html", {"title": _("Insert Outcome Code"),
-                                                                 "flags": list(InsertOutcome)})
+        return render_flag_table(request, _("Insert Outcome Code"), _("Insert Outcome"), InsertOutcome)
 
 
 class GetOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_template(request, "doc/code/get.html", {"title": _("Get Outcome Code"),
-                                                              "flags": list(GetOutcome)})
+        return render_flag_table(request, _("Get Outcome Code"), _("Get Outcome"), GetOutcome)
+
+
+class OperationOutcomeCodeView(View):
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
+    def get(self, request, *args, **kwargs):
+        return render_flag_table(request, _("Operation Outcome Code"), _("Operation Outcome"), OperationOutcome)
+
+
+class UpdateOutcomeCodeView(View):
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
+    def get(self, request, *args, **kwargs):
+        return render_flag_table(request, _("Update Outcome Code"), _("Update Outcome"), UpdateOutcome)

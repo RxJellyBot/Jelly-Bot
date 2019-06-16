@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flags import Platform
-from models import ChannelModel
+from models import ChannelModel, ChannelConfigModel
 from mongodb.factory.results import InsertOutcome, GetOutcome, ChannelRegistrationResult, ChannelGetResult
 
 from ._base import BaseCollection
@@ -10,13 +10,18 @@ DB_NAME = "channel"
 
 
 class ChannelManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "dict"
+    model_class = ChannelModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "dict", ChannelModel.Token)
+        super().__init__(ChannelModel.Token)
         self.create_index([(ChannelModel.Platform, 1), (ChannelModel.Token, 1)],
                           name="Channel Identity", unique=True)
 
     def register(self, platform: Platform, token: str) -> ChannelRegistrationResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(ChannelModel, platform=platform, token=token)
+        entry, outcome, ex, insert_result = self.insert_one_data(
+            ChannelModel, platform=platform, token=token, config=ChannelConfigModel.create_default().serialize())
 
         if InsertOutcome.is_inserted(outcome):
             self.set_cache(ChannelModel.Token, (platform, token), entry)

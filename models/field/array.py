@@ -17,7 +17,7 @@ class ArrayField(BaseField):
 
         return self.is_type_matched(value)
 
-    def add(self, item):
+    def add_item(self, item):
         if self._readonly:
             raise FieldReadOnly(self.__class__.__name__)
 

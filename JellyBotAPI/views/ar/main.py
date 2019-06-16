@@ -7,4 +7,4 @@ from JellyBotAPI.views.render import render_template
 class MainPageView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
-        return render_template(request, "ar/main.html", {"title": _("Auto-Reply Main")})
+        return render_template(request, _("Auto-Reply Home"), "ar/main.html")

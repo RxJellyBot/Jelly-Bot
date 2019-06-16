@@ -1,7 +1,7 @@
 from abc import ABC
 
 from JellyBotAPI.api.static import result
-from models import MixedUserModel, OnPlatformUserModel, APIUserModel
+from models import RootUserModel, OnPlatformUserModel, APIUserModel
 
 from ._base import ModelResult
 from ._outcome import InsertOutcome
@@ -32,16 +32,6 @@ class OnSiteUserRegistrationResult(IdentityRegistrationResult):
         return d
 
 
-class GetOnSiteUserDataResult(ModelResult):
-    def __init__(self, outcome, model, exception=None):
-        """
-        :type outcome: GetOutcome
-        :type model: APIUserModel
-        :type exception: Optional[Exception]
-        """
-        super().__init__(outcome, model, exception)
-
-
 class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
     def __init__(self, outcome, model, exception=None):
         """
@@ -52,11 +42,27 @@ class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
         super().__init__(outcome, model, exception)
 
 
-class MixedUserRegistrationResult(ModelResult):
+class GetRootUserDataResult(ModelResult):
+    def __init__(self, outcome, model_root, model_api, exception=None):
+        """
+        :type outcome: GetOutcome
+        :type model_root: RootUserModel
+        :type model_api: APIUserModel
+        :type exception: Optional[Exception]
+        """
+        super().__init__(outcome, model_root, exception)
+        self._model_api = model_api
+
+    @property
+    def model_api(self) -> APIUserModel:
+        return self._model_api
+
+
+class RootUserRegistrationResult(ModelResult):
     def __init__(self, overall_outcome, conn_entry, conn_outcome, conn_ex, idt_reg_result, hint):
         """
         :type overall_outcome: InsertOutcome
-        :type conn_entry: MixedUserModel
+        :type conn_entry: RootUserModel
         :type conn_outcome: InsertOutcome
         :type conn_ex: Optional[Exception]
         :type idt_reg_result: IdentityRegistrationResult
@@ -81,3 +87,7 @@ class MixedUserRegistrationResult(ModelResult):
                     result.Results.REG_RESULT: self._idt_reg_result,
                     result.Results.HINT: self._hint})
         return d
+
+
+class RootUserUpdateResult(ModelResult):
+    pass

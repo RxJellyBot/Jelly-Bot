@@ -9,9 +9,14 @@ from ._base import BaseCollection
 DB_NAME = "ar"
 
 
+# TODO: Auto Reply - Include sender user name field
 class AutoReplyContentManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "ctnt"
+    model_class = AutoReplyContentModel
+
     def __init__(self):
-        super().__init__(DB_NAME, "ctnt", AutoReplyContentModel.Content)
+        super().__init__(AutoReplyContentModel.Content)
         self.create_index([(AutoReplyContentModel.Content, 1), (AutoReplyContentModel.ContentType, 1)],
                           name="Auto Reply Content Identity", unique=True)
 

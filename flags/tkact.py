@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_noop as _
 
-from extutils.flags import FlagSingleEnum
+from extutils.flags import FlagSingleEnum, FlagDoubleEnum
 
 
 class TokenAction(FlagSingleEnum):
@@ -13,13 +13,24 @@ class TokenAction(FlagSingleEnum):
     20x - Auto Reply:
             201: Add
     """
+    # TODO: Token Action - Possibly need to know complete OnPlat or OnSite
     @staticmethod
     def default():
         return TokenAction.UNKNOWN
 
-    UNKNOWN = -1, _("Unknown token action")
+    UNKNOWN = -1, _("Unknown")
 
     CONNECT_API_TO_ONPLAT = 101, _("API -> OnPlat")
     CONNECT_ONPLAT_TO_API = 102, _("OnPlat -> API")
 
     AR_ADD = 201, _("Auto-Reply Addition")
+
+
+class TokenActionCollationErrorCode(FlagDoubleEnum):
+    @staticmethod
+    def default():
+        return TokenActionCollationErrorCode.MISC
+
+    MISC = -1, _("Error - Miscellaneous"), _("Miscellaneous collation error occurred.")
+
+    EMPTY_CONTENT = 101, _("Empty Content"), _("The content is empty.")
