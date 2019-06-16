@@ -7,7 +7,7 @@ from flags import TokenAction, Platform, TokenActionCollationErrorCode
 from mongodb.factory import ChannelManager, AutoReplyConnectionManager
 from mongodb.factory.results import (
     EnqueueTokenActionResult, CompleteTokenActionResult,
-    OperationOutcome, InsertOutcome
+    OperationOutcome
 )
 from models import TokenActionModel, Model, AutoReplyConnectionModel
 from JellyBotAPI.SystemConfig import Database
@@ -123,10 +123,10 @@ class TokenActionCompletor:
     def _token_ar_add(action_model: TokenActionModel, xparams: dict):
         conn = AutoReplyConnectionModel(**action_model.data.value, from_db=True, init_oid=False)
         cnl = ChannelManager.register(xparams[param.AutoReply.PLATFORM], xparams[param.AutoReply.CHANNEL_TOKEN])
-        success = InsertOutcome.is_success(cnl.outcome)
+        success = cnl.success
         if success:
             conn.channel_ids.add_item(cnl.model.id.value)
-            success = InsertOutcome.is_success(AutoReplyConnectionManager.add_conn_by_model(conn).outcome)
+            success = AutoReplyConnectionManager.add_conn_by_model(conn).success
 
         return success
 

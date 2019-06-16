@@ -1,7 +1,9 @@
 import urllib.request
 from typing import Any
 
-import extutils
+from JellyBotAPI.SystemConfig import AutoReply
+
+from extutils.line_sticker import LineStickerManager
 import flags
 
 
@@ -17,6 +19,9 @@ class AutoReplyValidators:
 
         if type_ == flags.AutoReplyContentType.LINE_STICKER:
             return _BaseValidators.is_content_sticker(content)
+
+        if type_ == flags.AutoReplyContentType.TEXT:
+            return len(content) <= AutoReply.MAX_CONTENT_LENGTH
 
         return True
 
@@ -36,4 +41,4 @@ class _BaseValidators:
 
     @staticmethod
     def is_content_sticker(content: Any) -> bool:
-        return extutils.LineStickerManager.is_sticker_exists(content)
+        return LineStickerManager.is_sticker_exists(content)

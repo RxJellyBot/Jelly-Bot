@@ -1,22 +1,46 @@
 from bson import ObjectId
 
+from extutils.locales import default_locale
+
 from ._base import Model, ModelDefaultValueExtension
+from ._mixin import CreateDefaultMixin
 from .exceptions import InvalidModelError
-from .field import PlatformField, TextField, ArrayField, ObjectIDField
+from .field import PlatformField, TextField, ArrayField, ObjectIDField, ModelField
 
 
-class MixedUserModel(Model):
-    APIUserID = "api"
-    OnPlatformUserIDs = "op"
+class RootUserConfigModel(CreateDefaultMixin, Model):
+    Locale = "l"
+    Name = "n"
 
     default_vals = (
-        (APIUserID, ModelDefaultValueExtension.Optional),
-        (OnPlatformUserIDs, ModelDefaultValueExtension.Optional)
+        (Locale, default_locale.pytz_code),
+        (Name, ModelDefaultValueExtension.Required),
     )
 
     def _init_fields_(self, **kwargs):
-        self.onplat_oids = ArrayField(MixedUserModel.OnPlatformUserIDs, ObjectId, allow_none=True)
-        self.api_oid = ObjectIDField(MixedUserModel.APIUserID, allow_none=True)
+        self.locale = TextField(RootUserConfigModel.Locale, allow_none=False)
+        self.name = TextField(RootUserConfigModel.Name, allow_none=False)
+
+
+class RootUserModel(Model):
+    APIUserID = "api"
+    OnPlatformUserIDs = "op"
+    Config = "c"
+
+    default_vals = (
+        (APIUserID, ModelDefaultValueExtension.Optional),
+        (OnPlatformUserIDs, ModelDefaultValueExtension.Optional),
+        (Config, RootUserConfigModel.create_default().serialize())
+    )
+
+    dict_models = (
+        (Config, RootUserConfigModel),
+    )
+
+    def _init_fields_(self, **kwargs):
+        self.onplat_oids = ArrayField(RootUserModel.OnPlatformUserIDs, ObjectId, allow_none=True)
+        self.api_oid = ObjectIDField(RootUserModel.APIUserID, allow_none=True)
+        self.config = ModelField(RootUserModel.Config, RootUserConfigModel)
 
     def is_valid(self):
         return (not self.onplat_oids.is_none()) or (not self.api_oid.is_none())

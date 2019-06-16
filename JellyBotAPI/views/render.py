@@ -5,6 +5,7 @@ from django.template import Template, RequestContext
 from JellyBotAPI import keys
 from JellyBotAPI.views.nav import construct_nav
 from JellyBotAPI.api.static import result, param, anchor
+from JellyBotAPI.components import get_root_oid
 from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
 
@@ -28,12 +29,18 @@ def render_template(request, title, template_name, context=None, content_type=No
     context["api_token"] = request.COOKIES.get(keys.USER_TOKEN)
 
     # Append necessary backend vars
-    # INCOMPLETE: Permission: Construct an array and import here for unlocking elements
-    context["unlock_classes"] = [keys.LOGGED_IN_ENABLE]
+    # INCOMPLETE: Permission - Construct an array and import here for unlocking elements
+    unlock_classes = []
+
+    if get_root_oid(request):
+        unlock_classes.append(keys.Css.LOGGED_IN_ENABLE)
+
+    context["unlock_classes"] = unlock_classes
 
     return render(request, template_name, context, content_type, status, using)
 
 
+# noinspection PyTypeChecker
 def render_flag_table(request, title: str, table_title: str, flag_enum: type(FlagCodeMixin), context: dict = None,
                       content_type=None, status=None, using=None) -> HttpResponse:
     if context is None:

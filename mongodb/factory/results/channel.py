@@ -30,6 +30,5 @@ class ChannelGetResult(ModelResult):
 
 @dataclass
 class PermissionProfileRegistrationResult(ModelResult):
-    # FIXME: `PermissionProfileRegistrationResult` not completed
-    def __init__(self):
-        super().__init__()
+    # INCOMPLETE: Permission - `PermissionProfileRegistrationResult` not completed
+    pass

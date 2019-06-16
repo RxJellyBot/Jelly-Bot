@@ -12,21 +12,51 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <div class="card border-primary mb-3">
-                    <h5 class="card-header text-center text-primary">{% trans "API Key" %}</h5>
+                <div class="card border-primary mb-3 text-primary text-center align-middle">
+                    <h5 class="card-header">{% trans "Basic Information" %}</h5>
                     <div class="card-body">
-                        <div class="card-text text-center">
-                            <button class="btn btn-outline-primary" type="button" data-toggle="collapse"
-                                    data-target="#apiKey" aria-expanded="false" aria-controls="apiKey">
-                                {% trans "Click to display/hide" %}
-                            </button>
-                        </div>
-
-                        <div class="collapse" id="apiKey">
-                            <div class="card-text text-center" style="margin-top: 1rem;">
-                                <code style="font-size: 1.5rem;">{{ api_user_data.token.value }}</code>
-                            </div>
-                        </div>
+                        <table class="table text-primary">
+                            <tbody>
+                            <tr>
+                                <th scope="row">{% trans "Google Account" %}</th>
+                                <td>{{ api_user_data.email.value }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="align-middle">{% trans "API Key" %}</th>
+                                <td>
+                                    <div class="card-text text-center">
+                                        <button class="btn btn-outline-primary" type="button" class="btn btn-primary"
+                                                data-toggle="modal"
+                                                data-target="#apiKey">
+                                            {% trans "Click to display" %}
+                                        </button>
+                                    </div>
+                                    <div class="modal fade" id="apiKey" tabindex="-1" role="dialog"
+                                         aria-labelledby="apiKeyTitle" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="apiKeyTitle">{% trans "API Key" %}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h4><code>{{ api_user_data.token.value }}</code></h4>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">{% trans "Close" %}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="card border-info">
@@ -38,17 +68,26 @@
             </div>
             <div class="col-md-6">
                 <div class="card border-dark mb-3">
-                    <h5 class="card-header text-center">{% trans "Google Account" %}</h5>
+                    <h5 class="card-header text-center">{% trans "Channel Controls" %}</h5>
                     <div class="card-body">
                         <h3 class="card-text text-center">
-                            {{ api_user_data.email.value }}
+                            <!-- INCOMPLETE: Main Account Page - Change a href and create corresponding page -->
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                                {% trans "Register" %}
+                            </a>
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                                {% trans "Manage" %}
+                            </a>
                         </h3>
                     </div>
                 </div>
                 <div class="card border-danger">
-                    <h5 class="card-header text-center text-danger">{% trans "Controls" %}</h5>
+                    <h5 class="card-header text-center text-danger">{% trans "Account Controls" %}</h5>
                     <div class="card-body">
                         <h3 class="card-text text-center">
+                            <a class="btn btn-outline-danger" role="button" href="{% url "account.settings" %}">
+                                {% trans "Settings" %}
+                            </a>
                             <a class="btn btn-outline-danger" role="button" href="{% url "account.logout" %}">
                                 {% trans "Logout" %}
                             </a>

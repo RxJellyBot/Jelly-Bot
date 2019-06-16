@@ -1,4 +1,4 @@
-from extutils.custobj import ColorFactory
+from extutils.color import ColorFactory
 from flags import PermissionCategory, PermissionCategoryDefault
 from models import Model, ModelDefaultValueExtension
 from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField

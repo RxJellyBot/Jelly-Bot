@@ -20,6 +20,14 @@ class PermissionCategory(FlagDoubleEnum):
         201, _("Members: Change Managers"), \
         _("User who has this permission can change the members of managers.")
 
+    CNL_ADJUST_FEATURES = \
+        301, _("Channel: Adjust features availability"), \
+        _("User who has this permission can access the availability of the certain features.")
+
+    CNL_ADJUST_VOTES = \
+        302, _("Channel: Vote for managers"), \
+        _("User who has this permission can access the availability of voting to promote members.")
+
 
 class PermissionCategoryDefault:
     _Cache = {}

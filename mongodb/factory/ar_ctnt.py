@@ -9,6 +9,7 @@ from ._base import BaseCollection
 DB_NAME = "ar"
 
 
+# TODO: Auto Reply - Include sender user name field
 class AutoReplyContentManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "ctnt"

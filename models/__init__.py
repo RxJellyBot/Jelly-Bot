@@ -7,7 +7,7 @@ from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import AutoReplyConnectionModel, AutoReplyContentModel
 # noinspection PyUnresolvedReferences
-from .user import APIUserModel, OnPlatformUserModel, MixedUserModel
+from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel
 # noinspection PyUnresolvedReferences

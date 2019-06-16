@@ -165,6 +165,12 @@ class GetOutcome(BaseOutcome):
     FAILED_NOT_FOUND_ABORTED_INSERT = \
         102, _("FAIL - Not Found, Aborted Insertion"), \
         _("The data was not found and the system aborted to insert a new data.")
+    FAILED_NOT_FOUND_FIRST_QUERY = \
+        103, _("FAIL - Not found on 1st query"), \
+        _("The data was not found for the 1st query.")
+    FAILED_NOT_FOUND_SECOND_QUERY = \
+        104, _("FAIL - Not found on 2nd query"), \
+        _("The data was not found for the 2nd query.")
     FAILED_NOT_EXECUTED = \
         901, _("FAIL - Not Executed"), \
         _("The acquiring process had not been executed.")
@@ -215,6 +221,36 @@ class OperationOutcome(BaseOutcome):
     FAILED_COLLATION_ERROR = \
         107, _("FAIL - Collation Error"), \
         _("An error occurred during parameter collation process.")
+    FAILED_NOT_EXECUTED = \
+        901, _("FAIL - Not Executed"), \
+        _("The operation had not been executed.")
+
+
+class UpdateOutcome(BaseOutcome):
+    """
+    Less than 0 - OK
+
+        -x - Miscellaneous
+            -1 - Success
+
+    Greater than 0 - Failed
+
+        1xx - Problems related to Model
+            101 - Model not found
+
+        9xx - Problems related to execution
+            901 - Not executed
+    """
+    @staticmethod
+    def default():
+        return UpdateOutcome.FAILED_NOT_EXECUTED
+
+    SUCCESS_UPDATED = \
+        -1, _("OK - Success"), \
+        _("The updating operation succeed.")
+    FAILED_NOT_FOUND = \
+        101, _("FAIL - Not found"), \
+        _("The data for updating is not found.")
     FAILED_NOT_EXECUTED = \
         901, _("FAIL - Not Executed"), \
         _("The operation had not been executed.")

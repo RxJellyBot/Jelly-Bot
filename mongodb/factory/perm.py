@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from extutils.custobj import Color
+from extutils.color import Color
 from models import ChannelPermissionProfileModel
 
 from ._base import BaseCollection
@@ -18,6 +18,7 @@ class PermissionProfileManager(BaseCollection):
         self.create_index([(ChannelPermissionProfileModel.UserID, 1), (ChannelPermissionProfileModel.ChannelID, 1)],
                           name="Permission Profile Identity", unique=True)
 
+    # INCOMPLETE: Permission - [NOT COMPLETED] Register new permission profile
     def register_new(self, channel_id: ObjectId, user_id: ObjectId, name: str, color: Color,
                      is_mod=False, is_admin=False):
         model, outcome, ex, insert_result = self.insert_one_data(
@@ -26,16 +27,13 @@ class PermissionProfileManager(BaseCollection):
 
         # If duplicated, check and fill if not set
 
-    # FIXME: Starts HERE - PermissionProfileManager
-
-    # INCOMPLETE: Check mod/admin promotable if the mod/admin to be demoted is the last
-    # INCOMPLETE: Custom permission profile creation (name and color changable only) - create then change
-    # DRAFT: Group control: watcher - handle member left if the member is mod/admin
+    # INCOMPLETE: Permission - Ensure mod/admin promotable if the mod/admin to be demoted is the last
+    # INCOMPLETE: Permission - Custom permission profile creation (name and color changable only) - create then change
     pass
 
 
 class PermissionPromotionStatusHolder(BaseCollection):
-    # INCOMPLETE: Keeps the promo record for a short period
+    # INCOMPLETE: Permission/Promotion - Keeps the promo record for a short period
     pass
 
 

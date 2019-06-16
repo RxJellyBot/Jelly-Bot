@@ -11,12 +11,15 @@
 # DRAFT: Function: Countdown / Countup Timer (can be queried on both sides)
 # DRAFT: Function: Anonymous message
 # DRAFT: Group control: watcher - track and view member activity (can config to be public or not)
+# DRAFT: Group control: watcher - handle member left if the member is mod/admin
 # DRAFT: Group Join/Leave: Ping when someone join/leave - send welcome/regret message
 # DRAFT: Group Join/Leave: WATCHDOG - Monitor members, send notification when getting big number of member leaving
 # DRAFT: On site - LINE Sticker: Web sticker utils
 # DRAFT: On site - Short URL: Shortened URL link changable
 # DRAFT: On site - Short URL: image update - store on-site url link
 # DRAFT: API Doc: https://getbootstrap.com/docs/4.3/components/scrollspy Design can be used for API Doc
+# TODO: API usage - Generalize usage
+#  (include either api_key or user_token/platform every time to get root user identity)
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: On site - API Key refresh
 # DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)

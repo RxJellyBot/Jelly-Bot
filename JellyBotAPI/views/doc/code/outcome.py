@@ -2,7 +2,7 @@ from django.views.generic.base import View
 from django.utils.translation import gettext as _
 
 from JellyBotAPI.views.render import render_flag_table
-from mongodb.factory.results import InsertOutcome, GetOutcome, OperationOutcome
+from mongodb.factory.results import InsertOutcome, GetOutcome, OperationOutcome, UpdateOutcome
 
 
 class InsertOutcomeCodeView(View):
@@ -21,3 +21,9 @@ class OperationOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
         return render_flag_table(request, _("Operation Outcome Code"), _("Operation Outcome"), OperationOutcome)
+
+
+class UpdateOutcomeCodeView(View):
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
+    def get(self, request, *args, **kwargs):
+        return render_flag_table(request, _("Update Outcome Code"), _("Update Outcome"), UpdateOutcome)

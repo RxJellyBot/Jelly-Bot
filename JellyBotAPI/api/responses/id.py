@@ -4,7 +4,6 @@ from JellyBotAPI.api.static import param, result
 from extutils import cast_keep_none
 from flags import Platform
 from mongodb.factory import ChannelManager
-from mongodb.factory.results import GetOutcome
 
 from ._base import BaseApiResponse
 
@@ -23,7 +22,7 @@ class ChannelDataQueryResponse(BaseApiResponse):
     def is_success(self) -> bool:
         return self._channel is not None and \
                self._platform is not None and \
-               GetOutcome.is_success(self._result.outcome)
+               self._result.success
 
     # noinspection PyArgumentList
     def _handle_platform(self):
