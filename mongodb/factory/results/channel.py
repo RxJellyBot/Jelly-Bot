@@ -26,3 +26,9 @@ class ChannelGetResult(ModelResult):
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)
+
+
+@dataclass
+class PermissionProfileRegistrationResult(ModelResult):
+    # INCOMPLETE: Permission - `PermissionProfileRegistrationResult` not completed
+    pass

@@ -1,4 +1,4 @@
-from flags import APIAction, AutoReplyContentType, TokenAction, Platform, PermissionCategory
+from flags import APIAction, AutoReplyContentType, TokenAction, Platform
 from .int import FlagField
 
 
@@ -8,10 +8,6 @@ class APIActionTypeField(FlagField):
 
 class AutoReplyContentTypeField(FlagField):
     FLAG_TYPE = AutoReplyContentType
-
-
-class PermissionLevelField(FlagField):
-    FLAG_TYPE = PermissionCategory
 
 
 class PlatformField(FlagField):

@@ -1,6 +1,4 @@
 # noinspection PyUnresolvedReferences
-from .utils import cast_keep_none
-# noinspection PyUnresolvedReferences
-from .linesticker import LineStickerManager, LineStickerType
+from .utils import cast_keep_none, is_empty_string
 # noinspection PyUnresolvedReferences
 from .timing import exec_timing

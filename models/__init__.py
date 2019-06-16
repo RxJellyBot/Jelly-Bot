@@ -1,14 +1,18 @@
 # noinspection PyUnresolvedReferences
 from .field import OID_KEY
 # noinspection PyUnresolvedReferences
-from ._base import Model
+from ._base import Model, ModelDefaultValueExtension
+# noinspection PyUnresolvedReferences
+from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import AutoReplyConnectionModel, AutoReplyContentModel
 # noinspection PyUnresolvedReferences
-from .user import APIUserModel, OnPlatformUserModel, MixedUserModel
+from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel
 # noinspection PyUnresolvedReferences
-from .channel import ChannelModel, ChannelManagerRelationshipModel
+from .channel import ChannelModel, ChannelConfigModel
 # noinspection PyUnresolvedReferences
 from .stats import APIStatisticModel
 # noinspection PyUnresolvedReferences
 from .tkact import TokenActionModel
+# noinspection PyUnresolvedReferences
+from .perm import ChannelPermissionProfileModel

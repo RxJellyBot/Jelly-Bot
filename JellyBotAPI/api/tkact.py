@@ -1,19 +1,18 @@
-from django.views.generic.base import View
-
+from JellyBotAPI.api.responses import TokenActionCompleteApiResponse, TokenActionListApiResponse
 from JellyBotAPI.api.static import param
-from components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBotAPI.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBotAPI.components.views import APIJsonResponseView
 
 
-class TokenProcessingView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, View):
-    def mandatory_keys(self) -> list:
-        return [param.TokenAction.TOKEN]
+class TokenActionCompleteView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+    post_response_class = TokenActionCompleteApiResponse
 
-    def post(self, request, *args, **kwargs):
-        # INCOMPLETE: Token: Get token and check required params
+    def mandatory_keys(self) -> set:
+        return set()
 
-        # request.session[keys.APIStatisticsCollection.API_ACTION] = APIAction.AR_ADD
-        # request.session[keys.APIStatisticsCollection.DICT_PARAMS] = param_dict
-        # request.session[keys.APIStatisticsCollection.DICT_RESPONSE] = response_json_dict
-        # request.session[keys.APIStatisticsCollection.SUCCESS] = response_json_dict.get(result.SUCCESS, False)
 
-        return None
+class TokenActionListView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+    get_response_class = TokenActionListApiResponse
+
+    def mandatory_keys(self) -> set:
+        return {param.TokenAction.PLATFORM, param.TokenAction.USER_TOKEN}

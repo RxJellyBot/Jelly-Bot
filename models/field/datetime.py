@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from ._base import BaseField
 
@@ -13,6 +13,9 @@ class DateTimeField(BaseField):
 
     def is_value_valid(self, value) -> bool:
         return self.is_type_matched(value)
+
+    def set_value(self, value: datetime):
+        super().set_value(value.replace(tzinfo=timezone.utc))
 
     @property
     def expected_types(self):

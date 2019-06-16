@@ -1,7 +1,9 @@
+from abc import ABC
+
 from ._base import NavBaseItem
 
 
-class NavFirstLevelItem(NavBaseItem):
+class NavFirstLevelItem(NavBaseItem, ABC):
     def __init__(self, label, active=False, parent=None, link=None):
         super().__init__(parent)
         self._label = label
@@ -26,11 +28,15 @@ class NavFirstLevelItem(NavBaseItem):
     def active_acc_str(self):
         return '<span class="sr-only">(current)</span>' if self.active else ''
 
-    def to_bread(self):
-        if self.active:
-            return f'<li class="breadcrumb-item active" aria-current="page">{self.label}</li>'
-        else:
+    def to_bread(self, active_link=None):
+        def get_content(additional):
             s = self.label
-            if self.link is not None:
-                s = f'<a href="{self.link}">{s}</a>'
-            return f'<li class="breadcrumb-item">{s}</li>'
+            if additional is not None:
+                s = f'<a href="{additional}">{s}</a>'
+
+            return s
+
+        if self.active:
+            return f'<li class="breadcrumb-item active" aria-current="page">{get_content(active_link)}</li>'
+        else:
+            return f'<li class="breadcrumb-item">{get_content(self.link)}</li>'

@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div class="card-text text-center">
+    <div class="mb-3">
+        <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                data-target=".token-action" aria-expanded="false">
+            {% trans "Show/Hide All" %}
+        </button>
+    </div>
+    {% for tkact in tkact_list %}
+        {% with token=tkact.token.value action=tkact.action.value ts=tkact.expire_time|date:'m-d h:i:s A (e)' %}
+            <div class="mb-3">
+                <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                        data-target="#_{{ token }}" aria-expanded="false" aria-controls="{{ token }}">
+                    {% blocktrans trimmed %}
+                        Expires on {{ ts }}
+                    {% endblocktrans %}
+                </button>
+                <div class="collapse token-action" id="_{{ token }}">
+                    <div class="card-text text-center" style="margin-top: 1rem;">
+                        <span>{% trans "Token: " %}<code>{{ token }}</code></span>
+                        <br>
+                        <span>{% trans "Action: " %}
+                            <a href="{% url "page.doc.code.api" %}#{{ action.code }}"><code>{{ action.key }}</code></a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endwith %}
+    {% endfor %}
+</div>

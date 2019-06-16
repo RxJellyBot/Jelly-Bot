@@ -1,0 +1,99 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center" style="word-break: break-word;">{% trans "Account Settings" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <form class="enable-login d-none">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-primary mb-3">
+                        <div class="card-header text-center text-primary">{% trans "Profile" %}</div>
+                        <div class="card-body text-primary">
+                            <div class="row">
+                                <label class="col-sm-4 col-form-label text-center"
+                                       for="cfgName">{% trans "Name" context "Profile Name" %}</label>
+                                <div class="col-sm-8">
+                                    {% with current_config.name.value as current_name %}
+                                        <input type="text" class="form-control" id="cfgName" name="x-name"
+                                               value="{{ current_name }}">
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-info mb-3">
+                        <div class="card-header text-center text-info">{% trans "Preferences" %}</div>
+                        <div class="card-body text-info">
+                            <div class="row">
+                                <label class="col-sm-4 col-form-label text-center" for="cfgLocale"
+                                       data-toggle="tooltip" data-placement="top"
+                                       title="{% trans "This will affect the displays of timezone." %}">{% trans "Locale" %}</label>
+                                <div class="col-sm-8">
+                                    <select id="cfgLocale" name="x-locale" class="form-control">
+                                        {% for locale in locale_list %}
+                                            {% with current_config.locale.value as current_pytz %}
+                                                <option value="{{ locale.pytz_code }}"
+                                                        {% if current_pytz == locale.pytz_code %}selected{% endif %}>
+                                                    {{ locale.description }}&nbsp;({{ locale.current_utc_hr_offset }})
+                                                </option>
+                                            {% endwith %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <div class="text-right">
+                <div class="col d-inline">
+                    <button type="submit" class="btn btn-outline-dark submit">{% trans "Update" %}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block ex-script %}
+    <script type="text/javascript" src="{% static "js/utils/generator.js" %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+        $(document).ready(function () {
+            $("form").submit(function () {
+                $(".submit").prop("disabled", true);
+                $.ajax({
+                    data: $(this).serialize(),
+                    type: "post",
+                    url: "{% url "account.settings" %}",
+                    success: function (response) {
+                        let s = response.split("/", 2);
+                        if (s.length < 2) {
+                            generateAlert("info", s);
+                        } else {
+                            generateAlert(s[0], s[1]);
+                        }
+                        $(".submit").prop("disabled", false);
+                    },
+                    error: function (xhr) {
+                        generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
+                        $(".submit").prop("disabled", false);
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+{% endblock %}

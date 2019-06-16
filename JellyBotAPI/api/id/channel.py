@@ -11,5 +11,5 @@ class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPara
     def get_api_action(self):
         return APIAction.DATA_CHANNEL
 
-    def mandatory_keys(self) -> list:
-        return [param.DataQuery.Channel.PLATFORM, param.DataQuery.Channel.CHANNEL_TOKEN]
+    def mandatory_keys(self) -> set:
+        return {param.DataQuery.Channel.PLATFORM, param.DataQuery.Channel.CHANNEL_TOKEN}

@@ -2,14 +2,14 @@ from abc import ABC
 
 from django.http import QueryDict
 
+from extutils import is_empty_string
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyConnectionModel
 from mongodb.factory import (
-    GetOutcome, InsertOutcome,
-    AutoReplyConnectionManager, AutoReplyContentManager, MixedUserManager, TokenActionManager
+    AutoReplyConnectionManager, AutoReplyContentManager, RootUserManager, TokenActionManager
 )
 
 from .._base import BaseApiResponse
@@ -26,7 +26,9 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
             param.AutoReply.CREATOR_TOKEN: param_dict.get(param.AutoReply.CREATOR_TOKEN),
             param.AutoReply.PRIVATE: cast_keep_none(param_dict.get(param.AutoReply.PRIVATE), bool),
             param.AutoReply.PINNED: cast_keep_none(param_dict.get(param.AutoReply.PINNED), bool),
-            param.AutoReply.COOLDOWN: int(param_dict.get(param.AutoReply.COOLDOWN, 0)),
+            param.AutoReply.COOLDOWN: int(
+                param_dict.get(param.AutoReply.COOLDOWN, AutoReplyConnectionModel.get_default_dict().get(
+                    AutoReplyConnectionModel.CoolDownSeconds))),
         }
 
         self._keyword = self._param_dict[param.AutoReply.KEYWORD]
@@ -41,8 +43,9 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
 
     def _handle_keyword(self):
         k = result.AutoReplyResponse.KEYWORD
-        r = AutoReplyContentManager.get_content(self._keyword, int(AutoReplyContentType.TEXT or self._keyword_type))
-        if GetOutcome.is_success(r.outcome):
+        r = AutoReplyContentManager.get_content(self._keyword,
+                                                int(AutoReplyContentType.default() or self._keyword_type))
+        if r.success:
             self._data[k] = r.model.id.value
         else:
             self._err[k] = r.serialize()
@@ -60,7 +63,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         type_len = len(self._response_types)
         diff = resp_len - type_len
         if diff > 0:
-            self._response_types = self._response_types + [AutoReplyContentType.TEXT] * diff
+            self._response_types = self._response_types + [AutoReplyContentType.default()] * diff
             self._info.append(info.AutoReply.RESPONSE_TYPES_LENGTHENED)
         elif diff < 0:
             self._response_types = self._response_types[:-diff]
@@ -69,8 +72,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         for idx, resp in enumerate(self._responses):
             r = AutoReplyContentManager.get_content(resp, self._response_types[idx])
 
-            resp_outcome = r.outcome
-            if GetOutcome.is_success(resp_outcome):
+            if r.success:
                 resp_list.append(r.model.id.value)
             else:
                 resp_err[idx] = r.serialize()
@@ -80,15 +82,15 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         else:
             self._data[k] = resp_list
 
-    def get_user_model(self):
+    def get_user_model_result(self):
         raise NotImplementedError()
 
     def _handle_creator_oid(self):
         k = result.AutoReplyResponse.CREATOR_OID
 
-        r = self.get_user_model()
+        r = self.get_user_model_result()
 
-        if GetOutcome.is_success(r.outcome):
+        if r.success:
             self._data[k] = r.model.id.value
         else:
             self._err[k] = r.serialize()
@@ -125,8 +127,8 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
     def is_success(self) -> bool:
         try:
             return super().is_success() and \
-                   InsertOutcome.is_success(self._result.outcome) and \
-                   (self._creator_token is not None)
+                   self._result.success and \
+                   not is_empty_string(self._creator_token)
         except AttributeError:
             return False
 
@@ -144,11 +146,11 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
         self._channel_token = self._param_dict[param.AutoReply.CHANNEL_TOKEN]
         self._platform = self._param_dict[param.AutoReply.PLATFORM]
 
-    def get_user_model(self):
+    def get_user_model_result(self):
         if self._is_local:
-            return MixedUserManager.get_user_data_api_token(self._creator_token)
+            return RootUserManager.get_root_data_api_token(self._creator_token)
         else:
-            return MixedUserManager.register_onplat(self._platform, self._creator_token)
+            return RootUserManager.register_onplat(self._platform, self._creator_token)
 
     def _handle_platform(self):
         k = result.AutoReplyResponse.PLATFORM
@@ -183,16 +185,17 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
 
     def is_success(self) -> bool:
         return super().is_success() and \
-               (self._channel_token is not None) and \
+               not is_empty_string(self._channel_token) and \
                (self._platform is not None)
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
-    def get_user_model(self):
-        return MixedUserManager.get_user_data_api_token(self._creator_token)
+    def get_user_model_result(self):
+        return RootUserManager.get_root_data_api_token(self._creator_token)
 
     def process_ifnoerror(self):
-        self._result = TokenActionManager.enqueue_action_ar_add(
+        self._result = TokenActionManager.enqueue_action(
+            self._data[result.AutoReplyResponse.CREATOR_OID],
             TokenAction.AR_ADD, AutoReplyConnectionModel,
             keyword_oid=self._data[result.AutoReplyResponse.KEYWORD],
             responses_oids=self._data[result.AutoReplyResponse.RESPONSES],

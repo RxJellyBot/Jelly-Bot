@@ -13,18 +13,20 @@ DB_NAME = "ar"
 
 
 class AutoReplyConnectionManager(BaseCollection):
-    # DRAFT: AUto Reply - Cache (KW, CH - Flatten)
+    # DRAFT: Auto Reply - Cache (KW, CH - Flatten)
+    database_name = DB_NAME
+    collection_name = "conn"
+    model_class = AutoReplyConnectionModel
 
     def __init__(self):
-        super().__init__(DB_NAME, "conn", AutoReplyContentModel.Content)
+        super().__init__(AutoReplyContentModel.Content)
         self.create_index([(AutoReplyConnectionModel.KeywordID, 1), (AutoReplyConnectionModel.ResponsesIDs, 1)],
                           name="Auto Reply Connection Identity", unique=True)
 
     def add_conn(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId,
                  platform: Platform, channel_token: str, pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyConnectionAddResult:
-
-        # TODO: Permission - Check if the user have the permission if pinned is true
+        # INCOMPLETE: Permission - Check if the user have the permission if pinned is true
 
         entry, ar_insert_outcome, ex, insert_result = \
             self.insert_one_data(
@@ -52,6 +54,11 @@ class AutoReplyConnectionManager(BaseCollection):
             overall_outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
 
         return AutoReplyConnectionAddResult(overall_outcome, ar_insert_outcome, entry, ex)
+
+    def add_conn_by_model(self, model: AutoReplyConnectionModel) -> AutoReplyConnectionAddResult:
+        outcome, ex = self.insert_one_model(model, include_oid=False)
+
+        return AutoReplyConnectionAddResult(outcome, outcome, model, ex)
 
     def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> InsertOutcome:
         update_result = self.update_one(

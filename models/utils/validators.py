@@ -1,22 +1,27 @@
 import urllib.request
 from typing import Any
 
-from extutils import LineStickerManager
-from flags import AutoReplyContentType
+from JellyBotAPI.SystemConfig import AutoReply
+
+from extutils.line_sticker import LineStickerManager
+import flags
 
 
 class AutoReplyValidators:
     # noinspection PyArgumentList
     @staticmethod
-    def is_valid_content(type_: AutoReplyContentType, content: Any) -> bool:
-        if not isinstance(type_, AutoReplyContentType):
-            type_ = AutoReplyContentType(type_)
+    def is_valid_content(type_: flags.AutoReplyContentType, content: Any) -> bool:
+        if not isinstance(type_, flags.AutoReplyContentType):
+            type_ = flags.AutoReplyContentType(type_)
 
-        if type_ == AutoReplyContentType.IMAGE:
+        if type_ == flags.AutoReplyContentType.IMAGE:
             return _BaseValidators.is_content_image(content)
 
-        if type_ == AutoReplyContentType.LINE_STICKER:
+        if type_ == flags.AutoReplyContentType.LINE_STICKER:
             return _BaseValidators.is_content_sticker(content)
+
+        if type_ == flags.AutoReplyContentType.TEXT:
+            return len(content) <= AutoReply.MAX_CONTENT_LENGTH
 
         return True
 

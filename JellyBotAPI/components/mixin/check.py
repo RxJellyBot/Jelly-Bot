@@ -6,8 +6,8 @@ from JellyBotAPI.api.static import result
 
 
 class CheckParameterMixin(View):
-    def mandatory_keys(self) -> list:
-        return []
+    def mandatory_keys(self) -> set:
+        return set()
 
     # noinspection PyAttributeOutsideInit
     def lacking_keys(self, request):

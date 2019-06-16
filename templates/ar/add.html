@@ -3,310 +3,256 @@
 {% load static %}
 
 {% block content %}
-    {% csrf_token %}
-    <div class="container">
-        <form class="enable-login needs-validation ar d-none" novalidate>
-            <div class="row">
-                <div class="col-md-6">
-                    <input type="hidden" id="response-count" value="1">
+    {% with ar_prfx=static_keys_param.AutoReply %}
+        {% csrf_token %}
+        <div class="container">
+            <form class="enable-login d-none needs-validation ar" novalidate>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="hidden" id="response-count" value="1">
 
-                    <div class="card border-primary mb-3">
-                        <div class="card-header text-center">{% trans "Main Settings" %}</div>
-                        <div class="card-body text-primary">
-                            <div class="form-group content-check">
+                        <div class="card border-primary mb-3">
+                            <div class="card-header text-center">{% trans "Main Settings" %}</div>
+                            <div class="card-body text-primary">
+                                <div class="form-group content-check">
 
-                                <h5 class="card-title">{% trans "Keyword" %}</h5>
-                                <label class="sr-only" for="arKeyword">{% trans "Keyword" %}</label>
-                                <p class="card-text">
-                                    <small>{% trans "The word to trigger the Auto-Reply module. Note that this is case-sensitive." %}</small>
-                                </p>
+                                    <h5 class="card-title">{% trans "Keyword" %}</h5>
+                                    <label class="sr-only" for="arKeyword">{% trans "Keyword" %}</label>
+                                    <p class="card-text">
+                                        <small>{% trans "The word to trigger the Auto-Reply module. Note that this is case-sensitive." %}</small>
+                                    </p>
 
-                                <div class="txtarea-count">
-                                    <textarea class="form-control" name="arKeyword" id="arKeyword"
-                                              data-postkey="{{ static_keys_param.AutoReply.KEYWORD }}"
-                                              required></textarea>
-                                    <div class="progress" style="height: 3px;">
-                                        <div class="progress-bar" role="progressbar" aria-valuenow="0"
-                                             aria-valuemin="0" data-type="progress" data-count="arKeyword"
-                                             aria-valuemax="{{ max_length }}"></div>
+                                    {% with prfx="arKeyword" prfxt="arKeywordType" %}
+                                        {% include "components/txtarea.html" with param_content=ar_prfx.KEYWORD param_content_type=ar_prfx.KEYWORD_TYPE txt_area_name=prfx txt_area_id=prfx type_select_id=prfxt max_length=max_length cttypes=contenttype_list only %}
+                                    {% endwith %}
+                                </div>
+
+                                <b class="d-none" id="respProp" data-max="{{ max_responses }}"></b>
+
+                                {% for i in ""|ljust:max_responses %}
+                                    <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
+
+                                        <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
+                                        <label class="sr-only"
+                                               for="arReply{{ forloop.counter }}">{% trans "Response" %}&nbsp;{{ forloop.counter }}</label>
+                                        <p class="card-text">
+                                            <small>{% trans "The word to reply when the module is triggered." %}</small>
+                                        </p>
+                                        {% with prfx="arReply" prfxt="arReplyType" ct=forloop.counter|stringformat:"s" %}
+                                            {% include "components/txtarea.html" with param_content=ar_prfx.RESPONSE param_content_type=ar_prfx.RESPONSE_TYPE txt_area_name=prfx txt_area_id=prfx|add:ct type_select_id=prfxt|add:ct max_length=max_length cttypes=contenttype_list only %}
+                                        {% endwith %}
                                     </div>
+                                {% endfor %}
 
-                                    <div class="form-group row mt-1">
-                                        <div class="col">
+                                <div class="form-group float-right">
+                                    <button type="button" class="btn btn-outline-primary mr-2 arRespBtnAdd"><b><span
+                                            style="font-family: monospace;">+</span></b></button>
+                                    <button type="button" class="btn btn-outline-primary arRespBtnDel" disabled><b><span
+                                            style="font-family: monospace;">-</span></b></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-info mb-3">
+                            <div class="card-header text-center">{% trans "Notes" %}</div>
+                            <div class="card-body text-info">
+                                <h4 class="card-title">{% trans "Content Type" %}</h4>
+                                <p class="card-text">
+                                    {% blocktrans trimmed %}
+                                        To let the content be valid, the content should be in the format described below
+                                        corresponds to the content type.
+                                    {% endblocktrans %}
+                                </p>
+                                <h5 class="card-title">{% trans "Text" %}</h5>
+                                <p class="card-text">
+                                    {% blocktrans trimmed %}
+                                        <small>Could be anything, but the <b>length cannot be over 2000.</b></small>
+                                    {% endblocktrans %}
+                                </p>
+                                <h5 class="card-title">{% trans "Image" %}</h5>
+                                <p class="card-text">
+                                    {% blocktrans trimmed %}
+                                        <small>The main MIME type should be <code>image</code>. In the other words, when
+                                            you
+                                            open then link,
+                                            the browser should <b>just give you an image</b> not a web page.
+                                        </small>
+                                    {% endblocktrans %}
+                                </p>
+                                <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
+                                <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
+                                <p class="card-text">
+                                    {% blocktrans trimmed %}
+                                        <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits of
+                                            number</b>.
+                                        </small>
+                                    {% endblocktrans %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card border-success mb-3">
+                            <div class="card-header text-center">{% trans "Properties" %}</div>
+                            <div class="card-body text-success">
+                                <!-- INCOMPLETE: Permission - Add `CLASS_KEY` to unlock when the user has the permission -->
+                                <div class="mb-3" data-toggle="tooltip" data-placement="top"
+                                     title="{% trans "You must have the permission to configure this." %}">
+                                    <div class="w-100 card card-body btn btn-outline-success border-success btn-div disabled"
+                                         data-input="arPinned">
+                                        <input type="hidden" value="0" id="arPinned" name="arPinned"
+                                               data-postkey="{{ static_keys_param.AutoReply.PINNED }}"/>
+                                        <h5 class="card-title">{% trans "Pinned" %}</h5>
+                                        <p class="card-text">
+                                            <small>{% trans "If the module is pinned, it can only be overwritten by another pinned module." %}</small>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="w-100 card card-body btn btn-outline-success border-success btn-div"
+                                         data-input="arPrivate">
+                                        <input type="hidden" value="0" id="arPrivate" name="arPrivate"
+                                               data-postkey="{{ static_keys_param.AutoReply.PRIVATE }}"/>
+                                        <h5 class="card-title">{% trans "Private" %}</h5>
+                                        <p class="card-text">
+                                            <small>{% trans "The module can only be used and searched within its channel." %}</small>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="w-100 card card-body border-success text-center">
+                                        <h5 class="card-title">{% trans "Cooldown (sec)" %}</h5>
+                                        <p class="card-text">
                                             <small>
-                                                <label for="arKeywordType"
-                                                       class="sr-only">{% trans "Keyword Type" %}</label>
-                                                <select id="arKeywordType" class="form-control form-control-sm ar-type"
-                                                        data-postkey="{{ static_keys_param.AutoReply.KEYWORD_TYPE }}">
-                                                    {% for cttype in contenttype_list %}
-                                                        <option value="{{ cttype.code }}">{{ cttype.key }}</option>
+                                                {% blocktrans trimmed %}
+                                                    Time duration for the module to be called again. 0 sec means no cool
+                                                    down. <br>
+                                                    Despite the range of the slide bar is between 0 and 30 sec, you can
+                                                    manually enter any integer to the box as the cooldown duration.
+                                                {% endblocktrans %}
+                                            </small>
+                                        </p>
+                                        <div class="form-row">
+                                            <div class="col-8">
+                                                <label class="sr-only"
+                                                       for="arCoolDownRange">{% trans "Cooldown (sec)" %}</label>
+                                                <input type="range" style="height: 1.5rem;" class="custom-range" min="0"
+                                                       max="30" step="1" value="0" id="arCoolDownRange">
+                                            </div>
+                                            <div class="col">
+                                                <label class="sr-only"
+                                                       for="arCoolDown">{% trans "Cooldown (sec)" %}</label>
+                                                <input type="number" style="height: 1.5rem;"
+                                                       class="form-control border-success" id="arCoolDown" value="0"
+                                                       name="arCoolDown"
+                                                       data-postkey="{{ static_keys_param.AutoReply.COOLDOWN }}"
+                                                       required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-warning mb-3">
+                            <div class="card-header text-center">{% trans "Registration" %}</div>
+                            <div class="card-body text-warning">
+                                <div class="mb-3" data-toggle="tooltip" data-placement="top"
+                                     title="{% trans "Search corresponding keyword on-site to get more information." %}">
+                                    <div class="btn-group btn-group-toggle col" data-toggle="buttons">
+                                        <label class="btn btn-warning active arRegister" id="arToken">
+                                            <input type="radio" autocomplete="off" checked>
+                                            {% trans "Get a token" %}
+                                        </label>
+                                        <label class="btn btn-warning arRegister" id="arChannel">
+                                            <input type="radio" autocomplete="off">
+                                            {% trans "By Channel ID" %}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3" data-btn-id="arToken">
+                                    <div class="w-100 card card-body btn btn-outline-warning active">
+                                        <h5 class="card-title">{% trans "Token" %}</h5>
+                                        <p class="card-text">
+                                            <small>{% trans "The token will appear below once the module was successfully registered." %}</small>
+                                        </p>
+                                        <div class="row">
+                                            <div class="col"></div>
+                                            <div class="col-8 bg-light"><h3><code id="arTokenReturn"></code></h3></div>
+                                            <div class="col"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 d-none" data-btn-id="arChannel">
+                                    <div class="w-100 card card-body btn btn-outline-warning active">
+                                        <h5 class="card-title">{% trans "Channel ID" %}</h5>
+                                        <p class="card-text">
+                                            <small>{% trans "Input the channel token to directly register the module." %}</small>
+                                            <br>
+                                            <small>{% trans "This method will be unusable if the channel had not been registered in the bot." %}</small>
+                                        </p>
+                                        <div class="form-group row">
+                                            <div class="col-3">
+                                                <label class="col-form-label"
+                                                       for="arPlatform">{% trans "Platform" %}</label>
+                                            </div>
+                                            <div class="col">
+                                                <select id="arPlatform" class="form-control">
+                                                    {% for platform in platform_list %}
+                                                        <option value="{{ platform.code }}"
+                                                                data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">{{ platform.key }}</option>
                                                     {% endfor %}
                                                 </select>
-                                            </small>
+                                            </div>
                                         </div>
-                                        <div class="col text-right tooltip-hide" data-toggle="tooltip"
-                                             data-placement="top"
-                                             title="{% trans "The length of the content is invalid." %}">
-                                            <small><span data-type="current"
-                                                         data-count="arKeyword"></span>/{{ max_length }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <b class="d-none" id="respProp" data-max="{{ max_responses }}"></b>
-
-                            {% for i in ""|ljust:max_responses %}
-                                <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
-
-                                    <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
-                                    <label class="sr-only"
-                                           for="arReply{{ forloop.counter }}">{% trans "Response" %}&nbsp;{{ forloop.counter }}</label>
-                                    <p class="card-text">
-                                        <small>{% trans "The word to reply when the module is triggered." %}</small>
-                                    </p>
-
-                                    <div class="txtarea-count">
-                                        <textarea class="form-control" name="arReply" id="arReply{{ forloop.counter }}"
-                                                  data-postkey="{{ static_keys_param.AutoReply.RESPONSE }}"
-                                                  required></textarea>
-                                        <div class="progress" style="height: 3px;">
-                                            <div class="progress-bar" role="progressbar" aria-valuenow="0"
-                                                 aria-valuemin="0" data-type="progress"
-                                                 data-count="arReply{{ forloop.counter }}"
-                                                 aria-valuemax="{{ max_length }}"></div>
-                                        </div>
-
-                                        <div class="form-group row mt-1">
+                                        <div class="form-group row">
                                             <div class="col">
-                                                <small>
-                                                    <label for="arReplyType{{ forloop.counter }}"
-                                                           class="sr-only">{% trans "Response Type" %}</label>
-                                                    <select id="arReplyType{{ forloop.counter }}"
-                                                            class="form-control form-control-sm ar-type"
-                                                            data-postkey="{{ static_keys_param.AutoReply.RESPONSE_TYPE }}">
-                                                        {% for cttype in contenttype_list %}
-                                                            <option value="{{ cttype.code }}">{{ cttype.key }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </small>
+                                                <label for="arChannelID"
+                                                       class="sr-only">{% trans "Channel Token" %}</label>
+                                                <input type="text" class="form-control" id="arChannelID"
+                                                       placeholder="Input the Channel Token"
+                                                       data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
                                             </div>
-                                            <div class="col text-right tooltip-hide" data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="{% trans "The length of the content is invalid." %}">
-                                                <small><span data-type="current"
-                                                             data-count="arReply{{ forloop.counter }}"></span>/{{ max_length }}
-                                                </small>
+                                        </div>
+                                        <div class="row text-right">
+                                            <div class="col align-self-end">
+                                                <button type="button"
+                                                        class="btn bg-light btn-outline-warning ml-2 text-dark"
+                                                        id="arChannelCheck">
+                                                    <span style="font-family: monospace;">{% trans "Check" %}</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            {% endfor %}
-
-                            <div class="form-group float-right">
-                                <button type="button" class="btn btn-outline-primary mr-2 arRespBtnAdd"><b><span
-                                        style="font-family: monospace;">+</span></b></button>
-                                <button type="button" class="btn btn-outline-primary arRespBtnDel" disabled><b><span
-                                        style="font-family: monospace;">-</span></b></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-info mb-3">
-                        <div class="card-header text-center">{% trans "Notes" %}</div>
-                        <div class="card-body text-info">
-                            <h4 class="card-title">{% trans "Content Type" %}</h4>
-                            <p class="card-text">
-                                {% blocktrans trimmed %}
-                                    To let the content be valid, the content should be in the format described below
-                                    corresponds to the content type.
-                                {% endblocktrans %}
-                            </p>
-                            <h5 class="card-title">{% trans "Text" %}</h5>
-                            <p class="card-text">
-                                {% blocktrans %}
-                                    <small>Could be anything, but the <b>length cannot be over 2000.</b></small>
-                                {% endblocktrans %}
-                            </p>
-                            <h5 class="card-title">{% trans "Image" %}</h5>
-                            <p class="card-text">
-                                {% blocktrans trimmed %}
-                                    <small>The main MIME type should be <code>image</code>. In the other words, when you
-                                        open then link,
-                                        the browser should <b>just give you an image</b> not a web page.
-                                    </small>
-                                {% endblocktrans %}
-                            </p>
-                            <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
-                            <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
-                            <p class="card-text">
-                                {% blocktrans %}
-                                    <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits of number</b>.
-                                    </small>
-                                {% endblocktrans %}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <!-- TODO: Permission - Add `CLASS_KEY` to unlock when the user has mod+ -->
-                    <div class="card border-success mb-3">
-                        <div class="card-header text-center">{% trans "Properties" %}</div>
-                        <div class="card-body text-success">
-                            <div class="mb-3" data-toggle="tooltip" data-placement="top"
-                                 title="{% trans "You must have the permission to configure this." %}">
-                                <div class="w-100 card card-body btn btn-outline-success border-success btn-div disabled"
-                                     data-input="arPinned">
-                                    <input type="hidden" value="0" id="arPinned" name="arPinned"
-                                           data-postkey="{{ static_keys_param.AutoReply.PINNED }}"/>
-                                    <h5 class="card-title">{% trans "Pinned" %}</h5>
-                                    <p class="card-text">
-                                        <small>{% trans "If the module is pinned, it can only be overwritten by another pinned module." %}</small>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="w-100 card card-body btn btn-outline-success border-success btn-div"
-                                     data-input="arPrivate">
-                                    <input type="hidden" value="0" id="arPrivate" name="arPrivate"
-                                           data-postkey="{{ static_keys_param.AutoReply.PRIVATE }}"/>
-                                    <h5 class="card-title">{% trans "Private" %}</h5>
-                                    <p class="card-text">
-                                        <small>{% trans "The module can only be used and searched within its channel." %}</small>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="w-100 card card-body border-success text-center">
-                                    <h5 class="card-title">{% trans "Cooldown (sec)" %}</h5>
-                                    <p class="card-text">
-                                        <small>
-                                            {% blocktrans %}
-                                                Time duration for the module to be called again. 0 sec means no cool down. <br>
-                                                The cooldown can be any integer while the slide bar only provides convenience to slide through 0 to 30.
-                                            {% endblocktrans %}
-                                        </small>
-                                    </p>
-                                    <div class="form-row">
-                                        <div class="col-8">
-                                            <label class="sr-only"
-                                                   for="arCoolDownRange">{% trans "Cooldown (sec)" %}</label>
-                                            <input type="range" style="height: 1.5rem;" class="custom-range" min="0"
-                                                   max="30" step="1" value="0" id="arCoolDownRange">
-                                        </div>
-                                        <div class="col">
-                                            <label class="sr-only"
-                                                   for="arCoolDown">{% trans "Cooldown (sec)" %}</label>
-                                            <input type="number" style="height: 1.5rem;"
-                                                   class="form-control border-success" id="arCoolDown" value="0"
-                                                   name="arCoolDown"
-                                                   data-postkey="{{ static_keys_param.AutoReply.COOLDOWN }}"
-                                                   required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-warning mb-3">
-                        <div class="card-header text-center">{% trans "Registration" %}</div>
-                        <div class="card-body text-warning">
-                            <div class="mb-3" data-toggle="tooltip" data-placement="top"
-                                 title="{% trans "Search corresponding keyword on-site to get more information." %}">
-                                <div class="btn-group btn-group-toggle col" data-toggle="buttons">
-                                    <label class="btn btn-warning active arRegister" id="arToken">
-                                        <input type="radio" autocomplete="off" checked>
-                                        {% trans "Get a token" %}
-                                    </label>
-                                    <label class="btn btn-warning arRegister" id="arChannel">
-                                        <input type="radio" autocomplete="off">
-                                        {% trans "By Channel ID" %}
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="mb-3" data-btn-id="arToken">
-                                <div class="w-100 card card-body btn btn-outline-warning active">
-                                    <h5 class="card-title">{% trans "Token" %}</h5>
-                                    <p class="card-text">
-                                        <small>{% trans "The token will appear below once the module was successfully registered." %}</small>
-                                    </p>
-                                    <div class="row">
-                                        <div class="col"></div>
-                                        <div class="col-8 bg-light"><h3><code id="arTokenReturn"></code></h3></div>
-                                        <div class="col"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3 d-none" data-btn-id="arChannel">
-                                <div class="w-100 card card-body btn btn-outline-warning active">
-                                    <h5 class="card-title">{% trans "Channel ID" %}</h5>
-                                    <p class="card-text">
-                                        <small>{% trans "Input the channel token to directly register the module." %}</small>
-                                        <br>
-                                        <small>{% trans "This method will be unusable if the channel had not been registered in the bot." %}</small>
-                                    </p>
-                                    <div class="form-group row">
-                                        <div class="col-3">
-                                            <label class="col-form-label"
-                                                   for="arPlatform">{% trans "Platform" %}</label>
-                                        </div>
-                                        <div class="col">
-                                            <select id="arPlatform" class="form-control">
-                                                {% for platform in platform_list %}
-                                                    <option value="{{ platform.code }}"
-                                                            data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">{{ platform.key }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col">
-                                            <label for="arChannelID" class="sr-only">{% trans "Channel Token" %}</label>
-                                            <input type="text" class="form-control" id="arChannelID"
-                                                   placeholder="Input the Channel Token"
-                                                   data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
-                                        </div>
-                                    </div>
-                                    <div class="row text-right">
-                                        <div class="col align-self-end">
-                                            <button type="button"
-                                                    class="btn bg-light btn-outline-warning ml-2 text-dark"
-                                                    id="arChannelCheck">
-                                                <span style="font-family: monospace;">{% trans "Check" %}</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <hr>
+                <hr>
 
-            <div class="text-right">
-                <div class="col text-danger d-none" id="inputFailed">{% trans "Recheck your inputs." %}</div>
-                <div class="col text-success d-none" id="submitSuccess">{% trans "Submission Succeed." %}</div>
-                <div class="col text-danger d-none" id="submitFailed">{% trans "Submission Failed." %}</div>
-                <div class="col d-inline">
-                    <span><a href="{% url "page.doc.code.insert" %}">{% trans "Insert Outcome Code:" %}</a></span>
-                    <h5 class="d-inline"><a id="arCodeLink" data-prefix="{% url "page.doc.code.insert" %}#"><code
-                            id="arCode">-</code></a></h5>
+                <div class="text-right">
+                    <div class="col text-danger d-none" id="inputFailed">{% trans "Recheck your inputs." %}</div>
+                    <div class="col text-success d-none" id="submitSuccess">{% trans "Submission Succeed." %}</div>
+                    <div class="col text-danger d-none" id="submitFailed">{% trans "Submission Failed." %}</div>
+                    <div class="col d-inline">
+                        <span><a href="{% url "page.doc.code.insert" %}">{% trans "Insert Outcome Code:" %}</a></span>
+                        <h5 class="d-inline"><a id="arCodeLink" data-prefix="{% url "page.doc.code.insert" %}#"><code
+                                id="arCode">-</code></a></h5>
+                    </div>
+                    <div class="col d-inline">
+                        <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
+                    </div>
                 </div>
-                <div class="col d-inline">
-                    <button type="submit" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
-                </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+    {% endwith %}
 {% endblock %}
 
 {% block ex-script %}

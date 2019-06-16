@@ -33,3 +33,5 @@ class DataQuery:
 
 class TokenAction:
     TOKEN = "tk"
+    PLATFORM = _Common.PLATFORM
+    USER_TOKEN = _Common.USER_TOKEN
