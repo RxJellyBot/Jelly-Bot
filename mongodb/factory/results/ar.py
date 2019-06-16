@@ -57,10 +57,6 @@ class AutoReplyConnectionAddResult(ModelResult):
     def insert_conn_outcome(self) -> InsertOutcome:
         return self._insert_conn_outcome
 
-    @property
-    def success(self) -> bool:
-        return InsertOutcome.is_success(self._outcome)
-
     def serialize(self) -> dict:
         d = super().serialize()
         d.update(**{result.Results.INSERT_CONN_OUTCOME: self._insert_conn_outcome})

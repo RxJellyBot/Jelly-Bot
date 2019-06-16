@@ -3,9 +3,9 @@ from django.utils.deprecation import MiddlewareMixin
 
 from JellyBotAPI import keys
 from JellyBotAPI.api.static import result
+from JellyBotAPI.components import get_root_oid
 from models import APIStatisticModel
 from mongodb.factory import APIStatisticsManager
-from mongodb.factory.results import InsertOutcome
 
 
 class APIStatisticsCollector(MiddlewareMixin):
@@ -33,11 +33,11 @@ class APIStatisticsCollector(MiddlewareMixin):
 
         if collect:
             rec_result = APIStatisticsManager.record_stats(
-                api_action, dict_response, dict_params, success, path_params,
+                api_action, get_root_oid(request), dict_response, dict_params, success, path_params,
                 request.path_info, request.get_full_path_info()
             )
 
-            if settings.DEBUG and not InsertOutcome.is_success(rec_result.outcome):
+            if settings.DEBUG and not rec_result.success:
                 if rec_result.exception is None:
                     raise RuntimeError(f"Stats not recorded. Result: {repr(rec_result.serialize())}")
                 else:

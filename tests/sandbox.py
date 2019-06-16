@@ -1,24 +1,30 @@
-import os
-import time
-from inspect import signature
-from typing import Type
+from extutils import exec_timing
 
-import pymongo
+import pytz
+from datetime import datetime
 
-MONGO_CLIENT = pymongo.MongoClient(os.environ.get("MONGO_URL"))
+
+def wrap():
+    for i in range(50000000):
+        sign = "+" if i > 0 else "-"
+        sign + str(i)
+
+
+def wrap2():
+    for i in range(50000000):
+        f"{i:+d}"
 
 
 if __name__ == "__main__":
-    _start = time.time_ns()
-
-    for i in range(99999999):
-        5 % 7 == 0
-
-    print(f"{time.time_ns() - _start} ns")
-    _start = time.time_ns()
-
-    for i in range(99999999):
-        5 > 7
-
-    print(f"{time.time_ns() - _start} ns")
-
+    duration, ret = exec_timing(wrap)
+    print(f"Duration: {duration}s")
+    duration, ret = exec_timing(wrap)
+    print(f"Duration: {duration}s")
+    duration, ret = exec_timing(wrap)
+    print(f"Duration: {duration}s")
+    duration, ret = exec_timing(wrap2)
+    print(f"Duration: {duration}s")
+    duration, ret = exec_timing(wrap2)
+    print(f"Duration: {duration}s")
+    duration, ret = exec_timing(wrap2)
+    print(f"Duration: {duration}s")

@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from typing import Optional
 
-from django.utils.timezone import get_current_timezone
+from django.utils import timezone
 
 from JellyBotAPI import SystemConfig
 from models import Model, ModelDefaultValueExtension
@@ -36,7 +36,7 @@ class TokenActionModel(Model):
     @property
     def expire_time(self) -> Optional[datetime]:
         if self.timestamp and not self.timestamp.is_none():
-            return self.timestamp.value.replace(tzinfo=get_current_timezone()) + \
-                   timedelta(seconds=SystemConfig.Database.TokenActionExpirySeconds)
+            return timezone.localtime(self.timestamp.value) + timedelta(
+                seconds=SystemConfig.Database.TokenActionExpirySeconds)
         else:
             return None

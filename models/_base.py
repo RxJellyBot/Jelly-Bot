@@ -2,6 +2,7 @@ import abc
 from typing import Tuple
 
 from bson import ObjectId
+from models.field import ModelField
 
 from .exceptions import InvalidModelError
 from .field import OID_KEY, ObjectIDField
@@ -9,6 +10,7 @@ from .field import OID_KEY, ObjectIDField
 
 class Model:
     default_vals: Tuple
+    dict_models: Tuple
 
     @classmethod
     def get_default_dict(cls) -> dict:
@@ -41,13 +43,23 @@ class Model:
     def _match_fields_(self, **kwargs):
         for k, v in kwargs.items():
             if k in self.__dict__:
-                self.__dict__[k].set_value(kwargs[k])
+                val = kwargs[k]
+
+                if isinstance(self.__dict__[k], ModelField):
+                    self.__dict__[k].set_value(self.__dict__[k].model_cls(**val, from_db=True, incl_oid=False))
+                else:
+                    self.__dict__[k].set_value(val)
 
     def _json_fill_in_(self, **json):
         for k, v in self.__dict__.items():
             json_key = v.key
             if json_key in json:
-                self.__dict__[k].set_value(json[json_key])
+                val = json[json_key]
+
+                if isinstance(self.__dict__[k], ModelField):
+                    self.__dict__[k].set_value(self.__dict__[k].model_cls(**val, from_db=True, incl_oid=False))
+                else:
+                    self.__dict__[k].set_value(val)
 
     def is_valid(self):
         return True

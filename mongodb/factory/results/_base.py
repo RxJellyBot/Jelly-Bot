@@ -27,6 +27,10 @@ class BaseResult(ABC):
     def serialize(self) -> dict:
         return {result.Results.EXCEPTION: str(self._exception), result.Results.OUTCOME: int(self._outcome)}
 
+    @property
+    def success(self) -> bool:
+        return self.outcome.__class__.is_success(self.outcome)
+
 
 class ModelResult(BaseResult, ABC):
     def __init__(self, outcome, model, exception=None):

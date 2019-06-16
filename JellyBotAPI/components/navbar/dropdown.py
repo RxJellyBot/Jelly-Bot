@@ -3,8 +3,8 @@ from ._base import NavBaseItem
 
 
 class NavDropdown(NavFirstLevelItem):
-    def __init__(self, label, parent=None, active=False):
-        super().__init__(label, active, parent)
+    def __init__(self, label, parent=None, active=False, link=None):
+        super().__init__(label, active, parent, link)
         self._items = []
 
     @property
@@ -48,8 +48,8 @@ class NavDropdown(NavFirstLevelItem):
 
         return s
 
-    def to_bread(self):
-        s = super().to_bread()
+    def to_bread(self, active_link=None):
+        s = super().to_bread(self.link)
         for i in self.active_item:
             s += i.to_bread()
 

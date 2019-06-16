@@ -1,4 +1,4 @@
-from extutils.custobj import Color, ColorFactory
+from extutils.color import Color, ColorFactory
 
 from ._base import BaseField
 

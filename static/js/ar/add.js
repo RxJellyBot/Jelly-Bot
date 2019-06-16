@@ -3,8 +3,6 @@ $(function () {
     $('.tooltip-hide[data-toggle="tooltip"]').tooltip('disable');
 });
 
-// OPTIMIZE: Dynamically generate input fields using javascript
-
 $(document).ready(function () {
     initEvents();
     initLayout();
@@ -34,7 +32,7 @@ function regSubmitBtnControl() {
     if (regId === "arChannel") {
         validateChannelInfo();
     } else {
-        $(".arSubmit").prop("disabled", false);
+        submitBtnDisable(false);
     }
 }
 
@@ -96,6 +94,7 @@ function initTextAreas() {
             } else {
                 progBar.removeClass("bg-danger");
             }
+            submitBtnDisable(percentage > 100);
         });
 
         txtArea.on("keyup change blur", function() {
@@ -118,7 +117,7 @@ function validateTextArea(parent, txtArea) {
         } else {
             txtArea.addClass("is-invalid");
         }
-        $(".arSubmit").prop("disabled", !valid);
+        submitBtnDisable(!valid);
     })
 }
 
@@ -151,7 +150,7 @@ function formSubmitHandle() {
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
             }
-            $(".arSubmit").prop("disabled", true);
+            submitBtnDisable(true);
         }
         event.preventDefault(); // Because of Ajax form submission
     })
@@ -183,7 +182,7 @@ function validateChannelInfo() {
 
     checkChannelExistence(arPlatVal, arChannelID, function (outcomeCode) {
         let result = outcomeCode > 0;
-        $(".arSubmit").prop("disabled", result);
+        submitBtnDisable(result);
 
         let elem = $("#arChannelID");
         elem.removeClass("is-valid is-invalid");
@@ -204,7 +203,7 @@ function hideAllValidClasses(elem) {
 }
 
 function onSubmitCallback(response) {
-    $(".arSubmit").prop("disabled", false);
+    submitBtnDisable(false);
 
     hideAllSubmitMsg();
 
@@ -252,4 +251,8 @@ function updateArCode(code) {
     } else {
         $("#arCode").text("-");
     }
+}
+
+function submitBtnDisable(disable) {
+    $(".arSubmit").prop("disabled", disable);
 }

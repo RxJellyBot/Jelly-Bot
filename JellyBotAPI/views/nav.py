@@ -3,7 +3,7 @@ from django.utils.translation import gettext as _
 
 from JellyBotAPI import keys
 from JellyBotAPI.components.navbar import (
-    nav_items_factory, NavItemsHolder, NavEntry, NavDropdown, NavHeader, NavDivider
+    nav_items_factory, NavItemsHolder, NavEntry, NavDropdown, NavHeader, NavDivider, NavDummy
 )
 
 
@@ -20,10 +20,6 @@ def construct_nav(request):
     login_item = nav_items_factory(
         NavEntry, current_path, label=_("Login"), link=reverse("page.login"), parent=home_item)
 
-    # Construct My Account item
-    my_account_item = nav_items_factory(
-        NavEntry, current_path, label=_("My Account"), link=reverse("account.main"), parent=home_item)
-
     # Construct About item
     about_item = nav_items_factory(
         NavEntry, current_path, label=_("About"), link=reverse("page.about"), parent=home_item)
@@ -32,7 +28,7 @@ def construct_nav(request):
     nav.add_item(home_item)
 
     if keys.USER_TOKEN in request.COOKIES:
-        nav.add_item(my_account_item)
+        nav.add_item(_construct_my_account(current_path, home_item))
     else:
         nav.add_item(login_item)
 
@@ -41,6 +37,19 @@ def construct_nav(request):
     nav.add_item(about_item)
 
     return nav
+
+
+def _construct_my_account(current_path, parent):
+    my_account_parent = nav_items_factory(
+        NavDropdown, current_path, label=_("My Account"), parent=parent, link=reverse("account.main"))
+    my_account_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Dashboard"), link=reverse("account.main"), parent=my_account_parent))
+
+    # Dummy
+    my_account_parent.add_item(nav_items_factory(
+        NavDummy, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
+
+    return my_account_parent
 
 
 def _construct_auto_reply(current_path, parent):
@@ -71,6 +80,8 @@ def _construct_docs(current_path, parent):
         NavEntry, current_path, label=_("Insert Outcome"), link=reverse("page.doc.code.insert"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Operation Outcome"), link=reverse("page.doc.code.ops"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Update Outcome"), link=reverse("page.doc.code.update"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavDivider, parent=docs_parent))
     docs_parent.add_item(nav_items_factory(

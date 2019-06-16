@@ -9,9 +9,8 @@ from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyConnectionModel
 from mongodb.factory import (
-    AutoReplyConnectionManager, AutoReplyContentManager, MixedUserManager, TokenActionManager
+    AutoReplyConnectionManager, AutoReplyContentManager, RootUserManager, TokenActionManager
 )
-from mongodb.factory.results import GetOutcome, InsertOutcome
 
 from .._base import BaseApiResponse
 
@@ -46,7 +45,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         k = result.AutoReplyResponse.KEYWORD
         r = AutoReplyContentManager.get_content(self._keyword,
                                                 int(AutoReplyContentType.default() or self._keyword_type))
-        if GetOutcome.is_success(r.outcome):
+        if r.success:
             self._data[k] = r.model.id.value
         else:
             self._err[k] = r.serialize()
@@ -73,8 +72,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         for idx, resp in enumerate(self._responses):
             r = AutoReplyContentManager.get_content(resp, self._response_types[idx])
 
-            resp_outcome = r.outcome
-            if GetOutcome.is_success(resp_outcome):
+            if r.success:
                 resp_list.append(r.model.id.value)
             else:
                 resp_err[idx] = r.serialize()
@@ -84,15 +82,15 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
         else:
             self._data[k] = resp_list
 
-    def get_user_model(self):
+    def get_user_model_result(self):
         raise NotImplementedError()
 
     def _handle_creator_oid(self):
         k = result.AutoReplyResponse.CREATOR_OID
 
-        r = self.get_user_model()
+        r = self.get_user_model_result()
 
-        if GetOutcome.is_success(r.outcome):
+        if r.success:
             self._data[k] = r.model.id.value
         else:
             self._err[k] = r.serialize()
@@ -129,7 +127,7 @@ class AutoReplyAddBaseResponse(BaseApiResponse, ABC):
     def is_success(self) -> bool:
         try:
             return super().is_success() and \
-                   InsertOutcome.is_success(self._result.outcome) and \
+                   self._result.success and \
                    not is_empty_string(self._creator_token)
         except AttributeError:
             return False
@@ -148,11 +146,11 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
         self._channel_token = self._param_dict[param.AutoReply.CHANNEL_TOKEN]
         self._platform = self._param_dict[param.AutoReply.PLATFORM]
 
-    def get_user_model(self):
+    def get_user_model_result(self):
         if self._is_local:
-            return MixedUserManager.get_user_data_api_token(self._creator_token)
+            return RootUserManager.get_root_data_api_token(self._creator_token)
         else:
-            return MixedUserManager.register_onplat(self._platform, self._creator_token)
+            return RootUserManager.register_onplat(self._platform, self._creator_token)
 
     def _handle_platform(self):
         k = result.AutoReplyResponse.PLATFORM
@@ -192,8 +190,8 @@ class AutoReplyAddResponse(AutoReplyAddBaseResponse):
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
-    def get_user_model(self):
-        return MixedUserManager.get_user_data_api_token(self._creator_token)
+    def get_user_model_result(self):
+        return RootUserManager.get_root_data_api_token(self._creator_token)
 
     def process_ifnoerror(self):
         self._result = TokenActionManager.enqueue_action(

@@ -1,4 +1,7 @@
-class NavBaseItem:
+from abc import ABC
+
+
+class NavBaseItem(ABC):
     def __init__(self, parent=None):
         self._parent = parent
         self._iter_current = self

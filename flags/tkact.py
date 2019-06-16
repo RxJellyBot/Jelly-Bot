@@ -13,6 +13,7 @@ class TokenAction(FlagSingleEnum):
     20x - Auto Reply:
             201: Add
     """
+    # TODO: Token Action - Possibly need to know complete OnPlat or OnSite
     @staticmethod
     def default():
         return TokenAction.UNKNOWN
