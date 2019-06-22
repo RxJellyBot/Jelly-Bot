@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 
@@ -13,3 +14,35 @@ def cast_keep_none(target, type_: type):
 
 def is_empty_string(s: Optional[str]):
     return s is None or len(s) == 0
+
+
+def all_lower(o: [str, tuple, list, set, dict]):
+    """
+    Will NOT modify the `o` itself.
+    """
+    if isinstance(o, str):
+        return o.lower()
+    elif isinstance(o, (tuple, list, set)):
+        org_type = type(o)
+        tmp = list(o)
+
+        for idx, oo in enumerate(o):
+            tmp[idx] = all_lower(oo)
+
+        return org_type(tmp)
+    elif isinstance(o, dict):
+        tmp = o.copy()
+        for k, v in tmp:
+            tmp[k] = all_lower(v)
+
+        return tmp
+    else:
+        return o
+
+
+def to_snake_case(s: str):
+    return re.sub(r"(?!^)([A-Z]+)", r"_\1", s).lower()
+
+
+def to_camel_case(s: str):
+    return ''.join(x[0].upper() + x[1:] if x else "_" for x in s.split('_'))

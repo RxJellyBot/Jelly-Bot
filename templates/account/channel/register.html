@@ -1,0 +1,54 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Registration" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card bg-success mb-3 text-white text-center align-middle">
+                    <h5 class="card-header">{% trans "I have a token" %}</h5>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="col mr-2">
+                                <input class="form-control" type="text"
+                                       placeholder="{% trans "Enter your token here" %}"
+                                       aria-label="{% trans "Enter channel registration token" %}">
+                            </div>
+                            <button class="btn btn-outline-light" type="button" id="submit-token">
+                                {% trans "Submit" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-danger mb-3 text-white text-center align-middle">
+                    <h5 class="card-header">{% trans "I want a token" %}</h5>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="col mr-2">
+                                <span class="bg-light rounded form-control">
+                                    <code class="h5" id="new-token">abcdefghij</code>
+                                </span>
+                            </div>
+                            <button class="btn btn-outline-light" type="button" id="get-token">
+                                {% trans "Get one" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-script %}
+    <script src="{% static "js/account/register.js" %}" type="text/javascript"></script>
+{% endblock %}

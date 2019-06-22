@@ -2,12 +2,16 @@ from ._base import BaseField
 
 
 class ModelField(BaseField):
-    def __init__(self, key, model_cls, instance=None, allow_none=True):
-        super().__init__(key, instance, allow_none)
+    def __init__(self, key, model_cls, default=None, allow_none=True, auto_cast=True):
         if model_cls is None:
             raise ValueError(f"`model_cls` needs to be specified for parsing.")
         else:
             self._model_cls = model_cls
+
+        if default is None:
+            default = model_cls.generate_default()
+
+        super().__init__(key, default, allow_none, auto_cast=auto_cast)
 
     @property
     def model_cls(self):

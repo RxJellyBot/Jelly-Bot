@@ -26,11 +26,11 @@ class RegisterAPIUserView(View):
             if InsertOutcome.data_found(result.outcome):
                 s = RegisterAPIUserView.PASS_SIGNAL
                 token = result.idt_reg_result.token
-            elif result.outcome == InsertOutcome.FAILED_NOT_EXECUTED:
+            elif result.outcome == InsertOutcome.X_NOT_EXECUTED:
                 s = _("Registration process not performed.")
-            elif result.outcome == InsertOutcome.FAILED_NOT_ACKNOWLEDGED:
+            elif result.outcome == InsertOutcome.X_NOT_ACKNOWLEDGED:
                 s = _("New user data creation failed.")
-            elif result.outcome == InsertOutcome.FAILED_NOT_SERIALIZABLE:
+            elif result.outcome == InsertOutcome.X_NOT_SERIALIZABLE:
                 s = _("The data is unable to be passed into the server.")
             else:
                 s = _(f"An unknown error occurred during the new user data registration. Code: {result.outcome}.")
@@ -47,7 +47,7 @@ class RegisterAPIUserView(View):
         response = simple_str_response(request, s)
 
         if token is not None:
-            response.set_cookie(keys.USER_TOKEN, token)
+            response.set_cookie(keys.Cookies.USER_TOKEN, token)
 
         if s == RegisterAPIUserView.PASS_SIGNAL and token is None:
             return simple_str_response(request, _(f"User token is null however login succeed. {s_contact}"))

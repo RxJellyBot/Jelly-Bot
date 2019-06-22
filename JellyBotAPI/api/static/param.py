@@ -1,10 +1,11 @@
 LOCAL_REFER = "lr"
 
 
-class _Common:
+class Common:
     CHANNEL_TOKEN = "c"
     USER_TOKEN = "u"
     PLATFORM = "p"
+    API_TOKEN = "api_key"
 
 
 class Validation:
@@ -17,9 +18,9 @@ class AutoReply:
     KEYWORD_TYPE = "kt"
     RESPONSE = "r"
     RESPONSE_TYPE = "rt"
-    CHANNEL_TOKEN = _Common.CHANNEL_TOKEN
-    CREATOR_TOKEN = _Common.USER_TOKEN
-    PLATFORM = _Common.PLATFORM
+    CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+    CREATOR_TOKEN = Common.USER_TOKEN
+    PLATFORM = Common.PLATFORM
     PRIVATE = "pr"
     PINNED = "pin"
     COOLDOWN = "cd"
@@ -27,11 +28,11 @@ class AutoReply:
 
 class DataQuery:
     class Channel:
-        PLATFORM = _Common.PLATFORM
-        CHANNEL_TOKEN = _Common.CHANNEL_TOKEN
+        PLATFORM = Common.PLATFORM
+        CHANNEL_TOKEN = Common.CHANNEL_TOKEN
 
 
 class TokenAction:
     TOKEN = "tk"
-    PLATFORM = _Common.PLATFORM
-    USER_TOKEN = _Common.USER_TOKEN
+    PLATFORM = Common.PLATFORM
+    USER_TOKEN = Common.USER_TOKEN

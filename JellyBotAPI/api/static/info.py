@@ -4,8 +4,13 @@ from extutils.flags import FlagDoubleEnum
 
 
 class AutoReply(FlagDoubleEnum):
-    @staticmethod
-    def default():
+    """
+    101 - Responses Truncated
+    102 - Response Types Lengthened
+    103 - Response Types Shortened
+    """
+    @classmethod
+    def default(cls):
         return AutoReply.DUMMY
 
     DUMMY = -1, _("Dummy"), _("Dummy")

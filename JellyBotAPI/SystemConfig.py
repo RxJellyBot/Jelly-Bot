@@ -17,3 +17,4 @@ class ChannelConfig:
 
 class Email:
     DefaultSubject = "Email Notification from Jelly BOT"
+    DefaultPrefix = "Jelly BOT - "

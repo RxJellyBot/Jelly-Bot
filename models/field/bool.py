@@ -2,8 +2,8 @@ from ._base import BaseField
 
 
 class BooleanField(BaseField):
-    def __init__(self, key, bool_: bool = None, allow_none=False, readonly=False):
-        super().__init__(key, bool_, allow_none, readonly=readonly)
+    def __init__(self, key, default=None, allow_none=False, readonly=False, auto_cast=True):
+        super().__init__(key, default, allow_none, readonly=readonly, auto_cast=auto_cast)
 
     @classmethod
     def none_obj(cls):

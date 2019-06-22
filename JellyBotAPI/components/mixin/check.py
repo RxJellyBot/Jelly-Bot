@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
 
-from JellyBotAPI import keys
+from JellyBotAPI.keys import Session
 from JellyBotAPI.api.static import result
 
 
@@ -31,8 +31,8 @@ class CheckParameterMixin(View):
         return ret
 
     def render_on_lacking_keys(self, lacking_keys: list):
-        self.request.session[keys.APIStatisticsCollection.DICT_RESPONSE] = {result.REQUIRED: lacking_keys}
-        return JsonResponse(self.request.session[keys.APIStatisticsCollection.DICT_RESPONSE])
+        self.request.session[Session.APIStatisticsCollection.DICT_RESPONSE] = {result.REQUIRED: lacking_keys}
+        return JsonResponse(self.request.session[Session.APIStatisticsCollection.DICT_RESPONSE])
 
     def dispatch(self, request, *args, **kwargs):
         lack_keys = self.lacking_keys(request)

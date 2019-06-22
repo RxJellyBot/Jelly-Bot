@@ -1,6 +1,6 @@
 from django.views import View
 
-from JellyBotAPI import keys
+from JellyBotAPI.keys import Session
 from flags import APIAction
 
 
@@ -9,7 +9,7 @@ class APIStatisticsCollectMixin(View):
         return APIAction.UNKNOWN
 
     def dispatch(self, request, *args, **kwargs):
-        request.session[keys.APIStatisticsCollection.COLLECT] = True
-        request.session[keys.APIStatisticsCollection.API_ACTION] = self.get_api_action()
+        request.session[Session.APIStatisticsCollection.COLLECT] = True
+        request.session[Session.APIStatisticsCollection.API_ACTION] = self.get_api_action()
 
         return super().dispatch(request, *args, **kwargs)

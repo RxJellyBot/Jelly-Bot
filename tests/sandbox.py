@@ -1,30 +1,14 @@
-from extutils import exec_timing
-
-import pytz
-from datetime import datetime
+from extutils import exec_timing_ns
+from extutils.utils import to_snake_case
 
 
+@exec_timing_ns
 def wrap():
-    for i in range(50000000):
-        sign = "+" if i > 0 else "-"
-        sign + str(i)
-
-
-def wrap2():
-    for i in range(50000000):
-        f"{i:+d}"
+    for i in range(500000):
+        to_snake_case("CamelCase")
 
 
 if __name__ == "__main__":
-    duration, ret = exec_timing(wrap)
-    print(f"Duration: {duration}s")
-    duration, ret = exec_timing(wrap)
-    print(f"Duration: {duration}s")
-    duration, ret = exec_timing(wrap)
-    print(f"Duration: {duration}s")
-    duration, ret = exec_timing(wrap2)
-    print(f"Duration: {duration}s")
-    duration, ret = exec_timing(wrap2)
-    print(f"Duration: {duration}s")
-    duration, ret = exec_timing(wrap2)
-    print(f"Duration: {duration}s")
+    wrap()
+    wrap()
+    wrap()

@@ -27,34 +27,40 @@ def construct_nav(request):
     # Collect items to Nav Bar
     nav.add_item(home_item)
 
-    if keys.USER_TOKEN in request.COOKIES:
-        nav.add_item(_construct_my_account(current_path, home_item))
+    if keys.Cookies.USER_TOKEN in request.COOKIES:
+        nav.add_item(_construct_my_account_(current_path, home_item))
     else:
         nav.add_item(login_item)
 
-    nav.add_item(_construct_auto_reply(current_path, home_item))
-    nav.add_item(_construct_docs(current_path, home_item))
+    nav.add_item(_construct_auto_reply_(current_path, home_item))
+    nav.add_item(_construct_docs_(current_path, home_item))
     nav.add_item(about_item)
 
     return nav
 
 
-def _construct_my_account(current_path, parent):
+def _construct_my_account_(current_path, parent):
     my_account_parent = nav_items_factory(
         NavDropdown, current_path, label=_("My Account"), parent=parent, link=reverse("account.main"))
     my_account_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Dashboard"), link=reverse("account.main"), parent=my_account_parent))
-
-    # Dummy
     my_account_parent.add_item(nav_items_factory(
-        NavDummy, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
+        NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
+
+    # Dummy Items
+    my_account_parent.add_item(nav_items_factory(
+        NavDummy, current_path, label=_("Channel Registration"),
+        link=reverse("account.channel.register"), parent=my_account_parent))
+    my_account_parent.add_item(nav_items_factory(
+        NavDummy, current_path, label=_("Channel Management"),
+        link=reverse("account.channel.manage"), parent=my_account_parent))
 
     return my_account_parent
 
 
-def _construct_auto_reply(current_path, parent):
+def _construct_auto_reply_(current_path, parent):
     auto_reply_parent = nav_items_factory(
-        NavDropdown, current_path, label=_("Auto Reply"), parent=parent)
+        NavDropdown, current_path, label=_("Auto Reply"), parent=parent, link=reverse("page.ar.main"))
     auto_reply_parent.add_item(nav_items_factory(
         NavHeader, label=_("Introduction"), parent=auto_reply_parent))
     auto_reply_parent.add_item(nav_items_factory(
@@ -69,9 +75,11 @@ def _construct_auto_reply(current_path, parent):
     return auto_reply_parent
 
 
-def _construct_docs(current_path, parent):
+def _construct_docs_(current_path, parent):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Terms Explanation"), link=reverse("page.doc.terms"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavHeader, label=_("Outcome Code"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(

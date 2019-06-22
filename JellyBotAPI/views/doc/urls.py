@@ -4,8 +4,10 @@ from .code import (
     InsertOutcomeCodeView, GetOutcomeCodeView, OperationOutcomeCodeView, UpdateOutcomeCodeView,
     APIActionCodeView, TokenActionCodeView
 )
+from .main import TermsExplanationView
 
 urlpatterns = [
+    path('terms', TermsExplanationView.as_view(), name="page.doc.terms"),
     path('outcome/insert', InsertOutcomeCodeView.as_view(), name="page.doc.code.insert"),
     path('outcome/get', GetOutcomeCodeView.as_view(), name="page.doc.code.get"),
     path('outcome/ops', OperationOutcomeCodeView.as_view(), name="page.doc.code.ops"),

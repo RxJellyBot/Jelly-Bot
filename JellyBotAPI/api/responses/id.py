@@ -1,36 +1,16 @@
-from django.http import QueryDict
-
-from JellyBotAPI.api.static import param, result
-from extutils import cast_keep_none
-from flags import Platform
+from JellyBotAPI.api.static import result
 from mongodb.factory import ChannelManager
 
 from ._base import BaseApiResponse
+from ._mixin import HandleChannelMixin, HandlePlatformMixin
 
 
-class ChannelDataQueryResponse(BaseApiResponse):
-    def __init__(self, param_dict: QueryDict):
-        super().__init__(param_dict)
-        self._param_dict = {
-            param.DataQuery.Channel.CHANNEL_TOKEN: param_dict.get(param.DataQuery.Channel.CHANNEL_TOKEN),
-            param.DataQuery.Channel.PLATFORM: cast_keep_none(param_dict.get(param.DataQuery.Channel.PLATFORM), int)
-        }
+class ChannelDataQueryResponse(HandleChannelMixin, HandlePlatformMixin, BaseApiResponse):
+    def __init__(self, param_dict, creator_oid):
+        super().__init__(param_dict, creator_oid)
 
-        self._channel = self._param_dict[param.DataQuery.Channel.CHANNEL_TOKEN]
-        self._platform = self._param_dict[param.DataQuery.Channel.PLATFORM]
-
-    def is_success(self) -> bool:
-        return self._channel is not None and \
-               self._platform is not None and \
-               self._result.success
-
-    # noinspection PyArgumentList
-    def _handle_platform(self):
-        if self._platform is not None:
-            self._platform = Platform(self._platform)
-
-    def pre_process(self):
-        self._handle_platform()
+    def extra_success_conditions(self) -> bool:
+        return super().extra_success_conditions() and self._result.success
 
     def process_ifnoerror(self):
         self._result = ChannelManager.get_channel_packed(self._platform, self._channel)

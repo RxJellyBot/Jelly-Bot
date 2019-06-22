@@ -15,5 +15,4 @@ type_registry: list = []
 
 
 def get_codec_options():
-    return CodecOptions(
-        type_registry=TypeRegistry(type_registry))
+    return CodecOptions(type_registry=TypeRegistry(type_registry))

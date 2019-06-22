@@ -1,6 +1,7 @@
 # DRAFT: Different ping port for different message event (in watcher)
 # DRAFT: Auto Reply - Find: React.js frontend interactive?
-# DRAFT: Auto Reply - Bundle: Change History/Rec Creator & Modifier/Duplicate with selected
+# DRAFT: Auto Reply - Bundle: Change History / Rec Creator & Modifier / Duplicate new
+# TODO: Auto Reply - Markdown content
 # DRAFT: API port: Upload image (imgur)
 # DRAFT: API port: Random generator (Percent, items, range) - Preset Pool (somehow same as AR bundle)
 # DRAFT: API port: Exchange rate
@@ -17,11 +18,12 @@
 # DRAFT: On site - LINE Sticker: Web sticker utils
 # DRAFT: On site - Short URL: Shortened URL link changable
 # DRAFT: On site - Short URL: image update - store on-site url link
+# DRAFT: On site - Calculator: Markdown2MathJax
 # DRAFT: API Doc: https://getbootstrap.com/docs/4.3/components/scrollspy Design can be used for API Doc
-# TODO: API usage - Generalize usage
-#  (include either api_key or user_token/platform every time to get root user identity)
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: On site - API Key refresh
+# TODO: On site - Customize 404.html 500.html 403.html 400.html to root template dir.
+#  API should return json response instead.
 # DRAFT: Json API Doc - _(item_name)_ will redirect to the anchor of the name same as (item_name)
 # DRAFT: Json API Doc - Add anchor for all parameters
 # DRAFT: Json API Doc - #(item_name)# will redirect to the page of specific thing (Indexing technique not determined)
