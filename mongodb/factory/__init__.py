@@ -2,7 +2,7 @@ from .factory import MONGO_CLIENT
 # noinspection PyPep8Naming
 from .rpdata import _inst as PendingRepairDataManager
 # noinspection PyPep8Naming
-from .ar_conn import _inst as AutoReplyConnectionManager
+from .ar_conn import _inst as AutoReplyModuleManager
 # noinspection PyPep8Naming
 from .ar_ctnt import _inst as AutoReplyContentManager
 # noinspection PyPep8Naming

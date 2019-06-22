@@ -21,8 +21,8 @@
                                 <label class="col-sm-4 col-form-label text-center"
                                        for="cfgName">{% trans "Name" context "Profile Name" %}</label>
                                 <div class="col-sm-8">
-                                    {% with current_config.name.value as current_name %}
-                                        <input type="text" class="form-control" id="cfgName" name="x-name"
+                                    {% with current_config.name as current_name %}
+                                        <input type="text" class="form-control" id="cfgName" name="x-Name"
                                                value="{{ current_name }}">
                                     {% endwith %}
                                 </div>
@@ -39,9 +39,9 @@
                                        data-toggle="tooltip" data-placement="top"
                                        title="{% trans "This will affect the displays of timezone." %}">{% trans "Locale" %}</label>
                                 <div class="col-sm-8">
-                                    <select id="cfgLocale" name="x-locale" class="form-control">
+                                    <select id="cfgLocale" name="x-Locale" class="form-control">
                                         {% for locale in locale_list %}
-                                            {% with current_config.locale.value as current_pytz %}
+                                            {% with current_config.locale as current_pytz %}
                                                 <option value="{{ locale.pytz_code }}"
                                                         {% if current_pytz == locale.pytz_code %}selected{% endif %}>
                                                     {{ locale.description }}&nbsp;({{ locale.current_utc_hr_offset }})

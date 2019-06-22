@@ -5,7 +5,7 @@
 {% block content %}
     <div class="jumbotron">
         <div class="container">
-            <div class="display-4 text-center" style="word-break: break-word;">{% trans "Account Info" %}</div>
+            <div class="display-4 text-center">{% trans "Account Info" %}</div>
         </div>
     </div>
 
@@ -19,7 +19,7 @@
                             <tbody>
                             <tr>
                                 <th scope="row">{% trans "Google Account" %}</th>
-                                <td>{{ api_user_data.email.value }}</td>
+                                <td>{{ api_user_data.email }}</td>
                             </tr>
                             <tr>
                                 <th scope="row" class="align-middle">{% trans "API Key" %}</th>
@@ -43,7 +43,7 @@
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <h4><code>{{ api_user_data.token.value }}</code></h4>
+                                                    <h4><code>{{ api_user_data.token }}</code></h4>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
@@ -67,24 +67,23 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card border-dark mb-3">
-                    <h5 class="card-header text-center">{% trans "Channel Controls" %}</h5>
+                <div class="card border-dark mb-3 text-center">
+                    <h5 class="card-header">{% trans "Channel Controls" %}</h5>
                     <div class="card-body">
-                        <h3 class="card-text text-center">
-                            <!-- INCOMPLETE: Main Account Page - Change a href and create corresponding page -->
-                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                        <h3 class="card-text">
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.channel.register" %}">
                                 {% trans "Register" %}
                             </a>
-                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.channel.manage" %}">
                                 {% trans "Manage" %}
                             </a>
                         </h3>
                     </div>
                 </div>
-                <div class="card border-danger">
-                    <h5 class="card-header text-center text-danger">{% trans "Account Controls" %}</h5>
+                <div class="card border-danger text-center text-danger">
+                    <h5 class="card-header">{% trans "Account Controls" %}</h5>
                     <div class="card-body">
-                        <h3 class="card-text text-center">
+                        <h3 class="card-text">
                             <a class="btn btn-outline-danger" role="button" href="{% url "account.settings" %}">
                                 {% trans "Settings" %}
                             </a>
@@ -98,5 +97,3 @@
         </div>
     </div>
 {% endblock %}
-
-<!-- DRAFT: (Low Priority) Customize 404.html 500.html 403.html 400.html to root template dir. -->

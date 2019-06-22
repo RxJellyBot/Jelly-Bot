@@ -1,15 +1,29 @@
-from django.utils.translation import gettext_noop as _
+from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagDoubleEnum
 
 
 class PermissionCategory(FlagDoubleEnum):
-    @staticmethod
-    def default():
+    """
+    0xx - Miscellaneous
+        1 - Normal
+
+    1xx - Auto Reply
+        101 - Access Pinned Module
+
+    2xx - Members Control
+        201 - Change Managers
+
+    3xx - Channel Control
+        301 - Adjust features
+        302 - Adjust Votes
+    """
+    @classmethod
+    def default(cls):
         raise PermissionCategory.NORMAL
 
     NORMAL = \
-        0, _("Normal"), \
+        1, _("Normal"), \
         _("User who has this permission can do all normal operations.")
 
     AR_ACCESS_PINNED_MODULE = \

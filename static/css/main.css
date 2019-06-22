@@ -19,3 +19,7 @@ body {
     font-size: 1rem;
     padding-top: var(--nav-height);
 }
+
+.no-line-break {
+    white-space: nowrap;
+}

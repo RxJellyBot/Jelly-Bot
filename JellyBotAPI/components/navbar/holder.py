@@ -1,4 +1,7 @@
+import warnings
 from typing import Union, List
+
+from extutils.gmail import MailSender
 
 from .entry import NavEntry, NavFirstLevelItem
 from .dropdown import NavDropdown, NavBaseItem
@@ -61,4 +64,5 @@ class NavItemsHolder:
             s += '</ol>'
             return s
         else:
+            warnings.warn("No breadcrumb for the page generated just now!")
             return ''

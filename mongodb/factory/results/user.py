@@ -28,7 +28,7 @@ class OnSiteUserRegistrationResult(IdentityRegistrationResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.Results.TOKEN: self._token})
+        d.update(**{result.UserManagementResponse.TOKEN: self._token})
         return d
 
 
@@ -43,6 +43,16 @@ class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
 
 
 class GetRootUserDataResult(ModelResult):
+    def __init__(self, outcome, model_root, exception=None):
+        """
+        :type outcome: GetOutcome
+        :type model_root: RootUserModel
+        :type exception: Optional[Exception]
+        """
+        super().__init__(outcome, model_root, exception)
+
+
+class GetRootUserDataApiResult(GetRootUserDataResult):
     def __init__(self, outcome, model_root, model_api, exception=None):
         """
         :type outcome: GetOutcome
@@ -83,9 +93,9 @@ class RootUserRegistrationResult(ModelResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.Results.CONN_OUTCOME: self._conn_outcome,
-                    result.Results.REG_RESULT: self._idt_reg_result,
-                    result.Results.HINT: self._hint})
+        d.update(**{result.UserManagementResponse.CONN_OUTCOME: self._conn_outcome,
+                    result.UserManagementResponse.REG_RESULT: self._idt_reg_result,
+                    result.UserManagementResponse.HINT: self._hint})
         return d
 
 

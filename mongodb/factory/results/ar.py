@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from JellyBotAPI.api.static import result
-from models import AutoReplyContentModel, AutoReplyConnectionModel
+from models import AutoReplyContentModel, AutoReplyModuleModel
 
 from ._base import ModelResult
 from ._outcome import InsertOutcome, GetOutcome
@@ -24,7 +24,7 @@ class AutoReplyContentGetResult(ModelResult):
     def __init__(self, outcome, model, exception=None, on_add_result=None):
         """
         :type outcome: GetOutcome
-        :type model: AutoReplyContentModel
+        :type model: Optional[AutoReplyContentModel]
         :type exception: Optional[Exception]
         :type on_add_result: Optional[AutoReplyContentAddResult]
         """
@@ -37,17 +37,17 @@ class AutoReplyContentGetResult(ModelResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.Results.ADD_RESULT: self._on_add_result})
+        d.update(**{result.AutoReplyResponse.ADD_RESULT: self._on_add_result})
         return d
 
 
 @dataclass
-class AutoReplyConnectionAddResult(ModelResult):
+class AutoReplyModuleAddResult(ModelResult):
     def __init__(self, overall_outcome, insert_conn_outcome, model, exception=None):
         """
         :type overall_outcome: InsertOutcome
         :type insert_conn_outcome: InsertOutcome
-        :type model: AutoReplyConnectionModel
+        :type model: AutoReplyModuleModel
         :type exception: Optional[Exception]
         """
         super().__init__(overall_outcome, model, exception)
@@ -59,5 +59,16 @@ class AutoReplyConnectionAddResult(ModelResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.Results.INSERT_CONN_OUTCOME: self._insert_conn_outcome})
+        d.update(**{result.AutoReplyResponse.INSERT_CONN_OUTCOME: self._insert_conn_outcome})
         return d
+
+
+@dataclass
+class AutoReplyModuleTagGetResult(ModelResult):
+    def __init__(self, outcome, model, exception=None):
+        """
+        :type outcome: GetOutcome
+        :type model: AutoReplyModuleTagModel
+        :type exception: Optional[Exception]
+        """
+        super().__init__(outcome, model, exception)

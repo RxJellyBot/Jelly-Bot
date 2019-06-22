@@ -4,9 +4,9 @@ from .mongo import register_encoder
 
 
 class FlagMixin:
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagMixin not implemented.")
+    @classmethod
+    def default(cls):
+        raise ValueError(f"Default in {cls.__name__} not implemented.")
 
 
 class FlagCodeMixin(FlagMixin):
@@ -62,10 +62,6 @@ class FlagCodeMixin(FlagMixin):
     def __repr__(self):
         return self.__str__()
 
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagCodeMixin not implemented.")
-
 
 class FlagSingleMixin(FlagCodeMixin):
     def __init__(self, code: int, key: str):
@@ -80,10 +76,6 @@ class FlagSingleMixin(FlagCodeMixin):
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key})>"
 
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagSingleMixin not implemented.")
-
 
 class FlagDoubleMixin(FlagSingleMixin):
     def __init__(self, code: int, key: str, description: str):
@@ -94,28 +86,42 @@ class FlagDoubleMixin(FlagSingleMixin):
     def description(self):
         return self._desc
 
-    # noinspection PyUnresolvedReferences
-    def __str__(self):
-        return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key}) - {self._desc[:40]}>"
+
+class FlagEnumMixin:
+    @classmethod
+    def contains(cls, item):
+        if isinstance(item, str) and not isinstance(cls, FlagSingleMixin):
+            return False
+
+        if isinstance(item, int):
+            det_fn = FlagEnumMixin._match_int_
+        elif isinstance(item, str):
+            det_fn = FlagEnumMixin._match_str_
+        else:
+            return False
+
+        for i in list(cls):
+            if det_fn(i, item):
+                return True
+
+        return False
 
     @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagDoubleMixin not implemented.")
+    def _match_int_(enum, item):
+        return enum.code == item
 
-
-class FlagCodeEnum(FlagCodeMixin, Enum):
     @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagCodeEnum not implemented.")
+    def _match_str_(enum, item):
+        return enum.key == item or enum.name == item
 
 
-class FlagSingleEnum(FlagSingleMixin, Enum):
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagSingleEnum not implemented.")
+class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):
+    pass
 
 
-class FlagDoubleEnum(FlagDoubleMixin, Enum):
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagDoubleEnum not implemented.")
+class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
+    pass
+
+
+class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
+    pass

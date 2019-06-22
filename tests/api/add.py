@@ -1,11 +1,15 @@
-# https://stackoverflow.com/a/25835403
-# https://docs.djangoproject.com/en/2.2/topics/testing/tools/
+# Request Factory - https://stackoverflow.com/a/25835403
+# Testing tools - https://docs.djangoproject.com/en/2.2/topics/testing/tools/
 import json
+import unittest
+import pprint
 
 import django
 from django.test import Client, TestCase
+from django.urls import reverse
 
 from JellyBotAPI.api.static import result as r, param as p
+from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import InsertOutcome
 
 c = Client(enforce_csrf_checks=True)
@@ -13,10 +17,15 @@ django.setup()
 
 
 class TestAddAutoReply(TestCase):
-    # TODO: Test: Mocking MongoDB Backend setting
-    # @classmethod
-    # def setUpTestData(cls) -> None:
-    #     pass
+    @classmethod
+    def setUpTestData(cls) -> None:
+        MONGO_CLIENT.get_database("stats").get_collection("api").delete_many({})
+        MONGO_CLIENT.get_database("tk_act").get_collection("main").delete_many({})
+        MONGO_CLIENT.get_database("user").get_collection("onplat").delete_many({})
+        MONGO_CLIENT.get_database("user").get_collection("root").delete_many({})
+        MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
+        MONGO_CLIENT.get_database("ar").get_collection("conn").delete_many({})
+        MONGO_CLIENT.get_database("ar").get_collection("ctnt").delete_many({})
 
     def _add_(self, kw, rep, channel, creator, platform, additional_msg=None):
         data = {
@@ -27,13 +36,13 @@ class TestAddAutoReply(TestCase):
             p.AutoReply.PLATFORM: platform
         }
 
-        response = c.post("/api/ar/add", data)
+        response = c.post(reverse("api.ar.add"), data)
 
         print(f"K: {kw} / R: {rep} / CH: {channel} / CR: {creator} / PL: {platform} - {None or additional_msg}")
         self.assertEqual(200, response.status_code)
         result = json.loads(response.content.decode())
-        print("Test - Add")
-        print(result)
+        print("=== Test - Add ===")
+        pprint.pprint(result)
         print()
         self.assertTrue(result[r.SUCCESS])
         return result
@@ -41,30 +50,33 @@ class TestAddAutoReply(TestCase):
     def test_add(self):
         # TODO: Test AR: Add test-cleaning work
         result = self._add_("ABC", "mno", "channel1", "user1", 1, "All New")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
-        self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_INSERTED)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        self.assertEqual(result[r.RESULT][r.AutoReplyResponse.INSERT_CONN_OUTCOME], InsertOutcome.O_INSERTED)
 
         result = self._add_("ABC", "mno", "channel1", "user2", 1, "Diff CR")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
-        self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_DATA_EXISTS)
+        self.assertEqual(result[r.RESULT][r.AutoReplyResponse.INSERT_CONN_OUTCOME], InsertOutcome.O_DATA_EXISTS)
 
         result = self._add_("ABC", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
-        self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_DATA_EXISTS)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        self.assertEqual(result[r.RESULT][r.AutoReplyResponse.INSERT_CONN_OUTCOME], InsertOutcome.O_DATA_EXISTS)
 
         result = self._add_("abc2", "mno2", "channel2", "user1", 1, "New Conn. Same User.")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.SUCCESS_INSERTED)
-        self.assertEquals(result[r.RESULT][r.Results.INSERT_CONN_OUTCOME], InsertOutcome.SUCCESS_INSERTED)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        self.assertEqual(result[r.RESULT][r.AutoReplyResponse.INSERT_CONN_OUTCOME], InsertOutcome.O_INSERTED)
 
     def test_lack_of_parameter(self):
-        response = c.post("/api/ar/add", {p.AutoReply.KEYWORD: "xx"})
+        response = c.post(reverse("api.ar.add"), {p.AutoReply.KEYWORD: "xx"})
 
         self.assertEqual(200, response.status_code)
         result = json.loads(response.content.decode())
-        print("Test - Lack of Parameter")
-        print(result)
+        print("=== Test - Lack of Parameter ===")
+        pprint.pprint(result)
         print()
         self.assertTrue(r.REQUIRED in result)
+
+    def test_add_data_error(self):
+        raise NotImplementedError()
 
     def test_add_token(self):
         data = {
@@ -75,11 +87,17 @@ class TestAddAutoReply(TestCase):
             p.AutoReply.PLATFORM: 1
         }
 
-        response = c.post("/api/ar/add/token", data)
+        response = c.post(reverse("api.ar.add_token"), data)
 
         self.assertEqual(200, response.status_code)
         result = json.loads(response.content.decode())
-        print("Test - Add - Token")
-        print(result)
+        print("=== Test - Add - Token ===")
+        pprint.pprint(result)
         print()
         self.assertTrue(result[r.SUCCESS])
+
+        raise NotImplementedError("Token completion test not implemented.")
+
+
+if __name__ == '__main__':
+    unittest.main()

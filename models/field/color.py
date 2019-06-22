@@ -4,6 +4,9 @@ from ._base import BaseField
 
 
 class ColorField(BaseField):
+    def __init__(self, key, allow_none=True):
+        super().__init__(key, allow_none)
+
     @property
     def expected_types(self):
         return Color

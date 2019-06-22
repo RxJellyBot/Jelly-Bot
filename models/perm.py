@@ -1,46 +1,29 @@
-from extutils.color import ColorFactory
+from django.utils.translation import gettext_lazy as _
+
 from flags import PermissionCategory, PermissionCategoryDefault
-from models import Model, ModelDefaultValueExtension
+from models import Model, ModelDefaultValueExt
 from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField
 
 
 class ChannelPermissionProfileModel(Model):
-    UserID = "u"
-    ChannelID = "c"
-    Name = "n"
-    Color = "col"
-    IsMod = "m"
-    IsAdmin = "a"
-    Permissions = "p"
+    UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required)
+    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
+    Name = TextField("n", default=_("(Unknown)"), must_have_content=True)
+    Color = ColorField("col")
+    IsMod = BooleanField("m")
+    IsAdmin = BooleanField("a")
+    NeedsPromo = BooleanField("promo")
+    Permission = DictionaryField("perm", default=PermissionCategoryDefault.get_default_preset(), allow_none=False)
 
-    default_vals = (
-        (UserID, ModelDefaultValueExtension.Required),
-        (ChannelID, ModelDefaultValueExtension.Required),
-        (Name, ModelDefaultValueExtension.Required),
-        (Color, ColorFactory.BLACK),
-        (IsMod, False),
-        (IsAdmin, False),
-        (Permissions, PermissionCategoryDefault.get_default_preset())
-    )
-
-    def _init_fields_(self, **kwargs):
-        self.user_oid = ObjectIDField(ChannelPermissionProfileModel.UserID, readonly=False)
-        self.channel_oid = ObjectIDField(ChannelPermissionProfileModel.ChannelID, readonly=False)
-        self.name = TextField(ChannelPermissionProfileModel.Name)
-        self.color = ColorField(ChannelPermissionProfileModel.Color)
-        self.is_mod = BooleanField(ChannelPermissionProfileModel.IsMod)
-        self.is_admin = BooleanField(ChannelPermissionProfileModel.IsAdmin)
-        self.permission = DictionaryField(ChannelPermissionProfileModel.Permissions, allow_none=False)
-
-    def pre_serialize(self):
-        if self.is_admin.value:
+    def pre_iter(self):
+        if self.is_admin:
             f = PermissionCategoryDefault.get_admin
-        elif self.is_mod.value:
+        elif self.is_mod:
             f = PermissionCategoryDefault.get_mod
         else:
             f = PermissionCategoryDefault.get_default
 
         for perm_cat in PermissionCategory:
             k = f"_{perm_cat.code}"
-            if k not in self.permission.value:
-                self.permission.value[k] = f(perm_cat)
+            if k not in self.permission:
+                self.permission[k] = f(perm_cat)

@@ -1,0 +1,39 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Management" %}</div>
+        </div>
+    </div>
+
+    <!-- INCOMPLETE: Channel Config - Manage page -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-success mb-3 text-success text-center align-middle">
+                    <h5 class="card-header">{% trans "I have the token" %}</h5>
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-danger mb-3 text-danger text-center align-middle">
+                    <h5 class="card-header">{% trans "I want a token" %}</h5>
+                    <div class="card-body">
+                        <h3 class="card-text">
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                                {% trans "Register" %}
+                            </a>
+                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
+                                {% trans "Manage" %}
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

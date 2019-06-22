@@ -1,21 +1,18 @@
-from django.http import QueryDict
-
 from extutils import is_empty_string
 from JellyBotAPI.api.static import param, result
-from flags import Platform
-from mongodb.factory import TokenActionManager, RootUserManager
+from mongodb.factory import TokenActionManager
 
 from ._base import BaseApiResponse
 
 
 class TokenActionCompleteApiResponse(BaseApiResponse):
-    def __init__(self, param_dict: QueryDict):
-        super().__init__(param_dict)
+    def __init__(self, param_dict, sender_oid):
+        super().__init__(param_dict, sender_oid)
 
         self._token = param_dict.get(param.TokenAction.TOKEN)
-        self._param_dict = param_dict
+        self._param_dict.update(**param_dict)
 
-    def is_success(self) -> bool:
+    def extra_success_conditions(self) -> bool:
         return not is_empty_string(self._token) and self._result.success
 
     def pre_process(self):
@@ -32,41 +29,21 @@ class TokenActionCompleteApiResponse(BaseApiResponse):
 
 
 class TokenActionListApiResponse(BaseApiResponse):
-    def __init__(self, param_dict: QueryDict):
-        super().__init__(param_dict)
-        self._param_dict = {
-            param.TokenAction.USER_TOKEN: param_dict.get(param.TokenAction.USER_TOKEN),
-            param.TokenAction.PLATFORM: param_dict.get(param.TokenAction.PLATFORM)
-        }
+    def __init__(self, param_dict, sender_oid):
+        super().__init__(param_dict, sender_oid)
 
-        self._platform = self._param_dict[param.TokenAction.PLATFORM]
-        self._user_token = self._param_dict[param.TokenAction.USER_TOKEN]
-        self._creator_oid = None
+    def extra_success_conditions(self) -> bool:
+        return self._sender_oid is not None
 
-    # noinspection PyArgumentList
-    def _handle_platform(self):
-        if self._platform is not None:
-            self._platform = Platform(int(self._platform))
-
-    def is_success(self) -> bool:
-        return super().is_success() and \
-               self._platform is not None and \
-               not is_empty_string(self._user_token) and \
-               self._creator_oid is not None
-
-    def _handle_get_creator_oid(self):
-        self._creator_oid = RootUserManager.get_onplat_data(self._platform, self._user_token)
-        if self._creator_oid:
-            self._creator_oid = self._creator_oid.id.value
-        else:
+    def _handle_creator_oid_(self):
+        if not self._sender_oid:
             self._err[result.TokenActionResponse.CREATOR_OID] = None
 
     def pre_process(self):
-        self._handle_platform()
-        self._handle_get_creator_oid()
+        self._handle_creator_oid_()
 
     def process_ifnoerror(self):
-        self._result = list(TokenActionManager.get_queued_actions(self._creator_oid))
+        self._result = list(TokenActionManager.get_queued_actions(self._sender_oid))
 
     def serialize_success(self) -> dict:
         return {result.RESULT: self._result}

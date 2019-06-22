@@ -1,4 +1,5 @@
 from .array import ArrayField
+from ._base import BaseField
 from .bool import BooleanField
 from .datetime import DateTimeField
 from .int import IntegerField
