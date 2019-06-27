@@ -1,6 +1,6 @@
 from typing import Optional
 
-from extutils.checker import DecoParamChecker
+from extutils.checker import DecoParamCaster
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel
 from mongodb.factory.results import InsertOutcome, GetOutcome, ChannelRegistrationResult, ChannelGetResult
@@ -19,7 +19,7 @@ class ChannelManager(BaseCollection):
         self.create_index([(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)],
                           name="Channel Identity", unique=True)
 
-    @DecoParamChecker({1: Platform, 2: str})
+    @DecoParamCaster({1: Platform, 2: str})
     def register(self, platform: Platform, token: str) -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
             ChannelModel, Platform=platform, Token=token, Config=ChannelConfigModel.generate_default())
@@ -31,12 +31,12 @@ class ChannelManager(BaseCollection):
 
         return ChannelRegistrationResult(outcome, entry, ex)
 
-    @DecoParamChecker({1: Platform, 2: str})
+    @DecoParamCaster({1: Platform, 2: str})
     def get_channel(self, platform: Platform, token: str) -> Optional[ChannelModel]:
         return self.get_cache(ChannelModel.Token.key, (platform, token), parse_cls=ChannelModel,
                               acquire_args=({ChannelModel.Token.key: token, ChannelModel.Platform.key: platform},))
 
-    @DecoParamChecker({1: Platform, 2: str})
+    @DecoParamCaster({1: Platform, 2: str})
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         """
         Insertion attempt not implemented.

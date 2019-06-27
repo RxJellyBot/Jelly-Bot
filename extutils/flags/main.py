@@ -36,7 +36,7 @@ class FlagCodeMixin(FlagMixin):
 
     def __eq__(self, other):
         if isinstance(other, int):
-            return self._code == other
+            return self.code == other
         else:
             return super().__eq__(other)
 
@@ -52,7 +52,7 @@ class FlagCodeMixin(FlagMixin):
             raise TypeError(f"Not comparable. ({type(self).__name__} & {type(other).__name__})")
 
     @property
-    def code(self):
+    def code(self) -> int:
         return self._code
 
     # noinspection PyUnresolvedReferences
@@ -85,6 +85,30 @@ class FlagDoubleMixin(FlagSingleMixin):
     @property
     def description(self):
         return self._desc
+
+
+class FlagPrefixedDoubleMixin(FlagDoubleMixin):
+    def __init__(self, code: int, key: str, description: str):
+        super().__init__(code, key, description)
+        self._desc = description
+
+    @property
+    def code_prefix(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    def description(self) -> str:
+        return self._desc
+
+    @property
+    def code(self) -> str:
+        return f"{self.code_prefix}{self._code}"
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.code == other
+        else:
+            return super().__eq__(other)
 
 
 class FlagEnumMixin:
@@ -125,3 +149,9 @@ class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
 
 class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
     pass
+
+
+class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
+    @property
+    def code_prefix(self) -> str:
+        raise NotImplementedError()

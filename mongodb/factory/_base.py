@@ -10,7 +10,7 @@ from pymongo.errors import DuplicateKeyError
 from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
-from extutils.checker import DecoParamChecker
+from extutils.checker import DecoParamCaster
 from extutils.mongo import get_codec_options
 from extutils.utils import all_lower
 from models import Model
@@ -43,7 +43,7 @@ class CacheMixin(Collection):
     def auto_init(self, value: bool):
         self._auto_init = value
 
-    @DecoParamChecker({1: str})
+    @DecoParamCaster({1: str})
     def init_cache(self, cache_key: str, check_exists=True):
         """
         Initialize a cache space if necessary.
@@ -55,7 +55,7 @@ class CacheMixin(Collection):
         if check_exists and cache_key not in self._cache:
             self._cache[cache_key] = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
-    @DecoParamChecker({1: str, 2: None})
+    @DecoParamCaster({1: str, 2: None})
     def set_cache(self, cache_key: str, item_key, item, parse_cls=None):
         """
         Set data to the cache.
@@ -73,7 +73,7 @@ class CacheMixin(Collection):
 
         return self._cache[cache_key][item_key]
 
-    @DecoParamChecker({1: str, 2: None, "item_key_from_data": None})
+    @DecoParamCaster({1: str, 2: None, "item_key_from_data": None})
     def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: Tuple = None,
                   acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False,
                   item_key_from_data=None):
@@ -132,7 +132,7 @@ class CacheMixin(Collection):
 
         return self.set_cache(cache_key, item_key, ret, parse_cls)
 
-    @DecoParamChecker({1: None, "item_key_from_data": None})
+    @DecoParamCaster({1: None, "item_key_from_data": None})
     def get_cache_condition(self, cache_key: str, item_func: types.LambdaType, acquire_args: Tuple,
                             item_key_of_data=None, acquire_func=None, acquire_kw_args: dict = None, acquire_auto=True,
                             parse_cls=None, case_insensitive=False, safe_lambda=False):

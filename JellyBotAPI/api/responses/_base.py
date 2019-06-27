@@ -22,10 +22,10 @@ class BaseApiResponse(abc.ABC):
         self._result = None
 
     def is_success(self) -> bool:
-        return len(self._err) == 0 and self.extra_success_conditions()
+        return len(self._err) == 0 and self.success_conditions()
 
     @abc.abstractmethod
-    def extra_success_conditions(self) -> bool:
+    def success_conditions(self) -> bool:
         raise NotImplementedError()
 
     # noinspection PyMethodMayBeStatic
@@ -46,10 +46,15 @@ class BaseApiResponse(abc.ABC):
             self.process_ifnoerror()
 
         d = self._serialize_()
-        d.update(**self.serialize_success())
-        d.update(**self.serialize_failed())
+        is_success = self.is_success()
+
+        if is_success:
+            d.update(**self.serialize_success())
+        else:
+            d.update(**self.serialize_failed())
+
         d.update(**self.serialize_extra())
-        d[result.SUCCESS] = self.is_success()
+        d[result.SUCCESS] = is_success
         return d
 
     @abc.abstractmethod

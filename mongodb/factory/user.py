@@ -7,7 +7,7 @@ from pymongo import ReturnDocument
 
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.locales import default_locale, LocaleInfo
-from extutils.checker import DecoParamChecker
+from extutils.checker import DecoParamCaster
 from flags import Platform
 from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY
 
@@ -77,14 +77,14 @@ class OnPlatformIdentityManager(BaseCollection):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
 
-    @DecoParamChecker({1: Platform, 2: str})
+    @DecoParamCaster({1: Platform, 2: str})
     def get_onplat(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
         return self.get_cache(OnPlatformUserModel.Token.key, (platform, user_token),
                               parse_cls=OnPlatformUserModel,
                               acquire_args=({OnPlatformUserModel.Platform.key: platform,
                                              OnPlatformUserModel.Token.key: user_token},))
 
-    @DecoParamChecker({1: Platform})
+    @DecoParamCaster({1: Platform})
     def register(self, platform, user_token) -> OnPlatformUserRegistrationResult:
         entry, outcome, ex, insert_result = \
             self.insert_one_data(OnPlatformUserModel, Token=user_token, Platform=platform)
@@ -168,7 +168,7 @@ class RootUserManager(BaseCollection):
                                "ApiOid", InsertOutcome.X_ON_CONN_API, InsertOutcome.X_ON_REG_API,
                                (id_data,), hint="APIUser", conn_arg_list=False)
 
-    @DecoParamChecker({1: ObjectId})
+    @DecoParamCaster({1: ObjectId})
     def get_root_data_oid(self, root_oid: [ObjectId, str]) -> Optional[RootUserModel]:
         return self.get_cache(OID_KEY, root_oid, parse_cls=RootUserModel)
 
@@ -188,7 +188,7 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data)
 
-    @DecoParamChecker({1: ObjectId})
+    @DecoParamCaster({1: ObjectId})
     def get_root_data_api_oid(self, api_oid: [ObjectId, str]) -> Optional[RootUserModel]:
         return self.get_cache_condition(
             OID_KEY, lambda item: item.api_oid == api_oid,
@@ -226,14 +226,14 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataResult(outcome, rt_user_data)
 
-    @DecoParamChecker({1: ObjectId})
+    @DecoParamCaster({1: ObjectId})
     def get_root_data_onplat_oid(self, onplat_oid: [ObjectId, str]) -> Optional[RootUserModel]:
         return self.get_cache_condition(
             OID_KEY, lambda item: onplat_oid in item.onplat_oids,
             ({RootUserModel.OnPlatOids.key: onplat_oid},),
             parse_cls=RootUserModel, safe_lambda=True)
 
-    @DecoParamChecker({1: Platform, 2: str})
+    @DecoParamCaster({1: Platform, 2: str})
     def get_onplat_data(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
         return self._mgr_onplat.get_onplat(platform, user_token)
 

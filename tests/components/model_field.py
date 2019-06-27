@@ -74,11 +74,7 @@ class TestModel(unittest.TestCase):
 
         m1 = AutoReplyModuleTagModel(name="Test")
 
-        # FIXME: Color value is bool (no validation no auto cast!?)
-
         inserted = col.find_one({"_id": col.insert_one(m1).inserted_id})
-
-        # FIXME: Single test - OK, bundled test - Failed
 
         self.assertTrue(AutoReplyModuleTagModel.Name.key in inserted)
         self.assertTrue(AutoReplyModuleTagModel.Color.key in inserted)

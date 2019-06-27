@@ -11,7 +11,7 @@ from models.field.exceptions import (
 class FieldInstance:
     def __init__(self, base, value=None):
         self._base = base
-        self._value = None
+        self._value = None  # Initialize an empty field
 
         if value is None and not base.allow_none:
             self.force_set(base.none_obj())
@@ -37,8 +37,8 @@ class FieldInstance:
         if self.base.auto_cast and not isinstance(value, (self.base.desired_type, type(None))):
             try:
                 value = self.base.cast_to_desired_type(value)
-            except (TypeError, ValueError):
-                raise FieldCastingFailed(self.base.key, type(value), self.base.desired_type)
+            except (TypeError, ValueError) as e:
+                raise FieldCastingFailed(self.base.key, value, type(value), self.base.desired_type, str(e))
 
         if not self._base.is_type_matched(value):
             raise FieldTypeMismatch(self.base.key, type(value), self.base.expected_types)

@@ -43,24 +43,13 @@ class AutoReplyContentGetResult(ModelResult):
 
 @dataclass
 class AutoReplyModuleAddResult(ModelResult):
-    def __init__(self, overall_outcome, insert_conn_outcome, model, exception=None):
+    def __init__(self, overall_outcome, model, exception=None):
         """
         :type overall_outcome: InsertOutcome
-        :type insert_conn_outcome: InsertOutcome
         :type model: AutoReplyModuleModel
         :type exception: Optional[Exception]
         """
         super().__init__(overall_outcome, model, exception)
-        self._insert_conn_outcome = insert_conn_outcome
-
-    @property
-    def insert_conn_outcome(self) -> InsertOutcome:
-        return self._insert_conn_outcome
-
-    def serialize(self) -> dict:
-        d = super().serialize()
-        d.update(**{result.AutoReplyResponse.INSERT_CONN_OUTCOME: self._insert_conn_outcome})
-        return d
 
 
 @dataclass

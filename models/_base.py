@@ -4,7 +4,7 @@ from typing import MutableMapping
 from bson import ObjectId
 
 from flags import ModelValidityCheckResult
-from extutils.checker import DecoParamChecker
+from extutils.checker import DecoParamCaster
 from models import OID_KEY
 from models.field import BaseField
 from extutils.utils import to_snake_case, to_camel_case
@@ -198,7 +198,7 @@ class Model(MutableMapping, abc.ABC):
         except KeyError:
             raise KeyNotExistedError(fk, self.__class__.__name__)
 
-    @DecoParamChecker({1: ObjectId})
+    @DecoParamCaster({1: ObjectId})
     def set_oid(self, oid):
         self._inner_dict_update_("Id", oid)
 
@@ -218,41 +218,48 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def model_fields(cls) -> set:
-        if not hasattr(cls, "_CacheField"):
-            cls._CacheField = {k for k, v in cls.__dict__.items() if cls._considered_model_key_(k, v)}
+        if not hasattr(cls, "_CacheField") or cls.__name__ not in cls._CacheField:
+            s = {k for k, v in cls.__dict__.items() if cls._valid_model_key_(k)}
             if cls.WITH_OID:
-                cls._CacheField.add("Id")
+                s.add("Id")
 
-        return cls._CacheField
+            cls._CacheField = {cls.__name__: s}
+
+        return cls._CacheField[cls.__name__]
 
     @classmethod
     def model_json(cls) -> set:
-        if not hasattr(cls, "_CacheJson"):
-            cls._CacheJson = {v.key for fk, v in cls.__dict__.items() if cls._considered_model_key_(fk, v)}
+        if not hasattr(cls, "_CacheJson") or cls.__name__ not in cls._CacheJson:
+            s = {v.key for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
             if cls.WITH_OID:
-                cls._CacheJson.add(cls.Id.key)
+                s.add(cls.Id.key)
 
-        return cls._CacheJson
+            cls._CacheJson = {cls.__name__: s}
+
+        return cls._CacheJson[cls.__name__]
 
     @classmethod
     def json_key_to_field(cls, json_key) -> str:
-        if not hasattr(cls, "_CacheToField"):
-            cls._CacheToField = {v.key: fk for fk, v in cls.__dict__.items() if cls._considered_model_key_(fk, v)}
+        if not hasattr(cls, "_CacheToField") or cls.__name__ not in cls._CacheToField:
+            d = {v.key: fk for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
             if cls.WITH_OID:
-                cls._CacheToField[OID_KEY] = "Id"
+                d[OID_KEY] = "Id"
 
-        return cls._CacheToField.get(json_key)
+            cls._CacheToField = {cls.__name__: d}
+
+        return cls._CacheToField[cls.__name__].get(json_key)
 
     @classmethod
     def generate_default(cls):
         return cls()
 
     @classmethod
-    def _considered_model_key_(cls, fk, v):
+    def _valid_model_key_(cls, fk):
         if fk.lower() == "Id":
             return cls.WITH_OID
         else:
-            return fk[0].isupper() and not fk.isupper() and isinstance(v, BaseField)
+            return fk[0].isupper() and not fk.isupper() and \
+                   fk in cls.__dict__ and isinstance(cls.__dict__[fk], BaseField)
 
     @staticmethod
     def _camelcase_kwargs_(**kwargs):
