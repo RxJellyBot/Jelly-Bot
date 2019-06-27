@@ -20,6 +20,7 @@ class AutoReply:
     RESPONSE_TYPE = "rt"
     CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     CREATOR_TOKEN = Common.USER_TOKEN
+    API_TOKEN = Common.API_TOKEN
     PLATFORM = Common.PLATFORM
     PRIVATE = "pr"
     PINNED = "pin"

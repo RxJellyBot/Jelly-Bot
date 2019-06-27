@@ -18,9 +18,13 @@ django.setup()
 
 class TestAddAutoReply(TestCase):
     TOKEN = None
+    FAKE_API_TOKEN = None
 
     @classmethod
     def setUpTestData(cls) -> None:
+        from mongodb.factory import RootUserManager
+        from extutils.gidentity import GoogleIdentityUserData
+
         MONGO_CLIENT.get_database("stats").get_collection("api").delete_many({})
         MONGO_CLIENT.get_database("tk_act").get_collection("main").delete_many({})
         MONGO_CLIENT.get_database("user").get_collection("onplat").delete_many({})
@@ -29,7 +33,15 @@ class TestAddAutoReply(TestCase):
         MONGO_CLIENT.get_database("ar").get_collection("conn").delete_many({})
         MONGO_CLIENT.get_database("ar").get_collection("ctnt").delete_many({})
 
-    def _add_(self, kw, rep, channel, creator, platform, additional_msg=None):
+        # Register Fake API Data
+        reg = RootUserManager.register_google(
+            GoogleIdentityUserData("Fake", "Fake", "Fake", "Fake@email.com", skip_check=True))
+        if reg.success:
+            cls.FAKE_API_TOKEN = reg.idt_reg_result.model.token
+        else:
+            raise ValueError("Fake data registration failed.")
+
+    def _add_token_(self, kw, rep, channel, creator, platform, additional_msg=None):
         data = {
             p.AutoReply.KEYWORD: kw,
             p.AutoReply.RESPONSE: rep,
@@ -43,25 +55,43 @@ class TestAddAutoReply(TestCase):
         print(f"K: {kw} / R: {rep} / CH: {channel} / CR: {creator} / PL: {platform} - {None or additional_msg}")
         self.assertEqual(200, response.status_code)
         result = json.loads(response.content.decode())
-        print("=== Test - Add ===")
+        print("=== Test - Add - TOKEN ===")
         pprint.pprint(result)
         print()
         self.assertTrue(result[r.SUCCESS])
         return result
 
-    def test_add(self):
-        # TODO: Test AR: Add test-cleaning work
-        result = self._add_("ABC", "mno", "channel1", "user1", 1, "All New")
+    def test_add_using_onplat(self):
+        result = self._add_token_("ABC", "mno", "channel1", "user1", 1, "All New")
         self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
 
-        result = self._add_("ABC", "mno", "channel1", "user2", 1, "Diff CR")
+        result = self._add_token_("ABC", "mno", "channel1", "user2", 1, "Diff CR")
         self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_DATA_EXISTS)
 
-        result = self._add_("ABC", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
+        result = self._add_token_("ABC", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
         self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_DATA_EXISTS)
 
-        result = self._add_("abc2", "mno2", "channel2", "user1", 1, "New Conn. Same User.")
-        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        result = self._add_token_("abc2", "mno2", "channel2", "user1", 1, "New Conn. Same User.")
+        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+
+    def test_add_using_api(self):
+        data = {
+            p.AutoReply.KEYWORD: "AC",
+            p.AutoReply.RESPONSE: "BD",
+            p.AutoReply.API_TOKEN: self.__class__.FAKE_API_TOKEN,
+            p.AutoReply.PLATFORM: 1,
+            p.AutoReply.CHANNEL_TOKEN: "channel1",
+        }
+
+        response = c.post(reverse("api.ar.add"), data)
+
+        self.assertEqual(200, response.status_code)
+        result = json.loads(response.content.decode())
+        print("=== Test - Add - API ===")
+        pprint.pprint(result)
+        print()
+        self.assertTrue(result[r.SUCCESS])
+        return result
 
     def test_lack_of_parameter(self):
         response = c.post(reverse("api.ar.add"), {p.AutoReply.KEYWORD: "xx"})
@@ -123,9 +153,9 @@ class TestAddAutoReply(TestCase):
         print("=== Test - Add - Empty User Token ===")
         pprint.pprint(result)
         print()
-        self.assertTrue(r.AutoReplyResponse.CREATOR_OID in result[r.ERRORS])
+        self.assertTrue(r.SenderIdentity.SENDER in result[r.ERRORS])
         # Creator OID is a Processed value (via `Middleware`)
-        self.assertEqual(result[r.ERRORS][r.AutoReplyResponse.CREATOR_OID], None)
+        self.assertEqual(result[r.ERRORS][r.SenderIdentity.SENDER], None)
         self.assertFalse(result[r.SUCCESS])
 
     def test_add_token(self):

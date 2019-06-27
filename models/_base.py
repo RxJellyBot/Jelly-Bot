@@ -192,11 +192,14 @@ class Model(MutableMapping, abc.ABC):
     def on_invalid(self, reason=ModelValidityCheckResult.X_UNCATEGORIZED):
         raise InvalidModelError(self.__class__.__name__, reason)
 
-    def is_field_none(self, fk):
+    def is_field_none(self, fk, raise_on_not_exists=True):
         try:
             return self._inner_dict_get_(fk).is_none()
         except KeyError:
-            raise KeyNotExistedError(fk, self.__class__.__name__)
+            if raise_on_not_exists:
+                raise KeyNotExistedError(fk, self.__class__.__name__)
+            else:
+                return True
 
     @DecoParamCaster({1: ObjectId})
     def set_oid(self, oid):

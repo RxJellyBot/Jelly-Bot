@@ -64,6 +64,7 @@ class InsertOutcome(BaseOutcome):
 
     9xx - Problems related to execution
         901 - Not executed
+        902 - Exception occurred
     """
     @property
     def code_prefix(self) -> str:
@@ -136,6 +137,9 @@ class InsertOutcome(BaseOutcome):
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The insertion process had not been executed.")
+    X_EXCEPTION_OCCURRED = \
+        902, _("X: Exception Occurred"), \
+        _("An exception occurred during execution.")
 
     @staticmethod
     def is_inserted(result):

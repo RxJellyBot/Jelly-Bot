@@ -3,17 +3,17 @@ from abc import ABC
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from JellyBotAPI.api.responses import BaseApiResponse
-from JellyBotAPI.api.responses.mixin import HandleChannelOidMixin, SerializeErrorMixin
+from JellyBotAPI.api.responses.mixin import HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyModuleModel, AutoReplyModuleTokenActionModel
 from mongodb.factory import (
-    AutoReplyModuleManager, AutoReplyContentManager, RootUserManager, TokenActionManager
+    AutoReplyModuleManager, AutoReplyContentManager, TokenActionManager
 )
 
 
 # TODO: API Response add common handles to `Mixin`
-class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
+class AutoReplyAddBaseResponse(RequireSenderMixin, SerializeErrorMixin, BaseApiResponse, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
         self._param_dict.update(**{
@@ -21,7 +21,6 @@ class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
             param.AutoReply.KEYWORD_TYPE: param_dict.get(param.AutoReply.KEYWORD_TYPE),
             param.AutoReply.RESPONSE: param_dict.getlist(param.AutoReply.RESPONSE),
             param.AutoReply.RESPONSE_TYPE: param_dict.getlist(param.AutoReply.RESPONSE_TYPE),
-            param.AutoReply.CREATOR_TOKEN: param_dict.get(param.AutoReply.CREATOR_TOKEN),
             param.AutoReply.PRIVATE: cast_keep_none(param_dict.get(param.AutoReply.PRIVATE), bool),
             param.AutoReply.PINNED: cast_keep_none(param_dict.get(param.AutoReply.PINNED), bool),
             param.AutoReply.COOLDOWN: int(
@@ -33,7 +32,6 @@ class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
         self._keyword_type = self._param_dict[param.AutoReply.KEYWORD_TYPE]
         self._responses = self._param_dict[param.AutoReply.RESPONSE]
         self._response_types = self._param_dict[param.AutoReply.RESPONSE_TYPE]
-        self._creator_oid = self._param_dict[param.AutoReply.CREATOR_TOKEN]
         self._private = self._param_dict[param.AutoReply.PRIVATE]
         self._pinned = self._param_dict[param.AutoReply.PINNED]
         self._cooldown = self._param_dict[param.AutoReply.COOLDOWN]
@@ -84,20 +82,6 @@ class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
         else:
             self._responses = self._data[k] = resp_list
 
-    def _handle_creator_oid_(self):
-        k = result.AutoReplyResponse.CREATOR_OID
-
-        data = RootUserManager.get_root_data_oid(self._sender_oid)
-
-        if data:
-            self._creator_oid = self._data[k] = data.id
-        else:
-            self._err[k] = self._sender_oid
-
-    def _handle_sender_(self):
-        if self._sender_oid is None:
-            self._err[result.AutoReplyResponse.CREATOR_OID] = self._sender_oid
-
     def _handle_pinned_(self):
         k = result.AutoReplyResponse.PINNED
         self._flag[k] = self._pinned
@@ -113,8 +97,6 @@ class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
     def pre_process(self):
         self._handle_keyword_()
         self._handle_responses_()
-        self._handle_creator_oid_()
-        self._handle_sender_()
         self._handle_pinned_()
         self._handle_private_()
         self._handle_cooldown_()
@@ -127,8 +109,7 @@ class AutoReplyAddBaseResponse(SerializeErrorMixin, BaseApiResponse, ABC):
 
     def success_conditions(self) -> bool:
         try:
-            return self._result.success and \
-                   self._creator_oid is not None
+            return self._result.success
         except AttributeError:
             return False
 
@@ -146,18 +127,13 @@ class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
 
     def process_ifnoerror(self):
         self._result = AutoReplyModuleManager.add_conn(
-            self._keyword, self._responses, self._creator_oid, self.get_channel_oid(),
+            self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),
             self._pinned, self._private, self._cooldown)
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
     def process_ifnoerror(self):
         self._result = TokenActionManager.enqueue_action(
-            self._data[result.AutoReplyResponse.CREATOR_OID],
-            TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
-            KeywordOid=self._data[result.AutoReplyResponse.KEYWORD],
-            ResponsesOids=self._data[result.AutoReplyResponse.RESPONSES],
-            CreatorOid=self._data[result.AutoReplyResponse.CREATOR_OID],
-            Pinned=self._flag[result.AutoReplyResponse.PINNED],
-            Private=self._flag[result.AutoReplyResponse.PRIVATE],
-            CooldownSec=self._flag[result.AutoReplyResponse.COOLDOWN_SEC])
+            self._sender_oid, TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
+            KeywordOid=self._keyword, ResponsesOids=self._responses, CreatorOid=self._sender_oid,
+            Pinned=self._pinned, Private=self._pinned, CooldownSec=self._cooldown)
