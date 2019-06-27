@@ -79,7 +79,7 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
             if tk_model:
                 try:
                     tk_model = TokenActionModel(**tk_model, from_db=True)
-                    required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action)
+                    required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action_type)
 
                     if required_keys == token_args.keys():
                         try:

@@ -1,9 +1,13 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from extutils.flags import FlagPrefixedDoubleEnum
 
 
-class BaseOutcome(FlagDoubleEnum):
+class BaseOutcome(FlagPrefixedDoubleEnum):
+    @property
+    def code_prefix(self) -> str:
+        raise NotImplementedError()
+
     @classmethod
     def default(cls):
         raise NotImplementedError()
@@ -61,6 +65,10 @@ class InsertOutcome(BaseOutcome):
     9xx - Problems related to execution
         901 - Not executed
     """
+    @property
+    def code_prefix(self) -> str:
+        return "I-"
+
     @classmethod
     def default(cls):
         return InsertOutcome.X_NOT_EXECUTED
@@ -159,9 +167,13 @@ class GetOutcome(BaseOutcome):
     9xx - Problems related to execution
         901 - Not executed
     """
+    @property
+    def code_prefix(self) -> str:
+        return "G-"
+
     @classmethod
     def default(cls):
-        return InsertOutcome.X_NOT_EXECUTED
+        return GetOutcome.X_NOT_EXECUTED
 
     SUCCESS_CACHE_DB = \
         -2, _("O: From Cache/DB"), \
@@ -210,6 +222,10 @@ class OperationOutcome(BaseOutcome):
     9xx - Problems related to execution
         901 - Not executed
     """
+    @property
+    def code_prefix(self) -> str:
+        return "O-"
+
     @classmethod
     def default(cls):
         return OperationOutcome.X_NOT_EXECUTED
@@ -262,6 +278,10 @@ class UpdateOutcome(BaseOutcome):
     9xx - Problems related to execution
         901 - Not executed
     """
+    @property
+    def code_prefix(self) -> str:
+        return "U-"
+
     @classmethod
     def default(cls):
         return UpdateOutcome.X_NOT_EXECUTED

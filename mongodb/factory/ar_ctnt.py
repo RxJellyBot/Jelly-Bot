@@ -1,5 +1,5 @@
 from extutils.utils import is_empty_string
-from extutils.checker import DecoParamChecker
+from extutils.checker import DecoParamCaster
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel
 from mongodb.factory.results import InsertOutcome, GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
@@ -34,7 +34,7 @@ class AutoReplyContentManager(BaseCollection):
                                              AutoReplyContentModel.ContentType.key: type_},),
                               parse_cls=AutoReplyContentModel, case_insensitive=case_insensitive)
 
-    @DecoParamChecker({2: AutoReplyContentType})
+    @DecoParamCaster({2: AutoReplyContentType})
     def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
         if is_empty_string(content):

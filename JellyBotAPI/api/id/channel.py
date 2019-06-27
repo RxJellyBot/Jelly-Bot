@@ -14,7 +14,7 @@ class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPara
     def mandatory_keys(self) -> set:
         return {param.DataQuery.Channel.PLATFORM, param.DataQuery.Channel.CHANNEL_TOKEN}
 
-# FIXME: Channel Registration token processing service
+# FIXME: FN. Channel Registration token processing service
 # class ChannelIssueRegisterTokenView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
 #     get_response_class = ChannelDataQueryResponse
 #

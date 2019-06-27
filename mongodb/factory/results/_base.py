@@ -25,7 +25,7 @@ class BaseResult(ABC):
         return self._exception
 
     def serialize(self) -> dict:
-        return {result.Results.EXCEPTION: str(self._exception), result.Results.OUTCOME: int(self._outcome)}
+        return {result.Results.EXCEPTION: str(self.exception), result.Results.OUTCOME: self.outcome.code}
 
     @property
     def success(self) -> bool:
@@ -48,5 +48,5 @@ class ModelResult(BaseResult, ABC):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.Results.MODEL: self._model})
+        d.update(**{result.Results.MODEL: self.model})
         return d

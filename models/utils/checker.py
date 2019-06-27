@@ -131,7 +131,6 @@ def _repair_single_data_(col_inst: Collection, required_write_holder, data) -> (
         return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, data if changed else None
 
 
-# FIXME: Repair - fill with default value? using correct keys?
 def _repair_fields_(model_cls, data, changed, missing):
     for json_key, default_val in _get_default_vals_(model_cls):
         if json_key not in data:

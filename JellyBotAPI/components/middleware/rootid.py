@@ -1,4 +1,4 @@
-# FIXME: API View require sender mixin (add required keys)
+# FIXME: 3. API View require sender mixin (add required keys)
 
 from django.utils.deprecation import MiddlewareMixin
 

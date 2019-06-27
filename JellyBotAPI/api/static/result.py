@@ -36,7 +36,6 @@ class AutoReplyResponse:
     COOLDOWN_SEC = "cooldown"
 
     ADD_RESULT = "addResult"
-    INSERT_CONN_OUTCOME = "connOutcome"
 
 
 class TokenActionResponse:

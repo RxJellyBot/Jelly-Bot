@@ -5,7 +5,7 @@ from bson import ObjectId
 from extutils.flags import FlagCodeMixin
 
 
-class DecoParamChecker:
+class DecoParamCaster:
     def __init__(self, dict_keys: dict = None):
         self._dict_keys = dict_keys
 
@@ -15,13 +15,13 @@ class DecoParamChecker:
 
             for arg_idx, val in enumerate(args):
                 if arg_idx in self._dict_keys:
-                    new_args.append(DecoParamChecker.type_check(val, self._dict_keys[arg_idx]))
+                    new_args.append(DecoParamCaster.type_check(val, self._dict_keys[arg_idx]))
                 else:
                     new_args.append(val)
 
             for key, val in kwargs.items():
                 if key in self._dict_keys:
-                    kwargs[key] = DecoParamChecker.type_check(val, self._dict_keys[key])
+                    kwargs[key] = DecoParamCaster.type_check(val, self._dict_keys[key])
                 else:
                     kwargs[key] = val
 

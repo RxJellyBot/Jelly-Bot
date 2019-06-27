@@ -17,6 +17,14 @@ class Color:
     def __repr__(self):
         return f"Color: #{self.color_int // 65536:02x}{(self.color_int // 256) % 256:02x}{self.color_int % 256:02x}"
 
+    def __eq__(self, other):
+        if isinstance(other, Color):
+            return other.color_int == self.color_int
+        elif isinstance(other, int):
+            return other == self.color_int
+        else:
+            return False
+
 
 class ColorFactory:
     BLACK = Color(0)
