@@ -265,6 +265,7 @@ class ControlExtensionMixin(Collection):
             outcome = InsertOutcome.X_CAST_FAILED
             ex = e
         except Exception as e:
+            raise e
             outcome = InsertOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 

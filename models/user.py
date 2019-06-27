@@ -20,7 +20,7 @@ class RootUserModel(Model):
     Config = ModelField("c", RootUserConfigModel)
 
     def perform_validity_check(self) -> ModelValidityCheckResult:
-        all_empty = self.is_field_none("OnPlatOids") and self.is_field_none("ApiOid")
+        all_empty = self.is_field_none("OnPlatOids", False) and self.is_field_none("ApiOid", False)
 
         if all_empty:
             return ModelValidityCheckResult.X_RTU_ALL_NONE

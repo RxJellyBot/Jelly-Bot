@@ -25,10 +25,13 @@ class Results:
     LACKING_KEYS = Common.LACKING_KEYS
 
 
+class SenderIdentity:
+    SENDER = "sender"
+
+
 class AutoReplyResponse:
     KEYWORD = "keyword"
     RESPONSES = "responses"
-    CREATOR_OID = Common.CREATOR_OID
     PLATFORM = Common.PLATFORM
     CHANNEL_OID = Common.CHANNEL_OID
     PRIVATE = "private"

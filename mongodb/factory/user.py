@@ -60,7 +60,10 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
         else:
             entry = self.get_user_data_google_id(id_data.uid)
             if entry is None:
-                outcome = InsertOutcome.X_CACHE_MISSING_ABORT_INSERT
+                if ex is not None:
+                    outcome = InsertOutcome.X_EXCEPTION_OCCURRED
+                else:
+                    outcome = InsertOutcome.X_CACHE_MISSING_ABORT_INSERT
             else:
                 token = entry.token
 

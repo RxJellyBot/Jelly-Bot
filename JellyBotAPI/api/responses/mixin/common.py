@@ -1,14 +1,14 @@
 from abc import ABC
 
 from JellyBotAPI.api.static import result, param
-from JellyBotAPI.api.responses import BaseApiResponse
 from mongodb.factory import ChannelManager
 from extutils import is_empty_string
 from flags import Platform
 
+from JellyBotAPI.api.responses.mixin import BaseMixin
 
 
-class HandleChannelMixin(BaseApiResponse, ABC):
+class HandleChannelMixin(BaseMixin, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
@@ -32,7 +32,7 @@ class HandleChannelMixin(BaseApiResponse, ABC):
                not is_empty_string(self._channel_token)
 
 
-class HandlePlatformMixin(BaseApiResponse, ABC):
+class HandlePlatformMixin(BaseMixin, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
@@ -66,3 +66,14 @@ class HandleChannelOidMixin(HandleChannelMixin, HandlePlatformMixin, ABC):
             return c.model.id
         else:
             return None
+
+
+class RequireSenderMixin(BaseMixin, ABC):
+    def __init__(self, param_dict, sender_oid):
+        super().__init__(param_dict, sender_oid)
+
+        if sender_oid is None:
+            self._err[result.SenderIdentity.SENDER] = sender_oid
+
+    def success_conditions(self) -> bool:
+        return super().success_conditions() and self._sender_oid is not None
