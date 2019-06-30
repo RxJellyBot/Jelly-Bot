@@ -77,7 +77,7 @@ class Model(MutableMapping, abc.ABC):
     def _check_validity_(self):
         result = self.perform_validity_check()
 
-        if not result.is_success():
+        if not result.is_success:
             self.on_invalid(result)
 
     def _inner_dict_create_(self, fk, v):
@@ -156,7 +156,11 @@ class Model(MutableMapping, abc.ABC):
                 else:
                     raise IdUnsupportedError(self.__class__.__name__)
             else:
-                warn_action_failed_json_key(self.__class__.__name__, jk, "GET")
+                # The key may be field_key (For Django template)
+                try:
+                    return self.__getattr__(to_snake_case(self.json_key_to_field(jk)))
+                except AttributeError:
+                    warn_action_failed_json_key(self.__class__.__name__, jk, "GET")
 
         return None
 
@@ -209,7 +213,8 @@ class Model(MutableMapping, abc.ABC):
         return self._inner_dict_get_("Id").value
 
     def clear_oid(self):
-        del self._dict_["Id"]
+        if "Id" in self._dict_:
+            del self._dict_["Id"]
 
     def to_json(self):
         d = {}

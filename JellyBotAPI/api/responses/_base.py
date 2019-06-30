@@ -26,7 +26,7 @@ class BaseApiResponse(abc.ABC):
 
     @abc.abstractmethod
     def success_conditions(self) -> bool:
-        raise NotImplementedError()
+        return True
 
     # noinspection PyMethodMayBeStatic
     def _serialize_(self) -> dict:

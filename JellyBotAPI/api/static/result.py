@@ -44,7 +44,7 @@ class AutoReplyResponse:
 class TokenActionResponse:
     LACKING_KEYS = Common.LACKING_KEYS
     CREATOR_OID = Common.CREATOR_OID
-    COMPLETION_RESULT = "cmplResult"
+    COMPLETION_OUTCOME = "cmplOutcome"
 
     TOKEN = Common.TOKEN
     EXPIRY = "expiry"

@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 
 
 class TokenAction(FlagDoubleEnum):
@@ -16,6 +16,9 @@ class TokenAction(FlagDoubleEnum):
 
     2xx - Auto Reply:
             201: Add
+
+    9xx - System
+            901 - Test
     """
     @classmethod
     def default(cls):
@@ -23,21 +26,18 @@ class TokenAction(FlagDoubleEnum):
 
     UNKNOWN = -1, _("Unknown"), _("Unknown Token Action.")
 
-    CONNECT_API_TO_ONPLAT = \
-        101, _("Connect: User Identity (on Web)"), \
-        _("Connect the API identity to the on-platform identity. (Complete on the website.)")
-    CONNECT_ONPLAT_TO_API = \
-        102, _("Connect: User Identity (on API)"), \
-        _("Connect the on-platform identity to the API identity. (Complete using API side.)")
-    CONNECT_CONFIRM_ON_WEB = \
-        111, _("Connect: Confirm Channel (on Web)"), \
-        _("Confirm the existence in a channel on website.")
-    CONNECT_CONFIRM_ON_API = \
-        112, _("Connect: Confirm Channel (on API)"), \
-        _("Confirm the existence in a channel using API.")
+    CONNECT_USER_ON_WEB = \
+        101, _("Connect: User Identity"), \
+        _("Connect the user identity data between on-platform and API.")
+    CONNECT_CHANNEL = \
+        111, _("Connect: Register Channel Existence"), \
+        _("Confirm the existence in a channel.")
     AR_ADD = \
         201, _("Auto-Reply: Add"), \
         _("Register an Auto-Reply module.")
+    SYS_TEST = \
+        901, _("System: Test"), \
+        _("Preserved for testing purpose.")
 
 
 class TokenActionCollationFailedReason(FlagDoubleEnum):
@@ -50,7 +50,7 @@ class TokenActionCollationFailedReason(FlagDoubleEnum):
     EMPTY_CONTENT = 101, _("Empty Content"), _("The content is empty.")
 
 
-class TokenActionCompletionOutcome(FlagDoubleEnum):
+class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     """
     # SUCCESS
 
@@ -64,6 +64,11 @@ class TokenActionCompletionOutcome(FlagDoubleEnum):
     1xx - Related to Auto Reply
         101 - Error during channel registration
         102 - Error during module registration
+
+    2xx - Related to Identity
+        201 - Default profile registratiom
+        202 - Channel not found
+        203 - Channel error
 
     5xx - Related to Model
         501 - Error during model construction
@@ -86,6 +91,16 @@ class TokenActionCompletionOutcome(FlagDoubleEnum):
         102, _("X: Auto Reply - Module Registration"), \
         _("An error occurred during module registration.")
 
+    X_IDT_REGISTER_DEFAULT_PROFILE = \
+        201, _("X: Identity - Default Profile Registration"), \
+        _("An error occurred during default profile registration.")
+    X_IDT_CHANNEL_NOT_FOUND = \
+        202, _("X: Identity - Channel not found"), \
+        _("Channel data not found using the provided information.")
+    X_IDT_CHANNEL_ERROR = \
+        203, _("X: Identity - Channel Error"), \
+        _("An error occurred during channel data acquiring process.")
+
     X_MODEL_CONSTRUCTION = \
         501, _("X: Model - Construction"), \
         _("An error occurred during model construction.")
@@ -93,6 +108,3 @@ class TokenActionCompletionOutcome(FlagDoubleEnum):
     X_NOT_EXECUTED = \
         901, _("X: Process - Not executed"), \
         _("Token action completion not executed.")
-
-    def is_success(self):
-        return self.code < 0

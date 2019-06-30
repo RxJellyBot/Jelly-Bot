@@ -50,7 +50,7 @@ def _construct_my_account_(current_path, parent):
     # Dummy Items
     my_account_parent.add_item(nav_items_factory(
         NavDummy, current_path, label=_("Channel Registration"),
-        link=reverse("account.channel.register"), parent=my_account_parent))
+        link=reverse("account.channel.connect"), parent=my_account_parent))
     my_account_parent.add_item(nav_items_factory(
         NavDummy, current_path, label=_("Channel Management"),
         link=reverse("account.channel.manage"), parent=my_account_parent))

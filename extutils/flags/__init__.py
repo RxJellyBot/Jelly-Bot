@@ -1,5 +1,5 @@
 from .main import (
     FlagCodeEnum, FlagSingleEnum, FlagDoubleEnum, FlagPrefixedDoubleEnum,
-    FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
+    FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin, FlagOutcomeMixin
 )
 from .mongo import type_registry

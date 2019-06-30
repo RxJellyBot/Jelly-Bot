@@ -2,13 +2,13 @@ from bson import ObjectId
 
 from JellyBotAPI import SystemConfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
+from models.utils import AutoReplyValidators
 
 from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
     BooleanField, IntegerField, ArrayField, DateTimeField, ColorField
 )
-from .utils import AutoReplyValidators
 
 
 class AutoReplyContentModel(Model):
@@ -68,8 +68,8 @@ class AutoReplyModuleTokenActionModel(Model):
     CooldownSec = IntegerField("cd", readonly=True)
     TagIds = ArrayField("t", ObjectId)
 
-    def to_actual_model(self, channel_ids: list):
-        return AutoReplyModuleModel(**self.to_json(), ch=channel_ids, from_db=True)
+    def to_actual_model(self, channel_id: ObjectId):
+        return AutoReplyModuleModel(**self.to_json(), ch=[channel_id], from_db=True)
 
 
 class AutoReplyModuleTagModel(Model):

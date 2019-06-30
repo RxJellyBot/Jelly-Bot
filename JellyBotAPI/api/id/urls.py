@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .channel import ChannelDataQueryView
+from .channel import ChannelDataQueryView, ChannelIssueRegistrationTokenView
 
 urlpatterns = [
-    path('ch', ChannelDataQueryView.as_view(), name='api.id.channel')
+    path('ch/data', ChannelDataQueryView.as_view(), name='api.id.channel.data'),
+    path('ch/reg/issue', ChannelIssueRegistrationTokenView.as_view(), name='api.id.channel.register_token')
 ]

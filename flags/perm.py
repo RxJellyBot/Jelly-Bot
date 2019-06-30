@@ -49,11 +49,13 @@ class PermissionCategoryDefault:
     _Preset = (
         (PermissionCategory.NORMAL, True),
         (PermissionCategory.AR_ACCESS_PINNED_MODULE, False),
-        (PermissionCategory.MBR_CHANGE_MEMBERS, False)
+        (PermissionCategory.MBR_CHANGE_MEMBERS, False),
+        (PermissionCategory.CNL_ADJUST_FEATURES, False),
+        (PermissionCategory.CNL_ADJUST_VOTES, False)
     )
 
     @staticmethod
-    def get_default_preset():
+    def get_default_preset() -> dict:
         if "default" not in PermissionCategoryDefault._Cache:
             PermissionCategoryDefault._Cache["default"] = {k: v for k, v in PermissionCategoryDefault._Preset}
         return PermissionCategoryDefault._Cache["default"]

@@ -1,16 +1,18 @@
 from datetime import datetime, timedelta
-from typing import Type, Iterator
+from typing import Type
 
 from bson import ObjectId
+from django.http import QueryDict
 
 from flags import TokenAction, Platform, TokenActionCollationFailedReason, TokenActionCompletionOutcome
-from mongodb.factory import ChannelManager, AutoReplyModuleManager
+from mongodb.factory import ChannelManager, AutoReplyModuleManager, PermissionManager
 from mongodb.factory.results import (
     EnqueueTokenActionResult, CompleteTokenActionResult,
     OperationOutcome
 )
 from models import TokenActionModel, Model, AutoReplyModuleTokenActionModel
 from models.exceptions import ModelConstructionError
+from mongodb.utils import CheckableCursor
 from JellyBotAPI.SystemConfig import Database
 from JellyBotAPI.api.static import param
 
@@ -47,31 +49,35 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
         self.create_index(TokenActionModel.Timestamp.key,
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.TokenActionExpirySeconds)
 
-    def enqueue_action(self, creator: ObjectId, token_action: TokenAction, data_cls: Type[Model], **data_kw_args):
+    def enqueue_action(
+            self, root_uid: ObjectId, token_action: TokenAction, data_cls: Type[Model] = None, **data_kw_args):
         token = self.generate_hex_token()
         now = datetime.utcnow()
 
+        if data_cls is not None:
+            data = data_cls(**data_kw_args)
+        else:
+            data = data_kw_args
+
         entry, outcome, ex, insert_result = self.insert_one_data(
-            TokenActionModel, CreatorOid=creator,
-            Token=token, ActionType=token_action, Timestamp=now, Data=data_cls(**data_kw_args))
+            TokenActionModel, CreatorOid=root_uid,
+            Token=token, ActionType=token_action, Timestamp=now, Data=data)
 
         return EnqueueTokenActionResult(outcome, token, now + timedelta(seconds=Database.TokenActionExpirySeconds), ex)
 
-    def get_queued_actions(self, creator_oid: ObjectId) -> Iterator[TokenActionModel]:
-        csr = self.find({TokenActionModel.CreatorOID.key: creator_oid})
-        for dict_ in csr:
-            o = TokenActionModel(**dict_, from_db=True)
-            yield o
+    def get_queued_actions(self, root_uid: ObjectId) -> CheckableCursor:
+        csr = self.find({TokenActionModel.CreatorOid.key: root_uid})
+        return CheckableCursor(csr, parse_cls=TokenActionModel)
 
-    def complete_action(self, token: str, token_args: dict):
+    def complete_action(self, token: str, token_kwargs: dict):
         lacking_keys = set()
         cond_dict = {TokenActionModel.Token.key: token}
         ex = None
         tk_model = None
         cmpl_outcome = None
 
-        if type(token_args) != dict:
-            token_args = dict(token_args)
+        if type(token_kwargs) != dict:
+            token_kwargs = dict(token_kwargs)
 
         if token:
             tk_model = self.find_one(cond_dict)
@@ -81,12 +87,12 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                     tk_model = TokenActionModel(**tk_model, from_db=True)
                     required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action_type)
 
-                    if required_keys == token_args.keys():
+                    if required_keys == token_kwargs.keys():
                         try:
-                            cmpl_outcome = TokenActionCompletor.complete_action(tk_model, token_args)
+                            cmpl_outcome = TokenActionCompletor.complete_action(tk_model, token_kwargs)
 
                             if cmpl_outcome.is_success:
-                                outcome = OperationOutcome.SUCCESS_COMPLETED
+                                outcome = OperationOutcome.O_COMPLETED
                                 self.delete_one(cond_dict)
                             else:
                                 outcome = OperationOutcome.X_COMPLETION_FAILED
@@ -101,7 +107,7 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                             ex = e
                     else:
                         outcome = OperationOutcome.X_KEYS_LACKING
-                        lacking_keys = required_keys.difference(token_args.keys())
+                        lacking_keys = required_keys.difference(token_kwargs.keys())
                 except ModelConstructionError:
                     outcome = OperationOutcome.X_CONSTRUCTION_ERROR
             else:
@@ -116,11 +122,13 @@ class TokenActionCompletor:
     # noinspection PyArgumentList
     @staticmethod
     def complete_action(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
-        action = action_model.action
-        xparams = TokenActionParameterCollator.collate_parameters(TokenAction(action_model.action), xparams)
+        action = action_model.action_type
+        xparams = TokenActionParameterCollator.collate_parameters(TokenAction(action), xparams)
 
         if action == TokenAction.AR_ADD:
             return TokenActionCompletor._token_ar_add_(action_model, xparams)
+        elif action == TokenAction.CONNECT_CHANNEL:
+            return TokenActionCompletor._token_connect_channel_(action_model, xparams)
         else:
             raise NoCompleteActionError(action)
 
@@ -140,12 +148,32 @@ class TokenActionCompletor:
 
         return TokenActionCompletionOutcome.O_OK
 
+    @staticmethod
+    def _token_connect_channel_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
+        try:
+            channel_data = ChannelManager.register(
+                xparams[param.TokenAction.PLATFORM], xparams[param.TokenAction.CHANNEL_TOKEN])
+        except Exception:
+            return TokenActionCompletionOutcome.X_IDT_CHANNEL_ERROR
+
+        if channel_data:
+            try:
+                PermissionManager.register_new_default(channel_data.model.id, action_model.creator_oid)
+            except Exception as e:
+                return TokenActionCompletionOutcome.X_IDT_REGISTER_DEFAULT_PROFILE
+        else:
+            return TokenActionCompletionOutcome.X_IDT_CHANNEL_NOT_FOUND
+
+        return TokenActionCompletionOutcome.O_OK
+
 
 class TokenActionParameterCollator:
     @staticmethod
     def collate_parameters(action: TokenAction, xparams: dict) -> dict:
         if action == TokenAction.AR_ADD:
             return TokenActionParameterCollator._token_ar_add_(action, xparams)
+        elif action == TokenAction.CONNECT_CHANNEL:
+            return TokenActionParameterCollator._token_conn_channel_(xparams)
         else:
             return xparams
 
@@ -166,6 +194,11 @@ class TokenActionParameterCollator:
 
         return xparams
 
+    # noinspection PyArgumentList
+    @staticmethod
+    def _token_conn_channel_(xparams: dict) -> dict:
+        return {k: v[0] if isinstance(v, list) else v for k, v in xparams.items()}
+
 
 class TokenActionRequiredKeys:
     @staticmethod
@@ -175,6 +208,9 @@ class TokenActionRequiredKeys:
         if token_action == TokenAction.AR_ADD:
             st.add(param.AutoReply.CHANNEL_TOKEN)
             st.add(param.AutoReply.PLATFORM)
+        elif token_action == TokenAction.CONNECT_CHANNEL:
+            st.add(param.TokenAction.CHANNEL_TOKEN)
+            st.add(param.TokenAction.PLATFORM)
 
         return st
 
