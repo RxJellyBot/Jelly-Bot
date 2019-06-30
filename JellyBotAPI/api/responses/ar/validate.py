@@ -1,13 +1,13 @@
 from extutils import is_empty_string
 from JellyBotAPI.api.static import param, result
-from JellyBotAPI.api.responses.mixin import SerializeErrorMixin
+from JellyBotAPI.api.responses.mixin import SerializeErrorMixin, SerializeResultExtraMixin
 from flags import AutoReplyContentType
 from models.utils import AutoReplyValidators
 
 from .._base import BaseApiResponse
 
 
-class ContentValidationResponse(SerializeErrorMixin, BaseApiResponse):
+class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, BaseApiResponse):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
         self._param_dict.update(**{
@@ -51,6 +51,3 @@ class ContentValidationResponse(SerializeErrorMixin, BaseApiResponse):
 
     def serialize_success(self) -> dict:
         return {result.DATA: self._data}
-
-    def serialize_extra(self) -> dict:
-        return {result.RESULT: self._result}

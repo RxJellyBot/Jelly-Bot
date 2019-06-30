@@ -256,10 +256,9 @@
 {% endblock %}
 
 {% block ex-script %}
-    <!--suppress UnterminatedStatementJS -->
     <script type="text/javascript">
         function checkChannelExistence(platVal, channel, fnOnLoad) {
-            let url = `{% url "api.id.channel" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
+            let url = `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             let xhr = new XMLHttpRequest();
             xhr.open("GET", url);
@@ -276,12 +275,12 @@
             // Attach KEYWORD and RESPONSES
             $(".content-check:not(.d-none)").find("textarea").each(function () {
                 param.append($(this).data("postkey"), $(this).val());
-            })
+            });
 
             // Attach KEYWORD TYPES and RESPONSE TYPES
             $(".content-check:not(.d-none) .ar-type").each(function () {
                 param.append($(this).data("postkey"), $(this).val());
-            })
+            });
 
             if (regId === "arChannel") {
                 // Attach CHANNEL_TOKEN
@@ -293,7 +292,7 @@
             // Attach PRIVATE, PIN, COOLDOWN
             $("#arPrivate, #arPinned, #arCoolDown").each(function () {
                 param.append($(this).data("postkey"), $(this).val());
-            })
+            });
 
             // Attach CREATOR_TOKEN flag
             param.append("{{ static_keys_param.AutoReply.API_TOKEN }}", "{{ api_token }}");
@@ -323,7 +322,7 @@
                 }
 
                 onLoadCallback(xhr.response);
-            }
+            };
             xhr.send(collectData());
         }
 

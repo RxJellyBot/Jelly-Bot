@@ -1,9 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagPrefixedDoubleEnum
+from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
-class BaseOutcome(FlagPrefixedDoubleEnum):
+class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     @property
     def code_prefix(self) -> str:
         raise NotImplementedError()
@@ -11,10 +11,6 @@ class BaseOutcome(FlagPrefixedDoubleEnum):
     @classmethod
     def default(cls):
         raise NotImplementedError()
-
-    @staticmethod
-    def is_success(result):
-        return result < 0
 
 
 class InsertOutcome(BaseOutcome):
@@ -34,12 +30,13 @@ class InsertOutcome(BaseOutcome):
 
     # FAILED
 
-    1xx - Problems related to the process
+    1xx - Problems related to the preaparation processes
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
         107 - Connecting OnPlatform User ID
         108 - Connecting API User ID
+        109 - Config Setting Failed
 
     2xx - Problems related to the model
         201 - Not Serializable
@@ -68,7 +65,7 @@ class InsertOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "I-"
+        return "I "
 
     @classmethod
     def default(cls):
@@ -81,19 +78,22 @@ class InsertOutcome(BaseOutcome):
     O_MISC = \
         -1, _("O: Uncategorized"), _("The system returned OK with uncategorized reason.")
     X_ON_REG_CHANNEL = \
-        104, _("X: Registering Channel"), \
+        104, _("X: on Registering Channel"), \
         _("The insertion was failed while registering the identity of channel.")
     X_ON_REG_ONPLAT = \
-        105, _("X: Registering OnPlatform User ID"), \
+        105, _("X: on Registering OnPlatform User"), \
         _("The insertion was failed while registering the identity of on-platform user.")
     X_ON_REG_API = \
-        106, _("X: Registering API User ID"), \
+        106, _("X: on Registering API User"), \
         _("The insertion was failed while registering the identity of API user.")
     X_ON_CONN_ONPLAT = \
-        107, _("X: Connecting OnPlatform User ID"), \
+        107, _("X: on Connecting OnPlatform User"), \
         _("The insertion was failed while connecting the identity of on-platform user.")
     X_ON_CONN_API = \
-        108, _("X: Connecting API User ID"), \
+        108, _("X: on Connecting API User"), \
+        _("The insertion was failed while connecting the identity of API user.")
+    X_ON_SET_CONFIG = \
+        109, _("X: on Setting Config"), \
         _("The insertion was failed while connecting the identity of API user.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
@@ -168,21 +168,26 @@ class GetOutcome(BaseOutcome):
     2xx - Problems related to the given parameters
         201 - The content is empty
 
+    3xx - SPECIFIC - permission
+        301 - Channel not found
+        302 - Error during config creation
+        303 - Error during default profile creation
+
     9xx - Problems related to execution
         901 - Not executed
     """
     @property
     def code_prefix(self) -> str:
-        return "G-"
+        return "G "
 
     @classmethod
     def default(cls):
         return GetOutcome.X_NOT_EXECUTED
 
-    SUCCESS_CACHE_DB = \
+    O_CACHE_DB = \
         -2, _("O: From Cache/DB"), \
         _("The data was found in either Cache or Database.")
-    SUCCESS_ADDED = \
+    O_ADDED = \
         -1, _("O: Inserted"), \
         _("The data was not found yet the data has been inserted to the database.")
     X_NOT_FOUND_ATTEMPTED_INSERT = \
@@ -200,6 +205,15 @@ class GetOutcome(BaseOutcome):
     X_NO_CONTENT = \
         201, _("X: Empty Content"), \
         _("The content in the parameter is empty.")
+    X_CHANNEL_NOT_FOUND = \
+        301, _("X: Channel Not Found"), \
+        _("Channel data not found. Use the channel token and platform to register the channel first.")
+    X_CHANNEL_CONFIG_ERROR = \
+        302, _("X: Config Error"), \
+        _("An error occurred when getting configuration from the channel data.")
+    X_DEFAULT_PROFILE_ERROR = \
+        303, _("X: Default Profile Error"), \
+        _("An error occurred when creating a default profile.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The acquiring process had not been executed.")
@@ -219,6 +233,8 @@ class OperationOutcome(BaseOutcome):
         101 - Token Not Found
         102 - Keys Lacking
         103 - Completion Error
+        104 - Completion Process not Implemented
+        105 - Completion Error
 
     5xx - Problems related to Model
         501 - Construction Error
@@ -228,13 +244,13 @@ class OperationOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "O-"
+        return "O "
 
     @classmethod
     def default(cls):
         return OperationOutcome.X_NOT_EXECUTED
 
-    SUCCESS_COMPLETED = \
+    O_COMPLETED = \
         -1, _("O: Completed"), \
         _("The operation was successfully completed.")
     X_TOKEN_NOT_FOUND = \
@@ -284,13 +300,13 @@ class UpdateOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "U-"
+        return "U "
 
     @classmethod
     def default(cls):
         return UpdateOutcome.X_NOT_EXECUTED
 
-    SUCCESS_UPDATED = \
+    O_UPDATED = \
         -1, _("O: Success"), \
         _("The updating operation succeed.")
     X_NOT_FOUND = \

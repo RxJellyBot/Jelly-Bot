@@ -79,14 +79,14 @@ class AutoReplyModuleTagManager(BaseCollection):
             model, outcome, ex, insert_result = \
                 self.insert_one_data(AutoReplyModuleTagModel, Name=name, Color=color)
 
-            if InsertOutcome.is_success(outcome):
+            if outcome.is_success:
                 tag_data = self.set_cache(
                     AutoReplyModuleTagModel.Name.key, name, tag_data, parse_cls=AutoReplyModuleTagModel)
-                outcome = GetOutcome.SUCCESS_ADDED
+                outcome = GetOutcome.O_ADDED
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
         else:
-            outcome = GetOutcome.SUCCESS_CACHE_DB
+            outcome = GetOutcome.O_CACHE_DB
 
         return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
 

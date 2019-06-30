@@ -29,7 +29,7 @@ class BaseResult(ABC):
 
     @property
     def success(self) -> bool:
-        return self.outcome.__class__.is_success(self.outcome)
+        return self.outcome.is_success
 
 
 class ModelResult(BaseResult, ABC):

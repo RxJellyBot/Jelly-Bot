@@ -58,4 +58,4 @@ def render_flag_table(request, title: str, table_title: str, flag_enum: type(Fla
 
 
 def simple_str_response(request, s):
-    return HttpResponse(Template("{{result}}").render(RequestContext(request, {"result": s})))
+    return HttpResponse(Template("{{ result }}").render(RequestContext(request, {"result": s})))

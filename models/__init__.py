@@ -11,10 +11,10 @@ from .ar import (
 # noinspection PyUnresolvedReferences
 from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel
 # noinspection PyUnresolvedReferences
-from .channel import ChannelModel, ChannelConfigModel
+from .channel import ChannelModel, ChannelConfigModel, ChannelRegisterExistenceModel
 # noinspection PyUnresolvedReferences
 from .stats import APIStatisticModel
 # noinspection PyUnresolvedReferences
 from .tkact import TokenActionModel
 # noinspection PyUnresolvedReferences
-from .perm import ChannelPermissionProfileModel
+from .perm import ChannelPermissionProfileModel, ChannelPermissionConnectionModel, PermissionPromotionRecordModel

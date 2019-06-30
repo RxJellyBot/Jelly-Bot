@@ -62,5 +62,5 @@ class CompleteTokenActionResult(ModelResult):
     def serialize(self) -> dict:
         d = super().serialize()
         d.update(**{result.TokenActionResponse.LACKING_KEYS: self._lacking_keys,
-                    result.TokenActionResponse.COMPLETION_RESULT: self._completion_outcome})
+                    result.TokenActionResponse.COMPLETION_OUTCOME: self._completion_outcome})
         return d

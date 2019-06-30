@@ -36,4 +36,6 @@ class DataQuery:
 class TokenAction:
     TOKEN = "tk"
     PLATFORM = Common.PLATFORM
+    CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     USER_TOKEN = Common.USER_TOKEN
+    API_TOKEN = Common.API_TOKEN

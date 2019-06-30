@@ -1,12 +1,12 @@
+from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from flags import PermissionCategory, PermissionCategoryDefault
 from models import Model, ModelDefaultValueExt
-from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField
+from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField
 
 
 class ChannelPermissionProfileModel(Model):
-    UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required)
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
     Name = TextField("n", default=_("(Unknown)"), must_have_content=True)
     Color = ColorField("col")
@@ -27,3 +27,15 @@ class ChannelPermissionProfileModel(Model):
             k = f"_{perm_cat.code}"
             if k not in self.permission:
                 self.permission[k] = f(perm_cat)
+
+
+class ChannelPermissionConnectionModel(Model):
+    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
+    UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required)
+    ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=False)
+
+
+class PermissionPromotionRecordModel(Model):
+    SupporterOid = ObjectIDField("s")
+    TargetOid = ObjectIDField("t")
+    ProfileOid = ObjectIDField("p")

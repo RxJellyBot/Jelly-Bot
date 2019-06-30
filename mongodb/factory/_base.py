@@ -30,6 +30,10 @@ class CacheSectionUndefinedError(Exception):
 
 
 class CacheMixin(Collection):
+    CACHE_KEY_COMB1 = "**kc1**"
+    CACHE_KEY_COMB2 = "**kc2**"
+    CACHE_KEY_COMB3 = "**kc3**"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
@@ -265,14 +269,13 @@ class ControlExtensionMixin(Collection):
             outcome = InsertOutcome.X_CAST_FAILED
             ex = e
         except Exception as e:
-            raise e
             outcome = InsertOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 
         if model is not None:
             outcome, ex = self.insert_one_model(model)
 
-        if settings.DEBUG and not InsertOutcome.is_success(outcome):
+        if settings.DEBUG and not outcome.is_success:
             raise ex
 
         return model, outcome, ex, insert_result

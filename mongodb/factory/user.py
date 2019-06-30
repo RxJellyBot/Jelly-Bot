@@ -187,7 +187,7 @@ class RootUserManager(BaseCollection):
                 outcome = GetOutcome.X_NOT_FOUND_SECOND_QUERY
             else:
                 entry = root_u_data
-                outcome = GetOutcome.SUCCESS_CACHE_DB
+                outcome = GetOutcome.O_CACHE_DB
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data)
 
@@ -198,6 +198,7 @@ class RootUserManager(BaseCollection):
             ({RootUserModel.ApiOid.key: api_oid},),
             parse_cls=RootUserModel, safe_lambda=True)
 
+    @DecoParamCaster({1: Platform, 2: str})
     def get_root_data_onplat(self, platform, user_token, auto_register=True) -> GetRootUserDataResult:
         on_plat_data = self.get_onplat_data(platform, user_token)
         rt_user_data = None
@@ -219,13 +220,13 @@ class RootUserManager(BaseCollection):
 
                     if reg_result.success:
                         rt_user_data = reg_result.model
-                        outcome = GetOutcome.SUCCESS_ADDED
+                        outcome = GetOutcome.O_ADDED
                     else:
                         outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
                 else:
                     outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
             else:
-                outcome = GetOutcome.SUCCESS_CACHE_DB
+                outcome = GetOutcome.O_CACHE_DB
 
         return GetRootUserDataResult(outcome, rt_user_data)
 
@@ -269,7 +270,7 @@ class RootUserManager(BaseCollection):
         if upd_data is None:
             outcome = UpdateOutcome.X_NOT_FOUND
         else:
-            outcome = UpdateOutcome.SUCCESS_UPDATED
+            outcome = UpdateOutcome.O_UPDATED
 
         return RootUserUpdateResult(outcome, upd_data)
 

@@ -155,3 +155,9 @@ class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
     @property
     def code_prefix(self) -> str:
         raise NotImplementedError()
+
+
+class FlagOutcomeMixin(FlagCodeMixin):
+    @property
+    def is_success(self):
+        return self._code < 0

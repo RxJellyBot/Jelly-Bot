@@ -1,9 +1,9 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 
 
-class ModelValidityCheckResult(FlagDoubleEnum):
+class ModelValidityCheckResult(FlagOutcomeMixin, FlagDoubleEnum):
     """
     # SUCCESS
 
@@ -47,7 +47,6 @@ class ModelValidityCheckResult(FlagDoubleEnum):
         201, _("X: Root User - No child IDs"), \
         _("No related identity data connected.")
 
-    X_UNCATEGORIZED = 901, _("X: Uncategorized Reason"), _("Model is invalid for uncategorized reason.")
-
-    def is_success(self):
-        return self.code < 0
+    X_UNCATEGORIZED = \
+        901, _("X: Uncategorized Reason"), \
+        _("Model is invalid for uncategorized reason.")

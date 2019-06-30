@@ -48,11 +48,11 @@ class AutoReplyContentManager(BaseCollection):
 
             if InsertOutcome.is_inserted(add_result.outcome):
                 ret_entry = self._spec_get_cache_(content, type_, case_insensitive)
-                outcome = GetOutcome.SUCCESS_ADDED
+                outcome = GetOutcome.O_ADDED
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
         else:
-            outcome = GetOutcome.SUCCESS_CACHE_DB
+            outcome = GetOutcome.O_CACHE_DB
 
         return AutoReplyContentGetResult(outcome, ret_entry, on_add_result=add_result)
 

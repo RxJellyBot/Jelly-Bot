@@ -3,7 +3,9 @@ from abc import ABC
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from JellyBotAPI.api.responses import BaseApiResponse
-from JellyBotAPI.api.responses.mixin import HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin
+from JellyBotAPI.api.responses.mixin import (
+    HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultOnSuccessMixin
+)
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyModuleModel, AutoReplyModuleTokenActionModel
@@ -12,8 +14,8 @@ from mongodb.factory import (
 )
 
 
-# TODO: API Response add common handles to `Mixin`
-class AutoReplyAddBaseResponse(RequireSenderMixin, SerializeErrorMixin, BaseApiResponse, ABC):
+class AutoReplyAddBaseResponse(
+        RequireSenderMixin, SerializeErrorMixin, SerializeResultOnSuccessMixin, BaseApiResponse, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
         self._param_dict.update(**{
@@ -102,7 +104,9 @@ class AutoReplyAddBaseResponse(RequireSenderMixin, SerializeErrorMixin, BaseApiR
         self._handle_cooldown_()
 
     def serialize_success(self) -> dict:
-        return {result.DATA: self._data, result.RESULT: self._result}
+        d = super().serialize_success()
+        d[result.DATA] = self._data
+        return d
 
     def serialize_extra(self) -> dict:
         return {result.FLAGS: self._flag, result.INFO: self._info}
