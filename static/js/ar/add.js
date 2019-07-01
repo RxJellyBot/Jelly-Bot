@@ -180,13 +180,12 @@ function validateChannelInfo() {
     let arPlatVal = $("#arPlatform option:selected").val();
     let arChannelID = $("#arChannelID").val();
 
-    checkChannelExistence(arPlatVal, arChannelID, function (outcomeCode) {
-        let result = outcomeCode > 0;
-        submitBtnDisable(result);
+    checkChannelExistence(arPlatVal, arChannelID, function (exists) {
+        submitBtnDisable(!exists);
 
         let elem = $("#arChannelID");
         elem.removeClass("is-valid is-invalid");
-        if (typeof outcomeCode !== "undefined" && outcomeCode < 0) {
+        if (typeof exists !== "undefined" && exists) {
             elem.addClass("is-valid");
         } else {
             elem.addClass("is-invalid");

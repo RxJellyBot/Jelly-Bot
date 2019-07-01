@@ -124,6 +124,13 @@
 
                                 <div class="mb-3">
                                     <div class="w-100 card card-body border-success text-center">
+                                        <h5 class="card-title">{% trans "Tag" %}</h5>
+                                        <!-- FIXME: Section to choose and apply tag -->
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="w-100 card card-body border-success text-center">
                                         <h5 class="card-title">{% trans "Cooldown (sec)" %}</h5>
                                         <p class="card-text">
                                             <small>
@@ -224,7 +231,7 @@
                                                 <button type="button"
                                                         class="btn bg-light btn-outline-warning ml-2 text-dark"
                                                         id="arChannelCheck">
-                                                    <span style="font-family: monospace;">{% trans "Check" %}</span>
+                                                    <span>{% trans "Check" %}</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -242,7 +249,8 @@
                     <div class="col text-success d-none" id="submitSuccess">{% trans "Submission Succeed." %}</div>
                     <div class="col text-danger d-none" id="submitFailed">{% trans "Submission Failed." %}</div>
                     <div class="col d-inline">
-                        <span><a href="{% url "page.doc.code.insert" %}">{% trans "Insert Outcome Code:" %}</a></span>
+                        <span><a href="{% url "page.doc.code.insert" %}"
+                                 target="_blank">{% trans "Insert Outcome Code:" %}</a></span>
                         <h5 class="d-inline"><a id="arCodeLink" data-prefix="{% url "page.doc.code.insert" %}#"><code
                                 id="arCode">-</code></a></h5>
                     </div>
@@ -258,15 +266,19 @@
 {% block ex-script %}
     <script type="text/javascript">
         function checkChannelExistence(platVal, channel, fnOnLoad) {
-            let url = `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
+            if (channel === "") {
+                fnOnLoad(false);
+            } else {
+                let url = `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", url);
-            xhr.responseType = "json";
-            xhr.onload = function () {
-                fnOnLoad(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
-            };
-            xhr.send();
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", url);
+                xhr.responseType = "json";
+                xhr.onload = function () {
+                    fnOnLoad(parseInt(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]) < 0);
+                };
+                xhr.send();
+            }
         }
 
         function collectData() {
