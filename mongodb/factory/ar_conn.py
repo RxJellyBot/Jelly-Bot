@@ -25,8 +25,10 @@ class AutoReplyModuleManager(BaseCollection):
             [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponsesOids.key, 1)],
             name="Auto Reply Module Identity", unique=True)
 
-    def add_conn(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
-                 pinned: bool, private: bool, cooldown_sec: int) \
+    def add_conn(
+            self,
+            kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
+            pinned: bool, private: bool, cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
         # INCOMPLETE: Permission - Check if the user have the permission if pinned is true
 
@@ -75,7 +77,9 @@ class AutoReplyModuleTagManager(BaseCollection):
         tag_data = self.get_cache(
             AutoReplyModuleTagModel.Name.key, name, parse_cls=AutoReplyModuleTagModel, case_insensitive=True)
 
-        if tag_data is None:
+        if tag_data:
+            outcome = GetOutcome.O_CACHE_DB
+        else:
             model, outcome, ex, insert_result = \
                 self.insert_one_data(AutoReplyModuleTagModel, Name=name, Color=color)
 
@@ -85,8 +89,6 @@ class AutoReplyModuleTagManager(BaseCollection):
                 outcome = GetOutcome.O_ADDED
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-        else:
-            outcome = GetOutcome.O_CACHE_DB
 
         return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
 

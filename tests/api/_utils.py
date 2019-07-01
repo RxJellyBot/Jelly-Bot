@@ -12,7 +12,7 @@ django.setup()
 class GetJsonResponseMixin(TestCase):
     def print_and_get_json(self, http_method, url, data, print_title=None):
         if http_method.upper() == "GET":
-            response = c.post(url, data)
+            response = c.get(url, data)
         elif http_method.upper() == "POST":
             response = c.post(url, data)
         else:

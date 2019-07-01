@@ -73,3 +73,43 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
             "Test - Complete Register Token (with Channel)")
 
         self.assertTrue(result[r.SUCCESS])
+
+
+class TestChannelDataQuery(GetJsonResponseMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
+        ChannelManager.register(1, "channel1")
+
+    def test_get_existed_data(self):
+        result = self.print_and_get_json(
+            "GET",
+            reverse("api.id.channel.data"),
+            {p.DataQuery.Channel.PLATFORM: 1, p.DataQuery.Channel.CHANNEL_TOKEN: "channel1"},
+            "Test - Query existed channel data"
+        )
+
+        self.assertTrue(result[r.SUCCESS])
+
+    def test_get_non_existed_data(self):
+        result = self.print_and_get_json(
+            "GET",
+            reverse("api.id.channel.data"),
+            {p.DataQuery.Channel.PLATFORM: 1, p.DataQuery.Channel.CHANNEL_TOKEN: "channel2"},
+            "Test - Query non-existed channel data"
+        )
+
+        self.assertFalse(result[r.SUCCESS])
+        self.assertTrue(r.RESULT in result)
+
+    def test_get_channel_data_empty_channel_token(self):
+        result = self.print_and_get_json(
+            "GET",
+            reverse("api.id.channel.data"),
+            {p.DataQuery.Channel.PLATFORM: 1, p.DataQuery.Channel.CHANNEL_TOKEN: ""},
+            "Test - Query channel data with empty channel token"
+        )
+
+        self.assertFalse(result[r.SUCCESS])
+        self.assertTrue(r.RESULT in result)
+        self.assertTrue(result[r.RESULT] is None)

@@ -44,6 +44,7 @@ class ChannelManager(BaseCollection):
             self.CACHE_KEY_COMB1, lambda item: item.id == channel_oid, parse_cls=ChannelModel,
             acquire_args=({ChannelModel.Id.key: channel_oid},))
 
+    # noinspection PyArgumentList
     @DecoParamCaster({1: Platform, 2: str})
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         """

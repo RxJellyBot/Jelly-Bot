@@ -55,8 +55,3 @@ class UserManagementResponse:
     HINT = "hint"
     REG_RESULT = "regResult"
     CONN_OUTCOME = "connOutcome"
-
-
-class ChannelDataQueryResponse:
-    PLATFORM = Common.PLATFORM
-    CHANNEL_OID = Common.CHANNEL_OID
