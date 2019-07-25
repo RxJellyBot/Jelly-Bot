@@ -91,37 +91,33 @@
 {% block ex-script %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#get-token").click(function () {
+            $("button#get-token").click(function () {
                 let xhr = new XMLHttpRequest();
                 xhr.open("POST", `{% url "api.id.channel.register_token" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
                 xhr.responseType = "json";
                 xhr.onloadstart = function () {
-                    $("#get-token-error").addClass("d-none");
+                    $("div#get-token-error").addClass("d-none");
                 };
                 xhr.onload = function () {
-                    $("#new-token").text(
+                    $("code#new-token").text(
                         xhr.response.{{ static_keys_result.SUCCESS }} ?
                             xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"] :
                             "{% trans "An error occurred." %}");
 
-                    setDisability("#get-token", true);
-                    $("#get-token-tips").removeClass("d-none");
+                    $("button#get-token").prop("disabled", true);
+                    $("div#get-token-tips").removeClass("d-none");
 
                     setTimeout(function () {
-                        setDisability("#get-token", false);
-                        $("#get-token-tips").addClass("d-none");
+                        $("button#get-token").prop("disabled", false);
+                        $("div#get-token-tips").addClass("d-none");
                     }, parseInt({{ register_cooldown }}) * 1000);
                 };
                 xhr.onerror = function () {
-                    $("#get-token-error").removeClass("d-none");
+                    $("div#get-token-error").removeClass("d-none");
                 };
                 xhr.send();
             });
         });
-
-        function setDisability(selector, disable) {
-            $(selector).prop("disabled", disable)
-        }
     </script>
     <script src="{% static "js/account/register.js" %}" type="text/javascript"></script>
 {% endblock %}

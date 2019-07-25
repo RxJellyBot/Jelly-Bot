@@ -7,6 +7,9 @@ class Common:
     PLATFORM = "p"
     API_TOKEN = "api_key"
 
+    COUNT = "count"
+    KEYWORD = "w"
+
 
 class Validation:
     CONTENT = "c"
@@ -25,9 +28,13 @@ class AutoReply:
     PRIVATE = "pr"
     PINNED = "pin"
     COOLDOWN = "cd"
+    TAGS = "tags"
 
 
 class DataQuery:
+    COUNT = Common.COUNT
+    KEYWORD = Common.KEYWORD
+
     class Channel:
         PLATFORM = Common.PLATFORM
         CHANNEL_TOKEN = Common.CHANNEL_TOKEN

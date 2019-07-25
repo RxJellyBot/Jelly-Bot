@@ -1,21 +1,22 @@
 from abc import ABC
+from time import sleep
 
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
 from JellyBotAPI.api.responses import BaseApiResponse
 from JellyBotAPI.api.responses.mixin import (
-    HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultOnSuccessMixin
+    HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultExtraMixin
 )
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, TokenAction
 from models import AutoReplyModuleModel, AutoReplyModuleTokenActionModel
 from mongodb.factory import (
-    AutoReplyModuleManager, AutoReplyContentManager, TokenActionManager
+    AutoReplyManager, AutoReplyContentManager, TokenActionManager
 )
 
 
 class AutoReplyAddBaseResponse(
-        RequireSenderMixin, SerializeErrorMixin, SerializeResultOnSuccessMixin, BaseApiResponse, ABC):
+        RequireSenderMixin, SerializeErrorMixin, SerializeResultExtraMixin, BaseApiResponse, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
         self._param_dict.update(**{
@@ -25,6 +26,7 @@ class AutoReplyAddBaseResponse(
             param.AutoReply.RESPONSE_TYPE: param_dict.getlist(param.AutoReply.RESPONSE_TYPE),
             param.AutoReply.PRIVATE: cast_keep_none(param_dict.get(param.AutoReply.PRIVATE), bool),
             param.AutoReply.PINNED: cast_keep_none(param_dict.get(param.AutoReply.PINNED), bool),
+            param.AutoReply.TAGS: param_dict.get(param.AutoReply.TAGS),
             param.AutoReply.COOLDOWN: int(
                 param_dict.get(param.AutoReply.COOLDOWN, AutoReplyModuleModel.CooldownSec.default_value)
             )
@@ -36,6 +38,7 @@ class AutoReplyAddBaseResponse(
         self._response_types = self._param_dict[param.AutoReply.RESPONSE_TYPE]
         self._private = self._param_dict[param.AutoReply.PRIVATE]
         self._pinned = self._param_dict[param.AutoReply.PINNED]
+        self._tags = self._param_dict[param.AutoReply.TAGS]
         self._cooldown = self._param_dict[param.AutoReply.COOLDOWN]
         self._is_local = bool(param_dict.get(param.LOCAL_REFER, False))
 
@@ -84,13 +87,31 @@ class AutoReplyAddBaseResponse(
         else:
             self._responses = self._data[k] = resp_list
 
+    def _handle_private_(self):
+        k = result.AutoReplyResponse.PRIVATE
+        self._flag[k] = self._private
+
     def _handle_pinned_(self):
         k = result.AutoReplyResponse.PINNED
         self._flag[k] = self._pinned
 
-    def _handle_private_(self):
-        k = result.AutoReplyResponse.PRIVATE
-        self._flag[k] = self._private
+    def _handle_tags_(self):
+        k = result.AutoReplyResponse.TAGS
+
+        if self._tags:
+            # Tag string to array
+            tags = self._tags.split(SystemConfig.AutoReply.TAG_SPLITTOR)
+            tag_ids = []
+
+            for tag in tags:
+                # Replace tag name with its `ObjectId`
+                tres = AutoReplyManager.tag_get_insert(tag)
+                if tres.outcome.is_success:
+                    tag_ids.append(tres.model.id)
+
+            self._tags = tag_ids
+
+        self._flag[k] = self._tags
 
     def _handle_cooldown_(self):
         k = result.AutoReplyResponse.COOLDOWN_SEC
@@ -101,6 +122,7 @@ class AutoReplyAddBaseResponse(
         self._handle_responses_()
         self._handle_pinned_()
         self._handle_private_()
+        self._handle_tags_()
         self._handle_cooldown_()
 
     def serialize_success(self) -> dict:
@@ -109,7 +131,9 @@ class AutoReplyAddBaseResponse(
         return d
 
     def serialize_extra(self) -> dict:
-        return {result.FLAGS: self._flag, result.INFO: self._info}
+        d = super().serialize_extra()
+        d.update(**{result.FLAGS: self._flag, result.INFO: self._info})
+        return d
 
     def success_conditions(self) -> bool:
         try:
@@ -130,9 +154,9 @@ class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
         super().pre_process()
 
     def process_ifnoerror(self):
-        self._result = AutoReplyModuleManager.add_conn(
+        self._result = AutoReplyManager.add_conn(
             self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),
-            self._pinned, self._private, self._cooldown)
+            self._pinned, self._private, self._tags, self._cooldown)
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
@@ -140,4 +164,4 @@ class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
         self._result = TokenActionManager.enqueue_action(
             self._sender_oid, TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
             KeywordOid=self._keyword, ResponsesOids=self._responses, CreatorOid=self._sender_oid,
-            Pinned=self._pinned, Private=self._pinned, CooldownSec=self._cooldown)
+            Pinned=self._pinned, Private=self._pinned, TagIds=self._tags, CooldownSec=self._cooldown)

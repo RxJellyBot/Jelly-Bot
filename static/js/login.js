@@ -3,12 +3,12 @@ function onSignInHandle(googleUser, defaultRedirectUrl) {
     let xhr = new XMLHttpRequest();
     xhr.open('POST', window.location.href);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('X-CSRFToken', $("[name=csrfmiddlewaretoken]").val());
+    xhr.setRequestHeader('X-CSRFToken', $("input[name=csrfmiddlewaretoken]").val());
     xhr.onload = function () {
         if (xhr.responseText === "PASS") {
             window.location.replace(getRedirectUrl(defaultRedirectUrl));
         } else {
-            $("#msg").removeClass("d-none").text(" " + xhr.responseText);
+            $("div#msg").removeClass("d-none").text(" " + xhr.responseText);
         }
     };
     // noinspection JSUnresolvedFunction, JSUnresolvedVariable

@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from JellyBotAPI.api.static import result as r, param as p
+from models import AutoReplyModuleModel
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import InsertOutcome, GetOutcome
 
@@ -178,6 +179,23 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
             f"Test - Add - Token Complete")
 
         self.assertTrue(result[r.SUCCESS])
+
+    def test_add_with_tags(self):
+        result = self.print_and_get_json(
+            "POST",
+            reverse("api.ar.add"),
+            {
+                p.AutoReply.KEYWORD: "AC",
+                p.AutoReply.RESPONSE: "BD",
+                p.AutoReply.TAGS: "A|B|C",
+                p.AutoReply.API_TOKEN: self.__class__.FAKE_API_TOKEN,
+                p.AutoReply.PLATFORM: 1,
+                p.AutoReply.CHANNEL_TOKEN: "channel1",
+            },
+            f"Test - Add - API w/ Tags")
+
+        self.assertTrue(result[r.SUCCESS])
+        self.assertTrue(len(result[r.RESULT][r.Results.MODEL][AutoReplyModuleModel.TagIds.key]) > 0)
 
 
 if __name__ == '__main__':

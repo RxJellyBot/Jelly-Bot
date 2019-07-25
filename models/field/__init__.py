@@ -2,6 +2,7 @@ from .array import ArrayField
 from ._base import BaseField
 from .bool import BooleanField
 from .datetime import DateTimeField
+from .float import FloatField
 from .int import IntegerField
 from .color import ColorField
 from .oid import ObjectIDField, OID_KEY

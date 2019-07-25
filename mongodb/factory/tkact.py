@@ -2,10 +2,9 @@ from datetime import datetime, timedelta
 from typing import Type
 
 from bson import ObjectId
-from django.http import QueryDict
 
 from flags import TokenAction, Platform, TokenActionCollationFailedReason, TokenActionCompletionOutcome
-from mongodb.factory import ChannelManager, AutoReplyModuleManager, PermissionManager
+from mongodb.factory import ChannelManager, AutoReplyManager, PermissionManager
 from mongodb.factory.results import (
     EnqueueTokenActionResult, CompleteTokenActionResult,
     OperationOutcome
@@ -143,7 +142,7 @@ class TokenActionCompletor:
         except ModelConstructionError:
             return TokenActionCompletionOutcome.X_MODEL_CONSTRUCTION
 
-        if not AutoReplyModuleManager.add_conn_by_model(conn).success:
+        if not AutoReplyManager.add_conn_by_model(conn).success:
             return TokenActionCompletionOutcome.X_AR_REGISTER_MODULE
 
         return TokenActionCompletionOutcome.O_OK

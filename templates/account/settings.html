@@ -69,11 +69,11 @@
     <script type="text/javascript" src="{% static "js/utils/generator.js" %}"></script>
     <script type="text/javascript">
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+            $("div[data-toggle=tooltip]").tooltip();
         });
         $(document).ready(function () {
             $("form").submit(function () {
-                $(".submit").prop("disabled", true);
+                $("button.submit").prop("disabled", true);
                 $.ajax({
                     data: $(this).serialize(),
                     type: "post",
@@ -85,11 +85,11 @@
                         } else {
                             generateAlert(s[0], s[1]);
                         }
-                        $(".submit").prop("disabled", false);
+                        $("button.submit").prop("disabled", false);
                     },
                     error: function (xhr) {
                         generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
-                        $(".submit").prop("disabled", false);
+                        $("button.submit").prop("disabled", false);
                     }
                 });
                 return false;
