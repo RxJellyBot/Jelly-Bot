@@ -7,14 +7,14 @@ from models.utils import AutoReplyValidators
 from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
 )
 
 
 class AutoReplyContentModel(Model):
     Content = TextField(
         "c", default=ModelDefaultValueExt.Required, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
-        allow_none=False, regex=r"\w+")
+        allow_none=False, must_have_content=True)
     ContentType = AutoReplyContentTypeField("t")
 
     # noinspection PyAttributeOutsideInit
@@ -75,3 +75,10 @@ class AutoReplyModuleTokenActionModel(Model):
 class AutoReplyModuleTagModel(Model):
     Name = TextField("n", must_have_content=True)
     Color = ColorField("c")
+
+
+class AutoReplyTagPopularityDataModel(Model):
+    WeightedAvgTimeDiff = FloatField("w_avg_time_diff")
+    WeightedAppearances = FloatField("w_appearances")
+    Appearances = IntegerField("u_appearances")
+    Score = FloatField("score")

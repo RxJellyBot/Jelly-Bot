@@ -17,7 +17,7 @@ class ChannelManager(BaseCollection):
     model_class = ChannelModel
 
     def __init__(self):
-        super().__init__(self.CACHE_KEY_COMB1)
+        super().__init__(self.CACHE_KEY_SPEC1)
         self.create_index([(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)],
                           name="Channel Identity", unique=True)
 
@@ -27,7 +27,7 @@ class ChannelManager(BaseCollection):
             ChannelModel, Platform=platform, Token=token, Config=ChannelConfigModel.generate_default())
 
         if InsertOutcome.is_inserted(outcome):
-            self.set_cache(self.CACHE_KEY_COMB1, (platform, token), entry)
+            self.set_cache(self.CACHE_KEY_SPEC1, (platform, token), entry)
         elif InsertOutcome.data_found(outcome):
             entry = self.get_channel_token(platform, token)
 
@@ -35,21 +35,18 @@ class ChannelManager(BaseCollection):
 
     @DecoParamCaster({1: Platform, 2: str})
     def get_channel_token(self, platform: Platform, token: str) -> Optional[ChannelModel]:
-        return self.get_cache(self.CACHE_KEY_COMB1, (platform, token), parse_cls=ChannelModel,
+        return self.get_cache(self.CACHE_KEY_SPEC1, (platform, token), parse_cls=ChannelModel,
                               acquire_args=({ChannelModel.Token.key: token, ChannelModel.Platform.key: platform},))
 
     @DecoParamCaster({1: ObjectId})
     def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
         return self.get_cache_condition(
-            self.CACHE_KEY_COMB1, lambda item: item.id == channel_oid, parse_cls=ChannelModel,
+            self.CACHE_KEY_SPEC1, lambda item: item.id == channel_oid, parse_cls=ChannelModel,
             acquire_args=({ChannelModel.Id.key: channel_oid},))
 
     # noinspection PyArgumentList
     @DecoParamCaster({1: Platform, 2: str})
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
-        """
-        Insertion attempt not implemented.
-        """
         if not isinstance(platform, Platform):
             platform = Platform(platform)
 
@@ -75,7 +72,7 @@ class ChannelManager(BaseCollection):
         if found_any:
             model = ChannelConfigModel(**self.find_one(filter_)[ChannelModel.Config.key], from_db=True)
 
-            self.set_cache(self.CACHE_KEY_COMB1, (model.platform, model.token), model, parse_cls=ChannelModel)
+            self.set_cache(self.CACHE_KEY_SPEC1, (model.platform, model.token), model, parse_cls=ChannelModel)
 
         return found_any
 

@@ -95,7 +95,7 @@ class TestChannelDataQuery(GetJsonResponseMixin, TestCase):
         result = self.print_and_get_json(
             "GET",
             reverse("api.id.channel.data"),
-            {p.DataQuery.Channel.PLATFORM: 1, p.DataQuery.Channel.CHANNEL_TOKEN: "channel2"},
+            {p.DataQuery.Channel.PLATFORM: 1, p.DataQuery.Channel.CHANNEL_TOKEN: "channel5"},
             "Test - Query non-existed channel data"
         )
 

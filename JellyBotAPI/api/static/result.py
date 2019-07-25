@@ -36,6 +36,7 @@ class AutoReplyResponse:
     CHANNEL_OID = Common.CHANNEL_OID
     PRIVATE = "private"
     PINNED = "pinned"
+    TAGS = "tags"
     COOLDOWN_SEC = "cooldown"
 
     ADD_RESULT = "addResult"
@@ -55,3 +56,8 @@ class UserManagementResponse:
     HINT = "hint"
     REG_RESULT = "regResult"
     CONN_OUTCOME = "connOutcome"
+
+
+class DataQuery:
+    COUNT = "count"
+    KEYWORD = "keyword"

@@ -6,7 +6,8 @@ from ._base import Model, ModelDefaultValueExt
 from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import (
-    AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleTokenActionModel
+    AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleTokenActionModel,
+    AutoReplyTagPopularityDataModel
 )
 # noinspection PyUnresolvedReferences
 from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel

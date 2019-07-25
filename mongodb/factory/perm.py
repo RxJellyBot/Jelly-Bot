@@ -21,7 +21,7 @@ class PermissionConnectionManager(BaseCollection):
     model_class = ChannelPermissionConnectionModel
 
     def __init__(self):
-        super().__init__(self.CACHE_KEY_COMB1)
+        super().__init__(self.CACHE_KEY_SPEC1)
         self.create_index(
             ChannelPermissionConnectionModel.UserOid.key, name="Permission Connection Identity", unique=True)
 
@@ -48,7 +48,7 @@ class PermissionConnectionManager(BaseCollection):
                                  "however no corresponding model found.")
 
         return self.set_cache(
-            self.CACHE_KEY_COMB1, (channel_oid, user_oid), model, parse_cls=ChannelPermissionConnectionModel)
+            self.CACHE_KEY_SPEC1, (channel_oid, user_oid), model, parse_cls=ChannelPermissionConnectionModel)
 
 
 class PermissionProfileManager(BaseCollection):

@@ -14,4 +14,5 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
                                {"max_responses": AutoReply.MAX_RESPONSES,
                                 "max_length": AutoReply.MAX_CONTENT_LENGTH,
                                 "platform_list": list(Platform),
-                                "contenttype_list": list(AutoReplyContentType)})
+                                "contenttype_list": list(AutoReplyContentType),
+                                "tag_splittor": AutoReply.TAG_SPLITTOR})

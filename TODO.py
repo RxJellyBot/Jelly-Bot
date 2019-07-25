@@ -19,6 +19,7 @@
 # DRAFT: On site - Short URL: Shortened URL link changable
 # DRAFT: On site - Short URL: image update - store on-site url link
 # DRAFT: On site - Calculator: Markdown2MathJax
+# DRAFT: On site - tag cloud
 # DRAFT: API Doc: https://getbootstrap.com/docs/4.3/components/scrollspy Design can be used for API Doc
 # TODO: Google Analytics: https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: On site - API Key refresh

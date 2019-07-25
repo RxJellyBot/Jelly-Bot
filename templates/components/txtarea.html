@@ -2,7 +2,7 @@
 {% load i18n %}
 
 <div class="txtarea-count">
-    <label for="{{ txt_area_id }}"></label>
+    <label class="sr-only" for="{{ txt_area_id }}"></label>
     <textarea class="form-control" name="{{ txt_area_name }}" id="{{ txt_area_id }}"
               data-postkey="{{ param_content }}"
               required></textarea>

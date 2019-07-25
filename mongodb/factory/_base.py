@@ -30,14 +30,14 @@ class CacheSectionUndefinedError(Exception):
 
 
 class CacheMixin(Collection):
-    CACHE_KEY_COMB1 = "**kc1**"
-    CACHE_KEY_COMB2 = "**kc2**"
-    CACHE_KEY_COMB3 = "**kc3**"
+    CACHE_KEY_SPEC1 = "**Special Cache Key #1**"
+    CACHE_KEY_SPEC2 = "**Special Cache Key #2**"
+    CACHE_KEY_SPEC3 = "**Special Cache Key #3**"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
         self._auto_init = False
+        self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
     @property
     def auto_init(self) -> bool:
@@ -134,6 +134,11 @@ class CacheMixin(Collection):
         else:
             ret = self._cache[cache_key][item_key]
 
+        # print(f"[INFO] Attempted to get data from the cache of `{self.__class__.__name__}`.")
+        # print(f"            Cache Key: {cache_key} / Item Key: {item_key} / Acquire Fn: {acquire_func}")
+        # print(f"            Acquire Args: {acquire_args} / Auto Acquire: {acquire_auto} / Parse Class: {parse_cls}")
+        # print(f"            Return Value: {ret}")
+
         return self.set_cache(cache_key, item_key, ret, parse_cls)
 
     @DecoParamCaster({1: None, "item_key_from_data": None})
@@ -196,6 +201,9 @@ class CacheMixin(Collection):
                 ret = self.set_cache(cache_key, data[item_key_of_data], data, parse_cls)
 
         return ret
+
+    def reset_cache(self):
+        self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
     def _pre_check_(self, cache_key: str):
         if cache_key not in self._cache:
