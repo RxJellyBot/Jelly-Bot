@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-light table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "Channel ID" %}</th>
+            <th scope="col">{% trans "Platform" %}</th>
+            <th scope="col">{% trans "Channel Token" %}</th>
+            <th scope="col">{% trans "Profile(s)" %}</th>
+            <th scope="col">{% trans "Controls" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for channel_conn in channel_conn_list %}
+            <tr>
+                <td>{{ channel_conn.channel.id }}</td>
+                <td>{{ channel_conn.channel.platform }}</td>
+                <th scope="row" class="text-center no-line-break">
+                    {{ channel_conn.channel.token }}
+                </th>
+                <td>
+                    <!-- FIXME: [High Priority] Channel Connection List: <a href={PROFILE_LINK}>{PROFILE_NAME}</a> -->
+                </td>
+                <td> <!-- FIXME: [High Priority] Channel Connection List: Control Buttons --> </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

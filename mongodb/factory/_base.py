@@ -80,7 +80,7 @@ class CacheMixin(Collection):
     @DecoParamCaster({1: str, 2: None, "item_key_from_data": None})
     def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: Tuple = None,
                   acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False,
-                  item_key_from_data=None):
+                  item_key_from_data: Union[str, Tuple, None] = None):
         """
         Get data from the cache. Data can be acquired from the database and
         inserted to the cache if `acquire_auto` is `True` and the data is not found in the cache.
@@ -94,6 +94,7 @@ class CacheMixin(Collection):
         :param parse_cls: Class to parse after acquiring the data if found.
         :param case_insensitive: Determines if the searching will be case-insensitive.
         :param item_key_from_data: If this is set, the value of this key from the data will be used as `item_key`.
+                                   Disregarded if the return type of the `acquire_func` is `Cursor`.
         """
         ret = None
 
@@ -126,9 +127,18 @@ class CacheMixin(Collection):
 
                 if isinstance(data, Cursor):
                     data = list(data)
-
-                if item_key_from_data is not None:
-                    item_key = data[item_key_from_data]
+                else:
+                    if item_key_from_data is not None:
+                        if isinstance(item_key_from_data, str):
+                            item_key = data[item_key_from_data]
+                        elif isinstance(item_key_from_data, tuple):
+                            item_key = []
+                            for k in item_key_from_data:
+                                item_key.append(data[k])
+                            item_key = tuple(item_key)
+                        else:
+                            raise ValueError(
+                                f"The type of `item_key_from_data` is invalid. ({type(item_key_from_data)})")
 
                 ret = data
         else:

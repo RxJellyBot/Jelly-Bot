@@ -1,9 +1,12 @@
+from dataclasses import dataclass
+from typing import List
+
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from flags import PermissionCategory, PermissionCategoryDefault
-from models import Model, ModelDefaultValueExt
-from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField
+from models import Model, ChannelModel, ModelDefaultValueExt
+from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField, ModelField
 
 
 class ChannelPermissionProfileModel(Model):
@@ -27,6 +30,12 @@ class ChannelPermissionProfileModel(Model):
             k = f"_{perm_cat.code}"
             if k not in self.permission:
                 self.permission[k] = f(perm_cat)
+
+
+@dataclass
+class ChannelPermConnDisplayModel:
+    channel: ChannelModel
+    profiles: List[ChannelPermissionProfileModel]
 
 
 class ChannelPermissionConnectionModel(Model):
