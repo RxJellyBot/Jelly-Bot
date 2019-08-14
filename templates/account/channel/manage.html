@@ -9,30 +9,28 @@
         </div>
     </div>
 
-    <!-- INCOMPLETE: Channel Config - Manage page -->
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
-                <div class="card border-success mb-3 text-success text-center align-middle">
-                    <h5 class="card-header">{% trans "I have the token" %}</h5>
-                    <div class="card-body">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-danger mb-3 text-danger text-center align-middle">
-                    <h5 class="card-header">{% trans "I want a token" %}</h5>
-                    <div class="card-body">
-                        <h3 class="card-text">
-                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
-                                {% trans "Register" %}
-                            </a>
-                            <a class="btn btn-outline-dark" role="button" href="{% url "account.logout" %}">
-                                {% trans "Manage" %}
-                            </a>
-                        </h3>
-                    </div>
-                </div>
+            {% include "account/channel/channel_list.html" %}
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {% blocktrans %}
+                    If you:<br>
+                    <ul>
+                    <li>
+                        Cannot find the desired channel to manage: <br>
+                        Please go to the <a href="{% url 'account.channel.connect' %}">register page</a> to register your channel existence.
+                    </li>
+                    <li>
+                        Do not know how to determine what is the desired channel to manage: <br>
+                        <!-- INCOMPLETE: Channel List - official guide to check the current channel token -->
+                        If using the official handled port, please check this page to see how to check the channel token.<br>
+                        If NOT using the official handled port, please check the guide of the corresponding bot of how to check the channel token or channel id (The bot maker may not implement this).
+                    </li>
+                    </ul>
+                {% endblocktrans %}
             </div>
         </div>
     </div>
