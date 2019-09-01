@@ -10,15 +10,17 @@ from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
 
 def render_template(request, title, template_name, context=None, content_type=None, status=None,
-                    using=None) -> HttpResponse:
+                    using=None, nav_param=None) -> HttpResponse:
     if context is None:
         context = dict()
+    if nav_param is None:
+        nav_param = dict()
 
     # Append variable for base template
     context["title"] = title
 
     # Append navigation bar items
-    nav = construct_nav(request)
+    nav = construct_nav(request, nav_param)
     context["nav_bar_html"] = nav.to_html()
     context["nav_bread"] = nav.to_bread()
     context["static_keys_result"] = result

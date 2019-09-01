@@ -55,6 +55,10 @@ class FlagCodeMixin(FlagMixin):
     def code(self) -> int:
         return self._code
 
+    @property
+    def code_str(self) -> str:
+        return f"_{self._code}"
+
     # noinspection PyUnresolvedReferences
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code}>"
@@ -136,7 +140,7 @@ class FlagEnumMixin:
 
     @staticmethod
     def _match_str_(enum, item):
-        return enum.key == item or enum.name == item
+        return enum.key == item or enum.name == item or enum.code_str == item
 
 
 class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):

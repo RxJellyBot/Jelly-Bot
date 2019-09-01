@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load static %}
 
+<!-- INCOMPLETE: When CD > 20 sec, no force webpage over a lot of lines -->
+
 {% block content %}
     {% with ar_prfx=static_keys_param.AutoReply %}
         {% csrf_token %}
@@ -338,7 +340,7 @@
                     </div>
                 </div>
                 <div class="m-3 text-right">
-                    {% trans "Last Submission Status Update: " %}<span id="arSubmitTime">-</span>
+                    <small>{% trans "Last Submission Status Updated on " %}</small><span id="arSubmitTime">-</span>
                 </div>
             </form>
         </div>

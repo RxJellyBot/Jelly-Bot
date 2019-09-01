@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-light table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "Channel ID" %}</th>
+            <th scope="col">{% trans "Platform" %}</th>
+            <th scope="col">{% trans "Channel Token" %}</th>
+            <th scope="col">{% trans "Profile(s)" %}</th>
+            <th scope="col">{% trans "Controls" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for channel_conn in channel_conn_list %}
+            <tr>
+                <td class="text-center align-middle">{{ channel_conn.channel.id }}</td>
+                <td class="text-center align-middle">{{ channel_conn.channel.platform.key }}</td>
+                <th scope="row" class="text-center align-middle no-line-break">
+                    {{ channel_conn.channel.token }}
+                </th>
+                <td class="align-middle">
+                    <!-- FIXME: [Priority 4] Channel Connection List:
+                                <a href={PROFILE_LINK}>{PROFILE_NAME}</a> (Create a page for displaying information of a profile) -->
+                </td>
+                <td class="text-center align-middle">
+                    <a class="btn btn-outline-primary" href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">{% trans "Manage" %}</a>
+                    <!-- FIXME: [Priority 3] Channel Connection List:
+                                Control Buttons (Manage Channel)
+                                Create a profile - Detect if allowed in config first) --> </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

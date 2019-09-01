@@ -19,7 +19,7 @@ class TestModel(unittest.TestCase):
         json = {ChannelConfigModel.VotePromoMod.key: 5,
                 ChannelConfigModel.VotePromoAdmin.key: 5,
                 ChannelConfigModel.EnableAutoReply.key: False,
-                ChannelConfigModel.EnableCreateRole.key: False, "a": 0}
+                ChannelConfigModel.EnableCreateProfile.key: False, "a": 0}
         inst = ChannelConfigModel(**json, from_db=True)
         self.assertEqual(inst[ChannelConfigModel.VotePromoMod.key], 5)
         self.assertEqual(inst.vote_promo_mod, 5)
@@ -27,8 +27,8 @@ class TestModel(unittest.TestCase):
         self.assertEqual(inst.vote_promo_admin, 5)
         self.assertFalse(inst[ChannelConfigModel.EnableAutoReply.key])
         self.assertFalse(inst.enable_auto_reply)
-        self.assertFalse(inst[ChannelConfigModel.EnableCreateRole.key])
-        self.assertFalse(inst.enable_create_role)
+        self.assertFalse(inst[ChannelConfigModel.EnableCreateProfile.key])
+        self.assertFalse(inst.enable_create_profile)
 
     def test_parse_include_oid(self):
         json = {"_id": ObjectId("5d0aeb64b7e5ba4e71c319eb"),
@@ -44,33 +44,33 @@ class TestModel(unittest.TestCase):
 
     def test_init_from_field(self):
         m1 = ChannelConfigModel(
-            vote_promo_mod=5, vote_promo_admin=5, enable_auto_reply=False, enable_create_role=False)
+            vote_promo_mod=5, vote_promo_admin=5, enable_auto_reply=False, enable_create_profile=False)
 
         self.assertEqual(m1.vote_promo_mod, 5)
         self.assertEqual(m1.vote_promo_admin, 5)
         self.assertFalse(m1.enable_auto_reply)
-        self.assertFalse(m1.enable_create_role)
+        self.assertFalse(m1.enable_create_profile)
 
         m2 = ChannelConfigModel(
-            VotePromoMod=5, VotePromoAdmin=5, EnableAutoReply=False, EnableCreateRole=False)
+            VotePromoMod=5, VotePromoAdmin=5, EnableAutoReply=False, EnableCreateProfile=False)
 
         self.assertEqual(m2.vote_promo_mod, 5)
         self.assertEqual(m2.vote_promo_admin, 5)
         self.assertFalse(m2.enable_auto_reply)
-        self.assertFalse(m2.enable_create_role)
+        self.assertFalse(m2.enable_create_profile)
 
         m3 = ChannelConfigModel()
 
         self.assertEqual(m3.vote_promo_mod, ChannelConfig.VotesToPromoteMod)
         self.assertEqual(m3.vote_promo_admin, ChannelConfig.VotesToPromoteAdmin)
         self.assertEqual(m3.enable_auto_reply, ChannelConfigModel.EnableAutoReply.default_value)
-        self.assertEqual(m3.enable_create_role, ChannelConfigModel.EnableAutoReply.default_value)
+        self.assertEqual(m3.enable_create_profile, ChannelConfigModel.EnableAutoReply.default_value)
 
     def test_insert(self):
         col = MONGO.get_database("test").get_collection("test", codec_options=get_codec_options())
         with self.assertRaises(IdUnsupportedError):
             col.insert_one(ChannelConfigModel(
-                vote_promo_mod=5, vote_promo_admin=5, enable_auto_reply=False, enable_create_role=False))
+                vote_promo_mod=5, vote_promo_admin=5, enable_auto_reply=False, enable_create_profile=False))
 
         m1 = AutoReplyModuleTagModel(name="Test")
 

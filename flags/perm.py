@@ -61,6 +61,10 @@ class PermissionCategoryDefault:
         return PermissionCategoryDefault._Cache["default"]
 
     @staticmethod
+    def get_default_preset_json() -> dict:
+        return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_preset().items()}
+
+    @staticmethod
     def get_default(category: PermissionCategory):
         return PermissionCategoryDefault.get_default_preset().get(category, False)
 

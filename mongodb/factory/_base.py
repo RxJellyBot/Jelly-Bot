@@ -73,7 +73,10 @@ class CacheMixin(Collection):
 
         self._pre_check_(cache_key)
 
-        self._cache[cache_key][item_key] = CacheMixin._parse_item_(item, parse_cls)
+        if isinstance(item, (list, tuple)):
+            self._cache[cache_key][item_key] = [CacheMixin._parse_item_(i, parse_cls) for i in item]
+        else:
+            self._cache[cache_key][item_key] = CacheMixin._parse_item_(item, parse_cls)
 
         return self._cache[cache_key][item_key]
 
