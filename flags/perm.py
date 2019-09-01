@@ -1,10 +1,14 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from extutils.flags import FlagPrefixedDoubleEnum
 
 
-class PermissionCategory(FlagDoubleEnum):
+class PermissionCategory(FlagPrefixedDoubleEnum):
     """
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !! Add corresponding HTML file under `templates/account/channel/perm` with code as the name of the file. !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     0xx - Miscellaneous
         1 - Normal
 
@@ -17,7 +21,13 @@ class PermissionCategory(FlagDoubleEnum):
     3xx - Channel Control
         301 - Adjust features
         302 - Adjust Votes
+        303 - Adjust Info Privacy
     """
+
+    @property
+    def code_prefix(self) -> str:
+        return "_"
+
     @classmethod
     def default(cls):
         raise PermissionCategory.NORMAL
@@ -35,12 +45,16 @@ class PermissionCategory(FlagDoubleEnum):
         _("User who has this permission can change the members of managers.")
 
     CNL_ADJUST_FEATURES = \
-        301, _("Channel: Adjust features availability"), \
-        _("User who has this permission can access the availability of the certain features.")
+        301, _("Channel: Features availability"), \
+        _("User who has this permission can change the availability of the certain features.")
 
     CNL_ADJUST_VOTES = \
         302, _("Channel: Vote for managers"), \
-        _("User who has this permission can access the availability of voting to promote members.")
+        _("User who has this permission can change the availability of voting to promote members.")
+
+    CNL_ADJUST_PRIVACY = \
+        302, _("Channel: Info Privacy"), \
+        _("User who has this permission can change the privacy of the channel info.")
 
 
 class PermissionCategoryDefault:
@@ -54,6 +68,14 @@ class PermissionCategoryDefault:
         (PermissionCategory.CNL_ADJUST_VOTES, False)
     )
 
+    _ModOverride = (
+        (PermissionCategory.AR_ACCESS_PINNED_MODULE, True),
+    )
+
+    _AdminOverride = (
+        (PermissionCategory.MBR_CHANGE_MEMBERS, True),
+    )
+
     @staticmethod
     def get_default_preset() -> dict:
         if "default" not in PermissionCategoryDefault._Cache:
@@ -61,7 +83,7 @@ class PermissionCategoryDefault:
         return PermissionCategoryDefault._Cache["default"]
 
     @staticmethod
-    def get_default_preset_json() -> dict:
+    def get_default_preset_dict() -> dict:
         return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_preset().items()}
 
     @staticmethod
@@ -72,11 +94,17 @@ class PermissionCategoryDefault:
     def get_mod_preset():
         if "mod" not in PermissionCategoryDefault._Cache:
             d = PermissionCategoryDefault.get_default_preset()
-            d[PermissionCategory.AR_ACCESS_PINNED_MODULE] = True
+
+            for cat, val in PermissionCategoryDefault._ModOverride:
+                d[cat] = val
 
             PermissionCategoryDefault._Cache["mod"] = d
 
         return PermissionCategoryDefault._Cache["mod"]
+
+    @staticmethod
+    def get_mod_override():
+        return PermissionCategoryDefault._ModOverride
 
     @staticmethod
     def get_mod(category: PermissionCategory):
@@ -86,11 +114,17 @@ class PermissionCategoryDefault:
     def get_admin_preset():
         if "admin" not in PermissionCategoryDefault._Cache:
             d = PermissionCategoryDefault.get_mod_preset()
-            d[PermissionCategory.MBR_CHANGE_MEMBERS] = True
+
+            for cat, val in PermissionCategoryDefault._AdminOverride:
+                d[cat] = val
 
             PermissionCategoryDefault._Cache["admin"] = d
 
         return PermissionCategoryDefault._Cache["admin"]
+
+    @staticmethod
+    def get_admin_override():
+        return PermissionCategoryDefault._AdminOverride
 
     @staticmethod
     def get_admin(category: PermissionCategory):

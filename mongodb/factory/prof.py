@@ -6,6 +6,7 @@ from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from extutils.gmail import MailSender
+from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import InsertOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
 from mongodb.utils import CheckableCursor
@@ -59,22 +60,23 @@ class UserProfileManager(BaseCollection):
 
     # INCOMPLETE: user_detach_profile and delete
 
-    def get_user_profile_conns(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileConnectionModel]:
+    def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) -> Optional[
+        ChannelProfileConnectionModel]:
         """
-        Get the `list` of `ChannelProfileConnectionModel` of the specified user.
+        Get the `ChannelProfileConnectionModel` of the specified user in the specified channel.
 
-        :return: empty `list` on not found.
+        :return: `None` if not found.
         """
         if channel_oid and root_uid:
             return self.get_cache(
                 self.CACHE_KEY_SPEC1, (channel_oid, root_uid),
-                acquire_func=self.find,
                 acquire_args=({ChannelProfileConnectionModel.UserOid.key: root_uid,
                                ChannelProfileConnectionModel.ChannelOid.key: channel_oid},),
                 parse_cls=ChannelProfileConnectionModel,
-                item_key_from_data=ChannelProfileConnectionModel.ProfileOids.key) or []
+                item_key_from_data=(ChannelProfileConnectionModel.ChannelOid.key,
+                                    ChannelProfileConnectionModel.UserOid.key))
         else:
-            return []
+            return None
 
     def get_user_channel_profiles(self, root_uid: ObjectId) -> CheckableCursor:
         return CheckableCursor(self.find({ChannelProfileConnectionModel.UserOid.key: root_uid}),
@@ -159,21 +161,28 @@ class PermissionPromotionRecordHolder(BaseCollection):
 class ProfileManager:
     def __init__(self):
         self._conn = UserProfileManager()
-        self._perm = ProfileDataManager()
+        self._prof = ProfileDataManager()
         self._promo = PermissionPromotionRecordHolder()
 
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
-        default_prof = self._perm.get_default_profile(channel_oid)
+        default_prof = self._prof.get_default_profile(channel_oid)
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
+    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> Optional[List[ChannelProfileModel]]:
         """
         Get the `list` of `ChannelProfileModel` of the specified user.
 
-        :return: empty `list` on not found.
+        :return: `None` on not found.
         """
-        return self._conn.get_user_profile_conns(channel_oid, root_uid)
+        conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
+
+        if conn:
+            return [self._prof.get_profile(poid)
+                    for poid
+                    in conn.profile_oids if not None]
+        else:
+            return None
 
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId]) -> List[ChannelProfileListEntry]:
         if root_uid is None:
@@ -199,7 +208,7 @@ class ProfileManager:
             # Get Profile Model
             prof = []
             for p in d.profile_oids:
-                pm = self._perm.get_profile(p)
+                pm = self._prof.get_profile(p)
                 if pm:
                     prof.append(pm)
                 else:
@@ -226,6 +235,30 @@ class ProfileManager:
                 f"{not_found_prof_oids_txt}",
                 subject="Possible Data Corruption on Getting User Profile Connection"
             )
+
+        return ret
+
+    def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
+        return self._prof.get_profile(profile_oid)
+
+    # noinspection PyMethodMayBeStatic
+    def get_permissions(self, profiles: List[ChannelProfileModel]) -> List[PermissionCategory]:
+        ret = []
+
+        for prof in profiles:
+            ret.extend([PermissionCategory.cast(perm_cat)
+                        for perm_cat, perm_grant
+                        in prof.permission.items() if perm_grant])
+
+            if prof.is_mod:
+                ret.extend(PermissionCategory.cast(perm_cat)
+                           for perm_cat, perm_grant
+                           in PermissionCategoryDefault.get_mod_override() if perm_grant)
+
+            if prof.is_admin:
+                ret.extend(PermissionCategory.cast(perm_cat)
+                           for perm_cat, perm_grant
+                           in PermissionCategoryDefault.get_admin_override() if perm_grant)
 
         return ret
 

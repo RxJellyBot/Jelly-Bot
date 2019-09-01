@@ -31,24 +31,40 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
 
 
 class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View):
+    # noinspection PyTypeChecker
     def get(self, request, **kwargs):
-        # FIXME: [Priority 1]
-        #  render individual channel managing page depends on the user's permissions based on the profile
         channel_oid = safe_cast(kwargs["channel_oid"], ObjectId)
-        u_prof = ProfileManager.get_user_profiles(channel_oid, get_root_oid(request))
-
         # FIXME: [Priority 1]
-        #   - `u_prof` is not the `list` of `ChannelProfileModel`
+        #   - Add channel privacy settings
+        #   - Add logic to `ProfileManager.get_user_profiles` that
+        #       - If the channel is set to private: User needs to be in the channel
+        #       - If the channel is set to public: `channel_oid` needs to be valid only
+        u_profs = ProfileManager.get_user_profiles(channel_oid, get_root_oid(request))
 
-        if u_prof:
+        if u_profs:
             return render_template(
-                self.request, _("Channel Management"), "account/channel/manage.html", {
-                    "user_profiles": u_prof,
-                    "channel_oid": channel_oid,
-                    # Translators: Separator for the profiles in channel management page
-                    "prof_separator": _(", ")
+                self.request, _(f"Channel Management - {channel_oid}"), "account/channel/manage.html", {
+                    "user_profiles": u_profs,
+                    "perm_sum": ProfileManager.get_permissions(u_profs),
+                    "channel_oid": channel_oid
+                }, nav_param=kwargs)
+        else:
+            return render_template(self.request, _("Profile Link Not Found"), "err/account/proflink_not_found.html", {
+                "channel_oid": channel_oid
+            })
+
+
+class AccountProfileView(LoginRequiredMixin, TemplateResponseMixin, View):
+    def get(self, request, **kwargs):
+        profile_oid = safe_cast(kwargs["profile_oid"], ObjectId)
+        profile_data = ProfileManager.get_profile(profile_oid)
+
+        if profile_data:
+            return render_template(
+                self.request, _(f"Profile Info - {profile_data.name}"), "account/channel/profile.html", {
+                    "profile_data": profile_data,
                 }, nav_param=kwargs)
         else:
             return render_template(self.request, _("Profile Not Found"), "err/account/profile_not_found.html", {
-                "channel_oid": channel_oid
+                "profile_oid": profile_oid
             })

@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load i18n %}
 {% load static %}
+{% load utils %}
 
 {% block content %}
     <div class="jumbotron">
@@ -8,30 +9,66 @@
             <div class="display-4 text-center">{% trans "Channel Management" %}</div>
         </div>
     </div>
-    <!-- FIXME: [Priority 2]
-                        Channel Managing Elements:
-                            Informative:
-                                Display all profiles assigned to the user
-                            Administrative:
-                                (Mod+) All settings from config
-                -->
     <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <span class="h3">{% trans "Basic Information" %}</span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <code>{{ channel_oid }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Profiles" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h4">
+                            <div class="list-group">
+                                {% for prof in user_profiles %}
+                                    <a class="list-group-item list-group-item-action text-success"
+                                       href="{% url "account.profile" profile_oid=prof.id %}">{{ prof.name }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-3">
+            <div class="col">
+                <span class="h3">{% trans "Permissions and Controls" %}</span>
+            </div>
+        </div>
         <div class="row">
-            <div class="col-lg">
-                <div class="row">
-                    <div class="col">
-                        {% trans "Channel ID: " %}
+            <div class="col-1"></div>
+            <div class="col-10">
+                {% for perm_cat in perm_sum %}
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <span class="h4 text-primary">{{ perm_cat.key }}</span>&nbsp;
+                            <span class="h6 text-black-50">{{ perm_cat.description }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col text-center">
-                        <code style="font-size: 2rem;">{{ channel_oid }}</code>
+                    <div class="row mb-3">
+                        <div class="col">
+                            {% with "account/channel/perm/"|concat:perm_cat.code_num|concat:".html" as template %}
+                                {% include template %}
+                            {% endwith %}
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
-            <div class="col-lg">
-                {% trans "Profiles: " %}{{ user_profiles|join:prof_separator }}
-            </div>
+            <div class="col-1"></div>
         </div>
     </div>
 {% endblock %}

@@ -15,6 +15,7 @@
         {% for channel_conn in channel_conn_list %}
             <tr>
                 <td class="text-center align-middle">{{ channel_conn.channel.id }}</td>
+                <!-- INCOMPLETE: Link to channel info page (contains message count, members...etc., can be set to private or not) -->
                 <td class="text-center align-middle">{{ channel_conn.channel.platform.key }}</td>
                 <th scope="row" class="text-center align-middle no-line-break">
                     {{ channel_conn.channel.token }}
@@ -24,10 +25,7 @@
                                 <a href={PROFILE_LINK}>{PROFILE_NAME}</a> (Create a page for displaying information of a profile) -->
                 </td>
                 <td class="text-center align-middle">
-                    <a class="btn btn-outline-primary" href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">{% trans "Manage" %}</a>
-                    <!-- FIXME: [Priority 3] Channel Connection List:
-                                Control Buttons (Manage Channel)
-                                Create a profile - Detect if allowed in config first) --> </td>
+                    <a class="btn btn-outline-primary" href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">{% trans "Manage" %}</a></td>
             </tr>
         {% endfor %}
         </tbody>
