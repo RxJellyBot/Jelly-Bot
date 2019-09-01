@@ -16,7 +16,7 @@ class ChannelProfileModel(Model):
     IsMod = BooleanField("m")
     IsAdmin = BooleanField("a")
     NeedsPromo = BooleanField("promo")
-    Permission = DictionaryField("perm", default=PermissionCategoryDefault.get_default_preset_json(), allow_none=False)
+    Permission = DictionaryField("perm", default=PermissionCategoryDefault.get_default_preset_dict(), allow_none=False)
 
     def pre_iter(self):
         if self.is_admin:

@@ -18,7 +18,7 @@ from .stats import APIStatisticModel
 # noinspection PyUnresolvedReferences
 from .tkact import TokenActionModel
 # noinspection PyUnresolvedReferences
-from .perm import (
+from .prof import (
     ChannelProfileModel, ChannelProfileConnectionModel,
     PermissionPromotionRecordModel, ChannelProfileListEntry
 )

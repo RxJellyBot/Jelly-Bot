@@ -134,7 +134,7 @@ class CacheMixin(Collection):
                     if item_key_from_data is not None:
                         if isinstance(item_key_from_data, str):
                             item_key = data[item_key_from_data]
-                        elif isinstance(item_key_from_data, tuple):
+                        elif isinstance(item_key_from_data, (tuple, list)):
                             item_key = []
                             for k in item_key_from_data:
                                 item_key.append(data[k])

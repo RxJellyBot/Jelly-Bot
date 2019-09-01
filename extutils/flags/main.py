@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 from .mongo import register_encoder
 
@@ -108,6 +109,13 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
     def code(self) -> str:
         return f"{self.code_prefix}{self._code}"
 
+    @property
+    def code_num(self) -> int:
+        return self._code
+
+    def __hash__(self):
+        return hash((self.__class__, self._code))
+
     def __eq__(self, other):
         if isinstance(other, str):
             return self.code == other
@@ -117,8 +125,19 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 
 class FlagEnumMixin:
     @classmethod
+    def cast(cls, item: Union[str, int]):
+        if not isinstance(item, (str, int)):
+            raise ValueError(f"Source type ({type(item)}) for casting not handled.")
+
+        for i in list(cls):
+            if i.code == item:
+                return i
+
+        raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
+
+    @classmethod
     def contains(cls, item):
-        if isinstance(item, str) and not isinstance(cls, FlagSingleMixin):
+        if isinstance(item, str) and not issubclass(cls, FlagSingleMixin):
             return False
 
         if isinstance(item, int):

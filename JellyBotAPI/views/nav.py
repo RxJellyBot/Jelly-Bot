@@ -56,10 +56,17 @@ def _construct_my_account_(current_path, parent, nav_param):
         link=reverse("account.channel.list"), parent=my_account_parent))
     try:
         my_account_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_("Channel Management"),
+            NavDummy, current_path, label=_(f"Channel Management"),
             link=reverse("account.channel.manage", kwargs=nav_param), parent=my_account_parent))
     except NoReverseMatch:
-        raise
+        pass
+
+    try:
+        my_account_parent.add_item(nav_items_factory(
+            NavDummy, current_path, label=_(f"Profile Info"),
+            link=reverse("account.profile", kwargs=nav_param), parent=my_account_parent))
+    except NoReverseMatch:
+        pass
 
     return my_account_parent
 
