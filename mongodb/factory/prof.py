@@ -10,8 +10,8 @@ from mongodb.factory import ChannelManager
 from mongodb.factory.results import InsertOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
 from mongodb.utils import CheckableCursor
 from models import (
-    OID_KEY, ChannelConfigModel, ChannelPermConnDisplayModel,
-    ChannelPermissionProfileModel, ChannelPermissionConnectionModel, PermissionPromotionRecordModel
+    OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
 )
 
 from ._base import BaseCollection
@@ -19,28 +19,28 @@ from ._base import BaseCollection
 DB_NAME = "channel"
 
 
-class PermissionConnectionManager(BaseCollection):
+class UserProfileManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "user"
-    model_class = ChannelPermissionConnectionModel
+    model_class = ChannelProfileConnectionModel
 
     def __init__(self):
         super().__init__(self.CACHE_KEY_SPEC1)
         self.create_index(
-            [(ChannelPermissionConnectionModel.UserOid.key, pymongo.DESCENDING),
-             (ChannelPermissionConnectionModel.ChannelOid.key, pymongo.DESCENDING)],
-            name="Permission Connection Identity",
+            [(ChannelProfileConnectionModel.UserOid.key, pymongo.DESCENDING),
+             (ChannelProfileConnectionModel.ChannelOid.key, pymongo.DESCENDING)],
+            name="Profile Connection Identity",
             unique=True)
 
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oid: ObjectId) \
-            -> ChannelPermissionConnectionModel:
+            -> ChannelProfileConnectionModel:
         """
         Attach `ChannelPermissionProfileModel` and return the attached data.
         """
         id_ = self.update_one(
-            {ChannelPermissionConnectionModel.ChannelOid.key: channel_oid,
-             ChannelPermissionConnectionModel.UserOid.key: root_uid},
-            {"$addToSet": {ChannelPermissionConnectionModel.ProfileOids.key: profile_oid}}, upsert=True).upserted_id
+            {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+             ChannelProfileConnectionModel.UserOid.key: root_uid},
+            {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}}, upsert=True).upserted_id
 
         if id_:
             model = self.find_one({OID_KEY: id_})
@@ -48,49 +48,53 @@ class PermissionConnectionManager(BaseCollection):
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
         else:
-            model = self.find_one({ChannelPermissionConnectionModel.UserOid.key: root_uid})
+            model = self.find_one({ChannelProfileConnectionModel.UserOid.key: root_uid})
 
             if not model:
                 raise ValueError("`Model` should exists because `upserted_id` not exists, "
                                  "however no corresponding model found.")
 
         return self.set_cache(
-            self.CACHE_KEY_SPEC1, (channel_oid, root_uid), model, parse_cls=ChannelPermissionConnectionModel)
+            self.CACHE_KEY_SPEC1, (channel_oid, root_uid), model, parse_cls=ChannelProfileConnectionModel)
 
     # INCOMPLETE: user_detach_profile and delete
 
-    def get_user_profile_oid(self, channel_oid: ObjectId, root_uid: ObjectId) -> ObjectId:
+    def get_user_profile_conns(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileConnectionModel]:
         """
-        Gets the profile oid of the specified user.
+        Get the `list` of `ChannelProfileConnectionModel` of the specified user.
 
-        :return: `None` if not found.
+        :return: empty `list` on not found.
         """
-        return self.get_cache(
-            self.CACHE_KEY_SPEC1, (channel_oid, root_uid),
-            parse_cls=ChannelPermissionConnectionModel,
-            item_key_from_data=(ChannelPermissionConnectionModel.ChannelOid.key,
-                                ChannelPermissionConnectionModel.UserOid.key))
+        if channel_oid and root_uid:
+            return self.get_cache(
+                self.CACHE_KEY_SPEC1, (channel_oid, root_uid),
+                acquire_func=self.find,
+                acquire_args=({ChannelProfileConnectionModel.UserOid.key: root_uid,
+                               ChannelProfileConnectionModel.ChannelOid.key: channel_oid},),
+                parse_cls=ChannelProfileConnectionModel,
+                item_key_from_data=ChannelProfileConnectionModel.ProfileOids.key) or []
+        else:
+            return []
 
-    def get_user_connection_cursor(self, root_uid: ObjectId) -> CheckableCursor:
-        return CheckableCursor(self.find({ChannelPermissionConnectionModel.UserOid.key: root_uid}),
-                               parse_cls=ChannelPermissionConnectionModel)
+    def get_user_channel_profiles(self, root_uid: ObjectId) -> CheckableCursor:
+        return CheckableCursor(self.find({ChannelProfileConnectionModel.UserOid.key: root_uid}),
+                               parse_cls=ChannelProfileConnectionModel)
 
 
-
-class PermissionProfileManager(BaseCollection):
+class ProfileDataManager(BaseCollection):
     database_name = DB_NAME
-    collection_name = "perm"
-    model_class = ChannelPermissionProfileModel
+    collection_name = "prof"
+    model_class = ChannelProfileModel
 
     def __init__(self):
         super().__init__(OID_KEY)
         self.create_index(
-            [(ChannelPermissionProfileModel.ChannelOid.key, pymongo.DESCENDING),
-             (ChannelPermissionProfileModel.Name.key, pymongo.ASCENDING)],
-            name="Permission Profile Identity", unique=True)
+            [(ChannelProfileModel.ChannelOid.key, pymongo.DESCENDING),
+             (ChannelProfileModel.Name.key, pymongo.ASCENDING)],
+            name="Profile Identity", unique=True)
 
-    def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelPermissionProfileModel]:
-        return self.get_cache(OID_KEY, profile_oid, parse_cls=ChannelPermissionProfileModel)
+    def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
+        return self.get_cache(OID_KEY, profile_oid, parse_cls=ChannelProfileModel)
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
@@ -108,7 +112,7 @@ class PermissionProfileManager(BaseCollection):
             return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, None, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
-            perm_prof = self.get_cache(OID_KEY, prof_oid, parse_cls=ChannelPermissionProfileModel)
+            perm_prof = self.get_cache(OID_KEY, prof_oid, parse_cls=ChannelProfileModel)
 
             if perm_prof:
                 return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, perm_prof, ex)
@@ -123,9 +127,9 @@ class PermissionProfileManager(BaseCollection):
         default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default User"))
 
         if outcome.is_success:
-            self.set_cache(OID_KEY, default_profile.id, default_profile, parse_cls=ChannelPermissionProfileModel)
+            self.set_cache(OID_KEY, default_profile.id, default_profile, parse_cls=ChannelProfileModel)
             set_success = ChannelManager.set_config(
-                channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile)
+                channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
             if not set_success:
                 outcome = InsertOutcome.X_ON_SET_CONFIG
@@ -134,14 +138,15 @@ class PermissionProfileManager(BaseCollection):
 
     def _create_profile_(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
-            ChannelPermissionProfileModel, ChannelOid=channel_oid, **fk_param)
+            ChannelProfileModel, ChannelOid=channel_oid, **fk_param)
 
-    # INCOMPLETE: Permission - Ensure mod/admin promotable if the mod/admin to be demoted is the last
-    # INCOMPLETE: Permission - Custom permission profile creation (name and color changable only) - create then change
+    # INCOMPLETE: Profile/Permission - Ensure mod/admin promotable if the mod/admin to be demoted is the last
+    # INCOMPLETE: Profile/Permission -
+    #  Custom permission profile creation (name and color changable only) - create then change
     pass
 
 
-class PermissionPromotionStatusHolder(BaseCollection):
+class PermissionPromotionRecordHolder(BaseCollection):
     database_name = DB_NAME
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
@@ -151,27 +156,26 @@ class PermissionPromotionStatusHolder(BaseCollection):
     pass
 
 
-class PermissionManager:
+class ProfileManager:
     def __init__(self):
-        self._conn = PermissionConnectionManager()
-        self._perm = PermissionProfileManager()
-        self._promo = PermissionPromotionStatusHolder()
+        self._conn = UserProfileManager()
+        self._perm = ProfileDataManager()
+        self._promo = PermissionPromotionRecordHolder()
 
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
         default_prof = self._perm.get_default_profile(channel_oid)
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    def get_user_permission_profile(self, channel_oid: ObjectId, root_uid: ObjectId):
+    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
-        Gets the profile of the specified user.
+        Get the `list` of `ChannelProfileModel` of the specified user.
 
-        :return: `None` if not found.
+        :return: empty `list` on not found.
         """
-        # FIXME: Will be used for displaying the user's permission in Channel/Manage/<Channel ID> page
-        return self._conn.get_user_profile_oid(channel_oid, root_uid)
+        return self._conn.get_user_profile_conns(channel_oid, root_uid)
 
-    def get_user_channel_profile_list(self, root_uid: Optional[ObjectId]) -> List[ChannelPermConnDisplayModel]:
+    def get_user_channel_profiles(self, root_uid: Optional[ObjectId]) -> List[ChannelProfileListEntry]:
         if root_uid is None:
             return []
 
@@ -180,7 +184,7 @@ class PermissionManager:
         not_found_channel = []
         not_found_prof_oids_dict = {}
 
-        crs = self._conn.get_user_connection_cursor(root_uid)
+        crs = self._conn.get_user_channel_profiles(root_uid)
 
         for d in crs:
             not_found_prof_oids = []
@@ -206,7 +210,7 @@ class PermissionManager:
             elif len(not_found_prof_oids) > 0:
                 not_found_prof_oids_dict[d.channel_oid] = not_found_prof_oids
             else:
-                ret.append(ChannelPermConnDisplayModel(channel=cnl, profiles=prof))
+                ret.append(ChannelProfileListEntry(channel=cnl, profiles=prof))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
@@ -226,4 +230,4 @@ class PermissionManager:
         return ret
 
 
-_inst = PermissionManager()
+_inst = ProfileManager()

@@ -16,7 +16,7 @@ class ChannelConfigModel(Model):
     VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod)
     VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
     EnableAutoReply = BooleanField("e-ar", default=True)
-    EnableCreateRole = BooleanField("e-cro", default=True)
+    EnableCreateProfile = BooleanField("e-crp", default=True)
     DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
 
 

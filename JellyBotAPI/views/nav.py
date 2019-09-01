@@ -1,4 +1,4 @@
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.utils.translation import gettext as _
 
 from JellyBotAPI import keys
@@ -7,7 +7,7 @@ from JellyBotAPI.components.navbar import (
 )
 
 
-def construct_nav(request):
+def construct_nav(request, nav_param):
     current_path = request.path
 
     nav = NavItemsHolder()
@@ -18,7 +18,7 @@ def construct_nav(request):
 
     # Construct Login item
     login_item = nav_items_factory(
-        NavEntry, current_path, label=_("Login"), link=reverse("page.login"), parent=home_item)
+        NavEntry, current_path, label=_("Login"), link=reverse("account.login"), parent=home_item)
 
     # Construct About item
     about_item = nav_items_factory(
@@ -28,7 +28,7 @@ def construct_nav(request):
     nav.add_item(home_item)
 
     if keys.Cookies.USER_TOKEN in request.COOKIES:
-        nav.add_item(_construct_my_account_(current_path, home_item))
+        nav.add_item(_construct_my_account_(current_path, home_item, nav_param))
     else:
         nav.add_item(login_item)
 
@@ -39,7 +39,7 @@ def construct_nav(request):
     return nav
 
 
-def _construct_my_account_(current_path, parent):
+def _construct_my_account_(current_path, parent, nav_param):
     my_account_parent = nav_items_factory(
         NavDropdown, current_path, label=_("My Account"), parent=parent, link=reverse("account.main"))
     my_account_parent.add_item(nav_items_factory(
@@ -52,8 +52,14 @@ def _construct_my_account_(current_path, parent):
         NavDummy, current_path, label=_("Channel Registration"),
         link=reverse("account.channel.connect"), parent=my_account_parent))
     my_account_parent.add_item(nav_items_factory(
-        NavDummy, current_path, label=_("Channel Management"),
-        link=reverse("account.channel.manage"), parent=my_account_parent))
+        NavDummy, current_path, label=_("Channel List"),
+        link=reverse("account.channel.list"), parent=my_account_parent))
+    try:
+        my_account_parent.add_item(nav_items_factory(
+            NavDummy, current_path, label=_("Channel Management"),
+            link=reverse("account.channel.manage", kwargs=nav_param), parent=my_account_parent))
+    except NoReverseMatch:
+        raise
 
     return my_account_parent
 

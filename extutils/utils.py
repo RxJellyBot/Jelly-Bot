@@ -40,6 +40,20 @@ def all_lower(o: [str, tuple, list, set, dict]):
         return o
 
 
+def safe_cast(obj, dest_type: type):
+    """
+    Execute type-cast safely.
+
+    :param obj: Object to be casted.
+    :param dest_type: Destination type.
+    :return: Casted `obj`. Return `None` if failed.
+    """
+    try:
+        return dest_type(obj)
+    except Exception:
+        return None
+
+
 def to_snake_case(s: str):
     return re.sub(r"(?!^)([A-Z]+)", r"_\1", s).lower()
 

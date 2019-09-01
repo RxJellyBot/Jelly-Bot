@@ -39,7 +39,7 @@
                             <div class="col">
                                 <p class="text-left">
                                     <small>
-                                        {% url "account.channel.manage" as manage_url %}
+                                        {% url "account.channel.list" as list_url %}
                                         {% blocktrans trimmed %}
                                             Get a token from the website, then use it to complete the registration at
                                             where Jelly Bot supports using <b>Complete Token Action</b> function.
@@ -48,7 +48,7 @@
                                             <li>{% trans "This token will only grants you a default permission profile." %}</li>
                                             <li>
                                                 {% blocktrans trimmed %}
-                                                For non-default permission profile, please go to <a class="text-white alert-link" href="{{ manage_url }}">Manage</a> page.
+                                                For non-default permission profile, please <a class="text-white alert-link" href="{{ list_url }}">click here</a> and create a profile if allowed.
                                                 {% endblocktrans %}
                                             </li>
                                             <li>{% trans "Certain permissions need channel managers to control." %}</li>

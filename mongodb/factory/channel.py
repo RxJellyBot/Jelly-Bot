@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from extutils.checker import DecoParamCaster
 from flags import Platform
-from models import ChannelModel, ChannelConfigModel
+from models import ChannelModel, ChannelConfigModel, OID_KEY
 from mongodb.factory.results import InsertOutcome, GetOutcome, ChannelRegistrationResult, ChannelGetResult
 from ._base import BaseCollection
 
@@ -42,7 +42,7 @@ class ChannelManager(BaseCollection):
     def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
         return self.get_cache_condition(
             self.CACHE_KEY_SPEC1, lambda item: item.id == channel_oid, parse_cls=ChannelModel,
-            acquire_args=({ChannelModel.Id.key: channel_oid},))
+            acquire_args=({ChannelModel.Id.key: channel_oid},), item_key_of_data=OID_KEY)
 
     # noinspection PyArgumentList
     @DecoParamCaster({1: Platform, 2: str})

@@ -8,29 +8,29 @@
             <div class="display-4 text-center">{% trans "Channel Management" %}</div>
         </div>
     </div>
-
+    <!-- FIXME: [Priority 2]
+                        Channel Managing Elements:
+                            Informative:
+                                Display all profiles assigned to the user
+                            Administrative:
+                                (Mod+) All settings from config
+                -->
     <div class="container">
         <div class="row">
-            {% include "account/channel/channel_list.html" %}
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {% blocktrans %}
-                    If you:<br>
-                    <ul>
-                    <li>
-                        Cannot find the desired channel to manage: <br>
-                        Please go to the <a href="{% url 'account.channel.connect' %}">register page</a> to register your channel existence.
-                    </li>
-                    <li>
-                        Do not know how to determine what is the desired channel to manage: <br>
-                        <!-- INCOMPLETE: Channel List - official guide to check the current channel token -->
-                        If using the official handled port, please check this page to see how to check the channel token.<br>
-                        If NOT using the official handled port, please check the guide of the corresponding bot of how to check the channel token or channel id (The bot maker may not implement this).
-                    </li>
-                    </ul>
-                {% endblocktrans %}
+            <div class="col-lg">
+                <div class="row">
+                    <div class="col">
+                        {% trans "Channel ID: " %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col text-center">
+                        <code style="font-size: 2rem;">{{ channel_oid }}</code>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg">
+                {% trans "Profiles: " %}{{ user_profiles|join:prof_separator }}
             </div>
         </div>
     </div>

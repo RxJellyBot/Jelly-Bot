@@ -4,7 +4,7 @@ from typing import Type
 from bson import ObjectId
 
 from flags import TokenAction, Platform, TokenActionCollationFailedReason, TokenActionCompletionOutcome
-from mongodb.factory import ChannelManager, AutoReplyManager, PermissionManager
+from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
 from mongodb.factory.results import (
     EnqueueTokenActionResult, CompleteTokenActionResult,
     OperationOutcome
@@ -157,8 +157,8 @@ class TokenActionCompletor:
 
         if channel_data:
             try:
-                PermissionManager.register_new_default(channel_data.model.id, action_model.creator_oid)
-            except Exception as e:
+                ProfileManager.register_new_default(channel_data.model.id, action_model.creator_oid)
+            except Exception:
                 return TokenActionCompletionOutcome.X_IDT_REGISTER_DEFAULT_PROFILE
         else:
             return TokenActionCompletionOutcome.X_IDT_CHANNEL_NOT_FOUND

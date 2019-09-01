@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% trans "Logging out..." %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-meta %}
+    <meta name="google-signin-client_id"
+          content="431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com">
+{% endblock %}
+
+{% block ex-script %}
+    <script src="https://apis.google.com/js/platform.js?onload=init" type="text/javascript"></script>
+    <script type="text/javascript">
+        gapi.load('auth2', function () {
+            gapi.auth2.init({
+                client_id: '431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com'
+            }).then(function (gauth) {
+                gauth.signOut();
+                window.location.replace("{% url "page.home" %}");
+            }, function (err) {
+                console.log("Error occurred during logout.");
+                console.log(err);
+            });
+        });
+
+    </script>
+{% endblock %}
