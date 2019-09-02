@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import sys
 
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 ###############################################################################################
@@ -198,7 +199,7 @@ STATICFILES_DIRS = (
 
 # Authorization
 
-LOGIN_URL = '/login/'
+LOGIN_URL = reverse_lazy("account.login")
 
 # On-Error handling
 ADMINS = [('RaenonX JELLYCAT', os.environ.get("EMAIL_ACCOUNT"))]
