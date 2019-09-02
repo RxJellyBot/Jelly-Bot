@@ -37,7 +37,7 @@ class AutoReplyModuleManager(BaseCollection):
             kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        # INCOMPLETE: Permission - Check if the user have the permission if pinned is true
+        # FIXME: Permission - Check if the user have the permission if pinned is true
 
         model, outcome, ex, insert_result = \
             self.insert_one_data(

@@ -9,6 +9,10 @@ from JellyBotAPI.components import get_root_oid
 from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
 
+# FIXME: Display heroku release version on both staged and production in footer
+#  (https://github.com/martyzz1/heroku3.py#release)
+
+
 def render_template(request, title, template_name, context=None, content_type=None, status=None,
                     using=None, nav_param=None) -> HttpResponse:
     if context is None:
@@ -30,7 +34,7 @@ def render_template(request, title, template_name, context=None, content_type=No
     context["api_token"] = request.COOKIES.get(keys.Cookies.USER_TOKEN)
 
     # Append necessary backend vars
-    # INCOMPLETE: Permission - Construct an array and import here for unlocking elements
+    # FIXME: Permission - Construct an array and import here for unlocking elements
     unlock_classes = []
 
     if get_root_oid(request):

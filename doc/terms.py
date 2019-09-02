@@ -27,7 +27,7 @@ terms_collection["Core"] = TermsCollection(
     [TermExplanation(_("Operation"),
                      _("The system has two ways to control: on the website, using the API. "
                        "Some actions may only available at a single side."),
-                     _())
+                     _("-"))
      ]
 )
 terms_collection["Features"] = TermsCollection(
