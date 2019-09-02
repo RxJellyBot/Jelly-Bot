@@ -1,4 +1,3 @@
-db.sqlite3
 *.po
 .idea/
 __pycache__/
