@@ -4,29 +4,30 @@ from django.template import Template, RequestContext
 
 from JellyBotAPI import keys
 from JellyBotAPI.views.nav import construct_nav
-from JellyBotAPI.api.static import result, param, anchor
+from JellyBotAPI.api.static import result, param
 from JellyBotAPI.components import get_root_oid
 from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
 
 def render_template(request, title, template_name, context=None, content_type=None, status=None,
-                    using=None) -> HttpResponse:
+                    using=None, nav_param=None) -> HttpResponse:
     if context is None:
         context = dict()
+    if nav_param is None:
+        nav_param = dict()
 
     # Append variable for base template
     context["title"] = title
 
     # Append navigation bar items
-    nav = construct_nav(request)
+    nav = construct_nav(request, nav_param)
     context["nav_bar_html"] = nav.to_html()
     context["nav_bread"] = nav.to_bread()
     context["static_keys_result"] = result
     context["static_keys_param"] = param
-    context["static_keys_anchor"] = anchor
 
     # Append vars
-    context["api_token"] = request.COOKIES.get(keys.USER_TOKEN)
+    context["api_token"] = request.COOKIES.get(keys.Cookies.USER_TOKEN)
 
     # Append necessary backend vars
     # INCOMPLETE: Permission - Construct an array and import here for unlocking elements
@@ -59,4 +60,4 @@ def render_flag_table(request, title: str, table_title: str, flag_enum: type(Fla
 
 
 def simple_str_response(request, s):
-    return HttpResponse(Template("{{result}}").render(RequestContext(request, {"result": s})))
+    return HttpResponse(Template("{{ result }}").render(RequestContext(request, {"result": s})))

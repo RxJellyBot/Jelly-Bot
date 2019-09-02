@@ -5,8 +5,8 @@ from .perm import PermissionCategory, PermissionCategoryDefault
 # noinspection PyUnresolvedReferences
 from .platforms import Platform
 # noinspection PyUnresolvedReferences
-from .tkact import TokenAction, TokenActionCollationErrorCode
+from .tkact import TokenAction, TokenActionCollationFailedReason, TokenActionCompletionOutcome
 # noinspection PyUnresolvedReferences
-from .apiact import APIAction
+from .apiact import APICommand
 # noinspection PyUnresolvedReferences
-from .presrlz import PreserializationFailedReason
+from .result import *

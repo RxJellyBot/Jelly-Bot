@@ -20,7 +20,9 @@ from django.utils.translation import gettext_lazy as _
 # Check DEBUG, PRODUCTION keys is in a correct state                                          #
 # Run "In Production" config to ensure runnable                                               #
 # Run "py manage.py check --deploy" config to ensure no compiling bugs                        #
+#   Disregard: security.W004, security.W008, security.W012, security.W016
 # Run "py manage.py makemessages -a" to create translation files (compilemessages for *.mo)   #
+# Run tests with code coverage                                                                #
 ###############################################################################################
 
 # MAIN
@@ -83,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'JellyBotAPI.components.middleware.RootUserIDInsertMiddleware',
     'JellyBotAPI.components.middleware.APIStatisticsCollector',
     'JellyBotAPI.components.middleware.TimezoneActivator'
 ]

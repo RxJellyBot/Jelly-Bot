@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 
-from JellyBotAPI import keys
+from JellyBotAPI.keys import Session
 from JellyBotAPI.api.static import result
 from JellyBotAPI.components import get_root_oid
 from models import APIStatisticModel
@@ -11,19 +11,18 @@ from mongodb.factory import APIStatisticsManager
 class APIStatisticsCollector(MiddlewareMixin):
     # noinspection PyMethodMayBeStatic
     def process_response(self, request, response):
-        _default_dict = APIStatisticModel.get_default_dict()
-
-        api_action = request.session.pop(keys.APIStatisticsCollection.API_ACTION,
-                                         _default_dict.get(APIStatisticModel.APIAction))
-        dict_response = request.session.pop(keys.APIStatisticsCollection.DICT_RESPONSE,
-                                            _default_dict.get(APIStatisticModel.Response))
-        dict_params = request.session.pop(keys.APIStatisticsCollection.DICT_PARAMS,
-                                          _default_dict.get(APIStatisticModel.Parameter))
-        success = request.session.pop(keys.APIStatisticsCollection.SUCCESS,
-                                      _default_dict.get(
-                                          APIStatisticModel.Success) if dict_params is None else dict_params.get(
-                                          result.SUCCESS, _default_dict.get(APIStatisticModel.Success)))
-        collect = request.session.pop(keys.APIStatisticsCollection.COLLECT, False)
+        api_action = request.session.pop(Session.APIStatisticsCollection.API_ACTION,
+                                         APIStatisticModel.APIAction.default_value)
+        dict_response = request.session.pop(Session.APIStatisticsCollection.DICT_RESPONSE,
+                                            APIStatisticModel.Response.default_value)
+        dict_params = request.session.pop(Session.APIStatisticsCollection.DICT_PARAMS,
+                                          APIStatisticModel.Parameter.default_value)
+        success = request.session.pop(Session.APIStatisticsCollection.SUCCESS,
+                                      APIStatisticModel.Success.default_value
+                                      if dict_params is None
+                                      else dict_params.get(
+                                          result.SUCCESS, APIStatisticModel.Success.default_value))
+        collect = request.session.pop(Session.APIStatisticsCollection.COLLECT, False)
 
         path_params = None
         if request.method == "GET":

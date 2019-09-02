@@ -1,12 +1,13 @@
 from enum import Enum
+from typing import Union
 
 from .mongo import register_encoder
 
 
 class FlagMixin:
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagMixin not implemented.")
+    @classmethod
+    def default(cls):
+        raise ValueError(f"Default in {cls.__name__} not implemented.")
 
 
 class FlagCodeMixin(FlagMixin):
@@ -36,7 +37,7 @@ class FlagCodeMixin(FlagMixin):
 
     def __eq__(self, other):
         if isinstance(other, int):
-            return self._code == other
+            return self.code == other
         else:
             return super().__eq__(other)
 
@@ -52,8 +53,12 @@ class FlagCodeMixin(FlagMixin):
             raise TypeError(f"Not comparable. ({type(self).__name__} & {type(other).__name__})")
 
     @property
-    def code(self):
+    def code(self) -> int:
         return self._code
+
+    @property
+    def code_str(self) -> str:
+        return f"_{self._code}"
 
     # noinspection PyUnresolvedReferences
     def __str__(self):
@@ -61,10 +66,6 @@ class FlagCodeMixin(FlagMixin):
 
     def __repr__(self):
         return self.__str__()
-
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagCodeMixin not implemented.")
 
 
 class FlagSingleMixin(FlagCodeMixin):
@@ -80,10 +81,6 @@ class FlagSingleMixin(FlagCodeMixin):
     def __str__(self):
         return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key})>"
 
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagSingleMixin not implemented.")
-
 
 class FlagDoubleMixin(FlagSingleMixin):
     def __init__(self, code: int, key: str, description: str):
@@ -94,28 +91,96 @@ class FlagDoubleMixin(FlagSingleMixin):
     def description(self):
         return self._desc
 
-    # noinspection PyUnresolvedReferences
-    def __str__(self):
-        return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key}) - {self._desc[:40]}>"
+
+class FlagPrefixedDoubleMixin(FlagDoubleMixin):
+    def __init__(self, code: int, key: str, description: str):
+        super().__init__(code, key, description)
+        self._desc = description
+
+    @property
+    def code_prefix(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    def description(self) -> str:
+        return self._desc
+
+    @property
+    def code(self) -> str:
+        return f"{self.code_prefix}{self._code}"
+
+    @property
+    def code_num(self) -> int:
+        return self._code
+
+    def __hash__(self):
+        return hash((self.__class__, self._code))
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.code == other
+        else:
+            return super().__eq__(other)
+
+
+class FlagEnumMixin:
+    @classmethod
+    def cast(cls, item: Union[str, int]):
+        if not isinstance(item, (str, int)):
+            raise ValueError(f"Source type ({type(item)}) for casting not handled.")
+
+        for i in list(cls):
+            if i.code == item:
+                return i
+
+        raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
+
+    @classmethod
+    def contains(cls, item):
+        if isinstance(item, str) and not issubclass(cls, FlagSingleMixin):
+            return False
+
+        if isinstance(item, int):
+            det_fn = FlagEnumMixin._match_int_
+        elif isinstance(item, str):
+            det_fn = FlagEnumMixin._match_str_
+        else:
+            return False
+
+        for i in list(cls):
+            if det_fn(i, item):
+                return True
+
+        return False
 
     @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagDoubleMixin not implemented.")
+    def _match_int_(enum, item):
+        return enum.code == item
 
-
-class FlagCodeEnum(FlagCodeMixin, Enum):
     @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagCodeEnum not implemented.")
+    def _match_str_(enum, item):
+        return enum.key == item or enum.name == item or enum.code_str == item
 
 
-class FlagSingleEnum(FlagSingleMixin, Enum):
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagSingleEnum not implemented.")
+class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):
+    pass
 
 
-class FlagDoubleEnum(FlagDoubleMixin, Enum):
-    @staticmethod
-    def default():
-        raise NotImplementedError(f"Default in FlagDoubleEnum not implemented.")
+class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
+    pass
+
+
+class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
+    pass
+
+
+class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
+    @property
+    def code_prefix(self) -> str:
+        raise NotImplementedError()
+
+
+class FlagOutcomeMixin(FlagCodeMixin):
+    @property
+    def is_success(self):
+        return self._code < 0

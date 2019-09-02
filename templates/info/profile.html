@@ -1,0 +1,106 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Profile Info" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Basic Information" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h4 class="card-header text-dark">{% trans "Name" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2 font-weight-normal">
+                            <span class="dot" style="background-color: {{ profile_data.color.color_hex }}"></span>
+                            {{ profile_data.name }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="card border-dark text-center">
+                    <h4 class="card-header text-dark">{% trans "Profile ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <code>{{ profile_data.id }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-3">
+                <div class="card border-dark text-center">
+                    <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <code><a href="{% url "info.channel" channel_oid=profile_data.channel_oid %}">
+                                {{ profile_data.channel_oid }}
+                            </a></code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Privilege" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            {% if profile_data.is_admin %}
+                                <span class="text-danger">{% trans "Admin" %}</span>
+                            {% elif profile_data.is_mod %}
+                                <span class="text-success">{% trans "Moderator" %}</span>
+                            {% else %}
+                                <span class="text-black-50">{% trans "N/A" %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Promotion Required" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            {% if profile_data.needs_promo %}
+                                <span class="text-danger">{% trans "Yes" %}</span>
+                            {% else %}
+                                <span class="text-success">{% trans "No" %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Permissions" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            {% for perm_cat in perm_cats %}
+                <div class="col-lg-4 col-6 list-group-item list-group-item-action mb-0">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ perm_cat.key }}</h5>
+                        {% if profile_data.permission|get_val:perm_cat.code %}
+                        <span class="dot bg-success"></span>
+                        {% else %}
+                        <span class="dot bg-danger"></span>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0">{{ perm_cat.description }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

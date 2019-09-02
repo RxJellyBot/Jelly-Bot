@@ -1,7 +1,7 @@
-db.sqlite3
 *.po
 .idea/
 __pycache__/
 lib/
 node_modules/
 staticfiles/
+*.bat

@@ -8,36 +8,56 @@ RESULT = "result"
 REQUIRED = "required"
 
 
-# TODO: API Docs: Restruct result keys to reduce the difficulty of building docs (re-categorize)
+class Common:
+    CREATOR_OID = "creator"
+    CHANNEL_OID = "channel"
 
-class _Common:
-    CREATOR = "creator"
+    TOKEN = "token"
+    PLATFORM = "platform"
+
+    LACKING_KEYS = "keysLack"
 
 
 class Results:
     EXCEPTION = "exception"
     OUTCOME = "outcome"
     MODEL = "model"
-    TOKEN = "token"
-    HINT = "hint"
-    EXPIRY = "expiry"
-    ADD_RESULT = "addResult"
-    REG_RESULT = "regResult"
-    CONN_OUTCOME = "connOutcome"
-    INSERT_CONN_OUTCOME = "aConnOutcome"
-    LACKING_KEYS = "keysLack"
+    LACKING_KEYS = Common.LACKING_KEYS
+
+
+class SenderIdentity:
+    SENDER = "sender"
 
 
 class AutoReplyResponse:
     KEYWORD = "keyword"
     RESPONSES = "responses"
-    CREATOR_OID = _Common.CREATOR
-    PLATFORM = "platform"
-    CHANNEL = "channel"
+    PLATFORM = Common.PLATFORM
+    CHANNEL_OID = Common.CHANNEL_OID
     PRIVATE = "private"
     PINNED = "pinned"
+    TAGS = "tags"
     COOLDOWN_SEC = "cooldown"
+
+    ADD_RESULT = "addResult"
 
 
 class TokenActionResponse:
-    CREATOR_OID = _Common.CREATOR
+    LACKING_KEYS = Common.LACKING_KEYS
+    CREATOR_OID = Common.CREATOR_OID
+    COMPLETION_OUTCOME = "cmplOutcome"
+
+    TOKEN = Common.TOKEN
+    EXPIRY = "expiry"
+
+
+class UserManagementResponse:
+    TOKEN = Common.TOKEN
+    HINT = "hint"
+    REG_RESULT = "regResult"
+    CONN_OUTCOME = "connOutcome"
+
+
+class DataQuery:
+    COUNT = "count"
+    KEYWORD = "keyword"

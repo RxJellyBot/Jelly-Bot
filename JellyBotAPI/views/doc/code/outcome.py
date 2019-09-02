@@ -8,22 +8,26 @@ from mongodb.factory.results import InsertOutcome, GetOutcome, OperationOutcome,
 class InsertOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_flag_table(request, _("Insert Outcome Code"), _("Insert Outcome"), InsertOutcome)
+        return render_flag_table(
+            request, _("Insert Outcome Code"), _("Insert Outcome"), InsertOutcome, {"td_color": True})
 
 
 class GetOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_flag_table(request, _("Get Outcome Code"), _("Get Outcome"), GetOutcome)
+        return render_flag_table(
+            request, _("Get Outcome Code"), _("Get Outcome"), GetOutcome, {"td_color": True})
 
 
 class OperationOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_flag_table(request, _("Operation Outcome Code"), _("Operation Outcome"), OperationOutcome)
+        return render_flag_table(
+            request, _("Operation Outcome Code"), _("Operation Outcome"), OperationOutcome, {"td_color": True})
 
 
 class UpdateOutcomeCodeView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        return render_flag_table(request, _("Update Outcome Code"), _("Update Outcome"), UpdateOutcome)
+        return render_flag_table(
+            request, _("Update Outcome Code"), _("Update Outcome"), UpdateOutcome, {"td_color": True})
