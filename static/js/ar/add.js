@@ -200,7 +200,7 @@ function validateChannelInfo() {
     let arPlatVal = $("select#arPlatform option:selected").val();
     let arChannelID = $("input#arChannelID").val();
 
-    checkChannelExistence(arPlatVal, arChannelID, function (exists) {
+    checkChannelMembership(arPlatVal, arChannelID, function (exists) {
         submitBtnDisable(!exists);
 
         let elem = $("input#arChannelID");

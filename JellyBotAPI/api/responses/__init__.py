@@ -3,5 +3,5 @@ from .ar import (
     AutoReplyAddResponse, AutoReplyAddTokenActionResponse, ContentValidationResponse,
     AutoReplyTagPopularityResponse
 )
-from .id import ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse
+from .id import ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse, ChannelNameChangeResponse
 from .tkact import TokenActionCompleteApiResponse, TokenActionListApiResponse

@@ -1,5 +1,4 @@
 from abc import ABC
-from time import sleep
 
 from JellyBotAPI import SystemConfig
 from JellyBotAPI.api.static import result, info, param
@@ -100,6 +99,7 @@ class AutoReplyAddBaseResponse(
 
         if self._tags:
             # Tag string to array
+            # noinspection PyUnresolvedReferences
             tags = self._tags.split(SystemConfig.AutoReply.TAG_SPLITTOR)
             tag_ids = []
 

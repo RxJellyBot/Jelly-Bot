@@ -15,7 +15,7 @@
                 <div class="card border-primary mb-3 text-primary text-center align-middle">
                     <h5 class="card-header">{% trans "Basic Information" %}</h5>
                     <div class="card-body">
-                        <table class="table text-primary">
+                        <table class="table text-primary mb-0">
                             <tbody>
                             <tr>
                                 <th scope="row">{% trans "Google Account" %}</th>
@@ -72,7 +72,7 @@
                     <div class="card-body">
                         <h3 class="card-text">
                             <a class="btn btn-outline-dark" role="button" href="{% url "account.channel.connect" %}">
-                                {% trans "Connect" %}
+                                {% trans "Register Membership" %}
                             </a>
                             <a class="btn btn-outline-dark" role="button" href="{% url "account.channel.list" %}">
                                 {% trans "Manage" %}

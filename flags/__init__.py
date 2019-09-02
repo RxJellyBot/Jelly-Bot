@@ -7,6 +7,6 @@ from .platforms import Platform
 # noinspection PyUnresolvedReferences
 from .tkact import TokenAction, TokenActionCollationFailedReason, TokenActionCompletionOutcome
 # noinspection PyUnresolvedReferences
-from .apiact import APIAction
+from .apiact import APICommand
 # noinspection PyUnresolvedReferences
 from .result import *

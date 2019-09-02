@@ -3,7 +3,9 @@ LOCAL_REFER = "lr"
 
 class Common:
     CHANNEL_TOKEN = "c"
+    CHANNEL_OID = "cid"
     USER_TOKEN = "u"
+    USER_OID = "uid"
     PLATFORM = "p"
     API_TOKEN = "api_key"
 
@@ -38,6 +40,14 @@ class DataQuery:
     class Channel:
         PLATFORM = Common.PLATFORM
         CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+
+
+class Manage:
+    USER_OID = Common.USER_OID
+
+    class Channel:
+        CHANNEL_OID = Common.CHANNEL_OID
+        NEW_NAME = "name"
 
 
 class TokenAction:

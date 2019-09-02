@@ -1,5 +1,5 @@
 from extutils.flags import FlagCodeEnum
-from flags import APIAction, AutoReplyContentType, TokenAction, Platform
+from flags import APICommand, AutoReplyContentType, TokenAction, Platform
 from .int import IntegerField
 
 
@@ -36,8 +36,8 @@ class FlagField(IntegerField):
         return self.is_type_matched(value)
 
 
-class APIActionTypeField(FlagField):
-    FLAG_TYPE = APIAction
+class APICommandField(FlagField):
+    FLAG_TYPE = APICommand
 
 
 class AutoReplyContentTypeField(FlagField):

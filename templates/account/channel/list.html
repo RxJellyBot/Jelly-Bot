@@ -10,32 +10,67 @@
     </div>
 
     <div class="container">
-        <div class="row">
-            {% include "account/channel/list_table.html" %}
-        </div>
+        {% include "account/channel/list_table.html" %}
         <hr>
         <div class="row">
             <div class="col">
                 {% url 'account.channel.connect' as reg_url %}
-                {% blocktrans %}
+                <!-- INCOMPLETE: Channel List - official guide to check the current channel token -->
+                {% blocktrans trimmed %}
                     If you:<br>
                     <ul>
                         <li>
                             Cannot find the desired channel to manage: <br>
                             <small>Please go to the <a href="{{ reg_url }}">register page</a> to register your channel
-                            existence.</small>
+                                membership.</small>
                         </li>
                         <li>
                             Do not know how to determine what is the desired channel to manage: <br>
-                            <!-- INCOMPLETE: Channel List - official guide to check the current channel token -->
-                            <small>If using the official handled port, please check this page to see how to check the channel
-                            token.<br>
-                            If NOT using the official handled port, please check the guide of the corresponding bot of
-                            how to check the channel token or channel id (The bot maker may not implement this).</small>
+                            <small>If using the official handled port, please check this page to see how to check the
+                                channel
+                                token.<br>
+                                If NOT using the official handled port, please check the guide of the corresponding bot
+                                to know how to check the channel token or channel id (The bot maker may not implement
+                                this).</small>
                         </li>
                     </ul>
                 {% endblocktrans %}
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block ex-script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input.channel-name").keyup(function (e) {
+                let elem = $(this);
+                elem.removeClass("is-valid is-invalid");
+
+                if (e.which === 13) {
+                    let url = `{% url "api.id.channel.name_change" %}`;
+                    let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
+
+                    let xhr = new XMLHttpRequest();
+                    xhr.open("POST", url);
+                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhr.responseType = "json";
+                    xhr.onload = function () {
+                        let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+
+                        onNameChangeLoad(success, xhr.response, elem);
+                    };
+                    xhr.send(params);
+                }
+            })
+        });
+
+        function onNameChangeLoad(success, response, elem) {
+            elem.addClass(success ? "is-valid" : "is-invalid");
+
+            if (!success) {
+                console.log(response);
+            }
+        }
+    </script>
 {% endblock %}

@@ -1,4 +1,3 @@
-from django.shortcuts import redirect
 from django.utils import timezone
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
@@ -37,9 +36,10 @@ class AccountLoginView(View):
             elif result.outcome == InsertOutcome.X_NOT_ACKNOWLEDGED:
                 s = _("New user data creation failed.")
             elif result.outcome == InsertOutcome.X_NOT_SERIALIZABLE:
-                s = _("The data is unable to be passed into the server.")
+                s = _("The data cannot be passed into the server.")
             else:
-                s = _(f"An unknown error occurred during the new user data registration. Code: {result.outcome}.")
+                s = _(
+                    "An unknown error occurred during the new user data registration. Code: {}.").format(result.outcome)
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:
@@ -56,7 +56,7 @@ class AccountLoginView(View):
             response.set_cookie(keys.Cookies.USER_TOKEN, token)
 
         if s == AccountLoginView.PASS_SIGNAL and token is None:
-            return simple_str_response(request, _(f"User token is null however login succeed. {s_contact}"))
+            return simple_str_response(request, _("User token is null however login succeed. {}").format(s_contact))
         else:
             return response
 
@@ -79,7 +79,7 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
             return simple_str_response(
                 request,
                 f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - " +
-                _(f"Account settings updated."))
+                _("Account settings updated."))
         else:
             return simple_str_response(
                 request,

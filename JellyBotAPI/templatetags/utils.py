@@ -18,3 +18,8 @@ def concat(str1, str2):
     Concatenate two strings.
     """
     return str(str1) + str(str2)
+
+
+@register.filter
+def get_val(dict_: dict, key):
+    return dict_.get(key, "")

@@ -3,7 +3,7 @@ from django.urls import path
 from .main import AccountMainPageView
 from .control import AccountLoginView, AccountLogoutView, AccountSettingsPageView
 from .channel import (
-    AccountChannelRegistrationView, AccountChannelListView, AccountChannelManagingView, AccountProfileView
+    AccountChannelRegistrationView, AccountChannelListView, AccountChannelManagingView
 )
 
 urlpatterns = [
@@ -14,5 +14,4 @@ urlpatterns = [
     path('channel/register', AccountChannelRegistrationView.as_view(), name='account.channel.connect'),
     path('channel/manage', AccountChannelListView.as_view(), name='account.channel.list'),
     path('channel/manage/<str:channel_oid>', AccountChannelManagingView.as_view(), name='account.channel.manage'),
-    path('profile/<str:profile_oid>', AccountProfileView.as_view(), name='account.profile')
 ]

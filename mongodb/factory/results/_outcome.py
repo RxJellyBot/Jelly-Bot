@@ -94,7 +94,7 @@ class InsertOutcome(BaseOutcome):
         _("The insertion was failed while connecting the identity of API user.")
     X_ON_SET_CONFIG = \
         109, _("X: on Setting Config"), \
-        _("The insertion was failed while connecting the identity of API user.")
+        _("An error occurred when trying to set the config after the default profile is generated.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")
@@ -236,11 +236,15 @@ class OperationOutcome(BaseOutcome):
         104 - Completion Process not Implemented
         105 - Completion Error
 
+    2xx - Problems related to Channel
+        201 - Channel Not Found
+
     5xx - Problems related to Model
         501 - Construction Error
 
     9xx - Problems related to execution
         901 - Not executed
+        902 - Error
     """
     @property
     def code_prefix(self) -> str:
@@ -274,12 +278,18 @@ class OperationOutcome(BaseOutcome):
     X_COLLATION_ERROR = \
         107, _("X: Collation Error"), \
         _("An error occurred during parameter collation process.")
+    X_CHANNEL_NOT_FOUND = \
+        201, _("X: Channel Not Found"), \
+        _("Channel was not found using the given Channel ID.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The operation had not been executed.")
+    X_ERROR = \
+        902, _("X: Error"), \
+        _("An error has occurred during the process execution.")
 
 
 class UpdateOutcome(BaseOutcome):

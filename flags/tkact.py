@@ -11,8 +11,8 @@ class TokenAction(FlagDoubleEnum):
             102: Connect Identity (on API)
 
         11x - Connect Channel Identity:
-            111: Register Existence (on Web)
-            112: Register Existence (on API)
+            111: Register Membership (on Web)
+            112: Register Membership (on API)
 
     2xx - Auto Reply:
             201: Add
@@ -30,8 +30,8 @@ class TokenAction(FlagDoubleEnum):
         101, _("Connect: User Identity"), \
         _("Connect the user identity data between on-platform and API.")
     CONNECT_CHANNEL = \
-        111, _("Connect: Register Channel Existence"), \
-        _("Confirm the existence in a channel.")
+        111, _("Connect: Register Channel Membership"), \
+        _("Get the membership of a channel.")
     AR_ADD = \
         201, _("Auto-Reply: Add"), \
         _("Register an Auto-Reply module.")

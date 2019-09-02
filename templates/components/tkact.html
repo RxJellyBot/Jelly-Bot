@@ -1,20 +1,18 @@
 {% load i18n %}
 
 <div class="card-text text-center">
-    <div class="mb-3">
-        {% if tkact_list.empty %}
-            <p class="text-info">{% trans "No pending token actions." %}</p>
-        {% else %}
-            <button class="btn btn-outline-info" type="button" data-toggle="collapse"
-                    data-target=".token-action" aria-expanded="false">
-                {% trans "Show/Hide All" %}
-            </button>
-        {% endif %}
+    {% if tkact_list.empty %}
+        <span class="text-info">{% trans "No pending token actions." %}</span>
+    {% else %}
+        <button class="btn btn-outline-info" type="button" data-toggle="collapse"
+                data-target=".token-action" aria-expanded="false">
+            {% trans "Show/Hide All" %}
+        </button>
+    {% endif %}
 
-    </div>
     {% for tkact in tkact_list %}
         {% with token=tkact.token action=tkact.action_type ts=tkact.expire_time|date:'m-d h:i:s A (e)' %}
-            <div class="mb-3">
+            <div class="mt-3">
                 <button class="btn btn-outline-info" type="button" data-toggle="collapse"
                         data-target="#_{{ token }}" aria-expanded="false" aria-controls="{{ token }}">
                     {% blocktrans trimmed %}
