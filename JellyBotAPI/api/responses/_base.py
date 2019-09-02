@@ -1,5 +1,6 @@
 import abc
 
+from bson import ObjectId
 from django.http import QueryDict
 
 from JellyBotAPI.api.static import result
@@ -7,8 +8,12 @@ from JellyBotAPI.api.static import result
 
 class BaseApiResponse(abc.ABC):
     @abc.abstractmethod
-    def __init__(self, param_dict: QueryDict):
+    def __init__(self, param_dict: QueryDict, sender_oid: ObjectId):
         self.__param_dict = param_dict
+
+        self._param_dict = {}
+
+        self._sender_oid = sender_oid
 
         self._err = dict()
         self._data = dict()
@@ -16,9 +21,12 @@ class BaseApiResponse(abc.ABC):
         self._info = list()
         self._result = None
 
-    @abc.abstractmethod
     def is_success(self) -> bool:
-        return len(self._err) == 0
+        return len(self._err) == 0 and self.success_conditions()
+
+    @abc.abstractmethod
+    def success_conditions(self) -> bool:
+        return True
 
     # noinspection PyMethodMayBeStatic
     def _serialize_(self) -> dict:
@@ -38,10 +46,15 @@ class BaseApiResponse(abc.ABC):
             self.process_ifnoerror()
 
         d = self._serialize_()
-        d.update(**self.serialize_success())
-        d.update(**self.serialize_failed())
+        is_success = self.is_success()
+
+        if is_success:
+            d.update(**self.serialize_success())
+        else:
+            d.update(**self.serialize_failed())
+
         d.update(**self.serialize_extra())
-        d[result.SUCCESS] = self.is_success()
+        d[result.SUCCESS] = is_success
         return d
 
     @abc.abstractmethod

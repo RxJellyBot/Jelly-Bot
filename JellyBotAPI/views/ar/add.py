@@ -10,8 +10,11 @@ from JellyBotAPI.views.render import render_template
 class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
+        # FIXME: Check the user's membership in the channel for list select in Registration/By Channel ID section.
+
         return render_template(request, _("Add an Auto-Reply"), "ar/add.html",
                                {"max_responses": AutoReply.MAX_RESPONSES,
                                 "max_length": AutoReply.MAX_CONTENT_LENGTH,
                                 "platform_list": list(Platform),
-                                "contenttype_list": list(AutoReplyContentType)})
+                                "contenttype_list": list(AutoReplyContentType),
+                                "tag_splittor": AutoReply.TAG_SPLITTOR})

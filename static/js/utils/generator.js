@@ -1,5 +1,5 @@
 function generateAlert(level, message) {
-    return $(".gen-alert").append(`<div class="row"><div class="alert alert-${level} alert-dismissible col fade show" role="alert">
+    return $("div.gen-alert").append(`<div class="row"><div class="alert alert-${level} alert-dismissible col fade show" role="alert">
                 ${message}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span> 

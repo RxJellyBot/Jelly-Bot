@@ -1,49 +1,32 @@
 from JellyBotAPI.SystemConfig import ChannelConfig
-from models.field import PlatformField, TextField, ModelField, IntegerField, BooleanField
+from models.field import (
+    PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField, DictionaryField
+)
 
 
-from ._mixin import CreateDefaultMixin
-from ._base import Model, ModelDefaultValueExtension
+from ._base import Model, ModelDefaultValueExt
 
 
-class ChannelConfigModel(CreateDefaultMixin, Model):
-    # INCOMPLETE: Channel Config - Turn on/off functions (Enable*) by votes if no mod/admin (% of 5 days active member)
+class ChannelConfigModel(Model):
+    # INCOMPLETE: Channel Config - Turn on/off features (Enable*) by votes if no mod/admin (% of 5 days active member)
+    # INCOMPLETE: Channel Config - Vote = 0 means no promo
 
-    VoteToPromoteMod = "vm"
-    VoteToPromoteAdmin = "va"
-    EnableAutoReply = "ar"
-    EnableCreateRole = "cro"
+    WITH_OID = False
 
-    default_vals = (
-        (VoteToPromoteMod, True),
-        (VoteToPromoteAdmin, True),
-        (EnableAutoReply, True),
-        (EnableCreateRole, True)
-    )
-
-    def _init_fields_(self, **kwargs):
-        self.vote_promo_mod = IntegerField(ChannelConfigModel.VoteToPromoteMod, ChannelConfig.VotesToPromoteMod)
-        self.vote_promo_admin = IntegerField(ChannelConfigModel.VoteToPromoteAdmin, ChannelConfig.VotesToPromoteAdmin)
-        self.enable_auto_reply = BooleanField(ChannelConfigModel.EnableAutoReply)
-        self.enable_create_role = BooleanField(ChannelConfigModel.EnableCreateRole)
+    VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod)
+    VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
+    EnableAutoReply = BooleanField("e-ar", default=True)
+    EnableCreateProfile = BooleanField("e-crp", default=True)
+    InfoPrivate = BooleanField("prv", default=False)
+    DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
 
 
 class ChannelModel(Model):
-    Platform = "p"
-    Token = "t"
-    Config = "c"
+    Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
+    Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
+    Name = DictionaryField("n", default=ModelDefaultValueExt.Required)
+    Config = ModelField("c", ChannelConfigModel)
 
-    default_vals = (
-        (Platform, ModelDefaultValueExtension.Required),
-        (Token, ModelDefaultValueExtension.Required),
-        (Config, ChannelConfigModel.create_default().serialize())
-    )
 
-    dict_models = (
-        (Config, ChannelConfigModel),
-    )
-
-    def _init_fields_(self, **kwargs):
-        self.platform = PlatformField(ChannelModel.Platform)
-        self.token = TextField(ChannelModel.Token, must_have_content=True)
-        self.config = ModelField(ChannelModel.Config, ChannelConfigModel)
+class ChannelRegisterMembershipModel(Model):
+    RootOid = ObjectIDField("u")

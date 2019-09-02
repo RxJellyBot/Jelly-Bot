@@ -9,7 +9,7 @@ from models import Model
 class JellyBotAPISerializer(DjangoJSONEncoder):
     def default(self, o):
         if isinstance(o, Model):
-            return o.serialize()
+            return o.to_json()
         elif isinstance(o, BaseResult):
             return o.serialize()
         elif isinstance(o, ObjectId):

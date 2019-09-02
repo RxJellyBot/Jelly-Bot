@@ -1,6 +1,6 @@
 $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-    $('.tooltip-hide[data-toggle="tooltip"]').tooltip('disable');
+    $('div[data-toggle="tooltip"]').tooltip();
+    $('div.tooltip-hide[data-toggle="tooltip"]').tooltip('disable');
 });
 
 $(document).ready(function () {
@@ -8,8 +8,17 @@ $(document).ready(function () {
     initLayout();
 });
 
+function keyEventHandle() {
+    $(window).keydown(function (event) {
+        if (event.which === 13 && !$(document.activeElement).is("input#arTagKeyword, textarea")) {
+            $("form#arForm").submit();
+            return false;
+        }
+    });
+}
+
 function initLayout() {
-    $("#respGroup1").removeClass("d-none");
+    $("div#respGroup1").removeClass("d-none");
 }
 
 let responseCount = 1;
@@ -24,8 +33,8 @@ function initEvents() {
 }
 
 function regPanelSwitch() {
-    $("[data-btn-id]").addClass("d-none");
-    $("[data-btn-id=" + regId + "]").removeClass("d-none");
+    $("div[data-btn-id]").addClass("d-none");
+    $("div[data-btn-id=" + regId + "]").removeClass("d-none");
 }
 
 function regSubmitBtnControl() {
@@ -37,56 +46,56 @@ function regSubmitBtnControl() {
 }
 
 function initProperties() {
-    $(".btn-div").click(function () {
+    $("div.btn-div").click(function () {
         if (!$(this).hasClass("disabled")) {
-            let input_target = $("#" + $(this).data("input"));
+            let input_target = $("input#" + $(this).data("input"));
 
             input_target.val(reverseVal(input_target.val()));
             $(this).toggleClass("active");
         }
     });
-    $("#arCoolDownRange").on("input", function () {
-        $("#arCoolDown").val($(this).val());
+    $("input#arCoolDownRange").on("input", function () {
+        $("input#arCoolDown").val($(this).val());
     });
 }
 
 function initResponsesSection() {
-    $(".arRespBtnAdd").click(function () {
+    $("button.arRespBtnAdd").click(function () {
         responseCount++;
 
-        $("#respGroup" + responseCount).removeClass("d-none");
+        $("div#respGroup" + responseCount).removeClass("d-none");
 
-        if (responseCount >= $("#respProp").data("max")) {
+        if (responseCount >= $("b#respProp").data("max")) {
             $(this).prop("disabled", true);
         }
-        $(".arRespBtnDel").prop("disabled", false);
+        $("button.arRespBtnDel").prop("disabled", false);
     });
-    $(".arRespBtnDel").click(function () {
-        $("#respGroup" + responseCount).addClass("d-none");
+    $("button.arRespBtnDel").click(function () {
+        $("div#respGroup" + responseCount).addClass("d-none");
 
         responseCount--;
 
         if (responseCount <= 1) {
             $(this).prop("disabled", true);
         }
-        $(".arRespBtnAdd").prop("disabled", false);
+        $("button.arRespBtnAdd").prop("disabled", false);
     });
 }
 
 function initTextAreas() {
-    $(".txtarea-count").each(function () {
+    $("div.txtarea-count").each(function () {
         let parent = $(this);
         let txtArea = $(this).find("textarea");
         let id = "[data-count=" + txtArea.attr("id") + "]";
         $(this).init(function () {
-            $(this).find("[data-type=current]" + id).text(0);
+            $(this).find("span[data-type=current]" + id).text(0);
         }).on("input", function () {
             let currentCount = txtArea.val().length;
-            let progBar = $(this).find("[data-type=progress]" + id);
+            let progBar = $(this).find("div[data-type=progress]" + id);
 
             let percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
 
-            $(this).find("[data-type=current]" + id).text(currentCount);
+            $(this).find("span[data-type=current]" + id).text(currentCount);
             progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
 
             if (percentage > 100) {
@@ -97,18 +106,18 @@ function initTextAreas() {
             submitBtnDisable(percentage > 100);
         });
 
-        txtArea.on("keyup change blur", function() {
+        txtArea.on("keyup change blur", function () {
             validateTextArea(parent, txtArea);
         });
 
-        $(this).find(".ar-type").change(function() {
+        $(this).find("select.ar-type").change(function () {
             validateTextArea(parent, txtArea);
         })
     })
 }
 
 function validateTextArea(parent, txtArea) {
-    validateContent(parent.find(".ar-type option:selected").val(), txtArea.val(), function (success, result) {
+    validateContent(parent.find("select.ar-type option:selected").val(), txtArea.val(), function (success, result) {
         hideAllValidClasses(txtArea);
         let valid = success && result;
 
@@ -128,13 +137,21 @@ function initRegSelection() {
         regPanelSwitch();
         regSubmitBtnControl();
     });
-    $("#arChannelCheck").click(function () {
+    $("button#arChannelCheck").click(function () {
         validateChannelInfo();
     })
 }
 
 function formSubmitHandle() {
-    $(".ar").submit(function (event) {
+    $(document).ready(function () {
+        keyEventHandle();
+        $("button.arSubmit").click(function () {
+            $("form#arForm").submit();
+        })
+    });
+
+    $("form#arForm").submit(function () {
+        submitBtnDisable(true);
         let pass = true;
 
         if (!validateForm()) {
@@ -143,31 +160,34 @@ function formSubmitHandle() {
 
         if (!pass) {
             hideAllSubmitMsg();
-            $("#inputFailed").removeClass("d-none").addClass("d-inline");
+            showInputFailed(true);
+            submitBtnDisable(false);
         } else {
             if (regId === "arToken" || regId === "arChannel") {
                 submitData(onSubmitCallback);
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
             }
-            submitBtnDisable(true);
         }
-        event.preventDefault(); // Because of Ajax form submission
+
+        event.preventDefault(); // Cancel default submission behavior for Ajax
+        return false;
     })
 }
 
 function validateForm() {
+    updateLastSubmissionTime();
+
     let ret = true;
 
     // Validate content lengths
-    $(".content-check:not(.d-none)").each(function () {
+    $("div.content-check:not(.d-none)").each(function () {
         let txtArea = $(this).find("textarea");
         let ctLen = txtArea.val().length;
-        let maxLen = parseFloat($(this).find("[data-type=progress][data-count=" + txtArea.attr("id") + "]").attr("aria-valuemax"));
+        let maxLen = parseFloat($(this).find("div[data-type=progress][data-count=" + txtArea.attr("id") + "]").attr("aria-valuemax"));
 
         if (maxLen < ctLen || ctLen === 0) {
-            let elem = $(this).find(".tooltip-hide[data-toggle=tooltip]");
-            elem.tooltip('enable').tooltip('show').tooltip('disable');
+            $(this).find("div.tooltip-hide[data-toggle=tooltip]").tooltip('enable').tooltip('show').tooltip('disable');
             ret = false;
             updateArCode(null);
         }
@@ -177,16 +197,15 @@ function validateForm() {
 }
 
 function validateChannelInfo() {
-    let arPlatVal = $("#arPlatform option:selected").val();
-    let arChannelID = $("#arChannelID").val();
+    let arPlatVal = $("select#arPlatform option:selected").val();
+    let arChannelID = $("input#arChannelID").val();
 
-    checkChannelExistence(arPlatVal, arChannelID, function (outcomeCode) {
-        let result = outcomeCode > 0;
-        submitBtnDisable(result);
+    checkChannelMembership(arPlatVal, arChannelID, function (exists) {
+        submitBtnDisable(!exists);
 
-        let elem = $("#arChannelID");
+        let elem = $("input#arChannelID");
         elem.removeClass("is-valid is-invalid");
-        if (typeof outcomeCode !== "undefined" && outcomeCode < 0) {
+        if (typeof exists !== "undefined" && exists) {
             elem.addClass("is-valid");
         } else {
             elem.addClass("is-invalid");
@@ -194,41 +213,36 @@ function validateChannelInfo() {
     })
 }
 
-function hideAllSubmitMsg() {
-    $("#inputFailed, #submitFailed, #submitSuccess").removeClass("d-inline").addClass("d-none");
-}
-
 function hideAllValidClasses(elem) {
     elem.removeClass("is-invalid is-valid");
 }
 
 function onSubmitCallback(response) {
-    submitBtnDisable(false);
-
     hideAllSubmitMsg();
 
     if (response.success) {
-        $("#submitSuccess").removeClass("d-none").addClass("d-inline");
         displayToken(response);
 
         resetForm();
+        showSubmissionSucceed(true);
     } else {
-        $("#submitFailed").removeClass("d-none").addClass("d-inline");
+        showSubmissionFailed(true);
     }
-    console.log(response);
+    submitBtnDisable(false);
 }
 
 function resetForm() {
     // CLEAR all <textarea>
-    $(".content-check:not(.d-none)").find("textarea").each(function () {
+    $("div.content-check:not(.d-none)").find("textarea").each(function () {
         $(this).val("");
     });
 
     // Hide All
-    $(".txtarea-count").each(function () {
+    $("div.txtarea-count").each(function () {
         hideAllValidClasses($(this).find("textarea"));
-        $(this).find("[data-type=current]").text(0);
+        $(this).find("span[data-type=current]").text(0);
     });
+
     hideAllSubmitMsg();
 }
 
@@ -243,16 +257,45 @@ function reverseVal(str) {
 }
 
 function updateArCode(code) {
-    let link = $("#arCodeLink");
+    let link = $("a#arCodeLink");
     link.attr("href", link.data("prefix") + code);
 
     if (code) {
-        $("#arCode").text(code);
+        $("code#arCode").text(code);
     } else {
-        $("#arCode").text("-");
+        $("code#arCode").text("-");
     }
 }
 
 function submitBtnDisable(disable) {
-    $(".arSubmit").prop("disabled", disable);
+    $("button.arSubmit").prop("disabled", disable);
+}
+
+function hideAllSubmitMsg() {
+    $("div#inputFailed, div#submitFailed, div#submitSuccess").removeClass("d-inline").addClass("d-none");
+}
+
+function showSubmissionMessage(msgSel, show) {
+    if (show) {
+        updateLastSubmissionTime();
+        $(msgSel).removeClass("d-none").addClass("d-inline");
+    } else {
+        $(msgSel).addClass("d-none").removeClass("d-inline");
+    }
+}
+
+function showInputFailed(show) {
+    showSubmissionMessage("div#inputFailed", show);
+}
+
+function showSubmissionSucceed(show) {
+    showSubmissionMessage("div#submitSuccess", show);
+}
+
+function showSubmissionFailed(show) {
+    showSubmissionMessage("div#submitFailed", show);
+}
+
+function updateLastSubmissionTime() {
+    $("span#arSubmitTime").text(new Date().toString());
 }

@@ -1,0 +1,59 @@
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% for channel_conn in channel_conn_list %}
+    <div class="row">
+        <div class="col mb-3 border-success rounded">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th scope="col">{% trans "Platform" %}</th>
+                        <th scope="col">{% trans "Name" %}</th>
+                        <th scope="col">{% trans "Channel ID" %}</th>
+                        <th scope="col">{% trans "Channel Token" %}</th>
+                        <th scope="col">{% trans "Controls" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="align-middle text-center h2 font-weight-normal">{{ channel_conn.channel.platform.key }}</td>
+                        <td class="align-middle text-center h3 font-weight-normal">
+                            <!--suppress HtmlFormInputWithoutLabel -->
+                            <input type="text" class="form-control channel-name"
+                                   value="{{ channel_conn.channel.name|get_val:root_oid_str }}"
+                                   data-channel="{{ channel_conn.channel.id }}">
+                        </td>
+                        <td class="align-middle text-center h4">
+                            <code>
+                                <a href="{% url "info.channel" channel_oid=channel_conn.channel.id %}">{{ channel_conn.channel.id }}</a>
+                            </code>
+                        </td>
+                        <td class="align-middle text-center h5">{{ channel_conn.channel.token }}</td>
+                        <td class="align-middle text-center h5">
+                            <a class="btn btn-outline-primary"
+                               href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">
+                                {% trans "Manage" %}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="align-middle">{% trans "Profiles" %}</th>
+                        <td colspan="4">
+                            {% for profile_data in channel_conn.profiles %}
+                                <a class="btn btn-outline-dark mr-1 mb-1"
+                                   href="{% url "info.profile" profile_oid=profile_data.id %}">
+                                <span class="sm-dot"
+                                      style="background-color: {{ profile_data.color.color_hex }}"></span>
+                                    {{ profile_data.name }}
+                                </a>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endfor %}

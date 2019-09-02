@@ -1,6 +1,7 @@
 from django.urls import path
 
-from JellyBotAPI.views.ar import AutoReplyAddView, MainPageView
+from .add import AutoReplyAddView
+from .main import MainPageView
 
 urlpatterns = [
     path('', MainPageView.as_view(), name="page.ar.main"),

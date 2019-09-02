@@ -1,10 +1,16 @@
 LOCAL_REFER = "lr"
 
 
-class _Common:
+class Common:
     CHANNEL_TOKEN = "c"
+    CHANNEL_OID = "cid"
     USER_TOKEN = "u"
+    USER_OID = "uid"
     PLATFORM = "p"
+    API_TOKEN = "api_key"
+
+    COUNT = "count"
+    KEYWORD = "w"
 
 
 class Validation:
@@ -17,21 +23,36 @@ class AutoReply:
     KEYWORD_TYPE = "kt"
     RESPONSE = "r"
     RESPONSE_TYPE = "rt"
-    CHANNEL_TOKEN = _Common.CHANNEL_TOKEN
-    CREATOR_TOKEN = _Common.USER_TOKEN
-    PLATFORM = _Common.PLATFORM
+    CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+    CREATOR_TOKEN = Common.USER_TOKEN
+    API_TOKEN = Common.API_TOKEN
+    PLATFORM = Common.PLATFORM
     PRIVATE = "pr"
     PINNED = "pin"
     COOLDOWN = "cd"
+    TAGS = "tags"
 
 
 class DataQuery:
+    COUNT = Common.COUNT
+    KEYWORD = Common.KEYWORD
+
     class Channel:
-        PLATFORM = _Common.PLATFORM
-        CHANNEL_TOKEN = _Common.CHANNEL_TOKEN
+        PLATFORM = Common.PLATFORM
+        CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+
+
+class Manage:
+    USER_OID = Common.USER_OID
+
+    class Channel:
+        CHANNEL_OID = Common.CHANNEL_OID
+        NEW_NAME = "name"
 
 
 class TokenAction:
     TOKEN = "tk"
-    PLATFORM = _Common.PLATFORM
-    USER_TOKEN = _Common.USER_TOKEN
+    PLATFORM = Common.PLATFORM
+    CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+    USER_TOKEN = Common.USER_TOKEN
+    API_TOKEN = Common.API_TOKEN

@@ -1,11 +1,11 @@
-from django.utils.translation import gettext_noop as _
+from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
 
 
 class AutoReplyContentType(FlagSingleEnum):
-    @staticmethod
-    def default():
+    @classmethod
+    def default(cls):
         return AutoReplyContentType.TEXT
     TEXT = 0, _("Text")
     IMAGE = 1, _("Image")

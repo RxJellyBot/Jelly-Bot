@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Error" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row text-center text-danger">
+            <div class="col-lg display-4">
+                {% trans "Channel Not Found" %}
+            </div>
+            <div class="col-lg align-self-center">
+                {% trans "Channel data not found with the provided channel ID." %}
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                {% url "page.about" as about_page %}
+                {% blocktrans trimmed %}
+                    Please check that:<br>
+                    <ul>
+                        <li>{{ channel_oid }} is the Channel ID, <b>NOT the channel token</b>.</li>
+                    </ul>
+                    If all the conditions match, but the error still occurs, please
+                    <a href="{{ about_page }}">contact the website developer.</a>
+                {% endblocktrans %}
+            </div>
+        </div>
+{% endblock %}

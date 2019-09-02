@@ -1,9 +1,10 @@
-pytz
+markdown2
+requests
+dnspython
+pymongo
 bson
 Django
-google-api-python-client
-pymongo
-requests
-ttldict
-dnspython
 whitenoise
+google-api-python-client
+ttldict
+pytz

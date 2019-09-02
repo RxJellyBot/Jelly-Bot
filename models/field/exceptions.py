@@ -45,6 +45,18 @@ class FieldValueInvalid(Exception):
         return self._value
 
 
+class FieldCastingFailed(Exception):
+    def __init__(self, key, value, value_type, desired_type: type, ex_message):
+        super().__init__(
+            f"Field auto-type casting failed. Key: {key}; Value ({value_type}): {value}; Desired Type: {desired_type}; "
+            f"Exception: {ex_message}")
+
+
 class MaxLengthReachedError(Exception):
     def __init__(self, max_len: int):
         super().__init__(f"Max length ({max_len}) reached.")
+
+
+class InvalidFieldInstanceClassError(Exception):
+    def __init__(self, inst_cls):
+        super().__init__(f"Invalid field instance class type. ({inst_cls})")

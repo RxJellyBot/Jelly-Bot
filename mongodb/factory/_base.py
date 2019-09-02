@@ -1,7 +1,6 @@
 import types
 from typing import Tuple, Union, Type, Optional, Iterable as TIterable
 
-from bson import ObjectId
 from bson.errors import InvalidDocument
 from django.conf import settings
 from pymongo.collation import Collation
@@ -11,10 +10,12 @@ from pymongo.errors import DuplicateKeyError
 from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
-from extutils.flags import get_codec_options
+from extutils.checker import DecoParamCaster
+from extutils.mongo import get_codec_options
+from extutils.utils import all_lower
 from models import Model
-from models.exceptions import PreserializationFailedError
-from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid
+from models.exceptions import InvalidModelError
+from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import InsertOutcome
@@ -23,56 +24,43 @@ from JellyBotAPI.SystemConfig import Database
 CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 
 
-class DecoParamChecker:
-    def __init__(self, args_index: tuple, dict_keys: tuple = None):
-        self._args_idx = args_index
-        self._dict_keys = dict_keys
-
-    def __call__(self, f):
-        def wrap_f(*args, **kwargs):
-            new_args = []
-
-            for idx, val in enumerate(args):
-                if idx in self._args_idx:
-                    new_args.append(DecoParamChecker.type_check(args[idx]))
-                else:
-                    new_args.append(args[idx])
-
-            for key, val in kwargs.items():
-                if key in self._dict_keys:
-                    kwargs[key] = DecoParamChecker.type_check(val)
-                else:
-                    kwargs[key] = val
-
-            return f(*new_args, **kwargs)
-
-        return wrap_f
-
-    @staticmethod
-    def type_check(item):
-        if isinstance(item, ObjectId):
-            return str(item)
-
-        return item
+class CacheSectionUndefinedError(Exception):
+    def __init__(self, cache_key: str):
+        super().__init__(f"Cache section undefined. ({cache_key})")
 
 
 class CacheMixin(Collection):
+    CACHE_KEY_SPEC1 = "**Special Cache Key #1**"
+    CACHE_KEY_SPEC2 = "**Special Cache Key #2**"
+    CACHE_KEY_SPEC3 = "**Special Cache Key #3**"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._auto_init = False
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
-    @DecoParamChecker((1,))
-    def init_cache(self, cache_key):
+    @property
+    def auto_init(self) -> bool:
+        return self._auto_init
+
+    @auto_init.setter
+    def auto_init(self, value: bool):
+        self._auto_init = value
+
+    @DecoParamCaster({1: str})
+    def init_cache(self, cache_key: str, check_exists=True):
         """
         Initialize a cache space if necessary.
 
         :param cache_key: The key for the cache. Act like the category of a collection of the cache.
+        :param check_exists: Flag indicating that if the existence of the cache section
+                             should be checked before initialization.
         """
-        if cache_key not in self._cache:
+        if check_exists and cache_key not in self._cache:
             self._cache[cache_key] = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
-    @DecoParamChecker((1, 2,))
-    def set_cache(self, cache_key, item_key, item, parse_cls=None):
+    @DecoParamCaster({1: str, 2: None})
+    def set_cache(self, cache_key: str, item_key, item, parse_cls=None):
         """
         Set data to the cache.
 
@@ -82,16 +70,20 @@ class CacheMixin(Collection):
         :param parse_cls: Class to parse after acquiring the data if found.
         :return: The parsed `item` if `parse_cls` is not `None`.
         """
-        self.init_cache(cache_key)
 
-        self._cache[cache_key][item_key] = CacheMixin._parse_item(item, parse_cls)
+        self._pre_check_(cache_key)
+
+        if isinstance(item, (list, tuple)):
+            self._cache[cache_key][item_key] = [CacheMixin._parse_item_(i, parse_cls) for i in item]
+        else:
+            self._cache[cache_key][item_key] = CacheMixin._parse_item_(item, parse_cls)
 
         return self._cache[cache_key][item_key]
 
-    @DecoParamChecker((1, 2,), ("item_key_from_data",))
+    @DecoParamCaster({1: str, 2: None, "item_key_from_data": None})
     def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: Tuple = None,
                   acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False,
-                  item_key_from_data=None):
+                  item_key_from_data: Union[str, Tuple, None] = None):
         """
         Get data from the cache. Data can be acquired from the database and
         inserted to the cache if `acquire_auto` is `True` and the data is not found in the cache.
@@ -105,13 +97,14 @@ class CacheMixin(Collection):
         :param parse_cls: Class to parse after acquiring the data if found.
         :param case_insensitive: Determines if the searching will be case-insensitive.
         :param item_key_from_data: If this is set, the value of this key from the data will be used as `item_key`.
+                                   Disregarded if the return type of the `acquire_func` is `Cursor`.
         """
         ret = None
 
         if acquire_func is None:
             acquire_func = self.find_one
 
-        self.init_cache(cache_key)
+        self._pre_check_(cache_key)
 
         if item_key not in self._cache[cache_key] or self._cache[cache_key][item_key] is None:
             if not acquire_auto:
@@ -123,9 +116,9 @@ class CacheMixin(Collection):
             if case_insensitive:
                 acquire_kw_args["collation"] = Collation(locale='en', strength=1)
 
-                item_key_lower = item_key.lower()
+                item_key_lower = all_lower(item_key)
                 for k, v in self._cache[cache_key].items():
-                    if item_key_lower == k.lower():
+                    if item_key_lower == all_lower(k):
                         ret = v
                         break
 
@@ -137,20 +130,34 @@ class CacheMixin(Collection):
 
                 if isinstance(data, Cursor):
                     data = list(data)
-
-                if item_key_from_data is not None:
-                    item_key = data[item_key_from_data]
+                else:
+                    if item_key_from_data is not None:
+                        if isinstance(item_key_from_data, str):
+                            item_key = data[item_key_from_data]
+                        elif isinstance(item_key_from_data, (tuple, list)):
+                            item_key = []
+                            for k in item_key_from_data:
+                                item_key.append(data[k])
+                            item_key = tuple(item_key)
+                        else:
+                            raise ValueError(
+                                f"The type of `item_key_from_data` is invalid. ({type(item_key_from_data)})")
 
                 ret = data
         else:
             ret = self._cache[cache_key][item_key]
 
+        # print(f"[INFO] Attempted to get data from the cache of `{self.__class__.__name__}`.")
+        # print(f"            Cache Key: {cache_key} / Item Key: {item_key} / Acquire Fn: {acquire_func}")
+        # print(f"            Acquire Args: {acquire_args} / Auto Acquire: {acquire_auto} / Parse Class: {parse_cls}")
+        # print(f"            Return Value: {ret}")
+
         return self.set_cache(cache_key, item_key, ret, parse_cls)
 
-    @DecoParamChecker((1,), ("item_key_from_data",))
+    @DecoParamCaster({1: None, "item_key_from_data": None})
     def get_cache_condition(self, cache_key: str, item_func: types.LambdaType, acquire_args: Tuple,
                             item_key_of_data=None, acquire_func=None, acquire_kw_args: dict = None, acquire_auto=True,
-                            parse_cls=None, case_insensitive=False):
+                            parse_cls=None, case_insensitive=False, safe_lambda=False):
         """
         Return the first matched element using the given condition.
 
@@ -167,6 +174,7 @@ class CacheMixin(Collection):
         :param acquire_auto: Determines if the data not found, will execute `acquire_func` to get the data.
         :param parse_cls: Class to parse after acquiring the data if found.
         :param case_insensitive: Determines if the searching will be case-insensitive.
+        :param safe_lambda: Determines if `Exception` should be raised if any.
 
         .. note:: `case_insensitive` only works for the database data acquiring, not for cache acquiring,
           because you defined `item_lambda`!
@@ -176,7 +184,13 @@ class CacheMixin(Collection):
 
         self.init_cache(cache_key)
 
-        ret = next((item for item in self._cache[cache_key].values() if item_func(item)), None)
+        ret = None
+
+        try:
+            ret = next((item for item in self._cache[cache_key].values() if item_func(item)), None)
+        except Exception as e:
+            if not safe_lambda:
+                raise e
 
         if ret is None:
             if not acquire_auto:
@@ -201,36 +215,46 @@ class CacheMixin(Collection):
 
         return ret
 
+    def reset_cache(self):
+        self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
+
+    def _pre_check_(self, cache_key: str):
+        if cache_key not in self._cache:
+            if self.auto_init:
+                self.init_cache(cache_key)
+            else:
+                raise CacheSectionUndefinedError(cache_key)
+
     @staticmethod
-    def _parse_item(ret, parse_cls):
+    def _parse_item_(ret, parse_cls):
         if ret is not None and parse_cls is not None and not isinstance(ret, parse_cls):
-            return parse_cls.parse(ret)
+            return parse_cls(**ret, from_db=True)
 
         return ret
 
 
 class ControlExtensionMixin(Collection):
-    def insert_one_model(self, model: Model, include_oid=False) -> (InsertOutcome, Optional[Exception]):
+    def insert_one_model(self, model: Model) -> (InsertOutcome, Optional[Exception]):
         ex = None
 
         try:
-            insert_result = self.insert_one(model.serialize(include_oid))
+            insert_result = self.insert_one(model)
             if insert_result.acknowledged:
                 model.set_oid(insert_result.inserted_id)
-                outcome = InsertOutcome.SUCCESS_INSERTED
+                outcome = InsertOutcome.O_INSERTED
             else:
-                outcome = InsertOutcome.FAILED_NOT_ACKNOWLEDGED
+                outcome = InsertOutcome.X_NOT_ACKNOWLEDGED
         except (AttributeError, InvalidDocument) as e:
-            outcome = InsertOutcome.FAILED_NOT_SERIALIZABLE
+            outcome = InsertOutcome.X_NOT_SERIALIZABLE
             ex = e
         except DuplicateKeyError as e:
-            outcome = InsertOutcome.SUCCESS_DATA_EXISTS
+            outcome = InsertOutcome.O_DATA_EXISTS
             ex = e
-        except PreserializationFailedError as e:
-            outcome = InsertOutcome.FAILED_PRE_SERIALIZE_FAILED
+        except InvalidModelError as e:
+            outcome = InsertOutcome.X_INVALID_MODEL
             ex = e
         except Exception as e:
-            outcome = InsertOutcome.FAILED_INSERT_UNKNOWN
+            outcome = InsertOutcome.X_INSERT_UNKNOWN
             ex = e
 
         return outcome, ex
@@ -244,7 +268,7 @@ class ControlExtensionMixin(Collection):
         :return: model, outcome, ex, insert_result
         """
         model = None
-        outcome: InsertOutcome = InsertOutcome.FAILED_NOT_EXECUTED
+        outcome: InsertOutcome = InsertOutcome.X_NOT_EXECUTED
         ex = None
         insert_result = None
 
@@ -252,24 +276,27 @@ class ControlExtensionMixin(Collection):
             if issubclass(model_cls, Model):
                 model = model_cls(**model_args)
             else:
-                outcome = InsertOutcome.FAILED_NOT_MODEL
+                outcome = InsertOutcome.X_NOT_MODEL
         except FieldReadOnly as e:
-            outcome = InsertOutcome.FAILED_READONLY
+            outcome = InsertOutcome.X_READONLY
             ex = e
         except FieldTypeMismatch as e:
-            outcome = InsertOutcome.FAILED_TYPE_MISMATCH
+            outcome = InsertOutcome.X_TYPE_MISMATCH
             ex = e
         except FieldValueInvalid as e:
-            outcome = InsertOutcome.FAILED_INVALID
+            outcome = InsertOutcome.X_INVALID_FIELD
+            ex = e
+        except FieldCastingFailed as e:
+            outcome = InsertOutcome.X_CAST_FAILED
             ex = e
         except Exception as e:
-            outcome = InsertOutcome.FAILED_CONSTRUCT_UNKNOWN
+            outcome = InsertOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 
         if model is not None:
             outcome, ex = self.insert_one_model(model)
 
-        if settings.DEBUG and not InsertOutcome.is_success(outcome):
+        if settings.DEBUG and not outcome.is_success:
             raise ex
 
         return model, outcome, ex, insert_result
@@ -301,16 +328,18 @@ class BaseCollection(CacheMixin, ControlExtensionMixin, Collection):
         else:
             return cls.model_class
 
-    def __init__(self, cache_keys: Union[str, TIterable[str]] = None):
-        self._db = MONGO_CLIENT.get_database(self.__class__.get_db_name())
-        super().__init__(self._db, self.__class__.get_col_name(), codec_options=get_codec_options())
-        self._data_model = self.__class__.get_model_cls()
+    def __init__(self, cache_keys: Union[str, TIterable[str]] = None, cache_auto_init=False):
+        self._db = MONGO_CLIENT.get_database(self.get_db_name())
+        super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
+        self._data_model = self.get_model_cls()
         if cache_keys is not None:
             if isinstance(cache_keys, (list, tuple, set)):
                 for k in cache_keys:
                     self.init_cache(k)
             else:
                 self.init_cache(cache_keys)
+
+        self.auto_init = cache_auto_init
 
         ModelFieldChecker.check(self)
 

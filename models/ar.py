@@ -1,111 +1,84 @@
-from typing import Tuple
-
 from bson import ObjectId
 
 from JellyBotAPI import SystemConfig
-from flags import AutoReplyContentType, PreserializationFailedReason
+from flags import AutoReplyContentType, ModelValidityCheckResult
+from models.utils import AutoReplyValidators
 
-from ._base import Model, ModelDefaultValueExtension
-from .exceptions import PreserializationFailedError
+from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
-    BooleanField, IntegerField, ArrayField, DateTimeField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
 )
-from .utils import AutoReplyValidators
 
 
 class AutoReplyContentModel(Model):
-    Content = "c"
-    ContentType = "t"
-
-    default_vals = (
-        (Content, ModelDefaultValueExtension.Required),
-        (ContentType, AutoReplyContentType.default())
-    )
-
-    def _init_fields_(self, **kwargs):
-        self.type = AutoReplyContentTypeField(AutoReplyContentModel.ContentType)
-        self.content = TextField(AutoReplyContentModel.Content, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
-                                 allow_none=False, regex=r"\w+")
+    Content = TextField(
+        "c", default=ModelDefaultValueExt.Required, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
+        allow_none=False, must_have_content=True)
+    ContentType = AutoReplyContentTypeField("t")
 
     # noinspection PyAttributeOutsideInit
-    def pre_serialize(self):
-        if self.type is None:
-            self.type = AutoReplyContentType.default()
+    def perform_validity_check(self) -> ModelValidityCheckResult:
+        if self.content_type is None:
+            self.content_type = AutoReplyContentType.default()
 
-        if self.content.is_none():
-            raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_EMPTY)
+        if self.is_field_none("Content"):
+            return ModelValidityCheckResult.X_AR_CONTENT_EMPTY
 
-        valid = AutoReplyValidators.is_valid_content(self.type.value, self.content.value)
+        valid = AutoReplyValidators.is_valid_content(self.content_type, self.content)
 
         if not valid:
-            if self.type == AutoReplyContentType.IMAGE:
-                raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_NOT_IMAGE)
-            elif self.type == AutoReplyContentType.LINE_STICKER:
-                raise PreserializationFailedError(PreserializationFailedReason.AR_CONTENT_NOT_LINE_STICKER)
+            if self.content_type == AutoReplyContentType.IMAGE:
+                return ModelValidityCheckResult.X_AR_CONTENT_NOT_IMAGE
+            elif self.content_type == AutoReplyContentType.LINE_STICKER:
+                return ModelValidityCheckResult.X_AR_CONTENT_NOT_LINE_STICKER
+
+        return ModelValidityCheckResult.O_OK
 
 
-class AutoReplyConnectionModel(Model):
-    # DRAFT: AR_CONN MOD - Exclude user function
+class AutoReplyModuleModel(Model):
+    # TODO: Auto Reply: Target User - Mixed with Exclude User
 
-    KeywordID = "k"
-    ResponsesIDs = "r"
-    CreatorUserID = "cr"
-    Pinned = "p"
-    Disabled = "d"
-    Private = "pr"
-    CoolDownSeconds = "cd"
-    CalledCount = "c"
-    LastUsed = "l"
-    ExcludeUserIDs = "e"
-    ChannelIDs = "ch"
-
-    default_vals = (
-        (KeywordID, ModelDefaultValueExtension.Required),
-        (ResponsesIDs, ModelDefaultValueExtension.Required),
-        (CreatorUserID, ModelDefaultValueExtension.Required),
-        (Pinned, False),
-        (Disabled, False),
-        (Private, False),
-        (CoolDownSeconds, 0),
-        (CalledCount, 0),
-        (LastUsed, DateTimeField.none_obj()),
-        (ExcludeUserIDs, []),
-        (ChannelIDs, []),
-    )
-
-    def _init_fields_(self, **kwargs):
-        self.keyword_oid = ObjectIDField(AutoReplyConnectionModel.KeywordID, readonly=True)
-        self.responses_oids = \
-            ArrayField(AutoReplyConnectionModel.ResponsesIDs, ObjectId, max_len=SystemConfig.AutoReply.MAX_RESPONSES)
-        self.creator_oid = ObjectIDField(AutoReplyConnectionModel.CreatorUserID, readonly=True)
-        self.pinned = BooleanField(AutoReplyConnectionModel.Pinned, readonly=True)
-        self.disabled = BooleanField(AutoReplyConnectionModel.Disabled, readonly=True)
-        self.private = BooleanField(AutoReplyConnectionModel.Private, readonly=True)
-        self.cooldown_sec = IntegerField(AutoReplyConnectionModel.CoolDownSeconds, readonly=True)
-        self.called_count = IntegerField(AutoReplyConnectionModel.CalledCount, readonly=True)
-        self.last_used = DateTimeField(AutoReplyConnectionModel.LastUsed, readonly=True, allow_none=False)
-        self.exclude_user_oids = ArrayField(AutoReplyConnectionModel.ExcludeUserIDs, ObjectId, allow_none=True)
-        self.channel_ids = ArrayField(AutoReplyConnectionModel.ChannelIDs, ObjectId, allow_none=False)
+    KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
+    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                               max_len=SystemConfig.AutoReply.MAX_RESPONSES)
+    CreatorOid = ObjectIDField("cr", readonly=True)
+    Pinned = BooleanField("p", readonly=True)
+    Disabled = BooleanField("d", readonly=True)
+    Private = BooleanField("pr", readonly=True)
+    CooldownSec = IntegerField("cd", readonly=True)
+    CalledCount = IntegerField("c", readonly=True)
+    LastUsed = DateTimeField("l", readonly=True, allow_none=False)
+    ExcludedOids = ArrayField("e", ObjectId)
+    TagIds = ArrayField("t", ObjectId)
+    ChannelIds = ArrayField("ch", ObjectId, allow_empty=False)
 
     @property
     def creation_time(self):
-        return self.id.value.generation_time
+        return self.id.generation_time
 
 
-class AutoReplyBundle(Model):
-    Name = "n"
-    TagIDs = "t"  # TODO: AR_CONN UTILS - Create model for tags
-    ConnectionIDs = "c"
+class AutoReplyModuleTokenActionModel(Model):
+    KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
+    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                               max_len=SystemConfig.AutoReply.MAX_RESPONSES)
+    CreatorOid = ObjectIDField("cr", readonly=True)
+    Pinned = BooleanField("p", readonly=True)
+    Private = BooleanField("pr", readonly=True)
+    CooldownSec = IntegerField("cd", readonly=True)
+    TagIds = ArrayField("t", ObjectId)
 
-    @property
-    def default_vals(self) -> Tuple:
-        return (
-            (AutoReplyBundle.Name, None),
-            (AutoReplyBundle.TagIDs, []),
-            (AutoReplyBundle.ConnectionIDs, None)
-        )
+    def to_actual_model(self, channel_id: ObjectId):
+        return AutoReplyModuleModel(**self.to_json(), ch=[channel_id], from_db=True)
 
-    # TODO: AR_CONN UTILS - Bundle to copy a set of auto reply connections
-    def _init_fields_(self, **kwargs):
-        pass
+
+class AutoReplyModuleTagModel(Model):
+    Name = TextField("n", must_have_content=True)
+    Color = ColorField("c")
+
+
+class AutoReplyTagPopularityDataModel(Model):
+    WeightedAvgTimeDiff = FloatField("w_avg_time_diff")
+    WeightedAppearances = FloatField("w_appearances")
+    Appearances = IntegerField("u_appearances")
+    Score = FloatField("score")

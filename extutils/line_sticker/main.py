@@ -3,7 +3,7 @@ from typing import List
 
 import requests
 
-from django.utils.translation import gettext_noop as _
+from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
 
@@ -23,7 +23,7 @@ class LineStickerManager:
         self._tmp_dir = tempfile.TemporaryFile(prefix="LineSticker")
 
     # DRAFT: Line Sticker: Download Utils not completed
-    # def _get_content(self, sticker_type, pack_id, list_ids):
+    # def _get_content_(self, sticker_type, pack_id, list_ids):
     #     """
     #     :param sticker_type: The type of the sticker
     #     :type sticker_type: LineStickerType
@@ -42,7 +42,7 @@ class LineStickerManager:
     #     """
     #     act = LineStickerManager.get_download_action(sticker_content_type)
     #     if act is None:
-    #         raise ValueError(u"Url function and file extension of specified sticker type not handled. {}".format(
+    #         raise ValueError("Url function and file extension of specified sticker type not handled. {}".format(
     #         repr(sticker_content_type)))
     #
     #     url_func, file_ext = act
@@ -92,10 +92,10 @@ class LineStickerManager:
     #         LineStickerType.STATIC
     #
     #         _start = time.time()
-    #         path_list = self._get_content(content_type_to_download, pack_id, stk_ids)
+    #         path_list = self._get_content_(content_type_to_download, pack_id, stk_ids)
     #
     #         if download_sound_if_available and sticker_metadata.is_animated_sticker:
-    #             path_list.extend(self._get_content(LineStickerType.SOUND, pack_id, stk_ids))
+    #             path_list.extend(self._get_content_(LineStickerType.SOUND, pack_id, stk_ids))
     #         time_consumed_dl = time.time() - _start
     #
     #         _start = time.time()
@@ -178,10 +178,10 @@ class LineStickerMetadata:
         return int(self._dict["packageId"])
 
     def get_title(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object("title", locale)
+        return self._get_localized_object_("title", locale)
 
     def get_author(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object("author", locale)
+        return self._get_localized_object_("author", locale)
 
     @property
     def stickers(self) -> List[int]:
@@ -199,7 +199,7 @@ class LineStickerMetadata:
     def has_se(self):
         return self._dict.get("hasSound", False)
 
-    def _get_localized_object(self, key, locale):
+    def _get_localized_object_(self, key, locale):
         localized_object = self._dict.get(key)
         if localized_object is not None:
             localized_str_ret = localized_object.get(locale)

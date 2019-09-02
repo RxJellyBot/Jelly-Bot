@@ -1,11 +1,11 @@
-from django.utils.translation import gettext_noop as _
+from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
 
 
 class Platform(FlagSingleEnum):
-    @staticmethod
-    def default():
+    @classmethod
+    def default(cls):
         return Platform.UNKNOWN
 
     UNKNOWN = 0, _("Unknown Platform")

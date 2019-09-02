@@ -14,7 +14,7 @@ class PendingRepairDataManager:
 
     def new_bulk_holder(self, col_full_name):
         col = self._db.get_collection(col_full_name)
-        col.create_index(f"{PendingRepairDataModel.Data}.{OID_KEY}", unique=True)
+        col.create_index(f"{PendingRepairDataModel.Data.key}.{OID_KEY}", unique=True)
 
         return BulkWriteDataHolder(col, Database.BulkWriteCount)
 

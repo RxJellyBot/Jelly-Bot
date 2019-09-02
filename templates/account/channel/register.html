@@ -1,0 +1,123 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Confirm Channel Membership" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card bg-success mb-3 text-white text-center align-middle">
+                    <h5 class="card-header">{% trans "Confirm on API" %}</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <p class="text-left">
+                                    <small>
+                                        {% blocktrans trimmed %}
+                                            Type any message in the channel where Jelly Bot has a pingport connected
+                                            to it, Jelly Bot will automatically confirm the user's membership in the
+                                            channel.
+                                        {% endblocktrans %}
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-info mb-3 text-white text-center align-middle">
+                    <h5 class="card-header">{% trans "Confirm on Website" %}</h5>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <p class="text-left">
+                                    <small>
+                                        {% url "account.channel.list" as list_url %}
+                                        {% blocktrans trimmed %}
+                                            Get a token from the website, then use it to complete the registration at
+                                            where Jelly Bot supports using <b>Complete Token Action</b> function.
+                                        {% endblocktrans %}
+                                        <ul class="text-left">
+                                            <li>{% trans "This token will only grants you a default permission profile." %}</li>
+                                            <li>
+                                                {% blocktrans trimmed %}
+                                                For non-default permission profile, please <a class="text-white alert-link" href="{{ list_url }}">click here</a> and create a profile if allowed.
+                                                {% endblocktrans %}
+                                            </li>
+                                            <li>{% trans "Certain permissions need channel managers to control." %}</li>
+                                        </ul>
+                                    </small>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col mr-2">
+                                <span class="bg-light rounded form-control">
+                                    <code class="h5" id="new-token"></code>
+                                </span>
+                            </div>
+                            <button class="btn btn-outline-light" type="button" id="get-token">
+                                {% trans "Get one" %}
+                            </button>
+                        </div>
+                        <div class="row d-none text-left mt-3" id="get-token-tips">
+                            <div class="col">
+                                {% blocktrans trimmed %}
+                                    Token can only be acquired once {{ register_cooldown }} seconds.
+                                {% endblocktrans %}
+                            </div>
+                        </div>
+                        <div class="row d-none text-left mt-3" id="get-token-error">
+                            <div class="col">
+                                {% blocktrans trimmed %}
+                                    An error occurred during token acquiring process.
+                                {% endblocktrans %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("button#get-token").click(function () {
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", `{% url "api.id.channel.register_token" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
+                xhr.responseType = "json";
+                xhr.onloadstart = function () {
+                    $("div#get-token-error").addClass("d-none");
+                };
+                xhr.onload = function () {
+                    $("code#new-token").text(
+                        xhr.response.{{ static_keys_result.SUCCESS }} ?
+                            xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"] :
+                            "{% trans "An error occurred." %}");
+
+                    $("button#get-token").prop("disabled", true);
+                    $("div#get-token-tips").removeClass("d-none");
+
+                    setTimeout(function () {
+                        $("button#get-token").prop("disabled", false);
+                        $("div#get-token-tips").addClass("d-none");
+                    }, parseInt({{ register_cooldown }}) * 1000);
+                };
+                xhr.onerror = function () {
+                    $("div#get-token-error").removeClass("d-none");
+                };
+                xhr.send();
+            });
+        });
+    </script>
+    <script src="{% static "js/account/register.js" %}" type="text/javascript"></script>
+{% endblock %}

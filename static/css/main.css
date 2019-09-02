@@ -3,11 +3,11 @@
 }
 
 a[id].anchor:before {
-  display: block;
-  content: " ";
-  margin-top: calc(var(--nav-height) * -1);
-  height: var(--nav-height);
-  visibility: hidden;
+    display: block;
+    content: " ";
+    margin-top: calc(var(--nav-height) * -1);
+    height: var(--nav-height);
+    visibility: hidden;
 }
 
 nav {
@@ -18,4 +18,24 @@ body {
     font-family: "Segoe UI", "Microsoft JhengHei UI", "Roboto", serif, sans-serif;
     font-size: 1rem;
     padding-top: var(--nav-height);
+}
+
+.no-line-break {
+    white-space: nowrap;
+}
+
+.sm-dot {
+    height: 0.7rem;
+    width: 0.7rem;
+    border: 0.01rem solid #BBBBBB;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot {
+    height: 1.5rem;
+    width: 1.5rem;
+    border: 0.01rem solid #BBBBBB;
+    border-radius: 50%;
+    display: inline-block;
 }

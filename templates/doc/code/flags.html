@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-light table-bordered mb-0">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "Code" %}</th>
+            <th scope="col">{% trans "Name" context "Flag Name" %}</th>
+            {% if has_key %}
+                <th scope="col">{% trans "Short Description" %}</th>
+            {% endif %}
+            {% if has_description %}
+                <th scope="col">{% trans "Long Description" %}</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for flag in flags %}
+            {% if td_color %}
+                {% if flag.is_success %}
+                    <tr class="table-success">
+                        {% else %}
+                    <tr class="table-danger">
+                {% endif %}
+            {% else %}
+                <tr>
+            {% endif %}
+        <th scope="row" class="text-center no-line-break">
+            <a id="{{ flag.code }}" class="anchor"></a>
+            <a href="#{{ flag.code }}" class="text-dark">{{ flag.code }}</a>
+        </th>
+        <td>
+            <small>
+                <a id="{{ flag.name }}" class="anchor"></a>
+                <a href="#{{ flag.name }}" class="alert-link text-dark">{{ flag.name }}</a>
+            </small>
+        </td>
+        {% if has_key %}
+            <td>{{ flag.key }}</td>
+        {% endif %}
+        {% if has_description %}
+            <td>
+                <small>{{ flag.description }}</small>
+            </td>
+        {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
