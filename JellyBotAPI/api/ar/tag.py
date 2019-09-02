@@ -2,7 +2,7 @@ from JellyBotAPI.components.mixin import CsrfExemptMixin, APIStatisticsCollectMi
 from JellyBotAPI.components.views import APIJsonResponseView
 from JellyBotAPI.api.responses import AutoReplyTagPopularityResponse
 
-from flags import APIAction
+from flags import APICommand
 
 
 class AutoReplyTagPopularityQueryView(
@@ -10,7 +10,7 @@ class AutoReplyTagPopularityQueryView(
     get_response_class = AutoReplyTagPopularityResponse
 
     def get_api_action(self):
-        return APIAction.AR_TAG_POP
+        return APICommand.AR_TAG_POP
 
     def mandatory_keys(self) -> set:
         return set()

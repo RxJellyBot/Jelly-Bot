@@ -1,6 +1,6 @@
 from JellyBotAPI.SystemConfig import ChannelConfig
 from models.field import (
-    PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField
+    PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField, DictionaryField
 )
 
 
@@ -17,14 +17,16 @@ class ChannelConfigModel(Model):
     VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
     EnableAutoReply = BooleanField("e-ar", default=True)
     EnableCreateProfile = BooleanField("e-crp", default=True)
+    InfoPrivate = BooleanField("prv", default=False)
     DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
 
 
 class ChannelModel(Model):
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
+    Name = DictionaryField("n", default=ModelDefaultValueExt.Required)
     Config = ModelField("c", ChannelConfigModel)
 
 
-class ChannelRegisterExistenceModel(Model):
+class ChannelRegisterMembershipModel(Model):
     RootOid = ObjectIDField("u")

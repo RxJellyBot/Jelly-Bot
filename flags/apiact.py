@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagSingleEnum
 
 
-class APIAction(FlagSingleEnum):
+class APICommand(FlagSingleEnum):
     """
     1xx - Auto Reply:
         10x - Main Functions:
@@ -28,11 +28,11 @@ class APIAction(FlagSingleEnum):
     4xx - Management
         40x - Channel
             401: Issue Channel Registration Token
-            402: Complete Channel Registration
+            403: Change Channel Name
     """
     @classmethod
     def default(cls):
-        return APIAction.UNKNOWN
+        return APICommand.UNKNOWN
 
     UNKNOWN = -1, _("Unknown Action")
 
@@ -47,3 +47,4 @@ class APIAction(FlagSingleEnum):
     DATA_CHANNEL = 301, _("Data Query - Channel")
 
     MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Token")
+    MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")

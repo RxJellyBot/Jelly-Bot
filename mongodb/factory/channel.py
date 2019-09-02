@@ -1,11 +1,16 @@
 from typing import Optional
 
 from bson import ObjectId
+from pymongo import ReturnDocument
 
 from extutils.checker import DecoParamCaster
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, OID_KEY
-from mongodb.factory.results import InsertOutcome, GetOutcome, ChannelRegistrationResult, ChannelGetResult
+from mongodb.factory.results import (
+    InsertOutcome, GetOutcome, OperationOutcome,
+    ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
+)
+
 from ._base import BaseCollection
 
 DB_NAME = "channel"
@@ -21,10 +26,10 @@ class ChannelManager(BaseCollection):
         self.create_index([(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)],
                           name="Channel Identity", unique=True)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def register(self, platform: Platform, token: str) -> ChannelRegistrationResult:
+    @DecoParamCaster({1: Platform, 2: str, 3: str})
+    def register(self, platform: Platform, token: str, name: Optional[str] = "") -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelModel, Platform=platform, Token=token, Config=ChannelConfigModel.generate_default())
+            ChannelModel, Platform=platform, Token=token, Name=name, Config=ChannelConfigModel.generate_default())
 
         if InsertOutcome.is_inserted(outcome):
             self.set_cache(self.CACHE_KEY_SPEC1, (platform, token), entry)
@@ -32,6 +37,29 @@ class ChannelManager(BaseCollection):
             entry = self.get_channel_token(platform, token)
 
         return ChannelRegistrationResult(outcome, entry, ex)
+
+    @DecoParamCaster({1: ObjectId, 2: ObjectId, 3: str})
+    def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+        ex = None
+        ret = self.find_one_and_update(
+            {ChannelModel.Id.key: channel_oid},
+            {"$set": {f"{ChannelModel.Name.key}.{root_oid}": new_name}},
+            return_document=ReturnDocument.AFTER)
+
+        try:
+            if ret:
+                outcome = OperationOutcome.O_COMPLETED
+                self.set_cache(
+                    self.CACHE_KEY_SPEC1,
+                    (ret[ChannelModel.Platform.key], ret[ChannelModel.Token.key]),
+                    ret, parse_cls=ChannelModel)
+            else:
+                outcome = OperationOutcome.X_CHANNEL_NOT_FOUND
+        except Exception as e:
+            outcome = OperationOutcome.X_ERROR
+            ex = e
+
+        return ChannelChangeNameResult(outcome, ret, ex)
 
     @DecoParamCaster({1: Platform, 2: str})
     def get_channel_token(self, platform: Platform, token: str) -> Optional[ChannelModel]:

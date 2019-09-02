@@ -9,7 +9,7 @@ from .ar import (
     AutoReplyContentAddResult, AutoReplyModuleAddResult,
     AutoReplyContentGetResult, AutoReplyModuleTagGetResult
 )
-from .channel import ChannelRegistrationResult, ChannelGetResult
+from .channel import ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
 from .statistics import RecordAPIStatisticsResult
 from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult

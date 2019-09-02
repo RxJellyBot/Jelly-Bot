@@ -11,11 +11,27 @@ class Color:
             raise ValueError(f"Invalid `color_sum`. Should be 0~16777215. ({color_sum})")
 
     @property
-    def color_int(self):
+    def color_int(self) -> int:
         return self._col_code
 
+    @property
+    def r(self) -> int:
+        return self.color_int // 65536
+
+    @property
+    def g(self) -> int:
+        return (self.color_int // 256) % 256
+
+    @property
+    def b(self) -> int:
+        return self.color_int % 256
+
+    @property
+    def color_hex(self) -> str:
+        return f"#{self.color_int // 65536:02x}{(self.color_int // 256) % 256:02x}{self.color_int % 256:02x}"
+
     def __repr__(self):
-        return f"Color: #{self.color_int // 65536:02x}{(self.color_int // 256) % 256:02x}{self.color_int % 256:02x}"
+        return f"Color: {self.color_hex}"
 
     def __eq__(self, other):
         if isinstance(other, Color):

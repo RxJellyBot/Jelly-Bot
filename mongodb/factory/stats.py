@@ -2,7 +2,7 @@ from datetime import datetime
 
 from bson import ObjectId
 
-from flags import APIAction
+from flags import APICommand
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel
 from JellyBotAPI.SystemConfig import Database
@@ -22,7 +22,7 @@ class APIStatisticsManager(BaseCollection):
         self.create_index(APIStatisticModel.Timestamp.key,
                           expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 
-    def record_stats(self, api_action: APIAction, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
+    def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
                      org_param: dict, path_info: str, path_info_full: str):
         entry, outcome, ex, insert_result = self.insert_one_data(
             APIStatisticModel,

@@ -1,1 +1,1 @@
-from .channel import ChannelDataQueryView, ChannelIssueRegistrationTokenView
+from .channel import ChannelDataQueryView, ChannelIssueRegistrationTokenView, ChannelNameChangeView

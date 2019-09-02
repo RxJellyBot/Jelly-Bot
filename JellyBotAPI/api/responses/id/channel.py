@@ -1,10 +1,11 @@
 from JellyBotAPI.api.responses import BaseApiResponse
+from JellyBotAPI.api.static import param
 from JellyBotAPI.api.responses.mixin import (
     HandleChannelMixin, HandlePlatformMixin, RequireSenderMixin,
     SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
 )
 from flags import TokenAction
-from models import ChannelRegisterExistenceModel
+from models import ChannelRegisterMembershipModel
 from mongodb.factory import ChannelManager, TokenActionManager
 
 
@@ -40,4 +41,27 @@ class ChannelIssueRegisterTokenResponse(
     def process_ifnoerror(self):
         self._result = TokenActionManager.enqueue_action(
             self._sender_oid, TokenAction.CONNECT_CHANNEL,
-            ChannelRegisterExistenceModel, RootOid=self._sender_oid)
+            ChannelRegisterMembershipModel, RootOid=self._sender_oid)
+
+
+class ChannelNameChangeResponse(
+        RequireSenderMixin, SerializeErrorMixin, SerializeResultOnSuccessMixin, BaseApiResponse):
+
+    def __init__(self, param_dict, creator_oid):
+        super().__init__(param_dict, creator_oid)
+
+        self._param_dict.update(**{
+            param.Manage.USER_OID: creator_oid,
+            param.Manage.Channel.CHANNEL_OID: param_dict.get(param.Manage.Channel.CHANNEL_OID),
+            param.Manage.Channel.NEW_NAME: param_dict.get(param.Manage.Channel.NEW_NAME)
+        })
+
+        self._root_oid = creator_oid
+        self._channel_oid = self._param_dict[param.Manage.Channel.CHANNEL_OID]
+        self._new_name = self._param_dict[param.Manage.Channel.NEW_NAME]
+
+    def pre_process(self):
+        super().pre_process()
+
+    def process_ifnoerror(self):
+        self._result = ChannelManager.change_channel_name(self._channel_oid, self._root_oid, self._new_name)

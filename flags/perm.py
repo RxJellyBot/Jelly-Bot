@@ -53,7 +53,7 @@ class PermissionCategory(FlagPrefixedDoubleEnum):
         _("User who has this permission can change the availability of voting to promote members.")
 
     CNL_ADJUST_PRIVACY = \
-        302, _("Channel: Info Privacy"), \
+        303, _("Channel: Info Privacy"), \
         _("User who has this permission can change the privacy of the channel info.")
 
 

@@ -1,17 +1,20 @@
-import json
+import os
 
-import math
-from django.test import Client
-from django.urls import reverse
+import pymongo
+from pymongo import InsertOne
 
 from extutils import exec_timing_ns
 
-d = {i: None for i in range(500000)}
+MONGO_CLIENT = pymongo.MongoClient(os.environ.get("MONGO_URL"))
+col = MONGO_CLIENT.get_database("pdrp").get_collection("channel.dict")
+col2 = MONGO_CLIENT.get_database("channel").get_collection("dict")
 
 
 @exec_timing_ns
 def wrap():
-    pass
+    col.update_many({}, {"$set": {"d.n": {}}})
+    ops = [InsertOne(d_parent["d"]) for d_parent in col.find()]
+    col2.bulk_write(ops, ordered=False)
 
 
 @exec_timing_ns

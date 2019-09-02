@@ -60,8 +60,8 @@ class UserProfileManager(BaseCollection):
 
     # INCOMPLETE: user_detach_profile and delete
 
-    def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) -> Optional[
-        ChannelProfileConnectionModel]:
+    def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
+            -> Optional[ChannelProfileConnectionModel]:
         """
         Get the `ChannelProfileConnectionModel` of the specified user in the specified channel.
 
@@ -126,7 +126,7 @@ class ProfileDataManager(BaseCollection):
             create_result.model, ex)
 
     def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
-        default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default User"))
+        default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_success:
             self.set_cache(OID_KEY, default_profile.id, default_profile, parse_cls=ChannelProfileModel)

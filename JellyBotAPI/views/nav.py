@@ -24,6 +24,8 @@ def construct_nav(request, nav_param):
     about_item = nav_items_factory(
         NavEntry, current_path, label=_("About"), link=reverse("page.about"), parent=home_item)
 
+    # ----------------------------
+
     # Collect items to Nav Bar
     nav.add_item(home_item)
 
@@ -33,6 +35,7 @@ def construct_nav(request, nav_param):
         nav.add_item(login_item)
 
     nav.add_item(_construct_auto_reply_(current_path, home_item))
+    nav.add_item(_construct_info_(current_path, home_item, nav_param))
     nav.add_item(_construct_docs_(current_path, home_item))
     nav.add_item(about_item)
 
@@ -56,15 +59,8 @@ def _construct_my_account_(current_path, parent, nav_param):
         link=reverse("account.channel.list"), parent=my_account_parent))
     try:
         my_account_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_(f"Channel Management"),
+            NavDummy, current_path, label=_("Channel Management"),
             link=reverse("account.channel.manage", kwargs=nav_param), parent=my_account_parent))
-    except NoReverseMatch:
-        pass
-
-    try:
-        my_account_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_(f"Profile Info"),
-            link=reverse("account.profile", kwargs=nav_param), parent=my_account_parent))
     except NoReverseMatch:
         pass
 
@@ -88,6 +84,31 @@ def _construct_auto_reply_(current_path, parent):
     return auto_reply_parent
 
 
+def _construct_info_(current_path, parent, nav_param):
+    info_parent = nav_items_factory(
+        NavDropdown, current_path, label=_("Info"), parent=parent)
+
+    info_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Channel"), link=reverse("info.channel.search"), parent=info_parent))
+
+    # Dummy Items
+    try:
+        info_parent.add_item(nav_items_factory(
+            NavDummy, current_path, label=_("Channel"),
+            link=reverse("info.channel", kwargs=nav_param), parent=info_parent))
+    except NoReverseMatch:
+        pass
+
+    try:
+        info_parent.add_item(nav_items_factory(
+            NavDummy, current_path, label=_("Profile Info"),
+            link=reverse("info.profile", kwargs=nav_param), parent=info_parent))
+    except NoReverseMatch:
+        pass
+
+    return info_parent
+
+
 def _construct_docs_(current_path, parent):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
@@ -108,7 +129,7 @@ def _construct_docs_(current_path, parent):
     docs_parent.add_item(nav_items_factory(
         NavHeader, label=_("Action Code"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("API Action"), link=reverse("page.doc.code.api"), parent=docs_parent))
+        NavEntry, current_path, label=_("API Command"), link=reverse("page.doc.code.api"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Token Action"), link=reverse("page.doc.code.token"), parent=docs_parent))
 

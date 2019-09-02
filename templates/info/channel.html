@@ -1,0 +1,43 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Info" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Basic Information" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto mb-3">
+                                    <code>{{ channel_data.id }}</code>
+                                </div>
+                                {% if manageable %}
+                                    <div class="col-lg-auto">
+                                        <a class="btn btn-outline-primary"
+                                           href="{% url "account.channel.manage" channel_oid=channel_data.id %}">
+                                            {% trans "Manage" %}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

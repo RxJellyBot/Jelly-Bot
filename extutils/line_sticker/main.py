@@ -42,7 +42,7 @@ class LineStickerManager:
     #     """
     #     act = LineStickerManager.get_download_action(sticker_content_type)
     #     if act is None:
-    #         raise ValueError(u"Url function and file extension of specified sticker type not handled. {}".format(
+    #         raise ValueError("Url function and file extension of specified sticker type not handled. {}".format(
     #         repr(sticker_content_type)))
     #
     #     url_func, file_ext = act

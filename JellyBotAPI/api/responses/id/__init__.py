@@ -1,1 +1,1 @@
-from .channel import ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse
+from .channel import ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse, ChannelNameChangeResponse
