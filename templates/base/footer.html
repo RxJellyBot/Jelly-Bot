@@ -3,5 +3,17 @@
 <hr>
 <footer class="container" style="font-size: small">
     <!-- DRAFT: Website Footer - Change when BETA test. -->
-    <p>{% trans "Created by RaenonX on May 18, 2019. Currently in alpha test." %}</p>
+    <div class="row">
+        <div class="col">
+            {% trans "Created by RaenonX on May 18, 2019. Currently in alpha test." %}
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md">
+            <a href="http://bot-stage.raenonx.cc" target="_blank">Beta</a> updated at {{ beta_update }}
+        </div>
+        <div class="col-md">
+            <a href="http://bot.raenonx.cc" target="_blank">Stable</a> updated at {{ stable_update }}
+        </div>
+    </div>
 </footer>

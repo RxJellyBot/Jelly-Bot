@@ -8,3 +8,4 @@ whitenoise
 google-api-python-client
 ttldict
 pytz
+heroku3
