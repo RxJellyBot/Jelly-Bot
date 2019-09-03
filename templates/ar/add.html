@@ -1,6 +1,7 @@
 {% extends "base/base.html" %}
 {% load i18n %}
 {% load static %}
+{% load utils %}
 
 <!-- INCOMPLETE: When CD > 20 sec, no force webpage over a lot of lines -->
 
@@ -85,8 +86,7 @@
                                 <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
                                 <p class="card-text">
                                     {% blocktrans trimmed %}
-                                        <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits of
-                                            number</b>.
+                                        <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits number</b>.
                                         </small>
                                     {% endblocktrans %}
                                 </p>
@@ -146,7 +146,8 @@
                                                 {% trans "Popular Tags" %} -
                                                 <small>{% trans "Click on the tag to select." %}</small>
                                             </div>
-                                            <div class="d-none" id="arTagPopMsg">{% trans "No tags have been created. Try to create a new one!" %}</div>
+                                            <div class="d-none"
+                                                 id="arTagPopMsg">{% trans "No tags have been created. Try to create a new one!" %}</div>
                                             <div id="arTagPop">
                                             </div>
                                         </div>
@@ -160,9 +161,15 @@
                                                 <small>
                                                     {% blocktrans trimmed %}
                                                         <ul>
-                                                            <li>Searching keyword can be a <a href="https://regexr.com/">Regular Expression</a>.</li>
-                                                            <li>If the desired result is not found, try to narrow down the keyword.</li>
-                                                            <li>If the tag is not found, a newly created tag will be one of the searching result.</li>
+                                                            <li>Searching keyword can be a <a
+                                                                    href="https://regexr.com/">Regular Expression</a>.
+                                                            </li>
+                                                            <li>If the desired result is not found, try to narrow down
+                                                                the keyword.
+                                                            </li>
+                                                            <li>If the tag is not found, a newly created tag will be one
+                                                                of the searching result.
+                                                            </li>
                                                         </ul>
                                                     {% endblocktrans %}
                                                 </small>
@@ -170,7 +177,8 @@
                                             <div class="input-group mb-3">
                                                 <input type="text" class="form-control" placeholder="Search Keyword"
                                                        aria-label="{% trans "Tag Keyword" %}" id="arTagKeyword">
-                                                <div class="input-group-append tooltip-hide" id="tagSearchErr" data-toggle="tooltip" data-placement="top"
+                                                <div class="input-group-append tooltip-hide" id="tagSearchErr"
+                                                     data-toggle="tooltip" data-placement="top"
                                                      title="{% blocktrans trimmed %}Make sure that the Tag searching keyword does NOT contains '{{ tag_splittor }}' and NOT empty.{% endblocktrans %}">
                                                     <button type="button" class="btn btn-success" id="arTagSearch">
                                                         {% trans "Search" %}
@@ -255,8 +263,12 @@
                                 <div class="mb-3" data-toggle="tooltip" data-placement="top"
                                      title="{% trans "Search corresponding keyword on-site to get more information." %}">
                                     <div class="btn-group btn-group-toggle col" data-toggle="buttons">
-                                        <label class="btn btn-warning active arRegister" id="arToken">
+                                        <label class="btn btn-warning active arRegister" id="arMember">
                                             <input type="radio" autocomplete="off" checked>
+                                            {% trans "Channel Member" %}
+                                        </label>
+                                        <label class="btn btn-warning arRegister" id="arToken">
+                                            <input type="radio" autocomplete="off">
                                             {% trans "Get a token" %}
                                         </label>
                                         <label class="btn btn-warning arRegister" id="arChannel">
@@ -266,7 +278,89 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-3" data-btn-id="arToken">
+                                <div class="mb-3" data-btn-id="arMember">
+                                    <div class="w-100 card card-body btn btn-outline-warning active">
+                                        <h5 class="card-title">{% trans "Channel Member" %}</h5>
+                                        <p class="card-text">
+                                            <small>{% trans "Select the channel you are already in to register the module." %}</small>
+                                            <br>
+                                            <small>
+                                                {% url "account.channel.connect" as connect_url %}
+                                                {% blocktrans %}
+                                                    Check <a href="{{ connect_url }}" target="_blank">this page</a> to
+                                                    know how to get the channel's membership.
+                                                {% endblocktrans %}
+                                            </small>
+                                        </p>
+                                        <div class="form-group row">
+                                            <div class="col">
+                                                <select id="arPlatform" class="form-control">
+                                                    <option value="default">{% trans "Select a channel" %}</option>
+                                                    {% for user_ch_entry in user_ch_list %}
+                                                        {% with user_ch_entry.channel as channel_data %}
+                                                            {% with channel_data.name|get_val:root_uid_str as channel_name %}
+                                                                <option data-cname="{{ channel_name }}"
+                                                                        data-ctoken="{{ channel_data.token }}"
+                                                                        data-cplat="{{ channel_data.platform.key }}"
+                                                                        data-cid="{{ channel_data.id }}">
+                                                                    {% trans "ID: " %}{{ channel_data.id }}
+                                                                    {% if channel_name %}
+                                                                        &nbsp;-&nbsp;{{ channel_name }}
+                                                                    {% endif %}</option>
+                                                            {% endwith %}
+                                                        {% endwith %}
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-7">
+                                                <small>{% trans "Name" %}</small>
+                                            </div>
+                                            <div class="col-5">
+                                                <small>{% trans "Platform" %}</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-7">
+                                                <span id="channelName">-</span>
+                                            </div>
+                                            <div class="col-5">
+                                                <span id="channelPlatform"
+                                                      data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">-</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <small>{% trans "Channel Token" %}</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <code class="h6" id="channelToken"
+                                                      data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">-</code>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <small>{% trans "Channel ID" %}</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <code class="h6" id="channelId">-</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 d-none" data-btn-id="arToken">
                                     <div class="w-100 card card-body btn btn-outline-warning active">
                                         <h5 class="card-title">{% trans "Token" %}</h5>
                                         <p class="card-text">
@@ -336,7 +430,8 @@
                                 id="arCode">-</code></a></h5>
                     </div>
                     <div class="col d-inline">
-                        <button type="button" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
+                        <button type="button" class="btn btn-outline-dark arSubmit"
+                                disabled>{% trans "Submit" %}</button>
                     </div>
                 </div>
                 <div class="m-3 text-right">
@@ -355,7 +450,7 @@
             if (channel === "") {
                 fnOnLoad(false);
             } else {
-                let url =`{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
+                let url = `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
                 let xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
@@ -385,6 +480,11 @@
                 $("input#arChannelID, select#arPlatform option:selected").each(function () {
                     param.append($(this).data("postkey"), $(this).val());
                 });
+            } else if (regId === "arMember") {
+                // Attach CHANNEL_TOKEN, PLATFORM
+                $("span#channelPlatform, code#channelToken").each(function () {
+                    param.append($(this).data("postkey"), $(this).val());
+                });
             }
 
             // Attach PRIVATE, PIN, COOLDOWN
@@ -406,7 +506,7 @@
 
         function submitData(onLoadCallback) {
             let url;
-            if (regId === "arChannel") {
+            if (regId === "arChannel" || regId === "arMember") {
                 url = "{% url "api.ar.add" %}";
             } else if (regId === "arToken") {
                 url = "{% url "api.ar.add_token" %}"
@@ -459,7 +559,8 @@
         }
 
         function getTagsByPopularity(onFound, onNotFound) {
-            searchTagsByPopularity("", onFound, onNotFound, function() {});
+            searchTagsByPopularity("", onFound, onNotFound, function () {
+            });
         }
 
         function searchTagsByPopularity(word, onFound, onNotFound, onResult) {

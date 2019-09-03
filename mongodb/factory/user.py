@@ -241,6 +241,7 @@ class RootUserManager(BaseCollection):
     def get_onplat_data(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
         return self._mgr_onplat.get_onplat(platform, user_token)
 
+    @DecoParamCaster({1: ObjectId})
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -248,6 +249,7 @@ class RootUserManager(BaseCollection):
         else:
             return LocaleInfo.get_tzinfo(u_data.config.locale)
 
+    @DecoParamCaster({1: ObjectId})
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_cache(OID_KEY, root_oid, parse_cls=RootUserModel)
         if u_data is None:
@@ -255,10 +257,11 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config
 
+    @DecoParamCaster({1: ObjectId})
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:
         upd_data = self.set_cache(
             OID_KEY,
-            str(root_oid),
+            root_oid,
             self.find_one_and_update(
                 {OID_KEY: root_oid},
                 {"$set": {

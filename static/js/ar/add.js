@@ -22,7 +22,7 @@ function initLayout() {
 }
 
 let responseCount = 1;
-let regId = "arToken";
+let regId = "arMember";
 
 function initEvents() {
     initProperties();
@@ -40,8 +40,10 @@ function regPanelSwitch() {
 function regSubmitBtnControl() {
     if (regId === "arChannel") {
         validateChannelInfo();
-    } else {
+    } else if (regId === "arToken") {
         submitBtnDisable(false);
+    } else if (regId === "arMember") {
+        submitBtnDisable(true);
     }
 }
 
@@ -103,6 +105,7 @@ function initTextAreas() {
             } else {
                 progBar.removeClass("bg-danger");
             }
+
             submitBtnDisable(percentage > 100);
         });
 
@@ -139,7 +142,26 @@ function initRegSelection() {
     });
     $("button#arChannelCheck").click(function () {
         validateChannelInfo();
-    })
+    });
+    $("select#arPlatform").change(function () {
+        onChannelMemberSelected($(this).children("option:selected"));
+    });
+}
+
+function onChannelMemberSelected(option) {
+    if (option.val() === "default") {
+        $("span#channelName").text("-");
+        $("span#channelPlatform").text("-");
+        $("code#channelToken").text("-");
+        $("code#channelId").text("-");
+    } else {
+        $("span#channelName").text(option.data("cname"));
+        $("span#channelPlatform").text(option.data("cplat"));
+        $("code#channelToken").text(option.data("ctoken"));
+        $("code#channelId").text(option.data("cid"));
+    }
+
+    submitBtnDisable(option.val() === "default");
 }
 
 function formSubmitHandle() {
@@ -163,7 +185,7 @@ function formSubmitHandle() {
             showInputFailed(true);
             submitBtnDisable(false);
         } else {
-            if (regId === "arToken" || regId === "arChannel") {
+            if (regId === "arToken" || regId === "arChannel" || regId === "arMember") {
                 submitData(onSubmitCallback);
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
