@@ -2,7 +2,7 @@ import os, sys
 import heroku3
 
 
-class Heroku3Wrapper:
+class HerokuWrapper:
     def __init__(self):
         token = os.environ.get("HEROKU_API_TOKEN")
         if token:
@@ -11,6 +11,8 @@ class Heroku3Wrapper:
             print("Specify HEROKU_API_TOKEN in environment variables.")
             sys.exit(1)
 
+        self._cache_release_list = {}
+
     def apps(self):
         return self._core.apps()
 
@@ -18,12 +20,17 @@ class Heroku3Wrapper:
         return self.apps().get(app_name)
 
     def release_list(self, app_name, **kwargs):
-        app = self.get_app(app_name)
+        if app_name not in self._cache_release_list:
+            app = self.get_app(app_name)
 
-        if app:
-            return app.releases(**kwargs)
+            if app:
+                ret = app.releases(**kwargs)
+                self._cache_release_list[app_name] = ret
+                return ret
+            else:
+                return []
         else:
-            return []
+            return self._cache_release_list[app_name]
 
     def latest_succeeded_release(self, app_name, **kwargs):
         """
@@ -42,4 +49,4 @@ class Heroku3Wrapper:
         return self._core.ratelimit_remaining()
 
 
-_inst = Heroku3Wrapper()
+_inst = HerokuWrapper()
