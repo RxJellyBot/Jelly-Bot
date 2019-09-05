@@ -38,7 +38,6 @@ def render_template(request, title, template_name, context=None, content_type=No
         HerokuWrapper.latest_succeeded_release("jellybotapi").updated_at).strftime("%m/%d %H:%M (UTC%z)")
 
     # Append backend vars
-    # FIXME: Permission - Construct an array and import here for unlocking elements
     unlock_classes = []
 
     if get_root_oid(request):

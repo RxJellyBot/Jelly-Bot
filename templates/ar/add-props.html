@@ -1,0 +1,131 @@
+{% load i18n %}
+
+<div class="card border-success mb-3">
+    <div class="card-header text-center">{% trans "Properties" %}</div>
+    <div class="card-body text-success">
+        <div class="mb-3" data-toggle="tooltip" data-placement="top"
+             title="{% trans "You must have the access pinned module permission in the channel to configure this." %}">
+            <div class="w-100 card card-body btn btn-outline-success border-success btn-div disabled"
+                 data-input="arPinned">
+                <input type="hidden" value="0" id="arPinned" name="arPinned"
+                       data-postkey="{{ static_keys_param.AutoReply.PINNED }}"/>
+                <h5 class="card-title">{% trans "Pinned" %}</h5>
+                <p class="card-text">
+                    <small>{% trans "If the module is pinned, it can only be overwritten by another pinned module." %}</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="w-100 card card-body btn btn-outline-success border-success btn-div"
+                 data-input="arPrivate">
+                <input type="hidden" value="0" id="arPrivate" name="arPrivate"
+                       data-postkey="{{ static_keys_param.AutoReply.PRIVATE }}"/>
+                <h5 class="card-title">{% trans "Private" %}</h5>
+                <p class="card-text">
+                    <small>{% trans "The module can only be used and searched within its channel." %}</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="w-100 card card-body border-success">
+                <h5 class="card-title text-center">{% trans "Tags" %}</h5>
+
+                <p class="card-text">
+                    <small>{% trans "Tag can be used to categorize auto-reply modules. Mostly bringing convenience to copy modules to the other channel." %}</small>
+                </p>
+
+                <div class="mb-3">
+                    <div class="mb-2">
+                        <b>{% trans "Selected Tags" %}</b> -
+                        <small>{% trans "Click on the unwanted tag to remove." %}</small>
+                    </div>
+                    <div id="arTagSelectMsg">{% trans "No tags have been selected." %}</div>
+                    <div id="arTagSelected"></div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <div class="mb-2">
+                        {% trans "Popular Tags" %} -
+                        <small>{% trans "Click on the tag to select." %}</small>
+                    </div>
+                    <div class="d-none"
+                         id="arTagPopMsg">{% trans "No tags have been created. Try to create a new one!" %}</div>
+                    <div id="arTagPop">
+                    </div>
+                </div>
+                <hr>
+                <div class="mb-3">
+                    <div class="mb-2">
+                        {% trans "Search Tags" %} -
+                        <small>{% trans "Click on the tag to add." %}</small>
+                    </div>
+                    <p>
+                        <small>
+                            {% blocktrans trimmed %}
+                                <ul>
+                                    <li>Searching keyword can be a <a
+                                            href="https://regexr.com/">Regular Expression</a>.
+                                    </li>
+                                    <li>If the desired result is not found, try to narrow down
+                                        the keyword.
+                                    </li>
+                                    <li>If the tag is not found, a newly created tag will be one
+                                        of the searching result.
+                                    </li>
+                                </ul>
+                            {% endblocktrans %}
+                        </small>
+                    </p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Search Keyword"
+                               aria-label="{% trans "Tag Keyword" %}" id="arTagKeyword">
+                        <div class="input-group-append tooltip-hide" id="tagSearchErr"
+                             data-toggle="tooltip" data-placement="top"
+                             title="{% blocktrans trimmed %}Make sure that the Tag searching keyword does NOT contains '{{ tag_splittor }}' and NOT empty.{% endblocktrans %}">
+                            <button type="button" class="btn btn-success" id="arTagSearch">
+                                {% trans "Search" %}
+                            </button>
+                        </div>
+                    </div>
+                    <div id="arTagSearchResult">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="w-100 card card-body border-success text-center">
+                <h5 class="card-title">{% trans "Cooldown" %}</h5>
+                <div class="card-text">
+                    <div class="row">
+                        <div class="col-6">
+                            <small>
+                                {% blocktrans trimmed %}
+                                    Time duration for the module to be called again.<br>0 sec
+                                    means
+                                    no cool down.
+                                {% endblocktrans %}
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <input type="number"
+                                       class="form-control border-success" id="arCoolDown"
+                                       value="0" name="arCoolDown"
+                                       data-postkey="{{ static_keys_param.AutoReply.COOLDOWN }}"
+                                       aria-label="{% trans "Cooldown" %}"
+                                       aria-describedby="{% trans "Cooldown" %}" required>
+                                <div class="input-group-append">
+                                                        <span class="input-group-text"
+                                                              id="unit">{% trans "Seconds" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

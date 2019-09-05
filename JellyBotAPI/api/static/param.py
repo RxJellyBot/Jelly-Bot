@@ -36,10 +36,12 @@ class AutoReply:
 class DataQuery:
     COUNT = Common.COUNT
     KEYWORD = Common.KEYWORD
+    USER_OID = Common.USER_OID
 
     class Channel:
         PLATFORM = Common.PLATFORM
         CHANNEL_TOKEN = Common.CHANNEL_TOKEN
+        CHANNEL_OID = Common.CHANNEL_OID
 
 
 class Manage:

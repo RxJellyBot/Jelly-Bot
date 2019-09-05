@@ -22,10 +22,10 @@ class BaseApiResponse(abc.ABC):
         self._result = None
 
     def is_success(self) -> bool:
-        return len(self._err) == 0 and self.success_conditions()
+        return len(self._err) == 0 and self.pass_condition()
 
     @abc.abstractmethod
-    def success_conditions(self) -> bool:
+    def pass_condition(self) -> bool:
         return True
 
     # noinspection PyMethodMayBeStatic
@@ -37,13 +37,13 @@ class BaseApiResponse(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def process_ifnoerror(self):
+    def process_pass(self):
         pass
 
     def to_dict(self) -> dict:
         self.pre_process()
         if len(self._err) == 0:
-            self.process_ifnoerror()
+            self.process_pass()
 
         d = self._serialize_()
         is_success = self.is_success()

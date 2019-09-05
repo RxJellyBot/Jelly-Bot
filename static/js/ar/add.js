@@ -109,7 +109,7 @@ function initTextAreas() {
             submitBtnDisable(percentage > 100);
         });
 
-        txtArea.on("keyup change blur", function () {
+        txtArea.on("blur", function () {
             validateTextArea(parent, txtArea);
         });
 
@@ -143,7 +143,7 @@ function initRegSelection() {
     $("button#arChannelCheck").click(function () {
         validateChannelInfo();
     });
-    $("select#arPlatform").change(function () {
+    $("select#arChannel").change(function () {
         onChannelMemberSelected($(this).children("option:selected"));
     });
 }
@@ -152,13 +152,17 @@ function onChannelMemberSelected(option) {
     if (option.val() === "default") {
         $("span#channelName").text("-");
         $("span#channelPlatform").text("-");
+        $("input#channelPlatCode").val("");
         $("code#channelToken").text("-");
         $("code#channelId").text("-");
+        enablePinnedModuleAccess(false);
     } else {
         $("span#channelName").text(option.data("cname"));
         $("span#channelPlatform").text(option.data("cplat"));
+        $("input#channelPlatCode").val(option.data("cplatcode"));
         $("code#channelToken").text(option.data("ctoken"));
         $("code#channelId").text(option.data("cid"));
+        checkAccessPinnedPermission(option.data("cid"));
     }
 
     submitBtnDisable(option.val() === "default");
@@ -201,6 +205,10 @@ function validateForm() {
     updateLastSubmissionTime();
 
     let ret = true;
+
+    $("div.txtarea-count").each(function () {
+        validateTextArea($(this), $(this).find("textarea"));
+    });
 
     // Validate content lengths
     $("div.content-check:not(.d-none)").each(function () {
@@ -251,6 +259,11 @@ function onSubmitCallback(response) {
         showSubmissionFailed(true);
     }
     submitBtnDisable(false);
+}
+
+function onSubmissionFailed() {
+    showSubmissionFailed(true);
+    updateArCode(null);
 }
 
 function resetForm() {
@@ -320,4 +333,13 @@ function showSubmissionFailed(show) {
 
 function updateLastSubmissionTime() {
     $("span#arSubmitTime").text(new Date().toString());
+}
+
+function enablePinnedModuleAccess(enable) {
+    if (enable) {
+        $("div[data-input='arPinned']").removeClass("disabled");
+    } else {
+        $("div[data-input='arPinned']").addClass("disabled").removeClass("active");
+        $("input#arPinned").val("0");
+    }
 }

@@ -15,7 +15,7 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
         self._token = param_dict.get(param.TokenAction.TOKEN)
         self._param_dict.update(**param_dict)
 
-    def success_conditions(self) -> bool:
+    def pass_condition(self) -> bool:
         return not is_empty_string(self._token) and self._result.success
 
     def _handle_token_(self):
@@ -25,7 +25,7 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
     def pre_process(self):
         self._handle_token_()
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = TokenActionManager.complete_action(self._token, self.param_dict)
 
     def serialize_success(self) -> dict:
@@ -37,7 +37,7 @@ class TokenActionListApiResponse(
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = list(TokenActionManager.get_queued_actions(self._sender_oid))
 
     def pre_process(self):

@@ -1,0 +1,163 @@
+{% load i18n %}
+{% load utils %}
+
+<div class="card border-warning">
+    <div class="card-header text-center">{% trans "Registration" %}</div>
+    <div class="card-body text-warning">
+        <div class="mb-3" data-toggle="tooltip" data-placement="top"
+             title="{% trans "Search corresponding keyword on-site to get more information." %}">
+            <div class="btn-group btn-group-toggle col" data-toggle="buttons">
+                <label class="btn btn-warning active arRegister" id="arMember">
+                    <input type="radio" autocomplete="off" checked>
+                    {% trans "Channel Member" %}
+                </label>
+                <label class="btn btn-warning arRegister" id="arToken">
+                    <input type="radio" autocomplete="off">
+                    {% trans "Get a token" %}
+                </label>
+                <label class="btn btn-warning arRegister" id="arChannel">
+                    <input type="radio" autocomplete="off">
+                    {% trans "By Channel Token" %}
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-3" data-btn-id="arMember">
+            <div class="w-100 card card-body btn btn-outline-warning active">
+                <h5 class="card-title">{% trans "Channel Member" %}</h5>
+                <p class="card-text">
+                    <small>{% trans "Select the channel you are already in to register the module." %}</small>
+                    <br>
+                    <small>
+                        {% url "account.channel.connect" as connect_url %}
+                        {% blocktrans %}
+                            Check <a href="{{ connect_url }}" target="_blank">this page</a> to
+                            know how to get the channel's membership.
+                        {% endblocktrans %}
+                    </small>
+                </p>
+                <div class="form-group row">
+                    <div class="col">
+                        <select id="arChannel" class="form-control">
+                            <option value="default">{% trans "Select a channel" %}</option>
+                            {% for user_ch_entry in user_ch_list %}
+                                {% with user_ch_entry.channel as channel_data %}
+                                    {% with channel_data.name|get_val:root_uid_str as channel_name %}
+                                        <option data-cname="{{ channel_name }}"
+                                                data-ctoken="{{ channel_data.token }}"
+                                                data-cplat="{{ channel_data.platform.key }}"
+                                                data-cplatcode="{{ channel_data.platform.code }}"
+                                                data-cid="{{ channel_data.id }}">
+                                            {% trans "ID: " %}{{ channel_data.id }}
+                                            {% if channel_name %}
+                                                &nbsp;-&nbsp;{{ channel_name }}
+                                            {% endif %}</option>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" id="channelPlatCode"/>
+
+                <div class="row">
+                    <div class="col-7">
+                        <small>{% trans "Name" %}</small>
+                    </div>
+                    <div class="col-5">
+                        <small>{% trans "Platform" %}</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-7">
+                        <span id="channelName">-</span>
+                    </div>
+                    <div class="col-5">
+                        <span id="channelPlatform"
+                              data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">-</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <small>{% trans "Channel Token" %}</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <code class="h6" id="channelToken"
+                              data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">-</code>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <small>{% trans "Channel ID" %}</small>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <code class="h6" id="channelId">-</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3 d-none" data-btn-id="arToken">
+            <div class="w-100 card card-body btn btn-outline-warning active">
+                <h5 class="card-title">{% trans "Token" %}</h5>
+                <p class="card-text">
+                    <small>{% trans "The token will appear below once the module was successfully registered." %}</small>
+                </p>
+                <div class="row">
+                    <div class="col"></div>
+                    <div class="col-8 bg-light"><h3><code id="arTokenReturn"></code></h3></div>
+                    <div class="col"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3 d-none" data-btn-id="arChannel">
+            <div class="w-100 card card-body btn btn-outline-warning active">
+                <h5 class="card-title">{% trans "Channel Token" %}</h5>
+                <p class="card-text">
+                    <small>{% trans "Input the channel token to directly register the module." %}</small>
+                    <br>
+                    <small>{% trans "This method will be unusable if the channel had not been registered in the bot." %}</small>
+                </p>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label class="col-form-label"
+                               for="arPlatform">{% trans "Platform" %}</label>
+                    </div>
+                    <div class="col">
+                        <select id="arPlatform" class="form-control">
+                            {% for platform in platform_list %}
+                                <option value="{{ platform.code }}"
+                                        data-postkey="{{ static_keys_param.AutoReply.PLATFORM }}">{{ platform.key }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="arChannelID"
+                           placeholder="Input the Channel Token"
+                           aria-label="{% trans "Channel Token" %}"
+                           data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
+                    <div class="input-group-append">
+                        <button type="button"
+                                class="btn bg-light btn-outline-warning text-dark"
+                                id="arChannelCheck">
+                            <span>{% trans "Check" %}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

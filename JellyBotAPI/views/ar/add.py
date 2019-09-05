@@ -2,7 +2,7 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.utils.translation import gettext as _
 
 from mongodb.factory import ProfileManager
-from flags import Platform, AutoReplyContentType
+from flags import Platform, AutoReplyContentType, PermissionCategory
 from JellyBotAPI.SystemConfig import AutoReply
 from JellyBotAPI.components import get_root_oid
 from JellyBotAPI.components.mixin import LoginRequiredMixin
@@ -22,5 +22,6 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
                                    "contenttype_list": list(AutoReplyContentType),
                                    "tag_splittor": AutoReply.TAG_SPLITTOR,
                                    "user_ch_list": ProfileManager.get_user_channel_profiles(root_uid),
-                                   "root_uid_str": str(root_uid)
+                                   "root_uid_str": str(root_uid),
+                                   "perm_pin_access": PermissionCategory.AR_ACCESS_PINNED_MODULE.code_num
                                })
