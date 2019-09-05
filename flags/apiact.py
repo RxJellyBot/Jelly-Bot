@@ -24,6 +24,7 @@ class APICommand(FlagSingleEnum):
     3xx - Data Query:
         30x - Identity:
             301: Channel Data
+            302: Permission
 
     4xx - Management
         40x - Channel
@@ -45,6 +46,7 @@ class APICommand(FlagSingleEnum):
     TOKEN_COMPLETE = 299, _("Token Action - Complete Action")
 
     DATA_CHANNEL = 301, _("Data Query - Channel")
+    DATA_PERMISSION = 302, _("Data Query - Permission")
 
     MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Token")
     MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")

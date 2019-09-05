@@ -13,10 +13,10 @@ class ChannelDataQueryResponse(HandleChannelMixin, HandlePlatformMixin, Serializ
     def __init__(self, param_dict, creator_oid):
         super().__init__(param_dict, creator_oid)
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions() and self._result.success
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and self._result.success
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = ChannelManager.get_channel_packed(self._platform, self._channel_token)
 
     def serialize_success(self) -> dict:
@@ -38,7 +38,7 @@ class ChannelIssueRegisterTokenResponse(
     def pre_process(self):
         super().pre_process()
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = TokenActionManager.enqueue_action(
             self._sender_oid, TokenAction.CONNECT_CHANNEL,
             ChannelRegisterMembershipModel, RootOid=self._sender_oid)
@@ -46,7 +46,6 @@ class ChannelIssueRegisterTokenResponse(
 
 class ChannelNameChangeResponse(
         RequireSenderMixin, SerializeErrorMixin, SerializeResultOnSuccessMixin, BaseApiResponse):
-
     def __init__(self, param_dict, creator_oid):
         super().__init__(param_dict, creator_oid)
 
@@ -63,5 +62,5 @@ class ChannelNameChangeResponse(
     def pre_process(self):
         super().pre_process()
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = ChannelManager.change_channel_name(self._channel_oid, self._root_oid, self._new_name)

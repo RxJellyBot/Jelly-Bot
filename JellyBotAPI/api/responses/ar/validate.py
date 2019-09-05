@@ -36,7 +36,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
         k = param.Validation.CONTENT
         self._data[k] = self._content
 
-    def success_conditions(self) -> bool:
+    def pass_condition(self) -> bool:
         return not is_empty_string(self._content) and \
                not is_empty_string(self._content_type) and \
                self._result
@@ -45,7 +45,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
         self._handle_content_type_()
         self._handle_content_()
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = AutoReplyValidators.is_valid_content(self._data[param.Validation.CONTENT_TYPE],
                                                             self._data[param.Validation.CONTENT])
 

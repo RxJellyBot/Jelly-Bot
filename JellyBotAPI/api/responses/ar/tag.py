@@ -20,8 +20,8 @@ class AutoReplyTagPopularityResponse(SerializeResultOnSuccessMixin, BaseApiRespo
     def pre_process(self):
         super().pre_process()
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions()
+    def pass_condition(self) -> bool:
+        return super().pass_condition()
 
     def serialize_failed(self) -> dict:
         return dict()
@@ -29,5 +29,5 @@ class AutoReplyTagPopularityResponse(SerializeResultOnSuccessMixin, BaseApiRespo
     def serialize_extra(self) -> dict:
         return {result.FLAGS: self._flag}
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = AutoReplyManager.get_popularity_scores(self._keyword, self._count)

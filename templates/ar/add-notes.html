@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class="card border-info">
+    <div class="card-header text-center">{% trans "Notes" %}</div>
+    <div class="card-body text-info">
+        <h4 class="card-title">{% trans "Content Type" %}</h4>
+        <p class="card-text">
+            {% blocktrans trimmed %}
+                To let the content be valid, the content should be in the format described below
+                corresponds to the content type.
+            {% endblocktrans %}
+        </p>
+        <h5 class="card-title">{% trans "Text" %}</h5>
+        <p class="card-text">
+            {% blocktrans trimmed %}
+                <small>Could be anything, but the <b>length cannot be over 2000.</b></small>
+            {% endblocktrans %}
+        </p>
+        <h5 class="card-title">{% trans "Image" %}</h5>
+        <p class="card-text">
+            {% blocktrans trimmed %}
+                <small>The main MIME type should be <code>image</code>. In the other words, when
+                    you
+                    open then link,
+                    the browser should <b>just give you an image</b> not a web page.
+                </small>
+            {% endblocktrans %}
+        </p>
+        <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
+        <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
+        <p class="card-text">
+            {% blocktrans trimmed %}
+                <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits number</b>.
+                </small>
+            {% endblocktrans %}
+        </p>
+    </div>
+</div>
