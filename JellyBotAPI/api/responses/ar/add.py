@@ -135,9 +135,9 @@ class AutoReplyAddBaseResponse(
         d.update(**{result.FLAGS: self._flag, result.INFO: self._info})
         return d
 
-    def pass_condition(self) -> bool:
+    def is_success(self) -> bool:
         try:
-            return self._result.success
+            return super().is_success() and self._result.success
         except AttributeError:
             return False
 

@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 import heroku3
 
 
@@ -6,6 +8,7 @@ class HerokuWrapper:
     def __init__(self):
         token = os.environ.get("HEROKU_API_TOKEN")
         if token:
+            # noinspection PyUnresolvedReferences
             self._core = heroku3.from_key(token)
         else:
             print("Specify HEROKU_API_TOKEN in environment variables.")

@@ -9,8 +9,8 @@ from extutils.flags import FlagSingleEnum
 
 
 class LineStickerType(FlagSingleEnum):
-    @staticmethod
-    def default():
+    @classmethod
+    def default(cls):
         return LineStickerType.STATIC
 
     ANIMATED = 0, _("Animated Sticker")
