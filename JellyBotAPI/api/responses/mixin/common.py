@@ -46,7 +46,7 @@ class HandlePlatformMixin(BaseMixin, ABC):
     # noinspection PyArgumentList
     def _handle_(self):
         k = result.AutoReplyResponse.PLATFORM
-        if self._platform is None:
+        if not self._platform:
             self._err[k] = None
         else:
             self._platform = self._flag[k] = Platform(int(self._platform))

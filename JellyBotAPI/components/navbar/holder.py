@@ -1,8 +1,6 @@
 import warnings
 from typing import Union, List
 
-from extutils.gmail import MailSender
-
 from .entry import NavEntry, NavFirstLevelItem
 from .dropdown import NavDropdown, NavBaseItem
 

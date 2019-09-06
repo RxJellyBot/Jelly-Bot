@@ -1,0 +1,223 @@
+{% load i18n %}
+
+<script type="text/javascript">
+    // noinspection JSUnusedGlobalSymbols
+    let tagSplittor = "{{ tag_splittor }}";  // Used in artag.js
+
+    function getChannelDataEndpointUrl(platVal, channel) {
+        return `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
+    }
+
+    function checkChannelMembershipAsync(platVal, channel, fnOnLoad) {
+        if (channel === "") {
+            fnOnLoad(false);
+        } else {
+            let url = getChannelDataEndpointUrl(platVal, channel);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.responseType = "json";
+            xhr.onload = function () {
+                let success = xhr.response["{{ static_keys_result.SUCCESS }}"];
+
+                fnOnLoad(success);
+                console.log("Check Channel Membership (Async)");
+                console.log(xhr.response);
+                postCheckChannel(xhr.response);
+            };
+            xhr.send();
+        }
+    }
+
+    function hasChannelMembership(platVal, channel) {
+        // OPTIMIZE: Fix async XHR problem
+        let url = getChannelDataEndpointUrl(platVal, channel);
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url, false);
+        xhr.send();
+
+        let response = xhr.response;
+
+        console.log("Check Channel Membership");
+        console.log(response);
+
+        let success = response["{{ static_keys_result.SUCCESS }}"];
+
+        postCheckChannel(response, success);
+    }
+
+    function postCheckChannel(response, success) {
+        if (success) {
+            checkAccessPinnedPermission(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.MODEL }}"]["_id"].substring(10, 34));
+        } else {
+            enablePinnedModuleAccess(false);
+        }
+    }
+
+    function collectData() {
+        let param = new URLSearchParams();
+
+        // Attach KEYWORD and RESPONSES
+        $("div.content-check:not(.d-none)").find("textarea").each(function () {
+            param.append($(this).data("postkey"), $(this).val());
+        });
+
+        // Attach KEYWORD TYPES and RESPONSE TYPES
+        $("div.content-check:not(.d-none) .ar-type").each(function () {
+            param.append($(this).data("postkey"), $(this).val());
+        });
+
+        if (regId === "arChannel") {
+            // Attach CHANNEL_TOKEN, PLATFORM
+            $("input#arChannelToken, select#arPlatform option:selected").each(function () {
+                param.append($(this).data("postkey"), $(this).val());
+            });
+        } else if (regId === "arMember") {
+            // Attach PLATFORM
+            let elem = $("input#channelPlatCode");
+            param.append(elem.data("postkey"), elem.val());
+            // Attach CHANNEL_TOKEN
+            elem = $("code#channelToken");
+            if (elem.text() !== "-") {
+                param.append(elem.data("postkey"), elem.text());
+            }
+        }
+
+        // Attach PRIVATE, PIN, COOLDOWN
+        $("input#arPrivate, input#arPinned, input#arCoolDown").each(function () {
+            param.append($(this).data("postkey"), $(this).val());
+        });
+
+        // Attach TAGS
+        param.append("{{ static_keys_param.AutoReply.TAGS }}", selectedTags.join(","));
+
+        // Attach CREATOR_TOKEN flag
+        param.append("{{ static_keys_param.AutoReply.API_TOKEN }}", "{{ api_token }}");
+
+        // Attach LOCAL_REFER flag
+        param.append("{{ static_keys_param.LOCAL_REFER }}", "true");
+
+        return param;
+    }
+
+    function submitData(onLoadCallback) {
+        let url;
+        if (regId === "arChannel" || regId === "arMember") {
+            url = "{% url "api.ar.add" %}";
+        } else if (regId === "arToken") {
+            url = "{% url "api.ar.add_token" %}"
+        }
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", url);
+        xhr.responseType = "json";
+        xhr.onload = function () {
+            hideAllSubmitMsg();
+            try {
+                updateArCode(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
+            } catch (error) {
+                onSubmissionFailed()
+            }
+
+            onLoadCallback(xhr.response);
+        };
+        xhr.onerror = onSubmissionFailed;
+        xhr.send(collectData());
+    }
+
+    function displayToken(response) {
+        if (response.hasOwnProperty("{{ static_keys_result.RESULT }}") &&
+            response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.TokenActionResponse.TOKEN }}")) {
+            $("code#arTokenReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]);
+        } else {
+            console.log(`Token Display Failed. Token: ${response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]}`)
+        }
+    }
+
+    function validateContent(type, content, fnOnLoad) {
+        let url = `{% url "api.ar.validate" %}?{{ static_keys_param.Validation.CONTENT }}=${encodeURIComponent(content)}&{{ static_keys_param.Validation.CONTENT_TYPE }}=${type}`;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "json";
+        xhr.onload = function () {
+            let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+            let result = xhr.response.{{ static_keys_result.RESULT }} || false;
+
+            fnOnLoad(success, result);
+        };
+        xhr.send();
+    }
+
+    function searchTagsByPopularity(word, onFound, onNotFound, onResult) {
+        let url = `{% url "api.ar.tag.pop" %}?{{ static_keys_param.DataQuery.KEYWORD }}=${encodeURIComponent(word)}`;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "json";
+        xhr.onload = function () {
+            let resp = xhr.response["{{ static_keys_result.RESULT }}"];
+
+            onResult();
+            if (resp.length > 0) {
+                onFound(resp);
+            } else {
+                onNotFound();
+            }
+        };
+        xhr.send();
+    }
+
+    function checkAccessPinnedPermission(coid) {
+        let url = `{% url "api.id.perm" %}?{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${coid}&{{ static_keys_param.LOCAL_REFER }}=true`;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "json";
+        xhr.onload = function () {
+            enablePinnedModuleAccess(xhr.response["{{ static_keys_result.RESULT }}"].includes({{ perm_pin_access }}));
+        };
+        xhr.send();
+    }
+
+    function submitBtnCheck() {
+        let errmsgs = [];
+
+        // Overlimit check
+        $("div.txtarea-count").each(function () {
+            let progBar = $(this).find("div.progress-bar");
+            let valNow = parseInt(progBar.attr("aria-valuenow"));
+            let valMax = parseInt(progBar.attr("aria-valuemax"));
+
+            if (valNow > valMax) {
+                let txtareaFor = $("label[for='" + $(this).children("textarea").attr("id") + "']").text();
+                {% blocktrans trimmed %}
+                    let overlimit = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: ${valMax} / Current: <b>${valNow})</b>`;
+                {% endblocktrans %}
+                errmsgs.push(overlimit);
+            }
+        });
+
+        // Channel check
+        if (regId === "arChannel") {
+            let plat = $("select#arPlatform option:selected").val();
+            let channelToken = $("input#arChannelToken").val();
+
+            if (!hasChannelMembership(plat, channelToken)) {
+                let notMember = '{% trans "Channel validation failed. Recheck the input channel info." %}';
+                errmsgs.push(notMember);
+            }
+        }
+
+        // Determine if to display modal or not
+        let msgAvailable = errmsgs.length > 0;
+
+        if (msgAvailable) {
+            $("div#modalSubmitMessage").html(errmsgs.join("<br>"));
+            $("div#modalSubmit").modal("show");
+        }
+
+        return msgAvailable;
+    }
+</script>

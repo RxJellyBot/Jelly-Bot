@@ -19,14 +19,14 @@ class SpecEnum(FlagSingleEnum):
     A = (1, "K")
     B = (2, "V")
 
-    @staticmethod
-    def default():
+    @classmethod
+    def default(cls):
         return SpecEnum.A
 
 
 class SpecEnum2(FlagSingleEnum):
-    @staticmethod
-    def default():
+    @classmethod
+    def default(cls):
         return SpecEnum2.C
 
     C = (2, "K")

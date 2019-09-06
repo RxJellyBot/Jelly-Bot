@@ -1,8 +1,6 @@
 # Request Factory - https://stackoverflow.com/a/25835403
 # Testing tools - https://docs.djangoproject.com/en/2.2/topics/testing/tools/
-import json
 import unittest
-import pprint
 
 from django.test import TestCase
 from django.urls import reverse

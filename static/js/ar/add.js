@@ -37,16 +37,6 @@ function regPanelSwitch() {
     $("div[data-btn-id=" + regId + "]").removeClass("d-none");
 }
 
-function regSubmitBtnControl() {
-    if (regId === "arChannel") {
-        validateChannelInfo();
-    } else if (regId === "arToken") {
-        submitBtnDisable(false);
-    } else if (regId === "arMember") {
-        submitBtnDisable(true);
-    }
-}
-
 function initProperties() {
     $("div.btn-div").click(function () {
         if (!$(this).hasClass("disabled")) {
@@ -106,7 +96,7 @@ function initTextAreas() {
                 progBar.removeClass("bg-danger");
             }
 
-            submitBtnDisable(percentage > 100);
+            // submitBtnDisable(percentage > 100);
         });
 
         txtArea.on("blur", function () {
@@ -129,7 +119,6 @@ function validateTextArea(parent, txtArea) {
         } else {
             txtArea.addClass("is-invalid");
         }
-        submitBtnDisable(!valid);
     })
 }
 
@@ -138,7 +127,6 @@ function initRegSelection() {
         regId = $(this).attr("id");
 
         regPanelSwitch();
-        regSubmitBtnControl();
     });
     $("button#arChannelCheck").click(function () {
         validateChannelInfo();
@@ -164,8 +152,6 @@ function onChannelMemberSelected(option) {
         $("code#channelId").text(option.data("cid"));
         checkAccessPinnedPermission(option.data("cid"));
     }
-
-    submitBtnDisable(option.val() === "default");
 }
 
 function formSubmitHandle() {
@@ -184,6 +170,10 @@ function formSubmitHandle() {
             pass = false;
         }
 
+        if (submitBtnCheck()) {
+            pass = false;
+        }
+
         if (!pass) {
             hideAllSubmitMsg();
             showInputFailed(true);
@@ -196,6 +186,7 @@ function formSubmitHandle() {
             }
         }
 
+        // noinspection JSDeprecatedSymbols
         event.preventDefault(); // Cancel default submission behavior for Ajax
         return false;
     })
@@ -207,7 +198,9 @@ function validateForm() {
     let ret = true;
 
     $("div.txtarea-count").each(function () {
-        validateTextArea($(this), $(this).find("textarea"));
+        if (!$(this).parent().hasClass("d-none")) {
+            validateTextArea($(this), $(this).find("textarea"));
+        }
     });
 
     // Validate content lengths
@@ -228,12 +221,10 @@ function validateForm() {
 
 function validateChannelInfo() {
     let arPlatVal = $("select#arPlatform option:selected").val();
-    let arChannelID = $("input#arChannelID").val();
+    let arChannelToken = $("input#arChannelToken").val();
 
-    checkChannelMembership(arPlatVal, arChannelID, function (exists) {
-        submitBtnDisable(!exists);
-
-        let elem = $("input#arChannelID");
+    checkChannelMembershipAsync(arPlatVal, arChannelToken, function (exists) {
+        let elem = $("input#arChannelToken");
         elem.removeClass("is-valid is-invalid");
         if (typeof exists !== "undefined" && exists) {
             elem.addClass("is-valid");
@@ -249,6 +240,7 @@ function hideAllValidClasses(elem) {
 
 function onSubmitCallback(response) {
     hideAllSubmitMsg();
+    console.log(response);
 
     if (response.success) {
         displayToken(response);
@@ -302,10 +294,6 @@ function updateArCode(code) {
     }
 }
 
-function submitBtnDisable(disable) {
-    $("button.arSubmit").prop("disabled", disable);
-}
-
 function hideAllSubmitMsg() {
     $("div#inputFailed, div#submitFailed, div#submitSuccess").removeClass("d-inline").addClass("d-none");
 }
@@ -342,4 +330,8 @@ function enablePinnedModuleAccess(enable) {
         $("div[data-input='arPinned']").addClass("disabled").removeClass("active");
         $("input#arPinned").val("0");
     }
+}
+
+function submitBtnDisable(disable) {
+    $("button.arSubmit").prop("disabled", disable);
 }

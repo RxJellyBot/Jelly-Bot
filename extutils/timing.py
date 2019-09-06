@@ -1,5 +1,4 @@
 import time
-from typing import Any
 
 
 def exec_timing(fn):
