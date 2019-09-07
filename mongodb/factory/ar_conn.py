@@ -1,4 +1,4 @@
-from typing import Tuple, Iterator, Optional, List
+from typing import Tuple, Optional, List
 
 import math
 import pymongo
@@ -8,12 +8,14 @@ from datetime import datetime
 from JellyBotAPI.SystemConfig import Database, DataQuery
 from extutils import is_empty_string
 from extutils.color import ColorFactory
+from flags import PermissionCategory
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
 from mongodb.factory.results import (
     InsertOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
 from mongodb.utils import CheckableCursor
+from mongodb.factory import ProfileManager
 
 from ._base import BaseCollection
 
@@ -37,16 +39,18 @@ class AutoReplyModuleManager(BaseCollection):
             kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        # INCOMPLETE: Permission - Check if the user have the permission if pinned is true
+        perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, creator_oid))
+        if pinned and PermissionCategory.AR_ACCESS_PINNED_MODULE not in perms:
+            return AutoReplyModuleAddResult(InsertOutcome.X_INSUFFICIENT_PERMISSION, None, None)
+        else:
+            model, outcome, ex, insert_result = \
+                self.insert_one_data(
+                    AutoReplyModuleModel,
+                    KeywordOid=kw_oid, ResponsesOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
+                    Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds=[channel_oid]
+                )
 
-        model, outcome, ex, insert_result = \
-            self.insert_one_data(
-                AutoReplyModuleModel,
-                KeywordOid=kw_oid, ResponsesOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
-                Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds=[channel_oid]
-            )
-
-        return AutoReplyModuleAddResult(outcome, model, ex)
+            return AutoReplyModuleAddResult(outcome, model, ex)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         model.clear_oid()

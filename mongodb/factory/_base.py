@@ -128,22 +128,23 @@ class CacheMixin(Collection):
                 else:
                     data = acquire_func(*acquire_args, **acquire_kw_args)
 
-                if isinstance(data, Cursor):
-                    data = list(data)
-                else:
-                    if item_key_from_data is not None:
-                        if isinstance(item_key_from_data, str):
-                            item_key = data[item_key_from_data]
-                        elif isinstance(item_key_from_data, (tuple, list)):
-                            item_key = []
-                            for k in item_key_from_data:
-                                item_key.append(data[k])
-                            item_key = tuple(item_key)
-                        else:
-                            raise ValueError(
-                                f"The type of `item_key_from_data` is invalid. ({type(item_key_from_data)})")
+                if data:
+                    if isinstance(data, Cursor):
+                        data = list(data)
+                    else:
+                        if item_key_from_data is not None:
+                            if isinstance(item_key_from_data, str):
+                                item_key = data[item_key_from_data]
+                            elif isinstance(item_key_from_data, (tuple, list)):
+                                item_key = []
+                                for k in item_key_from_data:
+                                    item_key.append(data[k])
+                                item_key = tuple(item_key)
+                            else:
+                                raise ValueError(
+                                    f"The type of `item_key_from_data` is invalid. ({type(item_key_from_data)})")
 
-                ret = data
+                    ret = data
         else:
             ret = self._cache[cache_key][item_key]
 

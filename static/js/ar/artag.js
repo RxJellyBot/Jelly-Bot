@@ -1,29 +1,5 @@
 let selectedTags = [];
 
-$(document).ready(function () {
-    getTagsByPopularity(
-        function (tag_name_arr) {
-            $("div#arTagPopMsg").addClass("d-none");
-
-            tag_name_arr.forEach(function (tag_name) {
-                $("div#arTagPop").append(generateTagButtonDOM(tag_name, function (event) {
-                    addToSelectedTags($(event.target).text());
-                }));
-            })
-        },
-        function () {
-            $("div#arTagPopMsg").removeClass("d-none");
-        });
-    $("button#arTagSearch").click(searchTag);
-
-    $("input#arTagKeyword").keyup(function (e) {
-        if (e.which === 13) {
-            searchTag();
-            return false;
-        }
-    });
-});
-
 let searchLock = false;
 
 // OPTIMIZE: Get tag's Object ID with the name during search and send oid back only
@@ -90,3 +66,32 @@ function generateTagButtonDOM(txt, btnOnClick = null) {
     }
     return elem;
 }
+
+function getTagsByPopularity(onFound, onNotFound) {
+    searchTagsByPopularity("", onFound, onNotFound, function () {
+    });
+}
+
+$(document).ready(function () {
+    getTagsByPopularity(
+        function (tag_name_arr) {
+            $("div#arTagPopMsg").addClass("d-none");
+
+            tag_name_arr.forEach(function (tag_name) {
+                $("div#arTagPop").append(generateTagButtonDOM(tag_name, function (event) {
+                    addToSelectedTags($(event.target).text());
+                }));
+            })
+        },
+        function () {
+            $("div#arTagPopMsg").removeClass("d-none");
+        });
+    $("button#arTagSearch").click(searchTag);
+
+    $("input#arTagKeyword").keyup(function (e) {
+        if (e.which === 13) {
+            searchTag();
+            return false;
+        }
+    });
+});

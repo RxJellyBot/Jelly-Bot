@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 # Run "py manage.py check --deploy" config to ensure no compiling bugs                        #
 #   Disregard: security.W004, security.W008, security.W012, security.W016
 # Run "py manage.py makemessages -a" to create translation files (compilemessages for *.mo)   #
-# Run tests with code coverage                                                                #
+# Run tests                                                                                   #
 ###############################################################################################
 
 # MAIN

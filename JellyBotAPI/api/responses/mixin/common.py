@@ -26,8 +26,8 @@ class HandleChannelMixin(BaseMixin, ABC):
         else:
             self._flag[k] = self._channel_token
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions() and \
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and \
                self._channel_token is not None and \
                not is_empty_string(self._channel_token)
 
@@ -46,13 +46,13 @@ class HandlePlatformMixin(BaseMixin, ABC):
     # noinspection PyArgumentList
     def _handle_(self):
         k = result.AutoReplyResponse.PLATFORM
-        if self._platform is None:
+        if not self._platform:
             self._err[k] = None
         else:
             self._platform = self._flag[k] = Platform(int(self._platform))
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions() and \
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and \
                self._platform is not None
 
 
@@ -75,8 +75,8 @@ class RequireSenderMixin(BaseMixin, ABC):
         if sender_oid is None:
             self._err[result.SenderIdentity.SENDER] = sender_oid
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions() and self._sender_oid is not None
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and self._sender_oid is not None
 
 
 class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
@@ -108,5 +108,5 @@ class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
             if rt_result.success:
                 self._sender_oid = rt_result.model.id
 
-    def success_conditions(self) -> bool:
-        return super().success_conditions() and self._sender_oid is not None
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and self._sender_oid is not None

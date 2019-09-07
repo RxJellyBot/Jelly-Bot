@@ -135,9 +135,9 @@ class AutoReplyAddBaseResponse(
         d.update(**{result.FLAGS: self._flag, result.INFO: self._info})
         return d
 
-    def success_conditions(self) -> bool:
+    def is_success(self) -> bool:
         try:
-            return self._result.success
+            return super().is_success() and self._result.success
         except AttributeError:
             return False
 
@@ -153,14 +153,14 @@ class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
     def pre_process(self):
         super().pre_process()
 
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = AutoReplyManager.add_conn(
             self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),
             self._pinned, self._private, self._tags, self._cooldown)
 
 
 class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
-    def process_ifnoerror(self):
+    def process_pass(self):
         self._result = TokenActionManager.enqueue_action(
             self._sender_oid, TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
             KeywordOid=self._keyword, ResponsesOids=self._responses, CreatorOid=self._sender_oid,

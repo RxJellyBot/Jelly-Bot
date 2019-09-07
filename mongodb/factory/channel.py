@@ -98,7 +98,7 @@ class ChannelManager(BaseCollection):
             {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
 
         if found_any:
-            model = ChannelConfigModel(**self.find_one(filter_)[ChannelModel.Config.key], from_db=True)
+            model = ChannelModel(**self.find_one(filter_), from_db=True)
 
             self.set_cache(self.CACHE_KEY_SPEC1, (model.platform, model.token), model, parse_cls=ChannelModel)
 

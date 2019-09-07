@@ -1,3 +1,4 @@
+dotmap
 markdown2
 requests
 dnspython
@@ -8,3 +9,5 @@ whitenoise
 google-api-python-client
 ttldict
 pytz
+heroku3
+python-dateutil

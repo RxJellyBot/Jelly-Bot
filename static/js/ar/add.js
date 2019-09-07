@@ -22,7 +22,7 @@ function initLayout() {
 }
 
 let responseCount = 1;
-let regId = "arToken";
+let regId = "arMember";
 
 function initEvents() {
     initProperties();
@@ -35,14 +35,6 @@ function initEvents() {
 function regPanelSwitch() {
     $("div[data-btn-id]").addClass("d-none");
     $("div[data-btn-id=" + regId + "]").removeClass("d-none");
-}
-
-function regSubmitBtnControl() {
-    if (regId === "arChannel") {
-        validateChannelInfo();
-    } else {
-        submitBtnDisable(false);
-    }
 }
 
 function initProperties() {
@@ -103,10 +95,11 @@ function initTextAreas() {
             } else {
                 progBar.removeClass("bg-danger");
             }
-            submitBtnDisable(percentage > 100);
+
+            // submitBtnDisable(percentage > 100);
         });
 
-        txtArea.on("keyup change blur", function () {
+        txtArea.on("blur", function () {
             validateTextArea(parent, txtArea);
         });
 
@@ -126,7 +119,6 @@ function validateTextArea(parent, txtArea) {
         } else {
             txtArea.addClass("is-invalid");
         }
-        submitBtnDisable(!valid);
     })
 }
 
@@ -135,11 +127,31 @@ function initRegSelection() {
         regId = $(this).attr("id");
 
         regPanelSwitch();
-        regSubmitBtnControl();
     });
     $("button#arChannelCheck").click(function () {
         validateChannelInfo();
-    })
+    });
+    $("select#arChannel").change(function () {
+        onChannelMemberSelected($(this).children("option:selected"));
+    });
+}
+
+function onChannelMemberSelected(option) {
+    if (option.val() === "default") {
+        $("span#channelName").text("-");
+        $("span#channelPlatform").text("-");
+        $("input#channelPlatCode").val("");
+        $("code#channelToken").text("-");
+        $("code#channelId").text("-");
+        enablePinnedModuleAccess(false);
+    } else {
+        $("span#channelName").text(option.data("cname"));
+        $("span#channelPlatform").text(option.data("cplat"));
+        $("input#channelPlatCode").val(option.data("cplatcode"));
+        $("code#channelToken").text(option.data("ctoken"));
+        $("code#channelId").text(option.data("cid"));
+        checkAccessPinnedPermission(option.data("cid"));
+    }
 }
 
 function formSubmitHandle() {
@@ -158,18 +170,23 @@ function formSubmitHandle() {
             pass = false;
         }
 
+        if (submitBtnCheck()) {
+            pass = false;
+        }
+
         if (!pass) {
             hideAllSubmitMsg();
             showInputFailed(true);
             submitBtnDisable(false);
         } else {
-            if (regId === "arToken" || regId === "arChannel") {
+            if (regId === "arToken" || regId === "arChannel" || regId === "arMember") {
                 submitData(onSubmitCallback);
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
             }
         }
 
+        // noinspection JSDeprecatedSymbols
         event.preventDefault(); // Cancel default submission behavior for Ajax
         return false;
     })
@@ -179,6 +196,12 @@ function validateForm() {
     updateLastSubmissionTime();
 
     let ret = true;
+
+    $("div.txtarea-count").each(function () {
+        if (!$(this).parent().hasClass("d-none")) {
+            validateTextArea($(this), $(this).find("textarea"));
+        }
+    });
 
     // Validate content lengths
     $("div.content-check:not(.d-none)").each(function () {
@@ -198,12 +221,10 @@ function validateForm() {
 
 function validateChannelInfo() {
     let arPlatVal = $("select#arPlatform option:selected").val();
-    let arChannelID = $("input#arChannelID").val();
+    let arChannelToken = $("input#arChannelToken").val();
 
-    checkChannelMembership(arPlatVal, arChannelID, function (exists) {
-        submitBtnDisable(!exists);
-
-        let elem = $("input#arChannelID");
+    checkChannelMembershipAsync(arPlatVal, arChannelToken, function (exists) {
+        let elem = $("input#arChannelToken");
         elem.removeClass("is-valid is-invalid");
         if (typeof exists !== "undefined" && exists) {
             elem.addClass("is-valid");
@@ -219,6 +240,7 @@ function hideAllValidClasses(elem) {
 
 function onSubmitCallback(response) {
     hideAllSubmitMsg();
+    console.log(response);
 
     if (response.success) {
         displayToken(response);
@@ -229,6 +251,11 @@ function onSubmitCallback(response) {
         showSubmissionFailed(true);
     }
     submitBtnDisable(false);
+}
+
+function onSubmissionFailed() {
+    showSubmissionFailed(true);
+    updateArCode(null);
 }
 
 function resetForm() {
@@ -267,10 +294,6 @@ function updateArCode(code) {
     }
 }
 
-function submitBtnDisable(disable) {
-    $("button.arSubmit").prop("disabled", disable);
-}
-
 function hideAllSubmitMsg() {
     $("div#inputFailed, div#submitFailed, div#submitSuccess").removeClass("d-inline").addClass("d-none");
 }
@@ -298,4 +321,17 @@ function showSubmissionFailed(show) {
 
 function updateLastSubmissionTime() {
     $("span#arSubmitTime").text(new Date().toString());
+}
+
+function enablePinnedModuleAccess(enable) {
+    if (enable) {
+        $("div[data-input='arPinned']").removeClass("disabled");
+    } else {
+        $("div[data-input='arPinned']").addClass("disabled").removeClass("active");
+        $("input#arPinned").val("0");
+    }
+}
+
+function submitBtnDisable(disable) {
+    $("button.arSubmit").prop("disabled", disable);
 }
