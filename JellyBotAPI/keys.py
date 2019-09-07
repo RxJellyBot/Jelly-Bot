@@ -21,6 +21,6 @@ class Css:
     LOGGED_IN_ENABLE = "enable-login"
 
 
-# Param Dict Filter
-class ParamDictFilter:
-    Filter1 = "x-"
+# Param Dict Prefix
+class ParamDictPrefix:
+    PostKey = "x-"  # Used in http POST params from HTML forms

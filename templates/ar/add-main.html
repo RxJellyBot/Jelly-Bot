@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<div class="card border-primary mb-3">
+    <div class="card-header text-center">{% trans "Main Settings" %}</div>
+    <div class="card-body text-primary">
+        <div class="form-group content-check">
+
+            <h5 class="card-title">{% trans "Keyword" %}</h5>
+            <label class="sr-only" for="arKeyword">{% trans "Keyword" %}</label>
+            <p class="card-text">
+                <small>{% trans "The word to trigger the Auto-Reply module. Note that this is case-sensitive." %}</small>
+            </p>
+
+            {% with prfx="arKeyword" prfxt="arKeywordType" %}
+                {% include "components/txtarea.html" with param_content=ar_prfx.KEYWORD param_content_type=ar_prfx.KEYWORD_TYPE txt_area_name=prfx txt_area_id=prfx type_select_id=prfxt max_length=max_length cttypes=contenttype_list only %}
+            {% endwith %}
+        </div>
+
+        <b class="d-none" id="respProp" data-max="{{ max_responses }}"></b>
+
+        {% for i in ""|ljust:max_responses %}
+            <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
+
+                <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
+                <label class="sr-only"
+                       for="arReply{{ forloop.counter }}">{% trans "Response" %}&nbsp;{{ forloop.counter }}</label>
+                <p class="card-text">
+                    <small>{% trans "The word to reply when the module is triggered." %}</small>
+                </p>
+                {% with prfx="arReply" prfxt="arReplyType" ct=forloop.counter|stringformat:"s" %}
+                    {% include "components/txtarea.html" with param_content=ar_prfx.RESPONSE param_content_type=ar_prfx.RESPONSE_TYPE txt_area_name=prfx txt_area_id=prfx|add:ct type_select_id=prfxt|add:ct max_length=max_length cttypes=contenttype_list only %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+
+        <div class="form-group float-right">
+            <button type="button" class="btn btn-outline-primary mr-2 arRespBtnAdd"><b><span
+                    style="font-family: monospace;">+</span></b></button>
+            <button type="button" class="btn btn-outline-primary arRespBtnDel" disabled><b><span
+                    style="font-family: monospace;">-</span></b></button>
+        </div>
+    </div>
+</div>

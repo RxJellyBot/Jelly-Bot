@@ -4,8 +4,8 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
-                <div class="card border-primary text-center">
+            <div class="col-lg-6">
+                <div class="card border-primary text-center mb-3">
                     <h4 class="card-header text-primary">{% trans "Contact" %}</h4>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
@@ -19,28 +19,58 @@
                         </div>
                     </div>
                 </div>
+                <div class="card border-info">
+                    <h4 class="card-header text-info text-center">{% trans "Build" %}</h4>
+                    <div class="card-body text-info">
+                        <h5><a href="http://bot-stage.raenonx.cc">{% trans "Beta" %}</a></h5>
+                        {% blocktrans trimmed %}
+                            Usually, this build has new features, but contains more bugs than Stable.<br>
+                            Some translations may be incompleted.
+                        {% endblocktrans %}<br>
+                        <small>{% trans "Deployed on " %}</small><code>{{ beta_deploy }}</code><br>
+                        <small>{% trans "Updated on " %}</small><code>{{ beta_update_about }}</code>
+                        <hr>
+                        <h5><a href="http://bot.raenonx.cc">{% trans "Stable" %}</a></h5>
+                        {% blocktrans trimmed %}
+                            Only features believed that will not cause problems will appear on this build.<br>
+                            Bugs should be less than the Beta build, and the translations should be completed.
+                        {% endblocktrans %}<br>
+                        <small>{% trans "Deployed on " %}</small><code>{{ stable_deploy }}</code><br>
+                        <small>{% trans "Updated on " %}</small><code>{{ stable_update_about }}</code>
+                        <hr>
+                        <small>
+                            {% blocktrans trimmed %}
+                                Both Beta and Stable build share the same database.<br>
+                                If an operation on the Beta build caused the data corrupted, the data will be
+                                temporarily removed for pending repair,
+                                and it will be temporarily inaccessible. Please contact the website developer as soon as
+                                possible if you think this happened.
+                                The data will be added back to the database once the website developer fixed it.
+                            {% endblocktrans %}
+                        </small>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="card border-success text-center">
                     <h4 class="card-header text-success">{% trans "System" %}</h4>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://github.com/RaenonX/Jelly-Bot-API">{% trans "GitHub Repository" %}</a>
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://www.heroku.com/">{% trans "Deployed on" %}&nbsp;<b>Heroku</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://www.python.org/">{% trans "Language" %}:&nbsp;<b>Python</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://www.djangoproject.com/">{% trans "Backend Framework" %}:&nbsp;<b>Django</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://getbootstrap.com/">{% trans "Frontend framework" %}:&nbsp;<b>Bootstrap</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
                                href="https://jquery.com/">{% trans "Frontend framework" %}:&nbsp;<b>jQuery</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
-                               href="https://reactjs.org/">{% trans "Frontend framework" %}:&nbsp;<b>React.js</b></a>
-                            <a class="list-group-item list-group-item-action text-success"
-                               href="https://www.mongodb.com/cloud/atlas">{% trans "Database" %}:&nbsp;<b>MongoDB Atlas</b></a>
+                            <a class="list-group-item list-group-item-action text-success" target="_blank"
+                               href="https://www.mongodb.com/cloud/atlas">{% trans "Database" %}:&nbsp;<b>MongoDB
+                                Atlas</b></a>
                         </div>
                     </div>
                 </div>

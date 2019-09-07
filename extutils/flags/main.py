@@ -129,6 +129,7 @@ class FlagEnumMixin:
         if not isinstance(item, (str, int)):
             raise ValueError(f"Source type ({type(item)}) for casting not handled.")
 
+        # noinspection PyTypeChecker
         for i in list(cls):
             if i.code == item:
                 return i
@@ -147,6 +148,7 @@ class FlagEnumMixin:
         else:
             return False
 
+        # noinspection PyTypeChecker
         for i in list(cls):
             if det_fn(i, item):
                 return True

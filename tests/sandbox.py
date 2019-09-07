@@ -1,20 +1,29 @@
-import os
-
-import pymongo
-from pymongo import InsertOne
-
 from extutils import exec_timing_ns
+from dateutil import parser
+import requests
+from dotmap import DotMap
 
-MONGO_CLIENT = pymongo.MongoClient(os.environ.get("MONGO_URL"))
-col = MONGO_CLIENT.get_database("pdrp").get_collection("channel.dict")
-col2 = MONGO_CLIENT.get_database("channel").get_collection("dict")
+
+class GitHubWrapper:
+    API_URL = "https://api.github.com"
+
+    # noinspection PyMethodMayBeStatic
+    def get_latest_deployment(self, environment):
+        response = requests.get(f"{GitHubWrapper.API_URL}/repos/RaenonX/Jelly-Bot-API/deployments", {
+            "environment": environment
+        })
+
+        list_ = response.json()
+
+        if list_:
+            return DotMap(list_[0])
+        else:
+            return None
 
 
 @exec_timing_ns
 def wrap():
-    col.update_many({}, {"$set": {"d.n": {}}})
-    ops = [InsertOne(d_parent["d"]) for d_parent in col.find()]
-    col2.bulk_write(ops, ordered=False)
+    print(parser.parse(GitHubWrapper().get_latest_deployment("jellybotapi").updated_at))
 
 
 @exec_timing_ns

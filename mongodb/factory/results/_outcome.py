@@ -30,7 +30,8 @@ class InsertOutcome(BaseOutcome):
 
     # FAILED
 
-    1xx - Problems related to the preaparation processes
+    1xx - Problems related to the preparation processes
+        101 - Insufficient Permission
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
@@ -55,9 +56,9 @@ class InsertOutcome(BaseOutcome):
         401 - Missing in Cache, Attempted Insertion
         402 - Missing in Cache, Aborted Insertion
 
-    5xx - Unknown Problems
-        501 - Model Construction Unknown
-        502 - Insertion Unknown
+    8xx - Unknown Problems
+        801 - Model Construction Unknown
+        802 - Insertion Unknown
 
     9xx - Problems related to execution
         901 - Not executed
@@ -77,6 +78,9 @@ class InsertOutcome(BaseOutcome):
         -101, _("O: Existed"), _("The system returned OK with data already existed in the database.")
     O_MISC = \
         -1, _("O: Uncategorized"), _("The system returned OK with uncategorized reason.")
+    X_INSUFFICIENT_PERMISSION = \
+        101, _("X: Insufficient Permission"), \
+        _("THe insertion was failed becuase the permission is insufficient.")
     X_ON_REG_CHANNEL = \
         104, _("X: on Registering Channel"), \
         _("The insertion was failed while registering the identity of channel.")
@@ -129,10 +133,10 @@ class InsertOutcome(BaseOutcome):
         402, _("X: Missing in Cache, Aborted Insertion"), \
         _("The data was not found and the system aborted to insert a new data.")
     X_CONSTRUCT_UNKNOWN = \
-        501, _("X: Model Construction Unknown"), \
+        801, _("X: Model Construction Unknown"), \
         _("An unknown occurred during the construction of a data model.")
     X_INSERT_UNKNOWN = \
-        502, _("X: Insertion Unknown"), \
+        802, _("X: Insertion Unknown"), \
         _("An unknown occurred while inserting the data.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \

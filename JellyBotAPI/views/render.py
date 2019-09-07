@@ -1,11 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import Template, RequestContext
+from django.utils import timezone
 
 from JellyBotAPI import keys
 from JellyBotAPI.views.nav import construct_nav
 from JellyBotAPI.api.static import result, param
 from JellyBotAPI.components import get_root_oid
+from extutils import HerokuWrapper
 from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
 
@@ -26,11 +28,16 @@ def render_template(request, title, template_name, context=None, content_type=No
     context["static_keys_result"] = result
     context["static_keys_param"] = param
 
-    # Append vars
+    # Append user id vars
     context["api_token"] = request.COOKIES.get(keys.Cookies.USER_TOKEN)
 
-    # Append necessary backend vars
-    # INCOMPLETE: Permission - Construct an array and import here for unlocking elements
+    # Append version numbers for footer
+    context["beta_update"] = timezone.localtime(
+        HerokuWrapper.latest_succeeded_release("jellybotapi-staging").updated_at).strftime("%m/%d %H:%M (UTC%z)")
+    context["stable_update"] = timezone.localtime(
+        HerokuWrapper.latest_succeeded_release("jellybotapi").updated_at).strftime("%m/%d %H:%M (UTC%z)")
+
+    # Append backend vars
     unlock_classes = []
 
     if get_root_oid(request):
