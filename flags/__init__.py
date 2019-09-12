@@ -10,3 +10,5 @@ from .tkact import TokenAction, TokenActionCollationFailedReason, TokenActionCom
 from .apiact import APICommand
 # noinspection PyUnresolvedReferences
 from .result import *
+# noinspection PyUnresolvedReferences
+from .msgtype import MessageType

@@ -4,6 +4,13 @@ import sys
 from multiprocessing import Pool, cpu_count
 
 from linebot import LineBotApi, WebhookHandler
+from linebot.models import (
+    MessageEvent,
+    TextMessage
+)
+
+from flags import MessageType
+from external.line import handler
 
 __all__ = ["line_handle_event", "line_api", "line_handler"]
 
@@ -25,23 +32,18 @@ line_handle_pool = Pool(processes=cpu_count())
 
 def line_handle_event(body, signature):
     async def handle():
-        # TEMP:
-        print("HANDLE")
         line_handler.handle(body, signature)
-    print("FN CREATED")
     asyncio.run(handle())
 
 
-from .wrapper import LineApiWrapper
-from linebot.models import MessageEvent, TextMessage
+# For some reason, event handler cannot be attached in different file, or the function will never being executed
 
 
 @line_handler.add(MessageEvent, message=TextMessage)
-def handle_text(event, dest):
-    print(f"Line event triggered. [TextMessage]: {dest}")
-    # FIXME: [HP] Implement total handle and return all at once somewhere
-    # FIXME: Add webhook/bot links on home page
-    # FIXME: [MP] https://discordpy.readthedocs.io/en/latest/logging.html / LOGGER = logging.getLogger('linebot')
-    # FIXME: Discord handler
+def handle_text(event, destination):
+    handler.handle_main(MessageType.TEXT, event, destination)
 
-    LineApiWrapper().reply_text(event.reply_token, event.message.text)
+
+@line_handler.default()
+def handle_default(event, destination):
+    handler.handle_main(MessageType.UNKNOWN, event, destination)

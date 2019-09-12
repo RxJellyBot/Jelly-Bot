@@ -1,7 +1,3 @@
-from ..base import line_handler
-
-
-@line_handler.default()
-def handle_default(event):
-    # FIXME: Handle Line event default
-    print("Line event triggered. [Default]")
+# FIXME: Handle Line event default
+def handle_default(event, destination):
+    pass
