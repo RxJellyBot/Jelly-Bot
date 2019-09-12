@@ -32,7 +32,7 @@ def line_handle_event(body, signature):
     asyncio.run(handle())
 
 
-from external.line import LineApiWrapper
+from .wrapper import LineApiWrapper
 from linebot.models import MessageEvent, TextMessage
 
 
@@ -44,4 +44,4 @@ def handle_text(event, dest):
     # FIXME: [MP] https://discordpy.readthedocs.io/en/latest/logging.html / LOGGER = logging.getLogger('linebot')
     # FIXME: Discord handler
 
-    LineApiWrapper.reply_text(event.reply_token, event.message.text)
+    LineApiWrapper().reply_text(event.reply_token, event.message.text)
