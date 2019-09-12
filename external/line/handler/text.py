@@ -1,4 +1,4 @@
-from webhook.line import LineApiWrapper
+from external.line import LineApiWrapper
 from linebot.models import MessageEvent, TextMessage
 
 from ..base import line_handler
@@ -8,7 +8,7 @@ from ..base import line_handler
 def handle_text(event):
     print("Line event triggered. [TextMessage]")
     # FIXME: [HP] Implement total handle and return all at once somewhere
-    # FIXME: Add webhook link on home page
+    # FIXME: Add external link on home page
     # FIXME: [MP] Create logger class
     # FIXME: Discord handler
 
