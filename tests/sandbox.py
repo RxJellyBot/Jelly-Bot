@@ -1,29 +1,21 @@
 from extutils import exec_timing_ns
+import asyncio
 from dateutil import parser
 import requests
 from dotmap import DotMap
 
 
-class GitHubWrapper:
-    API_URL = "https://api.github.com"
+def f():
+    print("87")
 
-    # noinspection PyMethodMayBeStatic
-    def get_latest_deployment(self, environment):
-        response = requests.get(f"{GitHubWrapper.API_URL}/repos/RaenonX/Jelly-Bot-API/deployments", {
-            "environment": environment
-        })
 
-        list_ = response.json()
-
-        if list_:
-            return DotMap(list_[0])
-        else:
-            return None
+async def run():
+    f()
 
 
 @exec_timing_ns
 def wrap():
-    print(parser.parse(GitHubWrapper().get_latest_deployment("jellybotapi").updated_at))
+    asyncio.run(run())
 
 
 @exec_timing_ns

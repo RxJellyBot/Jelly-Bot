@@ -1,8 +1,8 @@
+import asyncio
 import os
 import sys
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 
-from JellyBotAPI.SystemConfig import System
 from linebot import LineBotApi, WebhookHandler
 
 __all__ = ["line_handle_event", "line_api", "line_handler"]
@@ -20,8 +20,11 @@ if not line_secret:
 line_api = LineBotApi(line_token)
 line_handler = WebhookHandler(line_secret)
 
-line_handle_pool = Pool(processes=System.LineAsyncMaxProcesses)
+print(f"CPU count = {cpu_count()}")
+line_handle_pool = Pool(processes=cpu_count())
 
 
 def line_handle_event(body, signature):
-    line_handle_pool.apply_async(line_handler.handle, args=(body, signature))
+    async def handle():
+        line_handler.handle(body, signature)
+    asyncio.run(handle())

@@ -42,7 +42,3 @@ class Email:
 
 class TokenAction:
     ChannelRegisterTokenCooldownSeconds = 60
-
-
-class System:
-    LineAsyncMaxProcesses = 4
