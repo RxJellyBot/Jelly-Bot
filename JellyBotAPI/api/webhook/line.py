@@ -1,5 +1,6 @@
 # DRAFT: Ping every time for user statistics
 # DRAFT: Ping every time for auto reply
+import json
 
 from django.views import View
 
@@ -14,9 +15,9 @@ class WebhookLineView(CsrfExemptMixin, View):
         signature = request.headers['X-Line-Signature']
 
         # get request body as text
-        body = request.get_data(as_text=True)
+        body = str.encode(json.dumps(request.body))
         print("LINE Webhook request body:")
-        print("\t" + body)
+        print("\t" + str(body))
 
         # handle webhook body
         line_handle_event(body, signature)
