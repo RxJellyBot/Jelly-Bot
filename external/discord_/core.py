@@ -11,8 +11,9 @@ class DiscordClient(Client):
         if message.author == self.user:
             return
 
-        print(f"Message Author: {message.author} / Content: {message.content}")
-        await message.channel.send(message.content)
+        if message.channel.name.startswith("[JBOK]"):
+            print(f"Message Author: {message.author} / Content: {message.content}")
+            await message.channel.send(message.content)
 
 
 def start_client():
