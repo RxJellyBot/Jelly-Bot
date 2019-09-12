@@ -42,8 +42,8 @@ def line_handle_event(body, signature):
 def handle_main(event, destination):
     print(f"[LINE] Event Type: {event.type} | To: {destination}")
     print(f"[LINE] Event Message Type: {event.message.type} | To: {destination}")
-    print(isinstance(event.type, MessageEvent))
-    print(isinstance(event.message.type, TextMessage))
+    print(isinstance(event, MessageEvent))
+    print(isinstance(event.message, TextMessage))
     #
     # try:
     #     if msgtype == MessageType.UNKNOWN:
