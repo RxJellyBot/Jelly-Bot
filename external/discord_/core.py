@@ -1,19 +1,19 @@
 from discord import Client
 
-from .token import discord_token
+from .token_ import discord_token
 
 
 class DiscordClient(Client):
     async def on_ready(self):
-        print(f"Logged on as {self.user}")
+        print(f"Logged on as {self.user}.")
 
     async def on_message(self, message):
-        if message.author == client.user:
+        if message.author == self.user:
             return
 
         print(f"Message Author: {message.author} / Content: {message.content}")
-        message.channel.send(message.content)
+        await message.channel.send(message.content)
 
 
-client = DiscordClient()
-client.run(discord_token)
+def start_client():
+    DiscordClient().run(discord_token)
