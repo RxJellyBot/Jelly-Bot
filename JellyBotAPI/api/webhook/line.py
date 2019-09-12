@@ -16,7 +16,7 @@ class WebhookLineView(CsrfExemptMixin, View):
         # get request body as text
         body = request.body.decode("utf-8")
         print("LINE Webhook request body:")
-        print("\t" + str(body))
+        print("\t" + str(body).replace("\n", "").replace(" ", ""))
 
         # handle webhook body
         line_handle_event(body, signature)
