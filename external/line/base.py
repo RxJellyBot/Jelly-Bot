@@ -10,7 +10,6 @@ from linebot.models import (
 )
 
 from flags import MessageType
-from external.line import handler
 
 __all__ = ["line_handle_event", "line_api", "line_handler"]
 
@@ -39,11 +38,18 @@ def line_handle_event(body, signature):
 # For some reason, LINE event handler cannot be attached in different file, or the function will never being executed
 
 
-@line_handler.add(MessageEvent, message=TextMessage)
-def handle_text(event, destination):
-    handler.handle_main(MessageType.TEXT, event, destination)
-
-
 @line_handler.default()
-def handle_default(event, destination):
-    handler.handle_main(MessageType.UNKNOWN, event, destination)
+def handle_main(event, destination):
+    print(f"[LINE] Type: {event} | To: {destination}")
+    #
+    # try:
+    #     if msgtype == MessageType.UNKNOWN:
+    #         handle_default(event, destination)
+    #         return
+    #     elif msgtype == MessageType.TEXT:
+    #         handle_text(event, destination)
+    #         return
+    # except Exception as e:
+    #     handle_error(e, event, destination)
+    #
+    # raise ValueError(f"Unhandled LINE message type ({msgtype}).")
