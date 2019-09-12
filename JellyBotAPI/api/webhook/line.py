@@ -1,10 +1,9 @@
 # DRAFT: Ping every time for user statistics
 # DRAFT: Ping every time for auto reply
-import json
-
 from django.views import View
 
 from JellyBotAPI.components.mixin import CsrfExemptMixin
+from JellyBotAPI.views import simple_str_response
 from webhook.line import line_handle_event
 
 
@@ -22,4 +21,4 @@ class WebhookLineView(CsrfExemptMixin, View):
         # handle webhook body
         line_handle_event(body, signature)
 
-        return "OK"
+        return simple_str_response(request, "OK")
