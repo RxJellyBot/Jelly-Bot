@@ -20,11 +20,13 @@ if not line_secret:
 line_api = LineBotApi(line_token)
 line_handler = WebhookHandler(line_secret)
 
-print(f"CPU count = {cpu_count()}")
 line_handle_pool = Pool(processes=cpu_count())
 
 
 def line_handle_event(body, signature):
     async def handle():
+        # TEMP:
+        print("HANDLE")
         line_handler.handle(body, signature)
+    print("FN CREATED")
     asyncio.run(handle())
