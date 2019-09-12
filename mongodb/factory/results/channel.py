@@ -41,5 +41,5 @@ class ChannelChangeNameResult(ModelResult):
 
 @dataclass
 class PermissionProfileRegistrationResult(ModelResult):
-    # FIXME: Permission - `PermissionProfileRegistrationResult` not completed
+    # INCOMPLETE: Permission - `PermissionProfileRegistrationResult` not completed
     pass

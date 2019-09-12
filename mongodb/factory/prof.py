@@ -59,7 +59,7 @@ class UserProfileManager(BaseCollection):
         return self.set_cache(
             self.CACHE_KEY_SPEC1, (channel_oid, root_uid), model, parse_cls=ChannelProfileConnectionModel)
 
-    # FIXME: user_detach_profile and delete
+    # INCOMPLETE: user_detach_profile and delete
 
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
