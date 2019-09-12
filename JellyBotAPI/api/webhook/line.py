@@ -3,10 +3,11 @@
 
 from django.views import View
 
+from JellyBotAPI.components.mixin import CsrfExemptMixin
 from webhook.line import line_handle_event
 
 
-class WebhookLineView(View):
+class WebhookLineView(CsrfExemptMixin, View):
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post(self, request, *args, **kwargs):
         # get X-Line-Signature header value
