@@ -1,4 +1,4 @@
-from external.line import LineApiWrapper
+from ..wrapper import LineApiWrapper
 
 
 def handle_text(event, destination):
