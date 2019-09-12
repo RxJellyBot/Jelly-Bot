@@ -11,5 +11,5 @@ urlpatterns = [
     path('id/', include('JellyBotAPI.api.id.urls')),
     path('token', TokenActionCompleteView.as_view(), name="api.token.complete"),
     path('token/list', TokenActionListView.as_view(), name="api.token.list"),
-    path('webhook/line', WebhookLineView.as_view(), name="api.webhook.line")
+    path('external/line', WebhookLineView.as_view(), name="api.external.line")
 ]
