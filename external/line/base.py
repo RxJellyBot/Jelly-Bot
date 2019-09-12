@@ -36,7 +36,7 @@ def line_handle_event(body, signature):
     asyncio.run(handle())
 
 
-# For some reason, event handler cannot be attached in different file, or the function will never being executed
+# For some reason, LINE event handler cannot be attached in different file, or the function will never being executed
 
 
 @line_handler.add(MessageEvent, message=TextMessage)
