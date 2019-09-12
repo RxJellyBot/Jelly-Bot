@@ -12,7 +12,7 @@ class DiscordClient(Client):
             return
 
         if message.channel.name.startswith("jbok"):
-            print(f"Message Author: {message.author} / Content: {message.content}")
+            print(f"Channel Name: {message.channel.name} / Author: {message.author} / Content: {message.content}")
             await message.channel.send(message.content)
 
 
