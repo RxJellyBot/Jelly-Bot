@@ -9,7 +9,7 @@ def handle_text(event):
     print("Line event triggered. [TextMessage]")
     # FIXME: [HP] Implement total handle and return all at once somewhere
     # FIXME: Add webhook/bot links on home page
-    # FIXME: [MP] Create logger class
+    # FIXME: [MP] https://discordpy.readthedocs.io/en/latest/logging.html
     # FIXME: Discord handler
 
     LineApiWrapper.reply_text(event.reply_token, event.message.text)
