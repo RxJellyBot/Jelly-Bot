@@ -15,7 +15,7 @@ class WebhookLineView(CsrfExemptMixin, View):
         signature = request.headers['X-Line-Signature']
 
         # get request body as text
-        body = str.encode(json.dumps(request.body))
+        body = request.body.decode("utf-8")
         print("LINE Webhook request body:")
         print("\t" + str(body))
 
