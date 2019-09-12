@@ -8,7 +8,7 @@ from ..base import line_handler
 def handle_text(event):
     print("Line event triggered. [TextMessage]")
     # FIXME: [HP] Implement total handle and return all at once somewhere
-    # FIXME: Add external link on home page
+    # FIXME: Add webhook/bot links on home page
     # FIXME: [MP] Create logger class
     # FIXME: Discord handler
 
