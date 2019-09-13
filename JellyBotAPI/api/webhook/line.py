@@ -5,6 +5,7 @@ from django.views import View
 from JellyBotAPI.components.mixin import CsrfExemptMixin
 from JellyBotAPI.views import simple_str_response
 from external.line import line_handle_event
+from external.line.logger import LINE
 
 
 class WebhookLineView(CsrfExemptMixin, View):
@@ -15,8 +16,7 @@ class WebhookLineView(CsrfExemptMixin, View):
 
         # get request body as text
         body = request.body.decode("utf-8")
-        print("LINE Webhook request body:")
-        print("\t" + str(body).replace("\n", "").replace(" ", ""))
+        LINE.logger.info("LINE Webhook request body: " + "\t" + str(body).replace("\n", "").replace(" ", ""))
 
         # handle external body
         line_handle_event(body, signature)

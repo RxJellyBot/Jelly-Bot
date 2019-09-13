@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if SECRET_KEY is None:
-    print('SECRET_KEY undefined.')
+    print('Django SECRET_KEY undefined.')
     sys.exit(1)
 
 DEBUG = bool(int(os.environ.get('DEBUG', 0)))

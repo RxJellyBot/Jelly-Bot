@@ -3,6 +3,8 @@ from pymongo.errors import BulkWriteError
 
 from models import OID_KEY
 
+from .logger import logger
+
 
 class BulkWriteDataHolder:
     def __init__(self, col, flush_base: int):
@@ -23,8 +25,7 @@ class BulkWriteDataHolder:
             try:
                 return [oid for idx, oid in self._col.bulk_write(self._reqs, ordered=False).upserted_ids.items()]
             except BulkWriteError as e:
-                print("Error occurred during bulk writing:")
-                print("\n".join(f"{s['errmsg']}" for s in e.details["writeErrors"]))
+                logger.logger.exception("\n".join(f"{s['errmsg']}" for s in e.details["writeErrors"]))
                 return e.details["writeErrors"]
 
     def repsert_single(self, filter_, data):

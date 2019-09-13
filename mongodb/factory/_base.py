@@ -148,11 +148,6 @@ class CacheMixin(Collection):
         else:
             ret = self._cache[cache_key][item_key]
 
-        # print(f"[INFO] Attempted to get data from the cache of `{self.__class__.__name__}`.")
-        # print(f"            Cache Key: {cache_key} / Item Key: {item_key} / Acquire Fn: {acquire_func}")
-        # print(f"            Acquire Args: {acquire_args} / Auto Acquire: {acquire_auto} / Parse Class: {parse_cls}")
-        # print(f"            Return Value: {ret}")
-
         return self.set_cache(cache_key, item_key, ret, parse_cls)
 
     @DecoParamCaster({1: None, "item_key_from_data": None})

@@ -6,3 +6,5 @@ from .timing import exec_timing, exec_timing_ns
 from .heroku import _inst as HerokuWrapper
 # noinspection PyUnresolvedReferences,PyPep8Naming
 from .github import _inst as GithubWrapper
+# noinspection PyUnresolvedReferences
+from .singleton import Singleton
