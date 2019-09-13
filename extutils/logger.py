@@ -22,22 +22,24 @@ class GlobalLogHandler(logging.StreamHandler):
 class LoggerSkeleton:
     DEFAULT_FMT = "%(asctime)s %(name)s[%(levelname)s]: %(message)s"
 
-    def __init__(self, name, fmt=None, level=None, logger_name_env=None):
+    def __init__(self, name: str, fmt: str = None, level: int = None, logger_name_env: str = None):
         # https://docs.python.org/3/library/logging.html#logrecord-attributes
 
         if not logger_name_env:
             logger_name_env = name
 
         self._enabled = False
-        self._is_debug = bool(int(os.environ.get("DEBUG", 0))) or level < logging.DEBUG
+        self._is_debug = bool(int(os.environ.get("DEBUG", 0)))
 
         if not level:
             if self._is_debug:
                 level = logging.DEBUG
             elif "LOG_LEVEL" in os.environ:
-                level = os.environ["LOG_LEVEL"]
+                level = int(os.environ["LOG_LEVEL"])
             else:
                 level = logging.WARNING
+
+        self._is_debug = self._is_debug or level <= logging.DEBUG
 
         # Initialize objects
         self._fmt = GlobalLogFormatter(fmt if fmt else LoggerSkeleton.DEFAULT_FMT)
