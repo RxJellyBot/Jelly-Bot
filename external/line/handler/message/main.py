@@ -50,4 +50,4 @@ def handle_msg_main(event, destination):
         else:
             handle_msg_default(event, destination)
     except Exception as e:
-        handle_error(e, event, destination)
+        handle_error(e, f"Error occurred in handle_msg_main. Handle function: {fn.__name__}", event, destination)

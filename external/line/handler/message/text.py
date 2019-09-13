@@ -5,5 +5,7 @@ def handle_text(event, destination):
     # FIXME: Discord handler
     #  REF 1: https://github.com/nick411077/repo_bot/blob/master/cogs/help.py
     #  REF 2: https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
-
-    print(event.message.text)
+    if event.message.text == "ERRORERROR":
+        raise Exception("Custom error for testing purpose.")
+    else:
+        pass
