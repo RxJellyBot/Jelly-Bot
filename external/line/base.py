@@ -23,8 +23,8 @@ line_api = LineBotApi(line_token)
 
 line_handler = WebhookHandler(line_secret)
 # Attach events
-line_handler.default()(handler.handle_main)
 line_handler.add(MessageEvent)(handler.handle_msg_main)
+line_handler.default()(handler.handle_main)
 
 line_handle_pool = Pool(processes=cpu_count())
 
