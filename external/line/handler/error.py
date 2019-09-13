@@ -6,13 +6,15 @@ from extutils.gmail import MailSender
 from external.line.logger import LINE, ExtraKey
 
 
-def handle_error(exception: Exception, event, destination):
+def handle_error(exception: Exception, extra_note: str, event, destination):
     if isinstance(exception, exceptions.LineBotApiError):
         # e.status_code, e.error.message, e.error.details
-        message = f"LINE API Error. Status code: {exception.status_code} | Message: {exception.error.message}\n" \
-                  f"\tDetails: {exception.error.details}"
+        message = f"LINE API Error.\n" \
+                  f"Status code: {exception.status_code} | Message: {exception.error.message}\n" \
+                  f"Details: {exception.error.details}\n" \
+                  f"Note: {extra_note}"
     else:
-        message = "Error occured on LINE webhook."
+        message = f"Error occured on LINE webhook.\nNote: {extra_note}"
 
     __log_error__(message, event, destination)
     __send_email__(message, event, destination)
