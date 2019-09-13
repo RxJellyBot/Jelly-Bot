@@ -40,12 +40,12 @@ class LoggerSkeleton:
         self._is_debug = bool(int(os.environ.get("DEBUG", 0)))
 
         if not level:
-            if self._is_debug:
+            if logger_name_env in loggers and loggers[logger_name_env]:
+                level = loggers[logger_name_env]
+            elif self._is_debug:
                 level = logging.DEBUG
             elif "LOG_LEVEL" in os.environ:
                 level = int(os.environ["LOG_LEVEL"])
-            elif logger_name_env in loggers and loggers[logger_name_env]:
-                level = loggers[logger_name_env]
             else:
                 level = logging.WARNING
 
