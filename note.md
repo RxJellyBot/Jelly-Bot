@@ -2,7 +2,8 @@
 ### `LOGGER`
 Logger(s) to be used and printed in the console.
 
-Options
+**Options:**
+
 > `LINE`: System's logger on `linebot` wrapper
 >
 > `LINE_INTERNAL`: `linebot`'s logger
@@ -17,22 +18,28 @@ Options
 >
 > `MONGO_UTILS`: MongoDB utility's logger
 
-Example Value
+**Example Value:**
 > LINE,LINE_INTERNAL
 
-Default Value
+**Default Value:**
 > N/A
+
+**Notes:**
+- If `DEBUG` in environment variable is set to `1`, this setting will be ignored.
 
 <hr>
 
 ### `LOG_LEVEL`
 Numeric value of the level to be logged.
 
-Options
+**Options:**
 > Refer to <https://docs.python.org/3/library/logging.html#levels>
 
-Example Value
+**Example Value:**
 > 50
 
-Default Value
+**Default Value:**
 > `logging.ERROR` (40)
+
+**Notes:**
+- If `DEBUG` in environment variable is set to 1, this setting will be ignored.
