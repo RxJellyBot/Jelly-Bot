@@ -2,12 +2,20 @@ import os
 import sys
 import logging
 
+from extutils import split_fill
+
 __all__ = ["LoggerSkeleton"]
 
 
-loggers = []
+LOGGER_SPLITTOR = ","
+LOGGER_LVSPLIT = "|"
+
+
+loggers = {}
 if "LOGGER" in os.environ:
-    loggers = [lgr.strip() for lgr in os.environ["LOGGER"].split(",")]
+    for lgr in os.environ["LOGGER"].split(LOGGER_SPLITTOR):
+        logger_name, lv = split_fill(lgr.strip(), 2, LOGGER_LVSPLIT)
+        loggers[logger_name] = int(lv) if lv else lv
 
 
 class GlobalLogFormatter(logging.Formatter):
@@ -36,6 +44,8 @@ class LoggerSkeleton:
                 level = logging.DEBUG
             elif "LOG_LEVEL" in os.environ:
                 level = int(os.environ["LOG_LEVEL"])
+            elif logger_name_env in loggers and loggers[logger_name_env]:
+                level = loggers[logger_name_env]
             else:
                 level = logging.WARNING
 
@@ -47,8 +57,7 @@ class LoggerSkeleton:
         self._core = logging.getLogger(name)
 
         # Configs
-        self._core.setLevel(level)
-        self._handler.setLevel(level)
+        self.set_level(level)
         self._handler.setFormatter(self._fmt)
 
         # Activate
@@ -60,6 +69,10 @@ class LoggerSkeleton:
 
     def disable(self):
         self._core.removeHandler(self._handler)
+
+    def set_level(self, level):
+        self._core.setLevel(level)
+        self._handler.setLevel(level)
 
     def temp_apply_format(self, fmt_str, level, msg, *args, **kwargs):
         self._handler.setFormatter(GlobalLogFormatter(fmt_str))

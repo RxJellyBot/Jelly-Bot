@@ -1,6 +1,6 @@
 # Optional Environment Variables
 ### `LOGGER`
-Logger(s) to be used and printed in the console.
+Logger(s) to be used and printed in the console. Log level can be specified.
 
 **Options:**
 
@@ -19,18 +19,27 @@ Logger(s) to be used and printed in the console.
 > `MONGO_UTILS`: MongoDB utility's logger
 
 **Example Value:**
+
+(w/o log level)
+
 > LINE,LINE_INTERNAL
+
+or
+
+(w/ log level)
+
+> LINE|40,DISCORD
 
 **Default Value:**
 > N/A
 
 **Notes:**
-- If `DEBUG` in environment variable is set to `1`, this setting will be ignored.
+- If `DEBUG` in environment variable is set to `1`, this setting will be ignored, except that the log level is specified.
 
 <hr>
 
 ### `LOG_LEVEL`
-Numeric value of the level to be logged.
+Default numeric value of the level to be logged. This will be overrided if a level is specified in [`LOGGER`](#logger).
 
 **Options:**
 > Refer to <https://docs.python.org/3/library/logging.html#levels>
