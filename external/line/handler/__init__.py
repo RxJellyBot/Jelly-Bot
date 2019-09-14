@@ -1,4 +1,4 @@
-from .message import *
+from .message import handle_msg_main
 from .main import handle_main
 from .default import handle_default
 from .error import handle_error

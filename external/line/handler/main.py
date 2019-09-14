@@ -7,7 +7,7 @@ from linebot.models import (
 
 from external.line.logger import LINE, ExtraKey, event_dest_fmt
 
-from .message import *
+from .message import handle_msg_main
 from .self import handle_self_main
 from .member import handle_member_main
 from .error import handle_error

@@ -3,7 +3,7 @@ from extutils.logger import LoggerSkeleton
 __all__ = ["LINE", "ExtraKey", "event_dest_fmt"]
 
 
-LINE = LoggerSkeleton("line.sys", logger_name_env="LINE")
+LINE = LoggerSkeleton("sys.line", logger_name_env="LINE")
 LINE_INTERNAL = LoggerSkeleton("linebot", logger_name_env="LINE_INTERNAL")
 
 
