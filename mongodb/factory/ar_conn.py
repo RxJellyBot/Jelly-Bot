@@ -244,7 +244,7 @@ class AutoReplyManager:
                 else:
                     resp_id_miss.append(resp_id)
 
-        if not resp_id_miss or not mod:
+        if resp_id_miss and ctnt_rst.success:
             content = f"""Malformed data detected.
             <hr>
             <h4>Parameters</h4>\n

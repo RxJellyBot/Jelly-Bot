@@ -1,2 +1,2 @@
 # noinspection PyPep8Naming
-from .core import start_client
+from .core import run_server

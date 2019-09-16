@@ -7,6 +7,11 @@ from external.handle import TextEventObject, HandledEventObject, HandledEventObj
 
 
 def process_auto_reply(e: TextEventObject) -> List[HandledEventObject]:
-    return [
-        HandledEventObjectText(txt) for txt in
-        AutoReplyManager.get_response(e.text, AutoReplyContentType.TEXT, case_insensitive=AutoReply.CaseSensitive)]
+    ret = []
+
+    for responses in AutoReplyManager.get_response(
+            e.text, AutoReplyContentType.TEXT, case_insensitive=AutoReply.CaseSensitive):
+        if responses:
+            ret.extend([HandledEventObjectText(content=response) for response in responses])
+
+    return ret
