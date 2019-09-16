@@ -24,4 +24,4 @@ line_handle_pool = Pool(processes=cpu_count())
 
 
 def line_handle_event(body, signature):
-    line_handler.handle(body, signature)
+    line_handle_pool.apply_async(line_handler.handle, args=(body, signature))
