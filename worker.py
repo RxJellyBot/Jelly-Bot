@@ -2,7 +2,7 @@ import asyncio
 
 import requests
 
-from external.discord_ import start_client
+from external.discord_ import start_discord_client_non_block
 
 
 async def _spam_ping_():
@@ -15,4 +15,4 @@ async def _spam_ping_():
 
 if __name__ == '__main__':
     asyncio.ensure_future(_spam_ping_())
-    start_client()
+    # start_client()

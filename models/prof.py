@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import List
 
 from bson import ObjectId
-from django.utils.translation import gettext_lazy as _
 
 from flags import PermissionCategory, PermissionCategoryDefault
 from models import Model, ChannelModel, ModelDefaultValueExt
@@ -11,7 +10,7 @@ from models.field import ObjectIDField, TextField, ColorField, DictionaryField, 
 
 class ChannelProfileModel(Model):
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
-    Name = TextField("n", default=_("(Unknown)"), must_have_content=True)
+    Name = TextField("n", default="-", must_have_content=True)
     Color = ColorField("col")
     IsMod = BooleanField("m")
     IsAdmin = BooleanField("a")

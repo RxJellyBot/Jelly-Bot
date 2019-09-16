@@ -18,3 +18,5 @@ def handle_text_event(e: TextEventObject) -> List[HandledEventObject]:
         responses = fn(e)
         if responses:
             return responses
+
+    return []
