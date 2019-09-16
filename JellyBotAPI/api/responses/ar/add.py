@@ -163,5 +163,5 @@ class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = TokenActionManager.enqueue_action(
             self._sender_oid, TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
-            KeywordOid=self._keyword, ResponsesOids=self._responses, CreatorOid=self._sender_oid,
+            KeywordOid=self._keyword, ResponseOids=self._responses, CreatorOid=self._sender_oid,
             Pinned=self._pinned, Private=self._pinned, TagIds=self._tags, CooldownSec=self._cooldown)

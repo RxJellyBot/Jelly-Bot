@@ -40,8 +40,8 @@ class AutoReplyModuleModel(Model):
     # TODO: Auto Reply: Target User - Mixed with Exclude User
 
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                               max_len=sysconfig.AutoReply.MaxResponses)
+    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                              max_len=sysconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Disabled = BooleanField("d", readonly=True)
@@ -60,8 +60,8 @@ class AutoReplyModuleModel(Model):
 
 class AutoReplyModuleTokenActionModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                               max_len=sysconfig.AutoReply.MaxResponses)
+    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                              max_len=sysconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
