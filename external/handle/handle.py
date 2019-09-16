@@ -1,6 +1,6 @@
 from typing import List
 
-from handle import HandledEventObject
+from external.handle import HandledEventObject
 from .base_in import EventObject, TextEventObject
 from .logger import logger
 from .text.main import handle_text_event

@@ -12,6 +12,7 @@ __all__ = ["process_calculator"]
 
 # Obtained and modified from https://stackoverflow.com/a/14822667
 def process_calculator(e: TextEventObject) -> List[HandledEventObject]:
+    # FIXME: [MP] Handle latex
     if e.text[-1] == "=":
         expr = e.text[:-1]
         symbol_vals = {}
