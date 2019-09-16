@@ -20,6 +20,8 @@ fn_dict = {
     MessageType.STICKER: handle_sticker
 }
 
+t_lock = False
+
 
 def handle_msg_main(event, destination):
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Message event",
@@ -45,6 +47,16 @@ def handle_msg_main(event, destination):
     fn = fn_dict.get(msg_type)
 
     try:
+
+        global t_lock
+
+        import time
+        if not t_lock:
+            time.sleep(5)
+            t_lock = True
+
+        print(t_lock)
+
         if fn:
             fn(event, destination)
         else:
