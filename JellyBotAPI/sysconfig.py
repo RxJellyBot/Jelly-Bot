@@ -43,3 +43,7 @@ class Email:
 
 class TokenAction:
     ChannelRegisterTokenCooldownSeconds = 60
+
+
+class System:
+    PingSpamWaitSeconds = 29 * 60  # 29 mins because Heroku sleep on 30 mins

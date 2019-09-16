@@ -19,7 +19,7 @@ from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValue
 from models.utils import ModelFieldChecker
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import InsertOutcome
-from JellyBotAPI.SystemConfig import Database
+from JellyBotAPI.sysconfig import Database
 
 CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 

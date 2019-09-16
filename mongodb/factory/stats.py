@@ -5,7 +5,7 @@ from bson import ObjectId
 from flags import APICommand
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel
-from JellyBotAPI.SystemConfig import Database
+from JellyBotAPI.sysconfig import Database
 
 from ._base import BaseCollection
 

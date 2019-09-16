@@ -1,7 +1,7 @@
 from typing import List
 
 from flags import AutoReplyContentType
-from JellyBotAPI.SystemConfig import AutoReply
+from JellyBotAPI.sysconfig import AutoReply
 from mongodb.factory import AutoReplyManager
 from external.handle import TextEventObject, HandledEventObject, HandledEventObjectText
 
