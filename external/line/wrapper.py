@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import List, Union
 
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
@@ -20,10 +21,15 @@ class LineApiWrapper:
     def __init__(self):
         self._core = line_api
 
-    def reply_text(self, reply_token, message):
-        self._core.reply_message(
-            reply_token,
-            TextSendMessage(text=message))
+    def reply_text(self, reply_token, message: Union[str, List[str]]):
+        if isinstance(message, str):
+            send_messages = TextSendMessage(text=message)
+        elif isinstance(message, list):
+            send_messages = [TextSendMessage(text=msg) for msg in message]
+        else:
+            raise ValueError("Message should be either in `list` of `str` or `str`.")
+
+        self._core.reply_message(reply_token, send_messages)
 
 
 _inst = LineApiWrapper()

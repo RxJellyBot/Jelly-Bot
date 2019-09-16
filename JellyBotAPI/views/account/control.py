@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from JellyBotAPI import keys
 from JellyBotAPI.components.mixin import LoginRequiredMixin

@@ -214,6 +214,9 @@ class CacheMixin(Collection):
     def reset_cache(self):
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
+    def remove_cache(self, cache_key: str, item_key):
+        del self._cache[cache_key][item_key]
+
     def _pre_check_(self, cache_key: str):
         if cache_key not in self._cache:
             if self.auto_init:

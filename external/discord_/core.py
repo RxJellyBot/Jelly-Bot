@@ -1,6 +1,7 @@
 from discord import Client, Activity, ActivityType
 from external.discord_.logger import DISCORD
-from external.handle import EventObjectFactory, handle_main
+# FIXME: [HP] Get rid of this or make it lazy
+# from external.handle import EventObjectFactory, handle_main
 
 from .token_ import discord_token
 
@@ -16,10 +17,13 @@ class DiscordClient(Client):
             return
 
         if message.channel.name.startswith("jbok"):
-            # FIXME: [LP] handle returned type will be changed
+            # FIXME: [LP] Redirect to webpage if too long
             DISCORD.logger.info(
                 f"Channel Name: {message.channel.name} / Author: {message.author} / Content: {message.content}")
-            await message.channel.send(handle_main(EventObjectFactory.from_discord(message)))
+
+            # for txt_handled in handle_main(EventObjectFactory.from_discord(message)):
+            #     await message.channel.send(txt_handled.content)
+            await message.channel.send(message.content)
 
 
 def start_client():

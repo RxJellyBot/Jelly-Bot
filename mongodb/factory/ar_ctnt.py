@@ -1,7 +1,11 @@
+from typing import Optional
+
+from bson import ObjectId
+
 from extutils.utils import is_empty_string
 from extutils.checker import DecoParamCaster
 from flags import AutoReplyContentType
-from models import AutoReplyContentModel
+from models import AutoReplyContentModel, OID_KEY
 from mongodb.factory.results import InsertOutcome, GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
 
 from ._base import BaseCollection
@@ -43,7 +47,9 @@ class AutoReplyContentManager(BaseCollection):
         ret_entry = self._spec_get_cache_(content, type_, case_insensitive)
         add_result = None
 
-        if ret_entry is None and add_on_not_found:
+        entry_none = ret_entry is None
+
+        if entry_none and add_on_not_found:
             add_result = self.add_content(content, type_)
 
             if InsertOutcome.is_inserted(add_result.outcome):
@@ -51,10 +57,18 @@ class AutoReplyContentManager(BaseCollection):
                 outcome = GetOutcome.O_ADDED
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
+        elif entry_none:
+            outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
         else:
             outcome = GetOutcome.O_CACHE_DB
 
         return AutoReplyContentGetResult(outcome, ret_entry, on_add_result=add_result)
+
+    @DecoParamCaster({1: ObjectId})
+    def get_content_by_id(self, oid: ObjectId) -> Optional[AutoReplyContentModel]:
+        return self.get_cache_condition(
+            AutoReplyContentModel.Content.key, lambda x: x.id == oid,
+            acquire_args=({OID_KEY: oid},), parse_cls=AutoReplyContentModel)
 
 
 _inst = AutoReplyContentManager()

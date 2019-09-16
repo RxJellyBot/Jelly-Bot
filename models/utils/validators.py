@@ -21,7 +21,7 @@ class AutoReplyValidators:
             return _BaseValidators.is_content_sticker(content)
 
         if type_ == flags.AutoReplyContentType.TEXT:
-            return len(content) <= AutoReply.MAX_CONTENT_LENGTH
+            return len(content) <= AutoReply.MaxContentLength
 
         return True
 

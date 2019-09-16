@@ -7,15 +7,17 @@ from datetime import datetime
 
 from JellyBotAPI.SystemConfig import Database, DataQuery
 from extutils import is_empty_string
+from extutils.gmail import MailSender
+from extutils.checker import DecoParamCaster
 from extutils.color import ColorFactory
-from flags import PermissionCategory
+from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
 from mongodb.factory.results import (
     InsertOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
 from mongodb.utils import CheckableCursor
-from mongodb.factory import ProfileManager
+from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
 
@@ -29,7 +31,7 @@ class AutoReplyModuleManager(BaseCollection):
     model_class = AutoReplyModuleModel
 
     def __init__(self):
-        super().__init__(AutoReplyModuleModel.KeywordOid.key)
+        super().__init__(AutoReplyModuleModel.Id.key)
         self.create_index(
             [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponsesOids.key, 1)],
             name="Auto Reply Module Identity", unique=True)
@@ -50,11 +52,17 @@ class AutoReplyModuleManager(BaseCollection):
                     Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds=[channel_oid]
                 )
 
+            if outcome.is_success:
+                self.set_cache(AutoReplyModuleModel.Id.key, model.id, model)
+
             return AutoReplyModuleAddResult(outcome, model, ex)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         model.clear_oid()
         outcome, ex = self.insert_one_model(model)
+
+        if outcome.is_success:
+            self.set_cache(AutoReplyModuleModel.Id.key, model.id, model)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
@@ -71,7 +79,16 @@ class AutoReplyModuleManager(BaseCollection):
         else:
             outcome = InsertOutcome.X_NOT_FOUND
 
+        if outcome.is_success:
+            self.remove_cache(AutoReplyModuleModel.Id.key, update_result.upserted_id)
+
         return outcome
+
+    @DecoParamCaster({1: ObjectId, 2: bool})
+    def get_conn(self, keyword_oid: ObjectId, case_insensitive: bool = True) -> Optional[AutoReplyModuleModel]:
+        return self.get_cache(
+            AutoReplyModuleModel.Id.key,
+            keyword_oid, parse_cls=AutoReplyModuleModel, case_insensitive=case_insensitive)
 
 
 class AutoReplyModuleTagManager(BaseCollection):
@@ -203,6 +220,44 @@ class AutoReplyManager:
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
+
+    def get_response(
+            self, keyword: str, type_: AutoReplyContentType, case_insensitive: bool = False) -> List[str]:
+        """
+        :return: Empty list (length of 0) if no corresponding response.
+        """
+        ctnt_rst = AutoReplyContentManager.get_content(keyword, type_, False, case_insensitive)
+        mod = None
+        resp_ctnt = []
+        resp_id_miss = []
+
+        if ctnt_rst.success:
+            mod = self._mod.get_conn(ctnt_rst.model.id, case_insensitive)
+
+        if mod:
+            resp_ids = mod.response_oids
+
+            for resp_id in resp_ids:
+                ctnt = AutoReplyContentManager.get_content_by_id(resp_id)
+                if ctnt:
+                    resp_ctnt.append(ctnt)
+                else:
+                    resp_id_miss.append(resp_id)
+
+        if not resp_id_miss or not mod:
+            content = f"""Malformed data detected.
+            <hr>
+            <h4>Parameters</h4>\n
+            Keyword: {keyword} / Type: {type_} / Case Insensitive: {case_insensitive}\n
+            <h4>Variables</h4>\n
+            Get content result (keyword): {ctnt_rst}\n
+            Keyword connection model: {mod}\n
+            Contents to response: {mod}\n
+            Contents missing (id): {resp_id_miss}\n
+            """
+            MailSender.send_email_async(content, subject="Lossy data in auto reply database")
+
+        return resp_ctnt
 
     def get_popularity_scores(self, search_keyword: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[str]:

@@ -1,3 +1,4 @@
 from .logger import logger
-from .base_in import EventObjectFactory, EventObject
+from .base_in import EventObjectFactory, EventObject, TextEventObject
+from .base_out import HandledEventObject, HandledEventObjectText
 from .handle import handle_main

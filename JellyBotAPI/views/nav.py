@@ -1,5 +1,5 @@
 from django.urls import reverse, NoReverseMatch
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from JellyBotAPI import keys
 from JellyBotAPI.components.navbar import (

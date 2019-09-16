@@ -2,9 +2,10 @@ import math
 
 
 class AutoReply:
-    MAX_RESPONSES = 5
-    MAX_CONTENT_LENGTH = 2000
-    TAG_SPLITTOR = "|"
+    MaxResponses = 5
+    MaxContentLength = 2000
+    TagSplittor = "|"
+    CaseSensitive = False
 
 
 class Database:
