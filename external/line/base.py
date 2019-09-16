@@ -1,6 +1,5 @@
 import os
 import sys
-from concurrent.futures.thread import ThreadPoolExecutor
 from multiprocessing import Pool, cpu_count
 
 from linebot import WebhookHandler
@@ -23,6 +22,17 @@ line_handler.default()(handle_main)
 
 line_handle_pool = Pool(processes=cpu_count())
 
-with ThreadPoolExecutor(max_workers=5) as executor:
-    def line_handle_event(body, signature):
-        executor.submit(line_handler.handle, body, signature).result()
+t_lock = False
+
+
+def line_handle_event(body, signature):
+    global t_lock
+
+    import time
+    if not t_lock:
+        time.sleep(5)
+        t_lock = True
+
+    print(t_lock)
+
+    line_handler.handle(body, signature)
