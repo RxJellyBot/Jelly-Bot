@@ -3,7 +3,8 @@ import threading
 from discord import Client, Activity, ActivityType
 
 from external.discord_.logger import DISCORD
-from external.handle import EventObjectFactory, handle_main
+from external.discord_ import handle_discord_main
+from external.handle import EventObjectFactory
 from .token_ import discord_token
 
 __all__ = ["run_server"]
@@ -24,7 +25,7 @@ class DiscordClient(Client):
             DISCORD.logger.info(
                 f"Channel Name: {message.channel.name} / Author: {message.author} / Content: {message.content}")
 
-            for txt_handled in handle_main(EventObjectFactory.from_discord(message)):
+            for txt_handled in handle_discord_main(EventObjectFactory.from_discord(message)):
                 await message.channel.send(txt_handled.content)
 
 

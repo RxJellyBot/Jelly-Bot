@@ -31,9 +31,9 @@ class AutoReplyModuleManager(BaseCollection):
     model_class = AutoReplyModuleModel
 
     def __init__(self):
-        super().__init__(AutoReplyModuleModel.Id.key)
+        super().__init__(AutoReplyModuleModel.KeywordOid.key)
         self.create_index(
-            [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponsesOids.key, 1)],
+            [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponseOids.key, 1)],
             name="Auto Reply Module Identity", unique=True)
 
     def add_conn(
@@ -48,12 +48,12 @@ class AutoReplyModuleManager(BaseCollection):
             model, outcome, ex, insert_result = \
                 self.insert_one_data(
                     AutoReplyModuleModel,
-                    KeywordOid=kw_oid, ResponsesOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
+                    KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
                     Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds=[channel_oid]
                 )
 
             if outcome.is_success:
-                self.set_cache(AutoReplyModuleModel.Id.key, model.id, model)
+                self.set_cache(AutoReplyModuleModel.KeywordOid.key, kw_oid, model)
 
             return AutoReplyModuleAddResult(outcome, model, ex)
 
@@ -62,13 +62,13 @@ class AutoReplyModuleManager(BaseCollection):
         outcome, ex = self.insert_one_model(model)
 
         if outcome.is_success:
-            self.set_cache(AutoReplyModuleModel.Id.key, model.id, model)
+            self.set_cache(AutoReplyModuleModel.KeywordOid.key, model.keyword_oid, model)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
     def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> InsertOutcome:
         update_result = self.update_one(
-            {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponsesOids.key: rep_oids},
+            {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
             {"$addToSet": {AutoReplyModuleModel.ChannelIds.key: channel_oid}})
 
         if update_result.matched_count > 0:
@@ -80,14 +80,14 @@ class AutoReplyModuleManager(BaseCollection):
             outcome = InsertOutcome.X_NOT_FOUND
 
         if outcome.is_success:
-            self.remove_cache(AutoReplyModuleModel.Id.key, update_result.upserted_id)
+            self.remove_cache(AutoReplyModuleModel.KeywordOid.key, kw_oid)
 
         return outcome
 
     @DecoParamCaster({1: ObjectId, 2: bool})
     def get_conn(self, keyword_oid: ObjectId, case_insensitive: bool = True) -> Optional[AutoReplyModuleModel]:
         return self.get_cache(
-            AutoReplyModuleModel.Id.key,
+            AutoReplyModuleModel.KeywordOid.key,
             keyword_oid, parse_cls=AutoReplyModuleModel, case_insensitive=case_insensitive)
 
 
@@ -221,7 +221,7 @@ class AutoReplyManager:
             -> AutoReplyModuleAddResult:
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
 
-    def get_response(
+    def get_responses(
             self, keyword: str, type_: AutoReplyContentType, case_insensitive: bool = False) -> List[str]:
         """
         :return: Empty list (length of 0) if no corresponding response.
@@ -238,9 +238,9 @@ class AutoReplyManager:
             resp_ids = mod.response_oids
 
             for resp_id in resp_ids:
-                ctnt = AutoReplyContentManager.get_content_by_id(resp_id)
-                if ctnt:
-                    resp_ctnt.append(ctnt)
+                ctnt_mdl = AutoReplyContentManager.get_content_by_id(resp_id)
+                if ctnt_mdl:
+                    resp_ctnt.append(ctnt_mdl.content)
                 else:
                     resp_id_miss.append(resp_id)
 

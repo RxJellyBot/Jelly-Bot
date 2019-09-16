@@ -7,11 +7,8 @@ from external.handle import TextEventObject, HandledEventObject, HandledEventObj
 
 
 def process_auto_reply(e: TextEventObject) -> List[HandledEventObject]:
-    ret = []
-
-    for responses in AutoReplyManager.get_response(
-            e.text, AutoReplyContentType.TEXT, case_insensitive=AutoReply.CaseSensitive):
-        if responses:
-            ret.extend([HandledEventObjectText(content=response) for response in responses])
-
-    return ret
+    # FIXME: [MP] Not yet channel specified (Handle channel and publics)
+    return [
+        HandledEventObjectText(content=response) for response
+        in AutoReplyManager.get_responses(e.text, AutoReplyContentType.TEXT, case_insensitive=AutoReply.CaseSensitive)
+        if response]
