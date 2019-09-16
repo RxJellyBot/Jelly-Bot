@@ -1,7 +1,7 @@
 from JellyBotAPI.api.static import param, result
 from JellyBotAPI.api.responses.mixin import SerializeResultOnSuccessMixin
 from JellyBotAPI.api.responses import BaseApiResponse
-from JellyBotAPI.SystemConfig import DataQuery
+from JellyBotAPI.sysconfig import DataQuery
 
 from mongodb.factory import AutoReplyManager
 

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pymongo.collection import Collection
 
-from JellyBotAPI.SystemConfig import Database
+from JellyBotAPI.sysconfig import Database
 from mongodb.utils import BulkWriteDataHolder
 from models import ModelDefaultValueExt, OID_KEY
 from models.field import ModelField

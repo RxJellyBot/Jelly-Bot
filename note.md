@@ -19,6 +19,8 @@ Logger(s) to be used and printed in the console. Log level can be specified.
 > `MONGO_UTILS`: MongoDB utility's logger
 >
 > `EVT_HANDLER`: External webhook/bot event handler's logger
+>
+> `PING_SPAM`: Ping spammer's logger
 
 **Example Value:**
 

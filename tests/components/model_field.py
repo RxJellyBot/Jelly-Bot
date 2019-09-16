@@ -3,7 +3,7 @@ import unittest
 import pymongo
 from bson import ObjectId
 
-from JellyBotAPI.SystemConfig import ChannelConfig
+from JellyBotAPI.sysconfig import ChannelConfig
 from flags import Platform
 from models import ChannelConfigModel, OnPlatformUserModel, AutoReplyModuleTagModel
 from models.exceptions import IdUnsupportedError
