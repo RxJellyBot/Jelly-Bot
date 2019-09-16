@@ -22,17 +22,6 @@ line_handler.default()(handle_main)
 
 line_handle_pool = Pool(processes=cpu_count())
 
-t_lock = False
-
 
 def line_handle_event(body, signature):
-    global t_lock
-
-    import time
-    if not t_lock:
-        time.sleep(5)
-        t_lock = True
-
-    print(t_lock)
-
     line_handler.handle(body, signature)
