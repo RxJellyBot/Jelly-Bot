@@ -58,3 +58,7 @@ class TokenAction:
     CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     USER_TOKEN = Common.USER_TOKEN
     API_TOKEN = Common.API_TOKEN
+
+
+class Message:
+    MESSAGE = "msg"

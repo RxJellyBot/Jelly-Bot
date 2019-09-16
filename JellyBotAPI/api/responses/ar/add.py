@@ -59,8 +59,8 @@ class AutoReplyAddBaseResponse(
         resp_err = list()
         resp_list = list()
 
-        if len(self._responses) > SystemConfig.AutoReply.MAX_CONTENT_LENGTH:
-            self._responses = self._responses[:SystemConfig.AutoReply.MAX_CONTENT_LENGTH]
+        if len(self._responses) > SystemConfig.AutoReply.MaxContentLength:
+            self._responses = self._responses[:SystemConfig.AutoReply.MaxContentLength]
             self._info.append(info.AutoReply.RESPONSES_TRUNCATED)
 
         resp_len = len(self._responses)
@@ -100,7 +100,7 @@ class AutoReplyAddBaseResponse(
         if self._tags:
             # Tag string to array
             # noinspection PyUnresolvedReferences
-            tags = self._tags.split(SystemConfig.AutoReply.TAG_SPLITTOR)
+            tags = self._tags.split(SystemConfig.AutoReply.TagSplittor)
             tag_ids = []
 
             for tag in tags:

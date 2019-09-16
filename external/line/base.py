@@ -1,6 +1,6 @@
-import asyncio
 import os
 import sys
+from concurrent.futures.thread import ThreadPoolExecutor
 from multiprocessing import Pool, cpu_count
 
 from linebot import WebhookHandler
@@ -23,8 +23,6 @@ line_handler.default()(handle_main)
 
 line_handle_pool = Pool(processes=cpu_count())
 
-
-def line_handle_event(body, signature):
-    async def handle():
-        line_handler.handle(body, signature)
-    asyncio.run(handle())
+with ThreadPoolExecutor(max_workers=5) as executor:
+    def line_handle_event(body, signature):
+        executor.submit(line_handler.handle, body, signature).result()

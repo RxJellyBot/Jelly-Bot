@@ -1,5 +1,4 @@
 # DRAFT: Ping every time for user statistics
-# DRAFT: Ping every time for auto reply
 from django.views import View
 
 from JellyBotAPI.components.mixin import CsrfExemptMixin

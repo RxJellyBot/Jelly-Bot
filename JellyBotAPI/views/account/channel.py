@@ -2,7 +2,7 @@ from bson import ObjectId
 
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 

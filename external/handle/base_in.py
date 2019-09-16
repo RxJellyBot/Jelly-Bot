@@ -43,3 +43,7 @@ class EventObjectFactory:
     @staticmethod
     def from_discord(message) -> EventObject:
         return TextEventObject(text=message.content, platform=Platform.DISCORD, raw=message)
+
+    @staticmethod
+    def from_direct(message: str):
+        return TextEventObject(text=message, platform=Platform.UNKNOWN, raw=message)
