@@ -74,11 +74,18 @@ class CacheMixin(Collection):
         self._pre_check_(cache_key)
 
         if isinstance(item, (list, tuple)):
-            self._cache[cache_key][item_key] = [CacheMixin._parse_item_(i, parse_cls) for i in item]
+            put = [CacheMixin._parse_item_(i, parse_cls) for i in item if item]
+            if len(put) > 0:
+                self._cache[cache_key][item_key] = put
+            else:
+                raise ValueError("Item to put into the cache cannot be a list with 0 length.")
         else:
-            self._cache[cache_key][item_key] = CacheMixin._parse_item_(item, parse_cls)
+            if item is not None:
+                self._cache[cache_key][item_key] = CacheMixin._parse_item_(item, parse_cls)
+            else:
+                raise ValueError("Item to put into the cache cannot be `None`.")
 
-        return self._cache[cache_key][item_key]
+        return self._cache[cache_key].get(item_key)
 
     @DecoParamCaster({1: str, 2: None, "item_key_from_data": None})
     def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: Tuple = None,
@@ -144,11 +151,12 @@ class CacheMixin(Collection):
                                 raise ValueError(
                                     f"The type of `item_key_from_data` is invalid. ({type(item_key_from_data)})")
 
-                    ret = data
+                    if data is not None:
+                        ret = self.set_cache(cache_key, item_key, data, parse_cls)
         else:
             ret = self._cache[cache_key][item_key]
 
-        return self.set_cache(cache_key, item_key, ret, parse_cls)
+        return ret
 
     @DecoParamCaster({1: None, "item_key_from_data": None})
     def get_cache_condition(self, cache_key: str, item_func: types.LambdaType, acquire_args: Tuple,

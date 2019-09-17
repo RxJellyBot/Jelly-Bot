@@ -82,19 +82,7 @@ function initTextAreas() {
         $(this).init(function () {
             $(this).find("span[data-type=current]" + id).text(0);
         }).on("input", function () {
-            let currentCount = txtArea.val().length;
-            let progBar = $(this).find("div[data-type=progress]" + id);
-
-            let percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
-
-            $(this).find("span[data-type=current]" + id).text(currentCount);
-            progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
-
-            if (percentage > 100) {
-                progBar.addClass("bg-danger");
-            } else {
-                progBar.removeClass("bg-danger");
-            }
+            updateTextAreaPercentBar(txtArea);
 
             // submitBtnDisable(percentage > 100);
         });
@@ -107,6 +95,22 @@ function initTextAreas() {
             validateTextArea(parent, txtArea);
         })
     })
+}
+
+function updateTextAreaPercentBar(txtArea) {
+    let currentCount = txtArea.val().length;
+    let progBar = $(this).find("div[data-type=progress]" + id);
+
+    let percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
+
+    $(this).find("span[data-type=current]" + id).text(currentCount);
+    progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
+
+    if (percentage > 100) {
+        progBar.addClass("bg-danger");
+    } else {
+        progBar.removeClass("bg-danger");
+    }
 }
 
 function validateTextArea(parent, txtArea) {
@@ -259,9 +263,10 @@ function onSubmissionFailed() {
 }
 
 function resetForm() {
-    // CLEAR all <textarea>
+    // Clear all <textarea> and reset percent bar
     $("div.content-check:not(.d-none)").find("textarea").each(function () {
         $(this).val("");
+        updateTextAreaPercentBar($(this));
     });
 
     // Hide All

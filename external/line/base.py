@@ -20,7 +20,7 @@ line_handler.add(MessageEvent)(handle_msg_main)
 line_handler.default()(handle_main)
 
 
-# FIXME: [SHP] Celery with Django for async requests (solve MongoDB fork error
+# FIXME: [HP] May need Celery with Django for async requests (solve MongoDB fork error
 #   https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
 #   Type "SSS" for 5 s delay, test = SSS (in 5sec) ERRORTEST and check output
 

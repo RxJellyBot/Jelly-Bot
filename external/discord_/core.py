@@ -1,5 +1,3 @@
-import threading
-
 from discord import Client, Activity, ActivityType
 
 from external.discord_.logger import DISCORD

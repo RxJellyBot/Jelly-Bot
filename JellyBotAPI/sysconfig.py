@@ -5,7 +5,7 @@ class AutoReply:
     MaxResponses = 5
     MaxContentLength = 2000
     TagSplittor = "|"
-    CaseSensitive = False
+    CaseInsensitive = True
 
 
 class Database:

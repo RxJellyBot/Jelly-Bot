@@ -14,9 +14,11 @@ def handle_discord_main(e: EventObject) -> List[HandledEventObject]:
         if isinstance(e, TextEventObject):
             return handle_main(e)
         else:
-            DISCORD.logger.info(f"Discord event object not handled.")
+            DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw}")
+            return []
     except Exception as e:
         handle_error(e)
+        return []
 
 
 def handle_error(e: Exception):
