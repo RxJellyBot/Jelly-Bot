@@ -27,7 +27,7 @@ class AutoReplyContentManager(BaseCollection):
         entry, outcome, ex, insert_result = self.insert_one_data(AutoReplyContentModel,
                                                                  Content=content, ContentType=type_)
 
-        if InsertOutcome.is_inserted(outcome):
+        if outcome.is_success:
             self.set_cache(AutoReplyContentModel.Content.key, (entry.content, entry.content_type), entry)
 
         return AutoReplyContentAddResult(outcome, entry, ex)

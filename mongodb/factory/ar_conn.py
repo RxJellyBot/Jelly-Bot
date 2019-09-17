@@ -222,7 +222,7 @@ class AutoReplyManager:
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
 
     def get_responses(
-            self, keyword: str, type_: AutoReplyContentType, case_insensitive: bool = False) -> List[str]:
+            self, keyword: str, type_: AutoReplyContentType, case_insensitive: bool = True) -> List[str]:
         """
         :return: Empty list (length of 0) if no corresponding response.
         """
