@@ -30,5 +30,4 @@ class DiscordClient(Client):
 
 
 def run_server():
-    """Non-blocking server activation call."""
-    threading.Thread(target=DiscordClient().run, args=(discord_token,)).start()
+    DiscordClient().run(discord_token)
