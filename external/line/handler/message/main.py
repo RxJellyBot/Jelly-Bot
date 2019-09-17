@@ -45,10 +45,6 @@ def handle_msg_main(event, destination):
     fn = fn_dict.get(msg_type)
 
     try:
-        if event.message.text == "SSS":
-            import time
-            time.sleep(5)
-
         if fn:
             fn(event, destination)
         else:
