@@ -82,7 +82,7 @@ function initTextAreas() {
         $(this).init(function () {
             $(this).find("span[data-type=current]" + id).text(0);
         }).on("input", function () {
-            updateTextAreaPercentBar(txtArea);
+            updateTextAreaPercentBar($(this), txtArea, id);
 
             // submitBtnDisable(percentage > 100);
         });
@@ -97,13 +97,13 @@ function initTextAreas() {
     })
 }
 
-function updateTextAreaPercentBar(txtArea) {
+function updateTextAreaPercentBar(area_base, txtArea, id) {
     let currentCount = txtArea.val().length;
-    let progBar = $(this).find("div[data-type=progress]" + id);
+    let progBar = area_base.find("div[data-type=progress]" + id);
 
     let percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
 
-    $(this).find("span[data-type=current]" + id).text(currentCount);
+    area_base.find("span[data-type=current]" + id).text(currentCount);
     progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
 
     if (percentage > 100) {
@@ -264,9 +264,13 @@ function onSubmissionFailed() {
 
 function resetForm() {
     // Clear all <textarea> and reset percent bar
-    $("div.content-check:not(.d-none)").find("textarea").each(function () {
-        $(this).val("");
-        updateTextAreaPercentBar($(this));
+    $("div.content-check:not(.d-none)").each(function () {
+        let txtArea = $(this).find("textarea").first();
+        txtArea.val("");
+        updateTextAreaPercentBar(
+            $(this).find("div.txtarea-count").first(),
+            txtArea,
+            "[data-count=" + $(this).attr("id") + "]");
     });
 
     // Hide All

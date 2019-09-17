@@ -210,6 +210,14 @@
             }
         }
 
+        // Member check
+        if (regId === "arMember") {
+            if ($("select#arChannel").children("option:selected").val() === "default") {
+                let defaultSelected = '{% trans "Select a channel in Registration > Channel Member to use the module." %}';
+                errmsgs.push(defaultSelected);
+            }
+        }
+
         // Determine if to display modal or not
         let msgAvailable = errmsgs.length > 0;
 
