@@ -22,7 +22,7 @@ line_handler.default()(handle_main)
 
 # FIXME: [HP] May need Celery with Django for async requests (solve MongoDB fork error
 #   https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
-#   Type "SSS" for 5 s delay, test = SSS (in 5sec) ERRORTEST and check output
+#   Type 99999**99999 for delay
 
 def line_handle_event(body, signature):
     line_handler.handle(body, signature)

@@ -219,6 +219,7 @@ class AutoReplyManager:
             self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
+        # FIXME: [HP] Logic on adding new conn (remove old or add flag...)
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
 
     def get_responses(
