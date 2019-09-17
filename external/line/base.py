@@ -1,6 +1,5 @@
 import os
 import sys
-from multiprocessing import Pool, cpu_count
 
 from linebot import WebhookHandler
 from linebot.models import MessageEvent
@@ -20,8 +19,10 @@ line_handler = WebhookHandler(line_secret)
 line_handler.add(MessageEvent)(handle_msg_main)
 line_handler.default()(handle_main)
 
-line_handle_pool = Pool(processes=cpu_count())
 
+# FIXME: [SHP] Celery with Django for async requests (solve MongoDB fork error
+#   https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
+#   Type "SSS" for 5 s delay, test = SSS (in 5sec) ERRORTEST and check output
 
 def line_handle_event(body, signature):
-    line_handle_pool.apply_async(line_handler.handle, args=(body, signature))
+    line_handler.handle(body, signature)
