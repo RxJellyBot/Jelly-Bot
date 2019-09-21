@@ -1,4 +1,4 @@
-from ._outcome import InsertOutcome, GetOutcome, OperationOutcome, UpdateOutcome
+from ._outcome import WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome
 from ._base import BaseResult
 from .user import (
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult,

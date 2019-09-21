@@ -17,8 +17,9 @@ from models import Model
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
+from mongodb.utils import CheckableCursor
 from mongodb.factory import MONGO_CLIENT
-from mongodb.factory.results import InsertOutcome
+from mongodb.factory.results import WriteOutcome
 from JellyBotAPI.sysconfig import Database
 
 CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
@@ -34,9 +35,17 @@ class CacheMixin(Collection):
     CACHE_KEY_SPEC2 = "**Special Cache Key #2**"
     CACHE_KEY_SPEC3 = "**Special Cache Key #3**"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, cache_keys: Union[str, TIterable[str]] = None, *args, cache_auto_init=False, **kwargs):
         super().__init__(*args, **kwargs)
-        self._auto_init = False
+
+        if cache_keys is not None:
+            if isinstance(cache_keys, (list, tuple, set)):
+                for k in cache_keys:
+                    self.init_cache(k)
+            else:
+                self.init_cache(cache_keys)
+
+        self._auto_init = cache_auto_init
         self._cache = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
     @property
@@ -241,33 +250,33 @@ class CacheMixin(Collection):
 
 
 class ControlExtensionMixin(Collection):
-    def insert_one_model(self, model: Model) -> (InsertOutcome, Optional[Exception]):
+    def insert_one_model(self, model: Model) -> (WriteOutcome, Optional[Exception]):
         ex = None
 
         try:
             insert_result = self.insert_one(model)
             if insert_result.acknowledged:
                 model.set_oid(insert_result.inserted_id)
-                outcome = InsertOutcome.O_INSERTED
+                outcome = WriteOutcome.O_INSERTED
             else:
-                outcome = InsertOutcome.X_NOT_ACKNOWLEDGED
+                outcome = WriteOutcome.X_NOT_ACKNOWLEDGED
         except (AttributeError, InvalidDocument) as e:
-            outcome = InsertOutcome.X_NOT_SERIALIZABLE
+            outcome = WriteOutcome.X_NOT_SERIALIZABLE
             ex = e
         except DuplicateKeyError as e:
-            outcome = InsertOutcome.O_DATA_EXISTS
+            outcome = WriteOutcome.O_DATA_EXISTS
             ex = e
         except InvalidModelError as e:
-            outcome = InsertOutcome.X_INVALID_MODEL
+            outcome = WriteOutcome.X_INVALID_MODEL
             ex = e
         except Exception as e:
-            outcome = InsertOutcome.X_INSERT_UNKNOWN
+            outcome = WriteOutcome.X_INSERT_UNKNOWN
             ex = e
 
         return outcome, ex
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
-            -> (Model, InsertOutcome, Optional[Exception], InsertOneResult):
+            -> (Model, WriteOutcome, Optional[Exception], InsertOneResult):
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.
@@ -275,7 +284,7 @@ class ControlExtensionMixin(Collection):
         :return: model, outcome, ex, insert_result
         """
         model = None
-        outcome: InsertOutcome = InsertOutcome.X_NOT_EXECUTED
+        outcome: WriteOutcome = WriteOutcome.X_NOT_EXECUTED
         ex = None
         insert_result = None
 
@@ -283,21 +292,21 @@ class ControlExtensionMixin(Collection):
             if issubclass(model_cls, Model):
                 model = model_cls(**model_args)
             else:
-                outcome = InsertOutcome.X_NOT_MODEL
+                outcome = WriteOutcome.X_NOT_MODEL
         except FieldReadOnly as e:
-            outcome = InsertOutcome.X_READONLY
+            outcome = WriteOutcome.X_READONLY
             ex = e
         except FieldTypeMismatch as e:
-            outcome = InsertOutcome.X_TYPE_MISMATCH
+            outcome = WriteOutcome.X_TYPE_MISMATCH
             ex = e
         except FieldValueInvalid as e:
-            outcome = InsertOutcome.X_INVALID_FIELD
+            outcome = WriteOutcome.X_INVALID_FIELD
             ex = e
         except FieldCastingFailed as e:
-            outcome = InsertOutcome.X_CAST_FAILED
+            outcome = WriteOutcome.X_CAST_FAILED
             ex = e
         except Exception as e:
-            outcome = InsertOutcome.X_CONSTRUCT_UNKNOWN
+            outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 
         if model is not None:
@@ -308,8 +317,34 @@ class ControlExtensionMixin(Collection):
 
         return model, outcome, ex, insert_result
 
+    def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
+        update_result = self.update_one(filter_, update, upsert, collation)
 
-class BaseCollection(CacheMixin, ControlExtensionMixin, Collection):
+        if update_result.matched_count > 0:
+            if update_result.modified_count > 0:
+                outcome = WriteOutcome.O_INSERTED
+            else:
+                outcome = WriteOutcome.O_DATA_EXISTS
+        else:
+            outcome = WriteOutcome.X_NOT_FOUND
+
+        return outcome
+
+    def find_checkable_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> CheckableCursor:
+        return CheckableCursor(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
+
+    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs):
+        return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
+
+    @staticmethod
+    def cast_model(ret, parse_cls):
+        if ret is not None and parse_cls is not None and not isinstance(ret, parse_cls):
+            return parse_cls(**ret, from_db=True)
+
+        return ret
+
+
+class BaseCollection(ControlExtensionMixin, Collection):
     database_name: str = None
     collection_name: str = None
     model_class: type(Model) = None
@@ -335,18 +370,10 @@ class BaseCollection(CacheMixin, ControlExtensionMixin, Collection):
         else:
             return cls.model_class
 
-    def __init__(self, cache_keys: Union[str, TIterable[str]] = None, cache_auto_init=False):
+    def __init__(self):
         self._db = MONGO_CLIENT.get_database(self.get_db_name())
         super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
-        self._data_model = self.get_model_cls()
-        if cache_keys is not None:
-            if isinstance(cache_keys, (list, tuple, set)):
-                for k in cache_keys:
-                    self.init_cache(k)
-            else:
-                self.init_cache(cache_keys)
-
-        self.auto_init = cache_auto_init
+        self._data_model = self.get_model_cls()\
 
         ModelFieldChecker.check(self)
 

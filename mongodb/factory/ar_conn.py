@@ -13,10 +13,10 @@ from extutils.color import ColorFactory
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
 from mongodb.factory.results import (
-    InsertOutcome, GetOutcome,
+    WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
-from mongodb.utils import CheckableCursor
+from mongodb.utils import CheckableCursor, case_insensitive_collation
 from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
@@ -25,13 +25,12 @@ DB_NAME = "ar"
 
 
 class AutoReplyModuleManager(BaseCollection):
-    # TODO: Auto Reply - Cache & Preload
     database_name = DB_NAME
     collection_name = "conn"
     model_class = AutoReplyModuleModel
 
     def __init__(self):
-        super().__init__(AutoReplyModuleModel.KeywordOid.key)
+        super().__init__()
         self.create_index(
             [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponseOids.key, 1)],
             name="Auto Reply Module Identity", unique=True)
@@ -43,17 +42,17 @@ class AutoReplyModuleManager(BaseCollection):
             -> AutoReplyModuleAddResult:
         perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, creator_oid))
         if pinned and PermissionCategory.AR_ACCESS_PINNED_MODULE not in perms:
-            return AutoReplyModuleAddResult(InsertOutcome.X_INSUFFICIENT_PERMISSION, None, None)
+            return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION, None, None)
         else:
             model, outcome, ex, insert_result = \
                 self.insert_one_data(
                     AutoReplyModuleModel,
                     KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
-                    Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds=[channel_oid]
+                    Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds={str(channel_oid): True}
                 )
 
-            if outcome.is_success:
-                self.set_cache(AutoReplyModuleModel.KeywordOid.key, kw_oid, model)
+            if outcome == WriteOutcome.O_DATA_EXISTS:
+                self.append_channel(model.keyword_oid, model.response_oids, channel_oid)\
 
             return AutoReplyModuleAddResult(outcome, model, ex)
 
@@ -61,34 +60,19 @@ class AutoReplyModuleManager(BaseCollection):
         model.clear_oid()
         outcome, ex = self.insert_one_model(model)
 
-        if outcome.is_success:
-            self.set_cache(AutoReplyModuleModel.KeywordOid.key, model.keyword_oid, model)
-
         return AutoReplyModuleAddResult(outcome, model, ex)
 
-    def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> InsertOutcome:
-        update_result = self.update_one(
+    def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> WriteOutcome:
+        return self.update_one_outcome(
             {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
-            {"$addToSet": {AutoReplyModuleModel.ChannelIds.key: channel_oid}})
-
-        if update_result.matched_count > 0:
-            if update_result.modified_count > 0:
-                outcome = InsertOutcome.O_INSERTED
-            else:
-                outcome = InsertOutcome.O_DATA_EXISTS
-        else:
-            outcome = InsertOutcome.X_NOT_FOUND
-
-        if outcome.is_success:
-            self.remove_cache(AutoReplyModuleModel.KeywordOid.key, kw_oid)
-
-        return outcome
+            {"$update": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
 
     @DecoParamCaster({1: ObjectId, 2: bool})
     def get_conn(self, keyword_oid: ObjectId, case_insensitive: bool = True) -> Optional[AutoReplyModuleModel]:
-        return self.get_cache(
-            AutoReplyModuleModel.KeywordOid.key,
-            keyword_oid, parse_cls=AutoReplyModuleModel, case_insensitive=case_insensitive)
+        return self.find_one_casted(
+            {AutoReplyModuleModel.KeywordOid.key: keyword_oid},
+            sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
+            collation=case_insensitive_collation if case_insensitive else None)
 
 
 class AutoReplyModuleTagManager(BaseCollection):
@@ -97,13 +81,15 @@ class AutoReplyModuleTagManager(BaseCollection):
     model_class = AutoReplyModuleTagModel
 
     def __init__(self):
-        super().__init__(AutoReplyModuleTagModel.Name.key)
+        super().__init__()
         self.create_index(AutoReplyModuleTagModel.Name.key, name="Auto Reply Tag Identity", unique=True)
 
     def get_insert(self, name, color=ColorFactory.BLACK) -> AutoReplyModuleTagGetResult:
         ex = None
-        tag_data = self.get_cache(
-            AutoReplyModuleTagModel.Name.key, name, parse_cls=AutoReplyModuleTagModel, case_insensitive=True)
+        tag_data = self.find_one_casted(
+            {AutoReplyModuleTagModel.Name.key: name},
+            parse_cls=AutoReplyModuleTagModel,
+            collation=case_insensitive_collation)
 
         if tag_data:
             outcome = GetOutcome.O_CACHE_DB
@@ -112,8 +98,7 @@ class AutoReplyModuleTagManager(BaseCollection):
                 self.insert_one_data(AutoReplyModuleTagModel, Name=name, Color=color)
 
             if outcome.is_success:
-                tag_data = self.set_cache(
-                    AutoReplyModuleTagModel.Name.key, name, tag_data, parse_cls=AutoReplyModuleTagModel)
+                tag_data = model
                 outcome = GetOutcome.O_ADDED
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
@@ -126,14 +111,13 @@ class AutoReplyModuleTagManager(BaseCollection):
 
         :param tag_keyword: Can be regex.
         """
-        return CheckableCursor(
-            self.find({"name": {"$regex": tag_keyword, "$options": "i"}}).sort([("_id", pymongo.DESCENDING)]),
+        return self.find_checkable_cursor(
+            {"name": {"$regex": tag_keyword, "$options": "i"}},
+            sort=[(OID_KEY, pymongo.DESCENDING)],
             parse_cls=AutoReplyModuleTagModel)
 
     def get_tag_data(self, tag_oid: ObjectId) -> Optional[AutoReplyModuleTagModel]:
-        return self.get_cache_condition(
-            AutoReplyModuleTagModel.Name.key, lambda item: item.id == tag_oid,
-            ({OID_KEY: tag_oid},), parse_cls=AutoReplyModuleTagModel)
+        return self.find_one_casted({OID_KEY: tag_oid}, parse_cls=AutoReplyModuleTagModel)
 
 
 class AutoReplyManager:

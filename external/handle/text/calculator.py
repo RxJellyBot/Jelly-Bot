@@ -3,6 +3,7 @@ from typing import List
 from sympy import sympify
 from sympy.core.compatibility import exec_
 from sympy.core.sympify import SympifyError
+# noinspection PyProtectedMember
 from sympy.abc import _clash1
 
 from external.handle import TextEventObject, HandledEventObject, HandledEventObjectText, logger

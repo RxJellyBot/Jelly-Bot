@@ -4,7 +4,7 @@ from JellyBotAPI.api.static import result
 from models import RootUserModel, OnPlatformUserModel, APIUserModel
 
 from ._base import ModelResult
-from ._outcome import InsertOutcome
+from ._outcome import WriteOutcome
 
 
 class IdentityRegistrationResult(ModelResult, ABC):
@@ -14,7 +14,7 @@ class IdentityRegistrationResult(ModelResult, ABC):
 class OnSiteUserRegistrationResult(IdentityRegistrationResult):
     def __init__(self, outcome, model, exception=None, token=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: APIUserModel
         :type exception: Optional[Exception]
         :type token: str
@@ -35,7 +35,7 @@ class OnSiteUserRegistrationResult(IdentityRegistrationResult):
 class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
     def __init__(self, outcome, model, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: OnPlatformUserModel
         :type exception: Optional[Exception]
         """
@@ -71,9 +71,9 @@ class GetRootUserDataApiResult(GetRootUserDataResult):
 class RootUserRegistrationResult(ModelResult):
     def __init__(self, overall_outcome, conn_entry, conn_outcome, conn_ex, idt_reg_result, hint):
         """
-        :type overall_outcome: InsertOutcome
+        :type overall_outcome: WriteOutcome
         :type conn_entry: RootUserModel
-        :type conn_outcome: InsertOutcome
+        :type conn_outcome: WriteOutcome
         :type conn_ex: Optional[Exception]
         :type idt_reg_result: IdentityRegistrationResult
         :type hint: str
@@ -88,7 +88,7 @@ class RootUserRegistrationResult(ModelResult):
         return self._idt_reg_result
 
     @property
-    def conn_outcome(self) -> InsertOutcome:
+    def conn_outcome(self) -> WriteOutcome:
         return self._conn_outcome
 
     def serialize(self) -> dict:
