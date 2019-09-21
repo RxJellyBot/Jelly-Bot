@@ -6,14 +6,14 @@ from flags import TokenActionCompletionOutcome
 from models import TokenActionModel
 
 from ._base import BaseResult, ModelResult
-from ._outcome import InsertOutcome, OperationOutcome
+from ._outcome import WriteOutcome, OperationOutcome
 
 
 @dataclass
 class EnqueueTokenActionResult(BaseResult):
     def __init__(self, outcome, token, expiry, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type token: str
         :type expiry: datetime
         :type exception: Optional[Exception]

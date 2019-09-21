@@ -1,5 +1,6 @@
 // from https://stackoverflow.com/a/48969580
 
+// noinspection JSUnusedGlobalSymbols
 function makeXHRPromise(method, url) {
     return new Promise(function (resolve, reject) {
         let xhr = new XMLHttpRequest();

@@ -13,7 +13,7 @@ class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
         raise NotImplementedError()
 
 
-class InsertOutcome(BaseOutcome):
+class WriteOutcome(BaseOutcome):
     """
     # SUCCESS
     
@@ -22,6 +22,7 @@ class InsertOutcome(BaseOutcome):
 
     -1xx - Not actually inserted
         -101 - Existed
+        -151 - Updated
 
     -x - Miscellaneous
         -1 - Uncategorized
@@ -70,10 +71,12 @@ class InsertOutcome(BaseOutcome):
 
     @classmethod
     def default(cls):
-        return InsertOutcome.X_NOT_EXECUTED
+        return WriteOutcome.X_NOT_EXECUTED
 
     O_INSERTED = \
         -201, _("O: Inserted"), _("The system returned OK with data inserted to the database.")
+    O_DATA_UPDATED = \
+        -151, _("O: Updated"), _("The system returned OK with data updated in the database.")
     O_DATA_EXISTS = \
         -101, _("O: Existed"), _("The system returned OK with data already existed in the database.")
     O_MISC = \
@@ -151,7 +154,7 @@ class InsertOutcome(BaseOutcome):
 
     @staticmethod
     def data_found(result):
-        return result < -100
+        return -199 < result < -100
 
 
 class GetOutcome(BaseOutcome):

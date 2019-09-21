@@ -30,7 +30,7 @@ def handle_leave(event, destination):
 
 def handle_self_main(event, destination):
     if isinstance(event, FollowEvent):
-        handle_self_main(event, destination)
+        handle_follow(event, destination)
     elif isinstance(event, UnfollowEvent):
         handle_unfollow(event, destination)
     elif isinstance(event, JoinEvent):

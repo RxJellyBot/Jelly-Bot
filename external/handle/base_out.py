@@ -1,18 +1,14 @@
 from abc import ABC
-from dataclasses import dataclass, field
 
 from flags import MessageType
 
 
-@dataclass
 class HandledEventObject(ABC):
-    msg_type: MessageType
-    content: str
+    def __init__(self, msg_type: MessageType, content: str):
+        self.content = content
+        self.msg_type = msg_type
 
 
-@dataclass
 class HandledEventObjectText(HandledEventObject):
-    msg_type: MessageType = field(init=False)
-
-    def __post_init__(self):
-        self.msg_type = MessageType.TEXT
+    def __init__(self, content: str):
+        super().__init__(MessageType.TEXT, content)

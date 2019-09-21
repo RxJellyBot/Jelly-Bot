@@ -9,7 +9,7 @@ from extutils.checker import DecoParamCaster
 from extutils.gmail import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
-from mongodb.factory.results import InsertOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
+from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
 from mongodb.utils import CheckableCursor
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
@@ -27,7 +27,7 @@ class UserProfileManager(BaseCollection):
     model_class = ChannelProfileConnectionModel
 
     def __init__(self):
-        super().__init__(self.CACHE_KEY_SPEC1)
+        super().__init__()
         self.create_index(
             [(ChannelProfileConnectionModel.UserOid.key, pymongo.DESCENDING),
              (ChannelProfileConnectionModel.ChannelOid.key, pymongo.DESCENDING)],
@@ -45,19 +45,21 @@ class UserProfileManager(BaseCollection):
             {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}}, upsert=True).upserted_id
 
         if id_:
-            model = self.find_one({OID_KEY: id_})
+            model = self.find_one_casted(
+                {OID_KEY: id_}, parse_cls=ChannelProfileConnectionModel)
 
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
         else:
-            model = self.find_one({ChannelProfileConnectionModel.UserOid.key: root_uid})
+            model = self.find_one_casted(
+                {ChannelProfileConnectionModel.UserOid.key: root_uid},
+                parse_cls=ChannelProfileConnectionModel)
 
             if not model:
                 raise ValueError("`Model` should exists because `upserted_id` not exists, "
                                  "however no corresponding model found.")
 
-        return self.set_cache(
-            self.CACHE_KEY_SPEC1, (channel_oid, root_uid), model, parse_cls=ChannelProfileConnectionModel)
+        return model
 
     # INCOMPLETE: user_detach_profile and delete
 
@@ -68,20 +70,20 @@ class UserProfileManager(BaseCollection):
 
         :return: `None` if not found.
         """
+
         if channel_oid and root_uid:
-            return self.get_cache(
-                self.CACHE_KEY_SPEC1, (channel_oid, root_uid),
-                acquire_args=({ChannelProfileConnectionModel.UserOid.key: root_uid,
-                               ChannelProfileConnectionModel.ChannelOid.key: channel_oid},),
-                parse_cls=ChannelProfileConnectionModel,
-                item_key_from_data=(ChannelProfileConnectionModel.ChannelOid.key,
-                                    ChannelProfileConnectionModel.UserOid.key))
+            self.find_one_casted(
+                {ChannelProfileConnectionModel.UserOid.key: root_uid,
+                 ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
+                parse_cls=ChannelProfileConnectionModel)
+
         else:
             return None
 
     def get_user_channel_profiles(self, root_uid: ObjectId) -> CheckableCursor:
-        return CheckableCursor(self.find({ChannelProfileConnectionModel.UserOid.key: root_uid}),
-                               parse_cls=ChannelProfileConnectionModel)
+        return self.find_checkable_cursor(
+            {ChannelProfileConnectionModel.UserOid.key: root_uid},
+            parse_cls=ChannelProfileConnectionModel)
 
 
 class ProfileDataManager(BaseCollection):
@@ -90,7 +92,7 @@ class ProfileDataManager(BaseCollection):
     model_class = ChannelProfileModel
 
     def __init__(self):
-        super().__init__(OID_KEY)
+        super().__init__()
         self.create_index(
             [(ChannelProfileModel.ChannelOid.key, pymongo.DESCENDING),
              (ChannelProfileModel.Name.key, pymongo.ASCENDING)],
@@ -115,7 +117,7 @@ class ProfileDataManager(BaseCollection):
             return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, None, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
-            perm_prof = self.get_cache(OID_KEY, prof_oid, parse_cls=ChannelProfileModel)
+            perm_prof = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
 
             if perm_prof:
                 return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, perm_prof, ex)
@@ -130,12 +132,11 @@ class ProfileDataManager(BaseCollection):
         default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_success:
-            self.set_cache(OID_KEY, default_profile.id, default_profile, parse_cls=ChannelProfileModel)
             set_success = ChannelManager.set_config(
                 channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
             if not set_success:
-                outcome = InsertOutcome.X_ON_SET_CONFIG
+                outcome = WriteOutcome.X_ON_SET_CONFIG
 
         return CreatePermissionProfileResult(outcome, default_profile, ex)
 

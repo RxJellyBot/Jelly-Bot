@@ -7,7 +7,7 @@ from models.utils import AutoReplyValidators
 from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, DictionaryField
 )
 
 
@@ -51,7 +51,7 @@ class AutoReplyModuleModel(Model):
     LastUsed = DateTimeField("l", readonly=True, allow_none=False)
     ExcludedOids = ArrayField("e", ObjectId)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = ArrayField("ch", ObjectId, allow_empty=False)
+    ChannelIds = DictionaryField("ch")  # `str` key!
 
     @property
     def creation_time(self):

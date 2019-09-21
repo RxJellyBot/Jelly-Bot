@@ -10,7 +10,7 @@ from JellyBotAPI.views import render_template, simple_str_response
 from extutils.locales import locales, now_utc_aware
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
 from mongodb.factory import RootUserManager
-from mongodb.factory.results import InsertOutcome
+from mongodb.factory.results import WriteOutcome
 
 
 class AccountLoginView(View):
@@ -23,19 +23,19 @@ class AccountLoginView(View):
     # noinspection PyMethodMayBeStatic, PyUnusedLocal, PyBroadException
     def post(self, request, *args, **kwargs):
         s = _("An unknown error occurred.")
-        s_contact = " " + _("Contact the administrator of the website.")
+        s_contact = f" {_('Contact the administrator of the website.')}"
         token = None
 
         try:
             result = RootUserManager.register_google(get_identity_data(request.POST.get("idtoken")))
-            if InsertOutcome.data_found(result.outcome):
+            if WriteOutcome.data_found(result.outcome):
                 s = AccountLoginView.PASS_SIGNAL
                 token = result.idt_reg_result.token
-            elif result.outcome == InsertOutcome.X_NOT_EXECUTED:
+            elif result.outcome == WriteOutcome.X_NOT_EXECUTED:
                 s = _("Registration process not performed.")
-            elif result.outcome == InsertOutcome.X_NOT_ACKNOWLEDGED:
+            elif result.outcome == WriteOutcome.X_NOT_ACKNOWLEDGED:
                 s = _("New user data creation failed.")
-            elif result.outcome == InsertOutcome.X_NOT_SERIALIZABLE:
+            elif result.outcome == WriteOutcome.X_NOT_SERIALIZABLE:
                 s = _("The data cannot be passed into the server.")
             else:
                 s = _(

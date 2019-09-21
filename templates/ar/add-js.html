@@ -60,7 +60,7 @@
 
         // Attach KEYWORD and RESPONSES
         $("div.content-check:not(.d-none)").find("textarea").each(function () {
-            param.append($(this).data("postkey"), $(this).val());
+            param.append($(this).data("postkey"), $(this).val().trim());
         });
 
         // Attach KEYWORD TYPES and RESPONSE TYPES
