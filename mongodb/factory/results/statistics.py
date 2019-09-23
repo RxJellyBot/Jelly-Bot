@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from models import APIStatisticModel
-from ._outcome import InsertOutcome
+from ._outcome import WriteOutcome
 from ._base import ModelResult
 
 
@@ -9,7 +9,7 @@ from ._base import ModelResult
 class RecordAPIStatisticsResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: APIStatisticModel
         :type exception: Optional[Exception]
         """

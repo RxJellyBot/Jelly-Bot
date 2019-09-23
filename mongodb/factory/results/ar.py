@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from JellyBotAPI.api.static import result
+from JellyBot.api.static import result
 from models import AutoReplyContentModel
 
 from ._base import ModelResult
-from ._outcome import InsertOutcome, GetOutcome
+from ._outcome import WriteOutcome, GetOutcome
 
 
 @dataclass
 class AutoReplyContentAddResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: AutoReplyContentModel
         :type exception: Optional[Exception]
         """
@@ -45,7 +45,7 @@ class AutoReplyContentGetResult(ModelResult):
 class AutoReplyModuleAddResult(ModelResult):
     def __init__(self, overall_outcome, model, exception=None):
         """
-        :type overall_outcome: InsertOutcome
+        :type overall_outcome: WriteOutcome
         :type model: Optional[AutoReplyModuleModel]
         :type exception: Optional[Exception]
         """

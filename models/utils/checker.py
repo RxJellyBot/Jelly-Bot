@@ -2,14 +2,18 @@ from typing import Optional
 
 from pymongo.collection import Collection
 
-from JellyBotAPI.SystemConfig import Database
+from JellyBot.sysconfig import Database
 from mongodb.utils import BulkWriteDataHolder
 from models import ModelDefaultValueExt, OID_KEY
 from models.field import ModelField
 from extutils.flags import FlagCodeEnum
 from extutils.gmail import MailSender
+from extutils.logger import LoggerSkeleton
 
 from ..rpdata import PendingRepairDataModel
+
+
+logger = LoggerSkeleton("mongo.modelcheck", logger_name_env="MODEL_CHECK")
 
 
 class DataRepairResult(FlagCodeEnum):
@@ -26,7 +30,7 @@ class ModelFieldChecker:
     @staticmethod
     def check(col_inst):
         from mongodb.factory import PendingRepairDataManager
-        print(f"Scanning `{col_inst.full_name}`...")
+        logger.logger.info(f"Scanning `{col_inst.full_name}`...")
 
         or_list = _build_find_or_list_(col_inst.data_model)
 
@@ -37,21 +41,22 @@ class ModelFieldChecker:
                 required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst.full_name)
                 repaired_write_holder = BulkWriteDataHolder(col_inst, Database.BulkWriteCount)
 
-                print("\tScanning potential repair requiring data...")
+                logger.logger.warning("Scanning potential repair requiring data...")
 
                 _scan_data_(col_inst, potential_repair_needed, required_write_holder, repaired_write_holder)
 
                 if repaired_write_holder.holding_data:
-                    print("\tUpdating repaired data to database...")
+                    logger.logger.warning("Updating repaired data to database...")
                     repaired_write_holder.complete()
 
                 if required_write_holder.holding_data:
-                    print("\tUpdating manual repairments required database/Sending email notification...")
+                    logger.logger.warning("Updating manual repairments required database...")
 
                     result = required_write_holder.complete()
+                    logger.logger.warning("Sending email notification...")
                     _send_mail_async_(col_inst, result, required_write_holder)
 
-        print(f"Done scanning `{col_inst.full_name}`.")
+        logger.logger.info(f"Done scanning `{col_inst.full_name}`.")
 
 
 # noinspection PyUnusedLocal
@@ -148,13 +153,13 @@ def _repair_fields_(model_cls, data, changed, missing):
 
 def _print_scanning_result_(counter):
     if counter[DataRepairResult.NO_PATCH_NEEDED] > 0:
-        print(f"\t{counter[DataRepairResult.NO_PATCH_NEEDED]} do not need any patches.")
+        logger.logger.info(f"\t{counter[DataRepairResult.NO_PATCH_NEEDED]} do not need any patches.")
 
     if counter[DataRepairResult.REPAIRED] > 0:
-        print(f"\t{counter[DataRepairResult.REPAIRED]} data repaired.")
+        logger.logger.info(f"\t{counter[DataRepairResult.REPAIRED]} data repaired.")
 
     if counter[DataRepairResult.REQUIRED_MISSING] > 0:
-        print(f"\t{counter[DataRepairResult.REQUIRED_MISSING]} data missing some required fields.")
+        logger.logger.info(f"\t{counter[DataRepairResult.REQUIRED_MISSING]} data missing some required fields.")
 
 
 def _send_mail_async_(col_inst, result_list, required_write_holder):

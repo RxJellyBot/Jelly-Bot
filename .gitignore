@@ -1,5 +1,7 @@
 *.po
-.idea/
+.idea
 __pycache__/
 lib/
 *.bat
+tests/sandbox.py
+tests/sandbox_mongo.py

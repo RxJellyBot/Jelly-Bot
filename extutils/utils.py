@@ -60,3 +60,7 @@ def to_snake_case(s: str):
 
 def to_camel_case(s: str):
     return ''.join(x[0].upper() + x[1:] if x else "_" for x in s.split('_'))
+
+
+def split_fill(s: str, n: int, delim="", fill=None):
+    return (s.split(delim) + [fill] * n)[:n]

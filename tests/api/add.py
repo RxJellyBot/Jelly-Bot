@@ -5,10 +5,10 @@ import unittest
 from django.test import TestCase
 from django.urls import reverse
 
-from JellyBotAPI.api.static import result as r, param as p
+from JellyBot.api.static import result as r, param as p
 from models import AutoReplyModuleModel
 from mongodb.factory import MONGO_CLIENT
-from mongodb.factory.results import InsertOutcome, GetOutcome
+from mongodb.factory.results import WriteOutcome, GetOutcome
 
 from ._utils import GetJsonResponseMixin
 
@@ -56,16 +56,16 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
             return ret
 
         result = _add_token_("ABC", "mno", "channel1", "user1", 1, "All New")
-        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_INSERTED)
 
         result = _add_token_("ABC", "mno", "channel1", "user2", 1, "Diff CR")
-        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_DATA_EXISTS)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_DATA_EXISTS)
 
         result = _add_token_("ABC", "mno", "channel2", "user2", 1, "Duplicate Conn. New CH.")
-        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_DATA_EXISTS)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_DATA_EXISTS)
 
         result = _add_token_("abc2", "mno2", "channel2", "user1", 1, "New Conn. Same User.")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], InsertOutcome.O_INSERTED)
+        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_INSERTED)
 
     def test_add_using_api(self):
         result = self.print_and_get_json(

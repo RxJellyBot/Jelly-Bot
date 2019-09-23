@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from ._base import ModelResult
-from ._outcome import GetOutcome, InsertOutcome
+from ._outcome import GetOutcome, WriteOutcome
 
 
 @dataclass
@@ -19,7 +19,7 @@ class GetPermissionProfileResult(ModelResult):
 class CreatePermissionProfileResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: Optional[ChannelPermissionProfileModel]
         :type exception: Optional[Exception]
         """
