@@ -6,7 +6,7 @@ from .tkact import TokenActionCompleteView, TokenActionListView
 from .webhook import WebhookLineView, DirectMessageWebhookView
 
 urlpatterns = [
-    path('status/', status_check, name='JellyBotAPI.api.status'),
+    path('status/', status_check, name='JellyBot.api.status'),
     path('ar/', include('JellyBot.api.ar.urls')),
     path('id/', include('JellyBot.api.id.urls')),
     path('token', TokenActionCompleteView.as_view(), name="api.token.complete"),

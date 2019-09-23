@@ -1,6 +1,6 @@
 from abc import ABC
 from collections import Callable
-from typing import Iterator, List
+from typing import Iterator, List, Any
 
 from flags import MessageType
 
@@ -30,7 +30,7 @@ class HandledEventsHolder:
         for item in self._core:
             yield item
 
-    def get_contents_condition(self, lambda_fn: Callable[[HandledEventObject], bool]) -> Iterator[HandledEventObject]:
+    def get_contents_condition(self, lambda_fn: Callable) -> Iterator:
         return filter(lambda_fn, self._core)
 
     def to_json(self):

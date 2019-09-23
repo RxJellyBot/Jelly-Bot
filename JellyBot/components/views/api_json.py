@@ -5,7 +5,7 @@ from django.views import View
 
 from JellyBot.keys import Session
 from JellyBot.components.utils import get_root_oid
-from extutils.serializer import JellyBotAPISerializer
+from extutils.serializer import JellyBotSerializer
 
 
 class APIJsonResponseView(View):
@@ -48,7 +48,7 @@ class APIJsonResponseView(View):
 
     # noinspection PyMethodMayBeStatic, PyUnusedLocal
     def process_api_response(self, request, response_api, *args, **kwargs):
-        response_http = JsonResponse(response_api.to_dict(), encoder=JellyBotAPISerializer)
+        response_http = JsonResponse(response_api.to_dict(), encoder=JellyBotSerializer)
 
         response_json_dict = json.loads(response_http.content)
 
