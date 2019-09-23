@@ -13,3 +13,4 @@ from .channel import ChannelRegistrationResult, ChannelGetResult, ChannelChangeN
 from .statistics import RecordAPIStatisticsResult
 from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
+from .exctnt import RecordExtraContentResult

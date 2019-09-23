@@ -15,3 +15,5 @@ from .user import _inst as RootUserManager
 from .stats import _inst as APIStatisticsManager
 # noinspection PyPep8Naming
 from .tkact import _inst as TokenActionManager, TokenActionRequiredKeys
+# noinspection PyPep8Naming
+from .exctnt import _inst as ExtraContentManager

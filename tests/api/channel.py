@@ -4,7 +4,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from JellyBotAPI.api.static import result as r, param as p
+from JellyBot.api.static import result as r, param as p
 from mongodb.factory import MONGO_CLIENT, ChannelManager
 
 from ._utils import GetJsonResponseMixin

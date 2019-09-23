@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from JellyBotAPI import sysconfig
+from JellyBot import sysconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models.utils import AutoReplyValidators
 
@@ -44,14 +44,13 @@ class AutoReplyModuleModel(Model):
                               max_len=sysconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
-    Disabled = BooleanField("d", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     CalledCount = IntegerField("c", readonly=True)
     LastUsed = DateTimeField("l", readonly=True, allow_none=False)
     ExcludedOids = ArrayField("e", ObjectId)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = DictionaryField("ch")  # `str` key!
+    ChannelIds = DictionaryField("ch")  # `str` key! Value=Active?
 
     @property
     def creation_time(self):

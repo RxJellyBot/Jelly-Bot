@@ -1,24 +1,23 @@
-from typing import List
 import traceback
 
 from extutils.gmail import MailSender
-from external.handle import EventObject, TextEventObject, HandledEventObject, handle_main
+from external.handle import EventObject, TextEventObject, handle_main, HandledEventsHolder
 
 from .logger import DISCORD
 
 __all__ = ["handle_discord_main"]
 
 
-def handle_discord_main(e: EventObject) -> List[HandledEventObject]:
+def handle_discord_main(e: EventObject) -> HandledEventsHolder:
     try:
         if isinstance(e, TextEventObject):
             return handle_main(e)
         else:
             DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw}")
-            return []
+            return HandledEventsHolder()
     except Exception as e:
         handle_error(e)
-        return []
+        return HandledEventsHolder()
 
 
 def handle_error(e: Exception):

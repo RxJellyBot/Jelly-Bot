@@ -12,3 +12,5 @@ from .apiact import APICommand
 from .result import *
 # noinspection PyUnresolvedReferences
 from .msgtype import MessageType
+# noinspection PyUnresolvedReferences
+from .exctnt import ExtraContentType

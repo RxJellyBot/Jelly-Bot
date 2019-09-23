@@ -11,5 +11,5 @@ from .dict import DictionaryField
 from .model import ModelField
 from .flags import (
     APICommandField, AutoReplyContentTypeField,
-    PlatformField, TokenActionField
+    PlatformField, TokenActionField, ExtraContentTypeField
 )

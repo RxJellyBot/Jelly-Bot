@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from JellyBotAPI.api.static import param as p
+from JellyBot.api.static import param as p
 
 from ._utils import GetJsonResponseMixin
 

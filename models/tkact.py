@@ -3,7 +3,7 @@ from typing import Optional
 
 from django.utils import timezone
 
-from JellyBotAPI import sysconfig
+from JellyBot import sysconfig
 from models import Model, ModelDefaultValueExt
 from models.field import TextField, TokenActionField, DateTimeField, DictionaryField, ObjectIDField
 

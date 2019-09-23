@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from JellyBotAPI.api.static import result
+from JellyBot.api.static import result
 from flags import TokenActionCompletionOutcome
 from models import TokenActionModel
 

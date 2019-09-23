@@ -12,8 +12,8 @@ from mongodb.factory.results import (
 from models import TokenActionModel, Model, AutoReplyModuleTokenActionModel
 from models.exceptions import ModelConstructionError
 from mongodb.utils import CheckableCursor
-from JellyBotAPI.sysconfig import Database
-from JellyBotAPI.api.static import param
+from JellyBot.sysconfig import Database
+from JellyBot.api.static import param
 
 from ._base import BaseCollection
 from ._mixin import GenerateTokenMixin
