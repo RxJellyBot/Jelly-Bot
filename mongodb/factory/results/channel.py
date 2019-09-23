@@ -3,14 +3,14 @@ from dataclasses import dataclass
 from models import ChannelModel
 
 from ._base import ModelResult
-from ._outcome import InsertOutcome, GetOutcome, OperationOutcome
+from ._outcome import WriteOutcome, GetOutcome, OperationOutcome
 
 
 @dataclass
 class ChannelRegistrationResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
-        :type outcome: InsertOutcome
+        :type outcome: WriteOutcome
         :type model: ChannelModel
         :type exception: Optional[Exception]
         """
@@ -41,5 +41,5 @@ class ChannelChangeNameResult(ModelResult):
 
 @dataclass
 class PermissionProfileRegistrationResult(ModelResult):
-    # FIXME: Permission - `PermissionProfileRegistrationResult` not completed
+    # INCOMPLETE: Permission - `PermissionProfileRegistrationResult` not completed
     pass

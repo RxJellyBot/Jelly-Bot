@@ -5,9 +5,9 @@ from pymongo import ReturnDocument
 
 from extutils.checker import DecoParamCaster
 from flags import Platform
-from models import ChannelModel, ChannelConfigModel, OID_KEY
+from models import ChannelModel, ChannelConfigModel
 from mongodb.factory.results import (
-    InsertOutcome, GetOutcome, OperationOutcome,
+    WriteOutcome, GetOutcome, OperationOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
 )
 
@@ -22,18 +22,16 @@ class ChannelManager(BaseCollection):
     model_class = ChannelModel
 
     def __init__(self):
-        super().__init__(self.CACHE_KEY_SPEC1)
-        self.create_index([(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)],
-                          name="Channel Identity", unique=True)
+        super().__init__()
+        self.create_index(
+            [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @DecoParamCaster({1: Platform, 2: str, 3: str})
     def register(self, platform: Platform, token: str, name: Optional[str] = "") -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
             ChannelModel, Platform=platform, Token=token, Name=name, Config=ChannelConfigModel.generate_default())
 
-        if InsertOutcome.is_inserted(outcome):
-            self.set_cache(self.CACHE_KEY_SPEC1, (platform, token), entry)
-        elif InsertOutcome.data_found(outcome):
+        if WriteOutcome.data_found(outcome):
             entry = self.get_channel_token(platform, token)
 
         return ChannelRegistrationResult(outcome, entry, ex)
@@ -49,10 +47,7 @@ class ChannelManager(BaseCollection):
         try:
             if ret:
                 outcome = OperationOutcome.O_COMPLETED
-                self.set_cache(
-                    self.CACHE_KEY_SPEC1,
-                    (ret[ChannelModel.Platform.key], ret[ChannelModel.Token.key]),
-                    ret, parse_cls=ChannelModel)
+                ret = self.cast_model(ret, parse_cls=ChannelModel)
             else:
                 outcome = OperationOutcome.X_CHANNEL_NOT_FOUND
         except Exception as e:
@@ -62,15 +57,24 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ret, ex)
 
     @DecoParamCaster({1: Platform, 2: str})
-    def get_channel_token(self, platform: Platform, token: str) -> Optional[ChannelModel]:
-        return self.get_cache(self.CACHE_KEY_SPEC1, (platform, token), parse_cls=ChannelModel,
-                              acquire_args=({ChannelModel.Token.key: token, ChannelModel.Platform.key: platform},))
+    def get_channel_token(self, platform: Platform, token: str, auto_register=False) -> Optional[ChannelModel]:
+        ret = self.find_one_casted(
+            {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
+
+        if not ret and auto_register:
+            reg_result = self.register(platform, token)
+            if reg_result.success:
+                ret = reg_result.model
+            else:
+                raise ValueError(
+                    f"Channel registration failed in ChannelManager.get_channel_token. "
+                    f"Platform: {platform} / Token: {token}")
+
+        return ret
 
     @DecoParamCaster({1: ObjectId})
     def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
-        return self.get_cache_condition(
-            self.CACHE_KEY_SPEC1, lambda item: item.id == channel_oid, parse_cls=ChannelModel,
-            acquire_args=({ChannelModel.Id.key: channel_oid},), item_key_of_data=OID_KEY)
+        return self.find_one_casted({ChannelModel.Id.key: channel_oid}, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
     @DecoParamCaster({1: Platform, 2: str})
@@ -91,18 +95,9 @@ class ChannelManager(BaseCollection):
         if json_key not in ChannelConfigModel.model_json():
             raise ValueError(f"Attempt to set value to non-existing field in `ChannelModel`. ({json_key})")
 
-        filter_ = {ChannelModel.Id.key: channel_oid}
-
-        found_any = self.update_one(
-            filter_,
+        return self.update_one(
+            {ChannelModel.Id.key: channel_oid},
             {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
-
-        if found_any:
-            model = ChannelModel(**self.find_one(filter_), from_db=True)
-
-            self.set_cache(self.CACHE_KEY_SPEC1, (model.platform, model.token), model, parse_cls=ChannelModel)
-
-        return found_any
 
 
 _inst = ChannelManager()

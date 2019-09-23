@@ -1,19 +1,19 @@
 from bson import ObjectId
 
-from JellyBotAPI import SystemConfig
+from JellyBot import sysconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models.utils import AutoReplyValidators
 
 from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, DictionaryField
 )
 
 
 class AutoReplyContentModel(Model):
     Content = TextField(
-        "c", default=ModelDefaultValueExt.Required, maxlen=SystemConfig.AutoReply.MAX_CONTENT_LENGTH,
+        "c", default=ModelDefaultValueExt.Required, maxlen=sysconfig.AutoReply.MaxContentLength,
         allow_none=False, must_have_content=True)
     ContentType = AutoReplyContentTypeField("t")
 
@@ -40,18 +40,17 @@ class AutoReplyModuleModel(Model):
     # TODO: Auto Reply: Target User - Mixed with Exclude User
 
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                               max_len=SystemConfig.AutoReply.MAX_RESPONSES)
+    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                              max_len=sysconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
-    Disabled = BooleanField("d", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     CalledCount = IntegerField("c", readonly=True)
     LastUsed = DateTimeField("l", readonly=True, allow_none=False)
     ExcludedOids = ArrayField("e", ObjectId)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = ArrayField("ch", ObjectId, allow_empty=False)
+    ChannelIds = DictionaryField("ch")  # `str` key! Value=Active?
 
     @property
     def creation_time(self):
@@ -60,8 +59,8 @@ class AutoReplyModuleModel(Model):
 
 class AutoReplyModuleTokenActionModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponsesOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                               max_len=SystemConfig.AutoReply.MAX_RESPONSES)
+    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
+                              max_len=sysconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)

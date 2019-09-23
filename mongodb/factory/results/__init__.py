@@ -1,4 +1,4 @@
-from ._outcome import InsertOutcome, GetOutcome, OperationOutcome, UpdateOutcome
+from ._outcome import WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome
 from ._base import BaseResult
 from .user import (
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult,
@@ -13,3 +13,4 @@ from .channel import ChannelRegistrationResult, ChannelGetResult, ChannelChangeN
 from .statistics import RecordAPIStatisticsResult
 from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
+from .exctnt import RecordExtraContentResult

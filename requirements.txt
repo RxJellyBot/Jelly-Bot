@@ -1,3 +1,4 @@
+discord.py
 dotmap
 markdown2
 requests
@@ -11,3 +12,5 @@ ttldict
 pytz
 heroku3
 python-dateutil
+line-bot-sdk
+sympy

@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Optional
 
-from JellyBotAPI.api.static import result
+from JellyBot.api.static import result
 from models import Model
 
 from ._outcome import BaseOutcome

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Iterable
 
 from bson import ObjectId
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from flags import AutoReplyContentType, PermissionCategory, Platform
 
