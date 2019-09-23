@@ -5,7 +5,7 @@ from bson import ObjectId
 from flags import APICommand
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel
-from JellyBotAPI.sysconfig import Database
+from JellyBot.sysconfig import Database
 
 from ._base import BaseCollection
 
@@ -27,9 +27,12 @@ class APIStatisticsManager(BaseCollection):
         entry, outcome, ex, insert_result = self.insert_one_data(
             APIStatisticModel,
             APIAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
-            Timestamp=datetime.now(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
+            Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
 
         return RecordAPIStatisticsResult(outcome, entry, ex)
+
+# FIXME: [HP] Implement stats for recording message activity and message content
+#   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature
 
 
 _inst = APIStatisticsManager()

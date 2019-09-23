@@ -20,7 +20,7 @@ from models.utils import ModelFieldChecker
 from mongodb.utils import CheckableCursor
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
-from JellyBotAPI.sysconfig import Database
+from JellyBot.sysconfig import Database
 
 CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 
@@ -331,13 +331,13 @@ class ControlExtensionMixin(Collection):
         return outcome
 
     def find_checkable_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> CheckableCursor:
-        return CheckableCursor(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
+        return CheckableCursor(self.find(filter_, *args, **kwargs), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs):
+    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs)-> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
 
     @staticmethod
-    def cast_model(ret, parse_cls):
+    def cast_model(ret, parse_cls) -> Optional[Model]:
         if ret is not None and parse_cls is not None and not isinstance(ret, parse_cls):
             return parse_cls(**ret, from_db=True)
 

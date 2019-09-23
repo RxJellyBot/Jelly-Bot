@@ -22,3 +22,5 @@ from .prof import (
     ChannelProfileModel, ChannelProfileConnectionModel,
     PermissionPromotionRecordModel, ChannelProfileListEntry
 )
+# noinspection PyUnresolvedReferences
+from .exctnt import ExtraContentModel

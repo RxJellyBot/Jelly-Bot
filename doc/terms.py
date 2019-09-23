@@ -2,7 +2,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List
 
-from JellyBotAPI.sysconfig import Database
+from JellyBot.sysconfig import Database
 
 from django.utils.translation import gettext_lazy as _
 

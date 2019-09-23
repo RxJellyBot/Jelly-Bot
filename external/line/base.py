@@ -20,9 +20,7 @@ line_handler.add(MessageEvent)(handle_msg_main)
 line_handler.default()(handle_main)
 
 
-# FIXME: [HP] May need Celery with Django for async requests (solve MongoDB fork error
-#   https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html
-#   Type 99999**99999 for delay
+# FIXME: [LP] Longtime message: No lock - set timeout
 
 def line_handle_event(body, signature):
     line_handler.handle(body, signature)

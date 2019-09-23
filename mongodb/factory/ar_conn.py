@@ -5,7 +5,7 @@ import pymongo
 from bson import ObjectId
 from datetime import datetime
 
-from JellyBotAPI.sysconfig import Database, DataQuery
+from JellyBot.sysconfig import Database, DataQuery
 from extutils import is_empty_string
 from extutils.gmail import MailSender
 from extutils.checker import DecoParamCaster
@@ -52,7 +52,10 @@ class AutoReplyModuleManager(BaseCollection):
                 )
 
             if outcome == WriteOutcome.O_DATA_EXISTS:
-                self.append_channel(model.keyword_oid, model.response_oids, channel_oid)\
+                self.append_channel(model.keyword_oid, model.response_oids, channel_oid)
+                self.update_many(
+                    {AutoReplyModuleModel.Id.key: {"$ne": model.id}},
+                    {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": False}})
 
             return AutoReplyModuleAddResult(outcome, model, ex)
 
@@ -68,9 +71,11 @@ class AutoReplyModuleManager(BaseCollection):
             {"$update": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
 
     @DecoParamCaster({1: ObjectId, 2: bool})
-    def get_conn(self, keyword_oid: ObjectId, case_insensitive: bool = True) -> Optional[AutoReplyModuleModel]:
+    def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
+            Optional[AutoReplyModuleModel]:
         return self.find_one_casted(
-            {AutoReplyModuleModel.KeywordOid.key: keyword_oid},
+            {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
+             f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True},
             sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
             collation=case_insensitive_collation if case_insensitive else None)
 
@@ -203,21 +208,21 @@ class AutoReplyManager:
             self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        # FIXME: [HP] Logic on adding new conn (remove old or add flag...)
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
 
     def get_responses(
-            self, keyword: str, type_: AutoReplyContentType, case_insensitive: bool = True) -> List[str]:
+            self, keyword: str, keyword_type: AutoReplyContentType,
+            channel_oid: ObjectId, case_insensitive: bool = True) -> List[str]:
         """
         :return: Empty list (length of 0) if no corresponding response.
         """
-        ctnt_rst = AutoReplyContentManager.get_content(keyword, type_, False, case_insensitive)
+        ctnt_rst = AutoReplyContentManager.get_contents_condition(keyword, keyword_type, False, case_insensitive)
         mod = None
         resp_ctnt = []
         resp_id_miss = []
 
         if ctnt_rst.success:
-            mod = self._mod.get_conn(ctnt_rst.model.id, case_insensitive)
+            mod = self._mod.get_conn(ctnt_rst.model.id, channel_oid, case_insensitive)
 
         if mod:
             resp_ids = mod.response_oids
@@ -233,7 +238,7 @@ class AutoReplyManager:
             content = f"""Malformed data detected.
             <hr>
             <h4>Parameters</h4>\n
-            Keyword: {keyword} / Type: {type_} / Case Insensitive: {case_insensitive}\n
+            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}\n
             <h4>Variables</h4>\n
             Get content result (keyword): {ctnt_rst}\n
             Keyword connection model: {mod}\n

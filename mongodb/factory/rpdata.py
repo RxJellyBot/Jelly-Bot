@@ -1,4 +1,4 @@
-from JellyBotAPI.sysconfig import Database
+from JellyBot.sysconfig import Database
 from models import OID_KEY, PendingRepairDataModel
 
 from .factory import MONGO_CLIENT

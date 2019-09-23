@@ -1,4 +1,4 @@
-from JellyBotAPI.sysconfig import ChannelConfig
+from JellyBot.sysconfig import ChannelConfig
 from models.field import (
     PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField, DictionaryField
 )

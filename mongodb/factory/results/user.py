@@ -1,6 +1,6 @@
 from abc import ABC
 
-from JellyBotAPI.api.static import result
+from JellyBot.api.static import result
 from models import RootUserModel, OnPlatformUserModel, APIUserModel
 
 from ._base import ModelResult

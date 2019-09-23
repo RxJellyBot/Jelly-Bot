@@ -72,11 +72,10 @@ class UserProfileManager(BaseCollection):
         """
 
         if channel_oid and root_uid:
-            self.find_one_casted(
+            return self.find_one_casted(
                 {ChannelProfileConnectionModel.UserOid.key: root_uid,
                  ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
                 parse_cls=ChannelProfileConnectionModel)
-
         else:
             return None
 
@@ -99,7 +98,7 @@ class ProfileDataManager(BaseCollection):
             name="Profile Identity", unique=True)
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
-        return self.get_cache(OID_KEY, profile_oid, parse_cls=ChannelProfileModel)
+        return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """

@@ -5,7 +5,7 @@ import unittest
 from django.test import TestCase
 from django.urls import reverse
 
-from JellyBotAPI.api.static import result as r, param as p
+from JellyBot.api.static import result as r, param as p
 from models import AutoReplyModuleModel
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome, GetOutcome

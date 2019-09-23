@@ -1,5 +1,6 @@
 from external.line import LineApiWrapper
 from external.handle import EventObjectFactory, handle_main
+from mongodb.factory import ExtraContentManager
 
 
 def handle_text(event, destination):

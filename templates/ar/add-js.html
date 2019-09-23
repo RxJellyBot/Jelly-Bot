@@ -116,13 +116,11 @@
             hideAllSubmitMsg();
             try {
                 updateArCode(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
+                onLoadCallback(xhr.response);
             } catch (error) {
-                onSubmissionFailed()
+                onSubmissionFailed(error);
             }
-
-            onLoadCallback(xhr.response);
         };
-        xhr.onerror = onSubmissionFailed;
         xhr.send(collectData());
     }
 
@@ -176,7 +174,10 @@
         xhr.open("GET", url);
         xhr.responseType = "json";
         xhr.onload = function () {
-            enablePinnedModuleAccess(xhr.response["{{ static_keys_result.RESULT }}"].includes({{ perm_pin_access }}));
+            let resp = xhr.response["{{ static_keys_result.RESULT }}"];
+            if (resp) {
+                enablePinnedModuleAccess(resp.includes({{ perm_pin_access }}));
+            }
         };
         xhr.send();
     }

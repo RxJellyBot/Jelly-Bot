@@ -257,9 +257,11 @@ function onSubmitCallback(response) {
     submitBtnDisable(false);
 }
 
-function onSubmissionFailed() {
+function onSubmissionFailed(error) {
+    console.log(error);
     showSubmissionFailed(true);
     updateArCode(null);
+    submitBtnDisable(false);
 }
 
 function resetForm() {
