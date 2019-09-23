@@ -1,6 +1,6 @@
 from abc import ABC
 from collections import Callable
-from typing import Iterator, List, Any
+from typing import Iterator, List
 
 from flags import MessageType
 
