@@ -6,7 +6,7 @@ from mongodb.factory.results import BaseResult
 from models import Model
 
 
-class JellyBotAPISerializer(DjangoJSONEncoder):
+class JellyBotSerializer(DjangoJSONEncoder):
     def default(self, o):
         if isinstance(o, Model):
             return o.to_json()
