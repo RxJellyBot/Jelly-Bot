@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from JellyBot.components.mixin import CsrfExemptMixin
 from JellyBot.api.static import param
 from JellyBot.views import simple_str_response
-from extutils.serializer import JellyBotAPISerializer
+from extutils.serializer import JellyBotSerializer
 from external.handle import EventObjectFactory, handle_main
 
 
@@ -15,6 +15,6 @@ class DirectMessageWebhookView(CsrfExemptMixin, View):
         msg = request.GET.get(param.Message.MESSAGE)
         if msg:
             return JsonResponse(
-                handle_main(EventObjectFactory.from_direct(msg)).to_json(), encoder=JellyBotAPISerializer)
+                handle_main(EventObjectFactory.from_direct(msg)).to_json(), encoder=JellyBotSerializer)
         else:
             return simple_str_response(request, _(f"Provide {param.Message.MESSAGE} as a query parameter for message."))

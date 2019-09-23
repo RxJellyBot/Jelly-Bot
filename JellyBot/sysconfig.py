@@ -1,9 +1,16 @@
 import math
 
 
+class System:
+    PingSpamWaitSeconds = 29 * 60  # 29 mins because Heroku sleep on 30 mins
+    HerokuAppNameBeta = "newjellybot-beta"
+    HerokuAppNameStable = "newjellybot"
+    MaxSendContentLength = 2000
+
+
 class AutoReply:
     MaxResponses = 5
-    MaxContentLength = 2000
+    MaxContentLength = System.MaxSendContentLength
     TagSplittor = "|"
     CaseInsensitive = True
 
@@ -44,7 +51,3 @@ class Email:
 
 class TokenAction:
     ChannelRegisterTokenCooldownSeconds = 60
-
-
-class System:
-    PingSpamWaitSeconds = 29 * 60  # 29 mins because Heroku sleep on 30 mins

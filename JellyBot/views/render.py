@@ -4,6 +4,7 @@ from django.template import Template, RequestContext
 from django.utils import timezone
 
 from JellyBot import keys
+from JellyBot.sysconfig import System
 from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
 from JellyBot.components import get_root_oid
@@ -33,9 +34,9 @@ def render_template(request, title, template_name, context=None, content_type=No
 
     # Append version numbers for footer
     context["beta_update"] = timezone.localtime(
-        HerokuWrapper.latest_succeeded_release("jellybotapi-staging").updated_at).strftime("%m/%d %H:%M (UTC%z)")
+        HerokuWrapper.latest_succeeded_release(System.HerokuAppNameBeta).updated_at).strftime("%m/%d %H:%M (UTC%z)")
     context["stable_update"] = timezone.localtime(
-        HerokuWrapper.latest_succeeded_release("jellybotapi").updated_at).strftime("%m/%d %H:%M (UTC%z)")
+        HerokuWrapper.latest_succeeded_release(System.HerokuAppNameStable).updated_at).strftime("%m/%d %H:%M (UTC%z)")
 
     # Append backend vars
     unlock_classes = []
