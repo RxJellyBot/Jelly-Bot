@@ -7,7 +7,7 @@ from datetime import datetime
 
 from JellyBot.sysconfig import Database, DataQuery
 from extutils import is_empty_string
-from extutils.gmail import MailSender
+from extutils.emailutils import MailSender
 from extutils.checker import DecoParamCaster
 from extutils.color import ColorFactory
 from flags import PermissionCategory, AutoReplyContentType
@@ -216,7 +216,7 @@ class AutoReplyManager:
         """
         :return: Empty list (length of 0) if no corresponding response.
         """
-        ctnt_rst = AutoReplyContentManager.get_contents_condition(keyword, keyword_type, False, case_insensitive)
+        ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
         resp_ctnt = []
         resp_id_miss = []

@@ -1,3 +1,5 @@
+from abc import ABC
+
 import math
 
 
@@ -5,7 +7,23 @@ class System:
     PingSpamWaitSeconds = 29 * 60  # 29 mins because Heroku sleep on 30 mins
     HerokuAppNameBeta = "newjellybot-beta"
     HerokuAppNameStable = "newjellybot"
+    MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
+
+
+class PlatformConfig(ABC):
+    max_responses: int = NotImplementedError
+    max_content_length: int = NotImplementedError
+
+
+class LineApi(PlatformConfig):
+    max_responses = System.MaxOneTimeResponses
+    max_content_length = System.MaxSendContentLength
+
+
+class Discord(PlatformConfig):
+    max_responses = System.MaxOneTimeResponses
+    max_content_length = System.MaxSendContentLength
 
 
 class AutoReply:
