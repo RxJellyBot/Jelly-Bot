@@ -2,7 +2,7 @@ import traceback
 
 from linebot import exceptions
 
-from extutils.gmail import MailSender
+from extutils.emailutils import MailSender
 from external.line.logger import LINE, ExtraKey
 
 

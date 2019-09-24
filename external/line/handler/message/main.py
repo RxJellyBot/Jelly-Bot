@@ -21,7 +21,7 @@ fn_dict = {
 }
 
 
-def handle_msg_main(event, destination):
+def handle_msg_main(request, event, destination):
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Message event",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
@@ -46,8 +46,8 @@ def handle_msg_main(event, destination):
 
     try:
         if fn:
-            fn(event, destination)
+            fn(request, event, destination)
         else:
-            handle_msg_default(event, destination)
+            handle_msg_default(request, event, destination)
     except Exception as e:
         handle_error(e, f"Error occurred in handle_msg_main. Handle function: {fn.__name__}", event, destination)

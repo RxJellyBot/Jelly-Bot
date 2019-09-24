@@ -2,7 +2,10 @@ from abc import ABC
 from collections import Callable
 from typing import Iterator, List
 
-from flags import MessageType
+from flags import MessageType, Platform
+from JellyBot.sysconfig import LineApi, Discord
+
+from .out_plat import HandledEventsHolderPlatform
 
 
 class HandledEventObject(ABC):
@@ -30,8 +33,11 @@ class HandledEventsHolder:
         for item in self._core:
             yield item
 
-    def get_contents_condition(self, lambda_fn: Callable) -> Iterator:
-        return filter(lambda_fn, self._core)
-
     def to_json(self):
         return [item.to_json() for item in self._core]
+
+    def to_platform(self, request, platform: Platform) -> HandledEventsHolderPlatform:
+        if platform == Platform.LINE:
+            return HandledEventsHolderPlatform(self, request, LineApi)
+        if platform == Platform.DISCORD:
+            return HandledEventsHolderPlatform(self, request, Discord)

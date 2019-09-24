@@ -13,14 +13,14 @@ from .member import handle_member_main
 from .error import handle_error
 
 
-def handle_main(event, destination):
+def handle_main(request, event, destination):
     try:
         if isinstance(event, MessageEvent):
-            handle_msg_main(event, destination)
+            handle_msg_main(request, event, destination)
         elif isinstance(event, (FollowEvent, UnfollowEvent, JoinEvent, LeaveEvent)):
-            handle_self_main(event, destination)
+            handle_self_main(request, event, destination)
         elif isinstance(event, (MemberJoinedEvent, MemberLeftEvent)):
-            handle_member_main(event, destination)
+            handle_member_main(request, event, destination)
         else:
             LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Unhandled LINE event.",
                                    extra={ExtraKey.Event: event, ExtraKey.Destination: destination})

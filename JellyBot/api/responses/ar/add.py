@@ -45,7 +45,7 @@ class AutoReplyAddBaseResponse(
         self._handle_keyword_type_()
 
         k = result.AutoReplyResponse.KEYWORD
-        r = AutoReplyContentManager.get_contents_condition(self._keyword, self._keyword_type)
+        r = AutoReplyContentManager.get_content(self._keyword, self._keyword_type)
         if r.success:
             self._keyword = self._data[k] = r.model.id
         else:
@@ -74,7 +74,7 @@ class AutoReplyAddBaseResponse(
             self._info.append(info.AutoReply.RESPONSE_TYPES_SHORTENED)
 
         for idx, resp in enumerate(self._responses):
-            r = AutoReplyContentManager.get_contents_condition(resp, self._response_types[idx])
+            r = AutoReplyContentManager.get_content(resp, self._response_types[idx])
 
             if r.success:
                 resp_list.append(r.model.id)

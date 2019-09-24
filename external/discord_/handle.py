@@ -1,6 +1,6 @@
 import traceback
 
-from extutils.gmail import MailSender
+from extutils.emailutils import MailSender
 from external.handle import EventObject, TextEventObject, handle_main, HandledEventsHolder
 
 from .logger import DISCORD
