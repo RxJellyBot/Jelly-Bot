@@ -1,21 +1,18 @@
-from JellyBot.sysconfig import System
+from django.utils.translation import activate, deactivate
+
+from flags import Platform
 from external.line import LineApiWrapper
 from external.handle import EventObjectFactory, handle_main
-from mongodb.factory import ExtraContentManager
 
 
-def handle_text(event, destination):
+def handle_text(request, event, destination):
     # FIXME: Discord handler
     #  REF 1: https://github.com/nick411077/repo_bot/blob/master/cogs/help.py
     #  REF 2: https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
 
-    # FIXME: [LP] Redirect to webpage if too long
-    # FIXME: [LP] Handle over 5 messages
-    handled_events = handle_main(EventObjectFactory.from_line(event))
+    activate('zh-tw')
+    handled_events = handle_main(EventObjectFactory.from_line(event)).to_platform(request, Platform.LINE)
+    handled_events.push_content()
 
-    handle_main(EventObjectFactory.from_line(event)).get_contents_condition(
-        lambda e: len(e.content) > System.MaxSendContentLength)
-
-    LineApiWrapper.reply_text(
-        event.reply_token,
-        [txt_handled.content for txt_handled in handle_main(EventObjectFactory.from_line(event))])
+    LineApiWrapper.reply_text(event.reply_token, handled_events.to_send)
+    deactivate()

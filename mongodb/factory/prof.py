@@ -6,7 +6,7 @@ from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from extutils.checker import DecoParamCaster
-from extutils.gmail import MailSender
+from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult

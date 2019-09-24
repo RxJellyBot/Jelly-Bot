@@ -7,7 +7,7 @@ from mongodb.utils import BulkWriteDataHolder
 from models import ModelDefaultValueExt, OID_KEY
 from models.field import ModelField
 from extutils.flags import FlagCodeEnum
-from extutils.gmail import MailSender
+from extutils.emailutils import MailSender
 from extutils.logger import LoggerSkeleton
 
 from ..rpdata import PendingRepairDataModel

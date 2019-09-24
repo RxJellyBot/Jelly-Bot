@@ -18,6 +18,6 @@ class WebhookLineView(CsrfExemptMixin, View):
         LINE.logger.info("LINE Webhook request body: " + "\t" + str(body).replace("\n", "").replace(" ", ""))
 
         # handle external body
-        line_handle_event(body, signature)
+        line_handle_event(request, body, signature)
 
         return simple_str_response(request, "OK")
