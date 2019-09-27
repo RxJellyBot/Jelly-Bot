@@ -1,15 +1,22 @@
-from multiprocessing import Process
+from multiprocessing import Pool, cpu_count
 
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.html import strip_tags
 
-from JellyBot.sysconfig import Email
+from JellyBot.systemconfig import Email
 
 
 class MailSender:
-    @staticmethod
-    def send_email(content_html: str, recipients: list = None,
+    _POOL = None
+
+    @classmethod
+    def _check_init_(cls):
+        if not cls._POOL:
+            cls._POOL = Pool(cpu_count())
+
+    @classmethod
+    def send_email(cls, content_html: str, recipients: list = None,
                    subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
         """
         :param content_html: The content of the email. Content can be html string.
@@ -17,6 +24,8 @@ class MailSender:
         :param subject: The subject of the email.
         :param prefix: Prefix of the subject. Set to `None` means no prefix.
         """
+        cls._check_init_()
+
         if recipients is None:
             recipients = [settings.EMAIL_HOST_USER]
 
@@ -26,9 +35,10 @@ class MailSender:
         email_from = settings.EMAIL_HOST_USER
         send_mail(subject, strip_tags(content_html), email_from, recipients, html_message=content_html)
 
-    @staticmethod
-    def send_email_async(content_html: str, recipients: list = None,
+    @classmethod
+    def send_email_async(cls, content_html: str, recipients: list = None,
                          subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
-        Process(target=MailSender.send_email,
-                args=(content_html,),
-                kwargs={"recipients": recipients, "subject": subject, "prefix": prefix}).start()
+        cls._check_init_()
+
+        MailSender._POOL.apply_async(
+            send_mail, (content_html,), kwds={"recipients": recipients, "subject": subject, "prefix": prefix})

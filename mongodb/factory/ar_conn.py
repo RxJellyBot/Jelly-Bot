@@ -5,7 +5,7 @@ import pymongo
 from bson import ObjectId
 from datetime import datetime
 
-from JellyBot.sysconfig import Database, DataQuery
+from JellyBot.systemconfig import Database, DataQuery
 from extutils import is_empty_string
 from extutils.emailutils import MailSender
 from extutils.checker import DecoParamCaster

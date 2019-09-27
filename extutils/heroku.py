@@ -15,6 +15,7 @@ class HerokuWrapper:
             sys.exit(1)
 
         self._cache_release_list = {}
+        self._cache_custom_domain = {}
 
     def apps(self):
         return self._core.apps()
@@ -46,6 +47,18 @@ class HerokuWrapper:
             return releases[0]
         else:
             return None
+
+    def get_custom_domain(self, app_name, **kwargs):
+        if app_name not in self._cache_custom_domain:
+            app = self.get_app(app_name)
+            if not app:
+                return None
+            domains = app.domains(kind="custom", **kwargs)
+            if not domains:
+                return None
+            self._cache_custom_domain[app_name] = domains[0]
+
+        return self._cache_custom_domain[app_name]
 
     @property
     def rate_limit_remaining(self):
