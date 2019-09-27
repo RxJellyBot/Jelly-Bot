@@ -11,7 +11,7 @@ from mongodb.factory import ProfileManager, ChannelManager
 from JellyBot.views import render_template
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
-from JellyBot.sysconfig import TokenAction
+from JellyBot.systemconfig import TokenAction
 
 
 class AccountChannelRegistrationView(LoginRequiredMixin, TemplateResponseMixin, View):

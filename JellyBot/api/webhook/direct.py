@@ -6,7 +6,8 @@ from JellyBot.components.mixin import CsrfExemptMixin
 from JellyBot.api.static import param
 from JellyBot.views import simple_str_response
 from extutils.serializer import JellyBotSerializer
-from external.handle import EventObjectFactory, handle_main
+from msghandle import handle_main
+from msghandle.models import EventObjectFactory
 
 
 class DirectMessageWebhookView(CsrfExemptMixin, View):

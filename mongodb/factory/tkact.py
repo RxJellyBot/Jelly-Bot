@@ -12,7 +12,7 @@ from mongodb.factory.results import (
 from models import TokenActionModel, Model, AutoReplyModuleTokenActionModel
 from models.exceptions import ModelConstructionError
 from mongodb.utils import CheckableCursor
-from JellyBot.sysconfig import Database
+from JellyBot.systemconfig import Database
 from JellyBot.api.static import param
 
 from ._base import BaseCollection

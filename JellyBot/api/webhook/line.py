@@ -3,8 +3,8 @@ from django.views import View
 
 from JellyBot.components.mixin import CsrfExemptMixin
 from JellyBot.views import simple_str_response
-from external.line import line_handle_event
-from external.line.logger import LINE
+from extline import line_handle_event
+from extline import LINE
 
 
 class WebhookLineView(CsrfExemptMixin, View):

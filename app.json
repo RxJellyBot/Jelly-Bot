@@ -1,0 +1,66 @@
+{
+  "name": "Jelly Bot",
+  "repository": "https://github.com/RaenonX/Jelly-Bot",
+  "env": {
+    "GI_CLIENT_ID": {
+      "description": "Google Identity service client id. Format should be 000000000000-ffffffffffffffffffffffffffffffff.apps.googleusercontent.com.",
+      "required": true
+    },
+    "SECRET_KEY": {
+      "description": "The secret key for Django app.",
+      "required": true
+    },
+    "DJANGO_SETTINGS_MODULE": {
+      "description": "Module of Django settings.",
+      "value": "JellyBot.settings"
+    },
+    "MONGO_URL": {
+      "description": "Connection string for pymongo to connect to mongoDB.",
+      "required": true
+    },
+    "PRODUCTION": {
+      "description": "Flag indicates that if the app is in production.",
+      "required": false
+    },
+    "DEBUG": {
+      "description": "Flag indicates that if the app should display debug message / in debug mode.",
+      "required": false
+    },
+    "EMAIL_ACCOUNT": {
+      "description": "Email address/account for sending error report.",
+      "required": true
+    },
+    "EMAIL_PASSWORD": {
+      "description": "Email password for sending error report. Recommended using alternate password for app access.",
+      "required": true
+    },
+    "HEROKU_API_TOKEN": {
+      "description": "Heroku API token for displaying status of the heroku app.",
+      "required": true
+    },
+    "LINE_SECRET": {
+      "description": "LINE Business Bot secret.",
+      "required": true
+    },
+    "LINE_TOKEN": {
+      "description": "LINE Business Bot access token.",
+      "required": true
+    },
+    "LOGGER": {
+      "description": "Logger(s) configuration. See `note.md` for more details.",
+      "required": false
+    },
+    "LOG_LEVEL": {
+      "description": "Logger(s) configuration, specifically log level. See `note.md` for more details.",
+      "required": false
+    },
+    "DISCORD_TOKEN": {
+      "description": "Token for discord bot.",
+      "required": true
+    },
+    "HOST_URL": {
+      "description": "The URL of the domain of the app. Including protocol.",
+      "required": true
+    }
+  }
+}

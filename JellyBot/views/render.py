@@ -4,7 +4,7 @@ from django.template import Template, RequestContext
 from django.utils import timezone
 
 from JellyBot import keys
-from JellyBot.sysconfig import System
+from JellyBot.systemconfig import System
 from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
 from JellyBot.components import get_root_oid

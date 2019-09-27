@@ -20,7 +20,7 @@ from models.utils import ModelFieldChecker
 from mongodb.utils import CheckableCursor
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
-from JellyBot.sysconfig import Database
+from JellyBot.systemconfig import Database
 
 CACHE_EXPIRATION_SECS = Database.CacheExpirySeconds
 

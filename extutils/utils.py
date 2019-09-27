@@ -64,3 +64,12 @@ def to_camel_case(s: str):
 
 def split_fill(s: str, n: int, delim="", fill=None):
     return (s.split(delim) + [fill] * n)[:n]
+
+
+def reduce_length(s: str, max_: int):
+    suffix = "..."
+
+    if len(s) > max_ - len(suffix):
+        return s[:-3] + suffix
+    else:
+        return s

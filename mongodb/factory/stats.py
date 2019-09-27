@@ -5,7 +5,7 @@ from bson import ObjectId
 from flags import APICommand
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel
-from JellyBot.sysconfig import Database
+from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
 
@@ -31,8 +31,11 @@ class APIStatisticsManager(BaseCollection):
 
         return RecordAPIStatisticsResult(outcome, entry, ex)
 
-# FIXME: [HP] Implement stats for recording message activity and message content
-#   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature
+# FIXME: [LP] Implement stats for recording message activity and message content
+#   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature (Personal and group)
+
+# FIXME: [LP] Potentially remove this and change to use `pyga` (collect stats on messages sent/processed)
+#  with https://docs.djangoproject.com/en/2.2/topics/signals/
 
 
 _inst = APIStatisticsManager()
