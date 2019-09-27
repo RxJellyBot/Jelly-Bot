@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from mongodb.factory import ProfileManager
 from flags import Platform, AutoReplyContentType, PermissionCategory
-from JellyBot.sysconfig import AutoReply
+from JellyBot.systemconfig import AutoReply
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.views.render import render_template

@@ -1,6 +1,6 @@
 from abc import ABC
 
-from JellyBot import sysconfig
+from JellyBot import systemconfig
 from JellyBot.api.static import result, info, param
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.responses.mixin import (
@@ -59,8 +59,8 @@ class AutoReplyAddBaseResponse(
         resp_err = list()
         resp_list = list()
 
-        if len(self._responses) > sysconfig.AutoReply.MaxContentLength:
-            self._responses = self._responses[:sysconfig.AutoReply.MaxContentLength]
+        if len(self._responses) > systemconfig.AutoReply.MaxContentLength:
+            self._responses = self._responses[:systemconfig.AutoReply.MaxContentLength]
             self._info.append(info.AutoReply.RESPONSES_TRUNCATED)
 
         resp_len = len(self._responses)
@@ -100,7 +100,7 @@ class AutoReplyAddBaseResponse(
         if self._tags:
             # Tag string to array
             # noinspection PyUnresolvedReferences
-            tags = self._tags.split(sysconfig.AutoReply.TagSplittor)
+            tags = self._tags.split(systemconfig.AutoReply.TagSplittor)
             tag_ids = []
 
             for tag in tags:
