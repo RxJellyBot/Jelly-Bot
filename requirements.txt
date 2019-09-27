@@ -14,3 +14,4 @@ heroku3
 python-dateutil
 line-bot-sdk
 sympy
+discord.py
