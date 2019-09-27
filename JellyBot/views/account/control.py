@@ -28,7 +28,7 @@ class AccountLoginView(View):
 
         try:
             result = RootUserManager.register_google(get_identity_data(request.POST.get("idtoken")))
-            if WriteOutcome.data_found(result.outcome):
+            if result.outcome.is_success:
                 s = AccountLoginView.PASS_SIGNAL
                 token = result.idt_reg_result.token
             elif result.outcome == WriteOutcome.X_NOT_EXECUTED:
@@ -39,7 +39,8 @@ class AccountLoginView(View):
                 s = _("The data cannot be passed into the server.")
             else:
                 s = _(
-                    "An unknown error occurred during the new user data registration. Code: {}.").format(result.outcome)
+                    "An unknown error occurred during the new user data registration. Code: {}.").format(
+                    result.outcome.code)
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:

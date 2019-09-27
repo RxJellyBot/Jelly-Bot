@@ -17,7 +17,7 @@ if not line_secret:
 line_parser = WebhookParser(line_secret)
 
 
-# FIXME: [LP] Longtime message: No lock - set timeout
+# TODO: Longtime message: No lock - set timeout (Needs multithread)
 
 def line_handle_event(request, body, signature):
     payload = line_parser.parse(body, signature, as_payload=True)
