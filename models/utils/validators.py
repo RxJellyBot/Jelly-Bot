@@ -1,7 +1,7 @@
 import urllib.request
 from typing import Any
 
-from JellyBot.sysconfig import AutoReply
+from JellyBot.systemconfig import AutoReply
 
 from extutils.line_sticker import LineStickerManager
 import flags

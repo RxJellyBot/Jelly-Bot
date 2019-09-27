@@ -1,6 +1,6 @@
-# Jelly Bot API
+# Jelly Bot
 
-See [Latest Release](https://github.com/RaenonX/Jelly-Bot-API/releases/latest) for the latest features list.
+See [Latest Release](https://github.com/RaenonX/Jelly-Bot/releases/latest) for the latest features list.
 
 <hr>
 

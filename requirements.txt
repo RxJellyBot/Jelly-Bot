@@ -1,4 +1,3 @@
-discord.py
 dotmap
 markdown2
 requests
@@ -6,6 +5,7 @@ dnspython
 pymongo
 bson
 Django
+django-html_sanitizer
 whitenoise
 google-api-python-client
 ttldict
@@ -14,3 +14,4 @@ heroku3
 python-dateutil
 line-bot-sdk
 sympy
+discord.py

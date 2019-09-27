@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sanitizer',
     'JellyBot'
 ]
 
@@ -202,9 +203,11 @@ STATICFILES_DIRS = (
 LOGIN_URL = reverse_lazy("account.login")
 
 # On-Error handling
+
 ADMINS = [('RaenonX JELLYCAT', os.environ.get("EMAIL_ACCOUNT"))]
 
 # Email
+
 if os.environ.get("EMAIL_ACCOUNT") is None:
     sys.exit("EMAIL_ACCOUNT not set in enviroment variable.")
 if os.environ.get("EMAIL_PASSWORD") is None:
@@ -215,3 +218,9 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_ACCOUNT")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+
+# Sanitizer
+
+SANITIZER_ALLOWED_TAGS = ['div', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'p', 'pre', 'code']
+SANITIZER_ALLOWED_ATTRIBUTES = ['class', 'id', 'role', 'data-toggle', 'href', 'aria-labelledby']
+SANITIZER_ALLOWED_STYLES = []

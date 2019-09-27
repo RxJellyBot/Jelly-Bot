@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from JellyBot import sysconfig
+from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models.utils import AutoReplyValidators
 
@@ -13,7 +13,7 @@ from .field import (
 
 class AutoReplyContentModel(Model):
     Content = TextField(
-        "c", default=ModelDefaultValueExt.Required, maxlen=sysconfig.AutoReply.MaxContentLength,
+        "c", default=ModelDefaultValueExt.Required, maxlen=systemconfig.AutoReply.MaxContentLength,
         allow_none=False, must_have_content=True)
     ContentType = AutoReplyContentTypeField("t")
 
@@ -41,7 +41,7 @@ class AutoReplyModuleModel(Model):
 
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                              max_len=sysconfig.AutoReply.MaxResponses)
+                              max_len=systemconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
@@ -60,7 +60,7 @@ class AutoReplyModuleModel(Model):
 class AutoReplyModuleTokenActionModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                              max_len=sysconfig.AutoReply.MaxResponses)
+                              max_len=systemconfig.AutoReply.MaxResponses)
     CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)

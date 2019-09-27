@@ -9,3 +9,4 @@ class ExtraContentType(FlagSingleEnum):
         return ExtraContentType.PURE_TEXT
 
     PURE_TEXT = 0, _("Pure Text")
+    EXTRA_MESSAGE = 1, _("Extra Message")

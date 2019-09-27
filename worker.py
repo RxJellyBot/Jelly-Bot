@@ -1,6 +1,6 @@
-from JellyBot.sysconfig import System
+from JellyBot.systemconfig import System
 
-from external.discord_ import run_server
+from extdiscord import run_server
 from extutils import activate_ping_spam
 
 

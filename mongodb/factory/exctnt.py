@@ -1,9 +1,9 @@
 from datetime import datetime
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 from bson import ObjectId
 
-from JellyBot.sysconfig import Database
+from JellyBot.systemconfig import Database
 from flags import ExtraContentType
 from models import ExtraContentModel, OID_KEY
 from mongodb.factory.results import RecordExtraContentResult, WriteOutcome
@@ -19,14 +19,23 @@ class ExtraContentManager(BaseCollection):
     collection_name = "content"
     model_class = ExtraContentModel
 
+    DefaultTitle = "-"
+
     def __init__(self):
         super().__init__()
         self.create_index(ExtraContentModel.Timestamp.key,
                           expireAfterSeconds=Database.ExtraContentExpirySeconds, name="Timestamp")
 
-    def record_content(self, type_: ExtraContentType, content: str, title: str = None) -> RecordExtraContentResult:
+    def record_extra_message(self, content_dict: list, title: str = None):
+        """
+        :param title: Title of the extra message.
+        :param content_dict: [(<REASON>, <MESSAGE_CONTENT>), (<REASON>, <MESSAGE_CONTENT>)...]
+        """
+        return self.record_content(ExtraContentType.EXTRA_MESSAGE, content_dict, title)
+
+    def record_content(self, type_: ExtraContentType, content: Any, title: str = None) -> RecordExtraContentResult:
         if not title:
-            title = "-"
+            title = ExtraContentManager.DefaultTitle
 
         if not content:
             return RecordExtraContentResult(WriteOutcome.X_NOT_EXECUTED)
