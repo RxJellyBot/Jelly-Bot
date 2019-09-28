@@ -5,7 +5,6 @@ from JellyBot.api.responses.mixin import (
     SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
 )
 from flags import TokenAction
-from models import ChannelRegisterMembershipModel
 from mongodb.factory import ChannelManager, TokenActionManager
 
 
