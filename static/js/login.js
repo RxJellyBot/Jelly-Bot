@@ -1,5 +1,11 @@
+$(document).ready(function() {
+    $("button#loginGoogle").click(function () {
+        googleSignIn();
+    });
+});
+
 // noinspection JSUnusedGlobalSymbols
-function onSignInHandle(googleUser, defaultRedirectUrl) {
+function onSignInHandle(idToken, defaultRedirectUrl) {
     let xhr = new XMLHttpRequest();
     xhr.open('POST', window.location.href);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -12,7 +18,7 @@ function onSignInHandle(googleUser, defaultRedirectUrl) {
         }
     };
     // noinspection JSUnresolvedFunction, JSUnresolvedVariable
-    xhr.send('idtoken=' + googleUser.getAuthResponse().id_token);
+    xhr.send('idtoken=' + idToken);
 }
 
 function getRedirectUrl(defaultUrl) {
