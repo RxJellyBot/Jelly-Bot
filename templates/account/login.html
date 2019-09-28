@@ -16,23 +16,24 @@
             <div class="jumbotron">
                 <p class="display-4">
                     {% blocktrans trimmed %}
-                        To use the features on the website, we will collect some data from
-                        your Google Account.
+                        To use the features on the website, we will collect some data from your account.
                     {% endblocktrans %}
                 </p>
                 <h4>{% trans "The data we will collect are:" %}</h4>
                 <ul>
-                    <li>{% trans "Your email" %}</li>
-                    <li>{% trans "Your unique user id for our API client" %}</li>
+                    <li>{% trans "Your email (if applicable)" %}</li>
+                    <li>{% trans "Your unique user ID" %}</li>
                 </ul>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col">
                         <p>
-                            {% trans "Clicking the button below to login, which also means that you agree the things above." %}
+                            {% trans "Select a service to login, which also means that you agree the things above." %}
                         </p>
                     </div>
-                    <div class="col-md-12">
-                        <div class="g-signin2" data-onsuccess="onSignIn" data-longtitle="true" data-theme="dark"></div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button type="button" class="btn btn-outline-primary" id="loginGoogle">Google</button>
                     </div>
                 </div>
             </div>
@@ -45,19 +46,24 @@
     </div>
 {% endblock %}
 
-{% block ex-meta %}
-    <meta name="google-signin-client_id"
-          content="431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com">
-{% endblock %}
-
 {% block ex-script %}
-    <script src="https://apis.google.com/js/platform.js?onload=renderButton" type="text/javascript" async
+    <script src="https://apis.google.com/js/platform.js" type="text/javascript" async
             defer></script>
     <script src="{% static "js/login.js" %}" type="text/javascript"></script>
+    <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
     <script type="text/javascript" async>
-        // noinspection JSUnusedLocalSymbols,JSUnusedGlobalSymbols
-        function onSignIn(googleUser) {
-            onSignInHandle(googleUser, "{% url "page.home" %}");
+        function googleSignIn() {
+            gapi.load('auth2', function () {
+                gapi.auth2.init({
+                    "client_id": "431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com"
+                }).signIn({"prompt": "select_account"}).then(function(googleUser) {
+                    onGoogleSignedIn(googleUser);
+                });
+            });
+        }
+
+        function onGoogleSignedIn(googleUser) {
+            onSignInHandle(googleUser.getAuthResponse().id_token, "{% url "page.home" %}");
         }
     </script>
 {% endblock %}
