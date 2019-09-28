@@ -10,7 +10,7 @@ from .ar import (
     AutoReplyContentGetResult, AutoReplyModuleTagGetResult
 )
 from .channel import ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
-from .statistics import RecordAPIStatisticsResult
+from .statistics import RecordAPIStatisticsResult, MessageRecordResult
 from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
 from .exctnt import RecordExtraContentResult

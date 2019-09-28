@@ -5,7 +5,7 @@ from flags import MessageType, Platform
 from JellyBot.systemconfig import LineApi, Discord
 
 
-class HandledEventObject(ABC):
+class HandledMessageEvent(ABC):
     def __init__(self, msg_type: MessageType, content: str):
         self.content = content
         self.msg_type = msg_type
@@ -14,12 +14,13 @@ class HandledEventObject(ABC):
         return {"content": str(self.content), "type": self.msg_type}
 
 
-class HandledEventObjectText(HandledEventObject):
-    def __init__(self, content: str):
+class HandledMessageEventText(HandledMessageEvent):
+    def __init__(self, content: str, bypass_multiline_check: bool = False):
         super().__init__(MessageType.TEXT, content)
+        self.bypass_multiline_check = bypass_multiline_check
 
 
-class HandledEventObjectCalculateResult(HandledEventObjectText):
+class HandledMessageCalculateResult(HandledMessageEventText):
     def __init__(self, content: str, latex: str):
         super().__init__(content)
         self.latex = latex
@@ -36,8 +37,8 @@ class HandledEventObjectCalculateResult(HandledEventObjectText):
         return super().to_json().update({"latex": self.latex})
 
 
-class HandledEventsHolder:
-    def __init__(self, init_items: List[HandledEventObject] = None):
+class HandledMessageEventsHolder:
+    def __init__(self, init_items: List[HandledMessageEvent] = None):
         if not init_items:
             init_items = []
 

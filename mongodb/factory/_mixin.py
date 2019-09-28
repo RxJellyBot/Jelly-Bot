@@ -10,14 +10,14 @@ class GenerateTokenMixin(BaseCollection):
     @classmethod
     def get_token_length(cls) -> int:
         if cls.token_length is None:
-            raise AttributeError(f"Assign a value to `token_length` in {cls.__name__}.")
+            raise AttributeError(f"Assign a value to `token_length` in {cls.__qualname__}.")
         else:
             return cls.token_length
 
     @classmethod
     def get_token_key(cls) -> str:
         if cls.token_key is None:
-            raise AttributeError(f"Assign a value to `token_key` in {cls.__name__}.")
+            raise AttributeError(f"Assign a value to `token_key` in {cls.__qualname__}.")
         else:
             return cls.token_key
 

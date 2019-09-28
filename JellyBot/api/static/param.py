@@ -62,3 +62,6 @@ class TokenAction:
 
 class Message:
     MESSAGE = "msg"
+    PLATFORM = Common.PLATFORM
+    USER_TOKEN = Common.USER_TOKEN
+    API_TOKEN = Common.API_TOKEN

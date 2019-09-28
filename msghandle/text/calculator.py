@@ -7,13 +7,13 @@ from sympy.core.sympify import SympifyError
 from sympy.abc import _clash1
 
 from msghandle import logger
-from msghandle.models import TextEventObject, HandledEventObject, HandledEventObjectCalculateResult
+from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageCalculateResult
 
 __all__ = ["process_calculator"]
 
 
 # Obtained and modified from https://stackoverflow.com/a/14822667
-def process_calculator(e: TextEventObject) -> List[HandledEventObject]:
+def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
     if e.text[-1] == "=":
         expr = e.text[:-1]
         symbol_vals = {}
@@ -34,7 +34,7 @@ def process_calculator(e: TextEventObject) -> List[HandledEventObject]:
             else:
                 ret = str(expression)
 
-            return [HandledEventObjectCalculateResult(content=ret, latex=latex(expression))]
+            return [HandledMessageCalculateResult(content=ret, latex=latex(expression))]
         except SympifyError as e:
             logger.logger.debug(
                 f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")

@@ -39,11 +39,11 @@ class ChannelProfileListEntry:
 
 class ChannelProfileConnectionModel(Model):
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
-    UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required)
+    UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
     ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=False)
 
 
 class PermissionPromotionRecordModel(Model):
-    SupporterOid = ObjectIDField("s")
-    TargetOid = ObjectIDField("t")
+    SupporterOid = ObjectIDField("s", stores_uid=True)
+    TargetOid = ObjectIDField("t", stores_uid=True)
     ProfileOid = ObjectIDField("p")

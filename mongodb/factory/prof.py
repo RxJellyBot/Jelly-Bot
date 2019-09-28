@@ -228,13 +228,11 @@ class ProfileManager:
                 [f'{cnl_id}: {" / ".join(prof_ids)}' for cnl_id, prof_ids in not_found_prof_oids_dict])
 
             MailSender.send_email_async(
-                f"User ID: {root_uid}"
-                f""
-                f"Connected channels but not found (`ObjectId`): "
-                f"{' & '.join(not_found_channel)}"
-                f""
-                f"Connected profiles but not found (`ObjectId`): "
-                f"{not_found_prof_oids_txt}",
+                f"User ID: <code>{root_uid}</code><hr>"
+                f"Channel IDs not found in DB:<br>"
+                f"<pre>{' & '.join([str(c) for c in not_found_channel])}</pre><hr>"
+                f"Profile IDs not found in DB:<br>"
+                f"<pre>{not_found_prof_oids_txt}</pre>",
                 subject="Possible Data Corruption on Getting User Profile Connection"
             )
 

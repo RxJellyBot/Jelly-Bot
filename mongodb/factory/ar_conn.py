@@ -5,7 +5,7 @@ import pymongo
 from bson import ObjectId
 from datetime import datetime
 
-from JellyBot.systemconfig import Database, DataQuery
+from JellyBot.systemconfig import AutoReply, Database, DataQuery
 from extutils import is_empty_string
 from extutils.emailutils import MailSender
 from extutils.checker import DecoParamCaster
@@ -212,9 +212,10 @@ class AutoReplyManager:
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
-            channel_oid: ObjectId, case_insensitive: bool = True) -> List[str]:
+            channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[str, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
+                [(<RESPONSE>, <BYPASS_MULTILINE>), (<RESPONSE>, <BYPASS_MULTILINE>)...]
         """
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
@@ -230,20 +231,20 @@ class AutoReplyManager:
             for resp_id in resp_ids:
                 ctnt_mdl = AutoReplyContentManager.get_content_by_id(resp_id)
                 if ctnt_mdl:
-                    resp_ctnt.append(ctnt_mdl.content)
+                    resp_ctnt.append((ctnt_mdl.content, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds))
                 else:
                     resp_id_miss.append(resp_id)
 
         if resp_id_miss and ctnt_rst.success:
             content = f"""Malformed data detected.
             <hr>
-            <h4>Parameters</h4>\n
-            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}\n
-            <h4>Variables</h4>\n
-            Get content result (keyword): {ctnt_rst}\n
-            Keyword connection model: {mod}\n
-            Contents to response: {mod}\n
-            Contents missing (id): {resp_id_miss}\n
+            <h4>Parameters</h4><br>
+            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}<br>
+            <h4>Variables</h4><br>
+            Get content result (keyword): {ctnt_rst}<br>
+            Keyword connection model: {mod}<br>
+            Contents to response: {mod}<br>
+            Contents missing (id): {resp_id_miss}
             """
             MailSender.send_email_async(content, subject="Lossy data in auto reply database")
 

@@ -42,15 +42,15 @@ class AutoReplyModuleModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)
-    CreatorOid = ObjectIDField("cr", readonly=True)
+    CreatorOid = ObjectIDField("cr", readonly=True, stores_uid=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     CalledCount = IntegerField("c", readonly=True)
     LastUsed = DateTimeField("l", readonly=True, allow_none=False)
-    ExcludedOids = ArrayField("e", ObjectId)
+    ExcludedOids = ArrayField("e", ObjectId, stores_uid=True)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = DictionaryField("ch")  # `str` key! Value=Active?
+    ChannelIds = DictionaryField("ch")  # `str` key / Value=Active?
 
     @property
     def creation_time(self):
@@ -61,14 +61,15 @@ class AutoReplyModuleTokenActionModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)
-    CreatorOid = ObjectIDField("cr", readonly=True)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     TagIds = ArrayField("t", ObjectId)
 
-    def to_actual_model(self, channel_id: ObjectId):
-        return AutoReplyModuleModel(**self.to_json(), ch=[channel_id], from_db=True)
+    def to_actual_model(self, channel_id: ObjectId, creator_oid: ObjectId):
+        return AutoReplyModuleModel(
+            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelIds.key: [channel_id],
+                                               AutoReplyModuleModel.CreatorOid.key: creator_oid})
 
 
 class AutoReplyModuleTagModel(Model):

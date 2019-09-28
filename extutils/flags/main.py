@@ -7,7 +7,7 @@ from .mongo import register_encoder
 class FlagMixin:
     @classmethod
     def default(cls):
-        raise ValueError(f"Default in {cls.__name__} not implemented.")
+        raise ValueError(f"Default in {cls.__qualname__} not implemented.")
 
 
 class FlagCodeMixin(FlagMixin):
@@ -50,7 +50,7 @@ class FlagCodeMixin(FlagMixin):
         elif isinstance(other, int):
             return self._code - other
         else:
-            raise TypeError(f"Not comparable. ({type(self).__name__} & {type(other).__name__})")
+            raise TypeError(f"Not comparable. ({type(self).__qualname__} & {type(other).__qualname__})")
 
     @property
     def code(self) -> int:

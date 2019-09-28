@@ -26,7 +26,3 @@ class ChannelModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
     Name = DictionaryField("n", default=ModelDefaultValueExt.Required)
     Config = ModelField("c", ChannelConfigModel)
-
-
-class ChannelRegisterMembershipModel(Model):
-    RootOid = ObjectIDField("u")

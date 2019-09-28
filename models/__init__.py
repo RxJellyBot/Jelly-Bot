@@ -14,7 +14,7 @@ from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConf
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel, ChannelRegisterMembershipModel
 # noinspection PyUnresolvedReferences
-from .stats import APIStatisticModel
+from .stats import APIStatisticModel, MessageRecordModel
 # noinspection PyUnresolvedReferences
 from .tkact import TokenActionModel
 # noinspection PyUnresolvedReferences

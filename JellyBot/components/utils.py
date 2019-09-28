@@ -5,11 +5,23 @@ from django.apps import apps
 from django.conf import settings
 from bson import ObjectId
 
+from mongodb.factory import RootUserManager
 from JellyBot.keys import Session, ParamDictPrefix
+from JellyBot.api.static.param import Message
 
 
 def get_root_oid(request) -> Optional[ObjectId]:
     oid_str = request.session.get(Session.USER_ROOT_ID)
+    if oid_str:
+        return ObjectId(oid_str)
+
+    u_token = request.GET.get(Message.USER_TOKEN)
+    if u_token:
+        RootUserManager.get_root_data_onplat()
+
+    u_token = request.GET.get(Message.USER_TOKEN)
+    if u_token:
+        RootUserManager.get_root_data_onplat()
 
     return None if oid_str is None else ObjectId(oid_str)
 
