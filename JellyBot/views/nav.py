@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from JellyBot import keys
 from JellyBot.components.navbar import (
-    nav_items_factory, NavItemsHolder, NavEntry, NavDropdown, NavHeader, NavDivider, NavDummy
+    nav_items_factory, NavItemsHolder, NavEntry, NavDropdown, NavHeader, NavDivider, NavHidden
 )
 
 
@@ -25,6 +25,14 @@ def construct_nav(request, nav_param):
         NavEntry, current_path, label=_("About"), link=reverse("page.about"), parent=home_item)
 
     # ----------------------------
+
+    # Attach hidden item
+    try:
+        nav.add_item(nav_items_factory(
+            NavHidden, current_path, label=_("Extra Content"),
+            link=reverse("page.extra", kwargs=nav_param), parent=home_item))
+    except NoReverseMatch:
+        pass
 
     # Collect items to Nav Bar
     nav.add_item(home_item)
@@ -50,16 +58,16 @@ def _construct_my_account_(current_path, parent, nav_param):
     my_account_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
 
-    # Dummy Items
+    # Hidden Items
     my_account_parent.add_item(nav_items_factory(
-        NavDummy, current_path, label=_("Channel Registration"),
+        NavHidden, current_path, label=_("Channel Registration"),
         link=reverse("account.channel.connect"), parent=my_account_parent))
     my_account_parent.add_item(nav_items_factory(
-        NavDummy, current_path, label=_("Channel List"),
+        NavHidden, current_path, label=_("Channel List"),
         link=reverse("account.channel.list"), parent=my_account_parent))
     try:
         my_account_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_("Channel Management"),
+            NavHidden, current_path, label=_("Channel Management"),
             link=reverse("account.channel.manage", kwargs=nav_param), parent=my_account_parent))
     except NoReverseMatch:
         pass
@@ -91,17 +99,17 @@ def _construct_info_(current_path, parent, nav_param):
     info_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Channel"), link=reverse("info.channel.search"), parent=info_parent))
 
-    # Dummy Items
+    # Hidden Items
     try:
         info_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_("Channel"),
+            NavHidden, current_path, label=_("Channel"),
             link=reverse("info.channel", kwargs=nav_param), parent=info_parent))
     except NoReverseMatch:
         pass
 
     try:
         info_parent.add_item(nav_items_factory(
-            NavDummy, current_path, label=_("Profile Info"),
+            NavHidden, current_path, label=_("Profile Info"),
             link=reverse("info.profile", kwargs=nav_param), parent=info_parent))
     except NoReverseMatch:
         pass

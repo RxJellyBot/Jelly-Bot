@@ -11,7 +11,7 @@ from models.field import TextField, TokenActionField, DateTimeField, DictionaryF
 class TokenActionModel(Model):
     TOKEN_LENGTH = 10
 
-    CreatorOid = ObjectIDField("cr", default=ModelDefaultValueExt.Required)
+    CreatorOid = ObjectIDField("cr", default=ModelDefaultValueExt.Required, stores_uid=True)
     Token = TextField("tk", default=ModelDefaultValueExt.Required,
                       regex=fr"\w{{{TOKEN_LENGTH}}}", must_have_content=True)
     ActionType = TokenActionField("a", default=ModelDefaultValueExt.Required)

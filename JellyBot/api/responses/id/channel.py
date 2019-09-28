@@ -39,9 +39,7 @@ class ChannelIssueRegisterTokenResponse(
         super().pre_process()
 
     def process_pass(self):
-        self._result = TokenActionManager.enqueue_action(
-            self._sender_oid, TokenAction.CONNECT_CHANNEL,
-            ChannelRegisterMembershipModel, RootOid=self._sender_oid)
+        self._result = TokenActionManager.enqueue_action(self._sender_oid, TokenAction.REGISTER_CHANNEL)
 
 
 class ChannelNameChangeResponse(

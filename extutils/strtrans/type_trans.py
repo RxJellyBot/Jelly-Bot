@@ -29,4 +29,4 @@ def type_translation(type_: type):
     elif isinstance(type_, type(None)):
         return _("(Null)")
     else:
-        return type_.__name__
+        return type_.__qualname__

@@ -50,7 +50,7 @@ class Model(MutableMapping, abc.ABC):
 
         unused_keys = kwargs.keys() - self.model_fields() - self.SKIP_DEFAULT_FILLING
         if len(unused_keys) > 0:
-            warn_keys_not_used(self.__class__.__name__, unused_keys)
+            warn_keys_not_used(self.__class__.__qualname__, unused_keys)
 
     def _input_kwargs_(self, **kwargs):
         for k, v in kwargs.items():
@@ -70,7 +70,7 @@ class Model(MutableMapping, abc.ABC):
 
                         filled.add(k)
             else:
-                raise KeyNotExistedError(k, self.__class__.__name__)
+                raise KeyNotExistedError(k, self.__class__.__qualname__)
 
         return not_filled - filled - self.SKIP_DEFAULT_FILLING
 
@@ -89,7 +89,7 @@ class Model(MutableMapping, abc.ABC):
             if attr:
                 self._dict_[to_snake_case(fk)] = attr.new(v)
             else:
-                raise KeyNotExistedError(fk, self.__class__.__name__)
+                raise KeyNotExistedError(fk, self.__class__.__qualname__)
 
     def _inner_dict_get_(self, fk):
         if fk.lower() == "id":
@@ -122,21 +122,21 @@ class Model(MutableMapping, abc.ABC):
                 if jk == OID_KEY:
                     self._inner_dict_create_(self.json_key_to_field(jk), v)
             else:
-                warn_field_key_not_found_for_json_key(self.__class__.__name__, jk, "GET")
+                warn_field_key_not_found_for_json_key(self.__class__.__qualname__, jk, "GET")
         else:
             if jk == OID_KEY:
                 if self.WITH_OID:
                     self.set_oid(v)
                 else:
-                    raise IdUnsupportedError(self.__class__.__name__)
+                    raise IdUnsupportedError(self.__class__.__qualname__)
             else:
-                warn_action_failed_json_key(self.__class__.__name__, jk, "SET")
+                warn_action_failed_json_key(self.__class__.__qualname__, jk, "SET")
 
     def __setattr__(self, fk_sc, value):
         if to_camel_case(fk_sc) in self.model_fields():
             self._inner_dict_update_(fk_sc, value)
 
-        raise KeyNotExistedError(fk_sc, self.__class__.__name__)
+        raise KeyNotExistedError(fk_sc, self.__class__.__qualname__)
 
     def __getitem__(self, jk):
         # Must throw `KeyError` for `_id` if `_id` not defined. `pymongo` will check this to determine if
@@ -148,19 +148,19 @@ class Model(MutableMapping, abc.ABC):
             if fd.base.key == jk:
                 return fd.value
 
-            warn_field_key_not_found_for_json_key(self.__class__.__name__, jk, "GET")
+            warn_field_key_not_found_for_json_key(self.__class__.__qualname__, jk, "GET")
         else:
             if jk == OID_KEY:
                 if self.WITH_OID:
                     return self.get_oid()
                 else:
-                    raise IdUnsupportedError(self.__class__.__name__)
+                    raise IdUnsupportedError(self.__class__.__qualname__)
             else:
                 # The key may be field_key (For Django template)
                 try:
                     return self.__getattr__(to_snake_case(self.json_key_to_field(jk)))
                 except AttributeError:
-                    warn_action_failed_json_key(self.__class__.__name__, jk, "GET")
+                    warn_action_failed_json_key(self.__class__.__qualname__, jk, "GET")
 
         return None
 
@@ -194,14 +194,14 @@ class Model(MutableMapping, abc.ABC):
         return ModelValidityCheckResult.default()
 
     def on_invalid(self, reason=ModelValidityCheckResult.X_UNCATEGORIZED):
-        raise InvalidModelError(self.__class__.__name__, reason)
+        raise InvalidModelError(self.__class__.__qualname__, reason)
 
     def is_field_none(self, fk, raise_on_not_exists=True):
         try:
             return self._inner_dict_get_(fk).is_none()
         except KeyError:
             if raise_on_not_exists:
-                raise KeyNotExistedError(fk, self.__class__.__name__)
+                raise KeyNotExistedError(fk, self.__class__.__qualname__)
             else:
                 return True
 
@@ -226,36 +226,36 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def model_fields(cls) -> set:
-        if not hasattr(cls, "_CacheField") or cls.__name__ not in cls._CacheField:
+        if not hasattr(cls, "_CacheField") or cls.__qualname__ not in cls._CacheField:
             s = {k for k, v in cls.__dict__.items() if cls._valid_model_key_(k)}
             if cls.WITH_OID:
                 s.add("Id")
 
-            cls._CacheField = {cls.__name__: s}
+            cls._CacheField = {cls.__qualname__: s}
 
-        return cls._CacheField[cls.__name__]
+        return cls._CacheField[cls.__qualname__]
 
     @classmethod
     def model_json(cls) -> set:
-        if not hasattr(cls, "_CacheJson") or cls.__name__ not in cls._CacheJson:
+        if not hasattr(cls, "_CacheJson") or cls.__qualname__ not in cls._CacheJson:
             s = {v.key for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
             if cls.WITH_OID:
                 s.add(cls.Id.key)
 
-            cls._CacheJson = {cls.__name__: s}
+            cls._CacheJson = {cls.__qualname__: s}
 
-        return cls._CacheJson[cls.__name__]
+        return cls._CacheJson[cls.__qualname__]
 
     @classmethod
     def json_key_to_field(cls, json_key) -> str:
-        if not hasattr(cls, "_CacheToField") or cls.__name__ not in cls._CacheToField:
+        if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
             d = {v.key: fk for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
             if cls.WITH_OID:
                 d[OID_KEY] = "Id"
 
-            cls._CacheToField = {cls.__name__: d}
+            cls._CacheToField = {cls.__qualname__: d}
 
-        return cls._CacheToField[cls.__name__].get(json_key)
+        return cls._CacheToField[cls.__qualname__].get(json_key)
 
     @classmethod
     def generate_default(cls):
@@ -291,7 +291,7 @@ class Model(MutableMapping, abc.ABC):
         return tmp
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}: {self._dict_}>"
+        return f"<{self.__class__.__qualname__}: {self._dict_}>"
 
 
 class ModelDefaultValueExtItem:

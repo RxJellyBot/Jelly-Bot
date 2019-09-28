@@ -95,12 +95,8 @@ class OnPlatformIdentityManager(BaseCollection):
 
 
 class RootUserManager(BaseCollection):
-    # TODO: ID_CONN / TOKEN - Connect API User and OnPlatform ID - migrate() check:
-    #   - AutoReplyModule.CreatorOID (ar.conn.cr)
-    #   - AutoReplyModule.ExcludedOIDs (ar.conn.e[])
-    #   - ChannelPermissionProfile.UserID (channel.perm.u)
-    #   - Channel.ManagerOIDs (channel.dict.mgr[])
-    #   - TokenAction.CreatorOID (tk_act.main.cr)
+    # FIXME: ID_CONN / TOKEN - Connect API User and OnPlatform ID - integrate() check:
+    #   Check config confliction
     #   Then check if the old user.mix identity is removed or not
     database_name = DB_NAME
     collection_name = "root"
@@ -149,6 +145,10 @@ class RootUserManager(BaseCollection):
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
 
+    @DecoParamCaster({1: Platform, 2: str})
+    def _get_onplat_data_(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
+        return self._mgr_onplat.get_onplat(platform, user_token)
+
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
 
@@ -188,14 +188,14 @@ class RootUserManager(BaseCollection):
 
     @DecoParamCaster({1: Platform, 2: str})
     def get_root_data_onplat(self, platform, user_token, auto_register=True) -> GetRootUserDataResult:
-        on_plat_data = self.get_onplat_data(platform, user_token)
+        on_plat_data = self._get_onplat_data_(platform, user_token)
         rt_user_data = None
 
         if on_plat_data is None and auto_register:
             on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
 
             if on_plat_reg_result.success:
-                on_plat_data = self.get_onplat_data(platform, user_token)
+                on_plat_data = self._get_onplat_data_(platform, user_token)
 
         if on_plat_data is None:
             outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
@@ -221,10 +221,6 @@ class RootUserManager(BaseCollection):
     @DecoParamCaster({1: ObjectId})
     def get_root_data_onplat_oid(self, onplat_oid: [ObjectId, str]) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid}, parse_cls=RootUserModel)
-
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_onplat_data(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
-        return self._mgr_onplat.get_onplat(platform, user_token)
 
     @DecoParamCaster({1: ObjectId})
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:

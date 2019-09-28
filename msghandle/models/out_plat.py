@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from collections import OrderedDict
 from typing import List, Tuple, Type
 import traceback
 from gettext import gettext as _
@@ -10,17 +9,18 @@ from extutils.emailutils import MailSender
 from JellyBot.systemconfig import PlatformConfig, HostUrl
 from mongodb.factory import ExtraContentManager
 
-from .pipe_out import HandledEventObjectCalculateResult, HandledEventsHolder
+from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder
 
 
 class ToSiteReason:
     TOO_LONG = _("Message length overlimit.")
     TOO_MANY_RESPONSES = _("Responses length overlimit.")
+    TOO_MANY_LINES = _("Too many lines.")
     LATEX_AVAILABLE = _("LaTeX available.")
 
 
 class HandledEventsHolderPlatform:
-    def __init__(self, holder: HandledEventsHolder, config_class: Type[PlatformConfig]):
+    def __init__(self, holder: HandledMessageEventsHolder, config_class: Type[PlatformConfig]):
         self.config_class = config_class
         self.to_send: List[str] = []
         self.to_site: List[Tuple[str, str]] = []
@@ -57,13 +57,17 @@ class HandledEventsHolderPlatform:
                     _("Content(s) is supposed to be recorded to database but failed. "
                       "An error report should be sent for investigation."))
 
-    def _sort_data_(self, holder: HandledEventsHolder, config_class: Type[PlatformConfig]):
+    def _sort_data_(self, holder: HandledMessageEventsHolder, config_class: Type[PlatformConfig]):
         for e in holder:
             if len(e.content) > config_class.max_content_length:
                 self.to_site.append((ToSiteReason.TOO_LONG, e.content))
             elif len(self.to_send) > config_class.max_responses:
                 self.to_site.append((ToSiteReason.TOO_MANY_RESPONSES, e.content))
-            elif isinstance(e, HandledEventObjectCalculateResult) and e.latex_available:
+            elif not e.bypass_multiline_check and len(self.to_send) > config_class.max_content_lines:
+                # TEST: Test if bypass multiline check is working. Setup an auto-reply with 20+ Line and trigger it.
+                #   Content should be displayed directly if working properly.
+                self.to_site.append((ToSiteReason.TOO_MANY_LINES, e.content))
+            elif isinstance(e, HandledMessageCalculateResult) and e.latex_available:
                 self.to_site.append((ToSiteReason.LATEX_AVAILABLE, e.latex_for_html))
             else:
                 self.to_send.append(e.content)

@@ -2,6 +2,7 @@ from ._base import BaseField
 
 
 class ModelField(BaseField):
+    # noinspection PyUnresolvedReferences
     def __init__(self, key, model_cls, default=None, allow_none=True, auto_cast=True):
         if model_cls is None:
             raise ValueError(f"`model_cls` needs to be specified for parsing.")

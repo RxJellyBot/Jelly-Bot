@@ -68,6 +68,9 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
         csr = self.find({TokenActionModel.CreatorOid.key: root_uid})
         return CheckableCursor(csr, parse_cls=TokenActionModel)
 
+    def clear_all_token_actions(self, root_uid: ObjectId):
+        self.delete_many({TokenActionModel.CreatorOid.key: root_uid})
+
     def complete_action(self, token: str, token_kwargs: dict):
         lacking_keys = set()
         cond_dict = {TokenActionModel.Token.key: token}
@@ -79,6 +82,7 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
             token_kwargs = dict(token_kwargs)
 
         if token:
+            # Not using self.find_one_casted for catching `ModelConstructionError`
             tk_model = self.find_one(cond_dict)
 
             if tk_model:
@@ -126,8 +130,8 @@ class TokenActionCompletor:
 
         if action == TokenAction.AR_ADD:
             return TokenActionCompletor._token_ar_add_(action_model, xparams)
-        elif action == TokenAction.CONNECT_CHANNEL:
-            return TokenActionCompletor._token_connect_channel_(action_model, xparams)
+        elif action == TokenAction.REGISTER_CHANNEL:
+            return TokenActionCompletor._token_register_channel_(action_model, xparams)
         else:
             raise NoCompleteActionError(action)
 
@@ -138,7 +142,8 @@ class TokenActionCompletor:
             return TokenActionCompletionOutcome.X_AR_REGISTER_CHANNEL
 
         try:
-            conn = AutoReplyModuleTokenActionModel(**action_model.data, from_db=True).to_actual_model(cnl.model.id)
+            conn = AutoReplyModuleTokenActionModel(**action_model.data, from_db=True).to_actual_model(
+                cnl.model.id, action_model.creator_oid)
         except ModelConstructionError:
             return TokenActionCompletionOutcome.X_MODEL_CONSTRUCTION
 
@@ -148,7 +153,7 @@ class TokenActionCompletor:
         return TokenActionCompletionOutcome.O_OK
 
     @staticmethod
-    def _token_connect_channel_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
+    def _token_register_channel_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
         try:
             channel_data = ChannelManager.register(
                 xparams[param.TokenAction.PLATFORM], xparams[param.TokenAction.CHANNEL_TOKEN])
@@ -171,7 +176,7 @@ class TokenActionParameterCollator:
     def collate_parameters(action: TokenAction, xparams: dict) -> dict:
         if action == TokenAction.AR_ADD:
             return TokenActionParameterCollator._token_ar_add_(action, xparams)
-        elif action == TokenAction.CONNECT_CHANNEL:
+        elif action == TokenAction.REGISTER_CHANNEL:
             return TokenActionParameterCollator._token_conn_channel_(xparams)
         else:
             return xparams
@@ -207,7 +212,7 @@ class TokenActionRequiredKeys:
         if token_action == TokenAction.AR_ADD:
             st.add(param.AutoReply.CHANNEL_TOKEN)
             st.add(param.AutoReply.PLATFORM)
-        elif token_action == TokenAction.CONNECT_CHANNEL:
+        elif token_action == TokenAction.REGISTER_CHANNEL:
             st.add(param.TokenAction.CHANNEL_TOKEN)
             st.add(param.TokenAction.PLATFORM)
 

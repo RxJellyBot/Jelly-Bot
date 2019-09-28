@@ -3,6 +3,7 @@ from typing import Union, List
 
 from .entry import NavEntry, NavFirstLevelItem
 from .dropdown import NavDropdown, NavBaseItem
+from .hidden import NavHidden
 
 
 class NavItemsHolder:
@@ -46,6 +47,8 @@ class NavItemsHolder:
                 dropdown_count += 1
 
                 s += item.to_html(dropdown_count)
+            elif isinstance(item, NavHidden):
+                pass
             else:
                 raise ValueError(f"Unhandled class {item}.")
         s += '</ul>'

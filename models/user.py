@@ -11,6 +11,7 @@ class RootUserConfigModel(Model):
     WITH_OID = False
 
     Locale = TextField("l", default=default_locale.pytz_code, allow_none=False)
+    Language = TextField("lg", default="zh-tw", allow_none=False)
     Name = TextField("n", allow_none=False)
 
 

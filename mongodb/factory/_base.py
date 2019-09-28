@@ -352,21 +352,21 @@ class BaseCollection(ControlExtensionMixin, Collection):
     @classmethod
     def get_db_name(cls):
         if cls.database_name is None:
-            raise AttributeError(f"Define `database_name` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `database_name` as class variable for {cls.__qualname__}.")
         else:
             return cls.database_name
 
     @classmethod
     def get_col_name(cls):
         if cls.collection_name is None:
-            raise AttributeError(f"Define `collection_name` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `collection_name` as class variable for {cls.__qualname__}.")
         else:
             return cls.collection_name
 
     @classmethod
     def get_model_cls(cls):
         if cls.model_class is None:
-            raise AttributeError(f"Define `model_class` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `model_class` as class variable for {cls.__qualname__}.")
         else:
             return cls.model_class
 

@@ -13,21 +13,25 @@ class System:
     HerokuAppNameStable = "newjellybot"
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
+    MaxSendContentLines = 20
 
 
 class PlatformConfig(ABC):
     max_responses: int = NotImplementedError
     max_content_length: int = NotImplementedError
+    max_content_lines: int = NotImplementedError
 
 
 class LineApi(PlatformConfig):
     max_responses = System.MaxOneTimeResponses
     max_content_length = System.MaxSendContentLength
+    max_content_lines = System.MaxSendContentLines
 
 
 class Discord(PlatformConfig):
     max_responses = System.MaxOneTimeResponses
     max_content_length = System.MaxSendContentLength
+    max_content_lines = System.MaxSendContentLines
 
 
 class AutoReply:
@@ -35,6 +39,7 @@ class AutoReply:
     MaxContentLength = System.MaxSendContentLength
     TagSplittor = "|"
     CaseInsensitive = True
+    BypassMultilineCDThresholdSeconds = 20
 
 
 class Database:
@@ -67,6 +72,7 @@ class ChannelConfig:
 
 
 class Email:
+    EmailCacheExpirySeconds = 600  # 10 mins
     DefaultSubject = "Email Notification from Jelly BOT"
     DefaultPrefix = "Jelly BOT - "
 
