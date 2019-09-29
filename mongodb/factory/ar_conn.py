@@ -1,3 +1,4 @@
+from datetime import timezone, timedelta
 from typing import Tuple, Optional, List
 
 import math
@@ -73,11 +74,21 @@ class AutoReplyModuleManager(BaseCollection):
     @DecoParamCaster({1: ObjectId, 2: bool})
     def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
-        return self.find_one_casted(
+        ret: Optional[AutoReplyModuleModel] = self.find_one_casted(
             {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
              f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True},
             sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
             collation=case_insensitive_collation if case_insensitive else None)
+
+        if ret:
+            now = datetime.now(tz=timezone.utc)
+            if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
+                self.update_one(
+                    {AutoReplyModuleModel.Id.key: ret.id},
+                    {"$set": {AutoReplyModuleModel.LastUsed.key: now}})
+                return ret
+
+        return None
 
 
 class AutoReplyModuleTagManager(BaseCollection):

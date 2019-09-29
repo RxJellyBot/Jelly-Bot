@@ -83,7 +83,10 @@ class BaseField(abc.ABC):
     def replace_uid_implemented(self) -> bool:
         return False
 
-    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId):
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
+        """
+        :return: Action has been acknowledges or not.
+        """
         raise RuntimeError(f"uid_replace function called but not implemented. ({self.__class__.__qualname__})")
 
     @property

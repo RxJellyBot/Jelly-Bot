@@ -27,7 +27,7 @@ class TokenAction(FlagDoubleEnum):
     REGISTER_CHANNEL = \
         101, _("Register: Channel Membership"), \
         _("Get the membership of a channel.")
-    INTERGATE_IDENTITY = \
+    INTEGRATE_USER_IDENTITY = \
         191, _("Integration: User Identity"), \
         _("Integrate user identity.")
     AR_ADD = \
