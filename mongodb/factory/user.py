@@ -95,9 +95,6 @@ class OnPlatformIdentityManager(BaseCollection):
 
 
 class RootUserManager(BaseCollection):
-    # FIXME: ID_CONN / TOKEN - Connect API User and OnPlatform ID - integrate() check:
-    #   Check config confliction
-    #   Then check if the old user.mix identity is removed or not
     database_name = DB_NAME
     collection_name = "root"
     model_class = RootUserModel
@@ -237,6 +234,13 @@ class RootUserManager(BaseCollection):
             return RootUserConfigModel.generate_default()
         else:
             return u_data.config
+
+    @DecoParamCaster({1: ObjectId})
+    def remove_root_user(self, root_oid: ObjectId) -> bool:
+        """
+        :return: Acknowledged flag of the removal.
+        """
+        return self.delete_one({RootUserModel.Id.key: root_oid}).acknowledged
 
     @DecoParamCaster({1: ObjectId})
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:

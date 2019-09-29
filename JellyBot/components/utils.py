@@ -5,9 +5,10 @@ from django.apps import apps
 from django.conf import settings
 from bson import ObjectId
 
+from flags import Platform
 from mongodb.factory import RootUserManager
 from JellyBot.keys import Session, ParamDictPrefix
-from JellyBot.api.static.param import Message
+from JellyBot.api.static.param import Common
 
 
 def get_root_oid(request) -> Optional[ObjectId]:
@@ -15,15 +16,22 @@ def get_root_oid(request) -> Optional[ObjectId]:
     if oid_str:
         return ObjectId(oid_str)
 
-    u_token = request.GET.get(Message.USER_TOKEN)
+    u_token = request.GET.get(Common.USER_TOKEN)
     if u_token:
-        RootUserManager.get_root_data_onplat()
+        platform = Platform.cast(request.GET.get(Common.PLATFORM)) or Platform.UNKNOWN
+        result = RootUserManager.get_root_data_onplat(platform, u_token, auto_register=False)
 
-    u_token = request.GET.get(Message.USER_TOKEN)
-    if u_token:
-        RootUserManager.get_root_data_onplat()
+        if result.success:
+            return result.model.id
 
-    return None if oid_str is None else ObjectId(oid_str)
+    api_token = request.GET.get(Common.API_TOKEN)
+    if api_token:
+        result = RootUserManager.get_root_data_api_token(api_token)
+
+        if result.success:
+            return result.model.id
+
+    return None
 
 
 def get_post_keys(qd):

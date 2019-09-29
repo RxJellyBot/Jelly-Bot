@@ -79,3 +79,7 @@ class Email:
 
 class TokenAction:
     ChannelRegisterTokenCooldownSeconds = 60
+
+
+class Bot:
+    Prefix = ".j"
