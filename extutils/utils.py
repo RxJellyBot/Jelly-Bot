@@ -16,6 +16,13 @@ def is_empty_string(s: Optional[str]):
     return s is None or len(s) == 0
 
 
+def list_get(l: list, idx: int):
+    try:
+        return l[idx]
+    except IndexError:
+        return None
+
+
 def all_lower(o: [str, tuple, list, set, dict]):
     """
     Will NOT modify the `o` itself.
@@ -73,3 +80,17 @@ def reduce_length(s: str, max_: int):
         return s[:-3] + suffix
     else:
         return s
+
+
+def decorator_wrap(target, fn_exec, *args, **kwargs):
+    """
+    Wrapper for a decorator function to be able to use in both w/ parameter(s) or w/o parameter(s).
+    """
+    if target:
+        fn_exec(*args, **kwargs)
+        return target
+    else:
+        def wrapper(target_in):
+            fn_exec(*args, **kwargs)
+            return target_in
+        return wrapper

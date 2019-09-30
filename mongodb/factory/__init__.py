@@ -20,9 +20,9 @@ from .exctnt import _inst as ExtraContentManager
 from ._base import BaseCollection
 
 
+def get_collection_subclasses():
+    return BaseCollection.__subclasses__()
+
+
 def is_base_collection(o: object):
     return isinstance(o, BaseCollection)
-
-
-def collection_sub_classes():
-    return BaseCollection.__subclasses__()

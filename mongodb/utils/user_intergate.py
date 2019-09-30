@@ -4,7 +4,7 @@ from bson import ObjectId
 
 from extutils.emailutils import MailSender
 from models.field import BaseField
-from mongodb.factory import BaseCollection, collection_sub_classes, MONGO_CLIENT, RootUserManager
+from mongodb.factory import BaseCollection, get_collection_subclasses, MONGO_CLIENT, RootUserManager
 
 
 class UserIdentityIntegrationHelper:
@@ -17,7 +17,7 @@ class UserIdentityIntegrationHelper:
         failed_names: List[str] = []
 
         cls: BaseCollection
-        for cls in collection_sub_classes():
+        for cls in get_collection_subclasses():
             if cls.model_class:
                 col = MONGO_CLIENT.get_database(cls.database_name).get_collection(cls.collection_name)
 
