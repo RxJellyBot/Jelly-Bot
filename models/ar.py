@@ -68,7 +68,7 @@ class AutoReplyModuleTokenActionModel(Model):
 
     def to_actual_model(self, channel_id: ObjectId, creator_oid: ObjectId):
         return AutoReplyModuleModel(
-            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelIds.key: [channel_id],
+            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelIds.key: {str(channel_id): True},
                                                AutoReplyModuleModel.CreatorOid.key: creator_oid})
 
 

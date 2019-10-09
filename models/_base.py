@@ -4,7 +4,7 @@ from typing import MutableMapping
 from bson import ObjectId
 
 from flags import ModelValidityCheckResult
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from models import OID_KEY
 from models.field import BaseField
 from extutils.utils import to_snake_case, to_camel_case
@@ -205,8 +205,8 @@ class Model(MutableMapping, abc.ABC):
             else:
                 return True
 
-    @DecoParamCaster({1: ObjectId})
-    def set_oid(self, oid):
+    @param_type_ensure
+    def set_oid(self, oid: ObjectId):
         self._inner_dict_update_("Id", oid)
 
     def get_oid(self):

@@ -1,8 +1,9 @@
-from typing import List, Optional, Type
+from typing import List
 
-from extutils import is_empty_string, list_get
+from extutils import is_empty_string
 from JellyBot.systemconfig import Bot
 from msghandle.models import TextMessageEventObject
+from msghandle.botcmd.command import cmd_handler
 
 
 def handle_bot_cmd_main(e: TextMessageEventObject) -> List[str]:
@@ -13,15 +14,5 @@ def handle_bot_cmd_main(e: TextMessageEventObject) -> List[str]:
     # Remove prefix from the string content
     e.content = e.content[len(Bot.Prefix):]
 
-    # FIXME: Bot handle
-
-    return []
-
-
-def _parse_content_(s: str):
-    s = s.split(Bot.Splittor)
-    return s[0], s[1:]
-
-
-if __name__ == '__main__':
-    print(handle_bot_cmd_main(TextMessageEventObject(raw="/uintg", text="/uintg")))
+    # Parse the command and return the response
+    return cmd_handler.handle(e, Bot.Splittor)

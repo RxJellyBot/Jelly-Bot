@@ -57,6 +57,7 @@ class TokenAction:
     PLATFORM = Common.PLATFORM
     CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     USER_TOKEN = Common.USER_TOKEN
+    USER_OID = Common.USER_OID
     API_TOKEN = Common.API_TOKEN
 
 

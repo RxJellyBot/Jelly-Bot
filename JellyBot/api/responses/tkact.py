@@ -14,6 +14,7 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
 
         self._token = param_dict.get(param.TokenAction.TOKEN)
         self._param_dict.update(**param_dict)
+        self._param_dict[param.TokenAction.USER_OID] = sender_oid
 
     def pass_condition(self) -> bool:
         return not is_empty_string(self._token) and self._result.success
@@ -24,9 +25,10 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
 
     def pre_process(self):
         self._handle_token_()
+        self._result = TokenActionManager.complete_action(self._token, self.param_dict)
 
     def process_pass(self):
-        self._result = TokenActionManager.complete_action(self._token, self.param_dict)
+        pass
 
     def serialize_success(self) -> dict:
         return dict()

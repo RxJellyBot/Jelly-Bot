@@ -3,16 +3,20 @@ from typing import List
 from bson import ObjectId
 
 from extutils.emailutils import MailSender
+from extutils.checker import param_type_ensure
 from models.field import BaseField
-from mongodb.factory import BaseCollection, get_collection_subclasses, MONGO_CLIENT, RootUserManager
 
 
 class UserIdentityIntegrationHelper:
     @staticmethod
+    @param_type_ensure
     def integrate(src_root_oid: ObjectId, dest_root_oid: ObjectId) -> bool:
         """
         :return: Integration succeed or not.
         """
+        # In function import to prevent circular import
+        from mongodb.factory import BaseCollection, get_collection_subclasses, MONGO_CLIENT, RootUserManager
+
         # Replace UID entries
         failed_names: List[str] = []
 

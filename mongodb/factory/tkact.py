@@ -11,7 +11,7 @@ from mongodb.factory.results import (
 )
 from models import TokenActionModel, Model, AutoReplyModuleTokenActionModel
 from models.exceptions import ModelConstructionError
-from mongodb.utils import CheckableCursor
+from mongodb.utils import CheckableCursor, UserIdentityIntegrationHelper
 from JellyBot.systemconfig import Database
 from JellyBot.api.static import param
 
@@ -31,7 +31,7 @@ class TokenActionCollationError(Exception):
     def __init__(self,
                  action: TokenAction, key: str, err_code: TokenActionCollationFailedReason, inner_ex: Exception = None):
         super().__init__(
-            f"Error occurred during collation of action {str(action)} at {key}. (Err #{err_code}, {inner_ex})")
+            f"Error occurred during collation of action {str(action)} at {key}. (Err Reason {err_code}, {inner_ex})")
 
 
 class TokenActionManager(GenerateTokenMixin, BaseCollection):
@@ -49,7 +49,8 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.TokenActionExpirySeconds)
 
     def enqueue_action(
-            self, root_uid: ObjectId, token_action: TokenAction, data_cls: Type[Model] = None, **data_kw_args):
+            self, root_uid: ObjectId, token_action: TokenAction, data_cls: Type[Model] = None, **data_kw_args) -> \
+            EnqueueTokenActionResult:
         token = self.generate_hex_token()
         now = datetime.utcnow()
 
@@ -71,13 +72,14 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
     def clear_all_token_actions(self, root_uid: ObjectId):
         self.delete_many({TokenActionModel.CreatorOid.key: root_uid})
 
-    def complete_action(self, token: str, token_kwargs: dict):
+    def complete_action(self, token: str, token_kwargs: dict) -> CompleteTokenActionResult:
         lacking_keys = set()
         cond_dict = {TokenActionModel.Token.key: token}
         ex = None
         tk_model = None
         cmpl_outcome = None
 
+        # Force type to be dict because the type of `token_kwargs` might be django QueryDict
         if type(token_kwargs) != dict:
             token_kwargs = dict(token_kwargs)
 
@@ -128,10 +130,13 @@ class TokenActionCompletor:
         action = action_model.action_type
         xparams = TokenActionParameterCollator.collate_parameters(TokenAction(action), xparams)
 
+        # TEST: Test token actions
         if action == TokenAction.AR_ADD:
             return TokenActionCompletor._token_ar_add_(action_model, xparams)
         elif action == TokenAction.REGISTER_CHANNEL:
             return TokenActionCompletor._token_register_channel_(action_model, xparams)
+        elif action == TokenAction.INTEGRATE_USER_IDENTITY:
+            return TokenActionCompletor._token_integrate_identity_(action_model, xparams)
         else:
             raise NoCompleteActionError(action)
 
@@ -144,7 +149,7 @@ class TokenActionCompletor:
         try:
             conn = AutoReplyModuleTokenActionModel(**action_model.data, from_db=True).to_actual_model(
                 cnl.model.id, action_model.creator_oid)
-        except ModelConstructionError:
+        except Exception:
             return TokenActionCompletionOutcome.X_MODEL_CONSTRUCTION
 
         if not AutoReplyManager.add_conn_by_model(conn).success:
@@ -167,6 +172,19 @@ class TokenActionCompletor:
                 return TokenActionCompletionOutcome.X_IDT_REGISTER_DEFAULT_PROFILE
         else:
             return TokenActionCompletionOutcome.X_IDT_CHANNEL_NOT_FOUND
+
+        return TokenActionCompletionOutcome.O_OK
+
+    @staticmethod
+    def _token_integrate_identity_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
+        try:
+            success = UserIdentityIntegrationHelper.integrate(
+                action_model.creator_oid, xparams.get(xparams[param.TokenAction.USER_OID]))
+        except Exception:
+            return TokenActionCompletionOutcome.X_IDT_INTEGRATION_ERROR
+
+        if not success:
+            return TokenActionCompletionOutcome.X_IDT_INTEGRATION_FAILED
 
         return TokenActionCompletionOutcome.O_OK
 

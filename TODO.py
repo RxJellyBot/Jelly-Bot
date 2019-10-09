@@ -2,6 +2,7 @@
 # DRAFT: Auto Reply - Find: React.js frontend interactive?
 # DRAFT: Auto Reply - Bundle: Change History / Rec Creator & Modifier / Duplicate new
 # TODO: Auto Reply - Markdown content
+# INCOMPLETE: Short URL service (rnnx.cc) / Insert content for people to view or redirect
 # DRAFT: API port: Upload image (imgur)
 # DRAFT: API port: Random generator (Percent, items, range) - Preset Pool (somehow same as AR bundle)
 # DRAFT: API port: Exchange rate
@@ -9,7 +10,7 @@
 # DRAFT: API port: Oxford Dictionary
 # DRAFT: API port: Calculator
 # DRAFT: API port: Token complete action
-# DRAFT: Function: Countdown / Countup Timer (can be queried on both sides)
+# DRAFT: Function: Countdown / Countup Timer (can be queried on both sides) - Daily Notifications on specific time
 # DRAFT: Function: Anonymous message
 # DRAFT: Group control: watcher - track and view member activity (can config to be public or not)
 # DRAFT: Group control: watcher - handle member left if the member is mod/admin

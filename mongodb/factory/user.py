@@ -7,7 +7,7 @@ from pymongo import ReturnDocument
 
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.locales import default_locale, LocaleInfo
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from flags import Platform
 from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY
 
@@ -75,14 +75,14 @@ class OnPlatformIdentityManager(BaseCollection):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_onplat(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
+    @param_type_ensure
+    def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
         return self.find_one_casted(
             {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
             parse_cls=OnPlatformUserModel)
 
-    @DecoParamCaster({1: Platform})
-    def register(self, platform, user_token) -> OnPlatformUserRegistrationResult:
+    @param_type_ensure
+    def register(self, platform: Platform, user_token) -> OnPlatformUserRegistrationResult:
         entry, outcome, ex, insert_result = \
             self.insert_one_data(OnPlatformUserModel, Token=user_token, Platform=platform)
 
@@ -142,8 +142,8 @@ class RootUserManager(BaseCollection):
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def _get_onplat_data_(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
+    @param_type_ensure
+    def _get_onplat_data_(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
         return self._mgr_onplat.get_onplat(platform, user_token)
 
     def is_user_exists(self, api_token: str) -> bool:
@@ -159,7 +159,7 @@ class RootUserManager(BaseCollection):
                                "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
                                (id_data,), hint="APIUser", conn_arg_list=False)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({OID_KEY: root_oid}, parse_cls=RootUserModel)
 
@@ -179,12 +179,11 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data)
 
-    @DecoParamCaster({1: ObjectId})
-    def get_root_data_api_oid(self, api_oid: [ObjectId, str]) -> Optional[RootUserModel]:
+    @param_type_ensure
+    def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_root_data_onplat(self, platform, user_token, auto_register=True) -> GetRootUserDataResult:
+    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
         on_plat_data = self._get_onplat_data_(platform, user_token)
         rt_user_data = None
 
@@ -215,11 +214,11 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataResult(outcome, rt_user_data)
 
-    @DecoParamCaster({1: ObjectId})
-    def get_root_data_onplat_oid(self, onplat_oid: [ObjectId, str]) -> Optional[RootUserModel]:
+    @param_type_ensure
+    def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid}, parse_cls=RootUserModel)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -227,7 +226,7 @@ class RootUserManager(BaseCollection):
         else:
             return LocaleInfo.get_tzinfo(u_data.config.locale)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -235,14 +234,14 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def remove_root_user(self, root_oid: ObjectId) -> bool:
         """
         :return: Acknowledged flag of the removal.
         """
         return self.delete_one({RootUserModel.Id.key: root_oid}).acknowledged
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:
         updated = self.find_one_and_update(
             {OID_KEY: root_oid},

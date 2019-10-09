@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center"
+                 style="word-break: break-word;">{% trans "User Identity Integration" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <div class="card border-primary mb-3">
+                    <div class="card-header text-center text-primary">
+                        <span class="h5">{% trans "Token Input" %}</span>
+                    </div>
+                    <div class="card-body">
+                        {% url "page.doc.botcmd.cmd" code=cmd_code as cmd_url %}
+                        {% blocktrans %}
+                            <p>
+                                Input the token acquired for user identity integration below.<br>
+                                Check <a href="{{ cmd_url }}">this page</a> for
+                                how to initiate the user identity integration process.
+                            </p>
+                        {% endblocktrans %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Integration token here"
+                                   aria-label="{% trans "Integration Token" %}" id="token">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary" id="tokenSubmit">
+                                    {% trans "Submit" %}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-none text-danger submit-msg mt-3"
+                           id="submitMsgNoToken">{% trans "Provide a token to complete user identity integration." %}</div>
+                        <div class="d-none text-danger submit-msg mt-3"
+                           id="submitMsgOK">{% trans "User identity integration succeed." %}</div>
+                        <div class="d-none text-danger submit-msg mt-3"
+                           id="submitMsgFailed">{% trans "User identity integration failed." %}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-script %}
+    <!--suppress JSDuplicatedDeclaration -->
+    <script type="text/javascript">
+        function sendTokenAjax(token, failedCallBack, okCallBack, completeCallback) {
+            $.ajax(
+                "{% url "api.token.complete" %}",
+                {
+                    method: "POST",
+                    complete: completeCallback,
+                    data: {
+                        "{{ static_keys_param.TokenAction.TOKEN }}": token,
+                        "{{ static_keys_param.LOCAL_REFER }}": true
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(`Send Token Ajax failed. (${textStatus})`);
+                        console.log(errorThrown);
+                        failedCallBack();
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            okCallBack(data);
+                        } else {
+                            failedCallBack(data);
+                        }
+                    }
+                }
+            );
+        }
+    </script>
+    <script type="text/javascript" src="{% static "js/account/integrate.js" %}"></script>
+{% endblock %}

@@ -96,6 +96,6 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def from_direct(message: str, channel_token: str, user_token: str):
-        user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.DISCORD, message.author.id)
-        channel_model = MessageEventObjectFactory._ensure_channel_(Platform.DISCORD, message.channel.id)
-        return TextMessageEventObject(message, Platform.UNKNOWN, message, user_model, channel_model)
+        user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.UNKNOWN,user_token)
+        channel_model = MessageEventObjectFactory._ensure_channel_(Platform.UNKNOWN, channel_token)
+        return TextMessageEventObject(message, message, channel_model, user_model)

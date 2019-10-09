@@ -1,154 +1,185 @@
-from abc import ABC
-from typing import List, Dict, Optional
+from dataclasses import dataclass
+from gettext import gettext as _
+from typing import List, Dict, Optional, Union
 
-from extutils import decorator_wrap
+from msghandle.models import TextMessageEventObject
+from extutils.checker import param_type_ensure
+from extutils import is_empty_string
+from extutils.logger import LoggerSkeleton
+
+logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
 
 
-# FIXME: [SSSHP] Command parsing process is a tree
+@dataclass
+class CommandFunction:
+    arg_count: int
+    description: str
+    fn: callable
+
+    @property
+    def example(self) -> str:
+        # FIXME: [HP] Example string
+        pass
 
 
-class CommandClassHolder:
-    def __init__(self):
-        self._cmd_holder: Dict[str, BotCommand] = {}
-        self._fn_holder: Dict[str, callable] = {}
-
-    def _register_cmd_(self, cmd_cls):
-        aliases = cmd_cls.get_aliases()
-        if any(alias in self._cmd_holder for alias in aliases):
-            # Warn that duplication of command alias detected
-            pass
-        self._cmd_holder.update({name: cmd_cls for name in aliases})
-
-    def _register_exec_fn_(self, fn, arg_count):
-        self._fn_holder[arg_count] = fn
-
-    def register_cmd(self, cmd_cls=None):
-        if cmd_cls:
-            self._register_cmd_(cmd_cls)
-            return cmd_cls
+class CommandNode:
+    # TEST: Test all bot commands
+    def __init__(self, codes=None, order_idx=0, name=None, description=None, is_root=False):
+        if codes:
+            self._codes = CommandNode.parse_code(codes)
         else:
-            def wrapper(cmd_cls_in):
-                self._register_cmd_(cmd_cls_in)
-                return cmd_cls_in
-            return wrapper
+            if not is_root:
+                raise ValueError(f"`codes` cannot be `None` if the command node is not root. "
+                                 f"(Command Node: {self.__class__.__name__})")
+        self._name = name
+        self._description = description
+        self._is_root = is_root
+        self._order_idx = order_idx
+        self._child_nodes: Dict[str, CommandNode] = {}  # {<CMD_CODES>: <COMMAND_NODE>}
+        self._fn: Dict[int, CommandFunction] = {}  # {<ARG_COUNT>: <FUNCTION>}
 
-    def get_cmd(self, cmd_code: str):
-        return self._cmd_holder.get(cmd_code)
+    def _register_(self, arg_count: int, fn: CommandFunction):
+        if arg_count in self._fn:
+            logger.logger.warning(f"A function has already existed in function holder. ({self._fn.__qualname__}) "
+                                  f"{fn.__qualname__} is going to replace it.")
+        self._fn[arg_count] = fn
 
-    def register_exec_fn(self, fn=None, arg_count: int = 0):
+    @property
+    def is_root(self) -> bool:
+        return self._is_root
+
+    @property
+    def command_codes(self) -> List[str]:
+        return self._codes
+
+    @property
+    def main_cmd_code(self) -> str:
+        return self.command_codes[0]
+
+    @property
+    def aliases(self) -> List[str]:
+        return self.command_codes[1:]
+
+    @property
+    def order_idx(self) -> int:
+        """This property is mainly used for the commands list generation."""
+        return self._order_idx
+
+    @property
+    def child_nodes(self):
+        """
+        :rtype: Iterable[CommandNode]
+        """
+        return sorted(set(self._child_nodes.values()), key=lambda item: item.order_idx)
+
+    @property
+    def full_cmd(self) -> str:
+        # FIXME: [HP] Full command called already from the root cmd node. For example, "jc uintg", "jc replace"
+        pass
+
+    @property
+    def name(self) -> Optional[str]:
+        return self._name
+
+    @property
+    def description(self) -> Optional[str]:
+        return self._description
+
+    @property
+    def max_arg_count(self) -> int:
+        return max(self._fn.keys())
+
+    @property
+    def functions(self) -> List[CommandFunction]:
+        return [cf for cf in sorted(self._fn.values(), key=lambda item: item.arg_count)]
+
+    def new_child_node(self, codes: Union[str, List[str]], name=None, description=None):
+        codes = CommandNode.parse_code(codes)
+        new = CommandNode(codes, name, description)
+        self.attach_child_node(new)
+        return new
+
+    def attach_child_node(self, cmd_node):
+        """
+        :type cmd_node: CommandNode
+        :rtype: CommandNode
+        """
+        for code in cmd_node.command_codes:
+            if code in self._child_nodes:
+                logger.logger.warning(f"Code {code} has a corresponding command node ({repr(self._child_nodes[code])}) "
+                                      f"registered. This will be replaced by {repr(cmd_node)}")
+            self._child_nodes[code] = cmd_node
+
+        return cmd_node
+
+    def get_child_node(self, code):
+        """
+        :rtype: CommandNode or None
+        """
+        return self._child_nodes.get(code)
+
+    def command_function(
+            self, fn: callable = None, arg_count: int = 0,
+            description: str = _("No description provided.")):
+        """
+        Function to use to decorate the function to execute command.
+        """
+        # Function argument count check
         if fn:
-            self._register_exec_fn_(fn, arg_count)
+            self._register_(arg_count, CommandFunction(arg_count, fn, description))
             return fn
         else:
-            def wrapper(fn_in):
-                self._register_exec_fn_(fn_in, arg_count)
-                return fn_in
+            def wrapper(target_fn):
+                self._register_(arg_count, CommandFunction(arg_count, target_fn, description))
+                return target_fn
             return wrapper
 
-    def get_exec_fn(self, arg_count: int):
-        return self._fn_holder.get(arg_count)
+    def get_fn(self, arg_count: int) -> Optional[callable]:
+        if arg_count in self._fn:
+            return self._fn[arg_count].fn
+        else:
+            return None
 
+    def parse_args(self, e: TextMessageEventObject, splittor: str) -> List[str]:
+        s = e.content
+        args = [] if is_empty_string(s) else s.split(splittor, self.max_arg_count)
 
-class BotCommand(ABC):
-    alias: List[str] = []
-    fn_holder: CommandClassHolder = None
+        cmd_fn: Optional[callable] = self.get_fn(len(args))
+        if cmd_fn:
+            ret = param_type_ensure(cmd_fn)(e, *args)
+            if not isinstance(ret, str):
+                ret = [str(ret)]
 
-    @classmethod
-    def get_fn_holder(cls):
-        if not cls.fn_holder:
-            cls.fn_holder = CommandClassHolder()
-        return cls.fn_holder
+            return ret
 
-    @classmethod
-    def get_aliases(cls) -> List[str]:
-        return cls.alias + [cls.__name__.lower()]
+        if s:
+            cmd_code, cmd_args = args[0], args[1:]
 
-    @classmethod
-    def __subcommands__(cls):
-        return cls.__subclasses__()
+            cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
+            if cmd_node:
+                return cmd_node.parse_args(s[len(cmd_code):], splittor)
 
-    @classmethod
-    def register_exec_fn(cls, fn=None, arg_count: int = 0):
-        return cls.get_fn_holder().register_exec_fn(fn, arg_count)
+        return []
 
-    @classmethod
-    def parse_args(cls, args_list: list) -> str:
-        return ""
-        cls.get_fn_holder().get_cmd(args_list[0])
+    @staticmethod
+    def parse_code(codes) -> List[str]:
+        if isinstance(codes, list):
+            return codes
+        elif isinstance(codes, str):
+            return [codes]
+        else:
+            raise ValueError(f"Parameter `codes` should be either `List[str]` or `str`. ({codes})")
+
+    def __repr__(self):
+        return f"CommandNode #{id(self)} " \
+               f"[root={self.is_root}|code={','.join(self._codes)}|sub={len(self._child_nodes)}|fn={len(self._fn)}]"
 
 
 class CommandHandler:
-    def __init__(self, holder: CommandClassHolder):
-        self._cmd_cls_holder = holder
+    def __init__(self, root_cmd_node: CommandNode):
+        if not root_cmd_node.is_root:
+            raise ValueError("Root Command Node is required for `CommandDispatcher`.")
+        self._root = root_cmd_node
 
-    def handle(self, s: str) -> str:
-        s = s.split(" ")
-        cmd_code, cmd_args = s[0], s[1:]
-        cmd_cls: Optional[BotCommand] = self._cmd_cls_holder.get_cmd(cmd_code)
-        if cmd_cls:
-            return cmd_cls.parse_args(cmd_args)
-        return ""
-
-
-main_cmd_holder = CommandClassHolder()
-cmd_handler = CommandHandler(main_cmd_holder)
-
-
-@main_cmd_holder.register_cmd
-class UserIntegrate(BotCommand):
-    alias = ["uintg"]
-
-    @main_cmd_holder.register_exec_fn
-    def issue_token(self):
-        # FIXME: [SHP] Await implementation
-        return "Issue Token."
-
-
-@main_cmd_holder.register_cmd()
-class Transform(BotCommand):
-    @BotCommand.register_exec_fn(arg_count=1)
-    def utf8(self, content):
-        return repr(content.encode("utf-8"))
-
-
-class TransformNewline(Transform):
-    @Transform.register_exec_fn(arg_count=1)
-    def newline_replace(self, content):
-        return content.replace("\n", "\\n")
-
-
-class TransformUtf8Encode(Transform):
-    @Transform.register_exec_fn(arg_count=1)
-    def utf8encode(self, content):
-        return repr(content.encode("utf-8"))
-
-
-class TransformReplace(Transform):
-    @Transform.register_exec_fn(arg_count=1)
-    def replace_single(self, end):
-        return "".join(range(end))
-
-    @Transform.register_exec_fn(arg_count=2)
-    def replace_double(self, start, end):
-        return "".join(range(start, end))
-
-
-if __name__ == '__main__':
-    # Imaginary scene:
-    #   /uintg
-    #   /userintegrate
-    #   /t rp 1
-    #   /t rp 1 5
-    #   /t nl A\nS
-    #   /t u8 AS
-
-    test_pairs = [
-        ("uintg", "Issue Token."),
-        ("userintegrate", "Issue Token."),
-        ("t rp 1", "01"),
-        ("t rp 1 5", "012345"),
-        ("t nl A\nS", "A\\nS"),
-        ("t u8 AS", repr("AS".encode("utf-8")))
-    ]
-    for src, result in test_pairs:
-        assert cmd_handler.handle(src) == result
+    def handle(self, e: TextMessageEventObject, splittor: str) -> List[str]:
+        return self._root.parse_args(e, splittor)

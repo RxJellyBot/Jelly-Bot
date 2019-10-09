@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card bg-success mb-3 text-white text-center align-middle">
-                    <h5 class="card-header">{% trans "Confirm on API" %}</h5>
+                    <h5 class="card-header">{% trans "Main Method" %}</h5>
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -33,7 +33,7 @@
             </div>
             <div class="col-md-6">
                 <div class="card bg-info mb-3 text-white text-center align-middle">
-                    <h5 class="card-header">{% trans "Confirm on Website" %}</h5>
+                    <h5 class="card-header">{% trans "Alternative Method" %}</h5>
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -41,7 +41,8 @@
                                     <small>
                                         {% url "account.channel.list" as list_url %}
                                         {% blocktrans trimmed %}
-                                            Get a token from the website, then use it to complete the registration at
+                                            In case the main method doesn't work, please get a token below,
+                                            then use it to complete the registration at
                                             where Jelly Bot supports using <b>Complete Token Action</b> function.
                                         {% endblocktrans %}
                                         <ul class="text-left">

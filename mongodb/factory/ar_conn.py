@@ -9,7 +9,7 @@ from datetime import datetime
 from JellyBot.systemconfig import AutoReply, Database, DataQuery
 from extutils import is_empty_string
 from extutils.emailutils import MailSender
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
@@ -69,9 +69,9 @@ class AutoReplyModuleManager(BaseCollection):
     def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> WriteOutcome:
         return self.update_one_outcome(
             {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
-            {"$update": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
+            {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
 
-    @DecoParamCaster({1: ObjectId, 2: bool})
+    @param_type_ensure
     def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
         ret: Optional[AutoReplyModuleModel] = self.find_one_casted(

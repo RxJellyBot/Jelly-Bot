@@ -25,6 +25,12 @@ class LocaleInfo:
         return PytzInfo(pytz.timezone(tzname))
 
 
+@dataclass
+class LanguageInfo:
+    name: str
+    abbr: str
+
+
 class PytzInfo(tzinfo):
     def __init__(self, tz):
         self._base = tz
@@ -77,4 +83,9 @@ locales = [
     USA_CENT, CAN_EAST, USA_EAST, LAX, USA_MNT, NYC, CAN_PACF, USA_PACF, YYZ, YVR,
     ADL, NZL, BNE, MEL, PER, SYD,
     UTC
+]
+
+languages = [
+    LanguageInfo(_("English (United States)"), "en-us"),
+    LanguageInfo(_("Chinese (Taiwan)"), "zh-tw")
 ]
