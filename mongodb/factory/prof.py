@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
@@ -170,8 +170,8 @@ class ProfileManager:
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    @DecoParamCaster({1: ObjectId, 2: ObjectId})
-    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> Optional[List[ChannelProfileModel]]:
+    @param_type_ensure
+    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
         Get the `list` of `ChannelProfileModel` of the specified user.
 
@@ -184,7 +184,7 @@ class ProfileManager:
                     for poid
                     in conn.profile_oids if not None]
         else:
-            return None
+            return []
 
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId]) -> List[ChannelProfileListEntry]:
         if root_uid is None:

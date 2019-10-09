@@ -3,7 +3,7 @@ from typing import Optional
 from bson import ObjectId
 from pymongo import ReturnDocument
 
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel
 from mongodb.factory.results import (
@@ -26,8 +26,8 @@ class ChannelManager(BaseCollection):
         self.create_index(
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
-    @DecoParamCaster({1: Platform, 2: str, 3: str})
-    def register(self, platform: Platform, token: str, name: Optional[str] = "") -> ChannelRegistrationResult:
+    @param_type_ensure
+    def register(self, platform: Platform, token: str, name: str = "") -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
             ChannelModel, Platform=platform, Token=token, Name=name, Config=ChannelConfigModel.generate_default())
 
@@ -36,7 +36,7 @@ class ChannelManager(BaseCollection):
 
         return ChannelRegistrationResult(outcome, entry, ex)
 
-    @DecoParamCaster({1: ObjectId, 2: ObjectId, 3: str})
+    @param_type_ensure
     def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
         ex = None
         ret = self.find_one_and_update(
@@ -56,7 +56,7 @@ class ChannelManager(BaseCollection):
 
         return ChannelChangeNameResult(outcome, ret, ex)
 
-    @DecoParamCaster({1: Platform, 2: str})
+    @param_type_ensure
     def get_channel_token(self, platform: Platform, token: str, auto_register=False) -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
@@ -72,12 +72,12 @@ class ChannelManager(BaseCollection):
 
         return ret
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
         return self.find_one_casted({ChannelModel.Id.key: channel_oid}, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
-    @DecoParamCaster({1: Platform, 2: str})
+    @param_type_ensure
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         if not isinstance(platform, Platform):
             platform = Platform(platform)

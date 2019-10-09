@@ -67,6 +67,8 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
         201 - Default profile registratiom
         202 - Channel not found
         203 - Channel error
+        204 - Integration error
+        205 - Integration failed
 
     5xx - Related to Model
         501 - Error during model construction
@@ -98,6 +100,12 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     X_IDT_CHANNEL_ERROR = \
         203, _("X: Identity - Channel Error"), \
         _("An error occurred during channel data acquiring process.")
+    X_IDT_INTEGRATION_ERROR = \
+        204, _("X: Identity - Integration Error"), \
+        _("An error occurred during user integration error.")
+    X_IDT_INTEGRATION_FAILED = \
+        205, _("X: Identity - Integration Failed"), \
+        _("Failed to integrate user identities.")
 
     X_MODEL_CONSTRUCTION = \
         501, _("X: Model - Construction"), \

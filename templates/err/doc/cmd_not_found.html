@@ -11,24 +11,19 @@
     <div class="container">
         <div class="row text-center text-danger">
             <div class="col-lg display-4">
-                {% trans "Profile Not Found" %}
-            </div>
-        </div>
-        <div class="row text-center text-danger">
-            <div class="col-lg align-self-center">
-                {% trans "User profile not found with the provided ID." %}
+                {% trans "Command Not Found" %}
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
                 {% url "page.about" as about_page %}
                 {% blocktrans trimmed %}
+                    Command data of {{ cmd_code }} not found.<br>
+                    <hr>
                     Please check that:<br>
                     <ul>
-                        <li>The length of {{ profile_oid }} is 24 characters. (Current: {{ profile_oid|length }})</li>
+                        <li>Command code of {{ cmd_code }} is the Channel ID, <b>NOT the channel token</b>.</li>
                     </ul>
-                    If all the conditions match, but the error still occurs, please
-                    <a href="{{ about_page }}">contact the website developer.</a>
                 {% endblocktrans %}
             </div>
         </div>

@@ -84,6 +84,9 @@
                     <h5 class="card-header">{% trans "Account Controls" %}</h5>
                     <div class="card-body">
                         <h3 class="card-text">
+                            <a class="btn btn-outline-danger" role="button" href="{% url "account.integrate" %}">
+                                {% trans "Integrate" %}
+                            </a>
                             <a class="btn btn-outline-danger" role="button" href="{% url "account.settings" %}">
                                 {% trans "Settings" %}
                             </a>

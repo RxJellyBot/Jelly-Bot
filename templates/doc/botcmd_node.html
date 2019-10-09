@@ -1,0 +1,72 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <h3 class="text-primary">{{ cmd_node.name }}&nbsp;({{ cmd_node.main_cmd_code }})</h3>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col">
+                <h4 class="text-info">{% trans "Functions" %}</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-light table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th scope="col">{% trans "Argument Count" %}</th>
+                        <th scope="col">{% trans "Description" %}</th>
+                        <th scope="col">{% trans "Example" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cmd_fn in cmd_node.functions %}
+                        <td><h5>{{ cmd_fn.arg_count }}</h5></td>
+                        <td>{{ cmd_fn.description }}</td>
+                        <td><code class="bg-light border border-light p-1">{{ cmd_fn.example }}</code></td>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col">
+                <h4 class="text-info">{% trans "Subcommands" %}</h4>
+            </div>
+        </div>
+
+        <!-- FIXME: [HP] Not completed -->
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-light table-bordered mb-0">
+                    <thead>
+                    <tr>
+                        <th scope="col">{% trans "Argument Count" %}</th>
+                        <th scope="col">{% trans "Description" %}</th>
+                        <th scope="col">{% trans "Example" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cmd_fn in cmd_node.functions %}
+                        <td><h5>{{ cmd_fn.arg_count }}</h5></td>
+                        <td>{{ cmd_fn.description }}</td>
+                        <td><code class="bg-light border border-light p-1">{{ cmd_fn.example }}</code></td>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -17,6 +17,7 @@ def handle_text_event(e: TextMessageEventObject) -> List[HandledMessageEvent]:
     ]
 
     for fn in handle_fn:
+        # INCOMPLETE: Handle exception occurred if any happened (error on discord won't be reported)
         responses = fn(e)
         if responses:
             return responses

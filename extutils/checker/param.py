@@ -1,42 +1,124 @@
-from typing import Any
+from abc import ABC, abstractmethod
+from typing import Any, Type, List, Union
+from inspect import signature, Parameter
 
 from bson import ObjectId
 
 from extutils.flags import FlagCodeMixin
+from .logger import logger
 
 
-class DecoParamCaster:
-    def __init__(self, dict_keys: dict = None):
-        self._dict_keys = dict_keys
+__all__ = ["param_type_ensure"]
 
-    def __call__(self, f):
-        def wrap_f(*args, **kwargs):
-            new_args = []
 
-            for arg_idx, val in enumerate(args):
-                if arg_idx in self._dict_keys:
-                    new_args.append(DecoParamCaster.type_check(val, self._dict_keys[arg_idx]))
+class BaseDataTypeConverter(ABC):
+    _ignore = [Any]
+    valid_data_types: List[type] = []
+
+    @classmethod
+    @abstractmethod
+    def _convert_(cls, data: Any, type_annt):
+        # Terminate if the type is already valid
+        if type(data) == type_annt:
+            return data
+
+        if type_annt is not Parameter.empty and type_annt not in cls.valid_data_types + cls._ignore:
+            return cls.on_type_invalid(data, type_annt)
+
+        try:
+            if type_annt not in cls._ignore:
+                return type_annt(data)
+            elif type_annt.__origin__ is Union:
+                return cls._cast_union_(data, type_annt)
+            else:
+                return data
+        except Exception as e:
+            return cls.on_cast_fail(data, type_annt, e)
+
+    @classmethod
+    def _cast_union_(cls, data: Any, type_annt):
+        last_e = None
+
+        for arg in type_annt.__args__:
+            try:
+                if arg is None:
+                    return None
                 else:
-                    new_args.append(val)
+                    return arg(data)
+            except Exception as e:
+                last_e = e
 
-            for key, val in kwargs.items():
-                if key in self._dict_keys:
-                    kwargs[key] = DecoParamCaster.type_check(val, self._dict_keys[key])
-                else:
-                    kwargs[key] = val
+        return cls.on_cast_fail(data, type_annt, last_e)
 
-            return f(*new_args, **kwargs)
-
-        return wrap_f
+    @classmethod
+    def convert(cls, data: Any, type_annt):
+        if type_annt is Parameter.empty:
+            return data
+        else:
+            return cls._convert_(data, type_annt)
 
     @staticmethod
-    def type_check(item: Any, type_: type = None):
-        ret = item
+    def on_type_invalid(data: Any, dtype: type):
+        raise NotImplementedError()
 
-        if isinstance(ret, ObjectId) and isinstance(type_, type) and not issubclass(type_, ObjectId):
-            ret = str(ret)
+    @staticmethod
+    def on_cast_fail(data: Any, dtype: type, e: Exception):
+        raise NotImplementedError()
 
-        if type_ is not None and not isinstance(ret, type_):
-            ret = type_(int(ret)) if issubclass(type_, FlagCodeMixin) else type_(ret)
 
+class GeneralDataTypeConverter(BaseDataTypeConverter):
+    valid_data_types = [int, str, bool, type, ObjectId]
+
+    @classmethod
+    def _convert_(cls, data: Any, type_annt):
+        ret = super()._convert_(data, type_annt)
         return ret
+
+    @staticmethod
+    def on_type_invalid(data: Any, dtype: type) -> Any:
+        if issubclass(dtype, FlagCodeMixin):
+            return dtype(int(data))
+        else:
+            return data
+
+    @staticmethod
+    def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
+        logger.logger.warning(f"Type casting failed. Data: {data} / Target Type: {dtype} / Exception: {e}")
+
+        return data
+
+
+def param_type_ensure(fn):
+    def wrapper_in(*args_cast, **kwargs_cast):
+        return _type_ensure_(fn, GeneralDataTypeConverter, *args_cast, **kwargs_cast)
+
+    return wrapper_in
+
+
+def _type_ensure_(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwargs_cast):
+    sg = signature(fn)
+    prms = sg.parameters
+    prms_vars = filter(
+        lambda _: prms[_].kind in (prms[_].POSITIONAL_OR_KEYWORD, prms[_].POSITIONAL_ONLY), prms)
+    prms_kw = filter(
+        lambda _: prms[_].kind in (prms[_].VAR_KEYWORD, prms[_].KEYWORD_ONLY), prms)
+
+    new_args = []
+    for old_arg, prm in zip(args_cast, prms_vars):
+        p = prms[prm]
+
+        if p is p.empty:
+            new_args.append(old_arg)
+        else:
+            new_args.append(converter.convert(old_arg, p.annotation))
+
+    new_kwargs = {}
+    for old_arg_k, prm in zip(kwargs_cast, prms_kw):
+        p = prms[prm]
+
+        if p is p.empty:
+            new_kwargs[old_arg_k] = kwargs_cast[old_arg_k]
+        else:
+            new_kwargs[old_arg_k] = converter.convert(kwargs_cast[old_arg_k], p.annotation)
+
+    return fn(*new_args, **new_kwargs)

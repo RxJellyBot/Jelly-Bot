@@ -1,8 +1,9 @@
 from django.urls import path, include
 
-from JellyBot.views.index import HomePageView
-from JellyBot.views.about import AboutView
-from JellyBot.views.exctnt import ExtraContentView
+from .index import HomePageView
+from .about import AboutView
+from .exctnt import ExtraContentView
+from .err import WebsiteErrorView
 
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('ar/', include('JellyBot.views.ar.urls')),
     path('doc/', include('JellyBot.views.doc.urls')),
     path('info/', include('JellyBot.views.info.urls')),
+    path('error/<int:code>', WebsiteErrorView.as_view(), name="page.error"),
 ]

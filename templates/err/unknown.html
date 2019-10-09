@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
 {% load i18n %}
-{% load static %}
 
 {% block content %}
     <div class="jumbotron">
@@ -11,20 +10,13 @@
     <div class="container">
         <div class="row text-center text-danger">
             <div class="col-lg display-4">
-                {% trans "Extra Content Not Found" %}
+                {% trans "Unknown Website Error" %}
             </div>
         </div>
         <div class="row text-center text-danger">
             <div class="col-lg align-self-center">
-                {% trans "Extra content corresponds to the provided id not found." %}
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col">
-                {% url "account.channel.list" as channel_list %}
-                {% url "page.about" as about_page %}
                 {% blocktrans trimmed %}
-                    No content recorded under ID: {{ page_id }}. The ID might be wrong or expired.
+                    Unknown website error with code {{ err_code }}.
                 {% endblocktrans %}
             </div>
         </div>

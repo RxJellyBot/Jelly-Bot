@@ -14,3 +14,5 @@ from .result import *
 from .msgtype import MessageType
 # noinspection PyUnresolvedReferences
 from .exctnt import ExtraContentType
+# noinspection PyUnresolvedReferences
+from .weberr import WebsiteError

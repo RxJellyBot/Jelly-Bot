@@ -7,7 +7,7 @@ from JellyBot import keys
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.components.utils import get_root_oid, get_post_keys
 from JellyBot.views import render_template, simple_str_response
-from extutils.locales import locales, now_utc_aware
+from extutils.locales import locales, languages, now_utc_aware
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
 from mongodb.factory import RootUserManager
 from mongodb.factory.results import WriteOutcome
@@ -94,4 +94,5 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Account Settings"), "account/settings.html",
             {"locale_list": sorted(locales, key=lambda item: item.description),
+             "lang_list": sorted(languages, key=lambda item: item.abbr),
              "current_config": config})
