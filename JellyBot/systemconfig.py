@@ -84,4 +84,4 @@ class TokenAction:
 
 class Bot:
     Prefix = "/"
-    Splittor = "\n"
+    Splittor = " ."

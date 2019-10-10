@@ -13,7 +13,9 @@
         <h5 class="card-title">{% trans "Text" %}</h5>
         <p class="card-text">
             {% blocktrans trimmed %}
-                <small>Could be anything, but the <b>length cannot be over 2000.</b></small>
+                <small>Could be anything, but the <b>length cannot be over 2000.</b></small><br>
+                <small>The content <b>could use markdown syntax</b>. The outcome depends on the platform.
+                    For LINE, it's support is very limited, while on Discord, it supports most basic syntax.</small>
             {% endblocktrans %}
         </p>
         <h5 class="card-title">{% trans "Image" %}</h5>
@@ -27,7 +29,7 @@
             {% endblocktrans %}
         </p>
         <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
-        <!-- TODO: LINE Sticker: Add the link to link sticker id acquiring page -->
+        <!-- DRAFT: LINE Sticker: Add the link to link sticker id acquiring page -->
         <p class="card-text">
             {% blocktrans trimmed %}
                 <small>Should be a sticker ID. Usually the ID will be <b>1~11 digits number</b>.

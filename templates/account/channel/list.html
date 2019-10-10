@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col">
                 {% url 'account.channel.connect' as reg_url %}
-                <!-- INCOMPLETE: Channel List - official guide to check the current channel token -->
+                {% url 'page.doc.botcmd.cmd' code=bot_cmd_info_code as ch_info_url %}
                 {% blocktrans trimmed %}
                     If you:<br>
                     <ul>
@@ -26,9 +26,8 @@
                         </li>
                         <li>
                             Do not know how to determine what is the desired channel to manage: <br>
-                            <small>If using the official handled port, please check this page to see how to check the
-                                channel
-                                token.<br>
+                            <small>If using the official handled port, please check <a href="{{ ch_info_url }}">this page</a>
+                                to see how to check the current channel info.<br>
                                 If NOT using the official handled port, please check the guide of the corresponding bot
                                 to know how to check the channel token or channel id (The bot maker may not implement
                                 this).</small>

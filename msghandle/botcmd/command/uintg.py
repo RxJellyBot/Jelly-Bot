@@ -17,9 +17,9 @@ cmd = CommandNode(
 def issue_token(e: TextMessageEventObject):
     result = TokenActionManager.enqueue_action(e.root_oid, TokenAction.INTEGRATE_USER_IDENTITY)
     if result.success:
-        return _("User Identity Integration Enqueued.\nToken: {}\nExpiry: {}\n\n"
+        return _("User Identity Integration Enqueued.\nToken: `{}`\nExpiry: `{}`\n\n"
                  "Please record the token and go to {}{} to complete the integration.").format(
-            HostUrl, reverse("account.integrate")
+            result.token, result.expiry.strftime("%Y %m/%d %H:%M:%S"), HostUrl, reverse("account.integrate")
         )
     else:
         return _("Token action not enqueued.\nResult: {}\nException: {}").format(result.outcome, result.exception)

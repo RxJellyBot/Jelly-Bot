@@ -8,6 +8,7 @@ from django.views.generic.base import TemplateResponseMixin
 from extutils import safe_cast
 from flags import WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
+from msghandle.botcmd.command import cmd_id
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
@@ -32,7 +33,8 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
                 "channel_conn_list": channel_conn_list,
-                "root_oid_str": str(root_oid)
+                "root_oid_str": str(root_oid),
+                "bot_cmd_info_code": cmd_id.main_cmd_code
             })
 
 

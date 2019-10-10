@@ -47,7 +47,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return MessageRecordResult(outcome, entry, ex)
 
-# INCOMPLETE: Message Analysis - Implement stats for recording message activity and message content
+# INCOMPLETE: Bot Statistics: Implement stats for recording message activity and message content
 #   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature
 
 

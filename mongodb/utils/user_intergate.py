@@ -32,6 +32,10 @@ class UserIdentityIntegrationHelper:
                         if not result:
                             failed_names.append(fd.__class__.__qualname__)
 
+        # FIXME: Language not changed (both on-site and on-bot)
+        # FIXME: Migration failed (O 102), root entry removal implemented but the entry in user.onplat not merged
+        # FIXME: [SHP] Review all tags and re-prioritize
+
         if failed_names:
             MailSender.send_email_async(
                 f"Fields value replacements failed.<hr><pre>{'<br>'.join(failed_names)}</pre>",
