@@ -1,14 +1,14 @@
 from bson import ObjectId
 
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils import safe_cast
+from flags import WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
-from JellyBot.views import render_template
+from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.systemconfig import TokenAction
@@ -55,10 +55,7 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             c_prof = ChannelManager.get_channel_oid(channel_oid)
 
             if c_prof:
-                return redirect(reverse("info.channel"))
+                return redirect("info.channel")
             else:
-                return render_template(
-                    self.request, _("Profile Link Not Found"), "err/account/proflink_not_found.html",
-                    {
-                        "channel_oid": channel_oid_str
-                    })
+                return WebsiteErrorView.website_error(
+                    request, WebsiteError.PROFILE_LINK_NOT_FOUND, {"channel_oid": channel_oid_str})

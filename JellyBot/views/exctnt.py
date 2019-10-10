@@ -1,7 +1,8 @@
 from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 
-from JellyBot.views.render import render_template
+from JellyBot.views import render_template, WebsiteErrorView
+from flags import WebsiteError
 from mongodb.factory import ExtraContentManager
 
 
@@ -17,4 +18,4 @@ class ExtraContentView(View):
                 "expiry": page_content.expires_on
             }, nav_param=d)
         else:
-            return render_template(request, _("Extra Content Not Found"), "err/exctnt_not_found.html", d, nav_param=d)
+            return WebsiteErrorView.website_error(request, WebsiteError.EXTRA_CONTENT_NOT_FOUND, d, nav_param=d)

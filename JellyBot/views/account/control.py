@@ -79,13 +79,13 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         if update_result.success:
             return simple_str_response(
                 request,
-                f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - " +
-                _("Account settings updated."))
+                f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"{_('Account settings updated.')}")
         else:
             return simple_str_response(
                 request,
-                f"danger/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - " +
-                _("Account settings failed to update."))
+                f"danger/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"{_('Account settings failed to update.')}")
 
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):

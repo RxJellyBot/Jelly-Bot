@@ -25,6 +25,8 @@ class NavDropdown(NavFirstLevelItem):
         item.parent = self
         self.items.append(item)
 
+        return item
+
     def active_cls_str(self):
         return "active" if self.active else ""
 

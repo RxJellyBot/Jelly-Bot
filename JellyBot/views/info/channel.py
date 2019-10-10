@@ -3,9 +3,10 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from JellyBot.views import render_template
+from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from extutils import safe_cast
+from flags import WebsiteError
 from mongodb.factory import ChannelManager, ProfileManager
 
 
@@ -30,12 +31,8 @@ class ChannelInfoView(TemplateResponseMixin, View):
                 },
                 nav_param=kwargs)
         else:
-            return render_template(
-                self.request, _("Channel Not Found"), "err/info/channel_not_found.html",
-                {
-                    "channel_oid": channel_oid_str
-                },
-                nav_param=kwargs)
+            return WebsiteErrorView.website_error(
+                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_oid_str}, nav_param=kwargs)
 
 
 class ChannelInfoSearchView(TemplateResponseMixin, View):

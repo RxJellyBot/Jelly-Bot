@@ -1,10 +1,11 @@
 {% extends "base/base.html" %}
 {% load i18n %}
 {% load static %}
+{% load markdown %}
 
 {% block content %}
     <div class="container">
-        <div class="row mb-3">
+        <div class="row">
             <div class="col">
                 <h3 class="text-primary">{{ cmd_node.name }}&nbsp;({{ cmd_node.main_cmd_code }})</h3>
             </div>
@@ -12,61 +13,33 @@
 
         <hr>
 
-        <div class="row mb-3">
-            <div class="col">
-                <h4 class="text-info">{% trans "Functions" %}</h4>
-            </div>
-        </div>
-
         <div class="row">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped table-light table-bordered mb-0">
-                    <thead>
-                    <tr>
-                        <th scope="col">{% trans "Argument Count" %}</th>
-                        <th scope="col">{% trans "Description" %}</th>
-                        <th scope="col">{% trans "Example" %}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for cmd_fn in cmd_node.functions %}
-                        <td><h5>{{ cmd_fn.arg_count }}</h5></td>
-                        <td>{{ cmd_fn.description }}</td>
-                        <td><code class="bg-light border border-light p-1">{{ cmd_fn.example }}</code></td>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <hr>
-
-        <div class="row mb-3">
             <div class="col">
-                <h4 class="text-info">{% trans "Subcommands" %}</h4>
-            </div>
-        </div>
-
-        <!-- FIXME: [HP] Not completed -->
-        <div class="row">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped table-light table-bordered mb-0">
-                    <thead>
-                    <tr>
-                        <th scope="col">{% trans "Argument Count" %}</th>
-                        <th scope="col">{% trans "Description" %}</th>
-                        <th scope="col">{% trans "Example" %}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for cmd_fn in cmd_node.functions %}
-                        <td><h5>{{ cmd_fn.arg_count }}</h5></td>
-                        <td>{{ cmd_fn.description }}</td>
-                        <td><code class="bg-light border border-light p-1">{{ cmd_fn.example }}</code></td>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-light table-bordered mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">{% trans "Usage" %}</th>
+                            <th scope="col">{% trans "Description" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for fn_entry in cmd_node.fn_list_for_doc %}
+                            <tr>
+                                    <td class="align-middle no-line-break"><code
+                                            class="bg-light border border-light p-1">{{ fn_entry.usage }}</code></td>
+                                    <td class="mb-0">{{ fn_entry.description|markdown }}</td>
+                                </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/p-b0.css" %}">
+    <link rel="stylesheet" href="{% static "css/utils/ul-b0.css" %}">
 {% endblock %}
