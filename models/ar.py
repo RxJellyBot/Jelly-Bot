@@ -37,8 +37,6 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
-    # TODO: Auto Reply: Target User - Mixed with Exclude User
-
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)

@@ -38,7 +38,7 @@ class ChannelInfoView(TemplateResponseMixin, View):
 class ChannelInfoSearchView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        # INCOMPLETE: Channel Info query page - .../info/channel for users to search channel info
+        # INCOMPLETE: Channel Info: .../info/channel for users to search channel info
         #   Allow to search channel by various conditions (ID, profile names, messages...etc.)
         return render_template(
             self.request, _("Channel Info Search"), "info/channel_search.html", nav_param=kwargs)

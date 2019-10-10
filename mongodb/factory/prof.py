@@ -13,8 +13,8 @@ from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfi
 from mongodb.utils import CheckableCursor
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
-)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
+    Model)
 
 from ._base import BaseCollection
 
@@ -35,7 +35,7 @@ class UserProfileManager(BaseCollection):
             unique=True)
 
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oid: ObjectId) \
-            -> ChannelProfileConnectionModel:
+            -> Model:
         """
         Attach `ChannelPermissionProfileModel` and return the attached data.
         """
@@ -61,7 +61,7 @@ class UserProfileManager(BaseCollection):
 
         return model
 
-    # INCOMPLETE: user_detach_profile and delete
+    # TODO: User Profile: user_detach_profile and delete
 
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
@@ -143,9 +143,8 @@ class ProfileDataManager(BaseCollection):
         return self.insert_one_data(
             ChannelProfileModel, ChannelOid=channel_oid, **fk_param)
 
-    # INCOMPLETE: Profile/Permission - Ensure mod/admin promotable if the mod/admin to be demoted is the last
-    # INCOMPLETE: Profile/Permission -
-    #  Custom permission profile creation (name and color changable only) - create then change
+    # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
+    # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change
     pass
 
 
@@ -154,8 +153,8 @@ class PermissionPromotionRecordHolder(BaseCollection):
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
 
-    # INCOMPLETE: Permission/Promotion - Keeps the promo record for a short period
-    # INCOMPLETE: Promote for any role who needs promotion or direct assignment
+    # TODO: User Profile: Profile Promotion - Keeps the promo record for a short period
+    # TODO: User Profile: Profile Promotion - Promote for any role who needs promotion or direct assignment
     pass
 
 

@@ -50,7 +50,7 @@ class CommandFunction:
 
     @property
     def usage(self) -> str:
-        s = self.cmd_node.get_usage(self.arg_count != 0)
+        s = self.cmd_node.get_usage(False)
 
         for i in range(1, self.arg_count + 1):
             s += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
@@ -60,7 +60,7 @@ class CommandFunction:
 
 class CommandNode:
     # TEST: Test all bot commands
-    def __init__(self, codes=None, order_idx=0, name=None, description=None,
+    def __init__(self, codes=None, order_idx=None, name=None, description=None,
                  is_root=False, splittor=None, prefix=None, parent=None):
         if codes:
             self._codes = CommandNode.parse_code(codes)
@@ -80,15 +80,16 @@ class CommandNode:
         self._is_root = is_root
         self._splittor = splittor
         self._prefix = prefix
-        self._order_idx = order_idx
+        self._order_idx = order_idx or 0
         self._parent = parent
         self._child_nodes: Dict[str, CommandNode] = {}  # {<CMD_CODES>: <COMMAND_NODE>}
         self._fn: Dict[int, CommandFunction] = {}  # {<ARG_COUNT>: <FUNCTION>}
 
     def _register_(self, arg_count: int, fn: CommandFunction):
         if arg_count in self._fn:
-            logger.logger.warning(f"A function has already existed in function holder. ({self._fn.__qualname__}) "
-                                  f"{fn.__qualname__} is going to replace it.")
+            logger.logger.warning(
+                f"A function({self._fn[arg_count].fn.__qualname__}) has already existed in function holder. "
+                f"{fn.fn.__qualname__} is going to replace it.")
         self._fn[arg_count] = fn
 
     @property
@@ -178,7 +179,7 @@ class CommandNode:
 
     @property
     def max_arg_count(self) -> int:
-        return max(self._fn.keys())
+        return max(self._fn.keys()) if self._fn else -1
 
     @property
     def functions(self) -> List[CommandFunction]:
@@ -260,14 +261,25 @@ class CommandNode:
         else:
             return None
 
-    def parse_args(self, e: TextMessageEventObject) -> List[str]:
+    def _split_args_(self, s: str, arg_count: int) -> List[str]:
+        if is_empty_string(s):
+            return []
+        elif arg_count == -1:
+            return s.split(self.splittor)
+        else:
+            return s.split(self.splittor, arg_count - 1)
+
+    def parse_args(self, e: TextMessageEventObject, max_arg_count: int = None) -> List[str]:
+        if not max_arg_count:
+            max_arg_count = self.max_arg_count
+
         s = e.content
-        args = [] if is_empty_string(s) else s.split(self.splittor, self.max_arg_count)
+        args = self._split_args_(s, max_arg_count)
 
         cmd_fn: Optional[callable] = self.get_fn(len(args))
         if cmd_fn:
             ret = param_type_ensure(cmd_fn)(e, *args)
-            if not isinstance(ret, str):
+            if isinstance(ret, str):
                 ret = [str(ret)]
 
             return ret
@@ -277,7 +289,8 @@ class CommandNode:
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
-                return cmd_node.parse_args(s[len(cmd_code):])
+                e.content = s[len(cmd_code) + len(self.splittor):]
+                return cmd_node.parse_args(e, cmd_node.max_arg_count)
 
         return []
 
@@ -293,7 +306,7 @@ class CommandNode:
     def __repr__(self):
         return f"CommandNode {hex(id(self))} " \
                f"[ root={self.is_root} | code={'N/A' if self.is_root else self.main_cmd_code} | " \
-               f"sub={len(self._child_nodes)} | fn={len(self._fn)} ]"
+               f"sub={len(set(self._child_nodes.values()))} | fn={len(self._fn)} ]"
 
 
 class CommandHandler:
