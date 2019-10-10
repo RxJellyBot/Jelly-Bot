@@ -1,11 +1,13 @@
+from JellyBot.systemconfig import Bot
+
 from ._base_ import CommandNode
 
-from .uintg import cmd as uintg_node
-from .trfm import cmd as trfm_node
+from .trfm import cmd as cmd_trfm
+from .uintg import cmd as cmd_uintg
 
 __all__ = ["cmd_root", "cmd_trfm", "cmd_uintg"]
 
 
-cmd_root = CommandNode(is_root=True)
-cmd_trfm = cmd_root.attach_child_node(trfm_node)
-cmd_uintg = cmd_root.attach_child_node(uintg_node)
+cmd_root = CommandNode(is_root=True, splittor=Bot.Splittor, prefix=Bot.Prefix)
+cmd_root.attach_child_node(cmd_trfm)
+cmd_root.attach_child_node(cmd_uintg)

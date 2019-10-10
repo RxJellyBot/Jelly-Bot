@@ -101,7 +101,7 @@ def _type_ensure_(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwar
     prms_vars = filter(
         lambda _: prms[_].kind in (prms[_].POSITIONAL_OR_KEYWORD, prms[_].POSITIONAL_ONLY), prms)
     prms_kw = filter(
-        lambda _: prms[_].kind in (prms[_].VAR_KEYWORD, prms[_].KEYWORD_ONLY), prms)
+        lambda _: prms[_].kind == prms[_].KEYWORD_ONLY, prms)
 
     new_args = []
     for old_arg, prm in zip(args_cast, prms_vars):
@@ -113,12 +113,18 @@ def _type_ensure_(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwar
             new_args.append(converter.convert(old_arg, p.annotation))
 
     new_kwargs = {}
-    for old_arg_k, prm in zip(kwargs_cast, prms_kw):
-        p = prms[prm]
+    for prm_name in prms_kw:
+        p = prms[prm_name]
 
-        if p is p.empty:
-            new_kwargs[old_arg_k] = kwargs_cast[old_arg_k]
-        else:
-            new_kwargs[old_arg_k] = converter.convert(kwargs_cast[old_arg_k], p.annotation)
+        try:
+            old = kwargs_cast.pop(prm_name)
+            if p is p.empty:
+                new_kwargs[prm_name] = old
+            else:
+                new_kwargs[prm_name] = converter.convert(old, p.annotation)
+        except KeyError:
+            pass
+
+    new_kwargs.update(**kwargs_cast)
 
     return fn(*new_args, **new_kwargs)

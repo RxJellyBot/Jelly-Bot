@@ -16,13 +16,13 @@
         </div>
         <div class="row mt-3">
             <div class="col">
-                {% url "page.about" as about_page %}
+                {% url "page.doc.botcmd.main" as cmd_list %}
                 {% blocktrans trimmed %}
-                    Command data of {{ cmd_code }} not found.<br>
+                    Command data of <code>{{ cmd_code }}</code> not found.<br>
                     <hr>
                     Please check that:<br>
                     <ul>
-                        <li>Command code of {{ cmd_code }} is the Channel ID, <b>NOT the channel token</b>.</li>
+                        <li>Command code <code>{{ cmd_code }}</code> appears in the <a href="{{ cmd_list }}">bot commands list</a>.</li>
                     </ul>
                 {% endblocktrans %}
             </div>

@@ -45,22 +45,21 @@ def construct_nav(request, nav_param):
     return nav
 
 
-def _attach_hidden_(nav, home_item, current_path, nav_param):
-    # Extra Content Page
+def __attach__(holder, nav_type, current_path, label, endpoint, nav_param, home_item):
     try:
-        nav.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Extra Content"),
-            link=reverse("page.extra", kwargs=nav_param), parent=home_item))
+        holder.add_item(nav_items_factory(
+            nav_type, current_path, label=label,
+            link=reverse(endpoint, kwargs=nav_param), parent=home_item))
     except NoReverseMatch:
         pass
 
+
+def _attach_hidden_(nav, home_item, current_path, nav_param):
+    # Extra Content Page
+    __attach__(nav, NavHidden, current_path, _("Extra Content"), "page.extra", nav_param, home_item)
+
     # Account Logout
-    try:
-        nav.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Logout"),
-            link=reverse("account.logout", kwargs=nav_param), parent=home_item))
-    except NoReverseMatch:
-        pass
+    __attach__(nav, NavHidden, current_path, _("Logout"), "account.logout", nav_param, home_item)
 
 
 def _construct_my_account_(current_path, parent, nav_param):
@@ -78,12 +77,10 @@ def _construct_my_account_(current_path, parent, nav_param):
     my_account_parent.add_item(nav_items_factory(
         NavHidden, current_path, label=_("Channel List"),
         link=reverse("account.channel.list"), parent=my_account_parent))
-    try:
-        my_account_parent.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Channel Management"),
-            link=reverse("account.channel.manage", kwargs=nav_param), parent=my_account_parent))
-    except NoReverseMatch:
-        pass
+
+    __attach__(
+        my_account_parent, NavHidden, current_path, _("Channel Management"),
+        "account.channel.manage", nav_param, my_account_parent)
 
     my_account_parent.add_item(nav_items_factory(
         NavHidden, current_path, label=_("Integrate Account"),
@@ -117,19 +114,8 @@ def _construct_info_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Channel"), link=reverse("info.channel.search"), parent=info_parent))
 
     # Hidden Items
-    try:
-        info_parent.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Channel"),
-            link=reverse("info.channel", kwargs=nav_param), parent=info_parent))
-    except NoReverseMatch:
-        pass
-
-    try:
-        info_parent.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Profile Info"),
-            link=reverse("info.profile", kwargs=nav_param), parent=info_parent))
-    except NoReverseMatch:
-        pass
+    __attach__(info_parent, NavHidden, current_path, _("Channel"), "info.channel", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path, _("Profile Info"), "info.profile", nav_param, info_parent)
 
     return info_parent
 
@@ -167,11 +153,8 @@ def _construct_docs_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Token Action"), link=reverse("page.doc.code.token"), parent=docs_parent))
 
     # Hidden Items
-    try:
-        docs_parent.add_item(nav_items_factory(
-            NavHidden, current_path, label=_("Bot Command - {}").format(nav_param.get("code")),
-            link=reverse("page.doc.botcmd.cmd", kwargs=nav_param), parent=docs_parent))
-    except NoReverseMatch:
-        pass
+    __attach__(
+        docs_parent, NavHidden, current_path, _("Bot Command - {}").format(nav_param.get("code")),
+        "page.doc.botcmd.cmd", nav_param, docs_parent)
 
     return docs_parent

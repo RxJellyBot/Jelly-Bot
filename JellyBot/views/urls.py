@@ -3,7 +3,6 @@ from django.urls import path, include
 from .index import HomePageView
 from .about import AboutView
 from .exctnt import ExtraContentView
-from .err import WebsiteErrorView
 
 
 urlpatterns = [
@@ -13,6 +12,5 @@ urlpatterns = [
     path('account/', include('JellyBot.views.account.urls')),
     path('ar/', include('JellyBot.views.ar.urls')),
     path('doc/', include('JellyBot.views.doc.urls')),
-    path('info/', include('JellyBot.views.info.urls')),
-    path('error/<int:code>', WebsiteErrorView.as_view(), name="page.error"),
+    path('info/', include('JellyBot.views.info.urls'))
 ]

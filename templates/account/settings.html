@@ -60,8 +60,8 @@
                                     <select id="cfgLocale" name="x-Language" class="form-control">
                                         {% for lang in lang_list %}
                                             {% with current_config.language as current_lang %}
-                                                <option value="{{ lang }}"
-                                                        {% if current_lang == lang %}selected{% endif %}>
+                                                <option value="{{ lang.abbr }}"
+                                                        {% if current_lang == lang.abbr %}selected{% endif %}>
                                                     {{ lang.name }}&nbsp;-&nbsp;{{ lang.abbr }}
                                                 </option>
                                             {% endwith %}

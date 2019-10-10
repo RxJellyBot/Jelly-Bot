@@ -9,10 +9,8 @@ from mongodb.factory import TokenActionManager
 
 from ._base_ import CommandNode
 
-cmd = CommandNode(["uintg", "userintegrate"],
-                  2000,
-                  _("User Integrate"),
-                  _("Controls related to user identity integration."))
+cmd = CommandNode(
+    ["uintg", "userintegrate"], 2000, _("User Integrate"), _("Controls related to user identity integration."))
 
 
 @cmd.command_function(description=_("Issue a token for user identity integration."))
@@ -24,6 +22,4 @@ def issue_token(e: TextMessageEventObject):
             HostUrl, reverse("account.integrate")
         )
     else:
-        return _("Token action not enqueued.\nResult: {}\nException: {}").format(
-            result.outcome, result.exception
-        )
+        return _("Token action not enqueued.\nResult: {}\nException: {}").format(result.outcome, result.exception)

@@ -21,10 +21,8 @@
         </div>
         <div class="row mt-3">
             <div class="col">
-                {% url "account.channel.list" as channel_list %}
-                {% url "page.about" as about_page %}
                 {% blocktrans trimmed %}
-                    No content recorded under ID: {{ page_id }}. The ID might be wrong or expired.
+                    No content recorded under ID: <code>{{ page_id }}</code>. The ID might be wrong or expired.
                 {% endblocktrans %}
             </div>
         </div>

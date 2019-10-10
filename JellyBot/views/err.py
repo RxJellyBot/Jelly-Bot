@@ -1,20 +1,25 @@
-from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 
+from flags import WebsiteError
 from JellyBot.views.render import render_template
-from mongodb.factory import ExtraContentManager
 
 
-class WebsiteErrorView(View):
-    # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def get(self, request, code, *args, **kwargs):
-        page_content = ExtraContentManager.get_content(page_id)
-        d = {"page_id": page_id}
-        if page_content:
-            title = page_content.title if page_content.title != ExtraContentManager.DefaultTitle else page_id
-            return render_template(request, _("Extra Content - {}").format(title), "exctnt.html", {
-                "content": page_content.content_html,
-                "expiry": page_content.expires_on
-            }, nav_param=d)
-        else:
-            return render_template(request, _("Extra Content Not Found"), "err/unknown.html", {"err_code": code})
+class WebsiteErrorView:
+    # noinspection PyArgumentList
+    @staticmethod
+    def website_error(request, code, ctxt, nav_param=None):
+        if not nav_param:
+            nav_param = {}
+
+        d = {
+            WebsiteError.EXTRA_CONTENT_NOT_FOUND: (_("Extra Content Not Found"), "err/exctnt_not_found.html"),
+            WebsiteError.PROFILE_LINK_NOT_FOUND: (_("Profile Link Not Found"), "err/account/proflink_not_found.html"),
+            WebsiteError.CHANNEL_NOT_FOUND: (_("Channel Data Not Found"), "err/info/channel_not_found.html"),
+            WebsiteError.PROFILE_NOT_FOUND: (_("Profile Data Not Found"), "err/info/profile_not_found.html"),
+            WebsiteError.BOT_CMD_NOT_FOUND: (_("Bot Command Not Found"), "err/doc/cmd_not_found.html"),
+            WebsiteError.UNKNOWN: (_("Unknown"), "err/unknown.html")
+        }
+
+        label, template = d.get(WebsiteError(code), WebsiteError.UNKNOWN)
+
+        return render_template(request, label, template, ctxt, nav_param=nav_param)
