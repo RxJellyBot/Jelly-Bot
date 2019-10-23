@@ -16,7 +16,7 @@
         <div class="row">
             <div class="col">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover table-bordered mb-0">
                         <thead class="thead-light">
                         <tr>
                             <th scope="col">{% trans "Usage" %}</th>
@@ -27,7 +27,7 @@
                         {% for fn_entry in cmd_node.fn_list_for_doc %}
                             <tr>
                                     <td class="align-middle no-line-break"><code
-                                            class="bg-light border border-light p-1">{{ fn_entry.usage }}</code></td>
+                                            class="bg-light border border-light p-1 h5">{{ fn_entry.usage }}</code></td>
                                     <td class="mb-0">{{ fn_entry.description|markdown }}</td>
                                 </tr>
                         {% endfor %}
@@ -42,4 +42,5 @@
 {% block ex-style %}
     <link rel="stylesheet" href="{% static "css/utils/p-b0.css" %}">
     <link rel="stylesheet" href="{% static "css/utils/ul-b0.css" %}">
+    <link rel="stylesheet" href="{% static "css/utils/hr-condense.css" %}">
 {% endblock %}

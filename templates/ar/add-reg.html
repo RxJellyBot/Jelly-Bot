@@ -30,7 +30,7 @@
                     <br>
                     <small>
                         {% url "account.channel.connect" as connect_url %}
-                        {% blocktrans %}
+                        {% blocktrans trimmed %}
                             Check <a href="{{ connect_url }}" target="_blank">this page</a> to
                             know how to get the channel's membership.
                         {% endblocktrans %}
@@ -145,7 +145,7 @@
 
                 <div class="input-group">
                     <input type="text" class="form-control" id="arChannelToken"
-                           placeholder="Input the Channel Token"
+                           placeholder="{% trans "Input the Channel Token" %}"
                            aria-label="{% trans "Channel Token" %}"
                            data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
                     <div class="input-group-append">

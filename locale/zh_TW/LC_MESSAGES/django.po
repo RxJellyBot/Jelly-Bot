@@ -1,0 +1,2488 @@
+# Translation of Traditional Chinese (Taiwan) of Jelly Bot.
+# Copyright (C) 2019 RaenonX JELLYCAT
+# RaenonX JELLYCAT <raenonx0710@gmail.com>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-10-22 20:48-0500\n"
+"PO-Revision-Date: 2019-10-22 21:04-0500\n"
+"Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"X-Generator: Poedit 2.2.3\n"
+
+#: .\JellyBot\api\static\info.py:16
+msgid "Dummy"
+msgstr "Dummy"
+
+#: .\JellyBot\api\static\info.py:19
+msgid "Response Truncated"
+msgstr "已截短回覆"
+
+#: .\JellyBot\api\static\info.py:19
+msgid "The content of response was truncated because it's too long."
+msgstr "回覆內容因長度過長，已被截短。"
+
+#: .\JellyBot\api\static\info.py:21
+msgid "Response Types Lengthened"
+msgstr "已拉長回覆種類陣列"
+
+#: .\JellyBot\api\static\info.py:22
+msgid ""
+"There are some responses are missing its type so the system filled it with "
+"default values."
+msgstr "因部分回覆種類未指定，故系統自動補上預設值。"
+
+#: .\JellyBot\api\static\info.py:24
+msgid "Response Types Shortened"
+msgstr "已縮短回覆種類陣列"
+
+#: .\JellyBot\api\static\info.py:25
+msgid ""
+"We cannot find the corresponding response for some specified response types "
+"so the system dropped it."
+msgstr "因部分回覆種類找不到對應的回覆，故系統自動無視。"
+
+#: .\JellyBot\settings.py:173
+msgid "English"
+msgstr "英文"
+
+#: .\JellyBot\settings.py:174
+msgid "Traditional Chinese"
+msgstr "繁體中文"
+
+#: .\JellyBot\views\about.py:15 .\JellyBot\views\nav.py:25
+msgid "About"
+msgstr "關於"
+
+#: .\JellyBot\views\account\channel.py:22
+msgid "Channel Register"
+msgstr "登錄頻道"
+
+#: .\JellyBot\views\account\channel.py:34 .\JellyBot\views\nav.py:82
+#: .\doc\terms.py:53 .\templates\account\channel\manage.html:9
+msgid "Channel Management"
+msgstr "頻道管理"
+
+#: .\JellyBot\views\account\channel.py:51
+msgid "Channel Management - {}"
+msgstr "頻道管理 - {}"
+
+#: .\JellyBot\views\account\control.py:21 .\JellyBot\views\nav.py:21
+msgid "Login"
+msgstr "登入"
+
+#: .\JellyBot\views\account\control.py:25
+msgid "An unknown error occurred."
+msgstr "發生未知的錯誤。"
+
+#: .\JellyBot\views\account\control.py:35
+msgid "Registration process not performed."
+msgstr "登錄程序未執行。"
+
+#: .\JellyBot\views\account\control.py:37
+msgid "New user data creation failed."
+msgstr "新用戶資料創建失敗。"
+
+#: .\JellyBot\views\account\control.py:39
+msgid "The data cannot be passed into the server."
+msgstr "資料無法傳送到伺服器中。"
+
+#: .\JellyBot\views\account\control.py:42
+msgid ""
+"An unknown error occurred during the new user data registration. Code: {}."
+msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {}。"
+
+#: .\JellyBot\views\account\control.py:60
+msgid "User token is null however login succeed. {}"
+msgstr "登入成功，但用戶編碼為空。 ({})"
+
+#: .\JellyBot\views\account\control.py:68 .\JellyBot\views\nav.py:62
+#: .\templates\account\main.html:94
+msgid "Logout"
+msgstr "登出"
+
+#: .\JellyBot\views\account\control.py:95 .\templates\account\settings.html:8
+msgid "Account Settings"
+msgstr "帳號設定"
+
+#: .\JellyBot\views\account\integrate.py:14
+msgid "Integrate Identity"
+msgstr "整合用戶資訊"
+
+#: .\JellyBot\views\account\main.py:18
+msgid "Account Home"
+msgstr "帳號首頁"
+
+#: .\JellyBot\views\ar\add.py:17
+msgid "Add an Auto-Reply"
+msgstr "新增自動回覆"
+
+#: .\JellyBot\views\ar\main.py:10
+msgid "Auto-Reply Home"
+msgstr "自動回覆 - 首頁"
+
+#: .\JellyBot\views\doc\botcmd.py:14 .\JellyBot\views\nav.py:133
+#: .\templates\doc\botcmd_main.html:9
+msgid "Bot Commands List"
+msgstr "機器人指令清單"
+
+#: .\JellyBot\views\doc\botcmd.py:24 .\JellyBot\views\nav.py:157
+msgid "Bot Command - {}"
+msgstr "機器人指令 - {}"
+
+#: .\JellyBot\views\doc\code\action.py:11
+msgid "API Command Code"
+msgstr "API指令代碼"
+
+#: .\JellyBot\views\doc\code\action.py:11
+msgid "API Action"
+msgstr "API指令"
+
+#: .\JellyBot\views\doc\code\action.py:17
+msgid "Token Action Code"
+msgstr "代號指令代碼"
+
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:153
+#: .\doc\terms.py:39
+msgid "Token Action"
+msgstr "代號指令"
+
+#: .\JellyBot\views\doc\code\outcome.py:12
+msgid "Insert Outcome Code"
+msgstr "新增結果代碼"
+
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:141
+msgid "Insert Outcome"
+msgstr "新增結果"
+
+#: .\JellyBot\views\doc\code\outcome.py:19
+msgid "Get Outcome Code"
+msgstr "獲取結果代碼"
+
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:139
+msgid "Get Outcome"
+msgstr "獲取結果"
+
+#: .\JellyBot\views\doc\code\outcome.py:26
+msgid "Operation Outcome Code"
+msgstr "作業結果代碼"
+
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:143
+msgid "Operation Outcome"
+msgstr "作業結果"
+
+#: .\JellyBot\views\doc\code\outcome.py:33
+msgid "Update Outcome Code"
+msgstr "更新結果代碼"
+
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:145
+msgid "Update Outcome"
+msgstr "更新結果"
+
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:127
+#: .\templates\doc\terms.html:9
+msgid "Terms Explanation"
+msgstr "名詞解釋"
+
+#: .\JellyBot\views\err.py:15 .\flags\weberr.py:27
+#: .\templates\err\exctnt_not_found.html:14
+msgid "Extra Content Not Found"
+msgstr "額外內容不存在"
+
+#: .\JellyBot\views\err.py:16 .\flags\weberr.py:29 .\flags\weberr.py:30
+#: .\templates\err\account\proflink_not_found.html:14
+msgid "Profile Link Not Found"
+msgstr "無對應身份組連結"
+
+#: .\JellyBot\views\err.py:17
+msgid "Channel Data Not Found"
+msgstr "頻道資料不存在"
+
+#: .\JellyBot\views\err.py:18
+msgid "Profile Data Not Found"
+msgstr "身份組不存在"
+
+#: .\JellyBot\views\err.py:19 .\flags\weberr.py:33
+msgid "Bot Command Not Found"
+msgstr "機器人指令不存在"
+
+#: .\JellyBot\views\err.py:20 .\flags\msgtype.py:11 .\flags\tkact.py:25
+#: .\flags\weberr.py:25
+msgid "Unknown"
+msgstr "不明行為"
+
+#: .\JellyBot\views\exctnt.py:16
+msgid "Extra Content - {}"
+msgstr "額外內容 - {}"
+
+#: .\JellyBot\views\index.py:10 .\JellyBot\views\nav.py:17
+msgid "Home Page"
+msgstr "首頁"
+
+#: .\JellyBot\views\info\channel.py:27
+msgid "Channel Info - {}"
+msgstr "頻道資訊 - {}"
+
+#: .\JellyBot\views\info\channel.py:44 .\templates\info\channel_search.html:9
+msgid "Channel Info Search"
+msgstr "頻道資訊搜尋"
+
+#: .\JellyBot\views\info\profile.py:22
+msgid "Profile Info - {}"
+msgstr "身份組資訊 - {}"
+
+#: .\JellyBot\views\nav.py:59
+msgid "Extra Content"
+msgstr "額外內容"
+
+#: .\JellyBot\views\nav.py:67
+msgid "My Account"
+msgstr "我的帳號"
+
+#: .\JellyBot\views\nav.py:69
+msgid "Dashboard"
+msgstr "總覽"
+
+#: .\JellyBot\views\nav.py:71 .\templates\account\main.html:91
+msgid "Settings"
+msgstr "設定"
+
+#: .\JellyBot\views\nav.py:75
+msgid "Channel Registration"
+msgstr "頻道登錄"
+
+#: .\JellyBot\views\nav.py:78 .\templates\account\channel\list.html:8
+msgid "Channel List"
+msgstr "頻道清單"
+
+#: .\JellyBot\views\nav.py:86
+msgid "Integrate Account"
+msgstr "整合帳號"
+
+#: .\JellyBot\views\nav.py:94 .\templates\index.html:21
+msgid "Auto Reply"
+msgstr "自動回覆"
+
+#: .\JellyBot\views\nav.py:96
+msgid "Introduction"
+msgstr "簡介"
+
+#: .\JellyBot\views\nav.py:98
+msgid "Main Intro"
+msgstr "主要介紹"
+
+#: .\JellyBot\views\nav.py:102
+msgid "Functions"
+msgstr "功能"
+
+#: .\JellyBot\views\nav.py:104
+msgid "Add"
+msgstr "新增"
+
+#: .\JellyBot\views\nav.py:111
+msgid "Info"
+msgstr "資訊查詢"
+
+#: .\JellyBot\views\nav.py:114 .\JellyBot\views\nav.py:117
+msgid "Channel"
+msgstr "頻道"
+
+#: .\JellyBot\views\nav.py:118
+msgid "Profile Info"
+msgstr "身份組"
+
+#: .\JellyBot\views\nav.py:125
+msgid "Documentation"
+msgstr "文件/說明"
+
+#: .\JellyBot\views\nav.py:131
+msgid "Bot"
+msgstr "機器人"
+
+#: .\JellyBot\views\nav.py:137
+msgid "Outcome Code"
+msgstr "結果代碼"
+
+#: .\JellyBot\views\nav.py:149
+msgid "Action Code"
+msgstr "操作代碼"
+
+#: .\JellyBot\views\nav.py:151
+msgid "API Command"
+msgstr "API指令"
+
+#: .\doc\terms.py:26
+msgid "Core"
+msgstr "系統基礎"
+
+#: .\doc\terms.py:27
+msgid "Operation"
+msgstr "運行"
+
+#: .\doc\terms.py:28
+msgid ""
+"The system has two ways to control: on the website, using the API. Some "
+"actions may only available at a single side."
+msgstr ""
+"本機器人系統可以於兩處控制: 網站上、使用API端口。部分功能可能只能在其中一處使"
+"用。"
+
+#: .\doc\terms.py:30
+msgid "-"
+msgstr "-"
+
+#: .\doc\terms.py:34
+msgid "Features"
+msgstr "功能"
+
+#: .\doc\terms.py:35
+msgid "Auto-Reply"
+msgstr "自動回覆"
+
+#: .\doc\terms.py:36
+msgid ""
+"When the system receives/sees a word, it will reply back certain word(s) if "
+"it is set."
+msgstr ""
+"設定系統回覆組後，當系統收到特定的文字，系統就會回覆組中預定要回覆的文字。"
+
+#: .\doc\terms.py:37
+msgid ""
+"User A setup an Auto-Reply module, which keyword is **A** and reply is "
+"**B**. Then, somebody typed **A** wherever Jelly BOT can see, so Jelly BOT "
+"will reply **B** back."
+msgstr ""
+"使用者A創建了一個**收到A則回答B**的自動回覆組。然後，有人在小水母可以偵測訊息"
+"的位置輸入**A**，小水母則會回覆**B**。使用者A創建了一個**收到A則回答B**的自動"
+"回覆組。然後，有人在小水母可以偵測訊息的位置輸入**A**，小水母則會回覆**B**。"
+
+#: .\doc\terms.py:40
+msgid ""
+"The users provide partial required information for an operation, then the "
+"system will yield a token to the users for completing it while holding it "
+"for {:d} hrs.<br>Users will need to use the given token with the lacking "
+"information for completing the operation before it expires."
+msgstr ""
+"使用者提交完成特定指令的部分資訊，然後，小水母會返回一個使用者完成指令用的代"
+"碼。小水母會保留這個代碼指令{}小時。使用者必須在代號指令完成前，提交代碼和剩"
+"餘的必須資訊以完成指令。"
+
+#: .\doc\terms.py:44
+msgid ""
+"User B created an Auto-Reply module on the website and choose the issue "
+"token option. Then, he submit the token in the channel, so the Auto-Reply "
+"module is registered."
+msgstr ""
+"使用者B在網站上建立一個自動回覆組，並選擇獲取代號。然後，他在希望建立該自動回"
+"覆組的頻道內提交代號，這樣一來，自動回覆組就建立完成了。"
+
+#: .\doc\terms.py:46
+msgid "Profile System/Permission"
+msgstr "身份組/權限系統"
+
+#: .\doc\terms.py:47
+msgid ""
+"Users can have multiple profiles in the channel for various features use. "
+"Profiles will have some permission or their privilege attached.<br>Some "
+"profiles may be granted by votes from channel members or assigned by channel "
+"manager.<br>This system is similar to the role system of **Discord**."
+msgstr ""
+"使用者可以在一個頻道內有多個身份組以使用不同功能。身份組會有對應的權限或特"
+"權。<br>有些身份組必須藉由群組成員投票或頻道管理員授予才能獲得。<br>這個系統"
+"和**Discord**的身份組系統相似。"
+
+#: .\doc\terms.py:51
+msgid ""
+"ChannelA have profiles called **A** with admin privilege and **B** for "
+"normal users.<br>Users who have profile **A** assigned will be able to use "
+"features that only admins can use."
+msgstr ""
+"使用者A創建了一個**收到A則回答B**的自動回覆組。然後，有人在小水母可以偵測訊息"
+"的位置輸入**A**，小水母則會回覆**B**。"
+
+#: .\doc\terms.py:54
+msgid ""
+"Users will be able to adjust the settings specifically designated to the "
+"channel. The availability of what can be adjusted will base on the user's "
+"profile."
+msgstr "使用者可以調整頻道專屬的設定。設定的存取權由使用者所擁有的身份組決定。"
+
+#: .\doc\terms.py:56
+msgid ""
+"Eligibility of accessing the pinned auto-reply module, changing the admin/"
+"mod of a channel...etc."
+msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...等。"
+
+#: .\extutils\line_sticker\main.py:16
+msgid "Animated Sticker"
+msgstr "動態貼圖"
+
+#: .\extutils\line_sticker\main.py:17
+msgid "Sticker with Sounds"
+msgstr "有聲貼圖"
+
+#: .\extutils\line_sticker\main.py:18
+msgid "Static Sticker"
+msgstr "靜態貼圖"
+
+#: .\extutils\locales.py:52
+msgid "Asia: Hong Kong"
+msgstr "亞洲: 香港"
+
+#: .\extutils\locales.py:53
+msgid "Asia: Kuala Lumpur, Malaysia"
+msgstr "亞洲: 馬來西亞 - 吉隆坡"
+
+#: .\extutils\locales.py:54
+msgid "Asia: Macau"
+msgstr "亞洲: 澳門"
+
+#: .\extutils\locales.py:55
+msgid "Asia: Seoul, South Korea"
+msgstr "亞洲: 南韓 - 首爾"
+
+#: .\extutils\locales.py:56
+msgid "Asia: Singapore"
+msgstr "亞洲: 新加坡"
+
+#: .\extutils\locales.py:57
+msgid "Asia: Taipei, Taiwan"
+msgstr "亞洲: 台灣 - 台北"
+
+#: .\extutils\locales.py:58
+msgid "Asia: Tokyo, Japan"
+msgstr "亞洲: 日本 - 東京"
+
+#: .\extutils\locales.py:59
+msgid "Europe: London, UK"
+msgstr "歐洲: 英國 - 倫敦"
+
+#: .\extutils\locales.py:60
+msgid "North America: Central Timezone, USA"
+msgstr "北美: 美國 - 中部時區"
+
+#: .\extutils\locales.py:61
+msgid "North America: Eastern Timezone, Canada"
+msgstr "北美: 加拿大 - 東部時區"
+
+#: .\extutils\locales.py:62
+msgid "North America: Eastern Timezone, USA"
+msgstr "北美: 美國 - 東部時區"
+
+#: .\extutils\locales.py:63
+msgid "North America: Los Angeles, USA"
+msgstr "北美: 美國 - 洛杉磯"
+
+#: .\extutils\locales.py:64
+msgid "North America: Mountain Timezone, USA"
+msgstr "北美: 美國 - 山地時區"
+
+#: .\extutils\locales.py:65
+msgid "North America: New York, USA"
+msgstr "北美: 美國 - 紐約"
+
+#: .\extutils\locales.py:66
+msgid "North America: Pacific Timezone, Canada"
+msgstr "北美: 加拿大 - 太平洋時區"
+
+#: .\extutils\locales.py:67
+msgid "North America: Pacific Timezone, USA"
+msgstr "北美: 美國 - 太平洋時區"
+
+#: .\extutils\locales.py:68
+msgid "North America: Toronto, Canada"
+msgstr "北美: 加拿大 - 多倫多"
+
+#: .\extutils\locales.py:69
+msgid "North America: Vancouver, Canada"
+msgstr "北美: 加拿大 - 溫哥華"
+
+#: .\extutils\locales.py:70
+msgid "Oceania: Adelaide, Australia"
+msgstr "大洋洲: 澳洲 - 阿德萊德"
+
+#: .\extutils\locales.py:71
+msgid "Oceania: Auckland, New Zealand"
+msgstr "大洋洲: 紐西蘭 - 奧克蘭"
+
+#: .\extutils\locales.py:72
+msgid "Oceania: Brisbane, Australia"
+msgstr "大洋洲: 澳洲 - 布里斯本"
+
+#: .\extutils\locales.py:73
+msgid "Oceania: Melbourne, Australia"
+msgstr "大洋洲: 澳洲 - 墨爾本"
+
+#: .\extutils\locales.py:74
+msgid "Oceania: Perth, Australia"
+msgstr "大洋洲: 澳洲 - 伯斯"
+
+#: .\extutils\locales.py:75
+msgid "Oceania: Sydney, Australia"
+msgstr "大洋洲: 澳洲 - 雪梨"
+
+#: .\extutils\locales.py:76
+msgid "Universal Time Coordinated"
+msgstr "世界標準時間"
+
+#: .\extutils\locales.py:89
+msgid "English (United States)"
+msgstr "英文 (美國)"
+
+#: .\extutils\locales.py:90
+msgid "Chinese (Taiwan)"
+msgstr "中文 (台灣)"
+
+#: .\extutils\strtrans\type_trans.py:12
+msgid "String"
+msgstr "字串"
+
+#: .\extutils\strtrans\type_trans.py:14
+msgid "Boolean"
+msgstr "布林代數"
+
+#: .\extutils\strtrans\type_trans.py:16
+msgid "Integer"
+msgstr "整數"
+
+#: .\extutils\strtrans\type_trans.py:18
+msgid "Auto Reply Content Type"
+msgstr "自動回覆種類"
+
+#: .\extutils\strtrans\type_trans.py:20
+msgid "Permission Category"
+msgstr "權限分類"
+
+#: .\extutils\strtrans\type_trans.py:22
+#: .\templates\account\channel\list_table.html:12
+#: .\templates\ar\add-reg.html:68 .\templates\ar\add-reg.html:134
+msgid "Platform"
+msgstr "平台"
+
+#: .\extutils\strtrans\type_trans.py:24
+msgid "Datetime"
+msgstr "日期 & 時間"
+
+#: .\extutils\strtrans\type_trans.py:26
+msgid "ObjectId"
+msgstr "識別碼"
+
+#: .\extutils\strtrans\type_trans.py:28
+msgid "Iterable (e.g. List, Array, Dictionary...)"
+msgstr "可循環/迭代物件(陣列、清單...等)"
+
+#: .\extutils\strtrans\type_trans.py:30
+msgid "(Null)"
+msgstr "(空)"
+
+#: .\flags\apiact.py:38
+msgid "Unknown Action"
+msgstr "不明指令"
+
+#: .\flags\apiact.py:40
+msgid "Auto-Reply - Addition"
+msgstr "自動回覆 - 新增"
+
+#: .\flags\apiact.py:41
+msgid "Auto-Reply - Content Validation"
+msgstr "自動回覆 - 內容驗證"
+
+#: .\flags\apiact.py:42
+msgid "Auto-Reply - Tag Popularity"
+msgstr "自動回覆 - 熱門標籤"
+
+#: .\flags\apiact.py:44
+msgid "Token Action - Auto-Reply Addition"
+msgstr "代號指令 - 自動回覆 - 新增"
+
+#: .\flags\apiact.py:45
+msgid "Token Action - List All"
+msgstr "代號指令 - 列出全部"
+
+#: .\flags\apiact.py:46
+msgid "Token Action - Complete Action"
+msgstr "代號指令 - 完成"
+
+#: .\flags\apiact.py:48
+msgid "Data Query - Channel"
+msgstr "資料查詢 - 頻道"
+
+#: .\flags\apiact.py:49
+msgid "Data Query - Permission"
+msgstr "資料查詢 - 權限"
+
+#: .\flags\apiact.py:51
+msgid "Management - Issue Channel Registration Token"
+msgstr "管理 - 發給頻道登錄代號"
+
+#: .\flags\apiact.py:52
+msgid "Management - Change Channel Name"
+msgstr "管理 - 更改頻道名稱"
+
+#: .\flags\artype.py:10 .\flags\msgtype.py:12 .\templates\ar\add-notes.html:13
+msgid "Text"
+msgstr "文字"
+
+#: .\flags\artype.py:11 .\flags\msgtype.py:13 .\templates\ar\add-notes.html:21
+msgid "Image"
+msgstr "圖片"
+
+#: .\flags\artype.py:12 .\templates\ar\add-notes.html:31
+msgid "LINE Sticker"
+msgstr "LINE貼圖"
+
+#: .\flags\artype.py:14
+msgid "Custom Signal"
+msgstr "自訂訊號"
+
+#: .\flags\chtype.py:18
+msgid "(Unknown Channel Type)"
+msgstr "(不明的頻道種類)"
+
+#: .\flags\chtype.py:19
+msgid "**Group (Text/Public)**"
+msgstr "**群組 (文字/公開)**"
+
+#: .\flags\chtype.py:20
+msgid "**Group (Text/Private)**"
+msgstr "**群組 (文字/私人)**"
+
+#: .\flags\chtype.py:21
+msgid "**Private (Text)**"
+msgstr "**私人 (文字)**"
+
+#: .\flags\cmdscope.py:27
+msgid "Not Restricted"
+msgstr "無限制"
+
+#: .\flags\cmdscope.py:28
+msgid "Group Only"
+msgstr "群組限定"
+
+#: .\flags\cmdscope.py:29
+msgid "Private Only"
+msgstr "私人限定"
+
+#: .\flags\exctnt.py:11
+msgid "Pure Text"
+msgstr "純文字"
+
+#: .\flags\exctnt.py:12
+msgid "Extra Message"
+msgstr "額外訊息"
+
+#: .\flags\msgtype.py:14
+msgid "Video"
+msgstr "影片"
+
+#: .\flags\msgtype.py:15
+msgid "Audio"
+msgstr "音訊"
+
+#: .\flags\msgtype.py:16
+msgid "Location"
+msgstr "地點"
+
+#: .\flags\msgtype.py:17
+msgid "Sticker"
+msgstr "貼圖"
+
+#: .\flags\msgtype.py:18
+msgid "File"
+msgstr "檔案"
+
+#: .\flags\perm.py:36
+msgid "Normal"
+msgstr "一般"
+
+#: .\flags\perm.py:37
+msgid "User who has this permission can do all normal operations."
+msgstr "擁有此權限的用戶可以使用所有一般功能。"
+
+#: .\flags\perm.py:40
+msgid "Auto-Reply: Access Pinned Module"
+msgstr "自動回覆: 存取置頂回覆組"
+
+#: .\flags\perm.py:41
+msgid ""
+"User who has this permission can access the Pinned property of the Auto-"
+"Reply modules."
+msgstr "擁有此權限的用戶可以存取回覆組的屬性。"
+
+#: .\flags\perm.py:44
+msgid "Members: Change Managers"
+msgstr "成員管理: 更動管理者"
+
+#: .\flags\perm.py:45
+msgid "User who has this permission can change the members of managers."
+msgstr "擁有此權限的用戶可以更改管理員的組成。"
+
+#: .\flags\perm.py:48
+msgid "Channel: Features availability"
+msgstr "頻道: 開關功能"
+
+#: .\flags\perm.py:49
+msgid ""
+"User who has this permission can change the availability of the certain "
+"features."
+msgstr "擁有此權限的用戶可以開關特定功能。"
+
+#: .\flags\perm.py:52
+msgid "Channel: Vote for managers"
+msgstr "頻道: 開關票選管理員功能"
+
+#: .\flags\perm.py:53
+msgid ""
+"User who has this permission can change the availability of voting to "
+"promote members."
+msgstr "擁有此權限的用戶可以開關票選管理員的功能。"
+
+#: .\flags\perm.py:56
+msgid "Channel: Info Privacy"
+msgstr "頻道: 資訊隱私"
+
+#: .\flags\perm.py:57
+msgid ""
+"User who has this permission can change the privacy of the channel info."
+msgstr "擁有此權限的用戶可以更改頻道資訊是否隱藏。"
+
+#: .\flags\platforms.py:11
+msgid "Unknown Platform"
+msgstr "不明平台"
+
+#: .\flags\platforms.py:12 .\templates\about.html:13
+msgid "LINE"
+msgstr "LINE"
+
+#: .\flags\platforms.py:13 .\templates\about.html:14
+msgid "Discord"
+msgstr "Discord"
+
+#: .\flags\result\mdinvalid.py:33 .\flags\tkact.py:84
+msgid "O: OK"
+msgstr "O: OK"
+
+#: .\flags\result\mdinvalid.py:33
+msgid "The model is valid."
+msgstr "資料模組有效。"
+
+#: .\flags\result\mdinvalid.py:36
+msgid "X: Auto Reply - Empty Content"
+msgstr "X: 自動回覆 - 無內容"
+
+#: .\flags\result\mdinvalid.py:37
+msgid "The content of the Auto-Reply is empty."
+msgstr "自動回覆的內容為空。"
+
+#: .\flags\result\mdinvalid.py:39
+msgid "X: Auto Reply - Content not Image"
+msgstr "X: 自動回覆 - 內容非相片"
+
+#: .\flags\result\mdinvalid.py:40
+msgid ""
+"The content is not a pure image. Make sure that when you open the link in "
+"the browser, it gives you an image, NOT A WEB PAGE."
+msgstr ""
+"自動回覆的內容不是圖片。請確認開啟連結時，瀏覽器只會顯示圖片，而不是網頁。"
+
+#: .\flags\result\mdinvalid.py:43
+msgid "X: Auto Reply - Content not LINE Sticker"
+msgstr "X: 自動回覆 - 內容非LINE貼圖"
+
+#: .\flags\result\mdinvalid.py:44
+msgid "No sticker found using the sticker ID provided."
+msgstr "找不到對應的LINE貼圖。"
+
+#: .\flags\result\mdinvalid.py:47
+msgid "X: Root User - No child IDs"
+msgstr "X: 使用者身份 - 無子ID"
+
+#: .\flags\result\mdinvalid.py:48
+msgid "No related identity data connected."
+msgstr "主身份資訊沒有連結其他子身份資訊。"
+
+#: .\flags\result\mdinvalid.py:51
+msgid "X: Uncategorized Reason"
+msgstr "X: 未分類"
+
+#: .\flags\result\mdinvalid.py:52
+msgid "Model is invalid for uncategorized reason."
+msgstr "資料模組因不明原因而無效。"
+
+#: .\flags\tkact.py:25
+msgid "Unknown Token Action."
+msgstr "不明的代碼指令。"
+
+#: .\flags\tkact.py:28
+msgid "Register: Channel Membership"
+msgstr "註冊: 頻道成員"
+
+#: .\flags\tkact.py:29
+msgid "Get the membership of a channel."
+msgstr "註冊為頻道成員。"
+
+#: .\flags\tkact.py:31
+msgid "Integration: User Identity"
+msgstr "整合: 用戶資訊"
+
+#: .\flags\tkact.py:32
+msgid "Integrate user identity."
+msgstr "整合用戶資訊。"
+
+#: .\flags\tkact.py:34
+msgid "Auto-Reply: Add"
+msgstr "自動回覆 - 新增"
+
+#: .\flags\tkact.py:35
+msgid "Register an Auto-Reply module."
+msgstr "新增自動回覆組。"
+
+#: .\flags\tkact.py:37
+msgid "System: Test"
+msgstr "系統: 測試"
+
+#: .\flags\tkact.py:38
+msgid "Preserved for testing purpose."
+msgstr "保留以於測試時使用。"
+
+#: .\flags\tkact.py:46
+msgid "Miscellaneous"
+msgstr "其他"
+
+#: .\flags\tkact.py:46
+msgid "Miscellaneous collation error occurred."
+msgstr "於校勘過程中發生錯誤。"
+
+#: .\flags\tkact.py:48
+msgid "Empty Content"
+msgstr "自動回覆 - 無內容"
+
+#: .\flags\tkact.py:48
+msgid "The content is empty."
+msgstr "內容為空。"
+
+#: .\flags\tkact.py:85
+msgid "Successfully completed."
+msgstr "程序執行完成。"
+
+#: .\flags\tkact.py:88
+msgid "X: Auto Reply - Channel Registration"
+msgstr "X: 自動回覆 - 登錄頻道"
+
+#: .\flags\tkact.py:89
+msgid "An error occurred during channel registration."
+msgstr "自動回覆組登錄頻道時發生錯誤。"
+
+#: .\flags\tkact.py:91
+msgid "X: Auto Reply - Module Registration"
+msgstr "X: 自動回覆 - 登錄回覆組"
+
+#: .\flags\tkact.py:92
+msgid "An error occurred during module registration."
+msgstr "自動回覆組登錄資料庫時發生錯誤。"
+
+#: .\flags\tkact.py:95
+msgid "X: Identity - Default Profile Registration"
+msgstr "X: 身份管理 - 登錄預設身份組"
+
+#: .\flags\tkact.py:96
+msgid "An error occurred during default profile registration."
+msgstr "登錄預設身份組時發生錯誤。"
+
+#: .\flags\tkact.py:98
+msgid "X: Identity - Channel not found"
+msgstr "X: 身份管理 - 頻道不存在"
+
+#: .\flags\tkact.py:99
+msgid "Channel data not found using the provided information."
+msgstr "沒有對應的頻道資訊。"
+
+#: .\flags\tkact.py:101
+msgid "X: Identity - Channel Error"
+msgstr "X: 身份管理 - 頻道錯誤"
+
+#: .\flags\tkact.py:102
+msgid "An error occurred during channel data acquiring process."
+msgstr "於獲取頻道資訊發生錯誤。"
+
+#: .\flags\tkact.py:104
+msgid "X: Identity - Integration Error"
+msgstr "X: 身份管理 - 整合處理錯誤"
+
+#: .\flags\tkact.py:105
+msgid "An error occurred during user integration."
+msgstr "整合用戶資訊時發生錯誤。"
+
+#: .\flags\tkact.py:107
+msgid "X: Identity - Integration Failed"
+msgstr "X: 身份管理 - 整合失敗"
+
+#: .\flags\tkact.py:108
+msgid "Failed to integrate user identities."
+msgstr "無法整合用戶資訊。"
+
+#: .\flags\tkact.py:111
+msgid "X: Model - Construction"
+msgstr "X: 資料模組 - 建構"
+
+#: .\flags\tkact.py:112 .\mongodb\factory\results\_outcome.py:313
+msgid "An error occurred during model construction."
+msgstr "於建構資料模組時發生錯誤。"
+
+#: .\flags\tkact.py:115
+msgid "X: Process - Not executed"
+msgstr "X: 程序 - 未執行"
+
+#: .\flags\tkact.py:116
+msgid "Token action completion not executed."
+msgstr "代號指令完成手續未執行。"
+
+#: .\flags\weberr.py:31 .\templates\err\info\profile_not_found.html:14
+msgid "Profile Not Found"
+msgstr "身份組不存在"
+
+#: .\mongodb\factory\prof.py:131
+msgid "Default Profile"
+msgstr "預設身份組"
+
+#: .\mongodb\factory\results\_outcome.py:78
+#: .\mongodb\factory\results\_outcome.py:202
+msgid "O: Inserted"
+msgstr "O: 已新增"
+
+#: .\mongodb\factory\results\_outcome.py:78
+msgid "The system returned OK with data inserted to the database."
+msgstr "執行成功。資料已新增至系統。"
+
+#: .\mongodb\factory\results\_outcome.py:80
+msgid "O: Updated"
+msgstr "O: 更新成功"
+
+#: .\mongodb\factory\results\_outcome.py:80
+msgid "The system returned OK with data updated in the database."
+msgstr "執行成功。資料已更新。"
+
+#: .\mongodb\factory\results\_outcome.py:82
+msgid "O: Existed"
+msgstr "O: 已存在"
+
+#: .\mongodb\factory\results\_outcome.py:82
+msgid "The system returned OK with data already existed in the database."
+msgstr "執行成功。資料已存在於系統中。"
+
+#: .\mongodb\factory\results\_outcome.py:84
+msgid "O: Uncategorized"
+msgstr "O: 未分類"
+
+#: .\mongodb\factory\results\_outcome.py:84
+msgid "The system returned OK with uncategorized reason."
+msgstr "執行成功。原因未分類。"
+
+#: .\mongodb\factory\results\_outcome.py:86
+msgid "X: Insufficient Permission"
+msgstr "X: 權限不足"
+
+#: .\mongodb\factory\results\_outcome.py:87
+msgid "The insertion was failed becuase the permission is insufficient."
+msgstr "執行失敗。使用者權限不足。"
+
+#: .\mongodb\factory\results\_outcome.py:89
+msgid "X: Channel Type Unidentifiable"
+msgstr "X: 頻道種類無法辨識"
+
+#: .\mongodb\factory\results\_outcome.py:90
+msgid ""
+"The channel type is unidentifiable using the provided token and platform."
+msgstr "無法使用既有的頻道識別碼和平台辨認頻道種類。"
+
+#: .\mongodb\factory\results\_outcome.py:92
+msgid "X: on Registering Channel"
+msgstr "X: 頻道登錄處理"
+
+#: .\mongodb\factory\results\_outcome.py:93
+msgid "The insertion was failed while registering the identity of channel."
+msgstr "執行失敗。於登錄頻道時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:95
+msgid "X: on Registering OnPlatform User"
+msgstr "X: 登錄平台用戶身份"
+
+#: .\mongodb\factory\results\_outcome.py:96
+msgid ""
+"The insertion was failed while registering the identity of on-platform user."
+msgstr "執行失敗。於登錄平台用戶身份時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:98
+msgid "X: on Registering API User"
+msgstr "X: 登錄API用戶身份"
+
+#: .\mongodb\factory\results\_outcome.py:99
+msgid "The insertion was failed while registering the identity of API user."
+msgstr "執行失敗。於登錄API用戶身份時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:101
+msgid "X: on Connecting OnPlatform User"
+msgstr "X: 連結平台用戶身份"
+
+#: .\mongodb\factory\results\_outcome.py:102
+msgid ""
+"The insertion was failed while connecting the identity of on-platform user."
+msgstr "執行失敗。於連結平台用戶身份時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:104
+msgid "X: on Connecting API User"
+msgstr "X: 連結API用戶身份"
+
+#: .\mongodb\factory\results\_outcome.py:105
+msgid "The insertion was failed while connecting the identity of API user."
+msgstr "執行失敗。於連結API用戶身份時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:107
+msgid "X: on Setting Config"
+msgstr "X: 設定配置"
+
+#: .\mongodb\factory\results\_outcome.py:108
+msgid ""
+"An error occurred when trying to set the config after the default profile is "
+"generated."
+msgstr "產生預設身份組後，嘗試更改頻道設定時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:110
+msgid "X: Not Serializable"
+msgstr "X: 無法封裝"
+
+#: .\mongodb\factory\results\_outcome.py:111
+msgid "The processed data cannot be serialized."
+msgstr "執行失敗。資料無法封裝。"
+
+#: .\mongodb\factory\results\_outcome.py:113
+msgid "X: Not Acknowledged"
+msgstr "X: 資料庫不接受"
+
+#: .\mongodb\factory\results\_outcome.py:114
+msgid "The database did not acknowledge the inserted data."
+msgstr "執行失敗。資料庫未接受要新增的資料。"
+
+#: .\mongodb\factory\results\_outcome.py:116
+msgid "X: Not Found"
+msgstr "X: 不存在"
+
+#: .\mongodb\factory\results\_outcome.py:117
+msgid "The condition to update/insert does not match any data in the database."
+msgstr "執行失敗。指定的更新/新增條件不符合任何資料庫中的資料。"
+
+#: .\mongodb\factory\results\_outcome.py:119
+msgid "X: Not Model"
+msgstr "X: 非資料模組"
+
+#: .\mongodb\factory\results\_outcome.py:120
+msgid "The processed data is not in the shape of a data model."
+msgstr "執行失敗。資料結構和預定的資料模組不符。"
+
+#: .\mongodb\factory\results\_outcome.py:122
+msgid "X: Invalid Model"
+msgstr "X: 無效資料模組"
+
+#: .\mongodb\factory\results\_outcome.py:123
+msgid "Some data of the model is invalid."
+msgstr "部分資料模組內的資訊無效。"
+
+#: .\mongodb\factory\results\_outcome.py:125
+msgid "X: Readonly"
+msgstr "X: 唯讀"
+
+#: .\mongodb\factory\results\_outcome.py:126
+msgid "There are some fields that are being attempted to modify are read-only."
+msgstr "執行失敗。嘗試更改唯讀的資料欄位。"
+
+#: .\mongodb\factory\results\_outcome.py:128
+msgid "X: Type Mismatch"
+msgstr "X: 型態不符"
+
+#: .\mongodb\factory\results\_outcome.py:129
+msgid ""
+"The type of the data to update does not match the type of the field to be "
+"modified."
+msgstr "執行失敗。資料欄位的資料型態與預期不符。"
+
+#: .\mongodb\factory\results\_outcome.py:131
+msgid "X: Invalid Data"
+msgstr "X: 資料無效"
+
+#: .\mongodb\factory\results\_outcome.py:132
+msgid "The data to be updated is invalid for the field."
+msgstr "執行失敗。欲更新的資料無效。"
+
+#: .\mongodb\factory\results\_outcome.py:134
+msgid "X: Casting Failed"
+msgstr "X: 轉型失敗"
+
+#: .\mongodb\factory\results\_outcome.py:135
+msgid ""
+"The data cannot be casted to the desired type. Check the datatype of the "
+"provided data."
+msgstr "資料無法被轉成目標資料型態。請檢查資料的資料型態。"
+
+#: .\mongodb\factory\results\_outcome.py:137
+msgid "X: Missing in Cache, Attempted Insertion"
+msgstr "X: 快取內不存在/已嘗試新增"
+
+#: .\mongodb\factory\results\_outcome.py:138
+#: .\mongodb\factory\results\_outcome.py:206
+msgid ""
+"The data was not found and the system has attempted to insert a new data but "
+"failed."
+msgstr "執行失敗。資料不存在於系統快取中，已嘗試新增但失敗。"
+
+#: .\mongodb\factory\results\_outcome.py:140
+msgid "X: Missing in Cache, Aborted Insertion"
+msgstr "X: 快取內不存在/未嘗試新增"
+
+#: .\mongodb\factory\results\_outcome.py:141
+#: .\mongodb\factory\results\_outcome.py:209
+msgid "The data was not found and the system aborted to insert a new data."
+msgstr "執行失敗。資料不存在於系統快取中，系統未嘗試新增。"
+
+#: .\mongodb\factory\results\_outcome.py:143
+msgid "X: Model Construction Unknown"
+msgstr "X: 不明(資料建構)"
+
+#: .\mongodb\factory\results\_outcome.py:144
+msgid "An unknown occurred during the construction of a data model."
+msgstr "執行失敗。於資料建構的過程中發生不明的錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:146
+msgid "X: Insertion Unknown"
+msgstr "X: 不明(新增資料)"
+
+#: .\mongodb\factory\results\_outcome.py:147
+msgid "An unknown occurred while inserting the data."
+msgstr "執行失敗。於新增資料的過程中發生不明的錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:149
+#: .\mongodb\factory\results\_outcome.py:229
+#: .\mongodb\factory\results\_outcome.py:315
+#: .\mongodb\factory\results\_outcome.py:359
+msgid "X: Not Executed"
+msgstr "X: 未執行"
+
+#: .\mongodb\factory\results\_outcome.py:150
+msgid "The insertion process had not been executed."
+msgstr "資料新增程序未執行。"
+
+#: .\mongodb\factory\results\_outcome.py:152
+msgid "X: Exception Occurred"
+msgstr "X: 發生錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:153
+msgid "An exception occurred during execution."
+msgstr "執行時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:199
+msgid "O: From Cache/DB"
+msgstr "O: 資料庫/快取中"
+
+#: .\mongodb\factory\results\_outcome.py:200
+msgid "The data was found in either Cache or Database."
+msgstr "資料於快取或資料庫中被找到。"
+
+#: .\mongodb\factory\results\_outcome.py:203
+msgid "The data was not found yet the data has been inserted to the database."
+msgstr "資料不存在，但系統已自動新增置資料庫。"
+
+#: .\mongodb\factory\results\_outcome.py:205
+msgid "X: Not Found, Attempted Insertion"
+msgstr "X: 不存在/已嘗試新增"
+
+#: .\mongodb\factory\results\_outcome.py:208
+msgid "X: Not Found, Aborted Insertion"
+msgstr "X: 不存在/未嘗試新增"
+
+#: .\mongodb\factory\results\_outcome.py:211
+msgid "X: Not found on 1st query"
+msgstr "X: 第一指令"
+
+#: .\mongodb\factory\results\_outcome.py:212
+msgid "The data was not found for the 1st query."
+msgstr "執行失敗。第一次獲取指令找不到資料。"
+
+#: .\mongodb\factory\results\_outcome.py:214
+msgid "X: Not found on 2nd query"
+msgstr "X: 第二指令"
+
+#: .\mongodb\factory\results\_outcome.py:215
+msgid "The data was not found for the 2nd query."
+msgstr "執行失敗。第二次獲取指令找不到資料。"
+
+#: .\mongodb\factory\results\_outcome.py:217
+msgid "X: Empty Content"
+msgstr "X:  無內容"
+
+#: .\mongodb\factory\results\_outcome.py:218
+msgid "The content in the parameter is empty."
+msgstr "參數的內容為空。"
+
+#: .\mongodb\factory\results\_outcome.py:220
+#: .\mongodb\factory\results\_outcome.py:300
+msgid "X: Channel Not Found"
+msgstr "X: 頻道不存在"
+
+#: .\mongodb\factory\results\_outcome.py:221
+msgid ""
+"Channel data not found. Use the channel token and platform to register the "
+"channel first."
+msgstr "沒有找到對應的頻道資訊。請先提供頻道代號和所在平台以登錄頻道資訊。"
+
+#: .\mongodb\factory\results\_outcome.py:223
+msgid "X: Config Error"
+msgstr "X: 設定錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:224
+msgid "An error occurred when getting configuration from the channel data."
+msgstr "於獲得頻道設定時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:226
+msgid "X: Default Profile Error"
+msgstr "X: 預設身份組錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:227
+msgid "An error occurred when creating a default profile."
+msgstr "於創建預設身份組時發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:230
+msgid "The acquiring process had not been executed."
+msgstr "資料獲取程序未執行。"
+
+#: .\mongodb\factory\results\_outcome.py:276
+msgid "O: Completed"
+msgstr "O: 已完成"
+
+#: .\mongodb\factory\results\_outcome.py:277
+msgid "The operation was successfully completed."
+msgstr "程序執行完成。"
+
+#: .\mongodb\factory\results\_outcome.py:279
+msgid "X: Token Not Found"
+msgstr "X: 代號不存在"
+
+#: .\mongodb\factory\results\_outcome.py:280
+msgid "No enqueued token action found using the specified token."
+msgstr "沒有找到對應的代號指令。"
+
+#: .\mongodb\factory\results\_outcome.py:282
+msgid "X: Keys Lacking"
+msgstr "X: 參數短少"
+
+#: .\mongodb\factory\results\_outcome.py:283
+msgid "There are keys lacking so that the token action cannot be completed."
+msgstr "因完成代號指令所需要的參數有缺，故指令執行失敗。"
+
+#: .\mongodb\factory\results\_outcome.py:285
+msgid "X: Completion Failed"
+msgstr "X: 完成手續失敗"
+
+#: .\mongodb\factory\results\_outcome.py:286
+msgid "The action completion was failed."
+msgstr "完成手續執行失敗。"
+
+#: .\mongodb\factory\results\_outcome.py:288
+msgid "X: No Complete Action"
+msgstr "X: 無對應完成手續"
+
+#: .\mongodb\factory\results\_outcome.py:289
+msgid "No complete action implemented yet for the provided action type."
+msgstr "代號指令所對應的完成手續尚未完成。"
+
+#: .\mongodb\factory\results\_outcome.py:291
+msgid "X: Completion Error"
+msgstr "X: 完成手續錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:292
+msgid "An error occurred during action completion process."
+msgstr "執行完成手續時發生了不明的錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:294
+msgid "X: Empty Token"
+msgstr "X: 空代號"
+
+#: .\mongodb\factory\results\_outcome.py:295
+msgid "The token is empty."
+msgstr "代號為空。"
+
+#: .\mongodb\factory\results\_outcome.py:297
+msgid "X: Collation Error"
+msgstr "X: 校勘錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:298
+msgid "An error occurred during parameter collation process."
+msgstr "於參數校勘的過程中發生了不明的錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:301
+msgid "Channel was not found using the given Channel ID."
+msgstr "頻道ID沒有對應的頻道資訊。"
+
+#: .\mongodb\factory\results\_outcome.py:303
+msgid "X: Source = Destination"
+msgstr "X: 來源和目標相同"
+
+#: .\mongodb\factory\results\_outcome.py:304
+msgid "Source user identity is equal to the destination user identity."
+msgstr "來源用戶資訊和目標用戶資訊相同。"
+
+#: .\mongodb\factory\results\_outcome.py:306
+msgid "X: Source Data Not Found"
+msgstr "X: 找不到來源用戶資訊"
+
+#: .\mongodb\factory\results\_outcome.py:307
+msgid "Source user identity data not found."
+msgstr "找不到來源用戶資訊。"
+
+#: .\mongodb\factory\results\_outcome.py:309
+msgid "X: Destination Data Not Found"
+msgstr "X: 找不到目標用戶資訊"
+
+#: .\mongodb\factory\results\_outcome.py:310
+msgid "Destination user identity data not found."
+msgstr "找不到目標用戶資訊。"
+
+#: .\mongodb\factory\results\_outcome.py:312
+msgid "X: Construction Error"
+msgstr "X: 建構錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:316
+#: .\mongodb\factory\results\_outcome.py:360
+msgid "The operation had not been executed."
+msgstr "程序未執行。"
+
+#: .\mongodb\factory\results\_outcome.py:318
+msgid "X: Not Updated"
+msgstr "X: 未更新"
+
+#: .\mongodb\factory\results\_outcome.py:319
+msgid "Update operation not performed."
+msgstr "更新處理未完成。"
+
+#: .\mongodb\factory\results\_outcome.py:321
+msgid "X: Not Deleted"
+msgstr "X: 未刪除"
+
+#: .\mongodb\factory\results\_outcome.py:322
+msgid "Delete operation not performed."
+msgstr "刪除處理未完成。"
+
+#: .\mongodb\factory\results\_outcome.py:324
+msgid "X: Error"
+msgstr "X: 錯誤"
+
+#: .\mongodb\factory\results\_outcome.py:325
+msgid "An error has occurred during the process execution."
+msgstr "於程序執行中發生錯誤。"
+
+#: .\mongodb\factory\results\_outcome.py:353
+msgid "O: Success"
+msgstr "O: 成功"
+
+#: .\mongodb\factory\results\_outcome.py:354
+msgid "The updating operation succeed."
+msgstr "更新手續執行成功。"
+
+#: .\mongodb\factory\results\_outcome.py:356
+msgid "X: Not found"
+msgstr "X: 不存在"
+
+#: .\mongodb\factory\results\_outcome.py:357
+msgid "The data for updating is not found."
+msgstr "執行失敗。找不到符合條件的資料更新。"
+
+#: .\msghandle\botcmd\command\_base_.py:255
+msgid "No description provided."
+msgstr "沒有敘述。"
+
+#: .\msghandle\botcmd\command\_base_.py:349
+msgid ""
+"Command not allowed to use under this channel type: {}\n"
+"Please use the command under either one of these channel types: {}"
+msgstr ""
+"指令無法在此頻道種類中使用: {}\n"
+"請在下列任一種頻道種類中使用此指令: {}"
+
+#: .\msghandle\botcmd\command\id.py:7
+msgid "Information"
+msgstr "資訊"
+
+#: .\msghandle\botcmd\command\id.py:8
+msgid ""
+"Check the information of various things (see the description section for "
+"more details)."
+msgstr "查閱各項資訊。(閱讀敘述已獲得更多詳細資訊)"
+
+#: .\msghandle\botcmd\command\id.py:13
+msgid "Check the user info of self."
+msgstr "查閱自己的使用者資訊。"
+
+#: .\msghandle\botcmd\command\id.py:15
+msgid "User ID: `{}`"
+msgstr "使用者ID: `{}`"
+
+#: .\msghandle\botcmd\command\id.py:18
+msgid "Check the channel info."
+msgstr "查閱頻道資訊。"
+
+#: .\msghandle\botcmd\command\id.py:20
+msgid ""
+"Channel ID: `{}`\n"
+"Channel Token: `{}`"
+msgstr ""
+"頻道ID: `{}`\n"
+"頻道識別碼: `{}`"
+
+#: .\msghandle\botcmd\command\trfm.py:7
+msgid "Transform/Replace"
+msgstr "轉型/替換"
+
+#: .\msghandle\botcmd\command\trfm.py:7
+msgid "Transform/Replace the given text."
+msgstr "轉型/替換提供的文字。"
+
+#: .\msghandle\botcmd\command\trfm.py:12
+msgid "String to be replaced."
+msgstr "要被替換的文字。"
+
+#: .\msghandle\botcmd\command\trfm.py:13
+msgid "Replace the real newline character to be the escaped character \\n."
+msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
+
+#: .\msghandle\botcmd\command\uintg.py:13
+msgid "User Integrate"
+msgstr "整合用戶資料"
+
+#: .\msghandle\botcmd\command\uintg.py:13
+msgid "Controls related to user identity integration."
+msgstr "與用戶資料整合有關的行為。"
+
+#: .\msghandle\botcmd\command\uintg.py:17
+msgid "Issue a token for user identity integration."
+msgstr "獲取一條代號以整合用戶資訊。"
+
+#: .\msghandle\botcmd\command\uintg.py:21
+msgid ""
+"User Identity Integration Enqueued.\n"
+"Token: `{}`\n"
+"Expiry: `{}`\n"
+"\n"
+"Please record the token and go to {}{} to complete the integration."
+msgstr ""
+"用戶資訊整合手續已就緒。\n"
+"代碼: `{}`\n"
+"於 `{}` 前有效\n"
+"\n"
+"請記下代碼，然後到{}{}提交代碼以完成整合手續。"
+
+#: .\msghandle\botcmd\command\uintg.py:26
+msgid ""
+"Token action not enqueued.\n"
+"Result: {}\n"
+"Exception: {}"
+msgstr ""
+"用戶資訊整合手續準備失敗。\n"
+"結果: {}\n"
+"錯誤: {}"
+
+#: .\msghandle\models\out_plat.py:16
+msgid "Message length overlimit."
+msgstr "訊息長度超過限制。"
+
+#: .\msghandle\models\out_plat.py:17
+msgid "Responses length overlimit."
+msgstr "超過回覆內容長度限制。"
+
+#: .\msghandle\models\out_plat.py:18
+msgid "Too many lines."
+msgstr "訊息行數過多。"
+
+#: .\msghandle\models\out_plat.py:19
+msgid "LaTeX available."
+msgstr "有LaTeX內容。"
+
+#: .\msghandle\models\out_plat.py:41
+msgid ""
+"{} content(s) was recorded to the database because of the following "
+"reason(s):{}\n"
+"URL: {}"
+msgstr ""
+"{}筆內容已因下列原因存至資料庫:{}\n"
+"閱覽網址: {}"
+
+#: .\msghandle\models\out_plat.py:57
+msgid ""
+"Content(s) is supposed to be recorded to database but failed. An error "
+"report should be sent for investigation."
+msgstr "訊息內容寫入資料庫失敗。錯誤報告已傳送給開發者以便除錯。"
+
+#: .\templates\about.html:9
+msgid "Contact"
+msgstr "聯絡"
+
+#: .\templates\about.html:18
+msgid "Email"
+msgstr "電子信箱"
+
+#: .\templates\about.html:23
+msgid "Build"
+msgstr "組建"
+
+#: .\templates\about.html:25
+msgid "Beta"
+msgstr "Beta測試"
+
+#: .\templates\about.html:26
+msgid ""
+"Usually, this build has new features, but contains more bugs than Stable."
+"<br> Some translations may be incompleted."
+msgstr ""
+"通常，此版本會有新的功能，但是可能比穩定版有更多的Bug。<br>部分內容的翻譯可能"
+"未完成。"
+
+#: .\templates\about.html:30 .\templates\about.html:53
+msgid "Deployed on "
+msgstr "部署於 "
+
+#: .\templates\about.html:32 .\templates\about.html:55
+msgid "Heroku Released on "
+msgstr "Heroku部署於 "
+
+#: .\templates\about.html:40 .\templates\about.html:63
+msgid "Website"
+msgstr "網站"
+
+#: .\templates\about.html:48
+msgid "Stable"
+msgstr "穩定"
+
+#: .\templates\about.html:49
+msgid ""
+"Only features believed that will not cause problems will appear on this "
+"build.<br> Bugs should be less than the Beta build, and the translations "
+"should be completed."
+msgstr ""
+"只有確定穩定的功能會出現在這個版本。<br>這個版本會有比較少的Bug，並且通常不會"
+"有未翻譯的文本。"
+
+#: .\templates\about.html:72
+msgid ""
+"Both Beta and Stable build share the same database.<br> If an operation on "
+"the Beta build caused the data corrupted, the data will be temporarily "
+"removed for pending repair, and it will be temporarily inaccessible. Please "
+"contact the website developer as soon as possible if you think this "
+"happened. The data will be added back to the database once the website "
+"developer fixed it."
+msgstr ""
+"測試版和穩定版使用同一個資料庫。<br>如果在測試版上執行一個指令，並造成資料損"
+"毀，資料會暫時從資料庫移除，並等待修復。該筆資料會暫時無法存取。若發生此情"
+"形，請盡速聯絡開發者。資料將會在修復後回到資料庫中。"
+
+#: .\templates\about.html:86
+msgid "System"
+msgstr "系統"
+
+#: .\templates\about.html:90
+msgid "GitHub Repository"
+msgstr "GitHub Repo"
+
+#: .\templates\about.html:92
+msgid "Deployed on"
+msgstr "部署於"
+
+#: .\templates\about.html:94 .\templates\account\settings.html:58
+msgid "Language"
+msgstr "語言"
+
+#: .\templates\about.html:96
+msgid "Backend Framework"
+msgstr "後台框架"
+
+#: .\templates\about.html:98 .\templates\about.html:100
+msgid "Frontend framework"
+msgstr "前台框架"
+
+#: .\templates\about.html:102
+msgid "Database"
+msgstr "資料庫"
+
+#: .\templates\account\channel\list.html:19
+#, python-format
+msgid ""
+"If you:<br> <ul> <li> Cannot find the desired channel to manage: <br> "
+"<small>Please go to the <a href=\"%(reg_url)s\">register page</a> to "
+"register your channel membership.</small> </li> <li> Do not know how to "
+"determine what is the desired channel to manage: <br> <small>If using the "
+"official handled port, please check <a href=\"%(ch_info_url)s\">this page</"
+"a> to see how to check the current channel info.<br> If NOT using the "
+"official handled port, please check the guide of the corresponding bot to "
+"know how to check the channel token or channel id (The bot maker may not "
+"implement this).</small> </li> </ul>"
+msgstr ""
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
+"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
+"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
+"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代號的方法。<br>如果<b>沒有</b>使"
+"用官方處理端口，請查閱處理端口的頻道代號獲取說明或聯繫該端口作者。請注意，作"
+"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
+
+#: .\templates\account\channel\list_table.html:13
+#: .\templates\ar\add-reg.html:65 .\templates\info\profile.html:21
+msgid "Name"
+msgstr "名稱"
+
+#: .\templates\account\channel\list_table.html:14
+#: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
+#: .\templates\info\channel.html:21 .\templates\info\profile.html:44
+msgid "Channel ID"
+msgstr "頻道ID"
+
+#: .\templates\account\channel\list_table.html:15
+#: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
+#: .\templates\ar\add-reg.html:149
+msgid "Channel Token"
+msgstr "頻道代號"
+
+#: .\templates\account\channel\list_table.html:16
+msgid "Controls"
+msgstr "頻道控制"
+
+#: .\templates\account\channel\list_table.html:37
+#: .\templates\account\main.html:78 .\templates\info\channel.html:32
+msgid "Manage"
+msgstr "管理"
+
+#: .\templates\account\channel\list_table.html:42
+#: .\templates\account\channel\manage.html:31
+msgid "Profiles"
+msgstr "身份組"
+
+#: .\templates\account\channel\manage.html:15 .\templates\account\main.html:16
+#: .\templates\info\channel.html:15 .\templates\info\profile.html:15
+msgid "Basic Information"
+msgstr "基本資訊"
+
+#: .\templates\account\channel\manage.html:48
+msgid "Permissions and Controls"
+msgstr "權限 / 相關控制"
+
+#: .\templates\account\channel\perm\1.html:2
+msgid "No operations available."
+msgstr "無可用操作。"
+
+#: .\templates\account\channel\register.html:8
+msgid "Confirm Channel Membership"
+msgstr "確認頻道成員身份"
+
+#: .\templates\account\channel\register.html:16
+msgid "Main Method"
+msgstr "主要方法"
+
+#: .\templates\account\channel\register.html:22
+msgid ""
+"Type any message in the channel where Jelly Bot has connected to it, Jelly "
+"Bot will automatically confirm the user's membership in the channel."
+msgstr ""
+"於小水母有連接偵測端口的地方輸入任何訊息，小水母會自動登錄使用者的頻道成員身"
+"份。"
+
+#: .\templates\account\channel\register.html:36
+msgid "Alternative Method"
+msgstr "替代方法"
+
+#: .\templates\account\channel\register.html:43
+msgid ""
+"In case the main method doesn't work, please get a token below, then use it "
+"to complete the registration at where Jelly Bot supports using <b>Complete "
+"Token Action</b> function."
+msgstr ""
+"如果主要方法無法使用，請於下方獲取一條代號，然後於可以<b>完成代號指令</b>的地"
+"方提交代號。"
+
+#: .\templates\account\channel\register.html:49
+msgid "This token will only grants you a default permission profile."
+msgstr "這個代號只會給你預設身份組。"
+
+#: .\templates\account\channel\register.html:51
+#, python-format
+msgid ""
+"For non-default permission profile, please <a class=\"text-white alert-link"
+"\" href=\"%(list_url)s\">click here</a> and create a profile if allowed."
+msgstr ""
+"若要非預設身份組，且擁有建立身份組的權限，請<a class=\"text-white alert-link"
+"\" href=\"%(list_url)s\">點此</a>以建立。"
+
+#: .\templates\account\channel\register.html:55
+msgid "Certain permissions need channel managers to control."
+msgstr "部分權限必須由頻道管理員更動。"
+
+#: .\templates\account\channel\register.html:68
+msgid "Get one"
+msgstr "獲取"
+
+#: .\templates\account\channel\register.html:73
+#, python-format
+msgid "Token can only be acquired once %(register_cooldown)s seconds."
+msgstr "每 %(register_cooldown)s 秒只能獲取一次代號。"
+
+#: .\templates\account\channel\register.html:80
+msgid "An error occurred during token acquiring process."
+msgstr "獲取代號時發生錯誤。"
+
+#: .\templates\account\channel\register.html:106
+msgid "An error occurred."
+msgstr "發生錯誤。"
+
+#: .\templates\account\integrate.html:9
+msgid "User Identity Integration"
+msgstr "整合用戶資料"
+
+#: .\templates\account\integrate.html:19
+msgid "Token Input"
+msgstr "輸入代號"
+
+#: .\templates\account\integrate.html:23
+#, python-format
+msgid ""
+"<p> Input the token acquired for user identity integration below.<br> Check "
+"<a href=\"%(cmd_url)s\">this page</a> for how to initiate the user identity "
+"integration process.<br> Account related data such as locale configuration "
+"on the account where you get the token will be discarded, only the data on "
+"the website will be kept. </p>"
+msgstr ""
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的代碼。<br> 查閱 <a href="
+"\"%(cmd_url)s\">此頁面</a> 以知道如何啟動用戶資料整合手續。<br> 綁定於獲取代"
+"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
+"定所取代。 </p>"
+
+#: .\templates\account\integrate.html:34
+msgid "Integration Token"
+msgstr "整合代碼"
+
+#: .\templates\account\integrate.html:37 .\templates\ar\add.html:39
+msgid "Submit"
+msgstr "提交"
+
+#: .\templates\account\integrate.html:42
+msgid "Provide a token to complete user identity integration."
+msgstr "提交代碼以完成用戶資料整合手續。"
+
+#: .\templates\account\integrate.html:44
+msgid "User identity integration succeed."
+msgstr "用戶資料整合成功。"
+
+#: .\templates\account\integrate.html:46
+msgid "User identity integration failed."
+msgstr "用戶資料整合失敗。"
+
+#: .\templates\account\login.html:18
+msgid ""
+"To use the features on the website, we will collect some data from your "
+"account."
+msgstr "使用網站上的功能前，我們將會從你的帳號中蒐集部分資料。"
+
+#: .\templates\account\login.html:22
+msgid "The data we will collect are:"
+msgstr "我們會蒐集的資訊是:"
+
+#: .\templates\account\login.html:24
+msgid "Your email (if applicable)"
+msgstr "您的email(如果可獲取)"
+
+#: .\templates\account\login.html:25
+msgid "Your unique user ID"
+msgstr "藉由第三方服務提供給我們使用的您的獨特使用者ID"
+
+#: .\templates\account\login.html:30
+msgid ""
+"Select a service to login, which also means that you agree the things above."
+msgstr "選擇下列任一第三方服務以登入，同時，也代表您同意上述事項。"
+
+#: .\templates\account\login.html:43
+msgid ""
+"The identity collection technique used is based on Google Sign-In for "
+"Websites."
+msgstr "此登入系統框架為 Google Sign-In for Websites。"
+
+#: .\templates\account\login.html:44
+msgid "Link"
+msgstr "連結"
+
+#: .\templates\account\logout.html:10
+msgid "Logging out..."
+msgstr "登出中..."
+
+#: .\templates\account\main.html:8
+msgid "Account Info"
+msgstr "帳號資訊"
+
+#: .\templates\account\main.html:21
+msgid "Google Account"
+msgstr "Google 帳號"
+
+#: .\templates\account\main.html:25 .\templates\account\main.html:39
+msgid "API Key"
+msgstr "API 密鑰"
+
+#: .\templates\account\main.html:31
+msgid "Click to display"
+msgstr "點擊以顯示"
+
+#: .\templates\account\main.html:50 .\templates\ar\add-modal.html:14
+msgid "Close"
+msgstr "關閉"
+
+#: .\templates\account\main.html:63
+msgid "Pending Token Actions"
+msgstr "尚未完成的代號指令"
+
+#: .\templates\account\main.html:71
+msgid "Channel Controls"
+msgstr "頻道相關"
+
+#: .\templates\account\main.html:75
+msgid "Register Membership"
+msgstr "註冊頻道成員"
+
+#: .\templates\account\main.html:84
+msgid "Account Controls"
+msgstr "帳號管理"
+
+#: .\templates\account\main.html:88
+msgid "Integrate"
+msgstr "整合"
+
+#: .\templates\account\settings.html:18
+msgid "Profile"
+msgstr "個人資料"
+
+#: .\templates\account\settings.html:22
+msgctxt "Profile Name"
+msgid "Name"
+msgstr "名稱"
+
+#: .\templates\account\settings.html:35
+msgid "Preferences"
+msgstr "偏好設定"
+
+#: .\templates\account\settings.html:41 .\templates\account\settings.html:58
+msgid "This will affect the displays of timezone."
+msgstr "此設定會影響顯示的時區。"
+
+#: .\templates\account\settings.html:41
+msgid "Locale"
+msgstr "地區"
+
+#: .\templates\account\settings.html:79
+msgid "Update"
+msgstr "更新"
+
+#: .\templates\ar\add-js.html:196
+msgid ""
+"let overlimit = `The content length of <b>${txtareaFor}</b> is overlimit. "
+"(Limit: ${valMax} / Current: <b>${valNow})</b>`;"
+msgstr ""
+"let overlimit = `<b>${txtareaFor}</b>的長度內容已超過限制。(最大長度: "
+"${valMax} / 目前長度: <b>${valNow})</b>`;"
+
+#: .\templates\ar\add-js.html:209
+msgid "Channel validation failed. Recheck the input channel info."
+msgstr "頻道資訊驗證失敗。請檢查輸入的頻道資訊。"
+
+#: .\templates\ar\add-js.html:217
+msgid ""
+"Select a channel in Registration > Channel Member for use of the module."
+msgstr "請於 註冊 > 頻道成員 中選擇此回覆組的所屬頻道。"
+
+#: .\templates\ar\add-main.html:4
+msgid "Main Settings"
+msgstr "主設定"
+
+#: .\templates\ar\add-main.html:8 .\templates\ar\add-main.html:9
+msgid "Keyword"
+msgstr "關鍵字"
+
+#: .\templates\ar\add-main.html:11
+msgid ""
+"The word to trigger the Auto-Reply module. Note that this is case-sensitive."
+msgstr "觸發回覆組用的字串。請注意，英文內容不分大小寫。"
+
+#: .\templates\ar\add-main.html:24 .\templates\ar\add-main.html:26
+msgid "Response"
+msgstr "回覆"
+
+#: .\templates\ar\add-main.html:28
+msgid "The word to reply when the module is triggered."
+msgstr "當回覆組被觸發時，回覆的字串。"
+
+#: .\templates\ar\add-modal.html:7
+msgid "Submission Message"
+msgstr "提交訊息"
+
+#: .\templates\ar\add-notes.html:4
+msgid "Notes"
+msgstr "備註"
+
+#: .\templates\ar\add-notes.html:6
+msgid "Content Type"
+msgstr "內容種類"
+
+#: .\templates\ar\add-notes.html:8
+msgid ""
+"To let the content be valid, the content should be in the format described "
+"below corresponds to the content type."
+msgstr "為了使內容有效，內容必須遵照下列所對應的格式。"
+
+#: .\templates\ar\add-notes.html:15
+msgid ""
+"<small>Could be anything, but the <b>length cannot be over 2000.</b></"
+"small><br> <small>The content <b>could use markdown syntax</b>. The outcome "
+"depends on the platform. For LINE, it's support is very limited, while on "
+"Discord, it supports most basic syntax.</small>"
+msgstr ""
+"<small>可以是任何文字，但是<b>長度不得超過2000字</b>。</small><br> <small>內"
+"容可以<b>使用Markdown語法</b>，但是顯示的結果會根據機器人所在平台有所不同。舉"
+"例來說，在LINE上，顯示的成果非常有限；但是在Discord上，基本語法的顯示效果都會"
+"出現。</small>"
+
+#: .\templates\ar\add-notes.html:23
+msgid ""
+"<small>The main MIME type should be <code>image</code>. In the other words, "
+"when you open then link, the browser should <b>just give you an image</b> "
+"not a web page. </small>"
+msgstr ""
+"<small>主多媒體種類(MIME type)必須為圖片(image)。也就是說，當連結被開啟時，瀏"
+"覽器<b>只會顯示圖片，而不是網頁</b>。</small>"
+
+#: .\templates\ar\add-notes.html:34
+msgid ""
+"<small>Should be a sticker ID. Usually the ID will be a <b>1~11 digits "
+"number</b>. </small>"
+msgstr "<small>必須是貼圖ID。貼圖ID通常由一組<b>1~11位數字</b>組成。</small>"
+
+#: .\templates\ar\add-props.html:4
+msgid "Properties"
+msgstr "屬性"
+
+#: .\templates\ar\add-props.html:7
+msgid ""
+"You must have the access pinned module permission in the channel to "
+"configure this."
+msgstr "你必須擁有更動置頂回復組的權限以調整此設定。"
+
+#: .\templates\ar\add-props.html:12
+msgid "Pinned"
+msgstr "置頂"
+
+#: .\templates\ar\add-props.html:14
+msgid ""
+"If the module is pinned, it can only be overwritten by another pinned module."
+msgstr "若回覆組已被置頂，則該回覆組只能被其他置頂回覆組覆寫。"
+
+#: .\templates\ar\add-props.html:24
+msgid "Private"
+msgstr "私人"
+
+#: .\templates\ar\add-props.html:26
+msgid "The module can only be used and searched within its channel."
+msgstr "此回覆組只可在所屬頻道內使用和被搜尋。"
+
+#: .\templates\ar\add-props.html:33
+msgid "Tags"
+msgstr "標籤"
+
+#: .\templates\ar\add-props.html:36
+msgid ""
+"Tag can be used to categorize auto-reply modules. Mostly bringing "
+"convenience to copy modules to the other channel."
+msgstr ""
+"標籤可以將自動回覆組分類。於複製回覆組至其他頻道時可以藉由標籤篩選以增加便利"
+"性。"
+
+#: .\templates\ar\add-props.html:41
+msgid "Selected Tags"
+msgstr "已選擇的標籤"
+
+#: .\templates\ar\add-props.html:42
+msgid "Click on the unwanted tag to remove."
+msgstr "點擊標籤以移除。"
+
+#: .\templates\ar\add-props.html:44
+msgid "No tags have been selected."
+msgstr "沒有選擇任何標籤。"
+
+#: .\templates\ar\add-props.html:50
+msgid "Popular Tags"
+msgstr "熱門標籤"
+
+#: .\templates\ar\add-props.html:51
+msgid "Click on the tag to select."
+msgstr "點擊標籤以選擇。"
+
+#: .\templates\ar\add-props.html:54
+msgid "No tags have been created. Try to create a new one!"
+msgstr "沒有標籤已存在。試著建立新標籤吧！"
+
+#: .\templates\ar\add-props.html:61
+msgid "Search Tags"
+msgstr "搜尋標籤"
+
+#: .\templates\ar\add-props.html:62
+msgid "Click on the tag to add."
+msgstr "點擊標籤以新增。"
+
+#: .\templates\ar\add-props.html:66
+msgid ""
+"<ul> <li>Searching keyword can be a <a href=\"https://regexr.com/\">Regular "
+"Expression</a>. </li> <li>If the desired result is not found, try to narrow "
+"down the keyword. </li> <li>If the tag is not found, a newly created tag "
+"will be one of the searching result. </li> </ul>"
+msgstr ""
+"<ul> <li>搜尋的字串可以是<a href=\"https://regexr.com/\">正規表達式</a>。</"
+"li> <li>如果沒有找到想要的結果，請試著縮小搜尋範圍。</li> <li>如果標籤沒有在"
+"資料庫中，則新標籤會是搜尋結果的其中之一。</li> </ul>"
+
+#: .\templates\ar\add-props.html:83
+msgid "Tag Keyword"
+msgstr "標籤關鍵字"
+
+#: .\templates\ar\add-props.html:86
+#, python-format
+msgid ""
+"Make sure that the Tag searching keyword does NOT contains "
+"'%(tag_splittor)s' and NOT empty."
+msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splittor)s 並且不是空字串。"
+
+#: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:19
+#: .\templates\components\navbar.html:20
+msgid "Search"
+msgstr "搜尋"
+
+#: .\templates\ar\add-props.html:100 .\templates\ar\add-props.html:118
+#: .\templates\ar\add-props.html:119
+msgid "Cooldown"
+msgstr "冷卻時間"
+
+#: .\templates\ar\add-props.html:105
+msgid ""
+"Time duration for the module to be called again.<br>0 sec means no cool down."
+msgstr "再次使用自動回覆組的時間間隔。<br>0秒代表無冷卻。"
+
+#: .\templates\ar\add-props.html:122
+msgid "Seconds"
+msgstr "秒"
+
+#: .\templates\ar\add-reg.html:5
+msgid "Registration"
+msgstr "註冊"
+
+#: .\templates\ar\add-reg.html:8
+msgid "Search corresponding keyword on-site to get more information."
+msgstr "站內搜尋對應的關鍵字以獲取更多資訊。"
+
+#: .\templates\ar\add-reg.html:12 .\templates\ar\add-reg.html:27
+msgid "Channel Member"
+msgstr "頻道成員"
+
+#: .\templates\ar\add-reg.html:16
+msgid "Get a token"
+msgstr "獲取代號"
+
+#: .\templates\ar\add-reg.html:20
+msgid "By Channel Token"
+msgstr "輸入頻道代號"
+
+#: .\templates\ar\add-reg.html:29
+msgid "Select the channel you are already in to register the module."
+msgstr "選擇一個你所在的頻道以登錄回覆組。"
+
+#: .\templates\ar\add-reg.html:33
+#, python-format
+msgid ""
+"Check <a href=\"%(connect_url)s\" target=\"_blank\">this page</a> to know "
+"how to get the channel's membership."
+msgstr ""
+"查閱 <a href=\"%(connect_url)s\" target=\"_blank\">此頁面</a> 以獲知如何登記"
+"頻道成員身份。"
+
+#: .\templates\ar\add-reg.html:41 .\templates\ar\add-reg.html:43
+msgid "Select a channel"
+msgstr "選擇一個頻道"
+
+#: .\templates\ar\add-reg.html:52
+msgid "ID: "
+msgstr "ID: "
+
+#: .\templates\ar\add-reg.html:111
+msgid "Token"
+msgstr "代號"
+
+#: .\templates\ar\add-reg.html:113
+msgid ""
+"The token will appear below once the module was successfully registered."
+msgstr "回覆組成功新增後，代號將會出現在下方。"
+
+#: .\templates\ar\add-reg.html:127
+msgid "Input the channel token to directly register the module."
+msgstr "輸入頻道ID以直接新增回覆組。"
+
+#: .\templates\ar\add-reg.html:129
+msgid ""
+"This method will be unusable if the channel had not been registered in the "
+"bot."
+msgstr "若頻道尚未註冊，則無法使用此方法。"
+
+#: .\templates\ar\add-reg.html:155
+msgid "Check"
+msgstr "檢查"
+
+#: .\templates\ar\add.html:29
+msgid "Recheck your inputs."
+msgstr "請重新檢查輸入的資料。"
+
+#: .\templates\ar\add.html:30
+msgid "Submission Succeed."
+msgstr "提交成功。"
+
+#: .\templates\ar\add.html:31
+msgid "Submission Failed."
+msgstr "提交失敗。"
+
+#: .\templates\ar\add.html:34
+msgid "Insert Outcome Code:"
+msgstr "新增結果代碼:"
+
+#: .\templates\ar\add.html:43
+msgid "Last Submission Status Updated on "
+msgstr "提交狀態更新時間: "
+
+#: .\templates\base\base.html:9
+msgid "Auto reply-based web application."
+msgstr "以自動回覆為基礎的線上應用程式。"
+
+#: .\templates\base\base.html:10
+msgid "RaenonX"
+msgstr "水母 / 醜兔"
+
+#: .\templates\base\base.html:16 .\templates\components\navbar.html:7
+msgid "Jelly Bot"
+msgstr "小水母"
+
+#: .\templates\base\footer.html:8
+msgid "Created by RaenonX on May 18, 2019. Currently in alpha test."
+msgstr "於2019年05月18日由水母/醜兔開站。目前正在測試階段。"
+
+#: .\templates\components\navbar.html:10
+msgid "Toggle Nav Bar"
+msgstr "開關導引列"
+
+#: .\templates\components\navbar.html:18
+msgid "Search in site"
+msgstr "站內搜尋"
+
+#: .\templates\components\tkact.html:5
+msgid "No pending token actions."
+msgstr "沒有待完成的代號指令。"
+
+#: .\templates\components\tkact.html:9
+msgid "Show/Hide All"
+msgstr "顯示/隱藏全部"
+
+#: .\templates\components\tkact.html:18
+#, python-format
+msgid "Expires on %(ts)s"
+msgstr "於 %(ts)s 到期"
+
+#: .\templates\components\tkact.html:24
+msgid "Token: "
+msgstr "代號: "
+
+#: .\templates\components\tkact.html:26
+msgid "Action: "
+msgstr "動作: "
+
+#: .\templates\components\txtarea.html:20
+msgid "Response Type"
+msgstr "回覆內容種類"
+
+#: .\templates\components\txtarea.html:32
+msgid "The length of the content is invalid."
+msgstr "內容長度無效。"
+
+#: .\templates\doc\botcmd_main.html:21
+msgid "Aliases: "
+msgstr "別名: "
+
+#: .\templates\doc\botcmd_main.html:29
+msgid "Command Usage"
+msgstr "指令使用方式"
+
+#: .\templates\doc\botcmd_node.html:22
+msgid "Usage"
+msgstr "使用方式"
+
+#: .\templates\doc\botcmd_node.html:23 .\templates\doc\terms.html:23
+msgid "Description"
+msgstr "解釋"
+
+#: .\templates\doc\code\flags.html:7
+msgid "Code"
+msgstr "代碼"
+
+#: .\templates\doc\code\flags.html:8
+msgctxt "Flag Name"
+msgid "Name"
+msgstr "代碼名稱"
+
+#: .\templates\doc\code\flags.html:10
+msgid "Short Description"
+msgstr "短敘述"
+
+#: .\templates\doc\code\flags.html:13
+msgid "Long Description"
+msgstr "長敘述"
+
+#: .\templates\doc\code\generic.html:13
+#, python-format
+msgid ""
+"<a href=\"%(about_link)s\">Contact</a> the website developer if the error "
+"seems to be impossible to fix."
+msgstr "如果錯誤無法處理，請<a href=\"%(about_link)s\">聯繫</a>網站開發者。"
+
+#: .\templates\doc\terms.html:22
+msgid "Term"
+msgstr "名詞"
+
+#: .\templates\doc\terms.html:24
+msgid "Example"
+msgstr "範例"
+
+#: .\templates\err\account\proflink_not_found.html:8
+#: .\templates\err\doc\cmd_not_found.html:8
+#: .\templates\err\exctnt_not_found.html:8
+#: .\templates\err\info\channel_not_found.html:8
+#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
+msgid "Error"
+msgstr "錯誤"
+
+#: .\templates\err\account\proflink_not_found.html:20
+msgid "User profile linked to the channel is not found."
+msgstr "沒有找到連結到頻道的身份組。"
+
+#: .\templates\err\account\proflink_not_found.html:28
+#, python-format
+msgid ""
+"Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
+"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
+"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"private.</li> </ul> If all the conditions match, but the error still occurs, "
+"please <a href=\"%(about_page)s\">contact the website developer.</a>"
+msgstr ""
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
+"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
+"不是</b>頻道識別碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有"
+"出現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。"
+"</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s"
+"\">聯絡網站開發者。</a>"
+
+#: .\templates\err\doc\cmd_not_found.html:14
+msgid "Command Not Found"
+msgstr "指令不存在"
+
+#: .\templates\err\doc\cmd_not_found.html:20
+#, python-format
+msgid ""
+"Command data of <code>%(cmd_code)s</code> not found.<br> <hr> Please check "
+"that:<br> <ul> <li>Command code <code>%(cmd_code)s</code> appears in the <a "
+"href=\"%(cmd_list)s\">bot commands list</a>.</li> </ul>"
+msgstr ""
+"沒有找到與指令 <code>%(cmd_code)s</code> 有關的資料。<br> <hr>請確認<br> "
+"<ul> <li>指令<code>%(cmd_code)s</code>有出現在<a href=\"%(cmd_list)s\">指令清"
+"單</a>中。</li> </ul>"
+
+#: .\templates\err\exctnt_not_found.html:19
+msgid "Extra content corresponds to the provided id not found."
+msgstr "沒有對應的額外內容。"
+
+#: .\templates\err\exctnt_not_found.html:24
+#, python-format
+msgid ""
+"No content recorded under ID: <code>%(page_id)s</code>. The ID might be "
+"wrong or expired."
+msgstr ""
+"沒有 ID為 <code>%(page_id)s</code> 的額外內容。此ID可能有誤或是內容已過期。"
+
+#: .\templates\err\info\channel_not_found.html:14
+msgid "Channel Not Found"
+msgstr "頻道不存在"
+
+#: .\templates\err\info\channel_not_found.html:19
+msgid "Channel data not found with the provided channel ID."
+msgstr "沒有對應的頻道資訊。"
+
+#: .\templates\err\info\channel_not_found.html:25
+#, python-format
+msgid ""
+"Please check that:<br> <ul> <li><code>%(channel_oid)s</code> is the Channel "
+"ID, <b>NOT the channel token</b>.</li> </ul> If all the conditions match, "
+"but the error still occurs, please <a href=\"%(about_page)s\">contact the "
+"website developer.</a>"
+msgstr ""
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道識別"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
+
+#: .\templates\err\info\profile_not_found.html:19
+msgid "User profile not found with the provided ID."
+msgstr "沒有找到對應的使用者身份組。"
+
+#: .\templates\err\info\profile_not_found.html:25
+#, python-format
+msgid ""
+"Please check that:<br> <ul> <li>The length of <code>%(profile_oid)s</code> "
+"is 24 characters. (Current: %(profile_oid|length)s)</li> </ul> If all the "
+"conditions match, but the error still occurs, please <a href=\"%(about_page)s"
+"\">contact the website developer.</a>"
+msgstr ""
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
+"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"href=\"%(about_page)s\">聯絡網站開發者。</a>"
+
+#: .\templates\err\unknown.html:13
+msgid "Unknown Website Error"
+msgstr "不明的網站錯誤"
+
+#: .\templates\err\unknown.html:18
+#, python-format
+msgid "Unknown website error with code %(err_code)s."
+msgstr "不明的網站錯誤。代碼 %(err_code)s"
+
+#: .\templates\exctnt.html:11
+msgid "These will be deleted from the database after: "
+msgstr "這些內容將會於下列時間後刪除: "
+
+#: .\templates\index.html:7
+msgid "JELLYBOT"
+msgstr "小水母"
+
+#: .\templates\index.html:9
+msgid ""
+"This website extends the traditional <b>auto-reply based/chatting group "
+"assistant bot</b> to be a web application which the content can be "
+"controlled using RESTful API with the assistance of the existing web pages."
+msgstr ""
+"此網站為延伸一般<b>自動回覆機器人/群組機器人</b>的網站。內容控制以應用程式端"
+"口和網站內控制相輔。"
+
+#: .\templates\index.html:22
+msgid ""
+"Reply the corresponding contents based on what has been received by the BOT "
+"using API."
+msgstr "使用應用程式端口，根據收到的內容回覆對應內容。"
+
+#: .\templates\index.html:23
+msgid ""
+"The keyword and the response can be either a picture, texts or any supported "
+"types."
+msgstr "關鍵字和回覆可以是圖片、文字，或是本網站有支援的形式。"
+
+#: .\templates\index.html:24 .\templates\index.html:30
+#: .\templates\index.html:35
+msgid "More Details"
+msgstr "詳細"
+
+#: .\templates\index.html:28 .\templates\index.html:29
+#: .\templates\index.html:33 .\templates\index.html:34
+msgid "(Preserve)"
+msgstr "(預留欄位)"
+
+#: .\templates\info\channel.html:9
+msgid "Channel Info"
+msgstr "頻道資訊"
+
+#: .\templates\info\channel_search.html:15
+msgid "Not Implemented"
+msgstr "未完成"
+
+#: .\templates\info\profile.html:9
+msgid "Channel Profile Info"
+msgstr "頻道身份組資訊"
+
+#: .\templates\info\profile.html:32
+msgid "Profile ID"
+msgstr "身分組ID"
+
+#: .\templates\info\profile.html:56
+msgid "Privilege"
+msgstr "特權等級"
+
+#: .\templates\info\profile.html:60
+msgid "Admin"
+msgstr "管理員"
+
+#: .\templates\info\profile.html:62
+msgid "Moderator"
+msgstr "副管"
+
+#: .\templates\info\profile.html:64
+msgid "N/A"
+msgstr "N/A"
+
+#: .\templates\info\profile.html:72
+msgid "Promotion Required"
+msgstr "需要投票"
+
+#: .\templates\info\profile.html:76
+msgid "Yes"
+msgstr "是"
+
+#: .\templates\info\profile.html:78
+msgid "No"
+msgstr "否"
+
+#: .\templates\info\profile.html:87
+msgid "Permissions"
+msgstr "權限"
+
+#~ msgid "Provide {param.Message.MESSAGE} as a query parameter for message."
+#~ msgstr "請附加參數 {param.Message.MESSAGE}=(訊息) 於網址中。"
+
+#~ msgid "Account settings updated."
+#~ msgstr "帳號設定已更新。"
+
+#~ msgid "Account settings failed to update."
+#~ msgstr "帳號更新失敗。"
+
+#~ msgid ""
+#~ "Content(s) was recorded to the database because either the length is too "
+#~ "long (over {}) or the limit of count of responses has reached (max {}).\n"
+#~ "{}"
+#~ msgstr ""
+#~ "因有訊息超過長度限制({})或回覆訊息量超過限制({})，故內容必須藉由網站查看。"
+#~ "請點選下方連結以查看內容:\n"
+#~ "{}"
+
+#~ msgid "Confirm on API"
+#~ msgstr "由API端口確認"
+
+#~ msgid "Confirm on Website"
+#~ msgstr "由網站上確認"
+
+#~ msgid "Your email"
+#~ msgstr "您的電子郵件信箱地址"
+
+#~ msgid ""
+#~ "<small>Could be anything, but the <b>length cannot be over 2000.</b></"
+#~ "small>"
+#~ msgstr "<small>可以是任何文字，但是總字數<b>不得超過2000</b>。</small>"

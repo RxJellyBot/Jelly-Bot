@@ -8,7 +8,7 @@
             {{ content|strip_html }}
         {% endautoescape %}
         <hr>
-        {% trans "These will be deleted from the database after " %}{{ expiry|date:'Y-m-d h:i:s A (e)' }}.
+        {% trans "These will be deleted from the database after: " %}{{ expiry|date:'Y-m-d h:i:s A (e)' }}.
     </div>
 {% endblock %}
 

@@ -23,15 +23,14 @@ class DiscordClient(Client):
         if message.author == self.user or message.author.bot:
             return
 
-        if "test" in message.channel.name:
-            DISCORD.logger.info(
-                f"Channel Name: {message.channel.name} / Author: {message.author} / Content: {message.content}")
+        DISCORD.logger.info(
+            f"Author: {message.author} / Content: {message.content}")
 
-            handled_event = handle_discord_main(
-                MessageEventObjectFactory.from_discord(message)).to_platform(Platform.DISCORD)
+        handled_event = handle_discord_main(
+            MessageEventObjectFactory.from_discord(message)).to_platform(Platform.DISCORD)
 
-            for content in handled_event.to_send:
-                await message.channel.send(content)
+        for content in handled_event.to_send:
+            await message.channel.send(content)
 
 
 def run_server():

@@ -24,5 +24,5 @@ class ChannelConfigModel(Model):
 class ChannelModel(Model):
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
-    Name = DictionaryField("n", default=ModelDefaultValueExt.Required)
+    Name = DictionaryField("n", allow_none=False, default={})
     Config = ModelField("c", ChannelConfigModel)

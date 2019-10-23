@@ -3,12 +3,15 @@ from gettext import gettext as _
 from typing import List, Dict, Optional, Union
 from inspect import signature
 
+from flags import CommandScopeCollection, CommandScope, ChannelType
 from msghandle.models import TextMessageEventObject
 from extutils.checker import param_type_ensure
 from extutils import is_empty_string
 from extutils.logger import LoggerSkeleton
 
 logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
+
+# TODO: Bot Command: Self generate help (1st arg is help then...)
 
 
 @dataclass
@@ -26,36 +29,59 @@ class CommandUsageDoc:
 @dataclass
 class CommandFunction:
     arg_count: int
-    arg_help: InitVar[List[str]]
+    arg_help: List[str]
     fn: callable
     cmd_node: 'CommandNode'
     description: str
+    scope: CommandScope
     prm_keys: List[CommandParameter] = field(init=False)
 
-    def __post_init__(self, arg_help):
+    def __post_init__(self):
         # List of parameters for future reference
         self.prm_keys = [CommandParameter(name, prm.annotation) for name, prm in signature(self.fn).parameters.items()]
+        self._cache = {}
 
-        # Attach arguments help text to description
-        self.description = f"{self.description}\n\n"
+    # Dynamically contstruct description because gettext(`_`) will trigger the AppNotReady exception for Django
+    #   (Despite that this seems completely irrelevant to Django)
+    @property
+    def description_formatted(self) -> str:
+        k = "descp"
 
-        for i in range(1, self.arg_count + 1):
-            self.description += f"- `{self.prm_keys[i].name}` (`{self.prm_keys[i].annotation.__name__}`): " \
-                                f"{arg_help[i - 1] if arg_help[i - 1] else 'N/A'}"
+        if k not in self._cache:
+            s = self.description
 
-        self.description = self.description.strip()
+            # Attach scopes to description
+            s += f"<hr>{_('Available Scope')}: " \
+                 f"{self.scope.name} " \
+                 f"<sub>{' / '.join([str(ctype.key) for ctype in self.scope.available_ctypes])}</sub>\n"
+
+            # Attach arguments help text to description
+            if self.arg_count > 0:
+                s += f"<hr>{_('Arguments')}:\n"
+
+                for i in range(1, self.arg_count + 1):
+                    s += f"\n- `{self.prm_keys[i].name}` (`{self.prm_keys[i].annotation.__name__}`): " \
+                                        f"{self.arg_help[i - 1] if self.arg_help[i - 1] else 'N/A'}"
+
+            self._cache[k] = s.strip()
+
+        return self._cache[k]
 
     # Dynamically construct `usage` because `cmd_node.splittor` is required. Command structure wasn't ready
     # when executing __post_init__().
-
     @property
     def usage(self) -> str:
-        s = self.cmd_node.get_usage(False)
+        k = "usage"
 
-        for i in range(1, self.arg_count + 1):
-            s += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
+        if k not in self._cache:
+            s = self.cmd_node.get_usage(False)
 
-        return s
+            for i in range(1, self.arg_count + 1):
+                s += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
+
+            self._cache[k] = s.strip()
+
+        return self._cache[k]
 
 
 class CommandNode:
@@ -190,7 +216,7 @@ class CommandNode:
         ret = []
 
         for fn in self.functions:
-            ret.append(CommandUsageDoc(fn.usage, fn.description))
+            ret.append(CommandUsageDoc(fn.usage, fn.description_formatted))
 
         for node in self.child_nodes:
             ret.extend(node.fn_list_for_doc)
@@ -225,8 +251,9 @@ class CommandNode:
         return self._child_nodes.get(code)
 
     def command_function(
-            self, fn: callable = None, arg_count: int = 0, arg_help: list = None,
-            description: str = _("No description provided.")):
+            self, fn: callable = None, *, arg_count: int = 0, arg_help: list = None,
+            description: str = _("No description provided."),
+            scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED):
         """
         Function used to decorate the function to be ready to execute command.
         """
@@ -241,7 +268,7 @@ class CommandNode:
             s = signature(f)
             # This length count needs to include the first parameter - e: TextEventObject for every function
             if len(s.parameters) > arg_count:
-                self._register_(arg_count, CommandFunction(arg_count, arg_help, f, self, description))
+                self._register_(arg_count, CommandFunction(arg_count, arg_help, f, self, description, scope))
             else:
                 logger.logger.warning(
                     f"Function `{f.__qualname__}` not registered because its argument length is insufficient.")
@@ -255,9 +282,9 @@ class CommandNode:
                 return target_fn
             return wrapper
 
-    def get_fn(self, arg_count: int) -> Optional[callable]:
+    def get_fn_obj(self, arg_count: int) -> Optional[CommandFunction]:
         if arg_count in self._fn:
-            return self._fn[arg_count].fn
+            return self._fn[arg_count]
         else:
             return None
 
@@ -276,9 +303,16 @@ class CommandNode:
         s = e.content
         args = self._split_args_(s, max_arg_count)
 
-        cmd_fn: Optional[callable] = self.get_fn(len(args))
+        cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
-            ret = param_type_ensure(cmd_fn)(e, *args)
+            ret: List[str]
+
+            # checks
+            if not cmd_fn.scope.is_in_scope(e.channel_type):
+                ret = [CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes)]
+            else:
+                ret = param_type_ensure(cmd_fn.fn)(e, *args)
+
             if isinstance(ret, str):
                 ret = [str(ret)]
 
@@ -307,6 +341,14 @@ class CommandNode:
         return f"CommandNode {hex(id(self))} " \
                f"[ root={self.is_root} | code={'N/A' if self.is_root else self.main_cmd_code} | " \
                f"sub={len(set(self._child_nodes.values()))} | fn={len(self._fn)} ]"
+
+
+class CommandSpecialResponse:
+    @staticmethod
+    def out_of_scope(current: ChannelType, allowed: List[ChannelType]) -> str:
+        return _("Command not allowed to use under this channel type: {}\n"
+                 "Please use the command under either one of these channel types: {}").format(
+            current.key, " / ".join([str(ctype.key) for ctype in allowed]))
 
 
 class CommandHandler:

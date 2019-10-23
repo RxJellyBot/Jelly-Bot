@@ -4,7 +4,7 @@ from bson import ObjectId
 from pymongo import ReturnDocument
 
 from extutils.checker import param_type_ensure
-from flags import Platform
+from flags import Platform, ChannelType
 from models import ChannelModel, ChannelConfigModel
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
@@ -27,9 +27,10 @@ class ChannelManager(BaseCollection):
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @param_type_ensure
-    def register(self, platform: Platform, token: str, name: str = "") -> ChannelRegistrationResult:
+    def register(self, platform: Platform, token: str) -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelModel, Platform=platform, Token=token, Name=name, Config=ChannelConfigModel.generate_default())
+            ChannelModel, Platform=platform, Token=token,
+            Config=ChannelConfigModel.generate_default())
 
         if WriteOutcome.data_found(outcome):
             entry = self.get_channel_token(platform, token)

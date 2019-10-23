@@ -1,4 +1,3 @@
-*.po
 .idea
 __pycache__/
 lib/

@@ -33,6 +33,7 @@ class WriteOutcome(BaseOutcome):
 
     1xx - Problems related to the preparation processes
         101 - Insufficient Permission
+        102 - CHannel type identification failed
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
@@ -83,7 +84,10 @@ class WriteOutcome(BaseOutcome):
         -1, _("O: Uncategorized"), _("The system returned OK with uncategorized reason.")
     X_INSUFFICIENT_PERMISSION = \
         101, _("X: Insufficient Permission"), \
-        _("THe insertion was failed becuase the permission is insufficient.")
+        _("The insertion was failed becuase the permission is insufficient.")
+    X_CHANNEL_TYPE_UNKNOWN = \
+        102, _("X: Channel Type Unidentifiable"), \
+        _("The channel type is unidentifiable using the provided token and platform.")
     X_ON_REG_CHANNEL = \
         104, _("X: on Registering Channel"), \
         _("The insertion was failed while registering the identity of channel.")
@@ -246,12 +250,19 @@ class OperationOutcome(BaseOutcome):
     2xx - Problems related to Channel
         201 - Channel Not Found
 
+    3xx - Problems related to User Identity
+        301 - Source is identical to destination
+        302 - Source user data not found
+        303 - Destination user data not found
+
     5xx - Problems related to Model
         501 - Construction Error
 
     9xx - Problems related to execution
         901 - Not executed
-        902 - Error
+        902 - Not updated
+        903 - not deleted
+        999 - Error
     """
     @property
     def code_prefix(self) -> str:
@@ -288,14 +299,29 @@ class OperationOutcome(BaseOutcome):
     X_CHANNEL_NOT_FOUND = \
         201, _("X: Channel Not Found"), \
         _("Channel was not found using the given Channel ID.")
+    X_SAME_SRC_DEST = \
+        301, _("X: Source = Destination"), \
+        _("Source user identity is equal to the destination user identity.")
+    X_SRC_DATA_NOT_FOUND = \
+        302, _("X: Source Data Not Found"), \
+        _("Source user identity data not found.")
+    X_DEST_DATA_NOT_FOUND = \
+        303, _("X: Destination Data Not Found"), \
+        _("Destination user identity data not found.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The operation had not been executed.")
+    X_NOT_UPDATED = \
+        902, _("X: Not Updated"), \
+        _("Update operation not performed.")
+    X_NOT_DELETED = \
+        903, _("X: Not Deleted"), \
+        _("Delete operation not performed.")
     X_ERROR = \
-        902, _("X: Error"), \
+        999, _("X: Error"), \
         _("An error has occurred during the process execution.")
 
 

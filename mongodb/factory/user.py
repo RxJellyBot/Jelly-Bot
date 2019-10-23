@@ -10,6 +10,7 @@ from extutils.locales import default_locale, LocaleInfo
 from extutils.checker import param_type_ensure
 from flags import Platform
 from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY
+from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
 from ._mixin import GenerateTokenMixin
@@ -103,8 +104,12 @@ class RootUserManager(BaseCollection):
         super().__init__()
         self._mgr_api = APIUserManager()
         self._mgr_onplat = OnPlatformIdentityManager()
-        self.create_index(RootUserModel.ApiOid.key, unique=True, sparse=True, name="API User OID")
-        self.create_index(RootUserModel.OnPlatOids.key, unique=True, sparse=True, name="On Platform Identity OIDs")
+        self.create_index(
+            RootUserModel.ApiOid.key, unique=True, name="API User OID",
+            partialFilterExpression={RootUserModel.ApiOid.key: {"$exists": True}})
+        self.create_index(
+            RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
+            partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
     def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                    oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False) \
@@ -235,11 +240,34 @@ class RootUserManager(BaseCollection):
             return u_data.config
 
     @param_type_ensure
-    def remove_root_user(self, root_oid: ObjectId) -> bool:
+    def merge_onplat_to_api(self, src_root_oid: ObjectId, dest_root_oid: ObjectId) -> OperationOutcome:
         """
-        :return: Acknowledged flag of the removal.
+        Merge 2 root user data to be the same. Only the data of `dest_root_oid` will be kept.
+
+        :return: True if all actions have been acknowledged and success.
         """
-        return self.delete_one({RootUserModel.Id.key: root_oid}).acknowledged
+        if src_root_oid == dest_root_oid:
+            return OperationOutcome.X_SAME_SRC_DEST
+
+        src_data = self.find_one({RootUserModel.Id.key: src_root_oid})
+        if not src_data:
+            return OperationOutcome.X_SRC_DATA_NOT_FOUND
+        dest_data = self.find_one({RootUserModel.Id.key: dest_root_oid})
+        if not dest_data:
+            return OperationOutcome.X_DEST_DATA_NOT_FOUND
+
+        ack_rm = self.delete_one({RootUserModel.Id.key: src_root_oid}).acknowledged
+        if ack_rm:
+            outcome = self.update_one_outcome(
+                {RootUserModel.Id.key: dest_data[RootUserModel.Id.key]},
+                {"$push": {RootUserModel.OnPlatOids.key: {"$each": src_data[RootUserModel.OnPlatOids.key]}}})
+
+            if outcome.is_success:
+                return OperationOutcome.O_COMPLETED
+            else:
+                return OperationOutcome.X_NOT_UPDATED
+        else:
+            return OperationOutcome.X_NOT_DELETED
 
     @param_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:

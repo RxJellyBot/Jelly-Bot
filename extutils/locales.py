@@ -89,3 +89,5 @@ languages = [
     LanguageInfo(_("English (United States)"), "en-us"),
     LanguageInfo(_("Chinese (Taiwan)"), "zh-tw")
 ]
+
+# OPTIMIZE: Store `language` and `locale` in the database using code(int) instead of string

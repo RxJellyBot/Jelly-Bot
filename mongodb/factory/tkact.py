@@ -72,7 +72,17 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
     def clear_all_token_actions(self, root_uid: ObjectId):
         self.delete_many({TokenActionModel.CreatorOid.key: root_uid})
 
+    # FIXME: Add condition to only allow certain TokenAction to perform completion process
+    #   Example: ABCDEFG for UserIntegrate and user input ABCDEFG but not for it, then the system return the result of
+    #   token not found or incorrect place
     def complete_action(self, token: str, token_kwargs: dict) -> CompleteTokenActionResult:
+        """
+        Finalize the pending token action.
+
+        :param token: Token.
+        :param token_kwargs: Arguments for completing the token action. Could carry more data than the required keys
+            of the type of the token action to be completed.
+        """
         lacking_keys = set()
         cond_dict = {TokenActionModel.Token.key: token}
         ex = None
@@ -92,7 +102,8 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                     tk_model = TokenActionModel(**tk_model, from_db=True)
                     required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action_type)
 
-                    if required_keys == token_kwargs.keys():
+                    lacking_keys = required_keys.difference(token_kwargs.keys())
+                    if len(lacking_keys) == 0:
                         try:
                             cmpl_outcome = TokenActionCompletor.complete_action(tk_model, token_kwargs)
 
@@ -112,7 +123,6 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                             ex = e
                     else:
                         outcome = OperationOutcome.X_KEYS_LACKING
-                        lacking_keys = required_keys.difference(token_kwargs.keys())
                 except ModelConstructionError:
                     outcome = OperationOutcome.X_CONSTRUCTION_ERROR
             else:
@@ -178,8 +188,9 @@ class TokenActionCompletor:
     @staticmethod
     def _token_integrate_identity_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
         try:
+            # `xparams` is casted from QueryDict, so get the value using [0]
             success = UserIdentityIntegrationHelper.integrate(
-                action_model.creator_oid, xparams.get(xparams[param.TokenAction.USER_OID]))
+                action_model.creator_oid, xparams.get(param.TokenAction.USER_OID)[0])
         except Exception:
             return TokenActionCompletionOutcome.X_IDT_INTEGRATION_ERROR
 
@@ -233,6 +244,8 @@ class TokenActionRequiredKeys:
         elif token_action == TokenAction.REGISTER_CHANNEL:
             st.add(param.TokenAction.CHANNEL_TOKEN)
             st.add(param.TokenAction.PLATFORM)
+        elif token_action == TokenAction.INTEGRATE_USER_IDENTITY:
+            st.add(param.TokenAction.USER_OID)
 
         return st
 
