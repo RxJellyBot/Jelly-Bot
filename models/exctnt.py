@@ -2,7 +2,7 @@ from collections import Hashable
 from datetime import timedelta
 from typing import List
 
-from extutils.utils import reduce_length
+from extutils.utils import str_reduce_length
 from flags import ExtraContentType
 from JellyBot.systemconfig import Database
 from models.field import (
@@ -49,7 +49,7 @@ class ExtraContentHTMLTransformer:
                 tab_list.append(
                     f'<a class="list-group-item list-group-item-action" '
                     f'id="list-{common_key}" '
-                    f'data-toggle="list" href="#{common_key}" role="tab">{reduce_length(content, 20)}</a>')
+                    f'data-toggle="list" href="#{common_key}" role="tab">{str_reduce_length(content, 20)}</a>')
                 tab_content.append(
                     f'<div class="tab-pane fade" id="{common_key}" role="tabpanel" '
                     f'aria-labelledby="list-{common_key}"><h4>{reason}</h4>{content}</div>')
