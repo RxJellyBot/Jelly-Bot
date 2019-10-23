@@ -61,24 +61,10 @@ def split_fill(s: str, n: int, delim="", fill=None):
     return (s.split(delim) + [fill] * n)[:n]
 
 
-def reduce_length(s: str, max_: int):
+def str_reduce_length(s: str, max_: int):
     suffix = "..."
 
     if len(s) > max_ - len(suffix):
         return s[:-3] + suffix
     else:
         return s
-
-
-def decorator_wrap(target, fn_exec, *args, **kwargs):
-    """
-    Wrapper for a decorator function to be able to use in both w/ parameter(s) or w/o parameter(s).
-    """
-    if target:
-        fn_exec(*args, **kwargs)
-        return target
-    else:
-        def wrapper(target_in):
-            fn_exec(*args, **kwargs)
-            return target_in
-        return wrapper
