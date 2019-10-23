@@ -1,4 +1,3 @@
-from extutils import is_empty_string
 from JellyBot.api.static import param, result
 from JellyBot.api.responses.mixin import (
     SerializeErrorMixin, SerializeResultOnSuccessMixin, RequireSenderMixin, SerializeResultExtraMixin
@@ -17,10 +16,10 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
         self._param_dict[param.TokenAction.USER_OID] = sender_oid
 
     def pass_condition(self) -> bool:
-        return not is_empty_string(self._token) and self._result.success
+        return self._token and self._result.success
 
     def _handle_token_(self):
-        if is_empty_string(self._token):
+        if not self._token:
             self._err[result.TokenActionResponse.TOKEN] = self._token
 
     def pre_process(self):

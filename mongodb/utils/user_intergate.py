@@ -32,7 +32,7 @@ class UserIdentityIntegrationHelper:
                         if not result:
                             failed_names.append(fd.__class__.__qualname__)
 
-        # FIXME: Language not changed (both on-site and on-bot)
+        # FIXME: Language not changed (on-bot)
 
         if failed_names:
             MailSender.send_email_async(

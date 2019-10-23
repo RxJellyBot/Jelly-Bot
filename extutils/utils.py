@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 
 
 def cast_keep_none(target, type_: type):
@@ -9,17 +8,6 @@ def cast_keep_none(target, type_: type):
         else:
             return type_(target)
     else:
-        return None
-
-
-def is_empty_string(s: Optional[str]):
-    return s is None or len(s) == 0
-
-
-def list_get(l: list, idx: int):
-    try:
-        return l[idx]
-    except IndexError:
         return None
 
 
@@ -49,7 +37,7 @@ def all_lower(o: [str, tuple, list, set, dict]):
 
 def safe_cast(obj, dest_type: type):
     """
-    Execute type-cast safely.
+    Executes type-cast safely.
 
     :param obj: Object to be casted.
     :param dest_type: Destination type.

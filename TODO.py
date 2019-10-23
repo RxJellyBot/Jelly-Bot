@@ -6,8 +6,6 @@
 # INCOMPLETE: Short URL: Short URL service (rnnx.cc)
 #   - Insert content for people to view or redirect
 #   - Changeable
-# TODO: API Statistics: Google Analytics Protocol
-#   https://developers.google.com/analytics/devguides/collection/protocol/v1/
 # TODO: Account Management: API Key refresh
 # TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir.
 #  API should return json response instead.
