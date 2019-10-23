@@ -5,6 +5,9 @@ from typing import List, Union
 from linebot import LineBotApi
 from linebot.models import TextSendMessage
 
+from flags import ChannelType
+
+
 __all__ = ["line_api", "_inst", "LineApiUtils"]
 
 
@@ -40,6 +43,18 @@ class LineApiUtils:
     @staticmethod
     def get_user_id(event):
         return event.sender_id
+
+    @staticmethod
+    def get_channel_type(channel_token: str):
+        key = channel_token[0]
+        if key == "U":
+            return ChannelType.PRIVATE_TEXT
+        elif key == "C":
+            return ChannelType.GROUP_PUB_TEXT
+        elif key == "C":
+            return ChannelType.GROUP_PRV_TEXT
+        else:
+            return ChannelType.UNKNOWN
 
 
 _inst = LineApiWrapper()

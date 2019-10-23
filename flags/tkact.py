@@ -102,7 +102,7 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
         _("An error occurred during channel data acquiring process.")
     X_IDT_INTEGRATION_ERROR = \
         204, _("X: Identity - Integration Error"), \
-        _("An error occurred during user integration error.")
+        _("An error occurred during user integration.")
     X_IDT_INTEGRATION_FAILED = \
         205, _("X: Identity - Integration Failed"), \
         _("Failed to integrate user identities.")

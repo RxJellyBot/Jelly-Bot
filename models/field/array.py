@@ -40,7 +40,9 @@ class ArrayField(BaseField):
         return True
 
     def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
-        return collection_inst.update_many({}, {"$push": {self.key: new}, "$pull": {self.key: old}}).acknowledged
+        ack_push = collection_inst.update_many({self.key: {"$in": [old]}}, {"$push": {self.key: new}}).acknowledged
+        ack_pull = collection_inst.update_many({self.key: {"$in": [old]}}, {"$pull": {self.key: old}}).acknowledged
+        return ack_pull and ack_push
 
 
 class ArrayFieldInstance(FieldInstance):

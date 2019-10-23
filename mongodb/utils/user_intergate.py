@@ -33,8 +33,6 @@ class UserIdentityIntegrationHelper:
                             failed_names.append(fd.__class__.__qualname__)
 
         # FIXME: Language not changed (both on-site and on-bot)
-        # FIXME: Migration failed (O 102), root entry removal implemented but the entry in user.onplat not merged
-        # FIXME: [SHP] Review all tags and re-prioritize
 
         if failed_names:
             MailSender.send_email_async(
@@ -42,4 +40,4 @@ class UserIdentityIntegrationHelper:
                 subject="User Identity Integration Failed.")
             return False
         else:
-            return RootUserManager.remove_root_user(src_root_oid)
+            return RootUserManager.merge_onplat_to_api(src_root_oid, dest_root_oid).is_success

@@ -1,6 +1,5 @@
 from bson import ObjectId
 from pymongo.collection import Collection
-from pymongo.results import UpdateResult
 
 from ._base import BaseField
 
@@ -28,4 +27,4 @@ class ObjectIDField(BaseField):
         return True
 
     def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
-        return collection_inst.update_many({}, {"$set": {self.key: new}}).acknowledged
+        return collection_inst.update_many({self.key: old}, {"$set": {self.key: new}}).acknowledged

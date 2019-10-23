@@ -20,15 +20,17 @@
                     </div>
                     <div class="card-body">
                         {% url "page.doc.botcmd.cmd" code=cmd_code as cmd_url %}
-                        {% blocktrans %}
+                        {% blocktrans trimmed %}
                             <p>
                                 Input the token acquired for user identity integration below.<br>
                                 Check <a href="{{ cmd_url }}">this page</a> for
-                                how to initiate the user identity integration process.
+                                how to initiate the user identity integration process.<br>
+                                Account related data such as locale configuration on the account where you get the token
+                                will be discarded, only the data on the website will be kept.
                             </p>
                         {% endblocktrans %}
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Integration token here"
+                            <input type="text" class="form-control" placeholder="{% trans "Integration token here" %}"
                                    aria-label="{% trans "Integration Token" %}" id="token">
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-outline-primary" id="tokenSubmit">
@@ -36,9 +38,9 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="d-none text-danger submit-msg mt-3"
+                        <div class="d-none text-primary submit-msg mt-3"
                            id="submitMsgNoToken">{% trans "Provide a token to complete user identity integration." %}</div>
-                        <div class="d-none text-danger submit-msg mt-3"
+                        <div class="d-none text-success submit-msg mt-3"
                            id="submitMsgOK">{% trans "User identity integration succeed." %}</div>
                         <div class="d-none text-danger submit-msg mt-3"
                            id="submitMsgFailed">{% trans "User identity integration failed." %}</div>
@@ -61,6 +63,7 @@
                     complete: completeCallback,
                     data: {
                         "{{ static_keys_param.TokenAction.TOKEN }}": token,
+                        "{{ static_keys_param.TokenAction.USER_OID }}": "{{ root_oid }}",
                         "{{ static_keys_param.LOCAL_REFER }}": true
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -80,4 +83,4 @@
         }
     </script>
     <script type="text/javascript" src="{% static "js/account/integrate.js" %}"></script>
-{% endblock %}
+{% endblock %}08f7dce28b

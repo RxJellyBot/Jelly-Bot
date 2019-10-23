@@ -276,7 +276,7 @@ class ControlExtensionMixin(Collection):
         return outcome, ex
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
-            -> (Model, WriteOutcome, Optional[Exception], InsertOneResult):
+            -> (Optional[Model], WriteOutcome, Optional[Exception], InsertOneResult):
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.

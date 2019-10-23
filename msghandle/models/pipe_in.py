@@ -9,34 +9,31 @@ from models import ChannelModel, RootUserModel
 from mongodb.factory import ChannelManager, RootUserManager
 from extutils.emailutils import MailSender
 from msghandle import logger
-from flags import Platform, MessageType
+from flags import Platform, MessageType, ChannelType as SysChannelType
 
 
 class Event(ABC):
-    def __init__(self, raw: Any, channel_model: ChannelModel = None):
+    def __init__(
+            self, raw: Any, channel_model: ChannelModel = None, sys_ctype: SysChannelType = None):
+        if not sys_ctype:
+            sys_ctype = SysChannelType.identify(channel_model.platform, channel_model.token)
+
         self.raw = raw
         self.channel_model = channel_model
+        self.channel_type = sys_ctype
 
 
 class MessageEventObject(Event, ABC):
-    def __init__(self, raw: Any, content: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None):
-        super().__init__(raw, channel_model)
+    def __init__(
+            self, raw: Any, content: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            sys_ctype: SysChannelType = None):
+        super().__init__(raw, channel_model, sys_ctype)
         self.content = content
         self.user_model = user_model
 
     @property
     def message_type(self) -> MessageType:
         raise NotImplementedError()
-
-
-class TextMessageEventObject(MessageEventObject):
-    def __init__(self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None):
-        super().__init__(raw, text, channel_model, user_model)
-        self.text = text
-
-    @property
-    def message_type(self) -> MessageType:
-        return MessageType.TEXT
 
     @property
     def channel_oid(self) -> ObjectId:
@@ -45,6 +42,18 @@ class TextMessageEventObject(MessageEventObject):
     @property
     def root_oid(self) -> ObjectId:
         return self.user_model.id
+
+
+class TextMessageEventObject(MessageEventObject):
+    def __init__(
+            self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            sys_ctype: SysChannelType = None):
+        super().__init__(raw, text, channel_model, user_model, sys_ctype)
+        self.text = text
+
+    @property
+    def message_type(self) -> MessageType:
+        return MessageType.TEXT
 
 
 class MessageEventObjectFactory:
@@ -87,15 +96,12 @@ class MessageEventObjectFactory:
     def from_discord(message: Message) -> MessageEventObject:
         if message.channel.type not in MessageEventObjectFactory.DiscordAcceptedChannelTypes:
             raise ValueError(
-                f"Channel type not supported. ({message.channel.channel_type})"
-                f"Currently supported channel types: {', '.join(MessageEventObjectFactory.DiscordAcceptedChannelTypes)}")
+                f"Channel type not supported. ({message.channel.type})"
+                f"Currently supported channel types: "
+                f"{', '.join(MessageEventObjectFactory.DiscordAcceptedChannelTypes)}")
 
         user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.DISCORD, message.author.id)
         channel_model = MessageEventObjectFactory._ensure_channel_(Platform.DISCORD, message.channel.id)
-        return TextMessageEventObject(message, message.content, channel_model, user_model)
-
-    @staticmethod
-    def from_direct(message: str, channel_token: str, user_token: str):
-        user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.UNKNOWN,user_token)
-        channel_model = MessageEventObjectFactory._ensure_channel_(Platform.UNKNOWN, channel_token)
-        return TextMessageEventObject(message, message, channel_model, user_model)
+        return TextMessageEventObject(
+            message, message.content, channel_model, user_model,
+            SysChannelType.trans_from_discord(message.channel.type))
