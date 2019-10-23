@@ -7,7 +7,6 @@ from bson import ObjectId
 from datetime import datetime
 
 from JellyBot.systemconfig import AutoReply, Database, DataQuery
-from extutils import is_empty_string
 from extutils.emailutils import MailSender
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
@@ -148,7 +147,7 @@ class AutoReplyManager:
 
         pipeline = []
 
-        if not is_empty_string(filter_word):
+        if filter_word:
             pipeline.append({"$match": {
                 "$or": [{OID_KEY: tag_data.id for tag_data in self._tag.search_tags(filter_word)}]}})
 

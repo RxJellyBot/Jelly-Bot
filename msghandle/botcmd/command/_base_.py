@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 from gettext import gettext as _
 from typing import List, Dict, Optional, Union
 from inspect import signature
@@ -6,7 +6,6 @@ from inspect import signature
 from flags import CommandScopeCollection, CommandScope, ChannelType
 from msghandle.models import TextMessageEventObject
 from extutils.checker import param_type_ensure
-from extutils import is_empty_string
 from extutils.logger import LoggerSkeleton
 
 logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
@@ -289,7 +288,7 @@ class CommandNode:
             return None
 
     def _split_args_(self, s: str, arg_count: int) -> List[str]:
-        if is_empty_string(s):
+        if not s:
             return []
         elif arg_count == -1:
             return s.split(self.splittor)

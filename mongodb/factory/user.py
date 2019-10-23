@@ -232,6 +232,14 @@ class RootUserManager(BaseCollection):
             return LocaleInfo.get_tzinfo(u_data.config.locale)
 
     @param_type_ensure
+    def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
+        u_data = self.get_root_data_oid(root_oid)
+        if u_data is None:
+            return None
+        else:
+            return u_data.config.language
+
+    @param_type_ensure
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:

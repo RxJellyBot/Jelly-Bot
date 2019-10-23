@@ -1,4 +1,3 @@
-from extutils import is_empty_string
 from JellyBot.api.static import param, result
 from JellyBot.api.responses.mixin import SerializeErrorMixin, SerializeResultExtraMixin
 from flags import AutoReplyContentType
@@ -37,9 +36,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
         self._data[k] = self._content
 
     def pass_condition(self) -> bool:
-        return not is_empty_string(self._content) and \
-               not is_empty_string(self._content_type) and \
-               self._result
+        return self._content and self._content_type and self._result
 
     def pre_process(self):
         self._handle_content_type_()

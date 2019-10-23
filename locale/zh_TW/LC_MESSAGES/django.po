@@ -2454,35 +2454,3 @@ msgstr "否"
 #: .\templates\info\profile.html:87
 msgid "Permissions"
 msgstr "權限"
-
-#~ msgid "Provide {param.Message.MESSAGE} as a query parameter for message."
-#~ msgstr "請附加參數 {param.Message.MESSAGE}=(訊息) 於網址中。"
-
-#~ msgid "Account settings updated."
-#~ msgstr "帳號設定已更新。"
-
-#~ msgid "Account settings failed to update."
-#~ msgstr "帳號更新失敗。"
-
-#~ msgid ""
-#~ "Content(s) was recorded to the database because either the length is too "
-#~ "long (over {}) or the limit of count of responses has reached (max {}).\n"
-#~ "{}"
-#~ msgstr ""
-#~ "因有訊息超過長度限制({})或回覆訊息量超過限制({})，故內容必須藉由網站查看。"
-#~ "請點選下方連結以查看內容:\n"
-#~ "{}"
-
-#~ msgid "Confirm on API"
-#~ msgstr "由API端口確認"
-
-#~ msgid "Confirm on Website"
-#~ msgstr "由網站上確認"
-
-#~ msgid "Your email"
-#~ msgstr "您的電子郵件信箱地址"
-
-#~ msgid ""
-#~ "<small>Could be anything, but the <b>length cannot be over 2000.</b></"
-#~ "small>"
-#~ msgstr "<small>可以是任何文字，但是總字數<b>不得超過2000</b>。</small>"

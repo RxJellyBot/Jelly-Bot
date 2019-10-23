@@ -2,7 +2,6 @@ from typing import Optional
 
 from bson import ObjectId
 
-from extutils.utils import is_empty_string
 from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
@@ -38,7 +37,7 @@ class AutoReplyContentManager(BaseCollection):
     @param_type_ensure
     def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
-        if is_empty_string(content):
+        if not content:
             return AutoReplyContentGetResult(GetOutcome.X_NO_CONTENT, None)
 
         ret_entry = self._get_content_(content, type_, case_insensitive)
