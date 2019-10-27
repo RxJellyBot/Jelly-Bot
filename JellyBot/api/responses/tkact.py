@@ -1,3 +1,4 @@
+from flags import TokenAction
 from JellyBot.api.static import param, result
 from JellyBot.api.responses.mixin import (
     SerializeErrorMixin, SerializeResultOnSuccessMixin, RequireSenderMixin, SerializeResultExtraMixin
@@ -12,6 +13,7 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
         super().__init__(param_dict, sender_oid)
 
         self._token = param_dict.get(param.TokenAction.TOKEN)
+        self._action_type = param_dict.get(param.TokenAction.ACTION_TYPE_ID)
         self._param_dict.update(**param_dict)
         self._param_dict[param.TokenAction.USER_OID] = sender_oid
 
@@ -22,9 +24,14 @@ class TokenActionCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMi
         if not self._token:
             self._err[result.TokenActionResponse.TOKEN] = self._token
 
+    def _handle_action_type_(self):
+        if self._action_type:
+            self._action_type = TokenAction.cast(int(self._action_type))
+
     def pre_process(self):
         self._handle_token_()
-        self._result = TokenActionManager.complete_action(self._token, self.param_dict)
+        self._handle_action_type_()
+        self._result = TokenActionManager.complete_action(self._token, self.param_dict, action=self._action_type)
 
     def process_pass(self):
         pass

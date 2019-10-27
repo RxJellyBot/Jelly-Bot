@@ -1,5 +1,5 @@
 # noinspection PyUnresolvedReferences
-from .utils import cast_keep_none, safe_cast, split_fill, decorator_wrap
+from .utils import cast_keep_none, safe_cast, split_fill
 # noinspection PyUnresolvedReferences
 from .timing import exec_timing, exec_timing_ns
 # noinspection PyUnresolvedReferences,PyPep8Naming

@@ -64,6 +64,7 @@
                     data: {
                         "{{ static_keys_param.TokenAction.TOKEN }}": token,
                         "{{ static_keys_param.TokenAction.USER_OID }}": "{{ root_oid }}",
+                        "{{ static_keys_param.TokenAction.ACTION_TYPE_ID }}": "{{ tkact_type_code }}",
                         "{{ static_keys_param.LOCAL_REFER }}": true
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
