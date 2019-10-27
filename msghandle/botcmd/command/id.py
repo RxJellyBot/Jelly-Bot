@@ -1,5 +1,5 @@
-from gettext import gettext as _
 from msghandle.models import TextMessageEventObject
+from msghandle.translation import gettext as _
 
 from ._base_ import CommandNode
 

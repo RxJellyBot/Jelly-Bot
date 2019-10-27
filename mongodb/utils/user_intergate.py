@@ -32,8 +32,6 @@ class UserIdentityIntegrationHelper:
                         if not result:
                             failed_names.append(fd.__class__.__qualname__)
 
-        # FIXME: Language not changed (on-bot)
-
         if failed_names:
             MailSender.send_email_async(
                 f"Fields value replacements failed.<hr><pre>{'<br>'.join(failed_names)}</pre>",

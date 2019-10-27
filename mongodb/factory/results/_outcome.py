@@ -179,10 +179,13 @@ class GetOutcome(BaseOutcome):
     2xx - Problems related to the given parameters
         201 - The content is empty
 
-    3xx - SPECIFIC - permission
-        301 - Channel not found
-        302 - Error during config creation
-        303 - Error during default profile creation
+    3xx - SPECIFIC
+        30x - Permission
+            301 - Channel not found
+            302 - Error during config creation
+            303 - Error during default profile creation
+        31x - Token Action
+            311 - Incorrect token action type
 
     9xx - Problems related to execution
         901 - Not executed
@@ -225,6 +228,9 @@ class GetOutcome(BaseOutcome):
     X_DEFAULT_PROFILE_ERROR = \
         303, _("X: Default Profile Error"), \
         _("An error occurred when creating a default profile.")
+    X_TOKENACTION_TYPE_INCORRECT = \
+        311, _("X: Incorrect Token Action type"), \
+        _("The token action type of the given token doesn't match the resired token action type.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The acquiring process had not been executed.")
@@ -243,9 +249,12 @@ class OperationOutcome(BaseOutcome):
     1xx - Problems related to Token Action
         101 - Token Not Found
         102 - Keys Lacking
-        103 - Completion Error
+        103 - Completion Failed
         104 - Completion Process not Implemented
         105 - Completion Error
+        106 - Empty Token
+        107 - Collation Error
+        108 - Type Mismatch
 
     2xx - Problems related to Channel
         201 - Channel Not Found
@@ -296,6 +305,9 @@ class OperationOutcome(BaseOutcome):
     X_COLLATION_ERROR = \
         107, _("X: Collation Error"), \
         _("An error occurred during parameter collation process.")
+    X_TOKEN_TYPE_MISMATCH = \
+        108, _("X: Token Action type Mismatch"), \
+        _("The action type of the token doesn't match the desired token action type.")
     X_CHANNEL_NOT_FOUND = \
         201, _("X: Channel Not Found"), \
         _("Channel was not found using the given Channel ID.")

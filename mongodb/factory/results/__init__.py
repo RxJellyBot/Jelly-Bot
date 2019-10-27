@@ -11,6 +11,6 @@ from .ar import (
 )
 from .channel import ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
 from .statistics import RecordAPIStatisticsResult, MessageRecordResult
-from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult
+from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult, GetTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
 from .exctnt import RecordExtraContentResult

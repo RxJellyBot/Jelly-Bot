@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
-from typing import Type
+from typing import Type, Optional
 
 from bson import ObjectId
 
 from flags import TokenAction, Platform, TokenActionCollationFailedReason, TokenActionCompletionOutcome
 from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
 from mongodb.factory.results import (
-    EnqueueTokenActionResult, CompleteTokenActionResult,
-    OperationOutcome
+    EnqueueTokenActionResult, CompleteTokenActionResult, GetTokenActionResult,
+    OperationOutcome, GetOutcome
 )
 from models import TokenActionModel, Model, AutoReplyModuleTokenActionModel
 from models.exceptions import ModelConstructionError
@@ -72,10 +72,26 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
     def clear_all_token_actions(self, root_uid: ObjectId):
         self.delete_many({TokenActionModel.CreatorOid.key: root_uid})
 
-    # FIXME: Add condition to only allow certain TokenAction to perform completion process
-    #   Example: ABCDEFG for UserIntegrate and user input ABCDEFG but not for it, then the system return the result of
-    #   token not found or incorrect place
-    def complete_action(self, token: str, token_kwargs: dict) -> CompleteTokenActionResult:
+    def get_token_action(self, token: str, action: TokenAction) -> GetTokenActionResult:
+        cond = {TokenActionModel.Token.key: token}
+
+        if action:
+            cond[TokenActionModel.ActionType.key] = action
+
+        ret = self.find_one_casted(cond, parse_cls=TokenActionModel)
+
+        if ret:
+            return GetTokenActionResult(GetOutcome.O_CACHE_DB, ret)
+        else:
+            if self.count({TokenActionModel.Token.key: token}) > 0:
+                return GetTokenActionResult(GetOutcome.X_TOKENACTION_TYPE_INCORRECT, None)
+            else:
+                return GetTokenActionResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT, None)
+
+    def remove_token_action(self, token: str):
+        self.delete_one({TokenActionModel.Token.key: token})
+
+    def complete_action(self, token: str, token_kwargs: dict, action: TokenAction = None) -> CompleteTokenActionResult:
         """
         Finalize the pending token action.
 
@@ -84,9 +100,8 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
             of the type of the token action to be completed.
         """
         lacking_keys = set()
-        cond_dict = {TokenActionModel.Token.key: token}
         ex = None
-        tk_model = None
+        tk_model: Optional[TokenActionModel] = None
         cmpl_outcome = None
 
         # Force type to be dict because the type of `token_kwargs` might be django QueryDict
@@ -95,11 +110,13 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
 
         if token:
             # Not using self.find_one_casted for catching `ModelConstructionError`
-            tk_model = self.find_one(cond_dict)
+            get_tkact = self.get_token_action(token, action)
 
-            if tk_model:
+            if get_tkact.success:
+                # noinspection PyTypeChecker
+                tk_model = get_tkact.model
+
                 try:
-                    tk_model = TokenActionModel(**tk_model, from_db=True)
                     required_keys = TokenActionRequiredKeys.get_required_keys(tk_model.action_type)
 
                     lacking_keys = required_keys.difference(token_kwargs.keys())
@@ -109,7 +126,7 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
 
                             if cmpl_outcome.is_success:
                                 outcome = OperationOutcome.O_COMPLETED
-                                self.delete_one(cond_dict)
+                                self.remove_token_action(token)
                             else:
                                 outcome = OperationOutcome.X_COMPLETION_FAILED
                         except NoCompleteActionError as e:
@@ -126,7 +143,12 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
                 except ModelConstructionError:
                     outcome = OperationOutcome.X_CONSTRUCTION_ERROR
             else:
-                outcome = OperationOutcome.X_TOKEN_NOT_FOUND
+                if get_tkact.outcome == GetOutcome.X_NOT_FOUND_ABORTED_INSERT:
+                    outcome = OperationOutcome.X_TOKEN_NOT_FOUND
+                elif get_tkact.outcome == GetOutcome.X_TOKENACTION_TYPE_INCORRECT:
+                    outcome = OperationOutcome.X_TOKEN_TYPE_MISMATCH
+                else:
+                    outcome = OperationOutcome.X_ERROR
         else:
             outcome = OperationOutcome.X_TOKEN_EMPTY
 

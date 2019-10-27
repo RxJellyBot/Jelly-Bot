@@ -1,13 +1,13 @@
 from datetime import datetime, timezone
 from typing import List, Tuple, Type
 import traceback
-from gettext import gettext as _
 
 from django.urls import reverse
 
 from extutils.emailutils import MailSender
 from JellyBot.systemconfig import PlatformConfig, HostUrl
 from mongodb.factory import ExtraContentManager
+from msghandle.translation import gettext as _
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder
 

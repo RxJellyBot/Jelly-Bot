@@ -1,10 +1,9 @@
-from gettext import gettext as _
-
 from django.urls import reverse
 
 from flags import TokenAction, CommandScopeCollection
 from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject
+from msghandle.translation import gettext as _
 from mongodb.factory import TokenActionManager
 
 from ._base_ import CommandNode
@@ -18,9 +17,10 @@ cmd = CommandNode(
 def issue_token(e: TextMessageEventObject):
     result = TokenActionManager.enqueue_action(e.root_oid, TokenAction.INTEGRATE_USER_IDENTITY)
     if result.success:
-        return _("User Identity Integration Enqueued.\nToken: `{}`\nExpiry: `{}`\n\n"
-                 "Please record the token and go to {}{} to complete the integration.").format(
+        return _("User Identity Integration process started.\nToken: `{}`\nExpiry: `{}`\n\n"
+                 "Please record the token and go to {}{} to complete the integration.").format(\
             result.token, result.expiry.strftime("%Y-%m-%d %H:%M:%S"), HostUrl, reverse("account.integrate")
         )
     else:
-        return _("Token action not enqueued.\nResult: {}\nException: {}").format(result.outcome, result.exception)
+        return _("User Identity Integration process failed to start.\nResult: {}\nException: {}").format(
+            result.outcome, result.exception)

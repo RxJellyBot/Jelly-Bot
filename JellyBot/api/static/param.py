@@ -59,6 +59,7 @@ class TokenAction:
     USER_TOKEN = Common.USER_TOKEN
     USER_OID = Common.USER_OID
     API_TOKEN = Common.API_TOKEN
+    ACTION_TYPE_ID = "type"
 
 
 class Message:

@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from gettext import gettext as _
 from typing import List, Dict, Optional, Union
 from inspect import signature
 
 from flags import CommandScopeCollection, CommandScope, ChannelType
 from msghandle.models import TextMessageEventObject
+from msghandle.translation import gettext as _
 from extutils.checker import param_type_ensure
 from extutils.logger import LoggerSkeleton
 
