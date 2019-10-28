@@ -33,7 +33,7 @@ class WriteOutcome(BaseOutcome):
 
     1xx - Problems related to the preparation processes
         101 - Insufficient Permission
-        102 - CHannel type identification failed
+        102 - Channel type identification failed
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
