@@ -33,7 +33,6 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
                 "channel_conn_list": channel_conn_list,
-                "root_oid_str": str(root_oid),
                 "bot_cmd_info_code": cmd_id.main_cmd_code
             })
 

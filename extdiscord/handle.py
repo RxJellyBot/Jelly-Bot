@@ -8,8 +8,6 @@ from .logger import DISCORD
 
 __all__ = ["handle_discord_main"]
 
-# Command Structure - https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
-
 
 def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
     try:

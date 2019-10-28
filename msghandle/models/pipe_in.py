@@ -5,6 +5,7 @@ from bson import ObjectId
 from linebot.models import TextMessage, MessageEvent
 from discord import Message, ChannelType
 
+from extdiscord.utils import channel_repr
 from models import ChannelModel, RootUserModel
 from mongodb.factory import ChannelManager, RootUserManager
 from extutils.emailutils import MailSender
@@ -60,8 +61,8 @@ class MessageEventObjectFactory:
     DiscordAcceptedChannelTypes = (ChannelType.text, ChannelType.private, ChannelType.group)
 
     @staticmethod
-    def _ensure_channel_(platform: Platform, token: Union[int, str]) -> Optional[ChannelModel]:
-        ret = ChannelManager.get_channel_token(platform, token, auto_register=True)
+    def _ensure_channel_(platform: Platform, token: Union[int, str], default_name: str = None) -> Optional[ChannelModel]:
+        ret = ChannelManager.get_channel_token(platform, token, auto_register=True, default_name=default_name)
         if not ret:
             MailSender.send_email_async(f"Platform: {platform} / Token: {token}", subject="Channel Registration Failed")
 
@@ -86,7 +87,8 @@ class MessageEventObjectFactory:
         from extline import LineApiUtils
 
         user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.LINE, LineApiUtils.get_user_id(event))
-        channel_model = MessageEventObjectFactory._ensure_channel_(Platform.LINE, LineApiUtils.get_channel_id(event))
+        channel_model = MessageEventObjectFactory._ensure_channel_(
+            Platform.LINE, LineApiUtils.get_channel_id(event))
         if isinstance(event.message, TextMessage):
             return TextMessageEventObject(event, event.message.text, channel_model, user_model)
         else:
@@ -101,7 +103,8 @@ class MessageEventObjectFactory:
                 f"{', '.join(MessageEventObjectFactory.DiscordAcceptedChannelTypes)}")
 
         user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.DISCORD, message.author.id)
-        channel_model = MessageEventObjectFactory._ensure_channel_(Platform.DISCORD, message.channel.id)
+        channel_model = MessageEventObjectFactory._ensure_channel_(
+            Platform.DISCORD, message.channel.id, channel_repr(message))
         return TextMessageEventObject(
             message, message.content, channel_model, user_model,
             SysChannelType.trans_from_discord(message.channel.type))

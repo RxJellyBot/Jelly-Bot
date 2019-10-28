@@ -18,11 +18,11 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="align-middle text-center h2 font-weight-normal">{{ channel_conn.channel.platform.key }}</td>
+                        <td class="align-middle text-center h4 font-weight-normal">{{ channel_conn.channel.platform.key }}</td>
                         <td class="align-middle text-center h3 font-weight-normal">
                             <!--suppress HtmlFormInputWithoutLabel -->
                             <input type="text" class="form-control channel-name"
-                                   value="{{ channel_conn.channel.name|get_val:root_oid_str }}"
+                                   value="{{ channel_conn.channel_name }}"
                                    data-channel="{{ channel_conn.channel.id }}">
                         </td>
                         <td class="align-middle text-center h4">

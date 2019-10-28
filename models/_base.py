@@ -258,8 +258,8 @@ class Model(MutableMapping, abc.ABC):
         return cls._CacheToField[cls.__qualname__].get(json_key)
 
     @classmethod
-    def generate_default(cls):
-        return cls()
+    def generate_default(cls, **kwargs):
+        return cls(**kwargs)
 
     @classmethod
     def _valid_model_key_(cls, fk):

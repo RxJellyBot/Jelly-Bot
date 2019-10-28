@@ -27,10 +27,10 @@ class ChannelManager(BaseCollection):
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @param_type_ensure
-    def register(self, platform: Platform, token: str) -> ChannelRegistrationResult:
+    def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
             ChannelModel, Platform=platform, Token=token,
-            Config=ChannelConfigModel.generate_default())
+            Config=ChannelConfigModel.generate_default(DefaultName=default_name))
 
         if WriteOutcome.data_found(outcome):
             entry = self.get_channel_token(platform, token)
@@ -39,11 +39,20 @@ class ChannelManager(BaseCollection):
 
     @param_type_ensure
     def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+        """
+        Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
+        """
         ex = None
-        ret = self.find_one_and_update(
-            {ChannelModel.Id.key: channel_oid},
-            {"$set": {f"{ChannelModel.Name.key}.{root_oid}": new_name}},
-            return_document=ReturnDocument.AFTER)
+        if new_name:
+            ret = self.find_one_and_update(
+                {ChannelModel.Id.key: channel_oid},
+                {"$set": {f"{ChannelModel.Name.key}.{root_oid}": new_name}},
+                return_document=ReturnDocument.AFTER)
+        else:
+            ret = self.find_one_and_update(
+                {ChannelModel.Id.key: channel_oid},
+                {"$unset": {f"{ChannelModel.Name.key}.{root_oid}": ""}},
+                return_document=ReturnDocument.AFTER)
 
         try:
             if ret:
@@ -58,12 +67,13 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ret, ex)
 
     @param_type_ensure
-    def get_channel_token(self, platform: Platform, token: str, auto_register=False) -> Optional[ChannelModel]:
+    def get_channel_token(self, platform: Platform, token: str, auto_register: bool = False, default_name: str = None) \
+            -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
 
         if not ret and auto_register:
-            reg_result = self.register(platform, token)
+            reg_result = self.register(platform, token, default_name=default_name)
             if reg_result.success:
                 ret = reg_result.model
             else:

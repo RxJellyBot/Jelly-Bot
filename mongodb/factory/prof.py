@@ -220,7 +220,8 @@ class ProfileManager:
             elif len(not_found_prof_oids) > 0:
                 not_found_prof_oids_dict[d.channel_oid] = not_found_prof_oids
             else:
-                ret.append(ChannelProfileListEntry(channel=cnl, profiles=prof))
+                ret.append(
+                    ChannelProfileListEntry(channel=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
