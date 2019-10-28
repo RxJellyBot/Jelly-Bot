@@ -11,7 +11,8 @@ from extutils.emailutils import MailSender
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from flags import PermissionCategory, AutoReplyContentType
-from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
+from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
+    AutoReplyContentModel
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
@@ -84,7 +85,8 @@ class AutoReplyModuleManager(BaseCollection):
             if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
                 self.update_one(
                     {AutoReplyModuleModel.Id.key: ret.id},
-                    {"$set": {AutoReplyModuleModel.LastUsed.key: now}})
+                    {"$set": {AutoReplyModuleModel.LastUsed.key: now},
+                     "$inc": {AutoReplyModuleModel.CalledCount.key: 1}})
                 return ret
 
         return None
@@ -222,10 +224,10 @@ class AutoReplyManager:
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
-            channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[str, bool]]:
+            channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
-                [(<RESPONSE>, <BYPASS_MULTILINE>), (<RESPONSE>, <BYPASS_MULTILINE>)...]
+                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPRESPONSE_MODELONSE>, <BYPASS_MULTILINE>)...]
         """
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
@@ -241,7 +243,7 @@ class AutoReplyManager:
             for resp_id in resp_ids:
                 ctnt_mdl = AutoReplyContentManager.get_content_by_id(resp_id)
                 if ctnt_mdl:
-                    resp_ctnt.append((ctnt_mdl.content, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds))
+                    resp_ctnt.append((ctnt_mdl, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds))
                 else:
                     resp_id_miss.append(resp_id)
 

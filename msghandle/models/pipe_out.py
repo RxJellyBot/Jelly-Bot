@@ -1,8 +1,9 @@
 from abc import ABC
 from typing import List
 
-from flags import MessageType, Platform
+from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
+from models import AutoReplyContentModel
 
 
 class HandledMessageEvent(ABC):
@@ -13,11 +14,37 @@ class HandledMessageEvent(ABC):
     def to_json(self):
         return {"content": str(self.content), "type": self.msg_type}
 
+    @staticmethod
+    def auto_reply_model_to_handled(response_model: AutoReplyContentModel, bypass_ml_check: bool):
+        """
+        Attempt to cast `AutoReplyContentModel` to be any the corresponding `HandledMessageEvent`.
+
+        :return: Casted `HandledMessageEvent`. Return `None` if no corresponding `HandledMessageEvent`.
+        """
+        if response_model.content_type == AutoReplyContentType.TEXT:
+            return HandledMessageEventText(content=response_model.content, bypass_multiline_check=bypass_ml_check)
+        elif response_model.content_type == AutoReplyContentType.IMAGE:
+            return HandledMessageEventImage(image_url=response_model.content)
+        elif response_model.content_type == AutoReplyContentType.LINE_STICKER:
+            return HandledMessageEventLineSticker(sticker_id=response_model.content)
+        else:
+            return None
+
 
 class HandledMessageEventText(HandledMessageEvent):
     def __init__(self, content: str, bypass_multiline_check: bool = False):
         super().__init__(MessageType.TEXT, content)
         self.bypass_multiline_check = bypass_multiline_check
+
+
+class HandledMessageEventImage(HandledMessageEvent):
+    def __init__(self, image_url):
+        super().__init__(MessageType.IMAGE, image_url)
+
+
+class HandledMessageEventLineSticker(HandledMessageEvent):
+    def __init__(self, sticker_id):
+        super().__init__(MessageType.STICKER, sticker_id)
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):
