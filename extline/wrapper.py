@@ -3,7 +3,7 @@ import sys
 from typing import List, Union
 
 from linebot import LineBotApi
-from linebot.models import TextSendMessage
+from linebot.models import TextSendMessage, SendMessage
 
 from flags import ChannelType
 
@@ -33,6 +33,9 @@ class LineApiWrapper:
             raise ValueError("Message should be either in `list` of `str` or `str`.")
 
         self._core.reply_message(reply_token, send_messages)
+
+    def reply_message(self, reply_token, messages: SendMessage):
+        self._core.reply_message(reply_token, messages)
 
 
 class LineApiUtils:
