@@ -54,6 +54,9 @@ class AutoReplyAddBaseResponse(
     def _handle_keyword_type_(self):
         self._keyword_type = int(AutoReplyContentType.default() or self._keyword_type)
 
+        if self._keyword_type == AutoReplyContentType.IMAGE:
+            self._err[result.AutoReplyResponse.KEYWORD] = False
+
     def _handle_responses_(self):
         k = result.AutoReplyResponse.RESPONSES
         resp_err = list()
@@ -147,12 +150,6 @@ class AutoReplyAddBaseResponse(
 
 
 class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
-    def __init__(self, param_dict, sender_oid):
-        super().__init__(param_dict, sender_oid)
-
-    def pre_process(self):
-        super().pre_process()
-
     def process_pass(self):
         self._result = AutoReplyManager.add_conn(
             self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),

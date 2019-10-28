@@ -345,4 +345,9 @@ function enablePinnedModuleAccess(enable) {
 
 function submitBtnDisable(disable) {
     $("button.arSubmit").prop("disabled", disable);
+    if (disable) {
+        $("div#submitSpin").removeClass("d-none").addClass("d-inline");
+    } else {
+        $("div#submitSpin").addClass("d-none").removeClass("d-inline");
+    }
 }

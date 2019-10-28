@@ -5,7 +5,6 @@ from bson import ObjectId
 from linebot.models import TextMessage, MessageEvent
 from discord import Message, ChannelType
 
-from extdiscord.utils import channel_repr
 from models import ChannelModel, RootUserModel
 from mongodb.factory import ChannelManager, RootUserManager
 from extutils.emailutils import MailSender
@@ -96,6 +95,8 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def from_discord(message: Message) -> MessageEventObject:
+        from extdiscord.utils import channel_repr
+
         if message.channel.type not in MessageEventObjectFactory.DiscordAcceptedChannelTypes:
             raise ValueError(
                 f"Channel type not supported. ({message.channel.type})"
