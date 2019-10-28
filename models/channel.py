@@ -1,3 +1,5 @@
+from bson import ObjectId
+
 from JellyBot.systemconfig import ChannelConfig
 from models.field import (
     PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField, DictionaryField
@@ -19,6 +21,7 @@ class ChannelConfigModel(Model):
     EnableCreateProfile = BooleanField("e-crp", default=True)
     InfoPrivate = BooleanField("prv", default=False)
     DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
+    DefaultName = TextField("d-name", allow_none=True)
 
 
 class ChannelModel(Model):
@@ -26,3 +29,11 @@ class ChannelModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
     Name = DictionaryField("n", allow_none=False, default={})
     Config = ModelField("c", ChannelConfigModel)
+
+    def get_channel_name(self, root_oid: ObjectId):
+        oid_str = str(root_oid)
+
+        if oid_str in self.name:
+            return self.name[oid_str]
+        else:
+            return self.config.default_name or ""
