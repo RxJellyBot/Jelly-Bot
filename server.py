@@ -1,11 +1,14 @@
 import os
 import sys
-from multiprocessing import Process
-from threading import Thread
+
+import ray
 
 from extdiscord import run_server
 
+ray.init()
 
+
+@ray.remote
 def django_main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'JellyBot.settings')
     try:
@@ -19,10 +22,10 @@ def django_main():
     execute_from_command_line(sys.argv)
 
 
+@ray.remote
 def discord_main():
     run_server()
 
 
 if __name__ == '__main__':
-    Thread(target=discord_main).start()
-    django_main()
+    ray.get([django_main.remote(), discord_main.remote()])
