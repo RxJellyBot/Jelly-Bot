@@ -16,3 +16,4 @@ python-dateutil
 line-bot-sdk
 sympy
 discord.py
+ray
