@@ -23,5 +23,5 @@ def discord_main():
 
 
 if __name__ == '__main__':
-    Thread(target=django_main).start()
     Thread(target=discord_main).start()
+    django_main()
