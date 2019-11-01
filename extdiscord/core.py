@@ -66,8 +66,6 @@ _inst = DiscordClientWrapper()
 
 
 def run_server():
-    # FIXME: `RuntimeError: set_wakeup_fd only works in main thread` on Heroku (Ubuntu 18.03)
-    #   Cannot use `Process` or DiscordClient won't be shared
-
+    # Obtained from https://github.com/Rapptz/discord.py/issues/710#issuecomment-395609297
     thread = threading.Thread(target=_inst.discord_loop.run_until_complete, args=(_inst.start(discord_token),))
     thread.start()
