@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-10-26 23:34-0500\n"
+"POT-Creation-Date: 2019-11-01 15:03-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,30 +25,40 @@ msgid ""
 "Please use the command under either one of these channel types: {}"
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:7
+#: msghandle\botcmd\command\id.py:11
 msgid "Information"
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:8
+#: msghandle\botcmd\command\id.py:12
 msgid "Check the information of various things (see the description section for more details)."
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:13
+#: msghandle\botcmd\command\id.py:17
 msgid "Check the user info of self."
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:15
+#: msghandle\botcmd\command\id.py:19
 msgid "User ID: `{}`"
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:18
+#: msghandle\botcmd\command\id.py:22
+msgid "User Token: `{}`"
+msgstr ""
+
+#: msghandle\botcmd\command\id.py:27
 msgid "Check the channel info."
 msgstr ""
 
-#: msghandle\botcmd\command\id.py:20
+#: msghandle\botcmd\command\id.py:37
 msgid ""
 "Channel ID: `{}`\n"
-"Channel Token: `{}`"
+"Channel Token: `{}`\n"
+"\n"
+"Top {} Message Count in 7 Days:\n"
+"```\n"
+"{}\n"
+"```\n"
+"Visit {}{} for more details."
 msgstr ""
 
 #: msghandle\botcmd\command\trfm.py:7
@@ -95,29 +105,36 @@ msgid ""
 "Exception: {}"
 msgstr ""
 
-#: msghandle\models\out_plat.py:16
+#: msghandle\models\out_plat.py:21
 msgid "Message length overlimit."
 msgstr ""
 
-#: msghandle\models\out_plat.py:17
+#: msghandle\models\out_plat.py:22
 msgid "Responses length overlimit."
 msgstr ""
 
-#: msghandle\models\out_plat.py:18
+#: msghandle\models\out_plat.py:23
 msgid "Too many lines."
 msgstr ""
 
-#: msghandle\models\out_plat.py:19
+#: msghandle\models\out_plat.py:24
 msgid "LaTeX available."
 msgstr ""
 
-#: msghandle\models\out_plat.py:41
+#: msghandle\models\out_plat.py:47
 msgid ""
 "{} content(s) was recorded to the database because of the following reason(s):{}\n"
 "URL: {}"
 msgstr ""
 
-#: msghandle\models\out_plat.py:57
+#: msghandle\models\out_plat.py:64
 msgid "Content(s) is supposed to be recorded to database but failed. An error report should be sent for investigation."
+msgstr ""
+
+#: msghandle\models\pipe_out.py:54
+msgid ""
+"**AUTO CALCULATOR**\n"
+"Expression: {}\n"
+"Result: {}"
 msgstr ""
 

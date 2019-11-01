@@ -73,9 +73,6 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return {d["_id"]: d["count"] for d in ret}
 
-# INCOMPLETE: Bot Statistics: Implement stats for recording message activity and message content
-#   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature
-
 
 _inst = APIStatisticsManager()
 _inst2 = MessageRecordStatisticsManager()

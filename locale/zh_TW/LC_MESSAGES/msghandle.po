@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-10-26 23:34-0500\n"
+"POT-Creation-Date: 2019-11-01 15:03-0500\n"
 "PO-Revision-Date: 2019-10-27 00:00-0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -29,35 +29,44 @@ msgstr ""
 "此頻道種類({})無法使用此指令。\n"
 "請在下列任一頻道種類中使用指令: {}"
 
-#: msghandle\botcmd\command\id.py:7
+#: msghandle\botcmd\command\id.py:11
 msgid "Information"
 msgstr "資訊"
 
-#: msghandle\botcmd\command\id.py:8
+#: msghandle\botcmd\command\id.py:12
 msgid ""
 "Check the information of various things (see the description section for "
 "more details)."
 msgstr "瀏覽各種東西的資訊(查閱說明以獲得更多詳細資訊)。"
 
-#: msghandle\botcmd\command\id.py:13
+#: msghandle\botcmd\command\id.py:17
 msgid "Check the user info of self."
 msgstr "閱覽自己的用戶資訊。"
 
-#: msghandle\botcmd\command\id.py:15
+#: msghandle\botcmd\command\id.py:19
 msgid "User ID: `{}`"
 msgstr "使用者ID: `{}`"
 
-#: msghandle\botcmd\command\id.py:18
+#: msghandle\botcmd\command\id.py:22
+#, fuzzy
+msgid "User Token: `{}`"
+msgstr "使用者ID: `{}`"
+
+#: msghandle\botcmd\command\id.py:27
 msgid "Check the channel info."
 msgstr "閱覽頻道資訊。"
 
-#: msghandle\botcmd\command\id.py:20
+#: msghandle\botcmd\command\id.py:37
 msgid ""
 "Channel ID: `{}`\n"
-"Channel Token: `{}`"
+"Channel Token: `{}`\n"
+"\n"
+"Top {} Message Count in 7 Days:\n"
+"```\n"
+"{}\n"
+"```\n"
+"Visit {}{} for more details."
 msgstr ""
-"頻道ID: `{}`\n"
-"頻道識別碼: `{}`"
 
 #: msghandle\botcmd\command\trfm.py:7
 msgid "Transform/Replace"
@@ -111,33 +120,47 @@ msgstr ""
 "錯誤代碼: {}\n"
 "錯誤內容: {}"
 
-#: msghandle\models\out_plat.py:16
+#: msghandle\models\out_plat.py:21
 msgid "Message length overlimit."
 msgstr "超過訊息長度限制。"
 
-#: msghandle\models\out_plat.py:17
+#: msghandle\models\out_plat.py:22
 msgid "Responses length overlimit."
 msgstr "回覆數量超過限制。"
 
-#: msghandle\models\out_plat.py:18
+#: msghandle\models\out_plat.py:23
 msgid "Too many lines."
 msgstr "太多行。"
 
-#: msghandle\models\out_plat.py:19
+#: msghandle\models\out_plat.py:24
 msgid "LaTeX available."
 msgstr "有 LaTeX 內容。"
 
-#: msghandle\models\out_plat.py:41
+#: msghandle\models\out_plat.py:47
 msgid ""
-"{} content(s) was recorded to the database because of the following "
-"reason(s):{}\n"
+"{} content(s) was recorded to the database because of the following reason"
+"(s):{}\n"
 "URL: {}"
 msgstr ""
 "{} 個內容因為下列原因而必須連外閱覽:{}\n"
 "網址: {}"
 
-#: msghandle\models\out_plat.py:57
+#: msghandle\models\out_plat.py:64
 msgid ""
 "Content(s) is supposed to be recorded to database but failed. An error "
 "report should be sent for investigation."
 msgstr "額外內容無法存放至資料庫。錯誤報告已傳送。"
+
+#: msghandle\models\pipe_out.py:54
+msgid ""
+"**AUTO CALCULATOR**\n"
+"Expression: {}\n"
+"Result: {}"
+msgstr ""
+
+#~ msgid ""
+#~ "Channel ID: `{}`\n"
+#~ "Channel Token: `{}`"
+#~ msgstr ""
+#~ "頻道ID: `{}`\n"
+#~ "頻道識別碼: `{}`"

@@ -1,7 +1,5 @@
 import os
 import sys
-from multiprocessing import Process
-from threading import Thread
 
 from extdiscord import run_server
 
@@ -24,8 +22,7 @@ def discord_main():
 
 
 if __name__ == '__main__':
-    # FIXME: `RuntimeError: set_wakeup_fd only works in main thread` on Heroku (Ubuntu 18.03)
-    #   Cannot use `Process` or DiscordClient won't be shared
+    # Prevent unnecessary execution of starting Discord Bot
     if sys.argv[1] == "runserver":
         discord_main()
     django_main()
