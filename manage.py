@@ -1,8 +1,5 @@
 import os
 import sys
-from multiprocessing import Process
-
-from extdiscord import run_server
 
 
 def django_main():
@@ -18,10 +15,5 @@ def django_main():
     execute_from_command_line(sys.argv)
 
 
-def discord_main():
-    run_server()
-
-
 if __name__ == '__main__':
-    Process(target=discord_main).start()
     django_main()
