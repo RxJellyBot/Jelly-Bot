@@ -30,11 +30,11 @@ def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
             expression = sympify(expr, ns)
 
             if hasattr(expression, "subs"):
-                ret = repr(expression.subs(symbol_vals))
+                calc_result = repr(expression.subs(symbol_vals))
             else:
-                ret = str(expression)
+                calc_result = str(expression)
 
-            return [HandledMessageCalculateResult(content=ret, latex=latex(expression))]
+            return [HandledMessageCalculateResult(calc_result=calc_result, latex=latex(expression), calc_expr=expr)]
         except SympifyError as e:
             logger.logger.debug(
                 f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")

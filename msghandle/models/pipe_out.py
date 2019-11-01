@@ -1,6 +1,8 @@
 from abc import ABC
 from typing import List
+from gettext import gettext as _
 
+from extutils import safe_cast
 from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
 from models import AutoReplyContentModel
@@ -48,15 +50,26 @@ class HandledMessageEventLineSticker(HandledMessageEvent):
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):
-    def __init__(self, content: str, latex: str):
-        # FIXME: Content reformat
-        super().__init__(content)
+    def __init__(self, calc_result: str, latex: str, calc_expr: str):
+        super().__init__(_("**AUTO CALCULATOR**\n"
+                           "Expression: {}\n"
+                           "Result: {}").format(calc_expr, calc_result))
         self.latex = latex
+        self.calc_result = calc_result
+        self.calc_expr = calc_expr
 
     @property
     def latex_available(self) -> bool:
-        # FIXME: 0.0361 should be equal to 0.0361000000 (etc.)
-        return self.latex != self.content
+        if self.latex == self.calc_result:
+            return False
+
+        ltx = safe_cast(self.latex, float)
+        crslt = safe_cast(self.calc_result, float)
+
+        if ltx and crslt:
+            return ltx != crslt
+        else:
+            return True
 
     @property
     def latex_for_html(self):
