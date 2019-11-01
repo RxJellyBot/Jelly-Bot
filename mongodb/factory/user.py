@@ -1,4 +1,5 @@
-from typing import Optional
+from collections import namedtuple
+from typing import Optional, Tuple
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -6,10 +7,11 @@ from datetime import tzinfo
 from pymongo import ReturnDocument
 
 from extutils.gidentity import GoogleIdentityUserData
+from extutils.emailutils import MailSender
 from extutils.locales import default_locale, LocaleInfo
 from extutils.checker import param_type_ensure
 from flags import Platform
-from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY
+from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel
 from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
@@ -75,6 +77,10 @@ class OnPlatformIdentityManager(BaseCollection):
         super().__init__()
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
+
+    @param_type_ensure
+    def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
+        return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
 
     @param_type_ensure
     def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
@@ -167,6 +173,43 @@ class RootUserManager(BaseCollection):
     @param_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({OID_KEY: root_oid}, parse_cls=RootUserModel)
+
+    @param_type_ensure
+    def get_root_data_uname(
+            self, root_oid: ObjectId, channel_data: Optional[ChannelModel] = None) -> Optional[namedtuple]:
+        """
+        Get the name of the user with UID = `root_oid`.
+
+        Returns `None` if no corresponding user data found.
+        Returns the root oid if no On Platform Identity found.
+
+        :return: namedtuple(user_oid, user_name)
+        """
+        udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
+
+        # No user data found? Return None
+        if not udata:
+            return None
+
+        UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
+
+        # Name has been set? Return it
+        if udata.config.name:
+            return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
+
+        # On Platform Identity found? Try to find the name and return it
+        if udata.on_plat_oids:
+            for onplatoid in udata.on_plat_oids:
+                onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
+
+                if onplat_data:
+                    return UserNameQuery(user_id=root_oid, user_name=onplat_data.get_name(channel_data))
+                else:
+                    MailSender.send_email(
+                        f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
+                        f"corresponding On-Platform data found.")
+
+        return UserNameQuery(user_id=root_oid, user_name=str(root_oid))
 
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)

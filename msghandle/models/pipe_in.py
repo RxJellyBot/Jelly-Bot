@@ -22,6 +22,21 @@ class Event(ABC):
         self.channel_model = channel_model
         self.channel_type = sys_ctype
 
+    @property
+    def platform(self) -> Platform:
+        return self.channel_model.platform
+
+    @property
+    def user_token(self) -> Optional:
+        if self.platform == Platform.LINE:
+            from extline import LineApiUtils
+
+            return LineApiUtils.get_user_id(self.raw)
+        elif self.platform == Platform.DISCORD:
+            return self.raw.author.id
+        else:
+            return None
+
 
 class MessageEventObject(Event, ABC):
     def __init__(

@@ -14,7 +14,7 @@ __all__ = ["process_calculator"]
 
 # Obtained and modified from https://stackoverflow.com/a/14822667
 def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    if e.text[-1] == "=":
+    if e.text and e.text[-1] == "=":
         expr = e.text[:-1]
         symbol_vals = {}
 

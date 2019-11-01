@@ -22,7 +22,7 @@
                     <div class="card-body">
                         <div class="card-text h2">
                             <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto mb-3">
+                                <div class="col-lg-auto">
                                     <code>{{ channel_data.id }}</code>
                                 </div>
                                 {% if manageable %}
@@ -35,6 +35,32 @@
                                 {% endif %}
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Message Statistics" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 1 Day" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
+                        {% include "info/channel/main_table.html" with message_stats=user_message_data1d %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 7 Days" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
+                        {% include "info/channel/main_table.html" with message_stats=user_message_data7d %}
                     </div>
                 </div>
             </div>

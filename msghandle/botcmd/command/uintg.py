@@ -18,7 +18,7 @@ def issue_token(e: TextMessageEventObject):
     result = TokenActionManager.enqueue_action(e.root_oid, TokenAction.INTEGRATE_USER_IDENTITY)
     if result.success:
         return _("User Identity Integration process started.\nToken: `{}`\nExpiry: `{}`\n\n"
-                 "Please record the token and go to {}{} to complete the integration.").format(\
+                 "Please record the token and go to {}{} to complete the integration.").format(
             result.token, result.expiry.strftime("%Y-%m-%d %H:%M:%S"), HostUrl, reverse("account.integrate")
         )
     else:

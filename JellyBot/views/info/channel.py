@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -7,7 +9,12 @@ from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
+from models import ChannelModel
 from mongodb.factory import ChannelManager, ProfileManager
+from mongodb.helper import MessageStatsDataProcessor
+
+# FIXME: Channel Info cannot display Discord name probably because the client has not started
+# FIXME: Discrod Server Message Stats
 
 
 class ChannelInfoView(TemplateResponseMixin, View):
@@ -20,14 +27,22 @@ class ChannelInfoView(TemplateResponseMixin, View):
         channel_oid_str = kwargs.get("channel_oid", "")
         channel_oid = safe_cast(channel_oid_str, ObjectId)
 
-        c_prof = ChannelManager.get_channel_oid(channel_oid)
+        channel_data: Optional[ChannelModel] = ChannelManager.get_channel_oid(channel_oid)
 
-        if c_prof:
+        if channel_data:
+            msgdata_1d = MessageStatsDataProcessor.get_user_messages(channel_data, 24)
+            msgdata_7d = MessageStatsDataProcessor.get_user_messages(channel_data, 168)
+
             return render_template(
-                self.request, _("Channel Info - {}").format(channel_oid), "info/channel.html",
+                self.request, _("Channel Info - {}").format(channel_oid), "info/channel/main.html",
                 {
-                    "channel_data": c_prof,
-                    "manageable": bool(ProfileManager.get_user_profiles(channel_oid, get_root_oid(request)))
+                    "channel_data": channel_data,
+                    "user_message_data1d": sorted(msgdata_1d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "msg_count1d": msgdata_1d.msg_count,
+                    "user_message_data7d": sorted(msgdata_7d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "msg_count7d": msgdata_7d.msg_count,
+                    "manageable": bool(
+                        ProfileManager.get_user_profiles(channel_oid, get_root_oid(request)))
                 },
                 nav_param=kwargs)
         else:
@@ -41,4 +56,4 @@ class ChannelInfoSearchView(TemplateResponseMixin, View):
         # INCOMPLETE: Channel Info: .../info/channel for users to search channel info
         #   Allow to search channel by various conditions (ID, profile names, messages...etc.)
         return render_template(
-            self.request, _("Channel Info Search"), "info/channel_search.html", nav_param=kwargs)
+            self.request, _("Channel Info Search"), "info/channel/search.html", nav_param=kwargs)

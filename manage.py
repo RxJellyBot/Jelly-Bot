@@ -1,5 +1,8 @@
 import os
 import sys
+from threading import Thread
+
+from extdiscord import run_server
 
 
 def django_main():
@@ -15,5 +18,10 @@ def django_main():
     execute_from_command_line(sys.argv)
 
 
+def discord_main():
+    run_server()
+
+
 if __name__ == '__main__':
-    django_main()
+    Thread(target=django_main).start()
+    Thread(target=discord_main).start()

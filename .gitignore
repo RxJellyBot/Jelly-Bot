@@ -3,4 +3,5 @@ __pycache__/
 lib/
 *.bat
 tests/sandbox.py
+tests/sandbox_cs435.py
 tests/sandbox_mongo.py
