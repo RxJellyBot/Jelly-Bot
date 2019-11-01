@@ -24,6 +24,7 @@ def discord_main():
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == "runserver":
-        Thread(target=discord_main).start()
+    # FIXME: `RuntimeError: set_wakeup_fd only works in main thread` on Heroku (Ubuntu 18.03)
+    # if sys.argv[1] == "runserver":
+    #     Thread(target=discord_main).start()
     django_main()

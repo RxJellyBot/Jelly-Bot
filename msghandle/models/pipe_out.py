@@ -49,11 +49,13 @@ class HandledMessageEventLineSticker(HandledMessageEvent):
 
 class HandledMessageCalculateResult(HandledMessageEventText):
     def __init__(self, content: str, latex: str):
+        # FIXME: Content reformat
         super().__init__(content)
         self.latex = latex
 
     @property
     def latex_available(self) -> bool:
+        # FIXME: 0.0361 should be equal to 0.0361000000 (etc.)
         return self.latex != self.content
 
     @property
