@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 from typing import List, Tuple, Type
 import traceback
@@ -7,6 +8,7 @@ from django.urls import reverse
 from linebot.models import TextSendMessage, ImageSendMessage
 
 from flags import MessageType
+from extutils.utils import list_insert_in_between
 from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
 from JellyBot.systemconfig import PlatformConfig, HostUrl
@@ -47,8 +49,7 @@ class HandledEventsHolderPlatform:
                      _("{} content(s) was recorded to the database because of the following reason(s):{}\nURL: {}")
                      .format(
                          len(self.to_site),
-                         "".join([f"\n - {getattr(ToSiteReason, v)}" for v in vars(ToSiteReason)
-                                 if not callable(getattr(ToSiteReason, v)) and not v.startswith("__")]),
+                         "".join([f"\n - {reason}" for reason, content in self.to_site]),
                          url)
                      )
                 )
@@ -115,6 +116,9 @@ class HandledEventsHolderPlatform:
                     Embed()
                     .set_image(url=LineStickerManager.get_sticker_url(content))
                     .set_footer(text=f"Line Sticker ID: {content}"))
+
+        # Insert separator between responses
+        send_list = list_insert_in_between(send_list, "------------------------------")
 
         # 2 For loops so that responses seem to be sent at once
         for s in send_list:

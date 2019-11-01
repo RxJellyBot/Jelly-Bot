@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from JellyBot.views import render_template, WebsiteErrorView
+from JellyBot.keys import URLPathParameter
 from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
@@ -13,8 +14,7 @@ from models import ChannelModel
 from mongodb.factory import ChannelManager, ProfileManager
 from mongodb.helper import MessageStatsDataProcessor
 
-# FIXME: Channel Info cannot display Discord name probably because the client has not started
-# FIXME: Discrod Server Message Stats
+# FIXME: Discord Server Message Stats
 
 
 class ChannelInfoView(TemplateResponseMixin, View):
@@ -24,7 +24,7 @@ class ChannelInfoView(TemplateResponseMixin, View):
 
         # `channel_oid` may be misformatted.
         # If so, `safe_cast` will yield `None` while the original parameter needs to be kept for the case of not found.
-        channel_oid_str = kwargs.get("channel_oid", "")
+        channel_oid_str = kwargs.get(URLPathParameter.ChannelOid, "")
         channel_oid = safe_cast(channel_oid_str, ObjectId)
 
         channel_data: Optional[ChannelModel] = ChannelManager.get_channel_oid(channel_oid)

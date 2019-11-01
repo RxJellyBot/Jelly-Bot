@@ -114,8 +114,12 @@ def _construct_info_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Channel"), link=reverse("info.channel.search"), parent=info_parent))
 
     # Hidden Items
-    __attach__(info_parent, NavHidden, current_path, _("Channel"), "info.channel", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path, _("Profile Info"), "info.profile", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path,
+               _("Channel - {}").format(nav_param.get(keys.URLPathParameter.ChannelOid, "N/A")),
+               "info.channel", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path,
+               _("Profile Info").format(nav_param.get(keys.URLPathParameter.ProfileOid, "N/A")),
+               "info.profile", nav_param, info_parent)
 
     return info_parent
 

@@ -225,7 +225,8 @@ class ProfileManager:
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
-                [f'{cnl_id}: {" / ".join(prof_ids)}' for cnl_id, prof_ids in not_found_prof_oids_dict])
+                [f'{cnl_id}: {" / ".join([str(oid) for oid in prof_ids])}'
+                 for cnl_id, prof_ids in not_found_prof_oids_dict.items()])
 
             MailSender.send_email_async(
                 f"User ID: <code>{root_uid}</code><hr>"

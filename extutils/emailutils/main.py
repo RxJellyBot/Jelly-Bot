@@ -21,7 +21,7 @@ class MailSender:
         :param subject: The subject of the email.
         :param prefix: Prefix of the subject. Set to `None` means no prefix.
         """
-        if content_html in MailSender._cache_:
+        if content_html not in MailSender._cache_:
             if recipients is None:
                 recipients = [settings.EMAIL_HOST_USER]
 
@@ -36,7 +36,6 @@ class MailSender:
     def send_email_async(
             content_html: str, recipients: list = None,
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
-
         Thread(
             target=MailSender.send_email, args=(content_html,),
             kwargs={"recipients": recipients, "subject": subject, "prefix": prefix}).start()
