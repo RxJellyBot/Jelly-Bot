@@ -20,7 +20,7 @@ def django_main():
 
 
 def discord_main():
-    Thread(target=run_server).start()
+    run_server()
 
 
 if __name__ == '__main__':

@@ -57,6 +57,11 @@ _inst = DiscordClientWrapper()
 
 
 def run_server():
+    thread = threading.Thread(target=start_client)
+    thread.start()
+
+
+def start_client():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     _inst.run(discord_token)
