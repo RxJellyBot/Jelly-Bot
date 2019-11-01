@@ -78,6 +78,7 @@ class HandledEventsHolderPlatform:
                 #   Content should be displayed directly if working properly.
                 self.to_site.append((ToSiteReason.TOO_MANY_LINES, e.content))
             elif isinstance(e, HandledMessageCalculateResult) and e.latex_available:
+                self.to_send.append((e.msg_type, e.content))
                 self.to_site.append((ToSiteReason.LATEX_AVAILABLE, e.latex_for_html))
             else:
                 self.to_send.append((e.msg_type, e.content))
