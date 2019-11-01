@@ -22,14 +22,17 @@ class BaseDataTypeConverter(ABC):
         if type(data) == type_annt:
             return data
 
-        if type_annt is not Parameter.empty and type_annt not in cls.valid_data_types + cls._ignore:
+        if type_annt is not Parameter.empty \
+                and type_annt not in cls.valid_data_types + cls._ignore\
+                and type_annt.__origin__ is not Union:
             return cls.on_type_invalid(data, type_annt)
 
         try:
-            if type_annt not in cls._ignore:
-                return type_annt(data)
-            elif type_annt.__origin__ is Union:
+            # [origin is Union] before [not in _ignore] so if type_annt is Union, then it won't go to `type_annt(data)`
+            if hasattr(type_annt, "__origin__") and type_annt.__origin__ is Union:
                 return cls._cast_union_(data, type_annt)
+            elif type_annt not in cls._ignore:
+                return type_annt(data)
             else:
                 return data
         except Exception as e:
@@ -39,12 +42,14 @@ class BaseDataTypeConverter(ABC):
     def _cast_union_(cls, data: Any, type_annt):
         last_e = None
 
-        for arg in type_annt.__args__:
+        for allowed_type in type_annt.__args__:
             try:
-                if arg is None:
+                if allowed_type is None:
                     return None
+                elif type(data) == allowed_type:
+                    return data
                 else:
-                    return arg(data)
+                    return allowed_type(data)
             except Exception as e:
                 last_e = e
 

@@ -14,7 +14,7 @@ from .user import _inst as RootUserManager
 # noinspection PyPep8Naming
 from .stats import _inst as APIStatisticsManager, _inst2 as MessageRecordStatisticsManager
 # noinspection PyPep8Naming
-from .tkact import _inst as TokenActionManager, TokenActionRequiredKeys
+from .tkact import _inst as TokenActionManager
 # noinspection PyPep8Naming
 from .exctnt import _inst as ExtraContentManager
 from ._base import BaseCollection

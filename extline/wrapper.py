@@ -1,12 +1,13 @@
 import os
 import sys
-from typing import List, Union
+from typing import List, Union, Optional
 
 from linebot import LineBotApi
-from linebot.models import TextSendMessage, SendMessage
+from linebot.exceptions import LineBotApiError
+from linebot.models import TextSendMessage, SendMessage, Profile
 
 from flags import ChannelType
-
+from models import ChannelModel
 
 __all__ = ["line_api", "_inst", "LineApiUtils"]
 
@@ -37,6 +38,33 @@ class LineApiWrapper:
     def reply_message(self, reply_token, messages: SendMessage):
         self._core.reply_message(reply_token, messages)
 
+    def get_profile(self, uid, channel_data: Optional[ChannelModel] = None) -> Optional[Profile]:
+        ctype = ChannelType.UNKNOWN
+
+        if channel_data:
+            ctype = LineApiUtils.get_channel_type(channel_data.token)
+
+        try:
+            if ctype == ChannelType.GROUP_PUB_TEXT:
+                return self._core.get_group_member_profile(channel_data.token, uid)
+            elif ctype == ChannelType.GROUP_PRV_TEXT:
+                return self._core.get_room_member_profile(channel_data.token, uid)
+            else:
+                return self._core.get_profile(uid)
+        except LineBotApiError as ex:
+            if ex.status_code == 404:
+                return None
+            else:
+                raise ex
+
+    def get_user_name_safe(self, uid, channel_data: Optional[ChannelModel] = None) -> Optional[str]:
+        prof = self.get_profile(uid, channel_data)
+
+        if prof:
+            return prof.display_name
+        else:
+            return None
+
 
 class LineApiUtils:
     @staticmethod
@@ -45,7 +73,7 @@ class LineApiUtils:
 
     @staticmethod
     def get_user_id(event):
-        return event.sender_id
+        return event.user_id
 
     @staticmethod
     def get_channel_type(channel_token: str):
@@ -54,7 +82,7 @@ class LineApiUtils:
             return ChannelType.PRIVATE_TEXT
         elif key == "C":
             return ChannelType.GROUP_PUB_TEXT
-        elif key == "C":
+        elif key == "R":
             return ChannelType.GROUP_PRV_TEXT
         else:
             return ChannelType.UNKNOWN

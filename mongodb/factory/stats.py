@@ -1,11 +1,11 @@
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timezone, timedelta
+from typing import Any, Optional
 
 from bson import ObjectId
 
 from flags import APICommand, MessageType
 from mongodb.factory.results import RecordAPIStatisticsResult, MessageRecordResult
-from models import APIStatisticModel, MessageRecordModel
+from models import APIStatisticModel, MessageRecordModel, OID_KEY
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -46,6 +46,32 @@ class MessageRecordStatisticsManager(BaseCollection):
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type, MessageContent=message_content)
 
         return MessageRecordResult(outcome, entry, ex)
+
+    def get_channel_user_messages(
+            self, channel_oid: ObjectId, hours_within: Optional[int] = None) \
+            -> dict:
+        """
+        :return: {<USER_OID>: <MESSAGE_COUNT>, <USER_OID>: <MESSAGE_COUNT>...}
+        """
+        match_d = {MessageRecordModel.ChannelOid.key: channel_oid}
+        if hours_within:
+            match_d.update(**{
+                OID_KEY: {
+                    "$gt": ObjectId.from_datetime(
+                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
+                }})
+
+        aggr_pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": "$" + MessageRecordModel.UserRootOid.key,
+                "count": {"$sum": 1}
+            }}
+        ]
+
+        ret = list(self.aggregate(aggr_pipeline))
+
+        return {d["_id"]: d["count"] for d in ret}
 
 # INCOMPLETE: Bot Statistics: Implement stats for recording message activity and message content
 #   accompany with jieba https://github.com/fxsjy/jieba to provide message summary feature

@@ -28,7 +28,7 @@ class LocaleInfo:
 @dataclass
 class LanguageInfo:
     name: str
-    abbr: str
+    code: str
 
 
 class PytzInfo(tzinfo):
@@ -75,8 +75,6 @@ PER = LocaleInfo(_("Oceania: Perth, Australia"), "Australia/Perth")
 SYD = LocaleInfo(_("Oceania: Sydney, Australia"), "Australia/Sydney")
 UTC = LocaleInfo(_("Universal Time Coordinated"), "UTC")
 
-default_locale = TWN
-
 locales = [
     HKG, MYS, MAC, KOR, SGP, TWN, JPN,
     GBR,
@@ -85,9 +83,15 @@ locales = [
     UTC
 ]
 
+default_locale = TWN
+
+EN_US = LanguageInfo(_("English (United States)"), "en_US")
+ZH_TW = LanguageInfo(_("Chinese (Taiwan)"), "zh_TW")
+
 languages = [
-    LanguageInfo(_("English (United States)"), "en_US"),
-    LanguageInfo(_("Chinese (Taiwan)"), "zh_TW")
+    EN_US, ZH_TW
 ]
+
+default_language = ZH_TW
 
 # OPTIMIZE: Store `language` and `locale` in the database using code(int) instead of string
