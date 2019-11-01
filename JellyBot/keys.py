@@ -24,3 +24,9 @@ class Css:
 # Param Dict Prefix
 class ParamDictPrefix:
     PostKey = "x-"  # Used in http POST params from HTML forms
+
+
+# URL Path Parameter Name
+class URLPathParameter:
+    ChannelOid = "channel_oid"
+    ProfileOid = "profile_oid"

@@ -7,13 +7,16 @@ from django.views.generic.base import TemplateResponseMixin
 from extutils import safe_cast
 from flags import PermissionCategory, WebsiteError
 from mongodb.factory import ProfileManager
+from JellyBot.keys import URLPathParameter
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components.mixin import LoginRequiredMixin
 
 
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, **kwargs):
-        profile_oid = safe_cast(kwargs["profile_oid"], ObjectId)
+        profile_oid_str = kwargs.get(URLPathParameter.ProfileOid, "")
+        profile_oid = safe_cast(profile_oid_str, ObjectId)
+
         profile_data = ProfileManager.get_profile(profile_oid)
 
         if profile_data:

@@ -116,7 +116,7 @@ class MessageEventObjectFactory:
             raise ValueError(
                 f"Channel type not supported. ({message.channel.type})"
                 f"Currently supported channel types: "
-                f"{', '.join(MessageEventObjectFactory.DiscordAcceptedChannelTypes)}")
+                f"{', '.join([str(t) for t in MessageEventObjectFactory.DiscordAcceptedChannelTypes])}")
 
         user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.DISCORD, message.author.id)
         channel_model = MessageEventObjectFactory._ensure_channel_(

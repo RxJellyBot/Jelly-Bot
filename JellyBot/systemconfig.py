@@ -73,7 +73,7 @@ class ChannelConfig:
 
 
 class Email:
-    EmailCacheExpirySeconds = 600  # 10 mins
+    EmailCacheExpirySeconds = 3600  # 60 mins
     DefaultSubject = "Email Notification from Jelly BOT"
     DefaultPrefix = "Jelly BOT - "
 
