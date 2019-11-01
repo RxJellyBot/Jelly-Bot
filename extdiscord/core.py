@@ -35,7 +35,8 @@ class DiscordClient(Client):
 
 class DiscordClientWrapper:
     def __init__(self):
-        self._core = DiscordClient(loop=asyncio.new_event_loop())
+        self._loop = asyncio.new_event_loop()
+        self._core = DiscordClient(loop=self._loop)
 
     def run(self, token):
         self._core.run(token)
@@ -52,16 +53,21 @@ class DiscordClientWrapper:
         else:
             return None
 
+    @property
+    def discord_client(self):
+        return self._core
+
+    @property
+    def discord_loop(self):
+        return self._loop
+
 
 _inst = DiscordClientWrapper()
 
 
 def run_server():
-    thread = threading.Thread(target=start_client)
+    # FIXME: `RuntimeError: set_wakeup_fd only works in main thread` on Heroku (Ubuntu 18.03)
+    #   Cannot use `Process` or DiscordClient won't be shared
+
+    thread = threading.Thread(target=_inst.discord_loop.run_until_complete, args=(_inst.start(discord_token),))
     thread.start()
-
-
-def start_client():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    _inst.run(discord_token)
