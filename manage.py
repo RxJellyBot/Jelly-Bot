@@ -1,6 +1,6 @@
 import os
 import sys
-from threading import Thread
+from multiprocessing import Process
 
 from extdiscord import run_server
 
@@ -23,5 +23,5 @@ def discord_main():
 
 
 if __name__ == '__main__':
-    Thread(target=discord_main).start()
+    Process(target=discord_main).start()
     django_main()
