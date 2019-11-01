@@ -1,5 +1,6 @@
 import asyncio
 from typing import Optional
+import threading
 
 from discord import Client, Activity, ActivityType
 
@@ -39,6 +40,9 @@ class DiscordClientWrapper:
     def run(self, token):
         self._core.run(token)
 
+    async def start(self, token):
+        await self._core.start(token)
+
     @param_type_ensure
     def get_user_name_safe(self, uid: int) -> Optional[str]:
         udata = self._core.get_user(uid)
@@ -53,7 +57,6 @@ _inst = DiscordClientWrapper()
 
 
 def run_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     _inst.run(discord_token)
-
-
-
