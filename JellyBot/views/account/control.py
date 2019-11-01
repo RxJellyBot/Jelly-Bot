@@ -94,5 +94,5 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Account Settings"), "account/settings.html",
             {"locale_list": sorted(locales, key=lambda item: item.description),
-             "lang_list": sorted(languages, key=lambda item: item.abbr),
+             "lang_list": sorted(languages, key=lambda item: item.code),
              "current_config": config})

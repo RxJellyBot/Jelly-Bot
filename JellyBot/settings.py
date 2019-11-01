@@ -60,8 +60,6 @@ ALLOWED_HOSTS = [
     'testserver',
     'localhost',
     '127.0.0.1',
-    'newjellybot.herokuapp.com',
-    'newjellybot-beta.herokuapp.com',
     'jelly.raenonx.cc',
     'jelly.beta.raenonx.cc'
 ]
