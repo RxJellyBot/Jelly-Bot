@@ -333,7 +333,7 @@ class ControlExtensionMixin(Collection):
     def find_checkable_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> CheckableCursor:
         return CheckableCursor(self.find(filter_, *args, **kwargs), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs)-> Optional[Model]:
+    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs) -> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
 
     @staticmethod

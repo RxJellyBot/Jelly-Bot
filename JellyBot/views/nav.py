@@ -115,10 +115,10 @@ def _construct_info_(current_path, parent, nav_param):
 
     # Hidden Items
     __attach__(info_parent, NavHidden, current_path,
-               _("Channel - {}").format(nav_param.get(keys.URLPathParameter.ChannelOid, "N/A")),
+               _("Channel - {}").format(nav_param.get("channel_oid", "N/A")),
                "info.channel", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,
-               _("Profile Info").format(nav_param.get(keys.URLPathParameter.ProfileOid, "N/A")),
+               _("Profile Info").format(nav_param.get("profile_oid", "N/A")),
                "info.profile", nav_param, info_parent)
 
     return info_parent

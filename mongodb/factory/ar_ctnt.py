@@ -48,7 +48,7 @@ class AutoReplyContentManager(BaseCollection):
         if entry_none and add_on_not_found:
             add_result = self.add_content(content, type_)
 
-            if WriteOutcome.is_inserted(add_result.outcome):
+            if add_result.outcome.is_inserted:
                 ret_entry = self._get_content_(content, type_, case_insensitive)
                 outcome = GetOutcome.O_ADDED
             else:

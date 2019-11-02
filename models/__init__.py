@@ -12,7 +12,7 @@ from .ar import (
 # noinspection PyUnresolvedReferences
 from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel
 # noinspection PyUnresolvedReferences
-from .channel import ChannelModel, ChannelConfigModel
+from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 # noinspection PyUnresolvedReferences
 from .stats import APIStatisticModel, MessageRecordModel
 # noinspection PyUnresolvedReferences

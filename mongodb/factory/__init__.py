@@ -2,7 +2,7 @@ from .factory import MONGO_CLIENT
 # noinspection PyPep8Naming
 from .rpdata import _inst as PendingRepairDataManager
 # noinspection PyPep8Naming
-from .channel import _inst as ChannelManager
+from .channel import _inst as ChannelManager, _inst2 as ChannelCollectionManager
 # noinspection PyPep8Naming
 from .prof import _inst as ProfileManager
 # noinspection PyPep8Naming
