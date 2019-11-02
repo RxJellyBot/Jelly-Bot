@@ -1,7 +1,9 @@
 from datetime import datetime, timezone, timedelta
-from typing import Any, Optional
+from typing import Any, Optional, Union, List
 
+import pymongo
 from bson import ObjectId
+from pymongo.command_cursor import CommandCursor
 
 from flags import APICommand, MessageType
 from mongodb.factory.results import RecordAPIStatisticsResult, MessageRecordResult
@@ -47,13 +49,17 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return MessageRecordResult(outcome, entry, ex)
 
-    def get_channel_user_messages(
-            self, channel_oid: ObjectId, hours_within: Optional[int] = None) \
-            -> dict:
-        """
-        :return: {<USER_OID>: <MESSAGE_COUNT>, <USER_OID>: <MESSAGE_COUNT>...}
-        """
-        match_d = {MessageRecordModel.ChannelOid.key: channel_oid}
+    def get_user_messages(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
+            sort: bool = False) \
+            -> CommandCursor:
+        if isinstance(channel_oids, ObjectId):
+            match_d = {MessageRecordModel.ChannelOid.key: channel_oids}
+        elif isinstance(channel_oids, list):
+            match_d = {MessageRecordModel.ChannelOid.key: {"$in": channel_oids}}
+        else:
+            raise ValueError("Parameter `channel_oids` must be either `ObjectId` or `List[ObjectId]`.")
+
         if hours_within:
             match_d.update(**{
                 OID_KEY: {
@@ -69,9 +75,10 @@ class MessageRecordStatisticsManager(BaseCollection):
             }}
         ]
 
-        ret = list(self.aggregate(aggr_pipeline))
+        if sort:
+            aggr_pipeline.append({"$sort": {"count": pymongo.DESCENDING, "_id": pymongo.ASCENDING}})
 
-        return {d["_id"]: d["count"] for d in ret}
+        return self.aggregate(aggr_pipeline)
 
 
 _inst = APIStatisticsManager()

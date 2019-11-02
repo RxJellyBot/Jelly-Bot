@@ -118,8 +118,11 @@ def _construct_info_(current_path, parent, nav_param):
                _("Channel - {}").format(nav_param.get("channel_oid", "N/A")),
                "info.channel", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,
-               _("Profile Info").format(nav_param.get("profile_oid", "N/A")),
+               _("Profile Info - {}").format(nav_param.get("profile_oid", "N/A")),
                "info.profile", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path,
+               _("Channel Collection Info - {}").format(nav_param.get("chcoll_oid", "N/A")),
+               "info.chcoll", nav_param, info_parent)
 
     return info_parent
 

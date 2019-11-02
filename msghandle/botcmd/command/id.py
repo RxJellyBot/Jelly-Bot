@@ -12,38 +12,138 @@ cmd = CommandNode(
     _("Check the information of various things (see the description section for more details)."))
 cmd_me = cmd.new_child_node(["me", "my"])
 cmd_ch = cmd.new_child_node(["ch", "channel"])
+cmd_id = cmd.new_child_node(["id"])
 
 
-@cmd_me.command_function(description=_("Check the user info of self."))
-def check_sender_identity(e: TextMessageEventObject):
-    ret = _("User ID: `{}`").format(e.user_model.id)
+def _user_id_section_(e: TextMessageEventObject):
+    ret = [_("User ID: `{}`").format(e.user_model.id)]
 
     if e.user_token:
-        ret += "\n" + _("User Token: `{}`").format(e.user_token)
+        ret.append(_("User Token: `{}`").format(e.user_token))
 
     return ret
 
 
-@cmd_ch.command_function(description=_("Check the channel info."))
-def check_channel_info(e: TextMessageEventObject):
-    limit = 10
+def _channel_id_section_(e: TextMessageEventObject):
+    return [_("Channel ID: `{}`").format(e.channel_model.id),
+            _("Channel Token: `{}`").format(e.channel_model.token)]
+
+
+def _channel_info_url_(e: TextMessageEventObject):
+    return [_("Channel Detailed Info URL: {}{}").format(
+        HostUrl, reverse("info.channel", kwargs={"channel_oid": e.channel_oid}))]
+
+
+def _chcoll_id_section_(e: TextMessageEventObject):
+    ret = []
+
+    if e.chcoll_model:
+        ret.append(_("Channel Collection ID: `{}`").format(e.chcoll_model.id))
+        ret.append(_("Channel Collection Token: `{}`").format(e.chcoll_model.token))
+
+    return ret
+
+
+def _chcoll_info_url_(e: TextMessageEventObject):
+    return [_("Channel Collection Detailed Info URL: {}{}").format(
+        HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
+
+
+def _user_ranking_section_(e: TextMessageEventObject):
+    ret = []
+
+    rk_ch_1d = MessageStatsDataProcessor.get_user_channel_ranking(e.channel_model, e.user_model.id, 24)
+    if rk_ch_1d.available:
+        ret.append(_("Current Channel Message Count Ranking in 1 Day - {}").format(str(rk_ch_1d)))
+
+    rk_ch_7d = MessageStatsDataProcessor.get_user_channel_ranking(e.channel_model, e.user_model.id, 168)
+    if rk_ch_7d.available:
+        ret.append(_("Current Channel Message Count Ranking in 7 Days - {}").format(str(rk_ch_7d)))
+
+    rk_ccoll_1d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 24)
+    if rk_ccoll_1d.available:
+        ret.append(_("Channel Collection Message Count Ranking in 1 Day - {}").format(str(rk_ccoll_1d)))
+
+    rk_ccoll_7d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 168)
+    if rk_ccoll_7d.available:
+        ret.append(_("Channel Collection Message Count Ranking in 7 Days - {}").format(str(rk_ccoll_7d)))
+
+    return ret
+
+
+def _channel_msg_count_list_section_(e: TextMessageEventObject, limit):
+    ret = []
 
     mem_stats = list(
         sorted(
-            MessageStatsDataProcessor.get_user_messages(
+            MessageStatsDataProcessor.get_user_channel_messages(
                 e.channel_model, hours_within=168).member_stats,
             key=lambda x: x.message_count, reverse=True))[:limit]
 
-    return _("Channel ID: `{}`\n"
-             "Channel Token: `{}`\n"
-             "\n"
-             "Top {} Message Count in 7 Days:\n```\n"
-             "{}"
-             "\n```\n"
-             "Visit {}{} for more details.").format(
-        e.channel_oid,
-        e.channel_model.token,
-        limit,
-        "\n".join([f"{entry.message_count:>6} ({entry.message_percentage:>7.02%}) - {entry.user_name}"
-                   for entry in mem_stats]),
-        HostUrl, reverse("info.channel", kwargs={"channel_oid": e.channel_oid}))
+    ret.append(_("Top {} Message Count in 7 Days in this channel:").format(limit))
+    ret.append("```")
+    ret.append("\n".join(
+        [f"{entry.message_count:>6} ({entry.message_percentage:>7.02%}) - {entry.user_name}" for entry in mem_stats]))
+    ret.append("```")
+
+    return ret
+
+
+def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
+    ret = []
+
+    if e.chcoll_model:
+        mem_stats_chcoll = list(
+            sorted(
+                MessageStatsDataProcessor.get_user_chcoll_messages(
+                    e.chcoll_model, hours_within=168).member_stats,
+                key=lambda x: x.message_count, reverse=True))[:limit]
+
+        ret.append("")
+        ret.append(_("Top {} Message Count in 7 Days in this channel collection:").format(limit))
+        ret.append("```")
+        ret.append("\n".join(
+            [f"{entry.message_count:>6} ({entry.message_percentage:>7.02%}) - {entry.user_name}" for entry in
+             mem_stats_chcoll]))
+        ret.append("```")
+
+    return ret
+
+
+@cmd_me.command_function(description=_("Check the user info of self."))
+def check_sender_identity(e: TextMessageEventObject):
+    ret = []
+
+    ret.extend(_user_id_section_(e))
+    ret.extend(_user_ranking_section_(e))
+
+    return "\n".join(ret)
+
+
+@cmd_ch.command_function(description=_("Check the channel info."))
+def check_channel_info(e: TextMessageEventObject):
+    ret = []
+
+    limit = 10
+
+    ret.extend(_chcoll_id_section_(e))
+    ret.extend(_chcoll_info_url_(e))
+    ret.extend(_channel_id_section_(e))
+    ret.extend(_channel_info_url_(e))
+
+    ret.append("")
+    ret.extend(_channel_msg_count_list_section_(e, limit))
+    ret.extend(_chcoll_msg_count_list_section_(e, limit))
+
+    return "\n".join(ret)
+
+
+@cmd_id.command_function(description=_("Check the current channel and the self user id."))
+def check_ids(e: TextMessageEventObject):
+    ret = []
+
+    ret.extend(_channel_id_section_(e))
+    ret.extend(_chcoll_id_section_(e))
+    ret.extend(_user_id_section_(e))
+
+    return "\n".join(ret)

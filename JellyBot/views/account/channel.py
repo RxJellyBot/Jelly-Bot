@@ -28,14 +28,20 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
 
-        channel_conn_list = ProfileManager.get_user_channel_profiles(root_oid)
+        access_ok = []
+        access_no = []
+        for channel_conn in ProfileManager.get_user_channel_profiles(root_oid):
+            if channel_conn.channel_data.bot_accessible:
+                access_ok.append(channel_conn)
+            else:
+                access_no.append(channel_conn)
 
-        # FIXME: Hide bot inaccessible channels
         # TODO: In webpage, group channels by ChannelCollection
 
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
-                "channel_conn_list": channel_conn_list,
+                "conn_access_ok": access_ok,
+                "conn_access_no": access_no,
                 "bot_cmd_info_code": cmd_id.main_cmd_code
             })
 

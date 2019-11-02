@@ -46,7 +46,7 @@ class MessageEventObject(Event, ABC):
         super().__init__(raw, channel_model, sys_ctype)
         self.content = content
         self.user_model = user_model
-        self.ch_parent_model = ch_parent_model
+        self.chcoll_model = ch_parent_model
 
     @property
     def message_type(self) -> MessageType:
@@ -121,7 +121,7 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def from_discord(message: Message) -> MessageEventObject:
-        from extdiscord.utils import channel_repr
+        from extdiscord.utils import msg_loc_repr
 
         if message.channel.type not in MessageEventObjectFactory.DiscordAcceptedChannelTypes:
             raise ValueError(
@@ -132,7 +132,7 @@ class MessageEventObjectFactory:
         user_model = MessageEventObjectFactory._ensure_user_idt_(
             Platform.DISCORD, message.author.id)
         channel_model = MessageEventObjectFactory._ensure_channel_(
-            Platform.DISCORD, message.channel.id, channel_repr(message))
+            Platform.DISCORD, message.channel.id, msg_loc_repr(message))
         ch_parent_model = MessageEventObjectFactory._ensure_channel_parent_(
             Platform.DISCORD, message.guild.id, channel_model.id, str(message.guild))
         return TextMessageEventObject(

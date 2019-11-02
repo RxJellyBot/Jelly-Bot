@@ -9,11 +9,10 @@ from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
-from models import ChannelModel
-from mongodb.factory import ChannelManager, ProfileManager
+from models import ChannelModel, ChannelCollectionModel
+from mongodb.factory import ChannelManager, ProfileManager, ChannelCollectionManager
 from mongodb.helper import MessageStatsDataProcessor
 
-# FIXME: Discord Server Message Stats
 # TODO: Click to update the channel name (Discord)
 
 
@@ -30,13 +29,18 @@ class ChannelInfoView(TemplateResponseMixin, View):
         channel_data: Optional[ChannelModel] = ChannelManager.get_channel_oid(channel_oid)
 
         if channel_data:
-            msgdata_1d = MessageStatsDataProcessor.get_user_messages(channel_data, 24)
-            msgdata_7d = MessageStatsDataProcessor.get_user_messages(channel_data, 168)
+            chcoll_data: Optional[ChannelCollectionModel] = \
+                ChannelCollectionManager.get_chcoll_child_channel(channel_data.id)
+
+            msgdata_1d = MessageStatsDataProcessor.get_user_channel_messages(channel_data, 24)
+            msgdata_7d = MessageStatsDataProcessor.get_user_channel_messages(channel_data, 168)
 
             return render_template(
                 self.request, _("Channel Info - {}").format(channel_oid), "info/channel/main.html",
                 {
+                    "ch_name": channel_data.get_channel_name(get_root_oid(request)),
                     "channel_data": channel_data,
+                    "chcoll_data": chcoll_data,
                     "user_message_data1d": sorted(msgdata_1d.member_stats, key=lambda x: x.message_count, reverse=True),
                     "msg_count1d": msgdata_1d.msg_count,
                     "user_message_data7d": sorted(msgdata_7d.member_stats, key=lambda x: x.message_count, reverse=True),

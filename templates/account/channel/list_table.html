@@ -3,38 +3,43 @@
 {% load utils %}
 
 <div class="row">
-    {% for channel_conn in channel_conn_list %}
+    {% for channel_conn in conn_list %}
         <div class="col-lg-6">
             <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">{{ channel_conn.channel.platform.key }}</h5>
+                <div class="card-body rounded{% if not channel_conn.channel_data.bot_accessible %} border border-danger{% endif %}">
+                    <h5 class="card-title">
+                        {{ channel_conn.channel_data.platform.key }}
+                        {% if not channel_conn.channel_data.bot_accessible %}
+                            -&nbsp;<small>{% trans "Inaccessible for Jelly Bot" %}</small>
+                        {% endif %}
+                    </h5>
                     <p>
                         <!--suppress HtmlFormInputWithoutLabel -->
                         <input type="text" class="form-control channel-name" value="{{ channel_conn.channel_name }}"
-                               data-channel="{{ channel_conn.channel.id }}">
+                               data-channel="{{ channel_conn.channel_data.id }}">
                     </p>
                     <div class="align-middle text-center">
                         <div class="btn-group">
                             <a class="btn btn-outline-primary"
-                               href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">
+                               href="{% url "account.channel.manage" channel_oid=channel_conn.channel_data.id %}">
                                 {% trans "Manage" %}
                             </a>
                             <a class="btn btn-outline-primary"
-                               href="{% url "info.channel" channel_oid=channel_conn.channel.id %}">
+                               href="{% url "info.channel" channel_oid=channel_conn.channel_data.id %}">
                                 {% trans "Check Info" %}
                             </a>
                             <a class="btn btn-outline-success" data-toggle="collapse" aria-expanded="false"
-                               href="#profile{{ channel_conn.channel.id }}">
+                               href="#profile{{ channel_conn.channel_data.id }}">
                                 {% trans "Check Profiles" %}
                             </a>
                             <a class="btn btn-outline-success" data-toggle="collapse" aria-expanded="false"
-                               href="#info{{ channel_conn.channel.id }}">
+                               href="#info{{ channel_conn.channel_data.id }}">
                                 {% trans "Check ID" %}
                             </a>
                         </div>
                     </div>
 
-                    <div class="collapse" id="profile{{ channel_conn.channel.id }}">
+                    <div class="collapse" id="profile{{ channel_conn.channel_data.id }}">
                         <div class="mt-3">
                             {% for profile_data in channel_conn.profiles %}
                                 <a class="btn btn-outline-dark mr-1 mb-1"
@@ -47,18 +52,18 @@
                         </div>
                     </div>
 
-                    <div class="collapse" id="info{{ channel_conn.channel.id }}">
+                    <div class="collapse" id="info{{ channel_conn.channel_data.id }}">
                         <div class="mt-3">
                             <h6>{% trans "Channel ID" %}</h6>
                             <div class="mb-3">
                                 <code class="h4">
-                                    <a href="{% url "info.channel" channel_oid=channel_conn.channel.id %}">{{ channel_conn.channel.id }}</a>
+                                    <a href="{% url "info.channel" channel_oid=channel_conn.channel_data.id %}">{{ channel_conn.channel_data.id }}</a>
                                 </code>
                             </div>
                             <h6>{% trans "Channel Token" %}</h6>
                             <div>
                                 <code class="h4">
-                                    {{ channel_conn.channel.token }}
+                                    {{ channel_conn.channel_data.token }}
                                 </code>
                             </div>
                         </div>

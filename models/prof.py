@@ -33,7 +33,7 @@ class ChannelProfileModel(Model):
 
 @dataclass
 class ChannelProfileListEntry:
-    channel: ChannelModel
+    channel_data: ChannelModel
     channel_name: str
     profiles: List[ChannelProfileModel]
 

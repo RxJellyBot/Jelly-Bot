@@ -8,6 +8,7 @@ from discord import (
     GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel
 )
 
+from extdiscord.utils import channel_full_repr
 from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
 from flags import Platform
@@ -74,7 +75,7 @@ class DiscordClient(Client):
     # noinspection PyMethodMayBeStatic
     async def on_guild_channel_create(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
         if channel.type == ChannelType.text:
-            reg_result = ChannelManager.register(Platform.DISCORD, channel.id, str(channel))
+            reg_result = ChannelManager.register(Platform.DISCORD, channel.id, channel_full_repr(channel))
 
             if not reg_result.success:
                 warn_txt = f"Guild Channel CREATED but the registration was failed. Channel token: {channel.id}"
@@ -94,7 +95,8 @@ class DiscordClient(Client):
             before: Union[TextChannel, VoiceChannel, CategoryChannel],
             after: Union[TextChannel, VoiceChannel, CategoryChannel]):
         if str(before) != str(after):
-            update_result = ChannelCollectionManager.update_default_name(Platform.DISCORD, after.guild.id, str(after))
+            update_result = ChannelCollectionManager.update_default_name(
+                Platform.DISCORD, after.guild.id, channel_full_repr(after))
 
             if not update_result.is_success:
                 warn_txt = f"Guild Channel Name UPDATED but the name was not updated. " \
