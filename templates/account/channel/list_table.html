@@ -19,13 +19,17 @@
                                href="{% url "account.channel.manage" channel_oid=channel_conn.channel.id %}">
                                 {% trans "Manage" %}
                             </a>
+                            <a class="btn btn-outline-primary"
+                               href="{% url "info.channel" channel_oid=channel_conn.channel.id %}">
+                                {% trans "Check Info" %}
+                            </a>
                             <a class="btn btn-outline-success" data-toggle="collapse" aria-expanded="false"
                                href="#profile{{ channel_conn.channel.id }}">
                                 {% trans "Check Profiles" %}
                             </a>
                             <a class="btn btn-outline-success" data-toggle="collapse" aria-expanded="false"
                                href="#info{{ channel_conn.channel.id }}">
-                                {% trans "Check Info" %}
+                                {% trans "Check ID" %}
                             </a>
                         </div>
                     </div>

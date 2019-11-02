@@ -2,7 +2,7 @@ import asyncio
 from typing import Optional
 import threading
 
-from discord import Client, Activity, ActivityType
+from discord import Client, Activity, ActivityType, Guild
 
 from extutils.checker import param_type_ensure
 from flags import Platform
@@ -54,6 +54,10 @@ class DiscordClientWrapper:
             return str(udata)
         else:
             return None
+
+    @param_type_ensure
+    def get_guild(self, gid: int) -> Optional[Guild]:
+        return self._core.get_guild(gid)
 
     @property
     def discord_client(self):

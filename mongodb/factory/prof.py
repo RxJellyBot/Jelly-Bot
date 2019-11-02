@@ -82,7 +82,7 @@ class UserProfileManager(BaseCollection):
     def get_user_channel_profiles(self, root_uid: ObjectId) -> CheckableCursor:
         return self.find_checkable_cursor(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
-            parse_cls=ChannelProfileConnectionModel)
+            parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)])
 
 
 class ProfileDataManager(BaseCollection):

@@ -30,6 +30,9 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         channel_conn_list = ProfileManager.get_user_channel_profiles(root_oid)
 
+        # FIXME: Hide bot inaccessible channels
+        # TODO: In webpage, group channels by ChannelCollection
+
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
                 "channel_conn_list": channel_conn_list,
