@@ -84,7 +84,7 @@ class CommandFunction:
 
 
 class CommandNode:
-    # TEST: Test all bot commands
+    # TEST: Test all bot commands by executing command functions
     def __init__(self, codes=None, order_idx=None, name=None, description=None,
                  is_root=False, splittor=None, prefix=None, parent=None):
         if codes:

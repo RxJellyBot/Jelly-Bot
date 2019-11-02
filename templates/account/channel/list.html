@@ -13,9 +13,33 @@
         <p>
             {% trans "To change the nickname of the channel, type the desired name then click Enter. If the name has been updated, a check mark will appear." %}
         </p>
+
         <hr>
-        {% include "account/channel/list_table.html" %}
+
+        <p>
+        <h5>{% trans "Bot accessible channels" %}</h5>
+        <small>{% trans "Data stored in the Jelly Bot indicates that it can access to these channels." %}</small>
+        </p>
+
+        {% include "account/channel/list_table.html" with conn_list=conn_access_ok %}
+
         <hr>
+
+        <p>
+        <h5>{% trans "Bot inaccessible channels" %}&nbsp;
+            <a href="#inaccessibleChannel" class="btn btn-outline-primary" data-toggle="collapse" aria-expanded="false">
+                {% trans "Show / Hide inaccessible channels" %}
+            </a>
+        </h5>
+        <small>{% trans "Jelly Bot marked these channels inaccessible by some event happened in the past." %}</small>
+        </p>
+
+        <div class="collapse" id="inaccessibleChannel">
+            {% include "account/channel/list_table.html" with conn_list=conn_access_no %}
+        </div>
+
+        <hr>
+
         <div class="row">
             <div class="col">
                 {% url 'account.channel.connect' as reg_url %}
@@ -30,7 +54,8 @@
                         </li>
                         <li>
                             Do not know how to determine what is the desired channel to manage: <br>
-                            <small>If using the official handled port, please check <a href="{{ ch_info_url }}">this page</a>
+                            <small>If using the official handled port, please check <a href="{{ ch_info_url }}">this
+                                page</a>
                                 to see how to check the current channel info.<br>
                                 If NOT using the official handled port, please check the guide of the corresponding bot
                                 to know how to check the channel token or channel id (The bot maker may not implement

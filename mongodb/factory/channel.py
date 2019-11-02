@@ -139,6 +139,7 @@ class ChannelCollectionManager(BaseCollection):
         self.create_index(
             [(ChannelCollectionModel.Platform.key, 1), (ChannelCollectionModel.Token.key, 1)],
             name="Channel Collection Identity", unique=True)
+        self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
 
     @param_type_ensure
     def register(
@@ -152,16 +153,30 @@ class ChannelCollectionManager(BaseCollection):
             DefaultName=default_name, Platform=platform, Token=token, ChildChannelOids=[child_channel_oid])
 
         if outcome.data_found:
-            entry = self.get_parent(platform, token)
+            entry = self.get_chcoll(platform, token)
             self.append_child_channel(entry.id, child_channel_oid)
 
         return ChannelCollectionRegistrationResult(outcome, entry, ex)
 
     @param_type_ensure
-    def get_parent(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
+    def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
         return self.find_one_casted(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             parse_cls=ChannelCollectionModel)
+
+    @param_type_ensure
+    def get_chcoll_oid(self, chcoll_oid: ObjectId) -> Optional[ChannelCollectionModel]:
+        return self.find_one_casted(
+            {ChannelCollectionModel.Id.key: chcoll_oid},
+            parse_cls=ChannelCollectionModel
+        )
+
+    @param_type_ensure
+    def get_chcoll_child_channel(self, child_channel_oid: ObjectId):
+        return self.find_one_casted(
+            {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid},
+            parse_cls=ChannelCollectionModel
+        )
 
     @param_type_ensure
     def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
