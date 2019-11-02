@@ -15,6 +15,8 @@ from .token_ import discord_token
 
 __all__ = ["run_server", "_inst"]
 
+# FIXME: On channel created and deleted, register channel info and deregister channel info
+
 
 class DiscordClient(Client):
     async def on_ready(self):

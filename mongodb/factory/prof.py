@@ -130,7 +130,7 @@ class ProfileDataManager(BaseCollection):
     def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
         default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
-        if outcome.is_success:
+        if outcome.is_inserted:
             set_success = ChannelManager.set_config(
                 channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
@@ -145,7 +145,6 @@ class ProfileDataManager(BaseCollection):
 
     # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
     # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change
-    pass
 
 
 class PermissionPromotionRecordHolder(BaseCollection):
@@ -155,7 +154,6 @@ class PermissionPromotionRecordHolder(BaseCollection):
 
     # TODO: User Profile: Profile Promotion - Keeps the promo record for a short period
     # TODO: User Profile: Profile Promotion - Promote for any role who needs promotion or direct assignment
-    pass
 
 
 class ProfileManager:

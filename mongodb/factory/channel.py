@@ -4,11 +4,11 @@ from bson import ObjectId
 from pymongo import ReturnDocument
 
 from extutils.checker import param_type_ensure
-from flags import Platform, ChannelType
-from models import ChannelModel, ChannelConfigModel
+from flags import Platform
+from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
-    ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
+    ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
 )
 
 from ._base import BaseCollection
@@ -32,10 +32,17 @@ class ChannelManager(BaseCollection):
             ChannelModel, Platform=platform, Token=token,
             Config=ChannelConfigModel.generate_default(DefaultName=default_name))
 
-        if WriteOutcome.data_found(outcome):
+        if outcome.data_found:
             entry = self.get_channel_token(platform, token)
 
         return ChannelRegistrationResult(outcome, entry, ex)
+
+    @param_type_ensure
+    def deregister(self, channel_oid: ObjectId) -> WriteOutcome:
+        return self.update_one_outcome(
+            {ChannelModel.Id.key: channel_oid},
+            {"$set": {ChannelModel.BotAccessible.key: False}}
+        )
 
     @param_type_ensure
     def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
@@ -111,4 +118,46 @@ class ChannelManager(BaseCollection):
             {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
 
 
+class ChannelCollectionManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "collection"
+    model_class = ChannelCollectionModel
+
+    def __init__(self):
+        super().__init__()
+        self.create_index(
+            [(ChannelCollectionModel.Platform.key, 1), (ChannelCollectionModel.Token.key, 1)],
+            name="Channel Collection Identity", unique=True)
+
+    @param_type_ensure
+    def register(
+            self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
+            -> ChannelCollectionRegistrationResult:
+        if not default_name:
+            default_name = f"{token} ({platform.key})"
+
+        entry, outcome, ex, insert_result = self.insert_one_data(
+            ChannelCollectionModel,
+            DefaultName=default_name, Platform=platform, Token=token, ChildChannelOids=[child_channel_oid])
+
+        if outcome.data_found:
+            entry = self.get_parent(platform, token)
+            self.append_child_channel(entry.id, child_channel_oid)
+
+        return ChannelCollectionRegistrationResult(outcome, entry, ex)
+
+    @param_type_ensure
+    def get_parent(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
+        return self.find_one_casted(
+            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
+            parse_cls=ChannelCollectionModel)
+
+    @param_type_ensure
+    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+        return self.update_one_outcome(
+            {ChannelCollectionModel.Id.key: parent_oid},
+            {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
+
+
 _inst = ChannelManager()
+_inst2 = ChannelCollectionManager()

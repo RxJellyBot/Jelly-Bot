@@ -53,7 +53,7 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
             self.insert_one_data(
                 APIUserModel, Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
 
-        if WriteOutcome.is_inserted(outcome):
+        if outcome.is_inserted:
             token = entry.token
         else:
             entry = self.get_user_data_google_id(id_data.uid)
@@ -93,7 +93,7 @@ class OnPlatformIdentityManager(BaseCollection):
         entry, outcome, ex, insert_result = \
             self.insert_one_data(OnPlatformUserModel, Token=user_token, Platform=platform)
 
-        if not WriteOutcome.is_inserted(outcome):
+        if not outcome.is_inserted:
             entry = self.get_onplat(platform, user_token)
             if entry is None:
                 outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
@@ -126,9 +126,9 @@ class RootUserManager(BaseCollection):
         build_conn_outcome = WriteOutcome.X_NOT_EXECUTED
         build_conn_ex = None
 
-        if WriteOutcome.is_inserted(user_reg_result.outcome):
+        if user_reg_result.outcome.is_inserted:
             user_reg_oid = user_reg_result.model.id
-        elif WriteOutcome.data_found(user_reg_result.outcome):
+        elif user_reg_result.outcome.data_found:
             get_data = get_oid_func(*args)
             if get_data is not None:
                 user_reg_oid = get_data.id
@@ -138,7 +138,7 @@ class RootUserManager(BaseCollection):
                 self.insert_one_data(RootUserModel,
                                      **{conn_arg_name: [user_reg_oid] if conn_arg_list else user_reg_oid})
 
-            if WriteOutcome.is_inserted(build_conn_outcome):
+            if build_conn_outcome.is_inserted:
                 overall_outcome = WriteOutcome.O_INSERTED
             else:
                 build_conn_entry = root_from_oid_func(user_reg_oid)

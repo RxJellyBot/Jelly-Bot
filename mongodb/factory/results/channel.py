@@ -40,6 +40,17 @@ class ChannelChangeNameResult(ModelResult):
 
 
 @dataclass
+class ChannelCollectionRegistrationResult(ModelResult):
+    def __init__(self, outcome, model, exception=None):
+        """
+        :type outcome: WriteOutcome
+        :type model: ChannelCollectionModel or None
+        :type exception: Optional[Exception]
+        """
+        super().__init__(outcome, model, exception)
+
+
+@dataclass
 class PermissionProfileRegistrationResult(ModelResult):
     # TODO: User Profile: `PermissionProfileRegistrationResult` not completed
     pass

@@ -152,13 +152,13 @@ class WriteOutcome(BaseOutcome):
         902, _("X: Exception Occurred"), \
         _("An exception occurred during execution.")
 
-    @staticmethod
-    def is_inserted(result):
-        return result < -200
+    @property
+    def is_inserted(self):
+        return self.code_num < -200
 
-    @staticmethod
-    def data_found(result):
-        return -199 < result < -100
+    @property
+    def data_found(self):
+        return -199 < self.code_num < -100
 
 
 class GetOutcome(BaseOutcome):
