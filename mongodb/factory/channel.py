@@ -38,14 +38,25 @@ class ChannelManager(BaseCollection):
         return ChannelRegistrationResult(outcome, entry, ex)
 
     @param_type_ensure
-    def deregister(self, channel_oid: ObjectId) -> WriteOutcome:
+    def deregister(self, platform: Platform, token: str) -> WriteOutcome:
+        return self.mark_accessibility(platform, token, False)
+
+    @param_type_ensure
+    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
         return self.update_one_outcome(
-            {ChannelModel.Id.key: channel_oid},
-            {"$set": {ChannelModel.BotAccessible.key: False}}
+            {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
+            {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
 
     @param_type_ensure
-    def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+    def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
+        return self.update_one_outcome(
+            {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
+            {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
+        )
+
+    @param_type_ensure
+    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
         """
         Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
         """
@@ -157,6 +168,12 @@ class ChannelCollectionManager(BaseCollection):
         return self.update_one_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
+
+    @param_type_ensure
+    def update_default_name(self, platform: Platform, token: str, new_default_name: str):
+        return self.update_one_outcome(
+            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
+            {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})
 
 
 _inst = ChannelManager()
