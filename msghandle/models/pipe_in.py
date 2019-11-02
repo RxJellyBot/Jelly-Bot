@@ -1,4 +1,5 @@
 from abc import ABC
+from threading import Thread
 from typing import Any, Optional, Union
 
 from bson import ObjectId
@@ -79,7 +80,10 @@ class MessageEventObjectFactory:
     def _ensure_channel_(platform: Platform, token: Union[int, str], default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = ChannelManager.register(platform, token, default_name=default_name)
-        if not ret.success:
+        if ret.success:
+            # Use Thread so no need to wait until the update is completed
+            Thread(target=ChannelManager.mark_accessibility, args=(platform, token, True)).start()
+        else:
             MailSender.send_email_async(f"Platform: {platform} / Token: {token}", subject="Channel Registration Failed")
 
         return ret.model

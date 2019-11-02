@@ -60,4 +60,4 @@ class ChannelNameChangeResponse(
         super().pre_process()
 
     def process_pass(self):
-        self._result = ChannelManager.change_channel_name(self._channel_oid, self._root_oid, self._new_name)
+        self._result = ChannelManager.update_channel_nickname(self._channel_oid, self._root_oid, self._new_name)

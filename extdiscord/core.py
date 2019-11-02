@@ -1,24 +1,30 @@
 import asyncio
-from typing import Optional
+from typing import Optional, Union
 import threading
 
-from discord import Client, Activity, ActivityType, Guild
+from discord import (
+    Client, Member, User, Guild,
+    Activity, ActivityType, ChannelType,
+    GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel
+)
 
 from extutils.checker import param_type_ensure
+from extutils.emailutils import MailSender
 from flags import Platform
 from extdiscord import handle_discord_main
 from extdiscord.logger import DISCORD
 from JellyBot.components.utils import load_server
+from mongodb.factory import ChannelManager, ChannelCollectionManager
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
 
 __all__ = ["run_server", "_inst"]
 
-# FIXME: On channel created and deleted, register channel info and deregister channel info
-
 
 class DiscordClient(Client):
+    # Events: https://discordpy.readthedocs.io/en/latest/api.html#event-reference
+
     async def on_ready(self):
         DISCORD.logger.info(f"Logged on as {self.user}.")
         # Load server for possible reverse() call
@@ -33,6 +39,86 @@ class DiscordClient(Client):
 
         await handle_discord_main(
             MessageEventObjectFactory.from_discord(message)).to_platform(Platform.DISCORD).send_discord(message.channel)
+
+    # noinspection PyMethodMayBeStatic
+    async def on_private_channel_delete(self, channel: Union[DMChannel, GroupChannel]):
+        if not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
+            warn_txt = f"Private Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
+            DISCORD.logger.warning(warn_txt)
+            MailSender.send_email_async(warn_txt, subject="Discord private channel deletion failed")
+
+    # noinspection PyMethodMayBeStatic
+    async def on_private_channel_create(self, channel: Union[DMChannel, GroupChannel]):
+        if not ChannelManager.register(Platform.DISCORD, channel.id, str(channel)).success:
+            warn_txt = f"Private Channel CREATED but the registration was failed. Channel token: {channel.id}"
+            DISCORD.logger.warning(warn_txt)
+            MailSender.send_email_async(warn_txt, subject="Discord private channel creation failed")
+
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    async def on_private_channel_update(self, before: GroupChannel, after: GroupChannel):
+        if str(before) != str(after) \
+                and not ChannelManager.update_channel_default_name(Platform.DISCORD, after.id, str(after)).is_success:
+            warn_txt = f"Private Channel Name UPDATED but the name was not updated. Channel token: {after.id} / " \
+                       f"Name: {str(before)} to {str(after)}"
+            DISCORD.logger.warning(warn_txt)
+            MailSender.send_email_async(warn_txt, subject="Discord private channel name update failed")
+
+    # noinspection PyMethodMayBeStatic
+    async def on_guild_channel_delete(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        if channel.type == ChannelType.text \
+                and not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
+            warn_txt = f"Guild Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
+            DISCORD.logger.warning(warn_txt)
+            MailSender.send_email_async(warn_txt, subject="Discord guild channel deletion failed")
+
+    # noinspection PyMethodMayBeStatic
+    async def on_guild_channel_create(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        if channel.type == ChannelType.text:
+            reg_result = ChannelManager.register(Platform.DISCORD, channel.id, str(channel))
+
+            if not reg_result.success:
+                warn_txt = f"Guild Channel CREATED but the registration was failed. Channel token: {channel.id}"
+                DISCORD.logger.warning(warn_txt)
+                MailSender.send_email_async(warn_txt, subject="Discord guild channel creation failed")
+
+            if not ChannelCollectionManager.register(
+                    Platform.DISCORD, channel.guild.id, reg_result.model.id, str(channel.guild)).success:
+                warn_txt = f"Guild Channel CREATED but the collection registration was failed. " \
+                           f"Channel token: {channel.id}"
+                DISCORD.logger.warning(warn_txt)
+                MailSender.send_email_async(warn_txt, subject="Discord channel collection creation failed")
+
+    # noinspection PyMethodMayBeStatic
+    async def on_guild_channel_update(
+            self,
+            before: Union[TextChannel, VoiceChannel, CategoryChannel],
+            after: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        if str(before) != str(after):
+            update_result = ChannelCollectionManager.update_default_name(Platform.DISCORD, after.guild.id, str(after))
+
+            if not update_result.is_success:
+                warn_txt = f"Guild Channel Name UPDATED but the name was not updated. " \
+                           f"Channel token: {after.id}"
+                DISCORD.logger.warning(warn_txt)
+                MailSender.send_email_async(warn_txt, subject="Discord guild channel name update failed")
+
+    async def on_member_join(self, member: Member):
+        pass
+
+    async def on_member_remove(self, member: Member):
+        pass
+
+    async def on_guild_join(self, guild: Guild):
+        pass
+
+    async def on_guild_remove(self, guild: Guild):
+        pass
+
+    async def on_group_join(self, channel: GroupChannel, user: User):
+        pass
+
+    async def on_group_remove(self, channel: GroupChannel, user: User):
+        pass
 
 
 class DiscordClientWrapper:
@@ -58,6 +144,9 @@ class DiscordClientWrapper:
     @param_type_ensure
     def get_guild(self, gid: int) -> Optional[Guild]:
         return self._core.get_guild(gid)
+
+    def latency(self) -> float:
+        return self._core.latency
 
     @property
     def discord_client(self):
