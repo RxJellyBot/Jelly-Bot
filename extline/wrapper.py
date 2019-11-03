@@ -73,7 +73,7 @@ class LineApiUtils:
 
     @staticmethod
     def get_user_id(event):
-        return event.user_id
+        return event.source.user_id
 
     @staticmethod
     def get_channel_type(channel_token: str):
