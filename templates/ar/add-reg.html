@@ -23,14 +23,14 @@
         </div>
 
         <div class="mb-3" data-btn-id="arMember">
-            <div class="w-100 card card-body btn btn-outline-warning active">
+            <div class="w-100 card card-body text-center text-dark border border-warning">
                 <h5 class="card-title">{% trans "Channel Member" %}</h5>
                 <p class="card-text">
                     <small>{% trans "Select the channel you are already in to register the module." %}</small>
                     <br>
                     <small>
                         {% url "account.channel.connect" as connect_url %}
-                        {% blocktrans %}
+                        {% blocktrans trimmed %}
                             Check <a href="{{ connect_url }}" target="_blank">this page</a> to
                             know how to get the channel's membership.
                         {% endblocktrans %}
@@ -43,7 +43,7 @@
                             <option value="default">{% trans "Select a channel" %}</option>
                             {% for user_ch_entry in user_ch_list %}
                                 {% with user_ch_entry.channel as channel_data %}
-                                    {% with channel_data.name|get_val:root_uid_str as channel_name %}
+                                    {% with user_ch_entry.channel_name as channel_name %}
                                         <option data-cname="{{ channel_name }}"
                                                 data-ctoken="{{ channel_data.token }}"
                                                 data-cplat="{{ channel_data.platform.key }}"
@@ -107,21 +107,21 @@
         </div>
 
         <div class="mb-3 d-none" data-btn-id="arToken">
-            <div class="w-100 card card-body btn btn-outline-warning active">
+            <div class="w-100 card card-body text-center text-dark border border-warning">
                 <h5 class="card-title">{% trans "Token" %}</h5>
                 <p class="card-text">
                     <small>{% trans "The token will appear below once the module was successfully registered." %}</small>
                 </p>
                 <div class="row">
                     <div class="col"></div>
-                    <div class="col-8 bg-light"><h3><code id="arTokenReturn"></code></h3></div>
+                    <div class="col-8 bg-light"><h3><code id="arTokenReturn">-</code></h3></div>
                     <div class="col"></div>
                 </div>
             </div>
         </div>
 
         <div class="mb-3 d-none" data-btn-id="arChannel">
-            <div class="w-100 card card-body btn btn-outline-warning active">
+            <div class="w-100 card card-body text-center text-dark border border-warning">
                 <h5 class="card-title">{% trans "Channel Token" %}</h5>
                 <p class="card-text">
                     <small>{% trans "Input the channel token to directly register the module." %}</small>
@@ -145,7 +145,7 @@
 
                 <div class="input-group">
                     <input type="text" class="form-control" id="arChannelToken"
-                           placeholder="Input the Channel Token"
+                           placeholder="{% trans "Input the Channel Token" %}"
                            aria-label="{% trans "Channel Token" %}"
                            data-postkey="{{ static_keys_param.AutoReply.CHANNEL_TOKEN }}">
                     <div class="input-group-append">

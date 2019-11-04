@@ -22,9 +22,11 @@ class AboutView(View):
             "beta_deploy": localtime(
                 parser.parse(
                     GithubWrapper.get_latest_deployment(
+                        System.GitHubRepoIDName,
                         System.HerokuAppNameBeta).updated_at)).strftime("%m/%d %H:%M:%S (UTC%z)"),
             "stable_deploy": localtime(
                 parser.parse(
                     GithubWrapper.get_latest_deployment(
+                        System.GitHubRepoIDName,
                         System.HerokuAppNameStable).updated_at)).strftime("%m/%d %H:%M:%S (UTC%z)")
         })

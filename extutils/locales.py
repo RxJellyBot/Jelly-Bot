@@ -25,6 +25,12 @@ class LocaleInfo:
         return PytzInfo(pytz.timezone(tzname))
 
 
+@dataclass
+class LanguageInfo:
+    name: str
+    code: str
+
+
 class PytzInfo(tzinfo):
     def __init__(self, tz):
         self._base = tz
@@ -69,8 +75,6 @@ PER = LocaleInfo(_("Oceania: Perth, Australia"), "Australia/Perth")
 SYD = LocaleInfo(_("Oceania: Sydney, Australia"), "Australia/Sydney")
 UTC = LocaleInfo(_("Universal Time Coordinated"), "UTC")
 
-default_locale = TWN
-
 locales = [
     HKG, MYS, MAC, KOR, SGP, TWN, JPN,
     GBR,
@@ -78,3 +82,16 @@ locales = [
     ADL, NZL, BNE, MEL, PER, SYD,
     UTC
 ]
+
+default_locale = TWN
+
+EN_US = LanguageInfo(_("English (United States)"), "en_US")
+ZH_TW = LanguageInfo(_("Chinese (Taiwan)"), "zh_TW")
+
+languages = [
+    EN_US, ZH_TW
+]
+
+default_language = ZH_TW
+
+# OPTIMIZE: Store `language` and `locale` in the database using code(int) instead of string

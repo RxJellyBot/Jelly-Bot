@@ -9,9 +9,9 @@ class GitHubWrapper:
         self._cache_deployments = {}
 
     # noinspection PyMethodMayBeStatic
-    def get_latest_deployment(self, environment):
+    def get_latest_deployment(self, repoidname, environment):
         if environment not in self._cache_deployments:
-            response = requests.get(f"{GitHubWrapper.API_URL}/repos/RaenonX/Jelly-Bot-API/deployments", {
+            response = requests.get(f"{GitHubWrapper.API_URL}/repos/{repoidname}/deployments", {
                 "environment": environment
             })
 

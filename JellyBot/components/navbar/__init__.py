@@ -3,7 +3,7 @@ from .dropdown import NavDropdown
 from .entry import NavEntry
 from .divider import NavDivider
 from .header import NavHeader
-from .dummy import NavDummy
+from .hidden import NavHidden
 
 
 def nav_items_factory(cls, current_path=None, **kwargs):

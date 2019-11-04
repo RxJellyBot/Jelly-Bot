@@ -1,4 +1,5 @@
-from typing import Optional
+from collections import namedtuple
+from typing import Optional, Tuple
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -6,10 +7,12 @@ from datetime import tzinfo
 from pymongo import ReturnDocument
 
 from extutils.gidentity import GoogleIdentityUserData
+from extutils.emailutils import MailSender
 from extutils.locales import default_locale, LocaleInfo
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from flags import Platform
-from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY
+from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel
+from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
 from ._mixin import GenerateTokenMixin
@@ -50,7 +53,7 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
             self.insert_one_data(
                 APIUserModel, Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
 
-        if WriteOutcome.is_inserted(outcome):
+        if outcome.is_inserted:
             token = entry.token
         else:
             entry = self.get_user_data_google_id(id_data.uid)
@@ -75,18 +78,22 @@ class OnPlatformIdentityManager(BaseCollection):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_onplat(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
+    @param_type_ensure
+    def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
+        return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
+
+    @param_type_ensure
+    def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
         return self.find_one_casted(
             {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
             parse_cls=OnPlatformUserModel)
 
-    @DecoParamCaster({1: Platform})
-    def register(self, platform, user_token) -> OnPlatformUserRegistrationResult:
+    @param_type_ensure
+    def register(self, platform: Platform, user_token) -> OnPlatformUserRegistrationResult:
         entry, outcome, ex, insert_result = \
             self.insert_one_data(OnPlatformUserModel, Token=user_token, Platform=platform)
 
-        if not WriteOutcome.is_inserted(outcome):
+        if not outcome.is_inserted:
             entry = self.get_onplat(platform, user_token)
             if entry is None:
                 outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
@@ -95,13 +102,6 @@ class OnPlatformIdentityManager(BaseCollection):
 
 
 class RootUserManager(BaseCollection):
-    # TODO: ID_CONN / TOKEN - Connect API User and OnPlatform ID - migrate() check:
-    #   - AutoReplyModule.CreatorOID (ar.conn.cr)
-    #   - AutoReplyModule.ExcludedOIDs (ar.conn.e[])
-    #   - ChannelPermissionProfile.UserID (channel.perm.u)
-    #   - Channel.ManagerOIDs (channel.dict.mgr[])
-    #   - TokenAction.CreatorOID (tk_act.main.cr)
-    #   Then check if the old user.mix identity is removed or not
     database_name = DB_NAME
     collection_name = "root"
     model_class = RootUserModel
@@ -110,8 +110,12 @@ class RootUserManager(BaseCollection):
         super().__init__()
         self._mgr_api = APIUserManager()
         self._mgr_onplat = OnPlatformIdentityManager()
-        self.create_index(RootUserModel.ApiOid.key, unique=True, sparse=True, name="API User OID")
-        self.create_index(RootUserModel.OnPlatOids.key, unique=True, sparse=True, name="On Platform Identity OIDs")
+        self.create_index(
+            RootUserModel.ApiOid.key, unique=True, name="API User OID",
+            partialFilterExpression={RootUserModel.ApiOid.key: {"$exists": True}})
+        self.create_index(
+            RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
+            partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
     def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                    oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False) \
@@ -122,9 +126,9 @@ class RootUserManager(BaseCollection):
         build_conn_outcome = WriteOutcome.X_NOT_EXECUTED
         build_conn_ex = None
 
-        if WriteOutcome.is_inserted(user_reg_result.outcome):
+        if user_reg_result.outcome.is_inserted:
             user_reg_oid = user_reg_result.model.id
-        elif WriteOutcome.data_found(user_reg_result.outcome):
+        elif user_reg_result.outcome.data_found:
             get_data = get_oid_func(*args)
             if get_data is not None:
                 user_reg_oid = get_data.id
@@ -134,7 +138,7 @@ class RootUserManager(BaseCollection):
                 self.insert_one_data(RootUserModel,
                                      **{conn_arg_name: [user_reg_oid] if conn_arg_list else user_reg_oid})
 
-            if WriteOutcome.is_inserted(build_conn_outcome):
+            if build_conn_outcome.is_inserted:
                 overall_outcome = WriteOutcome.O_INSERTED
             else:
                 build_conn_entry = root_from_oid_func(user_reg_oid)
@@ -149,6 +153,10 @@ class RootUserManager(BaseCollection):
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
 
+    @param_type_ensure
+    def _get_onplat_data_(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
+        return self._mgr_onplat.get_onplat(platform, user_token)
+
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
 
@@ -162,9 +170,46 @@ class RootUserManager(BaseCollection):
                                "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
                                (id_data,), hint="APIUser", conn_arg_list=False)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({OID_KEY: root_oid}, parse_cls=RootUserModel)
+
+    @param_type_ensure
+    def get_root_data_uname(
+            self, root_oid: ObjectId, channel_data: Optional[ChannelModel] = None) -> Optional[namedtuple]:
+        """
+        Get the name of the user with UID = `root_oid`.
+
+        Returns `None` if no corresponding user data found.
+        Returns the root oid if no On Platform Identity found.
+
+        :return: namedtuple(user_oid, user_name)
+        """
+        udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
+
+        # No user data found? Return None
+        if not udata:
+            return None
+
+        UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
+
+        # Name has been set? Return it
+        if udata.config.name:
+            return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
+
+        # On Platform Identity found? Try to find the name and return it
+        if udata.on_plat_oids:
+            for onplatoid in udata.on_plat_oids:
+                onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
+
+                if onplat_data:
+                    return UserNameQuery(user_id=root_oid, user_name=onplat_data.get_name(channel_data))
+                else:
+                    MailSender.send_email(
+                        f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
+                        f"corresponding On-Platform data found.")
+
+        return UserNameQuery(user_id=root_oid, user_name=str(root_oid))
 
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
@@ -182,20 +227,19 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data)
 
-    @DecoParamCaster({1: ObjectId})
-    def get_root_data_api_oid(self, api_oid: [ObjectId, str]) -> Optional[RootUserModel]:
+    @param_type_ensure
+    def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_root_data_onplat(self, platform, user_token, auto_register=True) -> GetRootUserDataResult:
-        on_plat_data = self.get_onplat_data(platform, user_token)
+    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
+        on_plat_data = self._get_onplat_data_(platform, user_token)
         rt_user_data = None
 
         if on_plat_data is None and auto_register:
             on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
 
             if on_plat_reg_result.success:
-                on_plat_data = self.get_onplat_data(platform, user_token)
+                on_plat_data = self._get_onplat_data_(platform, user_token)
 
         if on_plat_data is None:
             outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
@@ -218,15 +262,11 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataResult(outcome, rt_user_data)
 
-    @DecoParamCaster({1: ObjectId})
-    def get_root_data_onplat_oid(self, onplat_oid: [ObjectId, str]) -> Optional[RootUserModel]:
+    @param_type_ensure
+    def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid}, parse_cls=RootUserModel)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_onplat_data(self, platform: [int, Platform], user_token: str) -> Optional[OnPlatformUserModel]:
-        return self._mgr_onplat.get_onplat(platform, user_token)
-
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -234,7 +274,15 @@ class RootUserManager(BaseCollection):
         else:
             return LocaleInfo.get_tzinfo(u_data.config.locale)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
+    def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
+        u_data = self.get_root_data_oid(root_oid)
+        if u_data is None:
+            return None
+        else:
+            return u_data.config.language
+
+    @param_type_ensure
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -242,7 +290,37 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
+    def merge_onplat_to_api(self, src_root_oid: ObjectId, dest_root_oid: ObjectId) -> OperationOutcome:
+        """
+        Merge 2 root user data to be the same. Only the data of `dest_root_oid` will be kept.
+
+        :return: True if all actions have been acknowledged and success.
+        """
+        if src_root_oid == dest_root_oid:
+            return OperationOutcome.X_SAME_SRC_DEST
+
+        src_data = self.find_one({RootUserModel.Id.key: src_root_oid})
+        if not src_data:
+            return OperationOutcome.X_SRC_DATA_NOT_FOUND
+        dest_data = self.find_one({RootUserModel.Id.key: dest_root_oid})
+        if not dest_data:
+            return OperationOutcome.X_DEST_DATA_NOT_FOUND
+
+        ack_rm = self.delete_one({RootUserModel.Id.key: src_root_oid}).acknowledged
+        if ack_rm:
+            outcome = self.update_one_outcome(
+                {RootUserModel.Id.key: dest_data[RootUserModel.Id.key]},
+                {"$push": {RootUserModel.OnPlatOids.key: {"$each": src_data[RootUserModel.OnPlatOids.key]}}})
+
+            if outcome.is_success:
+                return OperationOutcome.O_COMPLETED
+            else:
+                return OperationOutcome.X_NOT_UPDATED
+        else:
+            return OperationOutcome.X_NOT_DELETED
+
+    @param_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:
         updated = self.find_one_and_update(
             {OID_KEY: root_oid},

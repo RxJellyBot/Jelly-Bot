@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Error" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row text-center text-danger">
+            <div class="col-lg display-4">
+                {% trans "Unknown Website Error" %}
+            </div>
+        </div>
+        <div class="row text-center text-danger">
+            <div class="col-lg align-self-center">
+                {% blocktrans trimmed %}
+                    Unknown website error with code {{ err_code }}.
+                {% endblocktrans %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

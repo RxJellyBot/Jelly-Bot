@@ -5,6 +5,7 @@ dnspython
 pymongo
 bson
 Django
+webencodings
 django-html_sanitizer
 whitenoise
 google-api-python-client
@@ -15,3 +16,4 @@ python-dateutil
 line-bot-sdk
 sympy
 discord.py
+jieba

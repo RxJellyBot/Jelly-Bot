@@ -1,12 +1,34 @@
-from .models.pipe_in import EventObject, TextEventObject
-from .models.pipe_out import HandledEventsHolder
+from django.utils.translation import activate, deactivate
+
+from mongodb.factory import MessageRecordStatisticsManager, ProfileManager
+
+from .models.pipe_in import MessageEventObject, TextMessageEventObject
+from .models.pipe_out import HandledMessageEventsHolder
 from .logger import logger
 from .text.main import handle_text_event
+from .translation import update_current_lang, deactivate_lang
 
 
-def handle_main(e: EventObject) -> HandledEventsHolder:
-    if isinstance(e, TextEventObject):
-        return HandledEventsHolder(handle_text_event(e))
+def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
+    # Record message for stats
+    MessageRecordStatisticsManager.record_message(e.channel_model.id, e.user_model.id, e.message_type, e.content)
+
+    # Ensure User existence in channel
+    ProfileManager.register_new_default(e.channel_model.id, e.user_model.id)
+
+    # Translation activation
+    update_current_lang('msghandle', e.user_model.config.language)
+    activate(e.user_model.config.language)
+
+    # Main handle process
+    if isinstance(e, TextMessageEventObject):
+        ret = HandledMessageEventsHolder(handle_text_event(e))
     else:
         logger.logger.info(f"Message handle object not handled. Raw: {e.raw}")
-        return HandledEventsHolder()
+        ret = HandledMessageEventsHolder()
+
+    # Translation deactivation
+    deactivate()
+    deactivate_lang()
+
+    return ret

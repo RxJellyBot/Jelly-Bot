@@ -21,7 +21,8 @@ from django.utils.translation import gettext_lazy as _
 # Check DEBUG, PRODUCTION keys is in a correct state                                          #
 # Run "In Production" config to ensure runnable                                               #
 # Run "py manage.py check --deploy" config to ensure no compiling bugs                        #
-#   Disregard: security.W004, security.W008, security.W012, security.W016
+#   Disregard: security.W004, security.W008, security.W012, security.W016                     #
+# Run translation.bat                                                                         #
 # Run "py manage.py makemessages -a" to create translation files (compilemessages for *.mo)   #
 # Run tests                                                                                   #
 ###############################################################################################
@@ -60,10 +61,11 @@ ALLOWED_HOSTS = [
     'testserver',
     'localhost',
     '127.0.0.1',
-    'newjellybot.herokuapp.com',
-    'newjellybot-beta.herokuapp.com',
     'jelly.raenonx.cc',
-    'jelly.beta.raenonx.cc'
+    'jelly.beta.raenonx.cc',
+    # Allowed URLs of Heroku's for LINE Bot webhook
+    'newjellybot.herokuapp.com',
+    'newjellybot-beta.herokuapp.com'
 ]
 
 INSTALLED_APPS = [
@@ -89,7 +91,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'JellyBot.components.middleware.RootUserIDInsertMiddleware',
     'JellyBot.components.middleware.APIStatisticsCollector',
-    'JellyBot.components.middleware.TimezoneActivator'
+    'JellyBot.components.middleware.TimezoneActivator',
+    'JellyBot.components.middleware.TranslationActivator'
 ]
 
 ROOT_URLCONF = 'JellyBot.urls'

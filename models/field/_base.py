@@ -2,6 +2,9 @@ import abc
 from collections.abc import Iterable
 from typing import Tuple
 
+from bson import ObjectId
+from pymongo.collection import Collection
+
 from models.field.exceptions import (
     FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed,
     InvalidFieldInstanceClassError
@@ -29,7 +32,7 @@ class FieldInstance:
     @value.setter
     def value(self, value):
         if self.base.read_only:
-            raise FieldReadOnly(self.base.__class__.__name__)
+            raise FieldReadOnly(self.base.__class__.__qualname__)
 
         self.force_set(value)
 
@@ -52,12 +55,13 @@ class FieldInstance:
         return self.base.is_none(self.value)
 
     def __repr__(self):
-        return f"Field Instance of {self.base.__class__.__name__} {' (Read-only)' if self.base.read_only else ''} " \
+        return f"Field Instance of {self.base.__class__.__qualname__} {' (Read-only)' if self.base.read_only else ''} " \
             f"<{self.base.key}: {self.value}>"
 
 
 class BaseField(abc.ABC):
-    def __init__(self, key, default=None, allow_none=True, readonly=False, auto_cast=True, inst_cls=FieldInstance):
+    def __init__(self, key, default=None, allow_none=True, readonly=False, auto_cast=True, inst_cls=FieldInstance,
+                 stores_uid=False):
         if not issubclass(inst_cls, FieldInstance):
             raise InvalidFieldInstanceClassError(inst_cls)
 
@@ -70,6 +74,20 @@ class BaseField(abc.ABC):
         self._read_only = readonly
         self._key = key
         self._auto_cast = auto_cast
+        self._stores_uid = stores_uid
+        if stores_uid and not self.replace_uid_implemented:
+            raise RuntimeError(f"replace_uid function not implemented while this field stores user id. "
+                               f"Please implement the function. ({self.__class__.__qualname__})")
+
+    @property
+    def replace_uid_implemented(self) -> bool:
+        return False
+
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
+        """
+        :return: Action has been acknowledges or not.
+        """
+        raise RuntimeError(f"uid_replace function called but not implemented. ({self.__class__.__qualname__})")
 
     @property
     @abc.abstractmethod
@@ -104,6 +122,10 @@ class BaseField(abc.ABC):
     def instance_class(self) -> type:
         return self._inst_cls
 
+    @property
+    def stores_uid(self) -> bool:
+        return self._stores_uid
+
     @classmethod
     def none_obj(cls):
         raise ValueError(f"None object not implemented for {cls}.")
@@ -128,5 +150,5 @@ class BaseField(abc.ABC):
             return value == self.none_obj()
 
     def __repr__(self):
-        return f"{self.__class__.__name__} {' (Read-only)' if self._read_only else ''} <{self._key}>"
+        return f"{self.__class__.__qualname__} {' (Read-only)' if self._read_only else ''} <{self._key}>"
 

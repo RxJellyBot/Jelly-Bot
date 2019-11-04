@@ -11,6 +11,6 @@ from .dict import DictionaryField
 from .general import GeneralField
 from .model import ModelField
 from .flags import (
-    APICommandField, AutoReplyContentTypeField,
+    APICommandField, AutoReplyContentTypeField, MessageTypeField,
     PlatformField, TokenActionField, ExtraContentTypeField
 )

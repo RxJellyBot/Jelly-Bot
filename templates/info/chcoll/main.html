@@ -1,0 +1,105 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Collection Info" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Basic Information" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center mb-3">
+                    <h4 class="card-header text-primary">{% trans "Channel Collection ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code>{{ chcoll_data.id }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel Collection Token" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code>{{ chcoll_data.token }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center mb-3">
+                    <h4 class="card-header text-primary">{% trans "Platform" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h5">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    {{ chcoll_data.platform.key }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Child Channels" %}</h4>
+                    <div class="card-body">
+                        <div class="list-group overflow-auto" style="max-height: 20rem">
+                            {% for cch_data in chcoll_cch_data %}
+                                <a href="{% url "info.channel" channel_oid=cch_data.channel_data.id %}" target="_blank"
+                                   class="list-group-item list-group-item-action{% if not cch_data.channel_data.bot_accessible %} list-group-item-danger{% endif %}">
+                                    <span class="h5 font-weight-normal">{{ cch_data.channel_name }}</span><br>
+                                    <code class="h6">{{ cch_data.channel_data.id }}</code>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Message Statistics" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 1 Day" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
+                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data1d %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 7 Days" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
+                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data7d %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

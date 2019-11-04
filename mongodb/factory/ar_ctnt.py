@@ -2,8 +2,7 @@ from typing import Optional
 
 from bson import ObjectId
 
-from extutils.utils import is_empty_string
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
 from mongodb.factory.results import WriteOutcome, GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
@@ -35,10 +34,10 @@ class AutoReplyContentManager(BaseCollection):
             {AutoReplyContentModel.Content.key: content, AutoReplyContentModel.ContentType.key: type_},
             parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
 
-    @DecoParamCaster({2: AutoReplyContentType})
+    @param_type_ensure
     def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
-        if is_empty_string(content):
+        if not content:
             return AutoReplyContentGetResult(GetOutcome.X_NO_CONTENT, None)
 
         ret_entry = self._get_content_(content, type_, case_insensitive)
@@ -49,7 +48,7 @@ class AutoReplyContentManager(BaseCollection):
         if entry_none and add_on_not_found:
             add_result = self.add_content(content, type_)
 
-            if WriteOutcome.is_inserted(add_result.outcome):
+            if add_result.outcome.is_inserted:
                 ret_entry = self._get_content_(content, type_, case_insensitive)
                 outcome = GetOutcome.O_ADDED
             else:
@@ -61,7 +60,7 @@ class AutoReplyContentManager(BaseCollection):
 
         return AutoReplyContentGetResult(outcome, ret_entry, on_add_result=add_result)
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_content_by_id(self, oid: ObjectId) -> Optional[AutoReplyContentModel]:
         return self.find_one_casted({OID_KEY: oid}, parse_cls=AutoReplyContentModel)
 

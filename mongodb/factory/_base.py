@@ -1,5 +1,5 @@
 import types
-from typing import Tuple, Union, Type, Optional, Iterable as TIterable
+from typing import Union, Type, Optional, Iterable as TIterable
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -10,7 +10,7 @@ from pymongo.errors import DuplicateKeyError
 from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from extutils.mongo import get_codec_options
 from extutils.utils import all_lower
 from models import Model
@@ -56,7 +56,7 @@ class CacheMixin(Collection):
     def auto_init(self, value: bool):
         self._auto_init = value
 
-    @DecoParamCaster({1: str})
+    @param_type_ensure
     def init_cache(self, cache_key: str, check_exists=True):
         """
         Initialize a cache space if necessary.
@@ -68,7 +68,7 @@ class CacheMixin(Collection):
         if check_exists and cache_key not in self._cache:
             self._cache[cache_key] = TTLOrderedDict(default_ttl=CACHE_EXPIRATION_SECS)
 
-    @DecoParamCaster({1: str, 2: None})
+    @param_type_ensure
     def set_cache(self, cache_key: str, item_key, item, parse_cls=None):
         """
         Set data to the cache.
@@ -96,10 +96,10 @@ class CacheMixin(Collection):
 
         return self._cache[cache_key].get(item_key)
 
-    @DecoParamCaster({1: str, 2: None, "item_key_from_data": None})
-    def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: Tuple = None,
+    @param_type_ensure
+    def get_cache(self, cache_key: str, item_key, acquire_func=None, acquire_args: tuple = None,
                   acquire_kw_args: dict = None, acquire_auto=True, parse_cls=None, case_insensitive=False,
-                  item_key_from_data: Union[str, Tuple, None] = None):
+                  item_key_from_data: Union[str, tuple, None] = None):
         """
         Get data from the cache. Data can be acquired from the database and
         inserted to the cache if `acquire_auto` is `True` and the data is not found in the cache.
@@ -167,8 +167,8 @@ class CacheMixin(Collection):
 
         return ret
 
-    @DecoParamCaster({1: None, "item_key_from_data": None})
-    def get_cache_condition(self, cache_key: str, item_func: types.LambdaType, acquire_args: Tuple,
+    @param_type_ensure
+    def get_cache_condition(self, cache_key: str, item_func: types.LambdaType, acquire_args: tuple,
                             item_key_of_data=None, acquire_func=None, acquire_kw_args: dict = None, acquire_auto=True,
                             parse_cls=None, case_insensitive=False, safe_lambda=False):
         """
@@ -276,7 +276,7 @@ class ControlExtensionMixin(Collection):
         return outcome, ex
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
-            -> (Model, WriteOutcome, Optional[Exception], InsertOneResult):
+            -> (Optional[Model], WriteOutcome, Optional[Exception], InsertOneResult):
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.
@@ -333,7 +333,7 @@ class ControlExtensionMixin(Collection):
     def find_checkable_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> CheckableCursor:
         return CheckableCursor(self.find(filter_, *args, **kwargs), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs)-> Optional[Model]:
+    def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs) -> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
 
     @staticmethod
@@ -352,21 +352,21 @@ class BaseCollection(ControlExtensionMixin, Collection):
     @classmethod
     def get_db_name(cls):
         if cls.database_name is None:
-            raise AttributeError(f"Define `database_name` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `database_name` as class variable for {cls.__qualname__}.")
         else:
             return cls.database_name
 
     @classmethod
     def get_col_name(cls):
         if cls.collection_name is None:
-            raise AttributeError(f"Define `collection_name` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `collection_name` as class variable for {cls.__qualname__}.")
         else:
             return cls.collection_name
 
     @classmethod
     def get_model_cls(cls):
         if cls.model_class is None:
-            raise AttributeError(f"Define `model_class` as class variable for {cls.__name__}.")
+            raise AttributeError(f"Define `model_class` as class variable for {cls.__qualname__}.")
         else:
             return cls.model_class
 

@@ -6,7 +6,7 @@ from flags import TokenActionCompletionOutcome
 from models import TokenActionModel
 
 from ._base import BaseResult, ModelResult
-from ._outcome import WriteOutcome, OperationOutcome
+from ._outcome import WriteOutcome, OperationOutcome, GetOutcome
 
 
 @dataclass
@@ -35,6 +35,15 @@ class EnqueueTokenActionResult(BaseResult):
         d.update(**{result.TokenActionResponse.TOKEN: self._token,
                     result.TokenActionResponse.EXPIRY: self._expiry})
         return d
+
+
+@dataclass
+class GetTokenActionResult(ModelResult):
+    def __init__(self, outcome, action_model):
+        """
+        :type outcome: GetOutcome
+        """
+        super().__init__(outcome, action_model, None)
 
 
 @dataclass

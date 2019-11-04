@@ -8,6 +8,10 @@ class CheckableCursor:
             o = self._parse_cls(**dict_, from_db=True)
             yield o
 
+    def sort(self, key_or_list, direction=None):
+        self._cursor = self._cursor.sort(key_or_list, direction)
+        return self
+
     @property
     def empty(self):
         return self._cursor.count() == 0
