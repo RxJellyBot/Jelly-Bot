@@ -1,2 +1,2 @@
 from .code import *
-from .main import TermsExplanationView
+from .terms import TermsExplanationView

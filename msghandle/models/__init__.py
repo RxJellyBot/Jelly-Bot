@@ -1,6 +1,6 @@
-from .pipe_in import EventObjectFactory, EventObject, TextEventObject, MessageEventObject
+from .pipe_in import MessageEventObjectFactory, Event, TextMessageEventObject, MessageEventObject
 from .pipe_out import (
-    HandledEventObject, HandledEventObjectText, HandledEventObjectCalculateResult,
-    HandledEventsHolder
+    HandledMessageEvent, HandledMessageEventText, HandledMessageCalculateResult,
+    HandledMessageEventsHolder, HandledMessageEventImage, HandledMessageEventLineSticker
 )
 from .out_plat import HandledEventsHolderPlatform

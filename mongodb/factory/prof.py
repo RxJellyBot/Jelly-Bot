@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
@@ -13,8 +13,8 @@ from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfi
 from mongodb.utils import CheckableCursor
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
-)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
+    Model)
 
 from ._base import BaseCollection
 
@@ -35,7 +35,7 @@ class UserProfileManager(BaseCollection):
             unique=True)
 
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oid: ObjectId) \
-            -> ChannelProfileConnectionModel:
+            -> Model:
         """
         Attach `ChannelPermissionProfileModel` and return the attached data.
         """
@@ -61,7 +61,7 @@ class UserProfileManager(BaseCollection):
 
         return model
 
-    # INCOMPLETE: user_detach_profile and delete
+    # TODO: User Profile: user_detach_profile and delete
 
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
@@ -82,7 +82,7 @@ class UserProfileManager(BaseCollection):
     def get_user_channel_profiles(self, root_uid: ObjectId) -> CheckableCursor:
         return self.find_checkable_cursor(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
-            parse_cls=ChannelProfileConnectionModel)
+            parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)])
 
 
 class ProfileDataManager(BaseCollection):
@@ -130,7 +130,7 @@ class ProfileDataManager(BaseCollection):
     def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
         default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
-        if outcome.is_success:
+        if outcome.is_inserted:
             set_success = ChannelManager.set_config(
                 channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
@@ -143,10 +143,8 @@ class ProfileDataManager(BaseCollection):
         return self.insert_one_data(
             ChannelProfileModel, ChannelOid=channel_oid, **fk_param)
 
-    # INCOMPLETE: Profile/Permission - Ensure mod/admin promotable if the mod/admin to be demoted is the last
-    # INCOMPLETE: Profile/Permission -
-    #  Custom permission profile creation (name and color changable only) - create then change
-    pass
+    # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
+    # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change
 
 
 class PermissionPromotionRecordHolder(BaseCollection):
@@ -154,9 +152,8 @@ class PermissionPromotionRecordHolder(BaseCollection):
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
 
-    # INCOMPLETE: Permission/Promotion - Keeps the promo record for a short period
-    # INCOMPLETE: Promote for any role who needs promotion or direct assignment
-    pass
+    # TODO: User Profile: Profile Promotion - Keeps the promo record for a short period
+    # TODO: User Profile: Profile Promotion - Promote for any role who needs promotion or direct assignment
 
 
 class ProfileManager:
@@ -170,8 +167,8 @@ class ProfileManager:
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    @DecoParamCaster({1: ObjectId, 2: ObjectId})
-    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> Optional[List[ChannelProfileModel]]:
+    @param_type_ensure
+    def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
         Get the `list` of `ChannelProfileModel` of the specified user.
 
@@ -184,7 +181,7 @@ class ProfileManager:
                     for poid
                     in conn.profile_oids if not None]
         else:
-            return None
+            return []
 
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId]) -> List[ChannelProfileListEntry]:
         if root_uid is None:
@@ -221,20 +218,21 @@ class ProfileManager:
             elif len(not_found_prof_oids) > 0:
                 not_found_prof_oids_dict[d.channel_oid] = not_found_prof_oids
             else:
-                ret.append(ChannelProfileListEntry(channel=cnl, profiles=prof))
+                ret.append(
+                    ChannelProfileListEntry(
+                        channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
-                [f'{cnl_id}: {" / ".join(prof_ids)}' for cnl_id, prof_ids in not_found_prof_oids_dict])
+                [f'{cnl_id}: {" / ".join([str(oid) for oid in prof_ids])}'
+                 for cnl_id, prof_ids in not_found_prof_oids_dict.items()])
 
             MailSender.send_email_async(
-                f"User ID: {root_uid}"
-                f""
-                f"Connected channels but not found (`ObjectId`): "
-                f"{' & '.join(not_found_channel)}"
-                f""
-                f"Connected profiles but not found (`ObjectId`): "
-                f"{not_found_prof_oids_txt}",
+                f"User ID: <code>{root_uid}</code><hr>"
+                f"Channel IDs not found in DB:<br>"
+                f"<pre>{' & '.join([str(c) for c in not_found_channel])}</pre><hr>"
+                f"Profile IDs not found in DB:<br>"
+                f"<pre>{not_found_prof_oids_txt}</pre>",
                 subject="Possible Data Corruption on Getting User Profile Connection"
             )
 

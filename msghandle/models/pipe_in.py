@@ -1,56 +1,92 @@
 from abc import ABC
+from threading import Thread
 from typing import Any, Optional, Union
 
 from bson import ObjectId
 from linebot.models import TextMessage, MessageEvent
 from discord import Message, ChannelType
 
-from models import ChannelModel, RootUserModel
-from mongodb.factory import ChannelManager, RootUserManager
+from models import ChannelModel, RootUserModel, ChannelCollectionModel
+from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager
 from extutils.emailutils import MailSender
 from msghandle import logger
-from flags import Platform
+from flags import Platform, MessageType, ChannelType as SysChannelType
 
 
-class EventObject(ABC):
-    def __init__(self, raw: Any, platform: Platform):
+class Event(ABC):
+    def __init__(
+            self, raw: Any, channel_model: ChannelModel = None, sys_ctype: SysChannelType = None):
+        if not sys_ctype:
+            sys_ctype = SysChannelType.identify(channel_model.platform, channel_model.token)
+
         self.raw = raw
-        self.platform = platform
-
-
-class MessageEventObject(EventObject, ABC):
-    def __init__(self, raw: Any, platform: Platform, content: Any):
-        super().__init__(raw, platform)
-        self.content = content
-
-
-class TextEventObject(MessageEventObject):
-    def __init__(self, raw: Any, platform: Platform, text: Any,
-                 channel_oid: ObjectId = None, root_oid: ObjectId = None):
-        super().__init__(raw, platform, text)
-        self.text = text
-        self.channel_oid = channel_oid
-        self.root_oid = root_oid
-
-    @staticmethod
-    def convert(e: EventObject, t: str, channel_oid: ObjectId):
-        return TextEventObject(e.raw, e.platform, t, channel_oid)
+        self.channel_model = channel_model
+        self.channel_type = sys_ctype
 
     @property
-    def recorded_channel(self):
-        return self.channel_oid is not None
+    def platform(self) -> Platform:
+        return self.channel_model.platform
+
+    @property
+    def user_token(self) -> Optional:
+        if self.platform == Platform.LINE:
+            from extline import LineApiUtils
+
+            return LineApiUtils.get_user_id(self.raw)
+        elif self.platform == Platform.DISCORD:
+            return self.raw.author.id
+        else:
+            return None
 
 
-class EventObjectFactory:
+class MessageEventObject(Event, ABC):
+    def __init__(
+            self, raw: Any, content: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+        super().__init__(raw, channel_model, sys_ctype)
+        self.content = content
+        self.user_model = user_model
+        self.chcoll_model = ch_parent_model
+
+    @property
+    def message_type(self) -> MessageType:
+        raise NotImplementedError()
+
+    @property
+    def channel_oid(self) -> ObjectId:
+        return self.channel_model.id
+
+    @property
+    def root_oid(self) -> ObjectId:
+        return self.user_model.id
+
+
+class TextMessageEventObject(MessageEventObject):
+    def __init__(
+            self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+        super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model)
+        self.text = text
+
+    @property
+    def message_type(self) -> MessageType:
+        return MessageType.TEXT
+
+
+class MessageEventObjectFactory:
     DiscordAcceptedChannelTypes = (ChannelType.text, ChannelType.private, ChannelType.group)
 
     @staticmethod
-    def _ensure_channel_(platform: Platform, token: Union[int, str]) -> Optional[ChannelModel]:
-        ret = ChannelManager.get_channel_token(platform, token, auto_register=True)
-        if not ret:
+    def _ensure_channel_(platform: Platform, token: Union[int, str], default_name: str = None) \
+            -> Optional[ChannelModel]:
+        ret = ChannelManager.register(platform, token, default_name=default_name)
+        if ret.success:
+            # Use Thread so no need to wait until the update is completed
+            Thread(target=ChannelManager.mark_accessibility, args=(platform, token, True)).start()
+        else:
             MailSender.send_email_async(f"Platform: {platform} / Token: {token}", subject="Channel Registration Failed")
 
-        return ret
+        return ret.model
 
     @staticmethod
     def _ensure_user_idt_(platform: Platform, token: Union[int, str], traceback=None) -> Optional[RootUserModel]:
@@ -67,27 +103,38 @@ class EventObjectFactory:
         return result.model
 
     @staticmethod
-    def from_line(event: MessageEvent) -> EventObject:
+    def _ensure_channel_parent_(
+            platform: Platform, token: Union[int, str], child_channel_oid: ObjectId, default_name: str):
+        return ChannelCollectionManager.register(platform, token, child_channel_oid, default_name).model
+
+    @staticmethod
+    def from_line(event: MessageEvent) -> MessageEventObject:
         from extline import LineApiUtils
 
-        user_model = EventObjectFactory._ensure_user_idt_(Platform.LINE, LineApiUtils.get_user_id(event))
-        channel_model = EventObjectFactory._ensure_channel_(Platform.LINE, LineApiUtils.get_channel_id(event))
+        user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.LINE, LineApiUtils.get_user_id(event))
+        channel_model = MessageEventObjectFactory._ensure_channel_(
+            Platform.LINE, LineApiUtils.get_channel_id(event))
         if isinstance(event.message, TextMessage):
-            return TextEventObject(event, Platform.LINE, event.message.text, channel_model.id, user_model.id)
+            return TextMessageEventObject(event, event.message.text, channel_model, user_model)
         else:
             logger.logger.warning(f"Unhandled LINE message event. {type(event.message)}")
 
     @staticmethod
-    def from_discord(message: Message) -> EventObject:
-        if message.channel.type not in EventObjectFactory.DiscordAcceptedChannelTypes:
+    def from_discord(message: Message) -> MessageEventObject:
+        from extdiscord.utils import msg_loc_repr
+
+        if message.channel.type not in MessageEventObjectFactory.DiscordAcceptedChannelTypes:
             raise ValueError(
-                f"Channel type not supported. ({message.channel.channel_type})"
-                f"Currently supported channel types: {', '.join(EventObjectFactory.DiscordAcceptedChannelTypes)}")
+                f"Channel type not supported. ({message.channel.type})"
+                f"Currently supported channel types: "
+                f"{', '.join([str(t) for t in MessageEventObjectFactory.DiscordAcceptedChannelTypes])}")
 
-        user_model = EventObjectFactory._ensure_user_idt_(Platform.DISCORD, message.author.id)
-        channel_model = EventObjectFactory._ensure_channel_(Platform.DISCORD, message.channel.id)
-        return TextEventObject(message, Platform.DISCORD, message.content, channel_model.id, user_model.id)
-
-    @staticmethod
-    def from_direct(message: str):
-        return TextEventObject(message, Platform.UNKNOWN, message)
+        user_model = MessageEventObjectFactory._ensure_user_idt_(
+            Platform.DISCORD, message.author.id)
+        channel_model = MessageEventObjectFactory._ensure_channel_(
+            Platform.DISCORD, message.channel.id, msg_loc_repr(message))
+        ch_parent_model = MessageEventObjectFactory._ensure_channel_parent_(
+            Platform.DISCORD, message.guild.id, channel_model.id, str(message.guild))
+        return TextMessageEventObject(
+            message, message.content, channel_model, user_model,
+            SysChannelType.trans_from_discord(message.channel.type), ch_parent_model)

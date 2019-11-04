@@ -31,6 +31,7 @@ def render_template(request, title, template_name, context=None, content_type=No
 
     # Append user id vars
     context["api_token"] = request.COOKIES.get(keys.Cookies.USER_TOKEN)
+    context["root_oid"] = get_root_oid(request)
 
     # Append version numbers for footer
     context["beta_update"] = timezone.localtime(

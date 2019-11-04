@@ -1,0 +1,12 @@
+.table-freeze-header {
+    overflow-y: auto;
+}
+
+.table-freeze-header thead th {
+    position: sticky;
+    top: 0;
+}
+
+.table-freeze-header th {
+    background-color: #eeeeee;
+}

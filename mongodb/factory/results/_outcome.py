@@ -33,6 +33,7 @@ class WriteOutcome(BaseOutcome):
 
     1xx - Problems related to the preparation processes
         101 - Insufficient Permission
+        102 - Channel type identification failed
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
@@ -83,7 +84,10 @@ class WriteOutcome(BaseOutcome):
         -1, _("O: Uncategorized"), _("The system returned OK with uncategorized reason.")
     X_INSUFFICIENT_PERMISSION = \
         101, _("X: Insufficient Permission"), \
-        _("THe insertion was failed becuase the permission is insufficient.")
+        _("The insertion was failed becuase the permission is insufficient.")
+    X_CHANNEL_TYPE_UNKNOWN = \
+        102, _("X: Channel Type Unidentifiable"), \
+        _("The channel type is unidentifiable using the provided token and platform.")
     X_ON_REG_CHANNEL = \
         104, _("X: on Registering Channel"), \
         _("The insertion was failed while registering the identity of channel.")
@@ -148,13 +152,13 @@ class WriteOutcome(BaseOutcome):
         902, _("X: Exception Occurred"), \
         _("An exception occurred during execution.")
 
-    @staticmethod
-    def is_inserted(result):
-        return result < -200
+    @property
+    def is_inserted(self):
+        return self.code_num < -200
 
-    @staticmethod
-    def data_found(result):
-        return -199 < result < -100
+    @property
+    def data_found(self):
+        return -199 < self.code_num < -100
 
 
 class GetOutcome(BaseOutcome):
@@ -175,10 +179,13 @@ class GetOutcome(BaseOutcome):
     2xx - Problems related to the given parameters
         201 - The content is empty
 
-    3xx - SPECIFIC - permission
-        301 - Channel not found
-        302 - Error during config creation
-        303 - Error during default profile creation
+    3xx - SPECIFIC
+        30x - Permission
+            301 - Channel not found
+            302 - Error during config creation
+            303 - Error during default profile creation
+        31x - Token Action
+            311 - Incorrect token action type
 
     9xx - Problems related to execution
         901 - Not executed
@@ -221,6 +228,9 @@ class GetOutcome(BaseOutcome):
     X_DEFAULT_PROFILE_ERROR = \
         303, _("X: Default Profile Error"), \
         _("An error occurred when creating a default profile.")
+    X_TOKENACTION_TYPE_INCORRECT = \
+        311, _("X: Incorrect Token Action type"), \
+        _("The token action type of the given token doesn't match the resired token action type.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The acquiring process had not been executed.")
@@ -239,19 +249,29 @@ class OperationOutcome(BaseOutcome):
     1xx - Problems related to Token Action
         101 - Token Not Found
         102 - Keys Lacking
-        103 - Completion Error
+        103 - Completion Failed
         104 - Completion Process not Implemented
         105 - Completion Error
+        106 - Empty Token
+        107 - Collation Error
+        108 - Type Mismatch
 
     2xx - Problems related to Channel
         201 - Channel Not Found
+
+    3xx - Problems related to User Identity
+        301 - Source is identical to destination
+        302 - Source user data not found
+        303 - Destination user data not found
 
     5xx - Problems related to Model
         501 - Construction Error
 
     9xx - Problems related to execution
         901 - Not executed
-        902 - Error
+        902 - Not updated
+        903 - not deleted
+        999 - Error
     """
     @property
     def code_prefix(self) -> str:
@@ -285,17 +305,35 @@ class OperationOutcome(BaseOutcome):
     X_COLLATION_ERROR = \
         107, _("X: Collation Error"), \
         _("An error occurred during parameter collation process.")
+    X_TOKEN_TYPE_MISMATCH = \
+        108, _("X: Token Action type Mismatch"), \
+        _("The action type of the token doesn't match the desired token action type.")
     X_CHANNEL_NOT_FOUND = \
         201, _("X: Channel Not Found"), \
         _("Channel was not found using the given Channel ID.")
+    X_SAME_SRC_DEST = \
+        301, _("X: Source = Destination"), \
+        _("Source user identity is equal to the destination user identity.")
+    X_SRC_DATA_NOT_FOUND = \
+        302, _("X: Source Data Not Found"), \
+        _("Source user identity data not found.")
+    X_DEST_DATA_NOT_FOUND = \
+        303, _("X: Destination Data Not Found"), \
+        _("Destination user identity data not found.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The operation had not been executed.")
+    X_NOT_UPDATED = \
+        902, _("X: Not Updated"), \
+        _("Update operation not performed.")
+    X_NOT_DELETED = \
+        903, _("X: Not Deleted"), \
+        _("Delete operation not performed.")
     X_ERROR = \
-        902, _("X: Error"), \
+        999, _("X: Error"), \
         _("An error has occurred during the process execution.")
 
 

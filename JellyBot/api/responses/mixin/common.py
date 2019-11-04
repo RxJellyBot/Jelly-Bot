@@ -2,7 +2,6 @@ from abc import ABC
 
 from JellyBot.api.static import result, param
 from mongodb.factory import ChannelManager, RootUserManager
-from extutils import is_empty_string
 from flags import Platform
 
 from JellyBot.api.responses.mixin import BaseMixin
@@ -21,15 +20,13 @@ class HandleChannelMixin(BaseMixin, ABC):
 
     def _handle_(self):
         k = result.AutoReplyResponse.CHANNEL_OID
-        if is_empty_string(self._channel_token):
-            self._err[k] = self._channel_token
-        else:
+        if self._channel_token:
             self._flag[k] = self._channel_token
+        else:
+            self._err[k] = self._channel_token
 
     def pass_condition(self) -> bool:
-        return super().pass_condition() and \
-               self._channel_token is not None and \
-               not is_empty_string(self._channel_token)
+        return super().pass_condition() and self._channel_token
 
 
 class HandlePlatformMixin(BaseMixin, ABC):

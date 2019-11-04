@@ -1,14 +1,15 @@
 from bson import ObjectId
 
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils import safe_cast
+from flags import WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
-from JellyBot.views import render_template
+from msghandle.botcmd.command import cmd_id
+from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.systemconfig import TokenAction
@@ -27,12 +28,21 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
 
-        channel_conn_list = ProfileManager.get_user_channel_profiles(root_oid)
+        access_ok = []
+        access_no = []
+        for channel_conn in ProfileManager.get_user_channel_profiles(root_oid):
+            if channel_conn.channel_data.bot_accessible:
+                access_ok.append(channel_conn)
+            else:
+                access_no.append(channel_conn)
+
+        # TODO: In webpage, group channels by ChannelCollection
 
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
-                "channel_conn_list": channel_conn_list,
-                "root_oid_str": str(root_oid)
+                "conn_access_ok": access_ok,
+                "conn_access_no": access_no,
+                "bot_cmd_info_code": cmd_id.main_cmd_code
             })
 
 
@@ -55,10 +65,7 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             c_prof = ChannelManager.get_channel_oid(channel_oid)
 
             if c_prof:
-                return redirect(reverse("info.channel"))
+                return redirect("info.channel")
             else:
-                return render_template(
-                    self.request, _("Profile Link Not Found"), "err/account/proflink_not_found.html",
-                    {
-                        "channel_oid": channel_oid_str
-                    })
+                return WebsiteErrorView.website_error(
+                    request, WebsiteError.PROFILE_LINK_NOT_FOUND, {"channel_oid": channel_oid_str})

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union, Optional, Any
+from typing import Optional, Any
 
 from bson import ObjectId
 
@@ -7,7 +7,7 @@ from JellyBot.systemconfig import Database
 from flags import ExtraContentType
 from models import ExtraContentModel, OID_KEY
 from mongodb.factory.results import RecordExtraContentResult, WriteOutcome
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 
 from ._base import BaseCollection
 
@@ -45,8 +45,8 @@ class ExtraContentManager(BaseCollection):
 
         return RecordExtraContentResult(outcome, model, ex)
 
-    @DecoParamCaster({1: ObjectId})
-    def get_content(self, content_id: Union[str, ObjectId]) -> Optional[ExtraContentModel]:
+    @param_type_ensure
+    def get_content(self, content_id: ObjectId) -> Optional[ExtraContentModel]:
         return self.find_one_casted({OID_KEY: content_id}, parse_cls=ExtraContentModel)
 
 

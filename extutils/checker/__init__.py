@@ -1,1 +1,1 @@
-from .param import DecoParamCaster
+from .param import param_type_ensure

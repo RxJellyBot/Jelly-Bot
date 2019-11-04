@@ -8,26 +8,31 @@ HostUrl = os.environ.get("HOST_URL") or "http://localhost:8000"
 
 
 class System:
-    PingSpamWaitSeconds = 29 * 60  # 29 mins because Heroku sleep on 30 mins
+    PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
+    GitHubRepoIDName = "RaenonX/Jelly-Bot"
     HerokuAppNameBeta = "newjellybot-beta"
     HerokuAppNameStable = "newjellybot"
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
+    MaxSendContentLines = 20
 
 
 class PlatformConfig(ABC):
     max_responses: int = NotImplementedError
     max_content_length: int = NotImplementedError
+    max_content_lines: int = NotImplementedError
 
 
 class LineApi(PlatformConfig):
     max_responses = System.MaxOneTimeResponses
     max_content_length = System.MaxSendContentLength
+    max_content_lines = System.MaxSendContentLines
 
 
 class Discord(PlatformConfig):
     max_responses = System.MaxOneTimeResponses
     max_content_length = System.MaxSendContentLength
+    max_content_lines = System.MaxSendContentLines
 
 
 class AutoReply:
@@ -35,6 +40,7 @@ class AutoReply:
     MaxContentLength = System.MaxSendContentLength
     TagSplittor = "|"
     CaseInsensitive = True
+    BypassMultilineCDThresholdSeconds = 20
 
 
 class Database:
@@ -67,9 +73,15 @@ class ChannelConfig:
 
 
 class Email:
+    EmailCacheExpirySeconds = 3600  # 60 mins
     DefaultSubject = "Email Notification from Jelly BOT"
     DefaultPrefix = "Jelly BOT - "
 
 
 class TokenAction:
     ChannelRegisterTokenCooldownSeconds = 60
+
+
+class Bot:
+    Prefix = "/"
+    Splittor = " ."

@@ -7,7 +7,7 @@ from JellyBot import keys
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.components.utils import get_root_oid, get_post_keys
 from JellyBot.views import render_template, simple_str_response
-from extutils.locales import locales, now_utc_aware
+from extutils.locales import locales, languages, now_utc_aware
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
 from mongodb.factory import RootUserManager
 from mongodb.factory.results import WriteOutcome
@@ -79,13 +79,13 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         if update_result.success:
             return simple_str_response(
                 request,
-                f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - " +
-                _("Account settings updated."))
+                f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"{_('Account settings updated.')}")
         else:
             return simple_str_response(
                 request,
-                f"danger/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - " +
-                _("Account settings failed to update."))
+                f"danger/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"{_('Account settings failed to update.')}")
 
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
@@ -94,4 +94,5 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Account Settings"), "account/settings.html",
             {"locale_list": sorted(locales, key=lambda item: item.description),
+             "lang_list": sorted(languages, key=lambda item: item.code),
              "current_config": config})

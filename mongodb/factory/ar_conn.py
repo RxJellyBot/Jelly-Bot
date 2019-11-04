@@ -1,3 +1,4 @@
+from datetime import timezone, timedelta
 from typing import Tuple, Optional, List
 
 import math
@@ -5,13 +6,13 @@ import pymongo
 from bson import ObjectId
 from datetime import datetime
 
-from JellyBot.systemconfig import Database, DataQuery
-from extutils import is_empty_string
+from JellyBot.systemconfig import AutoReply, Database, DataQuery
 from extutils.emailutils import MailSender
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from flags import PermissionCategory, AutoReplyContentType
-from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY
+from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
+    AutoReplyContentModel
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
@@ -68,16 +69,27 @@ class AutoReplyModuleManager(BaseCollection):
     def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> WriteOutcome:
         return self.update_one_outcome(
             {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
-            {"$update": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
+            {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
 
-    @DecoParamCaster({1: ObjectId, 2: bool})
+    @param_type_ensure
     def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
-        return self.find_one_casted(
+        ret: Optional[AutoReplyModuleModel] = self.find_one_casted(
             {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
              f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True},
             sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
             collation=case_insensitive_collation if case_insensitive else None)
+
+        if ret:
+            now = datetime.now(tz=timezone.utc)
+            if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
+                self.update_one(
+                    {AutoReplyModuleModel.Id.key: ret.id},
+                    {"$set": {AutoReplyModuleModel.LastUsed.key: now},
+                     "$inc": {AutoReplyModuleModel.CalledCount.key: 1}})
+                return ret
+
+        return None
 
 
 class AutoReplyModuleTagManager(BaseCollection):
@@ -137,7 +149,7 @@ class AutoReplyManager:
 
         pipeline = []
 
-        if not is_empty_string(filter_word):
+        if filter_word:
             pipeline.append({"$match": {
                 "$or": [{OID_KEY: tag_data.id for tag_data in self._tag.search_tags(filter_word)}]}})
 
@@ -212,9 +224,10 @@ class AutoReplyManager:
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
-            channel_oid: ObjectId, case_insensitive: bool = True) -> List[str]:
+            channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
+                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPRESPONSE_MODELONSE>, <BYPASS_MULTILINE>)...]
         """
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
@@ -230,20 +243,20 @@ class AutoReplyManager:
             for resp_id in resp_ids:
                 ctnt_mdl = AutoReplyContentManager.get_content_by_id(resp_id)
                 if ctnt_mdl:
-                    resp_ctnt.append(ctnt_mdl.content)
+                    resp_ctnt.append((ctnt_mdl, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds))
                 else:
                     resp_id_miss.append(resp_id)
 
         if resp_id_miss and ctnt_rst.success:
             content = f"""Malformed data detected.
             <hr>
-            <h4>Parameters</h4>\n
-            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}\n
-            <h4>Variables</h4>\n
-            Get content result (keyword): {ctnt_rst}\n
-            Keyword connection model: {mod}\n
-            Contents to response: {mod}\n
-            Contents missing (id): {resp_id_miss}\n
+            <h4>Parameters</h4><br>
+            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}<br>
+            <h4>Variables</h4><br>
+            Get content result (keyword): {ctnt_rst}<br>
+            Keyword connection model: {mod}<br>
+            Contents to response: {mod}<br>
+            Contents missing (id): {resp_id_miss}
             """
             MailSender.send_email_async(content, subject="Lossy data in auto reply database")
 

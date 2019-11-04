@@ -5,15 +5,17 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils import safe_cast
-from flags import PermissionCategory
+from flags import PermissionCategory, WebsiteError
 from mongodb.factory import ProfileManager
-from JellyBot.views import render_template
+from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components.mixin import LoginRequiredMixin
 
 
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
     def get(self, request, **kwargs):
-        profile_oid = safe_cast(kwargs["profile_oid"], ObjectId)
+        profile_oid_str = kwargs.get("profile_oid", "")
+        profile_oid = safe_cast(profile_oid_str, ObjectId)
+
         profile_data = ProfileManager.get_profile(profile_oid)
 
         if profile_data:
@@ -24,6 +26,5 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
                     "perm_cats": list(PermissionCategory)
                 }, nav_param=kwargs)
         else:
-            return render_template(self.request, _("Profile Not Found"), "err/info/profile_not_found.html", {
-                "profile_oid": profile_oid
-            })
+            return WebsiteErrorView.website_error(
+                request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid})

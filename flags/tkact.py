@@ -6,13 +6,11 @@ from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 class TokenAction(FlagDoubleEnum):
     """
     1xx - Identity Management:
-        10x - Connect User Identity:
-            101: Connect Identity (on Web)
-            102: Connect Identity (on API)
+        10x - Register Identity:
+            101: Channel Membership
 
-        11x - Connect Channel Identity:
-            111: Register Membership (on Web)
-            112: Register Membership (on API)
+        19x - Integrates Identity:
+            191: Integrate user identity
 
     2xx - Auto Reply:
             201: Add
@@ -26,12 +24,12 @@ class TokenAction(FlagDoubleEnum):
 
     UNKNOWN = -1, _("Unknown"), _("Unknown Token Action.")
 
-    CONNECT_USER_ON_WEB = \
-        101, _("Connect: User Identity"), \
-        _("Connect the user identity data between on-platform and API.")
-    CONNECT_CHANNEL = \
-        111, _("Connect: Register Channel Membership"), \
+    REGISTER_CHANNEL = \
+        101, _("Register: Channel Membership"), \
         _("Get the membership of a channel.")
+    INTEGRATE_USER_IDENTITY = \
+        191, _("Integration: User Identity"), \
+        _("Integrate user identity.")
     AR_ADD = \
         201, _("Auto-Reply: Add"), \
         _("Register an Auto-Reply module.")
@@ -69,6 +67,8 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
         201 - Default profile registratiom
         202 - Channel not found
         203 - Channel error
+        204 - Integration error
+        205 - Integration failed
 
     5xx - Related to Model
         501 - Error during model construction
@@ -100,6 +100,12 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     X_IDT_CHANNEL_ERROR = \
         203, _("X: Identity - Channel Error"), \
         _("An error occurred during channel data acquiring process.")
+    X_IDT_INTEGRATION_ERROR = \
+        204, _("X: Identity - Integration Error"), \
+        _("An error occurred during user integration.")
+    X_IDT_INTEGRATION_FAILED = \
+        205, _("X: Identity - Integration Failed"), \
+        _("Failed to integrate user identities.")
 
     X_MODEL_CONSTRUCTION = \
         501, _("X: Model - Construction"), \

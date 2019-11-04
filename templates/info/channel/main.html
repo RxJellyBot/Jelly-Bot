@@ -1,0 +1,145 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Info" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        {% if not channel_data.bot_accessible %}
+            <div class="row">
+                <div class="col mb-3 h4">
+                    {% trans "The channel is marked inaccessible for Jelly Bot, so the data of this channel will not update." %}
+                </div>
+            </div>
+
+            <hr>
+        {% endif %}
+
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Basic Information" %}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel Name" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
+                                    {{ ch_name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code>{{ channel_data.id }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Channel Token" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h2">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code>{{ channel_data.token }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Platform" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h4">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    {{ channel_data.platform.key }}
+                                </div>
+                            </div>
+                        </div>
+                        {% if chcoll_data %}
+                            <a class="mt-3 btn btn-outline-primary btn-lg btn-block"
+                               href="{% url "info.chcoll" chcoll_oid=chcoll_data.id %}" target="_blank">
+                                {% trans "Channel Collection ID: " %}<code class="text-dark">{{ chcoll_data.id }}</code>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg mb-3">
+                <div class="card border-primary text-center">
+                    <h4 class="card-header text-primary">{% trans "Controls" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h5">
+                            {% if manageable %}
+                                <div class="col-lg-auto">
+                                    <a class="btn btn-outline-primary"
+                                       href="{% url "account.channel.manage" channel_oid=channel_data.id %}">
+                                        {% trans "Manage" %}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h3">{% trans "Message Statistics" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 1 Day" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
+                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data1d %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card border-success text-center">
+                    <h4 class="card-header text-success">{% trans "Message Count in 7 Days" %}</h4>
+                    <div class="card-body">
+                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
+                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data7d %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

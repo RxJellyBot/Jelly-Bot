@@ -1,19 +1,28 @@
 import re
-from typing import Optional
 
 
-def cast_keep_none(target, type_: type):
-    if target is not None:
-        if issubclass(type_, bool):
-            return type_(int(target))
+def cast_keep_none(obj, dest_type: type):
+    if obj is not None:
+        if issubclass(dest_type, bool):
+            return dest_type(int(obj))
         else:
-            return type_(target)
+            return dest_type(obj)
     else:
         return None
 
 
-def is_empty_string(s: Optional[str]):
-    return s is None or len(s) == 0
+def safe_cast(obj, dest_type: type):
+    """
+    Executes type-cast safely.
+
+    :param obj: Object to be casted.
+    :param dest_type: Destination type.
+    :return: Casted `obj`. Return `None` if failed.
+    """
+    try:
+        return dest_type(obj)
+    except Exception:
+        return None
 
 
 def all_lower(o: [str, tuple, list, set, dict]):
@@ -40,20 +49,6 @@ def all_lower(o: [str, tuple, list, set, dict]):
         return o
 
 
-def safe_cast(obj, dest_type: type):
-    """
-    Execute type-cast safely.
-
-    :param obj: Object to be casted.
-    :param dest_type: Destination type.
-    :return: Casted `obj`. Return `None` if failed.
-    """
-    try:
-        return dest_type(obj)
-    except Exception:
-        return None
-
-
 def to_snake_case(s: str):
     return re.sub(r"(?!^)([A-Z]+)", r"_\1", s).lower()
 
@@ -66,10 +61,19 @@ def split_fill(s: str, n: int, delim="", fill=None):
     return (s.split(delim) + [fill] * n)[:n]
 
 
-def reduce_length(s: str, max_: int):
+def str_reduce_length(s: str, max_: int):
     suffix = "..."
 
     if len(s) > max_ - len(suffix):
         return s[:-3] + suffix
     else:
         return s
+
+
+def list_insert_in_between(l: list, insert_obj):
+    ret = l.copy()
+
+    for i in range(1, len(ret) * 2 - 2, 2):
+        ret[i:i] = [insert_obj]
+
+    return ret

@@ -5,7 +5,6 @@ from JellyBot.api.responses.mixin import (
     SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
 )
 from flags import TokenAction
-from models import ChannelRegisterMembershipModel
 from mongodb.factory import ChannelManager, TokenActionManager
 
 
@@ -39,9 +38,7 @@ class ChannelIssueRegisterTokenResponse(
         super().pre_process()
 
     def process_pass(self):
-        self._result = TokenActionManager.enqueue_action(
-            self._sender_oid, TokenAction.CONNECT_CHANNEL,
-            ChannelRegisterMembershipModel, RootOid=self._sender_oid)
+        self._result = TokenActionManager.enqueue_action(self._sender_oid, TokenAction.REGISTER_CHANNEL)
 
 
 class ChannelNameChangeResponse(
@@ -63,4 +60,4 @@ class ChannelNameChangeResponse(
         super().pre_process()
 
     def process_pass(self):
-        self._result = ChannelManager.change_channel_name(self._channel_oid, self._root_oid, self._new_name)
+        self._result = ChannelManager.update_channel_nickname(self._channel_oid, self._root_oid, self._new_name)

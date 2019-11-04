@@ -1,6 +1,8 @@
 import os
 import sys
 
+from extdiscord import run_server
+
 
 def django_main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'JellyBot.settings')
@@ -15,5 +17,12 @@ def django_main():
     execute_from_command_line(sys.argv)
 
 
+def discord_main():
+    run_server()
+
+
 if __name__ == '__main__':
+    # Prevent unnecessary execution of starting Discord Bot
+    if sys.argv[1] == "runserver":
+        discord_main()
     django_main()

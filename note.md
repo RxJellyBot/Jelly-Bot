@@ -21,6 +21,10 @@ Logger(s) to be used and printed in the console. Log level can be specified.
 > `EVT_HANDLER`: External webhook/bot event handler's logger
 >
 > `PING_SPAM`: Ping spammer's logger
+>
+> `BOT_CMD`: Bot command parser's logger
+>
+> `CHECKER`: Extra Utils' Checker logger
 
 **Example Value:**
 

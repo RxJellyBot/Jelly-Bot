@@ -3,12 +3,12 @@ from typing import Optional
 from bson import ObjectId
 from pymongo import ReturnDocument
 
-from extutils.checker import DecoParamCaster
+from extutils.checker import param_type_ensure
 from flags import Platform
-from models import ChannelModel, ChannelConfigModel
+from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
-    ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult
+    ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
 )
 
 from ._base import BaseCollection
@@ -26,23 +26,51 @@ class ChannelManager(BaseCollection):
         self.create_index(
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
-    @DecoParamCaster({1: Platform, 2: str, 3: str})
-    def register(self, platform: Platform, token: str, name: Optional[str] = "") -> ChannelRegistrationResult:
+    @param_type_ensure
+    def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
         entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelModel, Platform=platform, Token=token, Name=name, Config=ChannelConfigModel.generate_default())
+            ChannelModel, Platform=platform, Token=token,
+            Config=ChannelConfigModel.generate_default(DefaultName=default_name))
 
-        if WriteOutcome.data_found(outcome):
+        if outcome.data_found:
             entry = self.get_channel_token(platform, token)
 
         return ChannelRegistrationResult(outcome, entry, ex)
 
-    @DecoParamCaster({1: ObjectId, 2: ObjectId, 3: str})
-    def change_channel_name(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+    @param_type_ensure
+    def deregister(self, platform: Platform, token: str) -> WriteOutcome:
+        return self.mark_accessibility(platform, token, False)
+
+    @param_type_ensure
+    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
+        return self.update_one_outcome(
+            {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
+            {"$set": {ChannelModel.BotAccessible.key: accessibility}}
+        )
+
+    @param_type_ensure
+    def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
+        return self.update_one_outcome(
+            {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
+            {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
+        )
+
+    @param_type_ensure
+    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+        """
+        Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
+        """
         ex = None
-        ret = self.find_one_and_update(
-            {ChannelModel.Id.key: channel_oid},
-            {"$set": {f"{ChannelModel.Name.key}.{root_oid}": new_name}},
-            return_document=ReturnDocument.AFTER)
+        if new_name:
+            ret = self.find_one_and_update(
+                {ChannelModel.Id.key: channel_oid},
+                {"$set": {f"{ChannelModel.Name.key}.{root_oid}": new_name}},
+                return_document=ReturnDocument.AFTER)
+        else:
+            ret = self.find_one_and_update(
+                {ChannelModel.Id.key: channel_oid},
+                {"$unset": {f"{ChannelModel.Name.key}.{root_oid}": ""}},
+                return_document=ReturnDocument.AFTER)
 
         try:
             if ret:
@@ -56,13 +84,14 @@ class ChannelManager(BaseCollection):
 
         return ChannelChangeNameResult(outcome, ret, ex)
 
-    @DecoParamCaster({1: Platform, 2: str})
-    def get_channel_token(self, platform: Platform, token: str, auto_register=False) -> Optional[ChannelModel]:
+    @param_type_ensure
+    def get_channel_token(self, platform: Platform, token: str, auto_register: bool = False, default_name: str = None) \
+            -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
 
         if not ret and auto_register:
-            reg_result = self.register(platform, token)
+            reg_result = self.register(platform, token, default_name=default_name)
             if reg_result.success:
                 ret = reg_result.model
             else:
@@ -72,12 +101,12 @@ class ChannelManager(BaseCollection):
 
         return ret
 
-    @DecoParamCaster({1: ObjectId})
+    @param_type_ensure
     def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
         return self.find_one_casted({ChannelModel.Id.key: channel_oid}, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
-    @DecoParamCaster({1: Platform, 2: str})
+    @param_type_ensure
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         if not isinstance(platform, Platform):
             platform = Platform(platform)
@@ -100,4 +129,67 @@ class ChannelManager(BaseCollection):
             {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
 
 
+class ChannelCollectionManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "collection"
+    model_class = ChannelCollectionModel
+
+    def __init__(self):
+        super().__init__()
+        self.create_index(
+            [(ChannelCollectionModel.Platform.key, 1), (ChannelCollectionModel.Token.key, 1)],
+            name="Channel Collection Identity", unique=True)
+        self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
+
+    @param_type_ensure
+    def register(
+            self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
+            -> ChannelCollectionRegistrationResult:
+        if not default_name:
+            default_name = f"{token} ({platform.key})"
+
+        entry, outcome, ex, insert_result = self.insert_one_data(
+            ChannelCollectionModel,
+            DefaultName=default_name, Platform=platform, Token=token, ChildChannelOids=[child_channel_oid])
+
+        if outcome.data_found:
+            entry = self.get_chcoll(platform, token)
+            self.append_child_channel(entry.id, child_channel_oid)
+
+        return ChannelCollectionRegistrationResult(outcome, entry, ex)
+
+    @param_type_ensure
+    def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
+        return self.find_one_casted(
+            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
+            parse_cls=ChannelCollectionModel)
+
+    @param_type_ensure
+    def get_chcoll_oid(self, chcoll_oid: ObjectId) -> Optional[ChannelCollectionModel]:
+        return self.find_one_casted(
+            {ChannelCollectionModel.Id.key: chcoll_oid},
+            parse_cls=ChannelCollectionModel
+        )
+
+    @param_type_ensure
+    def get_chcoll_child_channel(self, child_channel_oid: ObjectId):
+        return self.find_one_casted(
+            {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid},
+            parse_cls=ChannelCollectionModel
+        )
+
+    @param_type_ensure
+    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+        return self.update_one_outcome(
+            {ChannelCollectionModel.Id.key: parent_oid},
+            {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
+
+    @param_type_ensure
+    def update_default_name(self, platform: Platform, token: str, new_default_name: str):
+        return self.update_one_outcome(
+            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
+            {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})
+
+
 _inst = ChannelManager()
+_inst2 = ChannelCollectionManager()

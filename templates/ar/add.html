@@ -3,8 +3,6 @@
 {% load static %}
 {% load utils %}
 
-<!-- INCOMPLETE: When CD > 20 sec, no force webpage over a lot of lines -->
-
 {% block content %}
     {% with ar_prfx=static_keys_param.AutoReply %}
         {% csrf_token %}
@@ -34,8 +32,14 @@
                     <div class="col d-inline">
                         <span><a href="{% url "page.doc.code.insert" %}"
                                  target="_blank">{% trans "Insert Outcome Code:" %}</a></span>
-                        <h5 class="d-inline"><a target="_blank" id="arCodeLink" data-prefix="{% url "page.doc.code.insert" %}#"><code
+                        <h5 class="d-inline"><a target="_blank" id="arCodeLink"
+                                                data-prefix="{% url "page.doc.code.insert" %}#"><code
                                 id="arCode">-</code></a></h5>
+                    </div>
+                    <div class="col d-none" id="submitSpin">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">{% trans "Submitting..." %}</span>
+                        </div>
                     </div>
                     <div class="col d-inline">
                         <button type="button" class="btn btn-outline-dark arSubmit">{% trans "Submit" %}</button>
