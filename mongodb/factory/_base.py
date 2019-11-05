@@ -1,5 +1,5 @@
 import types
-from typing import Union, Type, Optional, Iterable as TIterable
+from typing import Union, Type, Optional, Iterable as TIterable, Tuple
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -7,7 +7,6 @@ from pymongo.collation import Collation
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError
-from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
 from extutils.checker import param_type_ensure
@@ -250,7 +249,7 @@ class CacheMixin(Collection):
 
 
 class ControlExtensionMixin(Collection):
-    def insert_one_model(self, model: Model) -> (WriteOutcome, Optional[Exception]):
+    def insert_one_model(self, model: Model) -> Tuple[WriteOutcome, Optional[Exception]]:
         ex = None
 
         try:
@@ -276,17 +275,16 @@ class ControlExtensionMixin(Collection):
         return outcome, ex
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
-            -> (Optional[Model], WriteOutcome, Optional[Exception], InsertOneResult):
+            -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.
 
-        :return: model, outcome, ex, insert_result
+        :return: model, outcome, ex
         """
         model = None
         outcome: WriteOutcome = WriteOutcome.X_NOT_EXECUTED
         ex = None
-        insert_result = None
 
         try:
             if issubclass(model_cls, Model):
@@ -315,7 +313,7 @@ class ControlExtensionMixin(Collection):
         if settings.DEBUG and not outcome.is_success:
             raise ex
 
-        return model, outcome, ex, insert_result
+        return model, outcome, ex
 
     def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
         update_result = self.update_one(filter_, update, upsert, collation)
@@ -376,6 +374,9 @@ class BaseCollection(ControlExtensionMixin, Collection):
         self._data_model = self.get_model_cls()\
 
         ModelFieldChecker.check(self)
+
+    def insert_one_data(self, **model_args) -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
+        return super().insert_one_data(self.get_model_cls(), **model_args)
 
     @property
     def data_model(self):

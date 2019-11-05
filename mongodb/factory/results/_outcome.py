@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
+# OPTIMIZE: Integrate outcome
+
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     @property
     def code_prefix(self) -> str:
@@ -40,6 +42,7 @@ class WriteOutcome(BaseOutcome):
         107 - Connecting OnPlatform User ID
         108 - Connecting API User ID
         109 - Config Setting Failed
+        110 - Invalid URL
 
     2xx - Problems related to the model
         201 - Not Serializable
@@ -106,6 +109,9 @@ class WriteOutcome(BaseOutcome):
     X_ON_SET_CONFIG = \
         109, _("X: on Setting Config"), \
         _("An error occurred when trying to set the config after the default profile is generated.")
+    X_INVALID_URL = \
+        110, _("X: Invalid URL"), \
+        _("The URL dis invalid. Maybe missing the schema or the URL did not return 200.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")
@@ -349,6 +355,8 @@ class UpdateOutcome(BaseOutcome):
     
     1xx - Problems related to Model
         101 - Model not found
+
+    2
 
     9xx - Problems related to execution
         901 - Not executed

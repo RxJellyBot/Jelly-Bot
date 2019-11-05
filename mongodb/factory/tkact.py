@@ -47,9 +47,8 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
         else:
             data = data_kw_args
 
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            TokenActionModel, CreatorOid=root_uid,
-            Token=token, ActionType=token_action, Timestamp=now, Data=data)
+        entry, outcome, ex = self.insert_one_data(
+            CreatorOid=root_uid, Token=token, ActionType=token_action, Timestamp=now, Data=data)
 
         return EnqueueTokenActionResult(outcome, token, now + timedelta(seconds=Database.TokenActionExpirySeconds), ex)
 

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Tuple
+from typing import Optional
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -49,9 +49,8 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
 
     def register(self, id_data: GoogleIdentityUserData) -> OnSiteUserRegistrationResult:
         token = None
-        entry, outcome, ex, insert_result = \
-            self.insert_one_data(
-                APIUserModel, Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
+        entry, outcome, ex = \
+            self.insert_one_data(Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
 
         if outcome.is_inserted:
             token = entry.token
@@ -90,8 +89,8 @@ class OnPlatformIdentityManager(BaseCollection):
 
     @param_type_ensure
     def register(self, platform: Platform, user_token) -> OnPlatformUserRegistrationResult:
-        entry, outcome, ex, insert_result = \
-            self.insert_one_data(OnPlatformUserModel, Token=user_token, Platform=platform)
+        entry, outcome, ex = \
+            self.insert_one_data(Token=user_token, Platform=platform)
 
         if not outcome.is_inserted:
             entry = self.get_onplat(platform, user_token)
@@ -134,9 +133,8 @@ class RootUserManager(BaseCollection):
                 user_reg_oid = get_data.id
 
         if user_reg_oid is not None:
-            build_conn_entry, build_conn_outcome, build_conn_ex, insert_result = \
-                self.insert_one_data(RootUserModel,
-                                     **{conn_arg_name: [user_reg_oid] if conn_arg_list else user_reg_oid})
+            build_conn_entry, build_conn_outcome, build_conn_ex = \
+                self.insert_one_data(**{conn_arg_name: [user_reg_oid] if conn_arg_list else user_reg_oid})
 
             if build_conn_outcome.is_inserted:
                 overall_outcome = WriteOutcome.O_INSERTED

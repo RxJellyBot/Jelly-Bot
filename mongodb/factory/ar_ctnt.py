@@ -5,7 +5,7 @@ from bson import ObjectId
 from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
-from mongodb.factory.results import WriteOutcome, GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
+from mongodb.factory.results import GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
 from mongodb.utils import case_insensitive_collation
 
 from ._base import BaseCollection
@@ -24,8 +24,7 @@ class AutoReplyContentManager(BaseCollection):
                           name="Auto Reply Content Identity", unique=True)
 
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            AutoReplyContentModel, Content=content, ContentType=type_)
+        entry, outcome, ex = self.insert_one_data(Content=content, ContentType=type_)
 
         return AutoReplyContentAddResult(outcome, entry, ex)
 

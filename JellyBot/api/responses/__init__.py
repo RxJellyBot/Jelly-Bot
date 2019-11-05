@@ -7,3 +7,4 @@ from .id import (
     ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse, ChannelNameChangeResponse, PermissionQueryResponse
 )
 from .tkact import TokenActionCompleteApiResponse, TokenActionListApiResponse
+from .services import ShortUrlShortenResponse

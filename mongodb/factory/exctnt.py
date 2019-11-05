@@ -40,8 +40,8 @@ class ExtraContentManager(BaseCollection):
         if not content:
             return RecordExtraContentResult(WriteOutcome.X_NOT_EXECUTED)
 
-        model, outcome, ex, insert_result = self.insert_one_data(
-            ExtraContentModel, Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())
+        model, outcome, ex = self.insert_one_data(
+             Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())
 
         return RecordExtraContentResult(outcome, model, ex)
 

@@ -27,8 +27,7 @@ class APIStatisticsManager(BaseCollection):
 
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
                      org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            APIStatisticModel,
+        entry, outcome, ex = self.insert_one_data(
             APIAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
             Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
 
@@ -43,8 +42,7 @@ class MessageRecordStatisticsManager(BaseCollection):
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
             message_type: MessageType, message_content: Any) -> MessageRecordResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            MessageRecordModel,
+        entry, outcome, ex = self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type, MessageContent=message_content)
 
         return MessageRecordResult(outcome, entry, ex)

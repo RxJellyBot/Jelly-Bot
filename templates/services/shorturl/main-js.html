@@ -1,0 +1,105 @@
+{% load i18n %}
+
+<!--suppress JSDuplicatedDeclaration -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        initEvents();
+        initElems();
+    });
+
+    function initEvents() {
+        $("button#shorten").click(shortenClicked);
+        $("button#copy").click(copyClicked);
+    }
+
+    function initElems() {
+        $('[data-toggle="tooltip"]').tooltip().tooltip('disable');
+    }
+
+    function shortenClicked() {
+        let invalidMessage = validateUrl();
+        if (invalidMessage) {
+            generateAlert("danger", invalidMessage);
+        } else {
+            sendShortenAjax();
+        }
+    }
+
+    function copyClicked() {
+        let input = $("input#shortenedUrl");
+        let btnDiv = $("div#copyDiv");
+        input.focus();
+        input.select();
+
+        try {
+            let ok = document.execCommand('copy');
+            if (ok) {
+                btnDiv.attr("data-original-title", "{% trans "URL copied to the clipboard" %}");
+            } else {
+                btnDiv.attr("data-original-title", "{% trans "Failed to copy the URL to the clipboard" %}");
+            }
+        } catch (err) {
+            btnDiv.attr("data-original-title", "{% trans "Error occurred when copying the URL to the clipboard" %}");
+        }
+
+        btnDiv.tooltip('enable').tooltip('show').tooltip('disable');
+    }
+
+    function validateUrl() {
+        let url = $("input#shortenUrl").val();
+
+        if (!(url.startsWith("http://") || url.startsWith("https://"))) {
+            return "{% trans "URL to be shortened must starts with either http:// or https://." %}";
+        }
+
+        return "";
+    }
+
+    function sendShortenAjax() {
+        $.ajax({
+            data: {
+                "{{ static_keys_param.Service.ShortUrl.TARGET }}": $("input#shortenUrl").val(),
+                "{{ static_keys_param.Service.ShortUrl.USER_OID }}": "{{ root_oid }}",
+                "{{ static_keys_param.LOCAL_REFER }}": true
+            },
+            type: "POST",
+            url: "{% url "api.service.shorturl.short" %}",
+            success: function (response) {
+                console.log(response);
+
+                if ("{{ static_keys_result.SUCCESS }}" in response) {
+                    if (response["{{ static_keys_result.SUCCESS }}"]) {
+                        generateAlert("info", "{% trans "URL Shortened. Refresh the page to see the record in the list." %}");
+                        updateResultSection(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Service.ShortUrl.SHORTENED_URL }}"]);
+                    } else {
+                        let outcome = response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"];
+                        generateAlert("danger", `{% trans "URL Failed to be shortened. Outcome code: " %}${outcome}`);
+                        updateResultSection();
+                    }
+                } else {
+                    generateAlert("danger", "{% trans "Invalid response body." %}");
+                    updateResultSection();
+                }
+            },
+            error: function (xhr) {
+                generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
+                updateResultSection();
+            }
+        })
+    }
+
+    function updateResultSection(url = null) {
+        if (url) {
+            $("div#result").removeClass("d-none");
+            $("input#shortenedUrl").val(url);
+        } else {
+            $("div#result").addClass("d-none");
+        }
+    }
+
+    // FIXME: [HP] Remove and Update operation not implemented
+
+    function getUpdateTargetEndpointUrl(target, code) {
+        return `{% url "api.service.shorturl.update" %}?{{ static_keys_param.Service.ShortUrl.CODE }}=${code}&{{ static_keys_param.Service.ShortUrl.TARGET }}=${target}&{{ static_keys_param.Service.ShortUrl.USER_OID }}=${{ root_oid }}&{{ static_keys_param.LOCAL_REFER }}=true`;
+    }
+</script>

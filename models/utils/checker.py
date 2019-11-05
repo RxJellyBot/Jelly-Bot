@@ -1,3 +1,4 @@
+from threading import Thread
 from typing import Optional
 
 from pymongo.collection import Collection
@@ -27,6 +28,10 @@ class DataRepairResult(FlagCodeEnum):
 
 
 class ModelFieldChecker:
+    @staticmethod
+    def check_async(col_inst):
+        Thread(target=ModelFieldChecker.check, args=(col_inst,)).start()
+
     @staticmethod
     def check(col_inst):
         from mongodb.factory import PendingRepairDataManager

@@ -45,9 +45,8 @@ class AutoReplyModuleManager(BaseCollection):
         if pinned and PermissionCategory.AR_ACCESS_PINNED_MODULE not in perms:
             return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION, None, None)
         else:
-            model, outcome, ex, insert_result = \
+            model, outcome, ex = \
                 self.insert_one_data(
-                    AutoReplyModuleModel,
                     KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
                     Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds={str(channel_oid): True}
                 )
@@ -111,8 +110,8 @@ class AutoReplyModuleTagManager(BaseCollection):
         if tag_data:
             outcome = GetOutcome.O_CACHE_DB
         else:
-            model, outcome, ex, insert_result = \
-                self.insert_one_data(AutoReplyModuleTagModel, Name=name, Color=color)
+            model, outcome, ex = \
+                self.insert_one_data(Name=name, Color=color)
 
             if outcome.is_success:
                 tag_data = model

@@ -1,4 +1,3 @@
-from collections import Hashable
 from datetime import timedelta
 from typing import List
 
@@ -6,7 +5,7 @@ from extutils.utils import str_reduce_length
 from flags import ExtraContentType
 from JellyBot.systemconfig import Database
 from models.field import (
-    ExtraContentTypeField, TextField, DateTimeField,GeneralField
+    ExtraContentTypeField, TextField, DateTimeField, GeneralField
 )
 
 from ._base import Model, ModelDefaultValueExt

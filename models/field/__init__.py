@@ -6,7 +6,7 @@ from .float import FloatField
 from .int import IntegerField
 from .color import ColorField
 from .oid import ObjectIDField, OID_KEY
-from .text import TextField
+from .text import TextField, UrlField
 from .dict import DictionaryField
 from .general import GeneralField
 from .model import ModelField
