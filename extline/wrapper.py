@@ -9,6 +9,8 @@ from linebot.models import TextSendMessage, SendMessage, Profile
 from flags import ChannelType
 from models import ChannelModel
 
+from .logger import LINE
+
 __all__ = ["line_api", "_inst", "LineApiUtils"]
 
 
@@ -32,6 +34,8 @@ class LineApiWrapper:
             send_messages = [TextSendMessage(text=msg) for msg in message]
         else:
             raise ValueError("Message should be either in `list` of `str` or `str`.")
+
+        LINE.logger.debug(f"Message to send:\n{message}")
 
         self._core.reply_message(reply_token, send_messages)
 
