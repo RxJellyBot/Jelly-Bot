@@ -45,8 +45,10 @@ def _chcoll_id_section_(e: TextMessageEventObject):
 
 
 def _chcoll_info_url_(e: TextMessageEventObject):
-    return [_("Channel Collection Detailed Info URL: {}{}").format(
-        HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
+    if e.chcoll_model:
+        return [_("Channel Collection Detailed Info URL: {}{}").format(
+            HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
+    return []
 
 
 def _user_ranking_section_(e: TextMessageEventObject):
@@ -132,8 +134,8 @@ def check_channel_info(e: TextMessageEventObject):
     ret.extend(_channel_info_url_(e))
 
     ret.append("")
-    ret.extend(_channel_msg_count_list_section_(e, limit))
     ret.extend(_chcoll_msg_count_list_section_(e, limit))
+    ret.extend(_channel_msg_count_list_section_(e, limit))
 
     return "\n".join(ret)
 
@@ -142,8 +144,8 @@ def check_channel_info(e: TextMessageEventObject):
 def check_ids(e: TextMessageEventObject):
     ret = []
 
-    ret.extend(_channel_id_section_(e))
     ret.extend(_chcoll_id_section_(e))
+    ret.extend(_channel_id_section_(e))
     ret.extend(_user_id_section_(e))
 
     return "\n".join(ret)
