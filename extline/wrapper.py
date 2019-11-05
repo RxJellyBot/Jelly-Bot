@@ -35,7 +35,7 @@ class LineApiWrapper:
         else:
             raise ValueError("Message should be either in `list` of `str` or `str`.")
 
-        LINE.logger.debug(f"Message to send:\n{message}")
+        LINE.logger.debug(f"Message(s) to send:\n{message}")
 
         self._core.reply_message(reply_token, send_messages)
 

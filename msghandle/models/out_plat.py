@@ -98,7 +98,7 @@ class HandledEventsHolderPlatform:
                     sticker_url = LineStickerManager.get_sticker_url(content)
                     send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
 
-            LineApiWrapper.reply_text(reply_token, send_list)
+            LineApiWrapper.reply_message(reply_token, send_list)
 
     async def send_discord(self, dc_channel):
         send_list = []
