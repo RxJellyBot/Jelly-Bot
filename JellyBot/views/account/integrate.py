@@ -9,7 +9,7 @@ from msghandle.botcmd.command import cmd_uintg
 
 
 class UserIdentityIntegrateView(LoginRequiredMixin, TemplateResponseMixin, View):
-    # noinspection PyUnusedLocal
+    # noinspection PyUnusedLocal,PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
         return render_template(
             request, _("Integrate Identity"), "account/integrate.html",

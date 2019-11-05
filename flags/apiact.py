@@ -30,6 +30,11 @@ class APICommand(FlagSingleEnum):
         40x - Channel
             401: Issue Channel Registration Token
             403: Change Channel Name
+
+    5xx - Special Services
+        50x - Short URL
+            501: Shorten URL
+            502: Update Target
     """
     @classmethod
     def default(cls):
@@ -50,3 +55,6 @@ class APICommand(FlagSingleEnum):
 
     MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Token")
     MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")
+
+    SERV_SHORTEN_URL = 501, _("Services - Shorten URL")
+    SERV_UPDATE_TARGET = 502, _("Services - Update Target")

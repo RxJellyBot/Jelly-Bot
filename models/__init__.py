@@ -24,3 +24,5 @@ from .prof import (
 )
 # noinspection PyUnresolvedReferences
 from .exctnt import ExtraContentModel
+# noinspection PyUnresolvedReferences
+from .shorturl import ShortUrlRecordModel

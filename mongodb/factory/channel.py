@@ -28,8 +28,8 @@ class ChannelManager(BaseCollection):
 
     @param_type_ensure
     def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelModel, Platform=platform, Token=token,
+        entry, outcome, ex = self.insert_one_data(
+            Platform=platform, Token=token,
             Config=ChannelConfigModel.generate_default(DefaultName=default_name))
 
         if outcome.data_found:
@@ -56,7 +56,8 @@ class ChannelManager(BaseCollection):
         )
 
     @param_type_ensure
-    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
+            -> ChannelChangeNameResult:
         """
         Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
         """
@@ -148,8 +149,7 @@ class ChannelCollectionManager(BaseCollection):
         if not default_name:
             default_name = f"{token} ({platform.key})"
 
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelCollectionModel,
+        entry, outcome, ex = self.insert_one_data(
             DefaultName=default_name, Platform=platform, Token=token, ChildChannelOids=[child_channel_oid])
 
         if outcome.data_found:

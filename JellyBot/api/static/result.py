@@ -61,3 +61,8 @@ class UserManagementResponse:
 class DataQuery:
     COUNT = "count"
     KEYWORD = "keyword"
+
+
+class Service:
+    class ShortUrl:
+        SHORTENED_URL = "url"

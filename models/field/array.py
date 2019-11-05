@@ -1,8 +1,5 @@
-from typing import Any
-
 from bson import ObjectId
 from pymongo.collection import Collection
-from pymongo.results import UpdateResult
 
 from ._base import BaseField, FieldInstance
 from .exceptions import FieldReadOnly, FieldTypeMismatch, MaxLengthReachedError

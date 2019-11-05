@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Union
+from typing import List, Optional, Union
 
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor

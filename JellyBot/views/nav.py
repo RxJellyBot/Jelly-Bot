@@ -40,6 +40,7 @@ def construct_nav(request, nav_param):
     nav.add_item(_construct_auto_reply_(current_path, home_item))
     nav.add_item(_construct_info_(current_path, home_item, nav_param))
     nav.add_item(_construct_docs_(current_path, home_item, nav_param))
+    nav.add_item(_construct_services_(current_path, home_item))
     nav.add_item(about_item)
 
     return nav
@@ -165,3 +166,12 @@ def _construct_docs_(current_path, parent, nav_param):
         "page.doc.botcmd.cmd", nav_param, docs_parent)
 
     return docs_parent
+
+
+def _construct_services_(current_path, parent):
+    service_parent = nav_items_factory(
+        NavDropdown, current_path, label=_("Special Services"), parent=parent)
+    service_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Short URL"), link=reverse("service.shorturl"), parent=service_parent))
+
+    return service_parent

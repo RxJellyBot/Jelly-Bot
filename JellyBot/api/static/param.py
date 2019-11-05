@@ -52,6 +52,13 @@ class Manage:
         NEW_NAME = "name"
 
 
+class Service:
+    class ShortUrl:
+        USER_OID = Common.USER_OID
+        CODE = "code"
+        TARGET = "target"
+
+
 class TokenAction:
     TOKEN = "tk"
     PLATFORM = Common.PLATFORM

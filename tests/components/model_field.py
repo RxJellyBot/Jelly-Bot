@@ -123,18 +123,6 @@ class TestFieldFilter(unittest.TestCase):
         with self.assertRaises(FieldCastingFailed):
             field.value = 99999
 
-    def test_platformfield_no_cast(self):
-        field = PlatformField("n", auto_cast=False).new()
-
-        field.value = Platform.LINE
-        self.assertEqual(Platform.LINE, field.value)
-        with self.assertRaises(FieldTypeMismatch):
-            field.value = "LINE"
-        with self.assertRaises(FieldTypeMismatch):
-            field.value = None
-        with self.assertRaises(FieldValueInvalid):
-            field.value = 99999
-
     def test_field_allow_none(self):
         with self.assertRaises(FieldValueInvalid):
             _ = TextField("t", allow_none=False, must_have_content=True).new()

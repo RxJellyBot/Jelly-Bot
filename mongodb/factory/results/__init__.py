@@ -16,3 +16,4 @@ from .statistics import RecordAPIStatisticsResult, MessageRecordResult
 from .tkact import EnqueueTokenActionResult, CompleteTokenActionResult, GetTokenActionResult
 from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
 from .exctnt import RecordExtraContentResult
+from .shorturl import UrlShortenResult

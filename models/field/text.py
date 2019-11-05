@@ -1,4 +1,5 @@
 import re
+import requests
 
 from ._base import BaseField
 
@@ -25,3 +26,18 @@ class TextField(BaseField):
     @property
     def expected_types(self):
         return str
+
+
+class UrlField(BaseField):
+    def __init__(self, key, default=None, allow_none=False):
+        super().__init__(key, default, allow_none, readonly=True, auto_cast=True)
+
+    @property
+    def expected_types(self):
+        return str
+
+    def is_value_valid(self, value) -> bool:
+        try:
+            return requests.get(value).status_code == 200
+        except Exception:
+            return False

@@ -1,11 +1,9 @@
-# INCOMPLETE: Bot Statistics: Record message activity with various type of messages (image/text/video)
-#   - Can be viewed in channel info page
+# FIXME: Bot Statistics: Record message activity with various type of messages
+#   - Discord / LINE - Image
+#   - LINE - Sticker
 # INCOMPLETE: Bot Feature: Upload image (imgur)
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time
-# INCOMPLETE: Short URL: Short URL service (rnnx.cc)
-#   - Insert content for people to view or redirect
-#   - Changeable
 # TODO: Account Management: API Key refresh
 # TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir.
 #  API should return json response instead.

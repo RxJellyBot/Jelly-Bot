@@ -128,7 +128,7 @@ class ProfileDataManager(BaseCollection):
             create_result.model, ex)
 
     def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
-        default_profile, outcome, ex, insert_result = self._create_profile_(channel_oid, Name=_("Default Profile"))
+        default_profile, outcome, ex = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_inserted:
             set_success = ChannelManager.set_config(
@@ -141,7 +141,7 @@ class ProfileDataManager(BaseCollection):
 
     def _create_profile_(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
-            ChannelProfileModel, ChannelOid=channel_oid, **fk_param)
+            ChannelOid=channel_oid, **fk_param)
 
     # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
     # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change

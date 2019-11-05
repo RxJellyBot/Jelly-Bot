@@ -9,6 +9,7 @@ from ._base import BaseResult, ModelResult
 from ._outcome import WriteOutcome, OperationOutcome, GetOutcome
 
 
+# noinspection DuplicatedCode
 @dataclass
 class EnqueueTokenActionResult(BaseResult):
     def __init__(self, outcome, token, expiry, exception=None):
@@ -46,6 +47,7 @@ class GetTokenActionResult(ModelResult):
         super().__init__(outcome, action_model, None)
 
 
+# noinspection DuplicatedCode
 @dataclass
 class CompleteTokenActionResult(ModelResult):
     def __init__(self, outcome, completion_outcome, action_model, lacking_keys, exception=None):

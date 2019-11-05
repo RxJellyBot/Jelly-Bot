@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime, timezone
 from typing import List, Tuple, Type
 import traceback
@@ -85,20 +84,21 @@ class HandledEventsHolderPlatform:
                 self.to_send.append((e.msg_type, e.content))
 
     def send_line(self, reply_token):
-        from extline import LineApiWrapper
+        if self.to_send:
+            from extline import LineApiWrapper
 
-        send_list = []
+            send_list = []
 
-        for msg_type, content in self.to_send:
-            if msg_type == MessageType.TEXT:
-                send_list.append(TextSendMessage(text=content))
-            elif msg_type == MessageType.IMAGE:
-                send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
-            elif msg_type == MessageType.STICKER:
-                sticker_url = LineStickerManager.get_sticker_url(content)
-                send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
+            for msg_type, content in self.to_send:
+                if msg_type == MessageType.TEXT:
+                    send_list.append(TextSendMessage(text=content))
+                elif msg_type == MessageType.IMAGE:
+                    send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
+                elif msg_type == MessageType.STICKER:
+                    sticker_url = LineStickerManager.get_sticker_url(content)
+                    send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
 
-        LineApiWrapper.reply_text(reply_token, send_list)
+            LineApiWrapper.reply_text(reply_token, send_list)
 
     async def send_discord(self, dc_channel):
         send_list = []
