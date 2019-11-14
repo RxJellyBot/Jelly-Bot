@@ -373,7 +373,7 @@ class BaseCollection(ControlExtensionMixin, Collection):
         super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
         self._data_model = self.get_model_cls()\
 
-        ModelFieldChecker.check(self)
+        ModelFieldChecker.check_async(self)
 
     def insert_one_data(self, **model_args) -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
         return super().insert_one_data(self.get_model_cls(), **model_args)
