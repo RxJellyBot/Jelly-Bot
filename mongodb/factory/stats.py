@@ -46,7 +46,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
             message_type: MessageType, message_content: Any) -> MessageRecordResult:
         entry, outcome, ex = self.insert_one_data(
-            ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type, MessageContent=message_content)
+            ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
+            MessageContent=message_content[:Database.MessageStats.MaxContentCharacter])
 
         return MessageRecordResult(outcome, entry, ex)
 

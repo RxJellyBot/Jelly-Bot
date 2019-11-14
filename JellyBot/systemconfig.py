@@ -62,6 +62,9 @@ class Database:
         TimeCoeffB = -1 / TimeFunctionCoeff
         AppearanceCoeffA = 1 / math.pow(AppearanceIntersect, AppearanceFunctionCoeff - 1)
 
+    class MessageStats:
+        MaxContentCharacter = 500
+
 
 class DataQuery:
     TagPopularitySearchCount = 10
