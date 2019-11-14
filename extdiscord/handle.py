@@ -2,7 +2,7 @@ import traceback
 
 from extutils.emailutils import MailSender
 from msghandle import handle_message_main
-from msghandle.models import Event, TextMessageEventObject, HandledMessageEventsHolder
+from msghandle.models import Event, TextMessageEventObject, ImageMessageEventObject, HandledMessageEventsHolder
 
 from .logger import DISCORD
 
@@ -11,7 +11,7 @@ __all__ = ["handle_discord_main"]
 
 def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
     try:
-        if isinstance(e, TextMessageEventObject):
+        if isinstance(e, (TextMessageEventObject, ImageMessageEventObject)):
             return handle_message_main(e)
         else:
             DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw}")

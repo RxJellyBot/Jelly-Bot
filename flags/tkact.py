@@ -10,7 +10,7 @@ class TokenAction(FlagDoubleEnum):
             101: Channel Membership
 
         19x - Integrates Identity:
-            191: Integrate user identity
+            191: Integrate user data
 
     2xx - Auto Reply:
             201: Add
@@ -27,9 +27,9 @@ class TokenAction(FlagDoubleEnum):
     REGISTER_CHANNEL = \
         101, _("Register: Channel Membership"), \
         _("Get the membership of a channel.")
-    INTEGRATE_USER_IDENTITY = \
-        191, _("Integration: User Identity"), \
-        _("Integrate user identity.")
+    INTEGRATE_USER_DATA = \
+        191, _("Integration: User Data"), \
+        _("Integrate user data.")
     AR_ADD = \
         201, _("Auto-Reply: Add"), \
         _("Register an Auto-Reply module.")

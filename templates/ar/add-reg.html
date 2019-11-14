@@ -42,7 +42,7 @@
                         <select id="arChannel" class="form-control">
                             <option value="default">{% trans "Select a channel" %}</option>
                             {% for user_ch_entry in user_ch_list %}
-                                {% with user_ch_entry.channel as channel_data %}
+                                {% with user_ch_entry.channel_data as channel_data %}
                                     {% with user_ch_entry.channel_name as channel_name %}
                                         <option data-cname="{{ channel_name }}"
                                                 data-ctoken="{{ channel_data.token }}"

@@ -3,14 +3,15 @@ from threading import Thread
 from typing import Any, Optional, Union
 
 from bson import ObjectId
-from linebot.models import TextMessage, MessageEvent
+from linebot.models import TextMessage, ImageMessage, MessageEvent
 from discord import Message, ChannelType
 
 from models import ChannelModel, RootUserModel, ChannelCollectionModel
 from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager
 from extutils.emailutils import MailSender
 from msghandle import logger
-from flags import Platform, MessageType, ChannelType as SysChannelType
+from msghandle.models import ImageContent
+from flags import Platform, MessageType, ChannelType as SysChannelType, ImageContentType
 
 
 class Event(ABC):
@@ -73,6 +74,18 @@ class TextMessageEventObject(MessageEventObject):
         return MessageType.TEXT
 
 
+class ImageMessageEventObject(MessageEventObject):
+    def __init__(
+            self, raw: Any, image: ImageContent, channel_model: ChannelModel = None,
+            user_model: RootUserModel = None, sys_ctype: SysChannelType = None,
+            ch_parent_model: ChannelCollectionModel = None):
+        super().__init__(raw, image, channel_model, user_model, sys_ctype, ch_parent_model)
+
+    @property
+    def message_type(self) -> MessageType:
+        return MessageType.IMAGE
+
+
 class MessageEventObjectFactory:
     DiscordAcceptedChannelTypes = (ChannelType.text, ChannelType.private, ChannelType.group)
 
@@ -109,13 +122,19 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def from_line(event: MessageEvent) -> MessageEventObject:
-        from extline import LineApiUtils
+        from extline import LineApiUtils, LineApiWrapper
 
         user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.LINE, LineApiUtils.get_user_id(event))
         channel_model = MessageEventObjectFactory._ensure_channel_(
-            Platform.LINE, LineApiUtils.get_channel_id(event))
+            Platform.LINE, LineApiUtils.get_channel_id(event), LineApiUtils.get_channel_id(event))
+
         if isinstance(event.message, TextMessage):
-            return TextMessageEventObject(event, event.message.text, channel_model, user_model)
+            return TextMessageEventObject(
+                event, event.message.text, channel_model, user_model)
+        elif isinstance(event.message, ImageMessage):
+            return ImageMessageEventObject(
+                event, ImageContent(LineApiWrapper.get_image_base64(event.message), ImageContentType.BASE64),
+                channel_model, user_model)
         else:
             logger.logger.warning(f"Unhandled LINE message event. {type(event.message)}")
 
@@ -133,8 +152,20 @@ class MessageEventObjectFactory:
             Platform.DISCORD, message.author.id)
         channel_model = MessageEventObjectFactory._ensure_channel_(
             Platform.DISCORD, message.channel.id, msg_loc_repr(message))
-        ch_parent_model = MessageEventObjectFactory._ensure_channel_parent_(
-            Platform.DISCORD, message.guild.id, channel_model.id, str(message.guild))
-        return TextMessageEventObject(
-            message, message.content, channel_model, user_model,
-            SysChannelType.trans_from_discord(message.channel.type), ch_parent_model)
+        if message.guild:
+            ch_parent_model = MessageEventObjectFactory._ensure_channel_parent_(
+                Platform.DISCORD, message.guild.id, channel_model.id, str(message.guild))
+        else:
+            ch_parent_model = None
+
+        # If the message contains attachments, then consider it as an Image Message.
+        if message.attachments:
+            return ImageMessageEventObject(
+                message, ImageContent(message.attachments[0].url, ImageContentType.URL, message.content),
+                channel_model, user_model, SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
+            )
+        else:
+            return TextMessageEventObject(
+                message, message.content, channel_model, user_model,
+                SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
+            )

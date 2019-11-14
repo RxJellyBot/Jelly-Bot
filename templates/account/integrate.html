@@ -6,7 +6,7 @@
     <div class="jumbotron">
         <div class="container">
             <div class="display-4 text-center"
-                 style="word-break: break-word;">{% trans "User Identity Integration" %}</div>
+                 style="word-break: break-word;">{% trans "User Data Integration" %}</div>
         </div>
     </div>
 
@@ -22,9 +22,9 @@
                         {% url "page.doc.botcmd.cmd" code=cmd_code as cmd_url %}
                         {% blocktrans trimmed %}
                             <p>
-                                Input the token acquired for user identity integration below.<br>
+                                Input the token acquired for user data integration below.<br>
                                 Check <a href="{{ cmd_url }}">this page</a> for
-                                how to initiate the user identity integration process.<br>
+                                how to initiate the user data integration process.<br>
                                 Account related data such as locale configuration on the account where you get the token
                                 will be discarded, only the data on the website will be kept.
                             </p>
@@ -39,11 +39,11 @@
                             </div>
                         </div>
                         <div class="d-none text-primary submit-msg mt-3"
-                           id="submitMsgNoToken">{% trans "Provide a token to complete user identity integration." %}</div>
+                           id="submitMsgNoToken">{% trans "Provide a token to complete user data integration." %}</div>
                         <div class="d-none text-success submit-msg mt-3"
-                           id="submitMsgOK">{% trans "User identity integration succeed." %}</div>
+                           id="submitMsgOK">{% trans "User data integration succeed." %}</div>
                         <div class="d-none text-danger submit-msg mt-3"
-                           id="submitMsgFailed">{% trans "User identity integration failed." %}</div>
+                           id="submitMsgFailed">{% trans "User data integration failed." %}</div>
                     </div>
                 </div>
             </div>

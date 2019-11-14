@@ -69,6 +69,10 @@ def _construct_my_account_(current_path, parent, nav_param):
     my_account_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Dashboard"), link=reverse("account.main"), parent=my_account_parent))
     my_account_parent.add_item(nav_items_factory(
+        NavDivider, parent=my_account_parent))
+    my_account_parent.add_item(nav_items_factory(
+        NavHeader, label=_("Shortcut"), parent=my_account_parent))
+    my_account_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
 
     # Hidden Items

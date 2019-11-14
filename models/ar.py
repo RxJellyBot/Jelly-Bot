@@ -37,6 +37,8 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
+    # INCOMPLETE: Auto expire
+
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)

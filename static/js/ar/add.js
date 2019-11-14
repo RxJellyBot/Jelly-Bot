@@ -168,13 +168,11 @@ function formSubmitHandle() {
 
     $("form#arForm").submit(function () {
         submitBtnDisable(true);
+        updateLastSubmissionTime();
+
         let pass = true;
 
-        if (!validateForm()) {
-            pass = false;
-        }
-
-        if (submitBtnCheck()) {
+        if (formSubmissionChecks()) {
             pass = false;
         }
 
@@ -194,33 +192,6 @@ function formSubmitHandle() {
         event.preventDefault(); // Cancel default submission behavior for Ajax
         return false;
     })
-}
-
-function validateForm() {
-    updateLastSubmissionTime();
-
-    let ret = true;
-
-    $("div.txtarea-count").each(function () {
-        if (!$(this).parent().hasClass("d-none")) {
-            validateTextArea($(this), $(this).find("textarea"));
-        }
-    });
-
-    // Validate content lengths
-    $("div.content-check:not(.d-none)").each(function () {
-        let txtArea = $(this).find("textarea");
-        let ctLen = txtArea.val().length;
-        let maxLen = parseFloat($(this).find("div[data-type=progress][data-count=" + txtArea.attr("id") + "]").attr("aria-valuemax"));
-
-        if (maxLen < ctLen || ctLen === 0) {
-            $(this).find("div.tooltip-hide[data-toggle=tooltip]").tooltip('enable').tooltip('show').tooltip('disable');
-            ret = false;
-            updateArCode(null);
-        }
-    });
-
-    return ret;
 }
 
 function validateChannelInfo() {

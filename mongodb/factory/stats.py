@@ -5,9 +5,10 @@ import pymongo
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
-from flags import APICommand, MessageType
+from extutils.checker import param_type_ensure
+from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult, MessageRecordResult
-from models import APIStatisticModel, MessageRecordModel, OID_KEY
+from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -25,6 +26,7 @@ class APIStatisticsManager(BaseCollection):
         self.create_index(APIStatisticModel.Timestamp.key,
                           expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 
+    @param_type_ensure
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
                      org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
         entry, outcome, ex = self.insert_one_data(
@@ -39,6 +41,7 @@ class MessageRecordStatisticsManager(BaseCollection):
     collection_name = "msg"
     model_class = MessageRecordModel
 
+    @param_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
             message_type: MessageType, message_content: Any) -> MessageRecordResult:
@@ -79,5 +82,17 @@ class MessageRecordStatisticsManager(BaseCollection):
         return self.aggregate(aggr_pipeline)
 
 
+class BotFeatureUsageDataManager(BaseCollection):
+    database_name = DB_NAME
+    collection_name = "bot"
+    model_class = BotFeatureUsageModel
+
+    @param_type_ensure
+    def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
+        if feature_used != BotFeature.UNDEFINED:
+            self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
+
+
 _inst = APIStatisticsManager()
 _inst2 = MessageRecordStatisticsManager()
+_inst3 = BotFeatureUsageDataManager()

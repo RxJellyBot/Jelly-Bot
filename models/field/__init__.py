@@ -12,5 +12,5 @@ from .general import GeneralField
 from .model import ModelField
 from .flags import (
     APICommandField, AutoReplyContentTypeField, MessageTypeField,
-    PlatformField, TokenActionField, ExtraContentTypeField
+    PlatformField, TokenActionField, ExtraContentTypeField, BotFeatureField
 )

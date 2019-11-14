@@ -10,6 +10,7 @@
     function initEvents() {
         $("button#shorten").click(shortenClicked);
         $("button#copy").click(copyClicked);
+        notImplemented();
     }
 
     function initElems() {
@@ -97,7 +98,15 @@
         }
     }
 
-    // FIXME: [HP] Remove and Update operation not implemented
+    function notImplemented() {
+        // Clear up modal for displaying not implemented message (Keyword to search "NotImplementedModal")
+        $("button.action-delete").click(function() {
+            $("div#modalNotImplemented").modal("show");
+        });
+        $("button.action-update").click(function() {
+            $("div#modalNotImplemented").modal("show");
+        });
+    }
 
     function getUpdateTargetEndpointUrl(target, code) {
         return `{% url "api.service.shorturl.update" %}?{{ static_keys_param.Service.ShortUrl.CODE }}=${code}&{{ static_keys_param.Service.ShortUrl.TARGET }}=${target}&{{ static_keys_param.Service.ShortUrl.USER_OID }}=${{ root_oid }}&{{ static_keys_param.LOCAL_REFER }}=true`;

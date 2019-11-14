@@ -20,7 +20,6 @@
 
         {% for i in ""|ljust:max_responses %}
             <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
-
                 <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
                 <label class="sr-only"
                        for="arReply{{ forloop.counter }}">{% trans "Response" %}&nbsp;{{ forloop.counter }}</label>

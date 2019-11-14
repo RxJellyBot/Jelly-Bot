@@ -6,6 +6,8 @@ from sympy.core.sympify import SympifyError
 # noinspection PyProtectedMember
 from sympy.abc import _clash1
 
+from flags import BotFeature
+from mongodb.factory import BotFeatureUsageDataManager
 from msghandle import logger
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageCalculateResult
 
@@ -33,6 +35,8 @@ def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
                 calc_result = repr(expression.subs(symbol_vals))
             else:
                 calc_result = str(expression)
+
+            BotFeatureUsageDataManager.record_usage(BotFeature.TXT_FN_CALCULATOR, e.channel_oid, e.user_model.id)
 
             return [HandledMessageCalculateResult(calc_result=calc_result, latex=latex(expression), calc_expr=expr)]
         except SympifyError as e:

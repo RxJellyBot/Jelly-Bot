@@ -38,7 +38,7 @@
                             <div class="row mb-3">
                                 <label class="col-sm-4 col-form-label text-center" for="cfgLocale"
                                        data-toggle="tooltip" data-placement="top"
-                                       title="{% trans "This will affect the displays of timezone." %}">{% trans "Locale" %}</label>
+                                       title="{% trans "This will affect the displays of the timezone." %}">{% trans "Locale" %}</label>
                                 <div class="col-sm-8">
                                     <select id="cfgLocale" name="x-Locale" class="form-control">
                                         {% for locale in locale_list %}
@@ -55,7 +55,7 @@
                             <div class="row">
                                 <label class="col-sm-4 col-form-label text-center" for="cfgLocale"
                                        data-toggle="tooltip" data-placement="top"
-                                       title="{% trans "This will affect the displays of timezone." %}">{% trans "Language" %}</label>
+                                       title="{% trans "This will affect the displays of the language." %}">{% trans "Language" %}</label>
                                 <div class="col-sm-8">
                                     <select id="cfgLocale" name="x-Language" class="form-control">
                                         {% for lang in lang_list %}
@@ -87,7 +87,7 @@
     <script type="text/javascript" src="{% static "js/utils/generator.js" %}"></script>
     <script type="text/javascript">
         $(function () {
-            $("div[data-toggle=tooltip]").tooltip();
+            $("[data-toggle=tooltip]").tooltip();
         });
         $(document).ready(function () {
             $("form").submit(function () {

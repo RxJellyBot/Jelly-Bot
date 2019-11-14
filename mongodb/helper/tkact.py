@@ -3,7 +3,7 @@ from JellyBot.api.static import param
 from models import AutoReplyModuleTokenActionModel, TokenActionModel
 from mongodb.exceptions import NoCompleteActionError, TokenActionCollationError
 from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
-from mongodb.helper import UserIdentityIntegrationHelper
+from mongodb.helper import UserDataIntegrationHelper
 
 
 __all__ = ["TokenActionCompletor", "TokenActionParameterCollator", "TokenActionRequiredKeys"]
@@ -21,8 +21,8 @@ class TokenActionCompletor:
             return TokenActionCompletor._token_ar_add_(action_model, xparams)
         elif action == TokenAction.REGISTER_CHANNEL:
             return TokenActionCompletor._token_register_channel_(action_model, xparams)
-        elif action == TokenAction.INTEGRATE_USER_IDENTITY:
-            return TokenActionCompletor._token_integrate_identity_(action_model, xparams)
+        elif action == TokenAction.INTEGRATE_USER_DATA:
+            return TokenActionCompletor._token_user_data_integration_(action_model, xparams)
         else:
             raise NoCompleteActionError(action)
 
@@ -62,10 +62,10 @@ class TokenActionCompletor:
         return TokenActionCompletionOutcome.O_OK
 
     @staticmethod
-    def _token_integrate_identity_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
+    def _token_user_data_integration_(action_model: TokenActionModel, xparams: dict) -> TokenActionCompletionOutcome:
         try:
             # `xparams` is casted from QueryDict, so get the value using [0]
-            success = UserIdentityIntegrationHelper.integrate(
+            success = UserDataIntegrationHelper.integrate(
                 action_model.creator_oid, xparams.get(param.TokenAction.USER_OID)[0])
         except Exception:
             return TokenActionCompletionOutcome.X_IDT_INTEGRATION_ERROR
@@ -120,7 +120,7 @@ class TokenActionRequiredKeys:
         elif token_action == TokenAction.REGISTER_CHANNEL:
             st.add(param.TokenAction.CHANNEL_TOKEN)
             st.add(param.TokenAction.PLATFORM)
-        elif token_action == TokenAction.INTEGRATE_USER_IDENTITY:
+        elif token_action == TokenAction.INTEGRATE_USER_DATA:
             st.add(param.TokenAction.USER_OID)
 
         return st

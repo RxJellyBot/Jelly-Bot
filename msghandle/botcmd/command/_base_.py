@@ -2,9 +2,10 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Union
 from inspect import signature
 
-from flags import CommandScopeCollection, CommandScope, ChannelType
+from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject
 from msghandle.translation import gettext as _
+from mongodb.factory import BotFeatureUsageDataManager
 from extutils.checker import param_type_ensure
 from extutils.logger import LoggerSkeleton
 
@@ -31,6 +32,7 @@ class CommandFunction:
     arg_help: List[str]
     fn: callable
     cmd_node: 'CommandNode'
+    cmd_feature: BotFeature
     description: str
     scope: CommandScope
     prm_keys: List[CommandParameter] = field(init=False)
@@ -252,12 +254,16 @@ class CommandNode:
     def command_function(
             self, fn: callable = None, *, arg_count: int = 0, arg_help: list = None,
             description: str = _("No description provided."),
-            scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED):
+            scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED,
+            feature_flag: BotFeature = BotFeature.UNDEFINED):
         """
         Function used to decorate the function to be ready to execute command.
         """
         if not arg_help:
             arg_help = []
+
+        if feature_flag != BotFeature.UNDEFINED:
+            description = feature_flag.description
 
         # Check the length of arg help and fill it with empty string if len(arg_help) is shorter.
         if len(arg_help) < arg_count:
@@ -267,7 +273,8 @@ class CommandNode:
             s = signature(f)
             # This length count needs to include the first parameter - e: TextEventObject for every function
             if len(s.parameters) > arg_count:
-                self._register_(arg_count, CommandFunction(arg_count, arg_help, f, self, description, scope))
+                self._register_(
+                    arg_count, CommandFunction(arg_count, arg_help, f, self, feature_flag, description, scope))
             else:
                 logger.logger.warning(
                     f"Function `{f.__qualname__}` not registered because its argument length is insufficient.")
@@ -310,6 +317,7 @@ class CommandNode:
             if not cmd_fn.scope.is_in_scope(e.channel_type):
                 ret = [CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes)]
             else:
+                BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
                 ret = param_type_ensure(cmd_fn.fn)(e, *args)
 
             if isinstance(ret, str):
@@ -348,6 +356,10 @@ class CommandSpecialResponse:
         return _("Command not allowed to use under this channel type: {}\n"
                  "Please use the command under either one of these channel types: {}").format(
             current.key, " / ".join([str(ctype.key) for ctype in allowed]))
+
+# INCOMPLETE: Bot command:
+#   - Case insensitive on command selecting
+#   - Add auto reply (text, sticker to text, image, sticker)
 
 
 class CommandHandler:

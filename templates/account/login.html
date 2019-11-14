@@ -6,13 +6,6 @@
     {% csrf_token %}
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <div class="glyphicon glyphicon-remove-circle alert alert-danger d-none" role="alert" id="msg">
-                    <span class="sr-only">(Alert)</span>
-                </div>
-            </div>
-        </div>
-        <div class="row">
             <div class="jumbotron">
                 <p class="display-4">
                     {% blocktrans trimmed %}
@@ -47,6 +40,7 @@
 {% endblock %}
 
 {% block ex-script %}
+    <script src="{% static "js/utils/generator.js" %}" type="text/javascript"></script>
     <script src="https://apis.google.com/js/platform.js" type="text/javascript" async
             defer></script>
     <script src="{% static "js/login.js" %}" type="text/javascript"></script>

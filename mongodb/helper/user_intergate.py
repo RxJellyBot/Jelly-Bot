@@ -7,7 +7,7 @@ from extutils.checker import param_type_ensure
 from models.field import BaseField
 
 
-class UserIdentityIntegrationHelper:
+class UserDataIntegrationHelper:
     @staticmethod
     @param_type_ensure
     def integrate(src_root_oid: ObjectId, dest_root_oid: ObjectId) -> bool:
@@ -35,7 +35,7 @@ class UserIdentityIntegrationHelper:
         if failed_names:
             MailSender.send_email_async(
                 f"Fields value replacements failed.<hr><pre>{'<br>'.join(failed_names)}</pre>",
-                subject="User Identity Integration Failed.")
+                subject="User Data Integration Failed.")
             return False
         else:
             return RootUserManager.merge_onplat_to_api(src_root_oid, dest_root_oid).is_success

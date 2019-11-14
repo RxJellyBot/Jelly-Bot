@@ -1,5 +1,5 @@
 from extutils.flags import FlagCodeEnum
-from flags import APICommand, AutoReplyContentType, TokenAction, Platform, ExtraContentType, MessageType
+from flags import APICommand, AutoReplyContentType, TokenAction, Platform, ExtraContentType, MessageType, BotFeature
 from .int import IntegerField
 
 
@@ -58,3 +58,7 @@ class ExtraContentTypeField(FlagField):
 
 class MessageTypeField(FlagField):
     FLAG_TYPE = MessageType
+
+
+class BotFeatureField(FlagField):
+    FLAG_TYPE = BotFeature

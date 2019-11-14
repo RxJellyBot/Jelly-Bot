@@ -113,7 +113,7 @@ msgstr "帳號設定"
 
 #: .\JellyBot\views\account\integrate.py:14
 msgid "Integrate Identity"
-msgstr "整合用戶資訊"
+msgstr "整合資訊"
 
 #: .\JellyBot\views\account\main.py:18
 msgid "Account Home"
@@ -828,11 +828,11 @@ msgid "Get the membership of a channel."
 msgstr "註冊為頻道成員。"
 
 #: .\flags\tkact.py:31
-msgid "Integration: User Identity"
+msgid "Integration: User Data"
 msgstr "整合: 用戶資訊"
 
 #: .\flags\tkact.py:32
-msgid "Integrate user identity."
+msgid "Integrate user data."
 msgstr "整合用戶資訊。"
 
 #: .\flags\tkact.py:34
@@ -1332,7 +1332,7 @@ msgid "X: Source = Destination"
 msgstr "X: 來源和目標相同"
 
 #: .\mongodb\factory\results\_outcome.py:304
-msgid "Source user identity is equal to the destination user identity."
+msgid "Source user data is equal to the destination user data."
 msgstr "來源用戶資訊和目標用戶資訊相同。"
 
 #: .\mongodb\factory\results\_outcome.py:306
@@ -1340,7 +1340,7 @@ msgid "X: Source Data Not Found"
 msgstr "X: 找不到來源用戶資訊"
 
 #: .\mongodb\factory\results\_outcome.py:307
-msgid "Source user identity data not found."
+msgid "Source user data data not found."
 msgstr "找不到來源用戶資訊。"
 
 #: .\mongodb\factory\results\_outcome.py:309
@@ -1348,7 +1348,7 @@ msgid "X: Destination Data Not Found"
 msgstr "X: 找不到目標用戶資訊"
 
 #: .\mongodb\factory\results\_outcome.py:310
-msgid "Destination user identity data not found."
+msgid "Destination user data not found."
 msgstr "找不到目標用戶資訊。"
 
 #: .\mongodb\factory\results\_outcome.py:312
@@ -1463,16 +1463,16 @@ msgid "User Integrate"
 msgstr "整合用戶資料"
 
 #: .\msghandle\botcmd\command\uintg.py:13
-msgid "Controls related to user identity integration."
+msgid "Controls related to user data integration."
 msgstr "與用戶資料整合有關的行為。"
 
 #: .\msghandle\botcmd\command\uintg.py:17
-msgid "Issue a token for user identity integration."
+msgid "Issue a token for user data integration."
 msgstr "獲取一條代號以整合用戶資訊。"
 
 #: .\msghandle\botcmd\command\uintg.py:21
 msgid ""
-"User Identity Integration Enqueued.\n"
+"User Data Integration Enqueued.\n"
 "Token: `{}`\n"
 "Expiry: `{}`\n"
 "\n"
@@ -1743,7 +1743,7 @@ msgid "An error occurred."
 msgstr "發生錯誤。"
 
 #: .\templates\account\integrate.html:9
-msgid "User Identity Integration"
+msgid "User Data Integration"
 msgstr "整合用戶資料"
 
 #: .\templates\account\integrate.html:19
@@ -1753,8 +1753,8 @@ msgstr "輸入代號"
 #: .\templates\account\integrate.html:23
 #, python-format
 msgid ""
-"<p> Input the token acquired for user identity integration below.<br> Check "
-"<a href=\"%(cmd_url)s\">this page</a> for how to initiate the user identity "
+"<p> Input the token acquired for user data integration below.<br> Check "
+"<a href=\"%(cmd_url)s\">this page</a> for how to initiate the user data "
 "integration process.<br> Account related data such as locale configuration "
 "on the account where you get the token will be discarded, only the data on "
 "the website will be kept. </p>"
@@ -1773,15 +1773,15 @@ msgid "Submit"
 msgstr "提交"
 
 #: .\templates\account\integrate.html:42
-msgid "Provide a token to complete user identity integration."
+msgid "Provide a token to complete user data integration."
 msgstr "提交代碼以完成用戶資料整合手續。"
 
 #: .\templates\account\integrate.html:44
-msgid "User identity integration succeed."
+msgid "User data integration succeed."
 msgstr "用戶資料整合成功。"
 
 #: .\templates\account\integrate.html:46
-msgid "User identity integration failed."
+msgid "User data integration failed."
 msgstr "用戶資料整合失敗。"
 
 #: .\templates\account\login.html:18

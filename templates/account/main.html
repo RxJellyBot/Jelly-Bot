@@ -18,6 +18,10 @@
                         <table class="table text-primary mb-0">
                             <tbody>
                             <tr>
+                                <th scope="row">{% trans "User ID" %}</th>
+                                <td><code class="h6">{{ root_data.id }}</code></td>
+                            </tr>
+                            <tr>
                                 <th scope="row">{% trans "Google Account" %}</th>
                                 <td>{{ api_user_data.email }}</td>
                             </tr>

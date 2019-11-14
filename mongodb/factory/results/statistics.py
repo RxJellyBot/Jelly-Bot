@@ -10,7 +10,7 @@ class RecordAPIStatisticsResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
         :type outcome: WriteOutcome
-        :type model: APIStatisticModel
+        :type model: APIStatisticModel or None
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)
@@ -21,7 +21,7 @@ class MessageRecordResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
         :type outcome: WriteOutcome
-        :type model: MessageRecordModel
+        :type model: MessageRecordModel or None
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)
