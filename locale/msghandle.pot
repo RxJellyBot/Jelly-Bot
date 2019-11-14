@@ -78,7 +78,7 @@ msgid "Replace the real newline character to be the escaped character \\n."
 msgstr ""
 
 #: msghandle\botcmd\command\uintg.py:12
-msgid "Controls related to user identity integration."
+msgid "Controls related to user data integration."
 msgstr ""
 
 #: msghandle\botcmd\command\uintg.py:12
@@ -86,12 +86,12 @@ msgid "User Integrate"
 msgstr ""
 
 #: msghandle\botcmd\command\uintg.py:16
-msgid "Issue a token for user identity integration."
+msgid "Issue a token for user data integration."
 msgstr ""
 
 #: msghandle\botcmd\command\uintg.py:20
 msgid ""
-"User Identity Integration process started.\n"
+"User Data Integration process started.\n"
 "Token: `{}`\n"
 "Expiry: `{}`\n"
 "\n"
@@ -100,7 +100,7 @@ msgstr ""
 
 #: msghandle\botcmd\command\uintg.py:25
 msgid ""
-"User Identity Integration process failed to start.\n"
+"User Data Integration process failed to start.\n"
 "Result: {}\n"
 "Exception: {}"
 msgstr ""

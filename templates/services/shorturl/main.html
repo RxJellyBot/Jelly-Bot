@@ -24,7 +24,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">{% trans "Shortened URL" %}</span>
                         </div>
-                        <input type="text" class="form-control bg-light" id="shortenedUrl" aria-label="Shortened URL" readonly>
+                        <input type="text" class="form-control bg-light" id="shortenedUrl" aria-label="Shortened URL"
+                               readonly>
                         <div class="input-group-append" id="copyDiv" data-toggle="tooltip" title="-">
                             <button class="btn btn-outline-success" type="button" id="copy">
                                 {% trans "Copy" %}
@@ -42,12 +43,18 @@
         </div>
         <div class="row">
             <div class="col mb-3">
+                {% trans "Note that the used count statistic might be flawed as it is awaiting improvement of recognizing the source." %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col mb-3">
                 <div class="table-freeze-header" style="max-height: 25rem">
                     <table class="table table-hover table-bordered table-bordered mb-0">
                         <thead>
                         <tr>
                             <th scope="col">{% trans "Short URL" %}</th>
                             <th scope="col">{% trans "Used Count" %}</th>
+                            <th scope="col">{% trans "Actions" %}</th>
                             <th scope="col">{% trans "Target" %}</th>
                         </tr>
                         </thead>
@@ -57,6 +64,16 @@
                                 <td class="align-middle text-center"><span
                                         class="click-select">{{ record.short_url }}</span></td>
                                 <td class="align-middle text-center h5 font-weight-normal">{{ record.used_count }}</td>
+                                <td class="align-middle text-center no-line-break">
+                                    <button class="action-update btn btn-outline-primary" type="button"
+                                            data-target="{{ record.code }}">
+                                        {% trans "Update" %}
+                                    </button>
+                                    <button class="action-delete btn btn-outline-danger" type="button"
+                                            data-target="{{ record.code }}">
+                                        {% trans "Delete" %}
+                                    </button>
+                                </td>
                                 <td class="align-middle text-center">
                                     <code class="h6 no-line-break">
                                         <small><a href="{{ record.target }}"
@@ -67,6 +84,24 @@
                         {% endfor %}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NotImplementedModal -->
+    <div class="modal fade" id="modalNotImplemented" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{% trans "Not Implemented" %}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">{% trans "The update and delete function has not been implemented yet." %}</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">{% trans "Close" %}</button>
                 </div>
             </div>
         </div>

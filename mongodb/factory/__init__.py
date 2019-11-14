@@ -12,7 +12,11 @@ from .ar_conn import _inst as AutoReplyManager
 # noinspection PyPep8Naming
 from .user import _inst as RootUserManager
 # noinspection PyPep8Naming
-from .stats import _inst as APIStatisticsManager, _inst2 as MessageRecordStatisticsManager
+from .stats import (
+    _inst as APIStatisticsManager,
+    _inst2 as MessageRecordStatisticsManager,
+    _inst3 as BotFeatureUsageDataManager
+)
 # noinspection PyPep8Naming
 from .tkact import _inst as TokenActionManager
 # noinspection PyPep8Naming

@@ -20,3 +20,7 @@ from .cmdscope import CommandScopeCollection, CommandScope
 from .exctnt import ExtraContentType
 # noinspection PyUnresolvedReferences
 from .weberr import WebsiteError
+# noinspection PyUnresolvedReferences
+from .imgtype import ImageContentType
+# noinspection PyUnresolvedReferences
+from .botfeature import BotFeature

@@ -12,7 +12,7 @@ from mongodb.factory import ShortUrlDataManager
 class ShortUrlMainView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        # FIXME: Shorten URL
+        # TODO: Shorten URL
         #   Layout: Change target ajax, remove
         #   API Port: Remove short URL
         return render_template(

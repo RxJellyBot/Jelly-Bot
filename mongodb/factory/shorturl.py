@@ -16,8 +16,6 @@ from ._base import BaseCollection
 
 DB_NAME = "surl"
 
-# FIXME: Line Webhook test (print every message to reply for debug)
-
 
 class ShortUrlDataManager(BaseCollection):
     database_name = DB_NAME

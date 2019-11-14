@@ -1,5 +1,4 @@
 # FIXME: Bot Statistics: Record message activity with various type of messages
-#   - Discord / LINE - Image
 #   - LINE - Sticker
 # INCOMPLETE: Bot Feature: Upload image (imgur)
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)

@@ -265,7 +265,7 @@ class OperationOutcome(BaseOutcome):
     2xx - Problems related to Channel
         201 - Channel Not Found
 
-    3xx - Problems related to User Identity
+    3xx - Problems related to User Data
         301 - Source is identical to destination
         302 - Source user data not found
         303 - Destination user data not found
@@ -319,13 +319,13 @@ class OperationOutcome(BaseOutcome):
         _("Channel was not found using the given Channel ID.")
     X_SAME_SRC_DEST = \
         301, _("X: Source = Destination"), \
-        _("Source user identity is equal to the destination user identity.")
+        _("Source user data is equal to the destination user data.")
     X_SRC_DATA_NOT_FOUND = \
         302, _("X: Source Data Not Found"), \
-        _("Source user identity data not found.")
+        _("Source user data data not found.")
     X_DEST_DATA_NOT_FOUND = \
         303, _("X: Destination Data Not Found"), \
-        _("Destination user identity data not found.")
+        _("Destination user data data not found.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")

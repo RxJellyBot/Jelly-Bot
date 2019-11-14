@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from flags import BotFeature
 from mongodb.helper import MessageStatsDataProcessor
 from msghandle.models import TextMessageEventObject
 from msghandle.translation import gettext as _
@@ -8,7 +9,7 @@ from JellyBot.systemconfig import HostUrl
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["id", "info"], 500, _("Information"),
+    ["info", "id"], 500, _("Information"),
     _("Check the information of various things (see the description section for more details)."))
 cmd_me = cmd.new_child_node(["me", "my"])
 cmd_ch = cmd.new_child_node(["ch", "channel"])
@@ -113,17 +114,18 @@ def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
     return ret
 
 
-@cmd_me.command_function(description=_("Check the user info of self."))
-def check_sender_identity(e: TextMessageEventObject):
+@cmd_id.command_function(feature_flag=BotFeature.TXT_INFO_ID)
+def check_ids(e: TextMessageEventObject):
     ret = []
 
+    ret.extend(_chcoll_id_section_(e))
+    ret.extend(_channel_id_section_(e))
     ret.extend(_user_id_section_(e))
-    ret.extend(_user_ranking_section_(e))
 
     return "\n".join(ret)
 
 
-@cmd_ch.command_function(description=_("Check the channel info."))
+@cmd_ch.command_function(feature_flag=BotFeature.TXT_INFO_CHANNEL)
 def check_channel_info(e: TextMessageEventObject):
     ret = []
 
@@ -141,12 +143,11 @@ def check_channel_info(e: TextMessageEventObject):
     return "\n".join(ret)
 
 
-@cmd_id.command_function(description=_("Check the current channel and the self user id."))
-def check_ids(e: TextMessageEventObject):
+@cmd_me.command_function(feature_flag=BotFeature.TXT_INFO_USER)
+def check_sender_identity(e: TextMessageEventObject):
     ret = []
 
-    ret.extend(_chcoll_id_section_(e))
-    ret.extend(_channel_id_section_(e))
     ret.extend(_user_id_section_(e))
+    ret.extend(_user_ranking_section_(e))
 
     return "\n".join(ret)
