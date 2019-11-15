@@ -1,5 +1,6 @@
 from bson import ObjectId
 
+from models.exceptions import KeyNotExistedError
 from extutils.locales import default_locale, default_language
 from flags import ModelValidityCheckResult, Platform
 
@@ -21,12 +22,26 @@ class RootUserModel(Model):
     Config = ModelField("c", RootUserConfigModel)
 
     def perform_validity_check(self) -> ModelValidityCheckResult:
-        all_empty = self.is_field_none("OnPlatOids", False) and self.is_field_none("ApiOid", False)
+        all_empty = not self.has_onplat_data and not self.has_api_data
 
         if all_empty:
             return ModelValidityCheckResult.X_RTU_ALL_NONE
         else:
             return ModelValidityCheckResult.O_OK
+
+    @property
+    def has_onplat_data(self) -> bool:
+        try:
+            return not self.is_field_none("OnPlatOids")
+        except (KeyError, KeyNotExistedError, AttributeError):
+            return False
+
+    @property
+    def has_api_data(self) -> bool:
+        try:
+            return not self.is_field_none("ApiOid")
+        except (KeyError, KeyNotExistedError, AttributeError):
+            return False
 
 
 class APIUserModel(Model):

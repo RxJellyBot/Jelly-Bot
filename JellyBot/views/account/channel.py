@@ -1,6 +1,8 @@
 from bson import ObjectId
+from django.contrib import messages
 
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
@@ -65,7 +67,13 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             c_prof = ChannelManager.get_channel_oid(channel_oid)
 
             if c_prof:
-                return redirect("info.channel")
+                messages.info(
+                    request, _("You are redirected to the channel info page "
+                               "because you don't have any connections linked to the channel."),
+                    extra_tags="info"
+                )
+
+                return redirect(reverse("info.channel", kwargs={"channel_oid": channel_oid}))
             else:
                 return WebsiteErrorView.website_error(
                     request, WebsiteError.PROFILE_LINK_NOT_FOUND, {"channel_oid": channel_oid_str})

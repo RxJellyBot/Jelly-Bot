@@ -15,7 +15,7 @@
                 <div class="card border-primary mb-3 text-primary text-center align-middle">
                     <h5 class="card-header">{% trans "Basic Information" %}</h5>
                     <div class="card-body">
-                        <table class="table text-primary mb-0">
+                        <table class="table table-hover table-striped table-borderless text-primary mb-0">
                             <tbody>
                             <tr>
                                 <th scope="row">{% trans "User ID" %}</th>
@@ -59,6 +59,24 @@
                                     </div>
                                 </td>
                             </tr>
+                            </tbody>
+                        </table>
+                    <hr>
+                        <h5>{% trans "Connected Accounts" %}</h5>
+                        <table class="table table-hover table-striped table-borderless text-primary mb-0">
+                            <thead>
+                            <tr>
+                                <th scope="col">{% trans "Platform" %}</th>
+                                <th scope="col">{% trans "Token" %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for onplat_user_data in onplat_user_data_list %}
+                                <tr>
+                                    <td>{{ onplat_user_data.platform.key }}</td>
+                                    <td><code class="h6">{{ onplat_user_data.token }}</code></td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>

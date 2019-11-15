@@ -51,6 +51,25 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return MessageRecordResult(outcome, entry, ex)
 
+    # Statistics
+
+    def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
+        aggr = list(self.aggregate([
+            {"$match": {
+                MessageRecordModel.MessageContent.key: {"$regex": message_fragment, "$options": "i"}
+            }},
+            {"$group": {
+                "_id": None,
+                "cid": {"$addToSet": "$" + MessageRecordModel.ChannelOid.key}
+            }},
+            {"$unwind": "$cid"},
+            {"$project": {
+                "_id": 0
+            }}
+        ]))
+
+        return [e["cid"] for e in aggr]
+
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
             sort: bool = False) \

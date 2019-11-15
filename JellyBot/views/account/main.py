@@ -14,8 +14,7 @@ class AccountMainPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         u_data = RootUserManager.get_root_data_api_token(self.request.COOKIES[keys.Cookies.USER_TOKEN])
         tkact_list = TokenActionManager.get_queued_actions(u_data.model.id)
 
-        # INCOMPLETE: Account main page display connected user data
-
         return render_template(
             self.request, _("Account Home"), "account/main.html",
-            {"root_data": u_data, "api_user_data": u_data.model_api, "tkact_list": tkact_list})
+            {"root_data": u_data.model, "api_user_data": u_data.model_api,
+             "tkact_list": tkact_list, "onplat_user_data_list": u_data.model_onplat_list})

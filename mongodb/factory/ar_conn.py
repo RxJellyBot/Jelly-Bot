@@ -17,7 +17,7 @@ from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
-from mongodb.utils import CheckableCursor, case_insensitive_collation
+from mongodb.utils import ExtendedCursor, case_insensitive_collation
 from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
@@ -121,13 +121,13 @@ class AutoReplyModuleTagManager(BaseCollection):
 
         return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
 
-    def search_tags(self, tag_keyword: str) -> CheckableCursor:
+    def search_tags(self, tag_keyword: str) -> ExtendedCursor:
         """
         Accepts a keyword to search. Case-insensitive.
 
         :param tag_keyword: Can be regex.
         """
-        return self.find_checkable_cursor(
+        return self.find_extended_cursor(
             {"name": {"$regex": tag_keyword, "$options": "i"}},
             sort=[(OID_KEY, pymongo.DESCENDING)],
             parse_cls=AutoReplyModuleTagModel)
@@ -142,7 +142,7 @@ class AutoReplyManager:
         self._tag = AutoReplyModuleTagManager()
 
     def _get_tags_pop_score_(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
-            -> CheckableCursor:
+            -> ExtendedCursor:
         # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
         # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
 
@@ -210,7 +210,7 @@ class AutoReplyManager:
         }})
         pipeline.append({"$limit": count})
 
-        return CheckableCursor(self._mod.aggregate(pipeline), parse_cls=AutoReplyTagPopularityDataModel)
+        return ExtendedCursor(self._mod.aggregate(pipeline), parse_cls=AutoReplyTagPopularityDataModel)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         return self._mod.add_conn_by_model(model)

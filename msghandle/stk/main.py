@@ -7,10 +7,10 @@ from .autoreply import process_auto_reply
 
 
 def handle_line_sticker_event(e: LineStickerMessageEventObject) -> List[HandledMessageEvent]:
-    handle_fn = [
-        process_display_info,
-        process_auto_reply
-    ]
+    handle_fn = [process_display_info]
+
+    if e.channel_model.config.enable_auto_reply:
+        handle_fn.append(process_auto_reply)
 
     for fn in handle_fn:
         responses = fn(e)

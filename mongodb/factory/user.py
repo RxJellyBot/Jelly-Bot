@@ -196,7 +196,7 @@ class RootUserManager(BaseCollection):
             return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
 
         # On Platform Identity found? Try to find the name and return it
-        if udata.on_plat_oids:
+        if udata.has_onplat_data:
             for onplatoid in udata.on_plat_oids:
                 onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
 
@@ -212,6 +212,7 @@ class RootUserManager(BaseCollection):
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
         entry = None
+        onplat_list = []
 
         if api_u_data is None:
             outcome = GetOutcome.X_NOT_FOUND_FIRST_QUERY
@@ -223,7 +224,24 @@ class RootUserManager(BaseCollection):
                 entry = root_u_data
                 outcome = GetOutcome.O_CACHE_DB
 
-        return GetRootUserDataApiResult(outcome, entry, api_u_data)
+        if outcome.is_success and entry.has_onplat_data:
+            missing = []
+
+            for oid in entry.on_plat_oids:
+                onplat_data = self._mgr_onplat.get_onplat_by_oid(oid)
+
+                if onplat_data:
+                    onplat_list.append(onplat_data)
+                else:
+                    missing.append(oid)
+
+            if missing:
+                MailSender.send_email_async(
+                    f"On Platform Data not found while getting the root user data by providing api token.\n"
+                    f"API Token: {token} / OID of Missing On Platform Data: {' | '.join([str(i) for i in missing])}",
+                    subject="On Platform Data not found")
+
+        return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
 
     @param_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:

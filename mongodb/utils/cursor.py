@@ -1,4 +1,4 @@
-class CheckableCursor:
+class ExtendedCursor:
     def __init__(self, cursor, parse_cls=None):
         self._cursor = cursor
         self._parse_cls = parse_cls
@@ -13,5 +13,5 @@ class CheckableCursor:
         return self
 
     @property
-    def empty(self):
-        return self._cursor.count() == 0
+    def alive(self):
+        return self._cursor.alive
