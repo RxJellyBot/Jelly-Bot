@@ -2,11 +2,14 @@ from django.utils.translation import activate, deactivate
 
 from mongodb.factory import MessageRecordStatisticsManager, ProfileManager
 
-from .models.pipe_in import MessageEventObject, TextMessageEventObject, ImageMessageEventObject
+from .models.pipe_in import (
+    MessageEventObject, TextMessageEventObject, ImageMessageEventObject, LineStickerMessageEventObject
+)
 from .models.pipe_out import HandledMessageEventsHolder
 from .logger import logger
 from .text.main import handle_text_event
 from .img.main import handle_image_event
+from .stk.main import handle_line_sticker_event
 from .translation import update_current_lang, deactivate_lang
 
 
@@ -26,6 +29,8 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
         ret = HandledMessageEventsHolder(handle_text_event(e))
     elif isinstance(e, ImageMessageEventObject):
         ret = HandledMessageEventsHolder(handle_image_event(e))
+    elif isinstance(e, LineStickerMessageEventObject):
+        ret = HandledMessageEventsHolder(handle_line_sticker_event(e))
     else:
         logger.logger.info(f"Message handle object not handled. Raw: {e.raw}")
         ret = HandledMessageEventsHolder()

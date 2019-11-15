@@ -46,7 +46,7 @@ class HandledMessageEventImage(HandledMessageEvent):
 
 class HandledMessageEventLineSticker(HandledMessageEvent):
     def __init__(self, sticker_id):
-        super().__init__(MessageType.STICKER, sticker_id)
+        super().__init__(MessageType.LINE_STICKER, sticker_id)
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):

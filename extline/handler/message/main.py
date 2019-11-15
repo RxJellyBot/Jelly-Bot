@@ -17,7 +17,7 @@ fn_dict = {
     MessageType.UNKNOWN: handle_msg_default,
     MessageType.TEXT: handle_text,
     MessageType.IMAGE: handle_image,
-    MessageType.STICKER: handle_sticker
+    MessageType.LINE_STICKER: handle_sticker
 }
 
 
@@ -36,7 +36,7 @@ def handle_msg_main(request, event, destination):
     elif isinstance(event.message, LocationMessage):
         msg_type = MessageType.LOCATION
     elif isinstance(event.message, StickerMessage):
-        msg_type = MessageType.STICKER
+        msg_type = MessageType.LINE_STICKER
     elif isinstance(event.message, FileMessage):
         msg_type = MessageType.FILE
     else:

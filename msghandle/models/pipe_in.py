@@ -3,14 +3,14 @@ from threading import Thread
 from typing import Any, Optional, Union
 
 from bson import ObjectId
-from linebot.models import TextMessage, ImageMessage, MessageEvent
+from linebot.models import TextMessage, ImageMessage, StickerMessage, MessageEvent
 from discord import Message, ChannelType
 
 from models import ChannelModel, RootUserModel, ChannelCollectionModel
 from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager
 from extutils.emailutils import MailSender
 from msghandle import logger
-from msghandle.models import ImageContent
+from msghandle.models import ImageContent, LineStickerContent
 from flags import Platform, MessageType, ChannelType as SysChannelType, ImageContentType
 
 
@@ -86,6 +86,18 @@ class ImageMessageEventObject(MessageEventObject):
         return MessageType.IMAGE
 
 
+class LineStickerMessageEventObject(MessageEventObject):
+    def __init__(
+            self, raw: Any, sticker: LineStickerContent, channel_model: ChannelModel = None,
+            user_model: RootUserModel = None, sys_ctype: SysChannelType = None,
+            ch_parent_model: ChannelCollectionModel = None):
+        super().__init__(raw, sticker, channel_model, user_model, sys_ctype, ch_parent_model)
+
+    @property
+    def message_type(self) -> MessageType:
+        return MessageType.LINE_STICKER
+
+
 class MessageEventObjectFactory:
     DiscordAcceptedChannelTypes = (ChannelType.text, ChannelType.private, ChannelType.group)
 
@@ -134,6 +146,10 @@ class MessageEventObjectFactory:
         elif isinstance(event.message, ImageMessage):
             return ImageMessageEventObject(
                 event, ImageContent(LineApiWrapper.get_image_base64(event.message), ImageContentType.BASE64),
+                channel_model, user_model)
+        elif isinstance(event.message, StickerMessage):
+            return LineStickerMessageEventObject(
+                event, LineStickerContent(package_id=event.message.package_id, sticker_id=event.message.sticker_id),
                 channel_model, user_model)
         else:
             logger.logger.warning(f"Unhandled LINE message event. {type(event.message)}")

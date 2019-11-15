@@ -14,5 +14,5 @@ class MessageType(FlagSingleEnum):
     VIDEO = 3, _("Video")
     AUDIO = 4, _("Audio")
     LOCATION = 5, _("Location")
-    STICKER = 6, _("Sticker")
+    LINE_STICKER = 6, _("Sticker")
     FILE = 7, _("File")
