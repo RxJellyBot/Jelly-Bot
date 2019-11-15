@@ -37,7 +37,7 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
-    # INCOMPLETE: Auto expire
+    # INCOMPLETE: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
 
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
