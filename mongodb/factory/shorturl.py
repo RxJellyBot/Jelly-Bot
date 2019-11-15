@@ -10,7 +10,7 @@ from bson import ObjectId
 from extutils.checker import param_type_ensure
 from models import ShortUrlRecordModel
 from mongodb.factory.results import WriteOutcome, UrlShortenResult
-from mongodb.utils import CheckableCursor
+from mongodb.utils import ExtendedCursor
 
 from ._base import BaseCollection
 
@@ -96,8 +96,8 @@ class ShortUrlDataManager(BaseCollection):
         return self.find_one_casted({ShortUrlRecordModel.Code.key: code}, parse_cls=ShortUrlRecordModel)
 
     @param_type_ensure
-    def get_user_record(self, creator_oid: ObjectId) -> CheckableCursor:
-        crs = CheckableCursor(
+    def get_user_record(self, creator_oid: ObjectId) -> ExtendedCursor:
+        crs = ExtendedCursor(
             self.find({ShortUrlRecordModel.CreatorOid.key: creator_oid}), parse_cls=ShortUrlRecordModel)
         return crs.sort([(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 

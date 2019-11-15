@@ -10,7 +10,7 @@ from mongodb.factory.results import (
 )
 from models import TokenActionModel, Model
 from models.exceptions import ModelConstructionError
-from mongodb.utils import CheckableCursor
+from mongodb.utils import ExtendedCursor
 from mongodb.helper import TokenActionRequiredKeys, TokenActionCompletor
 from mongodb.exceptions import NoCompleteActionError, TokenActionCollationError
 from JellyBot.systemconfig import Database
@@ -52,9 +52,9 @@ class TokenActionManager(GenerateTokenMixin, BaseCollection):
 
         return EnqueueTokenActionResult(outcome, token, now + timedelta(seconds=Database.TokenActionExpirySeconds), ex)
 
-    def get_queued_actions(self, root_uid: ObjectId) -> CheckableCursor:
+    def get_queued_actions(self, root_uid: ObjectId) -> ExtendedCursor:
         csr = self.find({TokenActionModel.CreatorOid.key: root_uid})
-        return CheckableCursor(csr, parse_cls=TokenActionModel)
+        return ExtendedCursor(csr, parse_cls=TokenActionModel)
 
     def clear_all_token_actions(self, root_uid: ObjectId):
         self.delete_many({TokenActionModel.CreatorOid.key: root_uid})

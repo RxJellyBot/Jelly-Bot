@@ -6,6 +6,7 @@ from pymongo import ReturnDocument
 from extutils.checker import param_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
+from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
@@ -103,8 +104,24 @@ class ChannelManager(BaseCollection):
         return ret
 
     @param_type_ensure
-    def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
-        return self.find_one_casted({ChannelModel.Id.key: channel_oid}, parse_cls=ChannelModel)
+    def get_channel_oid(self, channel_oid: ObjectId, hide_private: bool = False) -> Optional[ChannelModel]:
+        filter_ = {ChannelModel.Id.key: channel_oid}
+
+        if hide_private:
+            filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
+
+        return self.find_one_casted(filter_, parse_cls=ChannelModel)
+
+    @param_type_ensure
+    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> ExtendedCursor:
+        filter_ = \
+            {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                    {"$regex": default_name, "$options": "i"}}
+
+        if hide_private:
+            filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
+
+        return self.find_extended_cursor(filter_, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
     @param_type_ensure

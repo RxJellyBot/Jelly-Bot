@@ -1,9 +1,9 @@
 <div class="container gen-alert">
+    <!-- Named messages so that the message utils in django can be used. https://stackoverflow.com/a/42039100 -->
     {% if messages %}
         <div class="row">
-            {% for message in alert_messages %}
-                <div class="alert alert-
-                        {% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible col fade show"
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible col fade show"
                      role="alert">
                     {{ message }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">

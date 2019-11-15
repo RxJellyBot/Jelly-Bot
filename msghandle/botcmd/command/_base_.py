@@ -369,10 +369,6 @@ class CommandSpecialResponse:
                  "Please use the command under either one of these channel types: {}").format(
             current.key, " / ".join([str(ctype.key) for ctype in allowed]))
 
-# INCOMPLETE: Bot command:
-#   - Case insensitive on command selecting
-#   - Add auto reply (text, sticker to text, image, sticker)
-
 
 class CommandHandler:
     def __init__(self, root_cmd_node: CommandNode):
