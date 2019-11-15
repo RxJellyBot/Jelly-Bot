@@ -1,6 +1,8 @@
 import os
 import sys
 
+from JellyBot.systemconfig import System
+from extutils import activate_ping_spam
 from extdiscord import run_server
 
 
@@ -21,8 +23,13 @@ def discord_main():
     run_server()
 
 
+def ping_spam():
+    activate_ping_spam(System.PingSpamWaitSeconds)
+
+
 if __name__ == '__main__':
     # Prevent unnecessary execution of starting Discord Bot
     if sys.argv[1] == "runserver":
         discord_main()
+        ping_spam()
     django_main()
