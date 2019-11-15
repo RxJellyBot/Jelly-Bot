@@ -10,8 +10,8 @@ def process_display_info(e: LineStickerMessageEventObject) -> List[HandledMessag
         sticker_info = e.content
 
         return [HandledMessageEventText(
-            content=_(f"Sticker ID: {sticker_info.sticker_id}"
-                      f"Package ID: {sticker_info.package_id}"),
+            content=_(f"Sticker ID: `{sticker_info.sticker_id}`\n"
+                      f"Package ID: `{sticker_info.package_id}`"),
             bypass_multiline_check=True)]
     else:
         return []
