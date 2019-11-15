@@ -10,7 +10,7 @@ from .id import cmd as cmd_id
 __all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg"]
 
 
-cmd_root = CommandNode(is_root=True, splittor=Bot.Splittor, prefix=Bot.Prefix)
+cmd_root = CommandNode(is_root=True, splittor=Bot.Splittor, prefix=Bot.Prefix, case_insensitive=Bot.CaseInsensitive)
 cmd_root.attach_child_node(cmd_trfm)
 cmd_root.attach_child_node(cmd_id)
 cmd_root.attach_child_node(cmd_uintg)

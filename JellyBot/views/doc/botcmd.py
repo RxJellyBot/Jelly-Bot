@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from flags import WebsiteError
 from msghandle.botcmd.command import cmd_root
+from JellyBot.systemconfig import Bot
 from JellyBot.views import WebsiteErrorView
 from JellyBot.views.render import render_template
 
@@ -11,7 +12,10 @@ class BotCommandMainView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
         return render_template(
-            request, _("Bot Commands List"), "doc/botcmd_main.html", {"cmd_nodes": cmd_root.child_nodes})
+            request, _("Bot Commands List"), "doc/botcmd_main.html",
+            {"cmd_nodes": cmd_root.child_nodes,
+             "case_insensitive": cmd_root.case_insensitive,
+             "case_insensitive_prefix": Bot.CaseInsensitivePrefix})
 
 
 class BotCommandHelpView(View):

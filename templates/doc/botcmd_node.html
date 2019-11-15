@@ -26,8 +26,9 @@
                         <tbody>
                         {% for fn_entry in cmd_node.fn_list_for_doc %}
                             <tr>
-                                    <td class="align-middle no-line-break"><code
-                                            class="bg-light border border-light p-1 h5">{{ fn_entry.usage }}</code></td>
+                                    <td class="align-middle no-line-break">
+                                        <pre class="bg-light border border-light p-1 h5">{{ fn_entry.usage }}</pre>
+                                    </td>
                                     <td class="mb-0">{{ fn_entry.description|markdown }}</td>
                                 </tr>
                         {% endfor %}

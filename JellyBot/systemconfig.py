@@ -86,5 +86,7 @@ class TokenAction:
 
 
 class Bot:
-    Prefix = "/"
-    Splittor = " ."
+    Prefix = "JC\n"
+    Splittor = "\n"
+    CaseInsensitive = True
+    CaseInsensitivePrefix = True

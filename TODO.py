@@ -1,4 +1,3 @@
-# INCOMPLETE: Bot Feature: Upload image (imgur)
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time
 # TODO: Account Management: API Key refresh
