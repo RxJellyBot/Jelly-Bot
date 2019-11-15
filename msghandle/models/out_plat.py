@@ -94,7 +94,7 @@ class HandledEventsHolderPlatform:
                     send_list.append(TextSendMessage(text=content))
                 elif msg_type == MessageType.IMAGE:
                     send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
-                elif msg_type == MessageType.STICKER:
+                elif msg_type == MessageType.LINE_STICKER:
                     sticker_url = LineStickerManager.get_sticker_url(content)
                     send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
 
@@ -111,7 +111,7 @@ class HandledEventsHolderPlatform:
                     Embed()
                     .set_image(url=content)
                     .set_footer(text=f"Image URL: {content}"))
-            elif msg_type == MessageType.STICKER:
+            elif msg_type == MessageType.LINE_STICKER:
                 send_list.append(
                     Embed()
                     .set_image(url=LineStickerManager.get_sticker_url(content))

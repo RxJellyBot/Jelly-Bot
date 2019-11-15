@@ -1,5 +1,3 @@
-# FIXME: Bot Statistics: Record message activity with various type of messages
-#   - LINE - Sticker
 # INCOMPLETE: Bot Feature: Upload image (imgur)
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time

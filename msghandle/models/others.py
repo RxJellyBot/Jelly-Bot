@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from flags import ImageContentType
 
@@ -17,3 +17,12 @@ class ImageContent:
             return f"Image at {self.content}, Comment={self.comment}"
         else:
             return super().__repr__()
+
+
+@dataclass
+class LineStickerContent:
+    package_id: Union[int, str]
+    sticker_id: Union[int, str]
+
+    def __repr__(self):
+        return f"Package#{self.package_id} / Sticker#{self.sticker_id}"

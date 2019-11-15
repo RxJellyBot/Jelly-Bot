@@ -1,7 +1,7 @@
-from .others import ImageContent
+from .others import ImageContent, LineStickerContent
 from .pipe_in import (
     MessageEventObjectFactory,
-    Event, MessageEventObject, ImageMessageEventObject, TextMessageEventObject
+    Event, MessageEventObject, ImageMessageEventObject, TextMessageEventObject, LineStickerMessageEventObject
 )
 from .pipe_out import (
     HandledMessageEvent, HandledMessageEventText, HandledMessageCalculateResult,
