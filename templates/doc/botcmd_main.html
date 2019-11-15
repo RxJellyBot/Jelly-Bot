@@ -5,8 +5,20 @@
 
 {% block content %}
     <div class="container">
-        <div class="row mb-3">
+        <div class="row">
             <h3 class="text-primary">{% trans "Bot Commands List" %}</h3>
+        </div>
+        <div class="row mb-3">
+            {% if case_insensitive %}
+                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
+            {% endif %}
+            {% if case_insensitive_prefix %}
+                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
+            {% endif %}
         </div>
 
         <div class="row">

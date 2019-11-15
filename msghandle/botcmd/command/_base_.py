@@ -88,7 +88,7 @@ class CommandFunction:
 class CommandNode:
     # TEST: Test all bot commands by executing command functions
     def __init__(self, codes=None, order_idx=None, name=None, description=None,
-                 is_root=False, splittor=None, prefix=None, parent=None):
+                 is_root=False, splittor=None, prefix=None, parent=None, case_insensitive=True):
         if codes:
             self._codes = CommandNode.parse_code(codes)
         else:
@@ -111,6 +111,7 @@ class CommandNode:
         self._parent = parent
         self._child_nodes: Dict[str, CommandNode] = {}  # {<CMD_CODES>: <COMMAND_NODE>}
         self._fn: Dict[int, CommandFunction] = {}  # {<ARG_COUNT>: <FUNCTION>}
+        self._case_insensitive = case_insensitive
 
     def _register_(self, arg_count: int, fn: CommandFunction):
         if arg_count in self._fn:
@@ -177,6 +178,10 @@ class CommandNode:
         """
         return sorted(set(self._child_nodes.values()), key=lambda item: item.order_idx)
 
+    @property
+    def case_insensitive(self) -> bool:
+        return self._case_insensitive
+
     def get_usage(self, incl_last_splittor: bool = False) -> str:
         current = self
         s = ""
@@ -239,6 +244,10 @@ class CommandNode:
             if code in self._child_nodes:
                 logger.logger.warning(f"Code {code} has a corresponding command node ({repr(self._child_nodes[code])}) "
                                       f"registered. This will be replaced by {repr(cmd_node)}")
+
+            if self._case_insensitive:
+                code = code.lower()
+
             self._child_nodes[code] = cmd_node
 
         cmd_node.parent = self
@@ -249,6 +258,9 @@ class CommandNode:
         """
         :rtype: CommandNode or None
         """
+        if self._case_insensitive:
+            code = code.lower()
+
         return self._child_nodes.get(code)
 
     def command_function(

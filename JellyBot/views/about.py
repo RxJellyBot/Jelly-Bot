@@ -25,13 +25,13 @@ class AboutView(View):
             "beta_deploy":
                 localtime(parser.parse(github_beta_deploy.updated_at)).strftime("%m/%d %H:%M:%S (UTC%z)"),
             "beta_commit":
-                github_beta_deploy.sha[:7],
+                github_beta_deploy.sha,
             "beta_commit_url":
                 GithubWrapper.get_commit_url(System.GitHubRepoIDName, github_beta_deploy.sha),
             "stable_deploy":
                 localtime(parser.parse(github_stable_deploy.updated_at)).strftime("%m/%d %H:%M:%S (UTC%z)"),
             "stable_commit":
-                github_stable_deploy.sha[:7],
+                github_stable_deploy.sha,
             "stable_commit_url":
                 GithubWrapper.get_commit_url(System.GitHubRepoIDName, github_stable_deploy.sha)
         })
