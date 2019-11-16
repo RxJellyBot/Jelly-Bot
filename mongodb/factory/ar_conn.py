@@ -17,7 +17,7 @@ from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
-from mongodb.utils import ExtendedCursor, case_insensitive_collation
+from mongodb.utils import CursorWithCount, case_insensitive_collation
 from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
@@ -121,13 +121,13 @@ class AutoReplyModuleTagManager(BaseCollection):
 
         return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
 
-    def search_tags(self, tag_keyword: str) -> ExtendedCursor:
+    def search_tags(self, tag_keyword: str) -> CursorWithCount:
         """
         Accepts a keyword to search. Case-insensitive.
 
         :param tag_keyword: Can be regex.
         """
-        return self.find_extended_cursor(
+        return self.find_cursor_with_count(
             {"name": {"$regex": tag_keyword, "$options": "i"}},
             sort=[(OID_KEY, pymongo.DESCENDING)],
             parse_cls=AutoReplyModuleTagModel)
@@ -142,15 +142,15 @@ class AutoReplyManager:
         self._tag = AutoReplyModuleTagManager()
 
     def _get_tags_pop_score_(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
-            -> ExtendedCursor:
+            -> CursorWithCount:
         # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
         # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
 
         pipeline = []
+        filter_ = {"$or": [{OID_KEY: tag_data.id for tag_data in self._tag.search_tags(filter_word)}]}
 
         if filter_word:
-            pipeline.append({"$match": {
-                "$or": [{OID_KEY: tag_data.id for tag_data in self._tag.search_tags(filter_word)}]}})
+            pipeline.append({"$match": filter_})
 
         pipeline.append({"$unwind": "$" + AutoReplyModuleModel.TagIds.key})
         pipeline.append({"$group": {
@@ -210,7 +210,10 @@ class AutoReplyManager:
         }})
         pipeline.append({"$limit": count})
 
-        return ExtendedCursor(self._mod.aggregate(pipeline), parse_cls=AutoReplyTagPopularityDataModel)
+        # Get the count of the result
+        count_doc = min(count, self._mod.count_documents(filter_ if filter_word else {}))
+
+        return CursorWithCount(self._mod.aggregate(pipeline), count_doc, parse_cls=AutoReplyTagPopularityDataModel)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         return self._mod.add_conn_by_model(model)

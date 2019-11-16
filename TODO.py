@@ -5,6 +5,8 @@
 # INCOMPLETE: Bot Feature / Auto Reply: Get usable module list
 # INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
 # INCOMPLETE: Bot Feature: Random generator (Percent, items, range) - Preset Pool (somehow same as AutoReply tags)
+# INCOMPLETE: Statistics: Message flow of the user
+# INCOMPLETE: Info: Message count and flow for each channel
 # TODO: Account Management: API Key refresh
 # TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir.
 #  API should return json response instead.

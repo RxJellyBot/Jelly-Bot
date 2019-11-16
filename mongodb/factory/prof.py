@@ -10,7 +10,7 @@ from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
-from mongodb.utils import ExtendedCursor
+from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
     ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
@@ -79,8 +79,8 @@ class UserProfileManager(BaseCollection):
         else:
             return None
 
-    def get_user_channel_profiles(self, root_uid: ObjectId) -> ExtendedCursor:
-        return self.find_extended_cursor(
+    def get_user_channel_profiles(self, root_uid: ObjectId) -> CursorWithCount:
+        return self.find_cursor_with_count(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
             parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)])
 

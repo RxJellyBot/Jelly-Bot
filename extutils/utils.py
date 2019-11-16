@@ -77,3 +77,14 @@ def list_insert_in_between(l: list, insert_obj):
         ret[i:i] = [insert_obj]
 
     return ret
+
+
+def demarkdown(markdown_str: str):
+    # OPTIMIZE: Regex?
+    return markdown_str\
+        .replace("\n\n", "\n")\
+        .replace("<br>", "\n")\
+        .replace("<br/>", "\n")\
+        .replace("<hr>", "----------")\
+        .replace("<pre>", "```")\
+        .replace("</pre>", "```")

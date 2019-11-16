@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional, Union, Callable, Tuple
 from inspect import signature
 
 from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
-from msghandle.models import TextMessageEventObject
+from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from msghandle.translation import gettext as _
 from mongodb.factory import BotFeatureUsageDataManager
 from extutils.checker import param_type_ensure
@@ -11,19 +11,15 @@ from extutils.logger import LoggerSkeleton
 
 logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
 
+
 # TODO: Bot Command: Self generate help (1st arg is help then...)
+#  DE-MARKDOWN the description (extutils.utils.demarkdown())
 
 
 @dataclass
 class CommandParameter:
     name: str
-    annotation: type
-
-
-@dataclass
-class CommandUsageDoc:
-    usage: str
-    description: str
+    annotation_name: str
 
 
 @dataclass
@@ -39,34 +35,9 @@ class CommandFunction:
 
     def __post_init__(self):
         # List of parameters for future reference
-        self.prm_keys = [CommandParameter(name, prm.annotation) for name, prm in signature(self.fn).parameters.items()]
+        self.prm_keys = [CommandParameter(name, prm.annotation.__name__)
+                         for name, prm in signature(self.fn).parameters.items()]
         self._cache = {}
-
-    # Dynamically contstruct description because gettext(`_`) will trigger the AppNotReady exception for Django
-    #   (Despite that this seems completely irrelevant to Django)
-    @property
-    def description_formatted(self) -> str:
-        k = "descp"
-
-        if k not in self._cache:
-            s = self.description
-
-            # Attach scopes to description
-            s += f"<hr>{_('Available Scope')}: " \
-                 f"{self.scope.name} " \
-                 f"<sub>{' / '.join([str(ctype.key) for ctype in self.scope.available_ctypes])}</sub>\n"
-
-            # Attach arguments help text to description
-            if self.arg_count > 0:
-                s += f"<hr>{_('Arguments')}:\n"
-
-                for i in range(1, self.arg_count + 1):
-                    s += f"\n- `{self.prm_keys[i].name}` (`{self.prm_keys[i].annotation.__name__}`): " \
-                                        f"{self.arg_help[i - 1] if self.arg_help[i - 1] else 'N/A'}"
-
-            self._cache[k] = s.strip()
-
-        return self._cache[k]
 
     # Dynamically construct `usage` because `cmd_node.splittor` is required. Command structure wasn't ready
     # when executing __post_init__().
@@ -75,7 +46,7 @@ class CommandFunction:
         k = "usage"
 
         if k not in self._cache:
-            s = self.cmd_node.get_usage(False)
+            s = self.cmd_node.get_usage()
 
             for i in range(1, self.arg_count + 1):
                 s += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
@@ -84,10 +55,37 @@ class CommandFunction:
 
         return self._cache[k]
 
+    @property
+    def all_usage(self) -> List[str]:
+        k = "all_usage"
+
+        if k not in self._cache:
+            ret = []
+
+            for usage in self.cmd_node.get_all_usage():
+                for i in range(1, self.arg_count + 1):
+                    usage += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
+
+                ret.append(usage.strip())
+
+            self._cache[k] = ret
+
+        return self._cache[k]
+
+    @property
+    def parallel_param_list(self) -> Tuple[CommandParameter, str]:
+        for i in range(1, self.arg_count + 1):
+            yield self.prm_keys[i], self.arg_help[i - 1]
+
+    @property
+    def function_id(self) -> int:
+        # For documentation use
+        return id(self.fn)
+
 
 class CommandNode:
     # TEST: Test all bot commands by executing command functions
-    def __init__(self, codes=None, order_idx=None, name=None, description=None,
+    def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
                  is_root=False, splittor=None, prefix=None, parent=None, case_insensitive=True):
         if codes:
             self._codes = CommandNode.parse_code(codes)
@@ -104,6 +102,7 @@ class CommandNode:
 
         self._name = name
         self._description = description
+        self._brief_description = brief_description or description
         self._is_root = is_root
         self._splittor = splittor
         self._prefix = prefix
@@ -182,7 +181,7 @@ class CommandNode:
     def case_insensitive(self) -> bool:
         return self._case_insensitive
 
-    def get_usage(self, incl_last_splittor: bool = False) -> str:
+    def get_usage(self) -> str:
         current = self
         s = ""
 
@@ -196,10 +195,23 @@ class CommandNode:
 
             current = current.parent
 
-        if not incl_last_splittor:
-            s = s[:-len(self.splittor)]
+        s = s[:-len(self.splittor)]
 
         return s
+
+    def _get_usage_all_code_(self, node, suffix):
+        if node.is_root:
+            return [(node.prefix + suffix)[:-len(self.splittor)]]
+        else:
+            ret = []
+
+            for code in node.command_codes:
+                ret.extend(self._get_usage_all_code_(node.parent, code + node.splittor + suffix))
+
+            return ret
+
+    def get_all_usage(self) -> List[str]:
+        return self._get_usage_all_code_(self, "")
 
     @property
     def name(self) -> Optional[str]:
@@ -210,6 +222,10 @@ class CommandNode:
         return self._description
 
     @property
+    def brief_description(self) -> Optional[str]:
+        return self._brief_description
+
+    @property
     def max_arg_count(self) -> int:
         return max(self._fn.keys()) if self._fn else -1
 
@@ -218,20 +234,17 @@ class CommandNode:
         return [cf for cf in sorted(self._fn.values(), key=lambda item: item.arg_count)]
 
     @property
-    def fn_list_for_doc(self) -> List[CommandUsageDoc]:
-        ret = []
-
-        for fn in self.functions:
-            ret.append(CommandUsageDoc(fn.usage, fn.description_formatted))
+    def functions_incl_child(self) -> List[CommandFunction]:
+        ret = self.functions
 
         for node in self.child_nodes:
-            ret.extend(node.fn_list_for_doc)
+            ret.extend(node.functions)
 
         return ret
 
-    def new_child_node(self, codes: Union[str, List[str]], order_idx=None, name=None, description=None):
+    def new_child_node(self, *, codes: Union[str, List[str]], order_idx=None, name=None, description=None):
         codes = CommandNode.parse_code(codes)
-        new = CommandNode(codes, order_idx, name, description)
+        new = CommandNode(codes=codes, order_idx=order_idx, name=name, description=description)
         self.attach_child_node(new)
         return new
 
@@ -264,12 +277,20 @@ class CommandNode:
         return self._child_nodes.get(code)
 
     def command_function(
-            self, fn: callable = None, *, arg_count: int = 0, arg_help: list = None,
+            self, fn: Callable = None, *, arg_count: int = 0, arg_help: List[str] = None,
             description: str = _("No description provided."),
             scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED,
             feature_flag: BotFeature = BotFeature.UNDEFINED):
         """
         Function used to decorate the function to be ready to execute command.
+
+        :param fn: No need to specify as the decorator will automatically use it.
+        :param arg_count: The count of the arguments indicating when will the `fn` be executed.
+        :param arg_help: Help of each arguments.
+        :param description: Description of the command function.
+        This will be replaced by the description of `feature_flag` even if specified.
+        :param scope: Usable scope of the command function.
+        :param feature_flag: Feature flag of the command function.
         """
         if not arg_help:
             arg_help = []
@@ -298,6 +319,7 @@ class CommandNode:
             def wrapper(target_fn):
                 exec_in(target_fn)
                 return target_fn
+
             return wrapper
 
     def get_fn_obj(self, arg_count: int) -> Optional[CommandFunction]:
@@ -314,7 +336,7 @@ class CommandNode:
         else:
             return s.split(self.splittor, arg_count - 1)
 
-    def parse_args(self, e: TextMessageEventObject, max_arg_count: int = None) -> List[str]:
+    def parse_args(self, e: TextMessageEventObject, max_arg_count: int = None) -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
@@ -323,17 +345,21 @@ class CommandNode:
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
-            ret: List[str]
+            ret: List[HandledMessageEventText]
 
             # checks
             if not cmd_fn.scope.is_in_scope(e.channel_type):
-                ret = [CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes)]
+                ret = [
+                    HandledMessageEventText(
+                        content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
             else:
                 BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
                 ret = param_type_ensure(cmd_fn.fn)(e, *args)
 
             if isinstance(ret, str):
-                ret = [str(ret)]
+                ret = [HandledMessageEventText(content=ret)]
+            elif isinstance(ret, list):
+                ret = [HandledMessageEventText(content=txt) if isinstance(txt, str) else txt for txt in ret]
 
             return ret
 
@@ -376,7 +402,7 @@ class CommandHandler:
             raise ValueError("Root Command Node is required for `CommandDispatcher`.")
         self._root = root_cmd_node
 
-    def handle(self, e: TextMessageEventObject) -> List[str]:
+    def handle(self, e: TextMessageEventObject) -> List[HandledMessageEventText]:
         # Remove prefix from the string content
         e.content = e.content[len(self._root.prefix):]
 

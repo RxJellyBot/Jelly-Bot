@@ -20,6 +20,10 @@ body {
     padding-top: var(--nav-height);
 }
 
+pre {
+    color: #e83e8c;
+}
+
 .no-line-break {
     white-space: nowrap;
 }

@@ -9,11 +9,11 @@ from JellyBot.systemconfig import HostUrl
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["info", "id"], 500, _("Information"),
-    _("Check the information of various things (see the description section for more details)."))
-cmd_me = cmd.new_child_node(["me", "my"])
-cmd_ch = cmd.new_child_node(["ch", "channel"])
-cmd_id = cmd.new_child_node(["id"])
+    codes=["info", "id"], order_idx=500, name=_("Information"),
+    description=_("Check the information of various things (see the description section for more details)."))
+cmd_me = cmd.new_child_node(codes=["me", "my"])
+cmd_ch = cmd.new_child_node(codes=["ch", "channel"])
+cmd_id = cmd.new_child_node(codes=["id"])
 
 
 def _user_id_section_(e: TextMessageEventObject):

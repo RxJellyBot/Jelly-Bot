@@ -9,7 +9,8 @@ from mongodb.factory import TokenActionManager
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["uintg", "userintegrate"], 2000, _("User Data Integration"), _("Controls related to user data integration."))
+    codes=["uintg", "userintegrate"], order_idx=2000, name=_("User Data Integration"),
+    description=_("Controls related to user data integration."))
 
 
 @cmd.command_function(

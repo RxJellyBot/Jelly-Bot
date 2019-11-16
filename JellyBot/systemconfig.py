@@ -86,7 +86,20 @@ class TokenAction:
 
 
 class Bot:
-    Prefix = "JC\n"
-    Splittor = "\n"
+    Prefix = "/"
+    Splittor = " ."
+
+    # DEPRECATE: Bot Command - Bot Prefix & Splittor
+    OldPrefix = "JC\n"
+    OldSplittor = "\n"
+
     CaseInsensitive = True
     CaseInsensitivePrefix = True
+
+    class AutoReply:
+        DefaultPinned = False
+        DefaultPrivate = False
+        DefaultTags = []
+        DefaultCooldownSecs = 0
+
+        MaxContentResultLength = 100

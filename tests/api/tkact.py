@@ -39,7 +39,7 @@ class TestTokenAction(TestCase):
     def test_token_action_list(self):
         tas = TokenActionManager.get_queued_actions(self.__class__.TEST_ROOT_UID)
 
-        self.assertFalse(tas.alive)
+        self.assertFalse(tas.empty)
 
         found = False
         for ta in tas:
