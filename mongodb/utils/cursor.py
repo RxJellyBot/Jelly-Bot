@@ -1,6 +1,7 @@
-class ExtendedCursor:
-    def __init__(self, cursor, parse_cls=None):
+class CursorWithCount:
+    def __init__(self, cursor, count, parse_cls=None):
         self._cursor = cursor
+        self._count = count
         self._parse_cls = parse_cls
 
     def __iter__(self):
@@ -13,5 +14,5 @@ class ExtendedCursor:
         return self
 
     @property
-    def alive(self):
-        return self._cursor.alive
+    def empty(self):
+        return self._count == 0

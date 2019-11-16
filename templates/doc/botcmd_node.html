@@ -6,12 +6,29 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col">
+            <div class="col mb-2">
                 <h3 class="text-primary">{{ cmd_node.name }}&nbsp;(<code>{{ cmd_node.main_cmd_code }}</code>)</h3>
             </div>
         </div>
 
-        <hr>
+        {% if cmd_node.aliases %}
+            <div class="row">
+                <div class="col mb-3">
+                    <p>{% trans "Aliases: " %}
+                        <code class="bg-light border border-light p-1 rounded">
+                            {{ cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
+                        </code></p>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col mb-3">
+                <div class="card card-body">
+                    {{ cmd_node.description|markdown }}
+                </div>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col">
@@ -24,13 +41,48 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for fn_entry in cmd_node.fn_list_for_doc %}
+                        {% for fn_entry in cmd_node.functions_incl_child %}
                             <tr>
-                                    <td class="align-middle no-line-break">
-                                        <pre class="bg-light border border-light p-1 h5">{{ fn_entry.usage }}</pre>
-                                    </td>
-                                    <td class="mb-0">{{ fn_entry.description|markdown }}</td>
-                                </tr>
+                                <td class="align-middle no-line-break">
+                                    <pre class="bg-light border border-light p-1 h5">{{ fn_entry.usage }}</pre>
+
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-toggle="collapse"
+                                            data-target="#fn{{ fn_entry.function_id }}" aria-expanded="false">
+                                        {% trans "Show / Hide all usage" %}
+                                    </button>
+                                    <div class="collapse" id="fn{{ fn_entry.function_id }}">
+                                        <div class="card card-body" style="margin-top: 1rem;">
+                                            {% for usage in fn_entry.all_usage %}
+                                                <code>{{ usage }}</code>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="mb-0">
+                                    {% if fn_entry.cmd_node.aliases %}
+                                        {% trans "Aliases: " %}
+                                        <code class="bg-light border border-light p-1 rounded">
+                                            {{ fn_entry.cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
+                                        </code>
+                                    {% endif %}
+                                    <hr>
+                                    {{ fn_entry.description|markdown }}
+                                    <hr>
+                                    {% trans "Available Scope" %}: {{ fn_entry.scope.name }}
+                                    <sub class="font-weight-bolder">{{ fn_entry.scope.list_channel_str }}</sub>
+                                    {% if fn_entry.arg_count > 0 %}
+                                        <hr>
+
+                                        <ul>
+                                            {% for prm, prm_txt in fn_entry.parallel_param_list %}
+                                                <li>
+                                                    <code>{{ prm.name }}</code>&nbsp;(<code>{{ prm.annotation_name }}</code>){% if prm_txt %}: {{ prm_txt|markdown }}{% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                     </table>

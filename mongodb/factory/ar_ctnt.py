@@ -34,10 +34,13 @@ class AutoReplyContentManager(BaseCollection):
             parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
 
     @param_type_ensure
-    def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
+    def get_content(self, content: str, type_: AutoReplyContentType = None, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
         if not content:
             return AutoReplyContentGetResult(GetOutcome.X_NO_CONTENT, None)
+
+        if not type_:
+            type_ = AutoReplyContentType.determine(content)
 
         ret_entry = self._get_content_(content, type_, case_insensitive)
         add_result = None

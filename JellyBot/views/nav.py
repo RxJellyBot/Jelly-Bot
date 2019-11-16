@@ -46,11 +46,11 @@ def construct_nav(request, nav_param):
     return nav
 
 
-def __attach__(holder, nav_type, current_path, label, endpoint, nav_param, home_item):
+def __attach__(holder, nav_type, current_path, label, endpoint, nav_param, parent_item):
     try:
         holder.add_item(nav_items_factory(
             nav_type, current_path, label=label,
-            link=reverse(endpoint, kwargs=nav_param), parent=home_item))
+            link=reverse(endpoint, kwargs=nav_param), parent=parent_item))
     except NoReverseMatch:
         pass
 
@@ -80,20 +80,15 @@ def _construct_my_account_(current_path, parent, nav_param):
             link=reverse("account.channel.list"), parent=my_account_parent))
 
     # Hidden Items
-    my_account_parent.add_item(nav_items_factory(
-        NavHidden, current_path, label=_("Channel Registration"),
-        link=reverse("account.channel.connect"), parent=my_account_parent))
-    my_account_parent.add_item(nav_items_factory(
-        NavHidden, current_path, label=_("Channel List"),
-        link=reverse("account.channel.list"), parent=my_account_parent))
-
+    __attach__(
+        my_account_parent, NavHidden, current_path, _("Channel Registration"),
+        "account.channel.connect", nav_param, my_account_parent)
     __attach__(
         my_account_parent, NavHidden, current_path, _("Channel Management"),
         "account.channel.manage", nav_param, my_account_parent)
-
-    my_account_parent.add_item(nav_items_factory(
-        NavHidden, current_path, label=_("Integrate Account"),
-        link=reverse("account.integrate"), parent=my_account_parent))
+    __attach__(
+        my_account_parent, NavHidden, current_path, _("Integrate Account"),
+        "account.integrate", nav_param, my_account_parent)
 
     return my_account_parent
 
@@ -139,14 +134,26 @@ def _construct_info_(current_path, parent, nav_param):
 def _construct_docs_(current_path, parent, nav_param):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
+
+    # DEPRECATE: Bot Command - Navbar
+    old_cmd_list = nav_items_factory(
+        NavEntry, current_path, label=_("Bot Commands List (Old usage)"), link=reverse("page.doc.botcmd.main.old"),
+        parent=docs_parent)
+    cmd_list = nav_items_factory(
+        NavEntry, current_path, label=_("Bot Commands List"), link=reverse("page.doc.botcmd.main"), parent=docs_parent)
+
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Terms Explanation"), link=reverse("page.doc.terms"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavDivider, parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavHeader, label=_("Bot"), parent=docs_parent))
+    docs_parent.add_item(cmd_list)
     docs_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("Bot Commands List"), link=reverse("page.doc.botcmd.main"), parent=docs_parent))
+        NavDivider, parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavHeader, label=_("Bot - Deprecating"), parent=docs_parent))
+    docs_parent.add_item(old_cmd_list)
     docs_parent.add_item(nav_items_factory(
         NavDivider, parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
@@ -169,9 +176,13 @@ def _construct_docs_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Token Action"), link=reverse("page.doc.code.token"), parent=docs_parent))
 
     # Hidden Items
+    # TODO: Navbar - Parent not in breadcrumb
     __attach__(
         docs_parent, NavHidden, current_path, _("Bot Command - {}").format(nav_param.get("code")),
-        "page.doc.botcmd.cmd", nav_param, docs_parent)
+        "page.doc.botcmd.cmd", nav_param, cmd_list)
+    __attach__(
+        docs_parent, NavHidden, current_path, _("Bot Command - {} (Old, deprecating)").format(nav_param.get("code")),
+        "page.doc.botcmd.cmd.old", nav_param, old_cmd_list)
 
     return docs_parent
 

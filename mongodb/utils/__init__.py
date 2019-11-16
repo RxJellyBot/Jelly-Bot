@@ -1,3 +1,3 @@
-from .cursor import ExtendedCursor
+from .cursor import CursorWithCount
 from .bulk import BulkWriteDataHolder
 from .misc import case_insensitive_collation

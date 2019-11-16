@@ -16,7 +16,7 @@ from models import Model
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
-from mongodb.utils import ExtendedCursor
+from mongodb.utils import CursorWithCount
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
 from JellyBot.systemconfig import Database
@@ -328,8 +328,9 @@ class ControlExtensionMixin(Collection):
 
         return outcome
 
-    def find_extended_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> ExtendedCursor:
-        return ExtendedCursor(self.find(filter_, *args, **kwargs), parse_cls=parse_cls)
+    def find_cursor_with_count(self, filter_, *args, parse_cls=None, **kwargs) -> CursorWithCount:
+        return CursorWithCount(
+            self.find(filter_, *args, **kwargs), self.count_documents(filter_, *args, **kwargs), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs) -> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)

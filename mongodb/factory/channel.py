@@ -6,7 +6,7 @@ from pymongo import ReturnDocument
 from extutils.checker import param_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
-from mongodb.utils import ExtendedCursor
+from mongodb.utils import CursorWithCount
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
@@ -113,7 +113,7 @@ class ChannelManager(BaseCollection):
         return self.find_one_casted(filter_, parse_cls=ChannelModel)
 
     @param_type_ensure
-    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> ExtendedCursor:
+    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
         filter_ = \
             {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
                     {"$regex": default_name, "$options": "i"}}
@@ -121,7 +121,7 @@ class ChannelManager(BaseCollection):
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
-        return self.find_extended_cursor(filter_, parse_cls=ChannelModel)
+        return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
     @param_type_ensure

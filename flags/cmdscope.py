@@ -22,6 +22,10 @@ class CommandScope:
 
         return ctype in self.available_ctypes
 
+    @property
+    def list_channel_str(self) -> str:
+        return ' / '.join([str(ctype.key) for ctype in self.available_ctypes])
+
 
 class CommandScopeCollection:
     NOT_RESTRICTED = CommandScope(_("Not Restricted"))

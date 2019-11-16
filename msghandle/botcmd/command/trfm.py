@@ -5,8 +5,9 @@ from msghandle.models import TextMessageEventObject
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["tf", "trfm", "transform", "rp", "replace"], 300, _("Transform/Replace"), _("Transform/Replace the given text."))
-cmd_nl = cmd.new_child_node(["nl", "newline"])
+    codes=["tf", "trfm", "transform", "rp", "replace"], order_idx=1000, name=_("Transform/Replace"),
+    description=_("Transform/Replace the given text."))
+cmd_nl = cmd.new_child_node(codes=["nl", "newline"])
 
 
 @cmd_nl.command_function(
