@@ -18,7 +18,7 @@ from mongodb.factory import ChannelManager, ChannelCollectionManager
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
-from .utils.cnflprvt import prioritized_bot_exists, record_current_id
+from .utils.cnflprvt import prioritized_bot_exists, initialize
 
 __all__ = ["run_server", "_inst"]
 
@@ -35,7 +35,7 @@ class DiscordClient(Client):
         # from JellyBot.components.utils import load_server
         # load_server()
 
-        record_current_id(self.user.id)
+        initialize(self.user.id)
 
         await self.change_presence(activity=Activity(name="8===D", type=ActivityType.playing))
 
