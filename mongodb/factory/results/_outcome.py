@@ -111,7 +111,7 @@ class WriteOutcome(BaseOutcome):
         _("An error occurred when trying to set the config after the default profile is generated.")
     X_INVALID_URL = \
         110, _("X: Invalid URL"), \
-        _("The URL dis invalid. Maybe missing the schema or the URL did not return 200.")
+        _("The URL is invalid. Maybe missing the schema or the URL did not return 200.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")

@@ -9,7 +9,8 @@ class BotFeature(FlagDoubleEnum):
         10 - Main
             100 - Auto Reply
                 1001 - Add
-                1002 - Respond
+                1002 - Delete
+                1009 - Respond
 
         11 - Sub
             110 - Information
@@ -36,8 +37,10 @@ class BotFeature(FlagDoubleEnum):
 
     TXT_AR_ADD = \
         1001, _("Text / Auto Reply / Add"), _("Register an auto-reply module.")
+    TXT_AR_DEL = \
+        1002, _("Text / Auto Reply / Delete"), _("Delete an auto-reply module.")
     TXT_AR_RESPOND = \
-        1002, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
+        1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
 
     TXT_INFO_ID = \
         1101, _("Text / Information / Check IDs"), _("Check the ID of current channel and self.")

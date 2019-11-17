@@ -1,6 +1,5 @@
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time
-# INCOMPLETE: Bot Feature / Auto Reply: Simplified Auto-Reply Add, Delete via Bot command
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature / Auto Reply: Get usable module list
 # INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
@@ -8,7 +7,7 @@
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Info: Message count and flow for each channel
 # TODO: Account Management: API Key refresh
-# TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir.
+# TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir
 #  API should return json response instead.
 # DRAFT: API: Documentation
 # DRAFT: Auto Reply: Find on website (js interactive framework?)

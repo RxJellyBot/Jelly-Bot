@@ -72,7 +72,7 @@ class BaseDataTypeConverter(ABC):
 
 
 class GeneralDataTypeConverter(BaseDataTypeConverter):
-    valid_data_types = [int, str, bool, type, ObjectId]
+    valid_data_types = [int, str, bool, type, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):

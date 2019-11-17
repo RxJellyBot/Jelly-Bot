@@ -37,20 +37,28 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
-    # INCOMPLETE: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
+    # TODO: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
 
+    # Main
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)
+    ChannelIds = DictionaryField("ch")  # `str` key / Value=Active?
+
+    # Record
     CreatorOid = ObjectIDField("cr", readonly=True, stores_uid=True)
+
+    # Property
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
-    CalledCount = IntegerField("c", readonly=True)
-    LastUsed = DateTimeField("l", readonly=True, allow_none=False)
     ExcludedOids = ArrayField("e", ObjectId, stores_uid=True)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = DictionaryField("ch")  # `str` key / Value=Active?
+
+    # Stats
+    CalledCount = IntegerField("c", readonly=True)
+    LastUsed = DateTimeField("l", readonly=True, allow_none=False)
+    RemovedAt = DateTimeField("rm", readonly=True, allow_none=False)
 
     @property
     def creation_time(self):

@@ -33,8 +33,12 @@ class AutoReplyModuleManager(BaseCollection):
     def __init__(self):
         super().__init__()
         self.create_index(
-            [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponseOids.key, 1)],
+            [(AutoReplyModuleModel.KeywordOid.key, 1),
+             (AutoReplyModuleModel.ResponseOids.key, 1)],
             name="Auto Reply Module Identity", unique=True)
+        self.create_index([(
+             (AutoReplyModuleModel.ChannelIds.key, 1))],
+            name="Channel IDs")
 
     def add_conn(
             self,
@@ -52,9 +56,11 @@ class AutoReplyModuleManager(BaseCollection):
                 )
 
             if outcome == WriteOutcome.O_DATA_EXISTS:
+                # Attach channel to the module
                 self.append_channel(model.keyword_oid, model.response_oids, channel_oid)
+                # Set other module with the same keyword to be inactive
                 self.update_many(
-                    {AutoReplyModuleModel.Id.key: {"$ne": model.id}},
+                    {AutoReplyModuleModel.Id.key: {"$ne": model.id}, AutoReplyModuleModel.KeywordOid.key: kw_oid},
                     {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": False}})
 
             return AutoReplyModuleAddResult(outcome, model, ex)
@@ -69,6 +75,18 @@ class AutoReplyModuleManager(BaseCollection):
         return self.update_one_outcome(
             {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
             {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
+
+    def module_mark_inactive(self, kw_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+        channel_key = f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}"
+
+        return self.update_one_outcome(
+            {AutoReplyModuleModel.KeywordOid.key: kw_oid,
+             channel_key: True},
+            {"$set": {
+                channel_key: False,
+                AutoReplyModuleModel.RemovedAt.key: datetime.now(tz=timezone.utc)
+            }}
+        )
 
     @param_type_ensure
     def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
@@ -154,7 +172,7 @@ class AutoReplyManager:
 
         pipeline.append({"$unwind": "$" + AutoReplyModuleModel.TagIds.key})
         pipeline.append({"$group": {
-            "_id": "$" + AutoReplyModuleModel.TagIds.key,
+            OID_KEY: "$" + AutoReplyModuleModel.TagIds.key,
             AutoReplyTagPopularityDataModel.WeightedAvgTimeDiff.key: {
                 "$avg": {
                     "$divide": [
@@ -224,12 +242,15 @@ class AutoReplyManager:
             -> AutoReplyModuleAddResult:
         return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
 
+    def del_conn(self, kw_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+        return self._mod.module_mark_inactive(kw_oid, channel_oid)
+
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
             channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
-                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPRESPONSE_MODELONSE>, <BYPASS_MULTILINE>)...]
+                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None

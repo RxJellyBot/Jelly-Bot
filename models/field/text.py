@@ -1,5 +1,6 @@
 import re
-import requests
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 from ._base import BaseField
 
@@ -38,6 +39,8 @@ class UrlField(BaseField):
 
     def is_value_valid(self, value) -> bool:
         try:
-            return requests.get(value).status_code == 200
-        except Exception:
+            URLValidator()(value)
+        except ValidationError:
             return False
+
+        return True

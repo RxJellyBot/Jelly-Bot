@@ -12,8 +12,7 @@ from JellyBot.systemconfig import HostUrl, Bot
 from ._base_ import CommandNode
 from ._tree_ import cmd_trfm
 
-
-__all__ = ["cmd_main", "cmd_old_add"]
+__all__ = ["cmd_main", "cmd_old_add", "cmd_old_del"]
 
 # ------------- Command Nodes
 
@@ -40,7 +39,7 @@ cmd_main = CommandNode(
         Bot.AutoReply.DefaultCooldownSecs)
 )
 cmd_add = cmd_main.new_child_node(codes=["a", "aa", "add"])
-
+cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 
 # ----- Old
 
@@ -62,6 +61,23 @@ cmd_old_add = CommandNode(
         "- Cooldown: `{}` secs").format(
         Bot.AutoReply.DefaultPinned, Bot.AutoReply.DefaultPrivate, Bot.AutoReply.DefaultTags,
         Bot.AutoReply.DefaultCooldownSecs))
+
+# DEPRECATE: Command Call - Auto Reply / Delete
+cmd_old_del = CommandNode(
+    codes=["d", "del"], order_idx=60, name=_("Auto Reply - Delete"),
+    brief_description=_("**(DEPRECATING)**\n\n\n"
+                        "Delete a module in the current channel."),
+    description=_(
+        "### DEPRECATING, PLEASE CHECK THE DOCUMENTATION TO SEE HOW TO USE THE COMMAND IN THE FUTURE\n\n\n"
+        "Deleted a module in the current channel."))
+
+
+def _get_deprecating_msgs_() -> List[HandledMessageEventText]:
+    return [HandledMessageEventText(
+        content=_(
+            "The way to use this command is deprecating. "
+            "Please visit {} to see how to use the command in the future.").format(
+            f"{HostUrl}{reverse('page.doc.botcmd.cmd', kwargs={'code': cmd_main.main_cmd_code})}"))]
 
 
 # ------------- Main Functions
@@ -92,11 +108,7 @@ cmd_old_add = CommandNode(
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def add_auto_reply_module_old(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
-    ret = [HandledMessageEventText(
-        content=_(
-            "The way to use this command is deprecating. "
-            "Please visit {} to see how to use the command in the future.").format(
-            f"{HostUrl}/{reverse('page.doc.botcmd.cmd', kwargs={'code': cmd_main.main_cmd_code})}"))]
+    ret = _get_deprecating_msgs_()
     ret.extend(add_auto_reply_module(e, keyword, response))
 
     return ret
@@ -115,8 +127,7 @@ def add_auto_reply_module_old(e: TextMessageEventObject, keyword: str, response:
           "Otherwise, the content type will be **text**.<hr>"
           "- For content **endswith .jpg**\n"
           "Please ensure that the URL is an image when you open it, **NOT** a webpage.\n"
-          "Otherwise, unexpected things may happen."
-        )
+          "Otherwise, unexpected things may happen.")
     ],
     scope=CommandScopeCollection.GROUP_ONLY
 )
@@ -128,7 +139,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                       "Auto-Reply module not registered.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
-                kw_ctnt_result.outcome, f"{HostUrl}/{reverse('page.doc.code.get')}"))]
+                kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
 
     rep_ctnt_result = AutoReplyContentManager.get_content(response)
     if not rep_ctnt_result.success:
@@ -137,7 +148,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                       "Auto-Reply module not registered.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
-                rep_ctnt_result.outcome, f"{HostUrl}/{reverse('page.doc.code.get')}"))]
+                rep_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
 
     add_result = AutoReplyManager.add_conn(
         kw_ctnt_result.model.id, (rep_ctnt_result.model.id,), e.user_model.id, e.channel_oid,
@@ -168,4 +179,46 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                 content=_("Failed to register the Auto-Reply module.\n"
                           "Code: {}\n"
                           "Visit {} to see the code explanation.").format(
-                    add_result.outcome.code_str, f"{HostUrl}/{reverse('page.doc.code.insert')}"))]
+                    add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+
+
+@cmd_old_del.command_function(
+    feature_flag=BotFeature.TXT_AR_DEL,
+    arg_count=1,
+    arg_help=[_("The keyword of the module to delete.")],
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def delete_auto_reply_module_old(e: TextMessageEventObject, keyword: str):
+    ret = _get_deprecating_msgs_()
+    ret.extend(delete_auto_reply_module(e, keyword))
+
+    return ret
+
+
+@cmd_del.command_function(
+    feature_flag=BotFeature.TXT_AR_DEL,
+    arg_count=1,
+    arg_help=[_("The keyword of the module to delete.")],
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
+    kw_ctnt_result = AutoReplyContentManager.get_content(keyword)
+    if not kw_ctnt_result.success:
+        return [HandledMessageEventText(
+            content=_("Failed to fetch the content ID of the **keyword**.\n"
+                      "Auto-Reply module not deleted.\n"
+                      "Code: `{}`\n"
+                      "Visit {} to see the code explanation.").format(
+                kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
+
+    outcome = AutoReplyManager.del_conn(kw_ctnt_result.model.id, e.channel_oid)
+
+    if outcome.is_success:
+        return [HandledMessageEventText(content=_("Auto-Reply Module deleted."))]
+    else:
+        return [
+            HandledMessageEventText(
+                content=_("Failed to delete the Auto-Reply module.\n"
+                          "Code: {}\n"
+                          "Visit {} to see the code explanation.").format(
+                    outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]

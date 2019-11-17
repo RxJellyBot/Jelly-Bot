@@ -49,7 +49,7 @@
 
     function postCheckChannel(response, success) {
         if (success) {
-            checkAccessPinnedPermission(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.MODEL }}"]["_id"].substring(10, 34));
+            checkAccessPinnedPermission(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.MODEL }}"]["{{ oid_key }}"].substring(10, 34));
         } else {
             enablePinnedModuleAccess(false);
         }

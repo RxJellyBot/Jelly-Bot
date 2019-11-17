@@ -12,7 +12,7 @@ from ttldict import TTLOrderedDict
 from extutils.checker import param_type_ensure
 from extutils.mongo import get_codec_options
 from extutils.utils import all_lower
-from models import Model
+from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
@@ -263,6 +263,10 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_NOT_SERIALIZABLE
             ex = e
         except DuplicateKeyError as e:
+            # The model's ID will be set by the call `self.insert_one()`,
+            # so if the data exists, then we should get the object ID of it and insert it onto the model.
+            model.set_oid(self._get_duplicated_doc_id_(model.to_json()))
+
             outcome = WriteOutcome.O_DATA_EXISTS
             ex = e
         except InvalidModelError as e:
@@ -273,6 +277,27 @@ class ControlExtensionMixin(Collection):
             ex = e
 
         return outcome, ex
+
+    def _get_duplicated_doc_id_(self, model_dict: dict):
+        unique_keys = []
+
+        for idx_info in self.index_information().values():
+            if idx_info.get("unique", False):
+                for key, order in idx_info["key"]:
+                    unique_keys.append(key)
+
+        filter_ = {}
+        for unique_key in unique_keys:
+            data = model_dict.get(unique_key)
+            if data is not None:
+                if isinstance(data, list):
+                    filter_[unique_key] = {"$elemMatch": {"$in": data}}
+                elif isinstance(data, dict):
+                    filter_[unique_key] = data
+                else:
+                    filter_[unique_key] = data
+
+        return self.find_one(filter_)[OID_KEY]
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
             -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
@@ -307,7 +332,7 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 
-        if model is not None:
+        if model:
             outcome, ex = self.insert_one_model(model)
 
         if settings.DEBUG and not outcome.is_success:

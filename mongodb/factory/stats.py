@@ -59,12 +59,12 @@ class MessageRecordStatisticsManager(BaseCollection):
                 MessageRecordModel.MessageContent.key: {"$regex": message_fragment, "$options": "i"}
             }},
             {"$group": {
-                "_id": None,
+                OID_KEY: None,
                 "cid": {"$addToSet": "$" + MessageRecordModel.ChannelOid.key}
             }},
             {"$unwind": "$cid"},
             {"$project": {
-                "_id": 0
+                OID_KEY: 0
             }}
         ]))
 
@@ -91,13 +91,13 @@ class MessageRecordStatisticsManager(BaseCollection):
         aggr_pipeline = [
             {"$match": match_d},
             {"$group": {
-                "_id": "$" + MessageRecordModel.UserRootOid.key,
+                OID_KEY: "$" + MessageRecordModel.UserRootOid.key,
                 "count": {"$sum": 1}
             }}
         ]
 
         if sort:
-            aggr_pipeline.append({"$sort": {"count": pymongo.DESCENDING, "_id": pymongo.ASCENDING}})
+            aggr_pipeline.append({"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}})
 
         return self.aggregate(aggr_pipeline)
 

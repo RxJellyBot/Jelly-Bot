@@ -22,7 +22,7 @@ def handle_bot_cmd_main(e: TextMessageEventObject) -> List[HandledMessageEventTe
                 content=_(
                     "This way of calling the command is deprecating. "
                     "Please visit {} to see what is available and to use it for the new command set."
-                ).format(f"{HostUrl}/{reverse('page.doc.botcmd.main')}"))]\
+                ).format(f"{HostUrl}{reverse('page.doc.botcmd.main')}"))]\
                    + cmd_handler_old.handle(e)
 
     return []
