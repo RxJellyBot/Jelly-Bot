@@ -5,7 +5,7 @@ from typing import List, Optional, Union
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
-from models import ChannelModel, ChannelCollectionModel
+from models import ChannelModel, ChannelCollectionModel, OID_KEY
 from mongodb.factory import RootUserManager, MessageRecordStatisticsManager
 
 
@@ -44,7 +44,7 @@ class MessageStatsDataProcessor:
     def _get_user_msg_stats_(msg_rec: CommandCursor, ch_data: ChannelModel = None) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
 
-        msg_rec = {d["_id"]: d["count"] for d in list(msg_rec)}
+        msg_rec = {d[OID_KEY]: d["count"] for d in list(msg_rec)}
 
         if msg_rec:
             total: int = sum(msg_rec.values())
@@ -76,7 +76,7 @@ class MessageStatsDataProcessor:
             channel_oids: Union[List[ObjectId], ObjectId], root_oid: ObjectId, hours_within: Optional[int] = None):
         data = list(MessageRecordStatisticsManager.get_user_messages(channel_oids, hours_within))
         for idx, entry in enumerate(data, start=1):
-            if entry["_id"] == root_oid:
+            if entry[OID_KEY] == root_oid:
                 return UserMessageRanking(rank=idx, total=len(data))
 
         return UserMessageRanking(rank=-1, total=len(data))

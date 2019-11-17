@@ -219,7 +219,7 @@ class Model(MutableMapping, abc.ABC):
     def to_json(self):
         d = {}
 
-        for k, v in self._dict_.items():
+        for v in self._dict_.values():
             d[v.base.key] = v.value.to_json() if isinstance(v.base, ModelField) else v.value
 
         return d
