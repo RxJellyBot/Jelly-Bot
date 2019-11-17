@@ -3,10 +3,9 @@ from typing import Optional, Union
 import threading
 
 from discord import (
-    Client, Member, User, Guild,
-    Activity, ActivityType, ChannelType,
-    GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel
-)
+    Client, Member, User, Guild, ChannelType,
+    GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel,
+    Activity, ActivityType)
 
 from extdiscord.utils import channel_full_repr
 from extutils.checker import param_type_ensure
@@ -15,6 +14,7 @@ from flags import Platform
 from extdiscord import handle_discord_main
 from extdiscord.logger import DISCORD
 from mongodb.factory import ChannelManager, ChannelCollectionManager
+from msghandle.botcmd.command import cmd_help
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
@@ -37,7 +37,7 @@ class DiscordClient(Client):
 
         initialize(self.user.id)
 
-        await self.change_presence(activity=Activity(name="8===D", type=ActivityType.playing))
+        await self.change_presence(activity=Activity(name=cmd_help.get_usage(), type=ActivityType.watching))
 
     async def on_message(self, message):
         # Prevent self reading and bot resonate

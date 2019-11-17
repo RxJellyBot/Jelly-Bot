@@ -17,6 +17,7 @@ class BotFeature(FlagDoubleEnum):
                 1101 - Check channel/self ID
                 1102 - Check channel info
                 1103 - Check user info
+                1109 - Bot Help
             111 - Transform/Replace
                 1111 - Replace newline character
 
@@ -48,6 +49,8 @@ class BotFeature(FlagDoubleEnum):
         1102, _("Text / Information / Channel"), _("Check the channel info.")
     TXT_INFO_USER = \
         1103, _("Text / Information / User"), _("Check the user info of self.")
+    TXT_BOT_HELP = \
+        1109, _("Text / Information / Help"), _("Get help for how to use the bot and the related information.")
 
     TXT_TRF_REPL_NEWLINE = \
         1111, _("Text / Transform / Newline"), _("Replace the real newline character to be the escaped character \\n.")
