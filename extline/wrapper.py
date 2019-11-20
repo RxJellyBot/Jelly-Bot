@@ -4,10 +4,12 @@ from typing import List, Union, Optional
 
 from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
-from linebot.models import TextSendMessage, SendMessage, Profile
+from linebot.models import TextSendMessage, SendMessage, Profile, ImageMessage, Content
 
 from flags import ChannelType
 from models import ChannelModel
+
+from .logger import LINE
 
 __all__ = ["line_api", "_inst", "LineApiUtils"]
 
@@ -35,7 +37,12 @@ class LineApiWrapper:
 
         self._core.reply_message(reply_token, send_messages)
 
-    def reply_message(self, reply_token, messages: SendMessage):
+    def reply_message(self, reply_token, messages: Union[SendMessage, List[SendMessage]]):
+        repr_ = "\n".join([f'- {repr(msg)}' for msg in messages]) \
+            if isinstance(messages, (list, tuple)) \
+            else repr(messages)
+        LINE.logger.debug(f"Message(s) to send:\n{repr_}")
+
         self._core.reply_message(reply_token, messages)
 
     def get_profile(self, uid, channel_data: Optional[ChannelModel] = None) -> Optional[Profile]:
@@ -64,6 +71,9 @@ class LineApiWrapper:
             return prof.display_name
         else:
             return None
+
+    def get_image_base64(self, message: ImageMessage) -> str:
+        return self._core.get_message_content(str(message.id)).content
 
 
 class LineApiUtils:

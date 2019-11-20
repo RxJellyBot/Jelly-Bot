@@ -59,7 +59,11 @@
       "required": true
     },
     "HOST_URL": {
-      "description": "The URL of the domain of the app. Including protocol.",
+      "description": "The URL of the app. Including protocol. Excluding slash.",
+      "required": true
+    },
+    "SERVICE_SHORT_URL": {
+      "description": "The URL to test the availability of the short service web app. Including protocol. Excluding slash.",
       "required": true
     }
   }

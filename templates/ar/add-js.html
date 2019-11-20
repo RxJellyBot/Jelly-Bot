@@ -49,7 +49,7 @@
 
     function postCheckChannel(response, success) {
         if (success) {
-            checkAccessPinnedPermission(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.MODEL }}"]["_id"].substring(10, 34));
+            checkAccessPinnedPermission(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.MODEL }}"]["{{ oid_key }}"].substring(10, 34));
         } else {
             enablePinnedModuleAccess(false);
         }
@@ -105,8 +105,8 @@
         let url;
         if (regId === "arChannel" || regId === "arMember") {
             url = "{% url "api.ar.add" %}";
-        } else if (regId === "arToken") {
-            url = "{% url "api.ar.add_token" %}"
+        } else if (regId === "arExecode") {
+            url = "{% url "api.ar.add_execode" %}"
         }
 
         let xhr = new XMLHttpRequest();
@@ -124,12 +124,12 @@
         xhr.send(collectData());
     }
 
-    function displayToken(response) {
+    function displayExecode(response) {
         if (response.hasOwnProperty("{{ static_keys_result.RESULT }}") &&
-            response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.TokenActionResponse.TOKEN }}")) {
-            $("code#arTokenReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]);
+            response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.ExecodeResponse.EXECODE }}")) {
+            $("code#arExecodeReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"]);
         } else {
-            console.log(`Token Display Failed. Token: ${response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]}`)
+            console.log(`Execode Display Failed. Code: ${response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"]}`)
         }
     }
 
@@ -182,42 +182,26 @@
         xhr.send();
     }
 
-    function submitBtnCheck() {
+    // Return `true` if any error was found.
+    function formSubmissionChecks() {
         let errmsgs = [];
 
-        // Overlimit check
-        $("div.txtarea-count").each(function () {
-            let progBar = $(this).find("div.progress-bar");
-            let valNow = parseInt(progBar.attr("aria-valuenow"));
-            let valMax = parseInt(progBar.attr("aria-valuemax"));
+        formValidateContentDisplayMarker();
 
-            if (valNow > valMax) {
-                let txtareaFor = $("label[for='" + $(this).children("textarea").attr("id") + "']").text();
-                {% blocktrans trimmed %}
-                    let overlimit = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: ${valMax} / Current: <b>${valNow})</b>`;
-                {% endblocktrans %}
-                errmsgs.push(overlimit);
-            }
-        });
+        // Check Content Length and related actions on components
+        errmsgs = errmsgs.concat(formValidateContentLength());
 
         // Channel check
         if (regId === "arChannel") {
-            let plat = $("select#arPlatform option:selected").val();
-            let channelToken = $("input#arChannelToken").val();
-
-            if (!hasChannelMembership(plat, channelToken)) {
-                let notMember = '{% trans "Channel validation failed. Recheck the input channel info." %}';
-                errmsgs.push(notMember);
-            }
+            errmsgs = errmsgs.concat(formValidateChannel());
         }
 
         // Member check
         if (regId === "arMember") {
-            if ($("select#arChannel").children("option:selected").val() === "default") {
-                let defaultSelected = '{% trans "Select a channel in Registration > Channel Member for use of the module." %}';
-                errmsgs.push(defaultSelected);
-            }
+            errmsgs = errmsgs.concat(formValidateMember());
         }
+
+        // ------------------------------
 
         // Determine if to display modal or not
         let msgAvailable = errmsgs.length > 0;
@@ -228,5 +212,69 @@
         }
 
         return msgAvailable;
+    }
+
+    function formValidateContentDisplayMarker() {
+        $("div.txtarea-count").each(function () {
+            if (!$(this).parent().hasClass("d-none")) {
+                validateTextArea($(this), $(this).find("textarea"));
+            }
+        });
+    }
+
+    function formValidateContentLength() {
+        let errmsgs = [];
+
+        $("div.content-check:not(.d-none)").each(function () {
+            let progBar = $(this).find("div.progress-bar");
+            let valNow = parseInt(progBar.attr("aria-valuenow"));
+            let valMax = parseInt(progBar.attr("aria-valuemax"));
+
+            let overlimit = valNow > valMax;
+            let empty = valNow === 0;
+
+            if (overlimit || empty) {
+                // Display tooltip of invalid length
+                $(this).find("div.tooltip-hide[data-toggle=tooltip]").tooltip('enable').tooltip('show').tooltip('disable');
+
+                updateArCode(null);
+
+                // Push Error Messages
+                let txtareaFor = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+
+                if (overlimit) {
+                    {% blocktrans trimmed %}
+                        let msg = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: ${valMax} / Current: <b>${valNow})</b>`;
+                    {% endblocktrans %}
+                    errmsgs.push(msg);
+                } else if (empty) {
+                    {% blocktrans trimmed %}
+                        let msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;
+                    {% endblocktrans %}
+                    errmsgs.push(msg);
+                }
+            }
+        });
+
+        return errmsgs;
+    }
+
+    function formValidateChannel() {
+        let plat = $("select#arPlatform option:selected").val();
+        let channelToken = $("input#arChannelToken").val();
+
+        if (!hasChannelMembership(plat, channelToken)) {
+            return ['{% trans "Channel validation failed. Recheck the input channel info." %}'];
+        }
+
+        return [];
+    }
+
+    function formValidateMember() {
+        if ($("select#arChannel").children("option:selected").val() === "default") {
+            return ['{% trans "Select a channel in Registration > Channel Member or any other method to register the module." %}'];
+        }
+
+        return [];
     }
 </script>

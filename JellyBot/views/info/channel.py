@@ -11,9 +11,7 @@ from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel, ChannelCollectionModel
 from mongodb.factory import ChannelManager, ProfileManager, ChannelCollectionManager
-from mongodb.helper import MessageStatsDataProcessor
-
-# TODO: Click to update the channel name (Discord)
+from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
 
 
 class ChannelInfoView(TemplateResponseMixin, View):
@@ -57,7 +55,12 @@ class ChannelInfoView(TemplateResponseMixin, View):
 class ChannelInfoSearchView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        # INCOMPLETE: Channel Info: .../info/channel for users to search channel info
-        #   Allow to search channel by various conditions (ID, profile names, messages...etc.)
+        keyword = request.GET.get("w", "")
+        channel_list = []
+
+        if keyword:
+            channel_list = IdentitySearcher.search_channel(keyword, get_root_oid(request))
+
         return render_template(
-            self.request, _("Channel Info Search"), "info/channel/search.html", nav_param=kwargs)
+            self.request, _("Channel Info Search"), "info/channel/search.html",
+            {"channel_list": channel_list, "keyword": keyword}, nav_param=kwargs)

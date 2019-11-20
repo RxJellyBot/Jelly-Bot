@@ -1,5 +1,5 @@
 from JellyBot.api.static import param
-from JellyBot.api.responses import AutoReplyAddResponse, AutoReplyAddTokenActionResponse
+from JellyBot.api.responses import AutoReplyAddResponse, AutoReplyAddExecodeResponse
 from JellyBot.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
 from JellyBot.components.views import APIJsonResponseView
 from flags import APICommand
@@ -15,11 +15,11 @@ class AutoReplyAddView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamete
         return {param.AutoReply.KEYWORD, param.AutoReply.RESPONSE}
 
 
-class AutoReplyAddTokenActionView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    post_response_class = AutoReplyAddTokenActionResponse
+class AutoReplyAddExecodeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+    post_response_class = AutoReplyAddExecodeResponse
 
     def get_api_action(self):
-        return APICommand.TOKEN_AR_ADD
+        return APICommand.EXECODE_AR_ADD
 
     def mandatory_keys(self) -> set:
         return {param.AutoReply.KEYWORD, param.AutoReply.RESPONSE}

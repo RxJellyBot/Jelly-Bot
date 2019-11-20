@@ -13,7 +13,7 @@ class AutoReplyContentAddResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
         :type outcome: WriteOutcome
-        :type model: AutoReplyContentModel
+        :type model: Optional[AutoReplyContentModel]
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)

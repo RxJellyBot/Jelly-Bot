@@ -1,26 +1,27 @@
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from flags import TokenAction, CommandScopeCollection
+from flags import Execode, CommandScopeCollection, BotFeature
 from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject
-from msghandle.translation import gettext as _
-from mongodb.factory import TokenActionManager
+from mongodb.factory import ExecodeManager
 
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["uintg", "userintegrate"], 2000, _("User Integrate"), _("Controls related to user identity integration."))
+    codes=["uintg", "userintegrate"], order_idx=2000, name=_("User Data Integration"),
+    description=_("Controls related to user data integration."))
 
 
 @cmd.command_function(
-    description=_("Issue a token for user identity integration."), scope=CommandScopeCollection.PRIVATE_ONLY)
-def issue_token(e: TextMessageEventObject):
-    result = TokenActionManager.enqueue_action(e.root_oid, TokenAction.INTEGRATE_USER_IDENTITY)
+    feature_flag=BotFeature.TXT_FN_UDI_START, scope=CommandScopeCollection.PRIVATE_ONLY)
+def issue_execode(e: TextMessageEventObject):
+    result = ExecodeManager.enqueue_execode(e.root_oid, Execode.INTEGRATE_USER_DATA)
     if result.success:
-        return _("User Identity Integration process started.\nToken: `{}`\nExpiry: `{}`\n\n"
-                 "Please record the token and go to {}{} to complete the integration.").format(
-            result.token, result.expiry.strftime("%Y-%m-%d %H:%M:%S"), HostUrl, reverse("account.integrate")
+        return _("User Data Integration process started.\nExecode: `{}`\nExpiry: `{}`\n\n"
+                 "Please record the Execode and go to {}{} to complete the integration.").format(
+            result.execode, result.expiry.strftime("%Y-%m-%d %H:%M:%S"), HostUrl, reverse("account.integrate")
         )
     else:
-        return _("User Identity Integration process failed to start.\nResult: {}\nException: {}").format(
+        return _("User Data Integration process failed to start.\nResult: {}\nException: {}").format(
             result.outcome, result.exception)

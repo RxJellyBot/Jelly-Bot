@@ -1,5 +1,5 @@
 import types
-from typing import Union, Type, Optional, Iterable as TIterable
+from typing import Union, Type, Optional, Iterable as TIterable, Tuple
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -7,17 +7,16 @@ from pymongo.collation import Collation
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.errors import DuplicateKeyError
-from pymongo.results import InsertOneResult
 from ttldict import TTLOrderedDict
 
 from extutils.checker import param_type_ensure
 from extutils.mongo import get_codec_options
 from extutils.utils import all_lower
-from models import Model
+from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
-from mongodb.utils import CheckableCursor
+from mongodb.utils import CursorWithCount
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
 from JellyBot.systemconfig import Database
@@ -250,7 +249,7 @@ class CacheMixin(Collection):
 
 
 class ControlExtensionMixin(Collection):
-    def insert_one_model(self, model: Model) -> (WriteOutcome, Optional[Exception]):
+    def insert_one_model(self, model: Model) -> Tuple[WriteOutcome, Optional[Exception]]:
         ex = None
 
         try:
@@ -264,6 +263,10 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_NOT_SERIALIZABLE
             ex = e
         except DuplicateKeyError as e:
+            # The model's ID will be set by the call `self.insert_one()`,
+            # so if the data exists, then we should get the object ID of it and insert it onto the model.
+            model.set_oid(self._get_duplicated_doc_id_(model.to_json()))
+
             outcome = WriteOutcome.O_DATA_EXISTS
             ex = e
         except InvalidModelError as e:
@@ -275,18 +278,38 @@ class ControlExtensionMixin(Collection):
 
         return outcome, ex
 
+    def _get_duplicated_doc_id_(self, model_dict: dict):
+        unique_keys = []
+
+        for idx_info in self.index_information().values():
+            if idx_info.get("unique", False):
+                for key, order in idx_info["key"]:
+                    unique_keys.append(key)
+
+        filter_ = {}
+        for unique_key in unique_keys:
+            data = model_dict.get(unique_key)
+            if data is not None:
+                if isinstance(data, list):
+                    filter_[unique_key] = {"$elemMatch": {"$in": data}}
+                elif isinstance(data, dict):
+                    filter_[unique_key] = data
+                else:
+                    filter_[unique_key] = data
+
+        return self.find_one(filter_)[OID_KEY]
+
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
-            -> (Optional[Model], WriteOutcome, Optional[Exception], InsertOneResult):
+            -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
         """
         :param model_cls: The class for the data to be sealed.
         :param model_args: The arguments for the `Model` construction.
 
-        :return: model, outcome, ex, insert_result
+        :return: model, outcome, ex
         """
         model = None
         outcome: WriteOutcome = WriteOutcome.X_NOT_EXECUTED
         ex = None
-        insert_result = None
 
         try:
             if issubclass(model_cls, Model):
@@ -303,19 +326,19 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_INVALID_FIELD
             ex = e
         except FieldCastingFailed as e:
-            outcome = WriteOutcome.X_CAST_FAILED
+            outcome = WriteOutcome.X_CASTING_FAILED
             ex = e
         except Exception as e:
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
 
-        if model is not None:
+        if model:
             outcome, ex = self.insert_one_model(model)
 
         if settings.DEBUG and not outcome.is_success:
             raise ex
 
-        return model, outcome, ex, insert_result
+        return model, outcome, ex
 
     def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
         update_result = self.update_one(filter_, update, upsert, collation)
@@ -330,8 +353,9 @@ class ControlExtensionMixin(Collection):
 
         return outcome
 
-    def find_checkable_cursor(self, filter_, *args, parse_cls=None, **kwargs) -> CheckableCursor:
-        return CheckableCursor(self.find(filter_, *args, **kwargs), parse_cls=parse_cls)
+    def find_cursor_with_count(self, filter_, *args, parse_cls=None, **kwargs) -> CursorWithCount:
+        return CursorWithCount(
+            self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs) -> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)
@@ -375,7 +399,10 @@ class BaseCollection(ControlExtensionMixin, Collection):
         super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
         self._data_model = self.get_model_cls()\
 
-        ModelFieldChecker.check(self)
+        ModelFieldChecker.check_async(self)
+
+    def insert_one_data(self, **model_args) -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
+        return super().insert_one_data(self.get_model_cls(), **model_args)
 
     @property
     def data_model(self):

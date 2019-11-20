@@ -56,9 +56,10 @@ class NavItemsHolder:
         return s
 
     def to_bread(self):
-        if self.active_item is not None:
+        if self.active_item:
             s = '<ol class="breadcrumb">'
             lst = []
+            # From deepest to shallowest
             for node in self.active_item:
                 lst.append(node.to_bread())
             s += "".join(reversed(lst))

@@ -17,14 +17,21 @@ class CollatedChannelData:
 class InfoProcessor:
     @staticmethod
     def collate_child_channel_data(root_oid: ObjectId, child_channel_oids: List[ObjectId]) -> List[CollatedChannelData]:
-        ret: List[CollatedChannelData] = []
+        accessible: List[CollatedChannelData] = []
+        inaccessible: List[CollatedChannelData] = []
+
         missing_oids = []
 
         for ccoid in child_channel_oids:
             cdata = ChannelManager.get_channel_oid(ccoid)
 
             if cdata:
-                ret.append(CollatedChannelData(channel_name=cdata.get_channel_name(root_oid), channel_data=cdata))
+                ccd = CollatedChannelData(channel_name=cdata.get_channel_name(root_oid), channel_data=cdata)
+
+                if cdata.bot_accessible:
+                    accessible.append(ccd)
+                else:
+                    inaccessible.append(ccd)
             else:
                 missing_oids.append(ccoid)
 
@@ -32,4 +39,7 @@ class InfoProcessor:
             MailSender.send_email_async(f"No associated channel data found of the channel IDs below:<br>"
                                         f"<pre>{' / '.join([str(oid) for oid in missing_oids])}</pre>")
 
-        return ret
+        accessible = sorted(accessible, key=lambda data: data.channel_data.id, reverse=True)
+        inaccessible = sorted(inaccessible, key=lambda data: data.channel_data.id, reverse=True)
+
+        return accessible + inaccessible

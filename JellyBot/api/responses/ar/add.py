@@ -7,11 +7,12 @@ from JellyBot.api.responses.mixin import (
     HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultExtraMixin
 )
 from extutils import cast_keep_none
-from flags import AutoReplyContentType, TokenAction
-from models import AutoReplyModuleModel, AutoReplyModuleTokenActionModel
+from flags import AutoReplyContentType, Execode
+from models import AutoReplyModuleModel, AutoReplyModuleExecodeModel
 from mongodb.factory import (
-    AutoReplyManager, AutoReplyContentManager, TokenActionManager
+    AutoReplyManager, AutoReplyContentManager, ExecodeManager
 )
+from mongodb.factory.results import WriteOutcome
 
 
 class AutoReplyAddBaseResponse(
@@ -138,12 +139,6 @@ class AutoReplyAddBaseResponse(
         d.update(**{result.FLAGS: self._flag, result.INFO: self._info})
         return d
 
-    def is_success(self) -> bool:
-        try:
-            return super().is_success() and self._result.success
-        except AttributeError:
-            return False
-
     @property
     def param_dict(self) -> dict:
         return self._param_dict
@@ -151,14 +146,26 @@ class AutoReplyAddBaseResponse(
 
 class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
     def process_pass(self):
-        self._result = AutoReplyManager.add_conn(
+        self._result = AutoReplyManager.add_conn_complete(
             self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),
             self._pinned, self._private, self._tags, self._cooldown)
 
+    def is_success(self) -> bool:
+        try:
+            return super().is_success() and self._result.outcome == WriteOutcome.O_INSERTED
+        except AttributeError:
+            return False
 
-class AutoReplyAddTokenActionResponse(AutoReplyAddBaseResponse):
+
+class AutoReplyAddExecodeResponse(AutoReplyAddBaseResponse):
     def process_pass(self):
-        self._result = TokenActionManager.enqueue_action(
-            self._sender_oid, TokenAction.AR_ADD, AutoReplyModuleTokenActionModel,
-            KeywordOid=self._keyword, ResponseOids=self._responses, CreatorOid=self._sender_oid,
+        self._result = ExecodeManager.enqueue_execode(
+            self._sender_oid, Execode.AR_ADD, AutoReplyModuleExecodeModel,
+            KeywordOid=self._keyword, ResponseOids=self._responses,
             Pinned=self._pinned, Private=self._pinned, TagIds=self._tags, CooldownSec=self._cooldown)
+
+    def is_success(self) -> bool:
+        try:
+            return super().is_success() and self._result.success
+        except AttributeError:
+            return False

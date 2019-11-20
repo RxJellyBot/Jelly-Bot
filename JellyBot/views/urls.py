@@ -12,5 +12,6 @@ urlpatterns = [
     path('account/', include('JellyBot.views.account.urls')),
     path('ar/', include('JellyBot.views.ar.urls')),
     path('doc/', include('JellyBot.views.doc.urls')),
-    path('info/', include('JellyBot.views.info.urls'))
+    path('info/', include('JellyBot.views.info.urls')),
+    path('service/', include('JellyBot.views.services.urls'))
 ]

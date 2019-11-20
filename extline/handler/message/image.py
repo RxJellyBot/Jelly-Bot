@@ -1,8 +1,9 @@
-import logging
-
-from extline import LINE, ExtraKey, event_dest_fmt
+from flags import Platform
+from msghandle import handle_message_main
+from msghandle.models import MessageEventObjectFactory
 
 
 def handle_image(request, event, destination):
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Image event.",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+    e = MessageEventObjectFactory.from_line(event)
+
+    handle_message_main(e).to_platform(Platform.LINE).send_line(event.reply_token)

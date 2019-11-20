@@ -1,10 +1,10 @@
-import asyncio
 from datetime import datetime, timezone
 from typing import List, Tuple, Type
 import traceback
 
 from discord import Embed
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from linebot.models import TextSendMessage, ImageSendMessage
 
 from flags import MessageType
@@ -13,7 +13,6 @@ from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
 from JellyBot.systemconfig import PlatformConfig, HostUrl
 from mongodb.factory import ExtraContentManager
-from msghandle.translation import gettext as _
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder, HandledMessageEvent, \
     HandledMessageEventText
@@ -85,20 +84,21 @@ class HandledEventsHolderPlatform:
                 self.to_send.append((e.msg_type, e.content))
 
     def send_line(self, reply_token):
-        from extline import LineApiWrapper
+        if self.to_send:
+            from extline import LineApiWrapper
 
-        send_list = []
+            send_list = []
 
-        for msg_type, content in self.to_send:
-            if msg_type == MessageType.TEXT:
-                send_list.append(TextSendMessage(text=content))
-            elif msg_type == MessageType.IMAGE:
-                send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
-            elif msg_type == MessageType.STICKER:
-                sticker_url = LineStickerManager.get_sticker_url(content)
-                send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
+            for msg_type, content in self.to_send:
+                if msg_type == MessageType.TEXT:
+                    send_list.append(TextSendMessage(text=content))
+                elif msg_type == MessageType.IMAGE:
+                    send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
+                elif msg_type == MessageType.LINE_STICKER:
+                    sticker_url = LineStickerManager.get_sticker_url(content)
+                    send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
 
-        LineApiWrapper.reply_text(reply_token, send_list)
+            LineApiWrapper.reply_message(reply_token, send_list)
 
     async def send_discord(self, dc_channel):
         send_list = []
@@ -110,12 +110,12 @@ class HandledEventsHolderPlatform:
                 send_list.append(
                     Embed()
                     .set_image(url=content)
-                    .set_footer(text=f"Image URL: {content}"))
-            elif msg_type == MessageType.STICKER:
+                    .set_footer(text=_("Image URL: {}").format(content)))
+            elif msg_type == MessageType.LINE_STICKER:
                 send_list.append(
                     Embed()
                     .set_image(url=LineStickerManager.get_sticker_url(content))
-                    .set_footer(text=f"Line Sticker ID: {content}"))
+                    .set_footer(text=_("Sticker ID: {}").format(content)))
 
         # Insert separator between responses
         send_list = list_insert_in_between(send_list, "------------------------------")

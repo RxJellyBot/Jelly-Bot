@@ -12,7 +12,7 @@
             </p>
 
             {% with prfx="arKeyword" prfxt="arKeywordType" %}
-                {% include "components/txtarea.html" with param_content=ar_prfx.KEYWORD param_content_type=ar_prfx.KEYWORD_TYPE txt_area_name=prfx txt_area_id=prfx type_select_id=prfxt max_length=max_length cttypes=contenttype_list_kw only %}
+                {% include "ar/add-txtarea.html" with param_content=ar_prfx.KEYWORD param_content_type=ar_prfx.KEYWORD_TYPE txt_area_name=prfx txt_area_id=prfx type_select_id=prfxt max_length=max_length cttypes=contenttype_list_kw only %}
             {% endwith %}
         </div>
 
@@ -20,7 +20,6 @@
 
         {% for i in ""|ljust:max_responses %}
             <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
-
                 <h5 class="card-title">{% trans "Response" %}&nbsp;{{ forloop.counter }}</h5>
                 <label class="sr-only"
                        for="arReply{{ forloop.counter }}">{% trans "Response" %}&nbsp;{{ forloop.counter }}</label>
@@ -28,7 +27,7 @@
                     <small>{% trans "The word to reply when the module is triggered." %}</small>
                 </p>
                 {% with prfx="arReply" prfxt="arReplyType" ct=forloop.counter|stringformat:"s" %}
-                    {% include "components/txtarea.html" with param_content=ar_prfx.RESPONSE param_content_type=ar_prfx.RESPONSE_TYPE txt_area_name=prfx txt_area_id=prfx|add:ct type_select_id=prfxt|add:ct max_length=max_length cttypes=contenttype_list_rep only %}
+                    {% include "ar/add-txtarea.html" with param_content=ar_prfx.RESPONSE param_content_type=ar_prfx.RESPONSE_TYPE txt_area_name=prfx txt_area_id=prfx|add:ct type_select_id=prfxt|add:ct max_length=max_length cttypes=contenttype_list_rep only %}
                 {% endwith %}
             </div>
         {% endfor %}

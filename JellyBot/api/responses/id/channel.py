@@ -4,8 +4,8 @@ from JellyBot.api.responses.mixin import (
     HandleChannelMixin, HandlePlatformMixin, RequireSenderMixin,
     SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
 )
-from flags import TokenAction
-from mongodb.factory import ChannelManager, TokenActionManager
+from flags import Execode
+from mongodb.factory import ChannelManager, ExecodeManager
 
 
 class ChannelDataQueryResponse(HandleChannelMixin, HandlePlatformMixin, SerializeResultExtraMixin, BaseApiResponse):
@@ -29,7 +29,7 @@ class ChannelDataQueryResponse(HandleChannelMixin, HandlePlatformMixin, Serializ
         return self._param_dict
 
 
-class ChannelIssueRegisterTokenResponse(
+class ChannelIssueRegisterExecodeResponse(
         RequireSenderMixin, SerializeErrorMixin, SerializeResultOnSuccessMixin, BaseApiResponse):
     def __init__(self, param_dict, creator_oid):
         super().__init__(param_dict, creator_oid)
@@ -38,7 +38,7 @@ class ChannelIssueRegisterTokenResponse(
         super().pre_process()
 
     def process_pass(self):
-        self._result = TokenActionManager.enqueue_action(self._sender_oid, TokenAction.REGISTER_CHANNEL)
+        self._result = ExecodeManager.enqueue_execode(self._sender_oid, Execode.REGISTER_CHANNEL)
 
 
 class ChannelNameChangeResponse(

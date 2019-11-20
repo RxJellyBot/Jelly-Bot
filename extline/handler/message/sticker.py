@@ -1,5 +1,9 @@
-from extline import LINE
+from flags import Platform
+from msghandle import handle_message_main
+from msghandle.models import MessageEventObjectFactory
 
 
 def handle_sticker(request, event, destination):
-    LINE.debug("[LINE] Sticker event.")
+    e = MessageEventObjectFactory.from_line(event)
+
+    handle_message_main(e).to_platform(Platform.LINE).send_line(event.reply_token)

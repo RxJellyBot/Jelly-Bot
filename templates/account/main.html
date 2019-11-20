@@ -15,8 +15,12 @@
                 <div class="card border-primary mb-3 text-primary text-center align-middle">
                     <h5 class="card-header">{% trans "Basic Information" %}</h5>
                     <div class="card-body">
-                        <table class="table text-primary mb-0">
+                        <table class="table table-hover table-striped table-borderless text-primary mb-0">
                             <tbody>
+                            <tr>
+                                <th scope="row">{% trans "User ID" %}</th>
+                                <td><code class="h6">{{ root_data.id }}</code></td>
+                            </tr>
                             <tr>
                                 <th scope="row">{% trans "Google Account" %}</th>
                                 <td>{{ api_user_data.email }}</td>
@@ -57,12 +61,30 @@
                             </tr>
                             </tbody>
                         </table>
+                    <hr>
+                        <h5>{% trans "Connected Accounts" %}</h5>
+                        <table class="table table-hover table-striped table-borderless text-primary mb-0">
+                            <thead>
+                            <tr>
+                                <th scope="col">{% trans "Platform" %}</th>
+                                <th scope="col">{% trans "Token" %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for onplat_user_data in onplat_user_data_list %}
+                                <tr>
+                                    <td>{{ onplat_user_data.platform.key }}</td>
+                                    <td><code class="h6">{{ onplat_user_data.token }}</code></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="card border-info">
-                    <h5 class="card-header text-center text-info">{% trans "Pending Token Actions" %}</h5>
+                    <h5 class="card-header text-center text-info">{% trans "Pending Execodes" %}</h5>
                     <div class="card-body">
-                        {% include "components/tkact.html" with tkact_list=tkact_list only %}
+                        {% include "account/main-excde.html" with execode_list=execode_list only %}
                     </div>
                 </div>
             </div>

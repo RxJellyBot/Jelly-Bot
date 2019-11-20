@@ -1,18 +1,19 @@
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
+from flags import BotFeature
 from mongodb.helper import MessageStatsDataProcessor
 from msghandle.models import TextMessageEventObject
-from msghandle.translation import gettext as _
 from JellyBot.systemconfig import HostUrl
 
 from ._base_ import CommandNode
 
 cmd = CommandNode(
-    ["id", "info"], 500, _("Information"),
-    _("Check the information of various things (see the description section for more details)."))
-cmd_me = cmd.new_child_node(["me", "my"])
-cmd_ch = cmd.new_child_node(["ch", "channel"])
-cmd_id = cmd.new_child_node(["id"])
+    codes=["info", "id"], order_idx=500, name=_("Information"),
+    description=_("Check the information of various things (see the description section for more details)."))
+cmd_me = cmd.new_child_node(codes=["me", "my"])
+cmd_ch = cmd.new_child_node(codes=["ch", "channel"])
+cmd_id = cmd.new_child_node(codes=["id"])
 
 
 def _user_id_section_(e: TextMessageEventObject):
@@ -45,8 +46,10 @@ def _chcoll_id_section_(e: TextMessageEventObject):
 
 
 def _chcoll_info_url_(e: TextMessageEventObject):
-    return [_("Channel Collection Detailed Info URL: {}{}").format(
-        HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
+    if e.chcoll_model:
+        return [_("Channel Collection Detailed Info URL: {}{}").format(
+            HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
+    return []
 
 
 def _user_ranking_section_(e: TextMessageEventObject):
@@ -60,13 +63,14 @@ def _user_ranking_section_(e: TextMessageEventObject):
     if rk_ch_7d.available:
         ret.append(_("Current Channel Message Count Ranking in 7 Days - {}").format(str(rk_ch_7d)))
 
-    rk_ccoll_1d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 24)
-    if rk_ccoll_1d.available:
-        ret.append(_("Channel Collection Message Count Ranking in 1 Day - {}").format(str(rk_ccoll_1d)))
+    if e.chcoll_model:
+        rk_ccoll_1d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 24)
+        if rk_ccoll_1d.available:
+            ret.append(_("Channel Collection Message Count Ranking in 1 Day - {}").format(str(rk_ccoll_1d)))
 
-    rk_ccoll_7d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 168)
-    if rk_ccoll_7d.available:
-        ret.append(_("Channel Collection Message Count Ranking in 7 Days - {}").format(str(rk_ccoll_7d)))
+        rk_ccoll_7d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 168)
+        if rk_ccoll_7d.available:
+            ret.append(_("Channel Collection Message Count Ranking in 7 Days - {}").format(str(rk_ccoll_7d)))
 
     return ret
 
@@ -110,17 +114,18 @@ def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
     return ret
 
 
-@cmd_me.command_function(description=_("Check the user info of self."))
-def check_sender_identity(e: TextMessageEventObject):
+@cmd_id.command_function(feature_flag=BotFeature.TXT_INFO_ID)
+def check_ids(e: TextMessageEventObject):
     ret = []
 
+    ret.extend(_chcoll_id_section_(e))
+    ret.extend(_channel_id_section_(e))
     ret.extend(_user_id_section_(e))
-    ret.extend(_user_ranking_section_(e))
 
     return "\n".join(ret)
 
 
-@cmd_ch.command_function(description=_("Check the channel info."))
+@cmd_ch.command_function(feature_flag=BotFeature.TXT_INFO_CHANNEL)
 def check_channel_info(e: TextMessageEventObject):
     ret = []
 
@@ -132,18 +137,17 @@ def check_channel_info(e: TextMessageEventObject):
     ret.extend(_channel_info_url_(e))
 
     ret.append("")
-    ret.extend(_channel_msg_count_list_section_(e, limit))
     ret.extend(_chcoll_msg_count_list_section_(e, limit))
+    ret.extend(_channel_msg_count_list_section_(e, limit))
 
     return "\n".join(ret)
 
 
-@cmd_id.command_function(description=_("Check the current channel and the self user id."))
-def check_ids(e: TextMessageEventObject):
+@cmd_me.command_function(feature_flag=BotFeature.TXT_INFO_USER)
+def check_sender_identity(e: TextMessageEventObject):
     ret = []
 
-    ret.extend(_channel_id_section_(e))
-    ret.extend(_chcoll_id_section_(e))
     ret.extend(_user_id_section_(e))
+    ret.extend(_user_ranking_section_(e))
 
     return "\n".join(ret)

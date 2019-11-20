@@ -2,29 +2,30 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from JellyBot.api.static import result
-from flags import TokenActionCompletionOutcome
-from models import TokenActionModel
+from flags import ExecodeCompletionOutcome
+from models import ExecodeEntryModel
 
 from ._base import BaseResult, ModelResult
 from ._outcome import WriteOutcome, OperationOutcome, GetOutcome
 
 
+# noinspection DuplicatedCode
 @dataclass
-class EnqueueTokenActionResult(BaseResult):
-    def __init__(self, outcome, token, expiry, exception=None):
+class EnqueueExecodeResult(BaseResult):
+    def __init__(self, outcome, execode, expiry, exception=None):
         """
         :type outcome: WriteOutcome
-        :type token: str
+        :type execode: str
         :type expiry: datetime
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, exception)
-        self._token = token
+        self._execode = execode
         self._expiry = expiry
 
     @property
-    def token(self) -> str:
-        return self._token
+    def execode(self) -> str:
+        return self._execode
 
     @property
     def expiry(self) -> datetime:
@@ -32,27 +33,29 @@ class EnqueueTokenActionResult(BaseResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.TokenActionResponse.TOKEN: self._token,
-                    result.TokenActionResponse.EXPIRY: self._expiry})
+        d.update(**{result.ExecodeResponse.EXECODE: self._execode,
+                    result.ExecodeResponse.EXPIRY: self._expiry})
         return d
 
 
 @dataclass
-class GetTokenActionResult(ModelResult):
+class GetExecodeEntryResult(ModelResult):
     def __init__(self, outcome, action_model):
         """
         :type outcome: GetOutcome
+        :type action_model: ExecodeEntryModel
         """
         super().__init__(outcome, action_model, None)
 
 
+# noinspection DuplicatedCode
 @dataclass
-class CompleteTokenActionResult(ModelResult):
+class CompleteExecodeResult(ModelResult):
     def __init__(self, outcome, completion_outcome, action_model, lacking_keys, exception=None):
         """
         :type outcome: OperationOutcome
-        :type completion_outcome: TokenActionCompletionOutcome
-        :type action_model: TokenActionModel
+        :type completion_outcome: ExecodeCompletionOutcome
+        :type action_model: ExecodeEntryModel
         :type lacking_keys: set
         :type exception: Optional[Exception]
         """
@@ -61,7 +64,7 @@ class CompleteTokenActionResult(ModelResult):
         self._lacking_keys = lacking_keys
 
     @property
-    def completion_outcome(self) -> TokenActionCompletionOutcome:
+    def completion_outcome(self) -> ExecodeCompletionOutcome:
         return self._completion_outcome
 
     @property
@@ -70,6 +73,6 @@ class CompleteTokenActionResult(ModelResult):
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.TokenActionResponse.LACKING_KEYS: self._lacking_keys,
-                    result.TokenActionResponse.COMPLETION_OUTCOME: self._completion_outcome})
+        d.update(**{result.ExecodeResponse.LACKING_KEYS: self._lacking_keys,
+                    result.ExecodeResponse.COMPLETION_OUTCOME: self._completion_outcome})
         return d

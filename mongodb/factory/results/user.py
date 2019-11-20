@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 from JellyBot.api.static import result
 from models import RootUserModel, OnPlatformUserModel, APIUserModel
@@ -53,19 +54,25 @@ class GetRootUserDataResult(ModelResult):
 
 
 class GetRootUserDataApiResult(GetRootUserDataResult):
-    def __init__(self, outcome, model_root, model_api, exception=None):
+    def __init__(self, outcome, model_root, model_api, model_onplat_list, exception=None):
         """
         :type outcome: GetOutcome
         :type model_root: RootUserModel
         :type model_api: APIUserModel
+        :type model_onplat_list: List[OnPlatformUserModel]
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model_root, exception)
         self._model_api = model_api
+        self._model_onplat_list = model_onplat_list
 
     @property
     def model_api(self) -> APIUserModel:
         return self._model_api
+
+    @property
+    def model_onplat_list(self) -> List[OnPlatformUserModel]:
+        return self._model_onplat_list
 
 
 class RootUserRegistrationResult(ModelResult):

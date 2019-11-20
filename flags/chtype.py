@@ -16,9 +16,9 @@ class ChannelType(FlagSingleEnum):
         return ChannelType.UNKNOWN
 
     UNKNOWN = 0, _("(Unknown Channel Type)")
-    GROUP_PUB_TEXT = 10, _("**Group (Text/Public)**")
-    GROUP_PRV_TEXT = 11, _("**Group (Text/Private)**")
-    PRIVATE_TEXT = 21, _("**Private (Text)**")
+    GROUP_PUB_TEXT = 10, _("Group (Text/Public)")
+    GROUP_PRV_TEXT = 11, _("Group (Text/Private)")
+    PRIVATE_TEXT = 21, _("Private (Text)")
 
     @staticmethod
     def identify(platform, token: str):

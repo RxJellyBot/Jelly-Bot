@@ -1,4 +1,6 @@
 import re
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 from ._base import BaseField
 
@@ -25,3 +27,24 @@ class TextField(BaseField):
     @property
     def expected_types(self):
         return str
+
+
+class UrlField(BaseField):
+    def __init__(self, key, default=None, allow_none=False):
+        super().__init__(key, default, allow_none, readonly=True, auto_cast=True)
+
+    @property
+    def expected_types(self):
+        return str
+
+    def is_value_valid(self, value) -> bool:
+        return UrlField.is_valid_url(value)
+
+    @staticmethod
+    def is_valid_url(url) -> bool:
+        try:
+            URLValidator()(url)
+        except ValidationError:
+            return False
+
+        return True

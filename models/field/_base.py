@@ -55,8 +55,9 @@ class FieldInstance:
         return self.base.is_none(self.value)
 
     def __repr__(self):
-        return f"Field Instance of {self.base.__class__.__qualname__} {' (Read-only)' if self.base.read_only else ''} " \
-            f"<{self.base.key}: {self.value}>"
+        return f"Field Instance of {self.base.__class__.__qualname__} " \
+               f"{' (Read-only)' if self.base.read_only else ''} " \
+               f"<{self.base.key}: {self.value}>"
 
 
 class BaseField(abc.ABC):

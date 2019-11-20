@@ -1,6 +1,8 @@
 from bson import ObjectId
+from django.contrib import messages
 
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
@@ -12,7 +14,7 @@ from msghandle.botcmd.command import cmd_id
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
-from JellyBot.systemconfig import TokenAction
+from JellyBot.systemconfig import ExecodeManager
 
 
 class AccountChannelRegistrationView(LoginRequiredMixin, TemplateResponseMixin, View):
@@ -20,7 +22,7 @@ class AccountChannelRegistrationView(LoginRequiredMixin, TemplateResponseMixin, 
     def get(self, request, *args, **kwargs):
         return render_template(
             self.request, _("Channel Register"), "account/channel/register.html",
-            {"register_cooldown": TokenAction.ChannelRegisterTokenCooldownSeconds})
+            {"register_cooldown": ExecodeManager.ChannelRegisterExecodeCooldownSeconds})
 
 
 class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
@@ -65,7 +67,13 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             c_prof = ChannelManager.get_channel_oid(channel_oid)
 
             if c_prof:
-                return redirect("info.channel")
+                messages.info(
+                    request, _("You are redirected to the channel info page "
+                               "because you don't have any connections linked to the channel."),
+                    extra_tags="info"
+                )
+
+                return redirect(reverse("info.channel", kwargs={"channel_oid": channel_oid}))
             else:
                 return WebsiteErrorView.website_error(
                     request, WebsiteError.PROFILE_LINK_NOT_FOUND, {"channel_oid": channel_oid_str})

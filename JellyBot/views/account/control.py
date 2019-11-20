@@ -44,9 +44,9 @@ class AccountLoginView(View):
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:
-            # EX: Insert `raise ex2` when any error occurred during login
-            # raise ex2
-            s += f" {ex2}"
+            # EXNOTE: Insert `raise ex2` when any error occurred during login
+            raise ex2
+            s += f" ({ex2})"
 
         if s != AccountLoginView.PASS_SIGNAL:
             s += s_contact
