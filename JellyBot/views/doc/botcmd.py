@@ -40,7 +40,7 @@ class BotCommandHelpView(View):
 def _warn_deprecation_(request):
     messages.warning(
         request, _("This way of using the bot command is deprecating. "
-                   "Please visit to see the usage of new command set.").format(
+                   "Please visit {} to see the usage of new command set.").format(
             f"{HostUrl}{reverse('page.doc.botcmd.main')}"),
         extra_tags="warning")
 

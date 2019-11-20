@@ -326,7 +326,7 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_INVALID_FIELD
             ex = e
         except FieldCastingFailed as e:
-            outcome = WriteOutcome.X_CAST_FAILED
+            outcome = WriteOutcome.X_CASTING_FAILED
             ex = e
         except Exception as e:
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
@@ -355,7 +355,7 @@ class ControlExtensionMixin(Collection):
 
     def find_cursor_with_count(self, filter_, *args, parse_cls=None, **kwargs) -> CursorWithCount:
         return CursorWithCount(
-            self.find(filter_, *args, **kwargs), self.count_documents(filter_, *args, **kwargs), parse_cls=parse_cls)
+            self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_, *args, parse_cls=None, **kwargs) -> Optional[Model]:
         return self.cast_model(self.find_one(filter_, *args, **kwargs), parse_cls=parse_cls)

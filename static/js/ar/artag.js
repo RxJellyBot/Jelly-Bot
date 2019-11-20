@@ -18,22 +18,28 @@ function searchTag() {
 
         searchTagsByPopularity(txt,
             function (tag_name_arr) {
+                if (!tag_name_arr.includes(txt)) {
+                    attachTagButton(txt);
+                }
+
                 tag_name_arr.forEach(function (tag_name) {
-                    $("div#arTagSearchResult").append(generateTagButtonDOM(tag_name, function (event) {
-                        addToSelectedTags($(event.target).text());
-                    }));
+                    attachTagButton(tag_name);
                 });
             },
             function () {
-                if (txt) {
-                    $("div#arTagSearchResult").append(generateTagButtonDOM(txt, function (event) {
-                        addToSelectedTags($(event.target).text());
-                    }));
-                }
+                attachTagButton(txt);
             },
             clearSearchResults
         );
         searchLock = false;
+    }
+}
+
+function attachTagButton(txt) {
+    if (txt) {
+        $("div#arTagSearchResult").append(generateTagButtonDOM(txt, function (event) {
+            addToSelectedTags($(event.target).text());
+        }));
     }
 }
 

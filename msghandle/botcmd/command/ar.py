@@ -1,12 +1,16 @@
 from typing import List
+import traceback
 
 from django.urls import reverse
 
 from extutils.utils import str_reduce_length
-from flags import BotFeature, CommandScopeCollection
-from mongodb.factory import AutoReplyManager, AutoReplyContentManager
+from extutils.emailutils import MailSender
+from flags import BotFeature, CommandScopeCollection, Execode
+from models import AutoReplyModuleExecodeModel
+from mongodb.factory import AutoReplyManager, AutoReplyContentManager, ExecodeManager
+from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
-from msghandle.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from JellyBot.systemconfig import HostUrl, Bot
 
 from ._base_ import CommandNode
@@ -88,7 +92,7 @@ def _get_deprecating_msgs_() -> List[HandledMessageEventText]:
     arg_count=2,
     arg_help=[
         _("The message for the auto-reply module to be triggered.\n\n"
-          "If the content **is number**, the content type will be **LINE sticker**. "
+          "If the content **is number**, the content type will be **LINE sticker**.\n\n"
           "Otherwise, the content type will be **text**."),
         _("The message for the auto-reply module to respond when triggered.<hr>"
           "If the content **is number**, the content type will be **LINE sticker**.\n\n"
@@ -115,6 +119,67 @@ def add_auto_reply_module_old(e: TextMessageEventObject, keyword: str, response:
 
 
 @cmd_add.command_function(
+    feature_flag=BotFeature.TXT_AR_ADD_EXECODE,
+    arg_count=1,
+    arg_help=[
+        _("The Execode obtained else where to complete the auto-reply module registration.")
+    ],
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> List[HandledMessageEventText]:
+    get_excde_result = ExecodeManager.get_execode_entry(execode, Execode.AR_ADD)
+
+    if not get_excde_result.success:
+        return [
+            HandledMessageEventText(content=_(
+                "Failed to get the Execode data using the Execode `{}`. Code: `{}`"
+            ).format(execode, get_excde_result.outcome))
+        ]
+
+    excde_entry = get_excde_result.model
+
+    if e.user_model.id != excde_entry.creator_oid:
+        return [
+            HandledMessageEventText(content=_(
+                "The ID of the creator of this Execode: `{}` does not match your ID: `{}`.\n"
+                "Only the creator of this Execode can complete this action."
+            ).format(excde_entry.creator_oid, e.user_model.id))
+        ]
+
+    try:
+        ar_model = AutoReplyModuleExecodeModel(**excde_entry.data, from_db=True).to_actual_model(
+            e.channel_oid, excde_entry.creator_oid)
+    except Exception as ex:
+        MailSender.send_email_async(
+            "Failed to construct an Auto-reply module using Execode.\n"
+            f"User ID: {e.user_model.id}\n"
+            f"Channel ID: {e.channel_oid}\n"
+            f"Execode: {excde_entry.execode}\n"
+            f"Exception: {traceback.format_exception(None, ex, ex.__traceback__)}",
+            subject="Failed to construct AR module")
+
+        return [HandledMessageEventText(content=_(
+            "Failed to create auto-reply module. An error report was sent for investigation."))]
+
+    add_result = AutoReplyManager.add_conn_by_model(ar_model)
+
+    if not add_result.success:
+        MailSender.send_email_async(
+            "Failed to register an Auto-reply module using model.\n"
+            f"User ID: {e.user_model.id}\n"
+            f"Channel ID: {e.channel_oid}\n"
+            f"Execode: {excde_entry.execode}\n"
+            f"Add result json: {add_result.serialize()}",
+            subject="Failed to construct AR module")
+
+        return [HandledMessageEventText(content=_(
+            "Failed to register the auto-reply module. Code: `{}`"
+        ).format(add_result.outcome))]
+
+    return [HandledMessageEventText(content=_("Auto-reply module registered."))]
+
+
+@cmd_add.command_function(
     feature_flag=BotFeature.TXT_AR_ADD,
     arg_count=2,
     arg_help=[
@@ -123,10 +188,11 @@ def add_auto_reply_module_old(e: TextMessageEventObject, keyword: str, response:
           "Otherwise, the content type will be **text**."),
         _("The message for the auto-reply module to respond when triggered.<hr>"
           "If the content **is number**, the content type will be **LINE sticker**.\n\n"
-          "If the content **endswith .jpg**, the content type will be **image**."
+          "If the content **endswith .jpg**, the content type will be **image**.\n\n"
           "Otherwise, the content type will be **text**.<hr>"
-          "- For content **endswith .jpg**\n"
-          "Please ensure that the URL is an image when you open it, **NOT** a webpage.\n"
+          "Notes:\n\n"
+          "- For content **endswith .jpg** - "
+          "Please ensure that the URL is an image when you open it, **NOT** a webpage. "
           "Otherwise, unexpected things may happen.")
     ],
     scope=CommandScopeCollection.GROUP_ONLY
@@ -144,13 +210,13 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     rep_ctnt_result = AutoReplyContentManager.get_content(response)
     if not rep_ctnt_result.success:
         return [HandledMessageEventText(
-            content=_("Failed to fetch the content ID of the response.\n"
+            content=_("Failed to fetch the content ID of the **response**.\n"
                       "Auto-Reply module not registered.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
                 rep_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
 
-    add_result = AutoReplyManager.add_conn(
+    add_result = AutoReplyManager.add_conn_complete(
         kw_ctnt_result.model.id, (rep_ctnt_result.model.id,), e.user_model.id, e.channel_oid,
         Bot.AutoReply.DefaultPinned, Bot.AutoReply.DefaultPrivate, Bot.AutoReply.DefaultTags,
         Bot.AutoReply.DefaultCooldownSecs)
@@ -168,7 +234,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                 "    Content: {}\n"
                 "Response: \n"
                 "    Type: {}\n"
-                "    Content: {}\n").format(
+                "    Content: {}").format(
                 add_result.model.id,
                 kw_ctnt_result.model.content_type.key, kw_ctnt,
                 rep_ctnt_result.model.content_type.key, rep_ctnt),
@@ -177,7 +243,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
         return [
             HandledMessageEventText(
                 content=_("Failed to register the Auto-Reply module.\n"
-                          "Code: {}\n"
+                          "Code: `{}`\n"
                           "Visit {} to see the code explanation.").format(
                     add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
 
@@ -211,10 +277,14 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
                       "Visit {} to see the code explanation.").format(
                 kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
 
-    outcome = AutoReplyManager.del_conn(kw_ctnt_result.model.id, e.channel_oid)
+    outcome = AutoReplyManager.del_conn(kw_ctnt_result.model.id, e.channel_oid, e.user_model.id)
 
     if outcome.is_success:
-        return [HandledMessageEventText(content=_("Auto-Reply Module deleted."))]
+        return [HandledMessageEventText(content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
+    elif outcome == WriteOutcome.X_INSUFFICIENT_PERMISSION:
+        return [HandledMessageEventText(content=_("Insufficient Permission to delete the auto-reply module."))]
+    elif outcome == WriteOutcome.X_NOT_FOUND:
+        return [HandledMessageEventText(content=_("Auto-reply module of the keyword {} not found.").format(keyword))]
     else:
         return [
             HandledMessageEventText(

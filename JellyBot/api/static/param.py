@@ -59,8 +59,8 @@ class Service:
         TARGET = "target"
 
 
-class TokenAction:
-    TOKEN = "tk"
+class Execode:
+    EXECODE = "excde"
     PLATFORM = Common.PLATFORM
     CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     USER_TOKEN = Common.USER_TOKEN

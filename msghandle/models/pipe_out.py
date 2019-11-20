@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import List
-from gettext import gettext as _
+
+from django.utils.translation import gettext_lazy as _
 
 from extutils import safe_cast
 from flags import MessageType, Platform, AutoReplyContentType

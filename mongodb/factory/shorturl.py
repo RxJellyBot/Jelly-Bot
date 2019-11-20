@@ -4,11 +4,11 @@ import random
 from typing import Optional
 
 import pymongo
-import requests
 from bson import ObjectId
 
 from extutils.checker import param_type_ensure
 from models import ShortUrlRecordModel
+from models.field import UrlField
 from mongodb.factory.results import WriteOutcome, UrlShortenResult
 from mongodb.utils import CursorWithCount
 
@@ -41,10 +41,7 @@ class ShortUrlDataManager(BaseCollection):
 
     @staticmethod
     def is_valid_url(url) -> bool:
-        try:
-            return requests.get(url).status_code == 200
-        except Exception:
-            return False
+        return UrlField.is_valid_url(url)
 
     def __init__(self):
         super().__init__()

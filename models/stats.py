@@ -1,6 +1,6 @@
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
-    MessageTypeField, BotFeatureField
+    MessageTypeField, BotFeatureField, FloatField
 )
 from models import Model, ModelDefaultValueExt
 
@@ -22,6 +22,7 @@ class MessageRecordModel(Model):
     UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
     MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
+    ProcessTimeMs = FloatField("pt", default=ModelDefaultValueExt.Optional)
 
 
 class BotFeatureUsageModel(Model):

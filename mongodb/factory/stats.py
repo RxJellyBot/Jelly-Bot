@@ -44,10 +44,12 @@ class MessageRecordStatisticsManager(BaseCollection):
     @param_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any) -> MessageRecordResult:
+            message_type: MessageType, message_content: Any, proc_time_ms: float) -> MessageRecordResult:
         entry, outcome, ex = self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
-            MessageContent=repr(message_content)[:Database.MessageStats.MaxContentCharacter])
+            MessageContent=repr(message_content)[:Database.MessageStats.MaxContentCharacter],
+            ProcessTimeMs=proc_time_ms
+        )
 
         return MessageRecordResult(outcome, entry, ex)
 
@@ -71,8 +73,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         return [e["cid"] for e in aggr]
 
     def get_user_messages(
-            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
-            sort: bool = False) \
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
             -> CommandCursor:
         if isinstance(channel_oids, ObjectId):
             match_d = {MessageRecordModel.ChannelOid.key: channel_oids}
@@ -93,11 +94,9 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$group": {
                 OID_KEY: "$" + MessageRecordModel.UserRootOid.key,
                 "count": {"$sum": 1}
-            }}
+            }},
+            {"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}}
         ]
-
-        if sort:
-            aggr_pipeline.append({"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}})
 
         return self.aggregate(aggr_pipeline)
 

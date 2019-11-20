@@ -14,7 +14,7 @@ from msghandle.botcmd.command import cmd_id
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
-from JellyBot.systemconfig import TokenAction
+from JellyBot.systemconfig import ExecodeManager
 
 
 class AccountChannelRegistrationView(LoginRequiredMixin, TemplateResponseMixin, View):
@@ -22,7 +22,7 @@ class AccountChannelRegistrationView(LoginRequiredMixin, TemplateResponseMixin, 
     def get(self, request, *args, **kwargs):
         return render_template(
             self.request, _("Channel Register"), "account/channel/register.html",
-            {"register_cooldown": TokenAction.ChannelRegisterTokenCooldownSeconds})
+            {"register_cooldown": ExecodeManager.ChannelRegisterExecodeCooldownSeconds})
 
 
 class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):

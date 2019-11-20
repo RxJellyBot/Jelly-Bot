@@ -1,23 +1,23 @@
 $(document).ready(function () {
-    $("button#tokenSubmit").click(onSubmitClick);
+    $("button#execodeSubmit").click(onSubmitClick);
 });
 
 function onSubmitClick() {
-    let token = $("input#token").val();
-    if (token === undefined || token.length === 0) {
-        updateSubmitMessage("submitMsgNoToken");
+    let execode = $("input#execode").val();
+    if (execode === undefined || execode.length === 0) {
+        updateSubmitMessage("submitMsgNoExecode");
         return;
     }
 
-    $("button#tokenSubmit").prop("disabled", true);
-    sendTokenAjax(token, function(data) {
+    $("button#execodeSubmit").prop("disabled", true);
+    sendExecodeAjax(execode, function(data) {
         console.log(data);
         updateSubmitMessage("submitMsgFailed");
     }, function() {
-        $("input#token").val("");
+        $("input#execode").val("");
         updateSubmitMessage("submitMsgOK");
     }, function () {
-        $("button#tokenSubmit").prop("disabled", false);
+        $("button#execodeSubmit").prop("disabled", false);
     });
 }
 

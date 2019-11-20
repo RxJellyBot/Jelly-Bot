@@ -15,6 +15,7 @@ class ShortUrlMainView(LoginRequiredMixin, TemplateResponseMixin, View):
         # TODO: Shorten URL
         #   Layout: Change target ajax, remove
         #   API Port: Remove short URL
+        #   Data field: Note of the Short URL
         return render_template(
             self.request, _("Short URL Service"), "services/shorturl/main.html",
             {"records": ShortUrlDataManager.get_user_record(get_root_oid(request))})

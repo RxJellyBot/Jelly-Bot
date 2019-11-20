@@ -41,12 +41,12 @@
                                     <small>
                                         {% url "account.channel.list" as list_url %}
                                         {% blocktrans trimmed %}
-                                            In case the main method doesn't work, please get a token below,
+                                            In case the main method doesn't work, please get an Execode below,
                                             then use it to complete the registration at
-                                            where Jelly Bot supports using <b>Complete Token Action</b> function.
+                                            where Jelly Bot supports using <b>Complete Execode</b> function.
                                         {% endblocktrans %}
                                         <ul class="text-left">
-                                            <li>{% trans "This token will only grants you a default permission profile." %}</li>
+                                            <li>{% trans "Doing so will only grants you a default permission profile." %}</li>
                                             <li>
                                                 {% blocktrans trimmed %}
                                                 For non-default permission profile, please <a class="text-white alert-link" href="{{ list_url }}">click here</a> and create a profile if allowed.
@@ -61,24 +61,24 @@
                         <div class="form-row">
                             <div class="col mr-2">
                                 <span class="bg-light rounded form-control">
-                                    <code class="h5" id="new-token"></code>
+                                    <code class="h5" id="new-execode"></code>
                                 </span>
                             </div>
-                            <button class="btn btn-outline-light" type="button" id="get-token">
+                            <button class="btn btn-outline-light" type="button" id="get-execode">
                                 {% trans "Get one" %}
                             </button>
                         </div>
-                        <div class="row d-none text-left mt-3" id="get-token-tips">
+                        <div class="row d-none text-left mt-3" id="get-execode-tips">
                             <div class="col">
                                 {% blocktrans trimmed %}
-                                    Token can only be acquired once {{ register_cooldown }} seconds.
+                                    Execode can only be acquired once {{ register_cooldown }} seconds.
                                 {% endblocktrans %}
                             </div>
                         </div>
-                        <div class="row d-none text-left mt-3" id="get-token-error">
+                        <div class="row d-none text-left mt-3" id="get-execode-error">
                             <div class="col">
                                 {% blocktrans trimmed %}
-                                    An error occurred during token acquiring process.
+                                    An error occurred during Execode acquiring process.
                                 {% endblocktrans %}
                             </div>
                         </div>
@@ -92,29 +92,29 @@
 {% block ex-script %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $("button#get-token").click(function () {
+            $("button#get-execode").click(function () {
                 let xhr = new XMLHttpRequest();
-                xhr.open("POST", `{% url "api.id.channel.register_token" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
+                xhr.open("POST", `{% url "api.id.channel.register_execode" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
                 xhr.responseType = "json";
                 xhr.onloadstart = function () {
-                    $("div#get-token-error").addClass("d-none");
+                    $("div#get-execode-error").addClass("d-none");
                 };
                 xhr.onload = function () {
-                    $("code#new-token").text(
+                    $("code#new-execode").text(
                         xhr.response.{{ static_keys_result.SUCCESS }} ?
-                            xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"] :
+                            xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"] :
                             "{% trans "An error occurred." %}");
 
-                    $("button#get-token").prop("disabled", true);
-                    $("div#get-token-tips").removeClass("d-none");
+                    $("button#get-execode").prop("disabled", true);
+                    $("div#get-execode-tips").removeClass("d-none");
 
                     setTimeout(function () {
-                        $("button#get-token").prop("disabled", false);
-                        $("div#get-token-tips").addClass("d-none");
+                        $("button#get-execode").prop("disabled", false);
+                        $("div#get-execode-tips").addClass("d-none");
                     }, parseInt({{ register_cooldown }}) * 1000);
                 };
                 xhr.onerror = function () {
-                    $("div#get-token-error").removeClass("d-none");
+                    $("div#get-execode-error").removeClass("d-none");
                 };
                 xhr.send();
             });

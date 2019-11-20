@@ -4,23 +4,23 @@
 import django
 from django.test import Client, TestCase
 
-from flags import TokenAction
-from mongodb.factory import MONGO_CLIENT, TokenActionManager
+from flags import Execode
+from mongodb.factory import MONGO_CLIENT, ExecodeManager
 
 c = Client(enforce_csrf_checks=True)
 django.setup()
 
 
-class TestTokenAction(TestCase):
+class TestExecode(TestCase):
     TEST_ROOT_UID = None
-    TEST_TA_TOKEN = None
+    TEST_EXCDE_TOKEN = None
 
     @classmethod
     def setUpTestData(cls) -> None:
         from mongodb.factory import RootUserManager
         from extutils.gidentity import GoogleIdentityUserData
 
-        MONGO_CLIENT.get_database("tk_act").get_collection("main").delete_many({})
+        MONGO_CLIENT.get_database("execode").get_collection("main").delete_many({})
         MONGO_CLIENT.get_database("user").get_collection("api").delete_many({})
         MONGO_CLIENT.get_database("user").get_collection("root").delete_many({})
 
@@ -33,17 +33,17 @@ class TestTokenAction(TestCase):
             raise ValueError("Fake data registration failed.")
 
     def test_enqueue_test_action(self):
-        self.__class__.TEST_TA_TOKEN = \
-            TokenActionManager.enqueue_action(self.__class__.TEST_ROOT_UID, TokenAction.SYS_TEST).token
+        self.__class__.TEST_EXCDE_TOKEN = \
+            ExecodeManager.enqueue_execode(self.__class__.TEST_ROOT_UID, Execode.SYS_TEST).execode
 
-    def test_token_action_list(self):
-        tas = TokenActionManager.get_queued_actions(self.__class__.TEST_ROOT_UID)
+    def test_execode_list(self):
+        excdes = ExecodeManager.get_queued_execodes(self.__class__.TEST_ROOT_UID)
 
-        self.assertFalse(tas.empty)
+        self.assertFalse(excdes.empty)
 
         found = False
-        for ta in tas:
-            if ta.token == self.__class__.TEST_TA_TOKEN and ta.action_type == TokenAction.SYS_TEST:
+        for excde in excdes:
+            if excde.execode == self.__class__.TEST_EXCDE_TOKEN and excde.action_type == Execode.SYS_TEST:
                 found = True
                 break
 

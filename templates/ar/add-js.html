@@ -105,8 +105,8 @@
         let url;
         if (regId === "arChannel" || regId === "arMember") {
             url = "{% url "api.ar.add" %}";
-        } else if (regId === "arToken") {
-            url = "{% url "api.ar.add_token" %}"
+        } else if (regId === "arExecode") {
+            url = "{% url "api.ar.add_execode" %}"
         }
 
         let xhr = new XMLHttpRequest();
@@ -124,12 +124,12 @@
         xhr.send(collectData());
     }
 
-    function displayToken(response) {
+    function displayExecode(response) {
         if (response.hasOwnProperty("{{ static_keys_result.RESULT }}") &&
-            response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.TokenActionResponse.TOKEN }}")) {
-            $("code#arTokenReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]);
+            response["{{ static_keys_result.RESULT }}"].hasOwnProperty("{{ static_keys_result.ExecodeResponse.EXECODE }}")) {
+            $("code#arExecodeReturn").text(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"]);
         } else {
-            console.log(`Token Display Failed. Token: ${response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.TokenActionResponse.TOKEN }}"]}`)
+            console.log(`Execode Display Failed. Code: ${response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"]}`)
         }
     }
 

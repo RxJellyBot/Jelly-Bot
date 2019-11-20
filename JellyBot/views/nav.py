@@ -173,7 +173,7 @@ def _construct_docs_(current_path, parent, nav_param):
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("API Command"), link=reverse("page.doc.code.api"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("Token Action"), link=reverse("page.doc.code.token"), parent=docs_parent))
+        NavEntry, current_path, label=_("Execode"), link=reverse("page.doc.code.excde"), parent=docs_parent))
 
     # Hidden Items
     # TODO: Navbar - Parent not in breadcrumb

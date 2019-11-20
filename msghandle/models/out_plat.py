@@ -4,6 +4,7 @@ import traceback
 
 from discord import Embed
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from linebot.models import TextSendMessage, ImageSendMessage
 
 from flags import MessageType
@@ -12,7 +13,6 @@ from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
 from JellyBot.systemconfig import PlatformConfig, HostUrl
 from mongodb.factory import ExtraContentManager
-from msghandle.translation import gettext as _
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder, HandledMessageEvent, \
     HandledMessageEventText
@@ -110,12 +110,12 @@ class HandledEventsHolderPlatform:
                 send_list.append(
                     Embed()
                     .set_image(url=content)
-                    .set_footer(text=f"Image URL: {content}"))
+                    .set_footer(text=_("Image URL: {}").format(content)))
             elif msg_type == MessageType.LINE_STICKER:
                 send_list.append(
                     Embed()
                     .set_image(url=LineStickerManager.get_sticker_url(content))
-                    .set_footer(text=f"Line Sticker ID: {content}"))
+                    .set_footer(text=_("Sticker ID: {}").format(content)))
 
         # Insert separator between responses
         send_list = list_insert_in_between(send_list, "------------------------------")
