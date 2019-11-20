@@ -2,8 +2,6 @@ from dataclasses import dataclass
 
 from bson import ObjectId
 
-from models import ExtraContentModel
-
 from ._base import ModelResult
 from ._outcome import WriteOutcome
 

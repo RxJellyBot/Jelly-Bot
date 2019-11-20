@@ -6,7 +6,7 @@
     <div class="jumbotron">
         <div class="container">
             <div class="display-4 text-center"
-                 style="word-break: break-word;">{% trans "User Identity Integration" %}</div>
+                 style="word-break: break-word;">{% trans "User Data Integration" %}</div>
         </div>
     </div>
 
@@ -16,34 +16,34 @@
             <div class="col-lg-8">
                 <div class="card border-primary mb-3">
                     <div class="card-header text-center text-primary">
-                        <span class="h5">{% trans "Token Input" %}</span>
+                        <span class="h5">{% trans "Execode Input" %}</span>
                     </div>
                     <div class="card-body">
                         {% url "page.doc.botcmd.cmd" code=cmd_code as cmd_url %}
                         {% blocktrans trimmed %}
                             <p>
-                                Input the token acquired for user identity integration below.<br>
+                                Input the Execode acquired for user data integration below.<br>
                                 Check <a href="{{ cmd_url }}">this page</a> for
-                                how to initiate the user identity integration process.<br>
-                                Account related data such as locale configuration on the account where you get the token
+                                how to initiate the user data integration process.<br>
+                                Account related data such as locale configuration on the account where you get the Execode
                                 will be discarded, only the data on the website will be kept.
                             </p>
                         {% endblocktrans %}
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="{% trans "Integration token here" %}"
-                                   aria-label="{% trans "Integration Token" %}" id="token">
+                            <input type="text" class="form-control" placeholder="{% trans "Integration Execode here" %}"
+                                   aria-label="{% trans "Integration Execode" %}" id="execode">
                             <div class="input-group-append">
-                                <button type="button" class="btn btn-outline-primary" id="tokenSubmit">
+                                <button type="button" class="btn btn-outline-primary" id="execodeSubmit">
                                     {% trans "Submit" %}
                                 </button>
                             </div>
                         </div>
                         <div class="d-none text-primary submit-msg mt-3"
-                           id="submitMsgNoToken">{% trans "Provide a token to complete user identity integration." %}</div>
+                           id="submitMsgNoExecode">{% trans "Provide an Execode to complete user data integration." %}</div>
                         <div class="d-none text-success submit-msg mt-3"
-                           id="submitMsgOK">{% trans "User identity integration succeed." %}</div>
+                           id="submitMsgOK">{% trans "User data integration succeed." %}</div>
                         <div class="d-none text-danger submit-msg mt-3"
-                           id="submitMsgFailed">{% trans "User identity integration failed." %}</div>
+                           id="submitMsgFailed">{% trans "User data integration failed." %}</div>
                     </div>
                 </div>
             </div>
@@ -55,20 +55,20 @@
 {% block ex-script %}
     <!--suppress JSDuplicatedDeclaration -->
     <script type="text/javascript">
-        function sendTokenAjax(token, failedCallBack, okCallBack, completeCallback) {
+        function sendExecodeAjax(execode, failedCallBack, okCallBack, completeCallback) {
             $.ajax(
-                "{% url "api.token.complete" %}",
+                "{% url "api.execode.complete" %}",
                 {
                     method: "POST",
                     complete: completeCallback,
                     data: {
-                        "{{ static_keys_param.TokenAction.TOKEN }}": token,
-                        "{{ static_keys_param.TokenAction.USER_OID }}": "{{ root_oid }}",
-                        "{{ static_keys_param.TokenAction.ACTION_TYPE_ID }}": "{{ tkact_type_code }}",
+                        "{{ static_keys_param.Execode.EXECODE }}": execode,
+                        "{{ static_keys_param.Execode.USER_OID }}": "{{ root_oid }}",
+                        "{{ static_keys_param.Execode.ACTION_TYPE_ID }}": "{{ excde_type_code }}",
                         "{{ static_keys_param.LOCAL_REFER }}": true
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        console.log(`Send Token Ajax failed. (${textStatus})`);
+                        console.log(`Send Execode Ajax failed. (${textStatus})`);
                         console.log(errorThrown);
                         failedCallBack();
                     },

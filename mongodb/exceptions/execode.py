@@ -1,13 +1,13 @@
-from flags import TokenAction, TokenActionCollationFailedReason
+from flags import Execode, ExecodeCollationFailedReason
 
 
 class NoCompleteActionError(Exception):
-    def __init__(self, action: TokenAction):
+    def __init__(self, action: Execode):
         super().__init__(f"No complete action implemented for {action}.")
 
 
-class TokenActionCollationError(Exception):
+class ExecodeCollationError(Exception):
     def __init__(self,
-                 action: TokenAction, key: str, err_code: TokenActionCollationFailedReason, inner_ex: Exception = None):
+                 action: Execode, key: str, err_code: ExecodeCollationFailedReason, inner_ex: Exception = None):
         super().__init__(
             f"Error occurred during collation of action {str(action)} at {key}. (Err Reason {err_code}, {inner_ex})")

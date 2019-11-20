@@ -9,13 +9,15 @@ class NavDropdown(NavFirstLevelItem):
 
     @property
     def active(self) -> bool:
-        for _ in self.active_item:
-            return True
-        return False
+        return None or self.active_item
 
     @property
     def active_item(self):
-        return filter(lambda item: hasattr(item, "active") and item.active, self.items)
+        for item in self.items:
+            if hasattr(item, "active") and item.active:
+                return item
+
+        return None
 
     @property
     def items(self):
@@ -52,7 +54,7 @@ class NavDropdown(NavFirstLevelItem):
 
     def to_bread(self, active_link=None):
         s = super().to_bread(self.link)
-        for i in self.active_item:
-            s += i.to_bread()
+        if self.active_item:
+            s += self.active_item.to_bread()
 
         return s

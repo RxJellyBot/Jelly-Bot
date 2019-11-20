@@ -52,8 +52,15 @@ class Manage:
         NEW_NAME = "name"
 
 
-class TokenAction:
-    TOKEN = "tk"
+class Service:
+    class ShortUrl:
+        USER_OID = Common.USER_OID
+        CODE = "code"
+        TARGET = "target"
+
+
+class Execode:
+    EXECODE = "excde"
     PLATFORM = Common.PLATFORM
     CHANNEL_TOKEN = Common.CHANNEL_TOKEN
     USER_TOKEN = Common.USER_TOKEN

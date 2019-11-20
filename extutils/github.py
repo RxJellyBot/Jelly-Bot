@@ -25,5 +25,9 @@ class GitHubWrapper:
         else:
             return DotMap(self._cache_deployments[environment][0])
 
+    @staticmethod
+    def get_commit_url(repo_id_name: str, commit_sha: str):
+        return f"https://github.com/{repo_id_name}/commit/{commit_sha}"
+
 
 _inst = GitHubWrapper()

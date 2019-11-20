@@ -9,15 +9,18 @@ from .botcmd import process_bot_cmd
 
 
 def handle_text_event(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    handle_fn = [
-        process_error_test,
-        process_bot_cmd,
-        process_auto_reply,
-        process_calculator
-    ]
+    handle_fn = [process_error_test]
+
+    if e.channel_model.config.enable_bot_command:
+        handle_fn.append(process_bot_cmd)
+
+    if e.channel_model.config.enable_auto_reply:
+        handle_fn.append(process_auto_reply)
+
+    if e.channel_model.config.enable_calculator:
+        handle_fn.append(process_calculator)
 
     for fn in handle_fn:
-        # INCOMPLETE: Bot Handling: Handle exception occurred if any happened (error on discord won't be reported)
         responses = fn(e)
         if responses:
             return responses

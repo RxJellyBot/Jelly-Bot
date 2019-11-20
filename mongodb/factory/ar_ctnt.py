@@ -5,7 +5,7 @@ from bson import ObjectId
 from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
-from mongodb.factory.results import WriteOutcome, GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
+from mongodb.factory.results import GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
 from mongodb.utils import case_insensitive_collation
 
 from ._base import BaseCollection
@@ -24,8 +24,7 @@ class AutoReplyContentManager(BaseCollection):
                           name="Auto Reply Content Identity", unique=True)
 
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            AutoReplyContentModel, Content=content, ContentType=type_)
+        entry, outcome, ex = self.insert_one_data(Content=content, ContentType=type_)
 
         return AutoReplyContentAddResult(outcome, entry, ex)
 
@@ -35,10 +34,13 @@ class AutoReplyContentManager(BaseCollection):
             parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
 
     @param_type_ensure
-    def get_content(self, content: str, type_: AutoReplyContentType, add_on_not_found=True, case_insensitive=True) \
+    def get_content(self, content: str, type_: AutoReplyContentType = None, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
         if not content:
             return AutoReplyContentGetResult(GetOutcome.X_NO_CONTENT, None)
+
+        if not type_:
+            type_ = AutoReplyContentType.determine(content)
 
         ret_entry = self._get_content_(content, type_, case_insensitive)
         add_result = None

@@ -31,7 +31,7 @@ class NavFirstLevelItem(NavBaseItem, ABC):
     def to_bread(self, active_link=None):
         def get_content(additional):
             s = self.label
-            if additional is not None:
+            if additional:
                 s = f'<a href="{additional}">{s}</a>'
 
             return s

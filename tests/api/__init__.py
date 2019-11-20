@@ -1,3 +1,3 @@
 from .add import TestAddAutoReply
-from .tkact import TestTokenAction
+from .execode import TestExecode
 from .channel import TestChannelRegistration, TestChannelDataQuery

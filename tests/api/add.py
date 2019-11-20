@@ -14,7 +14,7 @@ from ._utils import GetJsonResponseMixin
 
 
 class TestAddAutoReply(GetJsonResponseMixin, TestCase):
-    TOKEN = None
+    EXECODE = None
     FAKE_API_TOKEN = None
 
     @classmethod
@@ -23,7 +23,7 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
         from extutils.gidentity import GoogleIdentityUserData
 
         MONGO_CLIENT.get_database("stats").get_collection("api").delete_many({})
-        MONGO_CLIENT.get_database("tk_act").get_collection("main").delete_many({})
+        MONGO_CLIENT.get_database("execode").get_collection("main").delete_many({})
         MONGO_CLIENT.get_database("user").get_collection("onplat").delete_many({})
         MONGO_CLIENT.get_database("user").get_collection("root").delete_many({})
         MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
@@ -144,10 +144,10 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
         self.assertEqual(result[r.ERRORS][r.SenderIdentity.SENDER], None)
         self.assertFalse(result[r.SUCCESS])
 
-    def test_add_token(self):
+    def test_add_execode(self):
         result = self.print_and_get_json(
             "POST",
-            reverse("api.ar.add_token"),
+            reverse("api.ar.add_execode"),
             {
                 p.AutoReply.KEYWORD: "R",
                 p.AutoReply.RESPONSE: "X",
@@ -155,26 +155,26 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
                 p.AutoReply.CREATOR_TOKEN: "user1",
                 p.AutoReply.PLATFORM: 1
             },
-            f"Test - Add - Token")
+            f"Test - Add - Execode")
         
         self.assertTrue(result[r.SUCCESS])
-        self.assertTrue(r.TokenActionResponse.TOKEN in result[r.RESULT])
-        self.__class__.TOKEN = result[r.RESULT][r.TokenActionResponse.TOKEN]
+        self.assertTrue(r.ExecodeResponse.EXECODE in result[r.RESULT])
+        self.__class__.EXECODE = result[r.RESULT][r.ExecodeResponse.EXECODE]
 
-    def test_add_token_complete(self):
-        token = self.__class__.TOKEN
-        if token is None:
-            raise ValueError("Token action not performed yet.")
+    def test_add_execode_complete(self):
+        excde = self.__class__.EXECODE
+        if excde is None:
+            raise ValueError("Execode not performed yet.")
 
         result = self.print_and_get_json(
             "POST",
-            reverse("api.token.complete"),
+            reverse("api.execode.complete"),
             {
-                p.TokenAction.TOKEN: token,
+                p.Execode.EXECODE: excde,
                 p.AutoReply.CHANNEL_TOKEN: "channel1",
                 p.AutoReply.PLATFORM: 1
             },
-            f"Test - Add - Token Complete")
+            f"Test - Add - Execode Complete")
 
         self.assertTrue(result[r.SUCCESS])
 

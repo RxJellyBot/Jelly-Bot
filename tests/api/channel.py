@@ -13,14 +13,14 @@ from ._utils import GetJsonResponseMixin
 class TestChannelRegistration(GetJsonResponseMixin, TestCase):
     TEST_API_TOKEN = None
     TEST_ROOT_UID = None
-    TEST_TA_TOKEN = None
+    TEST_EXECODE = None
 
     @classmethod
     def setUpTestData(cls) -> None:
         from mongodb.factory import RootUserManager
         from extutils.gidentity import GoogleIdentityUserData
 
-        MONGO_CLIENT.get_database("tk_act").get_collection("main").delete_many({})
+        MONGO_CLIENT.get_database("execode").get_collection("main").delete_many({})
         MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
         MONGO_CLIENT.get_database("channel").get_collection("user").delete_many({})
         MONGO_CLIENT.get_database("channel").get_collection("perm").delete_many({})
@@ -38,39 +38,39 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
         ChannelManager.register(1, "channel1")
 
     def test_main(self):
-        self._issue_channel_register_token_()
+        self._issue_channel_register_execode_()
         self._complete_registration_no_channel_id_()
         self._complete_registration_()
 
-    def _issue_channel_register_token_(self):
+    def _issue_channel_register_execode_(self):
         result = self.print_and_get_json(
             "POST",
-            reverse("api.id.channel.register_token"),
-            {p.TokenAction.API_TOKEN: self.TEST_API_TOKEN},
-            "Test - Issue Register Token")
+            reverse("api.id.channel.register_execode"),
+            {p.Execode.API_TOKEN: self.TEST_API_TOKEN},
+            "Test - Issue Register Execode")
 
         self.assertTrue(result[r.SUCCESS])
-        self.TEST_TA_TOKEN = result[r.RESULT][r.TokenActionResponse.TOKEN]
+        self.TEST_EXECODE = result[r.RESULT][r.ExecodeResponse.EXECODE]
 
     def _complete_registration_no_channel_id_(self):
         result = self.print_and_get_json(
             "POST",
-            reverse("api.token.complete"),
-            {p.TokenAction.TOKEN: self.TEST_TA_TOKEN},
-            "Test - Complete Register Token (no Channel)")
+            reverse("api.execode.complete"),
+            {p.Execode.EXECODE: self.TEST_EXECODE},
+            "Test - Complete Register Execode (no Channel)")
 
         self.assertFalse(result[r.SUCCESS])
 
     def _complete_registration_(self):
         result = self.print_and_get_json(
             "POST",
-            reverse("api.token.complete"),
+            reverse("api.execode.complete"),
             {
-                p.TokenAction.TOKEN: self.TEST_TA_TOKEN,
-                p.TokenAction.CHANNEL_TOKEN: "channel1",
-                p.TokenAction.PLATFORM: 1
+                p.Execode.EXECODE: self.TEST_EXECODE,
+                p.Execode.CHANNEL_TOKEN: "channel1",
+                p.Execode.PLATFORM: 1
             },
-            "Test - Complete Register Token (with Channel)")
+            "Test - Complete Register Execode (with Channel)")
 
         self.assertTrue(result[r.SUCCESS])
 

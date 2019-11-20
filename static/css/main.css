@@ -20,6 +20,10 @@ body {
     padding-top: var(--nav-height);
 }
 
+pre {
+    color: #e83e8c;
+}
+
 .no-line-break {
     white-space: nowrap;
 }
@@ -38,4 +42,9 @@ body {
     border: 0.01rem solid #BBBBBB;
     border-radius: 50%;
     display: inline-block;
+}
+
+.click-select {
+    user-select: all;
+    cursor: pointer;
 }

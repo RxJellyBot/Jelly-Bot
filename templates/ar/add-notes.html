@@ -36,5 +36,21 @@
                 </small>
             {% endblocktrans %}
         </p>
+        <h5 class="card-title">{% trans "Emoji / Sticker" %}</h5>
+        <p class="card-text">
+            {% blocktrans trimmed %}
+                <small>Refer to the "LINE Sticker" section for LINE Sticker.</small><br>
+                <small>
+                    Discord emojis are treated as normal text. They are in the form of <code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>.
+                    Example: <code>&lt;:neut:554302047038734366&gt;</code><br>
+                    <ul>
+                        <li><code>EMOJI_NAME</code>: What you normally type in the chat window excluding the wrapping colons.
+                            If you type :neut: in the window, then "neut" is the name of the emoji.</li>
+                        <li><code>EMOJI_ID</code>: The number in the URL when you get the link of the emoji.
+                            On PC client, you can right click on the emoji and click "Copy Link" or "Open Link" to get the number / ID.</li>
+                    </ul>
+                </small>
+            {% endblocktrans %}
+        </p>
     </div>
 </div>

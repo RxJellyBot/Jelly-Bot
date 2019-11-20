@@ -1,13 +1,16 @@
+from typing import Optional
+
 from bson import ObjectId
 
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
+from models.exceptions import KeyNotExistedError
 from models.utils import AutoReplyValidators
 
 from ._base import Model, ModelDefaultValueExt
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, DictionaryField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
 )
 
 
@@ -37,25 +40,57 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
+    # TODO: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
+
+    # Main
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)
-    CreatorOid = ObjectIDField("cr", readonly=True, stores_uid=True)
-    Pinned = BooleanField("p", readonly=True)
-    Private = BooleanField("pr", readonly=True)
-    CooldownSec = IntegerField("cd", readonly=True)
-    CalledCount = IntegerField("c", readonly=True)
-    LastUsed = DateTimeField("l", readonly=True, allow_none=False)
+    ChannelId = ObjectIDField("ch")
+    Active = BooleanField("at", default=True)
+
+    # Type
+    ReferTo = ObjectIDField("rid", allow_none=True, default=ModelDefaultValueExt.Optional)
+
+    # Record
+    CreatorOid = ObjectIDField("cr", stores_uid=True)
+    RemoverOid = ObjectIDField("rmv", stores_uid=True, default=ModelDefaultValueExt.Optional)
+
+    # Property
+    Pinned = BooleanField("p")
+    Private = BooleanField("pr")
+    CooldownSec = IntegerField("cd")
     ExcludedOids = ArrayField("e", ObjectId, stores_uid=True)
     TagIds = ArrayField("t", ObjectId)
-    ChannelIds = DictionaryField("ch")  # `str` key / Value=Active?
+
+    # Stats
+    CalledCount = IntegerField("c")
+    LastUsed = DateTimeField("l", allow_none=False)
+    RemovedAt = DateTimeField("rm", allow_none=False)
 
     @property
     def creation_time(self):
         return self.id.generation_time
 
+    @property
+    def refer_oid(self) -> Optional[ObjectId]:
+        try:
+            if self.is_reference:
+                return self.refer_to
+            else:
+                return None
+        except (KeyError, KeyNotExistedError, AttributeError):
+            return None
 
-class AutoReplyModuleTokenActionModel(Model):
+    @property
+    def is_reference(self) -> bool:
+        try:
+            return not self.is_field_none("ReferTo")
+        except (KeyError, KeyNotExistedError, AttributeError):
+            return False
+
+
+class AutoReplyModuleExecodeModel(Model):
     KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
     ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
                               max_len=systemconfig.AutoReply.MaxResponses)
@@ -66,7 +101,7 @@ class AutoReplyModuleTokenActionModel(Model):
 
     def to_actual_model(self, channel_id: ObjectId, creator_oid: ObjectId):
         return AutoReplyModuleModel(
-            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelIds.key: {str(channel_id): True},
+            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelId.key: channel_id,
                                                AutoReplyModuleModel.CreatorOid.key: creator_oid})
 
 

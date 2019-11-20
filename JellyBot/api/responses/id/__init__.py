@@ -1,2 +1,2 @@
-from .channel import ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse, ChannelNameChangeResponse
+from .channel import ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse
 from .perm import PermissionQueryResponse

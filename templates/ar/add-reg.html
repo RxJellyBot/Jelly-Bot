@@ -11,9 +11,9 @@
                     <input type="radio" autocomplete="off" checked>
                     {% trans "Channel Member" %}
                 </label>
-                <label class="btn btn-warning arRegister" id="arToken">
+                <label class="btn btn-warning arRegister" id="arExecode">
                     <input type="radio" autocomplete="off">
-                    {% trans "Get a token" %}
+                    {% trans "Get an Execode" %}
                 </label>
                 <label class="btn btn-warning arRegister" id="arChannel">
                     <input type="radio" autocomplete="off">
@@ -42,7 +42,7 @@
                         <select id="arChannel" class="form-control">
                             <option value="default">{% trans "Select a channel" %}</option>
                             {% for user_ch_entry in user_ch_list %}
-                                {% with user_ch_entry.channel as channel_data %}
+                                {% with user_ch_entry.channel_data as channel_data %}
                                     {% with user_ch_entry.channel_name as channel_name %}
                                         <option data-cname="{{ channel_name }}"
                                                 data-ctoken="{{ channel_data.token }}"
@@ -106,15 +106,15 @@
             </div>
         </div>
 
-        <div class="mb-3 d-none" data-btn-id="arToken">
+        <div class="mb-3 d-none" data-btn-id="arExecode">
             <div class="w-100 card card-body text-center text-dark border border-warning">
-                <h5 class="card-title">{% trans "Token" %}</h5>
+                <h5 class="card-title">{% trans "Execode" %}</h5>
                 <p class="card-text">
-                    <small>{% trans "The token will appear below once the module was successfully registered." %}</small>
+                    <small>{% trans "The Execode for registering the module will appear below once the task is enqueued." %}</small>
                 </p>
                 <div class="row">
                     <div class="col"></div>
-                    <div class="col-8 bg-light"><h3><code id="arTokenReturn">-</code></h3></div>
+                    <div class="col-8 bg-light"><h3><code id="arExecodeReturn">-</code></h3></div>
                     <div class="col"></div>
                 </div>
             </div>

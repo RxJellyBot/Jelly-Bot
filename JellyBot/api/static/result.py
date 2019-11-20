@@ -42,12 +42,12 @@ class AutoReplyResponse:
     ADD_RESULT = "addResult"
 
 
-class TokenActionResponse:
+class ExecodeResponse:
     LACKING_KEYS = Common.LACKING_KEYS
     CREATOR_OID = Common.CREATOR_OID
     COMPLETION_OUTCOME = "cmplOutcome"
 
-    TOKEN = Common.TOKEN
+    EXECODE = "execode"
     EXPIRY = "expiry"
 
 
@@ -61,3 +61,8 @@ class UserManagementResponse:
 class DataQuery:
     COUNT = "count"
     KEYWORD = "keyword"
+
+
+class Service:
+    class ShortUrl:
+        SHORTENED_URL = "url"

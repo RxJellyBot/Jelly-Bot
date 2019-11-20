@@ -6,6 +6,7 @@ from pymongo import ReturnDocument
 from extutils.checker import param_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
+from mongodb.utils import CursorWithCount
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
@@ -28,8 +29,8 @@ class ChannelManager(BaseCollection):
 
     @param_type_ensure
     def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelModel, Platform=platform, Token=token,
+        entry, outcome, ex = self.insert_one_data(
+            Platform=platform, Token=token,
             Config=ChannelConfigModel.generate_default(DefaultName=default_name))
 
         if outcome.data_found:
@@ -56,7 +57,8 @@ class ChannelManager(BaseCollection):
         )
 
     @param_type_ensure
-    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) -> ChannelChangeNameResult:
+    def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
+            -> ChannelChangeNameResult:
         """
         Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
         """
@@ -102,8 +104,24 @@ class ChannelManager(BaseCollection):
         return ret
 
     @param_type_ensure
-    def get_channel_oid(self, channel_oid: ObjectId) -> Optional[ChannelModel]:
-        return self.find_one_casted({ChannelModel.Id.key: channel_oid}, parse_cls=ChannelModel)
+    def get_channel_oid(self, channel_oid: ObjectId, hide_private: bool = False) -> Optional[ChannelModel]:
+        filter_ = {ChannelModel.Id.key: channel_oid}
+
+        if hide_private:
+            filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
+
+        return self.find_one_casted(filter_, parse_cls=ChannelModel)
+
+    @param_type_ensure
+    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
+        filter_ = \
+            {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                    {"$regex": default_name, "$options": "i"}}
+
+        if hide_private:
+            filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
+
+        return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
     @param_type_ensure
@@ -148,8 +166,7 @@ class ChannelCollectionManager(BaseCollection):
         if not default_name:
             default_name = f"{token} ({platform.key})"
 
-        entry, outcome, ex, insert_result = self.insert_one_data(
-            ChannelCollectionModel,
+        entry, outcome, ex = self.insert_one_data(
             DefaultName=default_name, Platform=platform, Token=token, ChildChannelOids=[child_channel_oid])
 
         if outcome.data_found:

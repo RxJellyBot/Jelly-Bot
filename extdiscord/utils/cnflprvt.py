@@ -1,0 +1,43 @@
+from typing import Optional
+
+from discord import Guild, Status
+
+__all__ = ["initialize", "prioritized_bot_exists"]
+
+print("Discord Bot Conflict Preventer is active. "
+      "Disable this by deleting the usage of `log_bot_presence` and `prioritized_bot_exists` in `extdiscord.core` "
+      "if you forked the code repository.")
+
+LOCAL_BOT_ID = 623262302510252032
+BETA_BOT_ID = 621537611026137118
+STABLE_BOT_ID = 621539717841944587
+
+
+id_list_checked = False
+
+id_to_check = [LOCAL_BOT_ID, BETA_BOT_ID, STABLE_BOT_ID]
+
+
+def prioritized_bot_exists(dc_guild: Optional[Guild]):
+    if not id_list_checked:
+        print("Discord Bot Conflict Preventer not initialized. Did you execute `initialize()` once?")
+        return False
+
+    if dc_guild is not None:
+        for id_ in id_to_check:
+            bot = dc_guild.get_member(id_)
+            if bot and bot.status == Status.online:
+                return True
+
+    return False
+
+
+def initialize(id_: int):
+    global id_to_check, id_list_checked
+
+    try:
+        id_to_check = id_to_check[:id_to_check.index(id_)]
+    except ValueError:
+        print(f"ID {id_} is not in the bot ID list.")
+
+    id_list_checked = True

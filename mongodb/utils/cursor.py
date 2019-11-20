@@ -1,6 +1,7 @@
-class CheckableCursor:
-    def __init__(self, cursor, parse_cls=None):
+class CursorWithCount:
+    def __init__(self, cursor, count, parse_cls=None):
         self._cursor = cursor
+        self._count = count
         self._parse_cls = parse_cls
 
     def __iter__(self):
@@ -14,4 +15,4 @@ class CheckableCursor:
 
     @property
     def empty(self):
-        return self._cursor.count() == 0
+        return self._count == 0

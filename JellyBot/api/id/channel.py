@@ -1,6 +1,6 @@
 from JellyBot.api.static import param
 from JellyBot.api.responses import (
-    ChannelDataQueryResponse, ChannelIssueRegisterTokenResponse, ChannelNameChangeResponse
+    ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse
 )
 from JellyBot.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
 from JellyBot.components.views import APIJsonResponseView
@@ -17,9 +17,9 @@ class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPara
         return {param.DataQuery.Channel.PLATFORM, param.DataQuery.Channel.CHANNEL_TOKEN}
 
 
-class ChannelIssueRegistrationTokenView(
+class ChannelIssueRegistrationExecodeView(
         CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    post_response_class = ChannelIssueRegisterTokenResponse
+    post_response_class = ChannelIssueRegisterExecodeResponse
 
     def get_api_action(self):
         return APICommand.MG_CHANNEL_ISSUE_REG

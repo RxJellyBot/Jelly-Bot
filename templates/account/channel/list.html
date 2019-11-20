@@ -16,23 +16,24 @@
 
         <hr>
 
-        <p>
-        <h5>{% trans "Bot accessible channels" %}</h5>
-        <small>{% trans "Data stored in the Jelly Bot indicates that it can access to these channels." %}</small>
-        </p>
+        <div class="mb-3">
+            <h5>{% trans "Bot accessible channels" %}</h5>
+            <small>{% trans "Data stored in the Jelly Bot indicates that it can access to these channels." %}</small>
+        </div>
 
         {% include "account/channel/list_table.html" with conn_list=conn_access_ok %}
 
         <hr>
 
-        <p>
-        <h5>{% trans "Bot inaccessible channels" %}&nbsp;
-            <a href="#inaccessibleChannel" class="btn btn-outline-primary" data-toggle="collapse" aria-expanded="false">
-                {% trans "Show / Hide inaccessible channels" %}
-            </a>
-        </h5>
-        <small>{% trans "Jelly Bot marked these channels inaccessible by some event happened in the past." %}</small>
-        </p>
+        <div class="mb-3">
+            <h5>{% trans "Bot inaccessible channels" %}&nbsp;
+                <a href="#inaccessibleChannel" class="btn btn-outline-primary" data-toggle="collapse"
+                   aria-expanded="false">
+                    {% trans "Show / Hide inaccessible channels" %}
+                </a>
+            </h5>
+            <small>{% trans "Jelly Bot marked these channels inaccessible by some event happened in the past." %}</small>
+        </div>
 
         <div class="collapse" id="inaccessibleChannel">
             {% include "account/channel/list_table.html" with conn_list=conn_access_no %}

@@ -14,7 +14,7 @@ function onSignInHandle(idToken, defaultRedirectUrl) {
         if (xhr.responseText === "PASS") {
             window.location.replace(getRedirectUrl(defaultRedirectUrl));
         } else {
-            $("div#msg").removeClass("d-none").text(" " + xhr.responseText);
+            generateAlert("danger", xhr.responseText);
         }
     };
     // noinspection JSUnresolvedFunction, JSUnresolvedVariable

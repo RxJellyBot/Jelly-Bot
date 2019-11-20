@@ -34,7 +34,11 @@
                         <div class="card-text h2">
                             <div class="row justify-content-lg-center">
                                 <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
-                                    {{ ch_name }}
+                                    {% if ch_name %}
+                                        {{ ch_name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

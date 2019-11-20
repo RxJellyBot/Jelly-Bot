@@ -3,14 +3,14 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 
 
-class TokenAction(FlagDoubleEnum):
+class Execode(FlagDoubleEnum):
     """
     1xx - Identity Management:
         10x - Register Identity:
             101: Channel Membership
 
         19x - Integrates Identity:
-            191: Integrate user identity
+            191: Integrate user data
 
     2xx - Auto Reply:
             201: Add
@@ -20,16 +20,16 @@ class TokenAction(FlagDoubleEnum):
     """
     @classmethod
     def default(cls):
-        return TokenAction.UNKNOWN
+        return Execode.UNKNOWN
 
-    UNKNOWN = -1, _("Unknown"), _("Unknown Token Action.")
+    UNKNOWN = -1, _("Unknown"), _("Unknown Execode.")
 
     REGISTER_CHANNEL = \
         101, _("Register: Channel Membership"), \
         _("Get the membership of a channel.")
-    INTEGRATE_USER_IDENTITY = \
-        191, _("Integration: User Identity"), \
-        _("Integrate user identity.")
+    INTEGRATE_USER_DATA = \
+        191, _("Integration: User Data"), \
+        _("Integrate user data.")
     AR_ADD = \
         201, _("Auto-Reply: Add"), \
         _("Register an Auto-Reply module.")
@@ -38,17 +38,17 @@ class TokenAction(FlagDoubleEnum):
         _("Preserved for testing purpose.")
 
 
-class TokenActionCollationFailedReason(FlagDoubleEnum):
+class ExecodeCollationFailedReason(FlagDoubleEnum):
     @classmethod
     def default(cls):
-        return TokenActionCollationFailedReason.MISC
+        return ExecodeCollationFailedReason.MISC
 
     MISC = -1, _("Miscellaneous"), _("Miscellaneous collation error occurred.")
 
     EMPTY_CONTENT = 101, _("Empty Content"), _("The content is empty.")
 
 
-class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
+class ExecodeCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     """
     # SUCCESS
 
@@ -78,7 +78,7 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     """
     @classmethod
     def default(cls):
-        return TokenActionCompletionOutcome.X_NOT_EXECUTED
+        return ExecodeCompletionOutcome.X_NOT_EXECUTED
 
     O_OK = \
         -1, _("O: OK"), \
@@ -113,4 +113,4 @@ class TokenActionCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
 
     X_NOT_EXECUTED = \
         901, _("X: Process - Not executed"), \
-        _("Token action completion not executed.")
+        _("Execode completion not executed.")

@@ -17,7 +17,7 @@ from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
-from mongodb.utils import CheckableCursor, case_insensitive_collation
+from mongodb.utils import CursorWithCount, case_insensitive_collation
 from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
@@ -33,32 +33,51 @@ class AutoReplyModuleManager(BaseCollection):
     def __init__(self):
         super().__init__()
         self.create_index(
-            [(AutoReplyModuleModel.KeywordOid.key, 1), (AutoReplyModuleModel.ResponseOids.key, 1)],
+            [(AutoReplyModuleModel.KeywordOid.key, 1),
+             (AutoReplyModuleModel.ResponseOids.key, 1),
+             (AutoReplyModuleModel.ChannelId.key, 1)],
             name="Auto Reply Module Identity", unique=True)
 
-    def add_conn(
+    @staticmethod
+    def has_access_to_pinned(channel_oid: ObjectId, user_oid: ObjectId):
+        perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
+        return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
+
+    def add_conn_complete(
             self,
             kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, creator_oid))
-        if pinned and PermissionCategory.AR_ACCESS_PINNED_MODULE not in perms:
+        access_to_pinned = AutoReplyModuleManager.has_access_to_pinned(channel_oid, creator_oid)
+
+        # Terminate if someone without permission wants to create a pinned model
+        if pinned and not access_to_pinned:
             return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION, None, None)
-        else:
-            model, outcome, ex, insert_result = \
-                self.insert_one_data(
-                    AutoReplyModuleModel,
-                    KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
-                    Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelIds={str(channel_oid): True}
-                )
 
-            if outcome == WriteOutcome.O_DATA_EXISTS:
-                self.append_channel(model.keyword_oid, model.response_oids, channel_oid)
-                self.update_many(
-                    {AutoReplyModuleModel.Id.key: {"$ne": model.id}},
-                    {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": False}})
+        # Terminate if someone cannot access pinned module but attempt to overwrite the existing one
+        if not access_to_pinned and self.count_documents(
+                {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.Pinned.key: True}) > 0:
+            return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
 
-            return AutoReplyModuleAddResult(outcome, model, ex)
+        model, outcome, ex = \
+            self.insert_one_data(
+                KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
+                Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelId=channel_oid
+            )
+
+        # Set other module with the same keyword to be inactive
+        filter_ = {
+            AutoReplyModuleModel.Id.key: {"$ne": model.id},
+            AutoReplyModuleModel.KeywordOid.key: kw_oid,
+            AutoReplyModuleModel.ChannelId.key: channel_oid,
+            AutoReplyModuleModel.Active.key: True
+        }
+
+        self.update_many(
+            filter_,
+            {"$set": {f"{AutoReplyModuleModel.Active.key}": False}})
+
+        return AutoReplyModuleAddResult(outcome, model, ex)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         model.clear_oid()
@@ -66,17 +85,39 @@ class AutoReplyModuleManager(BaseCollection):
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
-    def append_channel(self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], channel_oid: ObjectId) -> WriteOutcome:
-        return self.update_one_outcome(
-            {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ResponseOids.key: rep_oids},
-            {"$set": {f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True}})
+    def module_mark_inactive(self, kw_oid: ObjectId, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+        access_to_pinned = AutoReplyModuleManager.has_access_to_pinned(channel_oid, remover_oid)
+
+        filter_ = {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.ChannelId.key: channel_oid}
+
+        if not access_to_pinned:
+            filter_[AutoReplyModuleModel.Pinned.key] = False
+
+        ret = self.update_one_outcome(
+            filter_,
+            {"$set": {
+                AutoReplyModuleModel.Active.key: False,
+                AutoReplyModuleModel.RemovedAt.key: datetime.now(tz=timezone.utc),
+                AutoReplyModuleModel.RemoverOid.key: remover_oid
+            }}
+        )
+
+        if ret == WriteOutcome.X_NOT_FOUND:
+            # If the `Pinned` property becomes True then something found,
+            # then it must because of the insufficient permission. Otherwise, it's really not found
+            filter_[AutoReplyModuleModel.Pinned.key] = True
+            if self.count_documents(filter_) > 0:
+                return WriteOutcome.X_INSUFFICIENT_PERMISSION
+
+        return ret
 
     @param_type_ensure
     def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
         ret: Optional[AutoReplyModuleModel] = self.find_one_casted(
             {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
-             f"{AutoReplyModuleModel.ChannelIds.key}.{str(channel_oid)}": True},
+             AutoReplyModuleModel.ChannelId.key: channel_oid,
+             AutoReplyModuleModel.Active.key: True},
             sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
             collation=case_insensitive_collation if case_insensitive else None)
 
@@ -111,8 +152,8 @@ class AutoReplyModuleTagManager(BaseCollection):
         if tag_data:
             outcome = GetOutcome.O_CACHE_DB
         else:
-            model, outcome, ex, insert_result = \
-                self.insert_one_data(AutoReplyModuleTagModel, Name=name, Color=color)
+            model, outcome, ex = \
+                self.insert_one_data(Name=name, Color=color)
 
             if outcome.is_success:
                 tag_data = model
@@ -122,14 +163,14 @@ class AutoReplyModuleTagManager(BaseCollection):
 
         return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
 
-    def search_tags(self, tag_keyword: str) -> CheckableCursor:
+    def search_tags(self, tag_keyword: str) -> CursorWithCount:
         """
         Accepts a keyword to search. Case-insensitive.
 
         :param tag_keyword: Can be regex.
         """
-        return self.find_checkable_cursor(
-            {"name": {"$regex": tag_keyword, "$options": "i"}},
+        return self.find_cursor_with_count(
+            {AutoReplyModuleTagModel.Name.key: {"$regex": tag_keyword, "$options": "i"}},
             sort=[(OID_KEY, pymongo.DESCENDING)],
             parse_cls=AutoReplyModuleTagModel)
 
@@ -143,19 +184,21 @@ class AutoReplyManager:
         self._tag = AutoReplyModuleTagManager()
 
     def _get_tags_pop_score_(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
-            -> CheckableCursor:
+            -> CursorWithCount:
         # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
         # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
 
         pipeline = []
+        filter_ = {
+            AutoReplyModuleModel.TagIds.key: {"$in": [tag_data.id for tag_data in self._tag.search_tags(filter_word)]}
+        }
 
         if filter_word:
-            pipeline.append({"$match": {
-                "$or": [{OID_KEY: tag_data.id for tag_data in self._tag.search_tags(filter_word)}]}})
+            pipeline.append({"$match": filter_})
 
         pipeline.append({"$unwind": "$" + AutoReplyModuleModel.TagIds.key})
         pipeline.append({"$group": {
-            "_id": "$" + AutoReplyModuleModel.TagIds.key,
+            OID_KEY: "$" + AutoReplyModuleModel.TagIds.key,
             AutoReplyTagPopularityDataModel.WeightedAvgTimeDiff.key: {
                 "$avg": {
                     "$divide": [
@@ -211,23 +254,30 @@ class AutoReplyManager:
         }})
         pipeline.append({"$limit": count})
 
-        return CheckableCursor(self._mod.aggregate(pipeline), parse_cls=AutoReplyTagPopularityDataModel)
+        # Get the count of the result
+        count_doc = min(count, self._mod.count_documents(filter_ if filter_word else {}))
+
+        return CursorWithCount(self._mod.aggregate(pipeline), count_doc, parse_cls=AutoReplyTagPopularityDataModel)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         return self._mod.add_conn_by_model(model)
 
-    def add_conn(
+    def add_conn_complete(
             self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
             pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        return self._mod.add_conn(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids, cooldown_sec)
+        return self._mod.add_conn_complete(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids,
+                                           cooldown_sec)
+
+    def del_conn(self, kw_oid: ObjectId, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+        return self._mod.module_mark_inactive(kw_oid, channel_oid, remover_oid)
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
             channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
-                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPRESPONSE_MODELONSE>, <BYPASS_MULTILINE>)...]
+                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None

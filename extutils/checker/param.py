@@ -24,7 +24,7 @@ class BaseDataTypeConverter(ABC):
 
         if type_annt is not Parameter.empty \
                 and type_annt not in cls.valid_data_types + cls._ignore\
-                and type_annt.__origin__ is not Union:
+                and not (hasattr(type_annt, "__origin__") and type_annt.__origin__ is Union):
             return cls.on_type_invalid(data, type_annt)
 
         try:
@@ -72,7 +72,7 @@ class BaseDataTypeConverter(ABC):
 
 
 class GeneralDataTypeConverter(BaseDataTypeConverter):
-    valid_data_types = [int, str, bool, type, ObjectId]
+    valid_data_types = [int, str, bool, type, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):

@@ -3,10 +3,9 @@ from typing import Optional, Union
 import threading
 
 from discord import (
-    Client, Member, User, Guild,
-    Activity, ActivityType, ChannelType,
-    GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel
-)
+    Client, Member, User, Guild, ChannelType,
+    GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel,
+    Activity, ActivityType)
 
 from extdiscord.utils import channel_full_repr
 from extutils.checker import param_type_ensure
@@ -14,11 +13,11 @@ from extutils.emailutils import MailSender
 from flags import Platform
 from extdiscord import handle_discord_main
 from extdiscord.logger import DISCORD
-from JellyBot.components.utils import load_server
 from mongodb.factory import ChannelManager, ChannelCollectionManager
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
+from .utils.cnflprvt import prioritized_bot_exists, initialize
 
 __all__ = ["run_server", "_inst"]
 
@@ -27,15 +26,23 @@ class DiscordClient(Client):
     # Events: https://discordpy.readthedocs.io/en/latest/api.html#event-reference
 
     async def on_ready(self):
-        DISCORD.logger.info(f"Logged on as {self.user}.")
-        # Load server for possible reverse() call
-        load_server()
+        from msghandle.botcmd.command import cmd_help
 
-        await self.change_presence(activity=Activity(name="8===D", type=ActivityType.playing))
+        DISCORD.logger.info(f"Logged on as {self.user}.")
+
+        # Disabled as the DiscordBot is started on the Django server
+        #
+        # # Load server for possible reverse() call
+        # from JellyBot.components.utils import load_server
+        # load_server()
+
+        initialize(self.user.id)
+
+        await self.change_presence(activity=Activity(name=cmd_help.get_usage(), type=ActivityType.watching))
 
     async def on_message(self, message):
         # Prevent self reading and bot resonate
-        if message.author == self.user or message.author.bot:
+        if message.author == self.user or message.author.bot or prioritized_bot_exists(message.guild):
             return
 
         await handle_discord_main(

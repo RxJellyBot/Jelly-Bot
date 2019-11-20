@@ -45,7 +45,7 @@ class AutoReply:
 
 class Database:
     StatisticsExpirySeconds = 15811200  # 183 Days
-    TokenActionExpirySeconds = 86400  # 24 Hrs
+    ExecodeExpirySeconds = 86400  # 24 Hrs
     CacheExpirySeconds = 172800  # 2 Days
     ExtraContentExpirySeconds = 2073600  # 30 Days
     BulkWriteCount = 300
@@ -61,6 +61,9 @@ class Database:
         TimeCoeffA = 2 * TimeDiffIntersectHr
         TimeCoeffB = -1 / TimeFunctionCoeff
         AppearanceCoeffA = 1 / math.pow(AppearanceIntersect, AppearanceFunctionCoeff - 1)
+
+    class MessageStats:
+        MaxContentCharacter = 500
 
 
 class DataQuery:
@@ -78,10 +81,25 @@ class Email:
     DefaultPrefix = "Jelly BOT - "
 
 
-class TokenAction:
-    ChannelRegisterTokenCooldownSeconds = 60
+class ExecodeManager:
+    ChannelRegisterExecodeCooldownSeconds = 60
 
 
 class Bot:
     Prefix = "/"
     Splittor = " ."
+
+    # DEPRECATE: Bot Command - Bot Prefix & Splittor
+    OldPrefix = "JC\n"
+    OldSplittor = "\n"
+
+    CaseInsensitive = True
+    CaseInsensitivePrefix = True
+
+    class AutoReply:
+        DefaultPinned = False
+        DefaultPrivate = False
+        DefaultTags = []
+        DefaultCooldownSecs = 0
+
+        MaxContentResultLength = 100

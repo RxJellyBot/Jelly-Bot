@@ -5,8 +5,20 @@
 
 {% block content %}
     <div class="container">
-        <div class="row mb-3">
+        <div class="row">
             <h3 class="text-primary">{% trans "Bot Commands List" %}</h3>
+        </div>
+        <div class="row mb-3">
+            {% if case_insensitive %}
+                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
+            {% endif %}
+            {% if case_insensitive_prefix %}
+                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
+            {% endif %}
         </div>
 
         <div class="row">
@@ -15,17 +27,18 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title mb-3">
-                                <code class="bg-light border border-light p-1 rounded">{{ cmd_node.main_cmd_code }}</code>&nbsp;-&nbsp;{{ cmd_node.name }}</h5>
+                                <code class="bg-light border border-light p-1 rounded">{{ cmd_node.main_cmd_code }}</code>&nbsp;-&nbsp;{{ cmd_node.name }}
+                            </h5>
                             {% if cmd_node.aliases %}
                                 <h6 class="card-subtitle mb-2 text-muted">
                                     {% trans "Aliases: " %}
                                     <code class="bg-light border border-light p-1 rounded">
-                                    {{ cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
-                                </code>
+                                        {{ cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
+                                    </code>
                                 </h6>
                             {% endif %}
-                            <p class="card-text">{{ cmd_node.description }}</p>
-                            <a href="{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}"
+                            <p class="card-text">{{ cmd_node.brief_description|markdown }}</p>
+                            <a href="{% if is_old %}{% url "page.doc.botcmd.cmd.old" code=cmd_node.main_cmd_code %}{% else %}{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}{% endif %}"
                                class="card-link">{% trans "Command Usage" %}</a>
                         </div>
                     </div>
