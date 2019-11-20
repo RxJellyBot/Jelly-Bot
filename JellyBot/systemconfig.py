@@ -45,7 +45,7 @@ class AutoReply:
 
 class Database:
     StatisticsExpirySeconds = 15811200  # 183 Days
-    TokenActionExpirySeconds = 86400  # 24 Hrs
+    ExecodeExpirySeconds = 86400  # 24 Hrs
     CacheExpirySeconds = 172800  # 2 Days
     ExtraContentExpirySeconds = 2073600  # 30 Days
     BulkWriteCount = 300
@@ -81,8 +81,8 @@ class Email:
     DefaultPrefix = "Jelly BOT - "
 
 
-class TokenAction:
-    ChannelRegisterTokenCooldownSeconds = 60
+class ExecodeManager:
+    ChannelRegisterExecodeCooldownSeconds = 60
 
 
 class Bot:

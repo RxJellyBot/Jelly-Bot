@@ -2,9 +2,10 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Union, Callable, Tuple
 from inspect import signature
 
+from django.utils.translation import gettext_lazy as _
+
 from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
-from msghandle.translation import gettext as _
 from mongodb.factory import BotFeatureUsageDataManager
 from extutils.checker import param_type_ensure
 from extutils.logger import LoggerSkeleton

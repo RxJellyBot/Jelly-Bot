@@ -1,9 +1,9 @@
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from flags import BotFeature
 from mongodb.helper import MessageStatsDataProcessor
 from msghandle.models import TextMessageEventObject
-from msghandle.translation import gettext as _
 from JellyBot.systemconfig import HostUrl
 
 from ._base_ import CommandNode

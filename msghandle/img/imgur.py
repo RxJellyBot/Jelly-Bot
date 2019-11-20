@@ -1,5 +1,6 @@
-from gettext import gettext as _
 from typing import List
+
+from django.utils.translation import gettext_lazy as _
 
 from extutils import exec_timing_result
 from extutils.imgproc import ImgurClient
@@ -17,12 +18,12 @@ def process_imgur_upload(e: ImageMessageEventObject) -> List[HandledMessageEvent
 
         return [
             HandledMessageEventText(
-                content=_(f"Uploaded to imgur.\n\n"
-                          f"Time consumed: *{exec_result.execution_ms:.2f} ms*\n"
-                          f"Link to the image below."),
+                content=_("Uploaded to imgur.\n\n"
+                          "Time consumed: *{:.2f} ms*\n"
+                          "Link to the image below.").format(exec_result.execution_ms),
                 bypass_multiline_check=True),
             HandledMessageEventText(
-                content=_(upload_result.link),
+                content=upload_result.link,
                 bypass_multiline_check=True)
         ]
     else:

@@ -10,6 +10,7 @@ class BotFeature(FlagDoubleEnum):
             100 - Auto Reply
                 1001 - Add
                 1002 - Delete
+                1003 - Add (Execode)
                 1009 - Respond
 
         11 - Sub
@@ -40,6 +41,8 @@ class BotFeature(FlagDoubleEnum):
         1001, _("Text / Auto Reply / Add"), _("Register an auto-reply module.")
     TXT_AR_DEL = \
         1002, _("Text / Auto Reply / Delete"), _("Delete an auto-reply module.")
+    TXT_AR_ADD_EXECODE = \
+        1003, _("Text / Auto Reply / Add (Execode)"), _("Register an auto-reply module using Execode.")
     TXT_AR_RESPOND = \
         1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
 
@@ -56,7 +59,7 @@ class BotFeature(FlagDoubleEnum):
         1111, _("Text / Transform / Newline"), _("Replace the real newline character to be the escaped character \\n.")
 
     TXT_FN_UDI_START = \
-        1901, _("Text / User Data Integration / Start"), _("Issue a token for user data integration.")
+        1901, _("Text / User Data Integration / Start"), _("Issue an Execode for user data integration.")
     TXT_FN_CALCULATOR = \
         1902, _("Text / Calculator"), _("Auto-detected calculator.")
     TXT_FN_ERROR_TEST = \

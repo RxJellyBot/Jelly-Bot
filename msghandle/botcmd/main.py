@@ -1,7 +1,7 @@
-from gettext import gettext as _
 from typing import List
 
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import Bot, HostUrl
 from msghandle.models import TextMessageEventObject, HandledMessageEventText

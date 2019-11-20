@@ -6,7 +6,7 @@ from ._base import Model, ModelDefaultValueExt
 from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import (
-    AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleTokenActionModel,
+    AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleExecodeModel,
     AutoReplyTagPopularityDataModel
 )
 # noinspection PyUnresolvedReferences
@@ -16,7 +16,7 @@ from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 # noinspection PyUnresolvedReferences
 from .stats import APIStatisticModel, MessageRecordModel, BotFeatureUsageModel
 # noinspection PyUnresolvedReferences
-from .tkact import TokenActionModel
+from .execode import ExecodeEntryModel
 # noinspection PyUnresolvedReferences
 from .prof import (
     ChannelProfileModel, ChannelProfileConnectionModel,

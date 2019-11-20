@@ -5,7 +5,7 @@ from .perm import PermissionCategory, PermissionCategoryDefault
 # noinspection PyUnresolvedReferences
 from .platforms import Platform
 # noinspection PyUnresolvedReferences
-from .tkact import TokenAction, TokenActionCollationFailedReason, TokenActionCompletionOutcome
+from .execode import Execode, ExecodeCollationFailedReason, ExecodeCompletionOutcome
 # noinspection PyUnresolvedReferences
 from .apiact import APICommand
 # noinspection PyUnresolvedReferences

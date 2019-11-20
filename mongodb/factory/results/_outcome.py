@@ -36,6 +36,7 @@ class WriteOutcome(BaseOutcome):
     1xx - Problems related to the preparation processes
         101 - Insufficient Permission
         102 - Channel type identification failed
+        103 - (Auto Reply) Pinned module existed
         104 - Registering Channel
         105 - Registering OnPlatform User ID
         106 - Registering API User ID
@@ -91,6 +92,10 @@ class WriteOutcome(BaseOutcome):
     X_CHANNEL_TYPE_UNKNOWN = \
         102, _("X: Channel Type Unidentifiable"), \
         _("The channel type is unidentifiable using the provided token and platform.")
+    X_PINNED_CONTENT_EXISTED = \
+        103, _("X: Pinned Module Existed"), \
+        _("A pinned module has already existed. "
+          "You have to have the permission of accessing the pinned module to overwrite.")
     X_ON_REG_CHANNEL = \
         104, _("X: on Registering Channel"), \
         _("The insertion was failed while registering the identity of channel.")
@@ -190,8 +195,8 @@ class GetOutcome(BaseOutcome):
             301 - Channel not found
             302 - Error during config creation
             303 - Error during default profile creation
-        31x - Token Action
-            311 - Incorrect token action type
+        31x - Execode
+            311 - Incorrect Execode type
 
     9xx - Problems related to execution
         901 - Not executed
@@ -234,9 +239,9 @@ class GetOutcome(BaseOutcome):
     X_DEFAULT_PROFILE_ERROR = \
         303, _("X: Default Profile Error"), \
         _("An error occurred when creating a default profile.")
-    X_TOKENACTION_TYPE_INCORRECT = \
-        311, _("X: Incorrect Token Action type"), \
-        _("The token action type of the given token doesn't match the resired token action type.")
+    X_EXECODE_TYPE_INCORRECT = \
+        311, _("X: Incorrect Execode type"), \
+        _("The type of the given Execode doesn't match the desired one.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The acquiring process had not been executed.")
@@ -252,13 +257,13 @@ class OperationOutcome(BaseOutcome):
 
     # FAILED
 
-    1xx - Problems related to Token Action
-        101 - Token Not Found
+    1xx - Problems related to Execode
+        101 - Execode Not Found
         102 - Keys Lacking
         103 - Completion Failed
         104 - Completion Process not Implemented
         105 - Completion Error
-        106 - Empty Token
+        106 - Empty Execode
         107 - Collation Error
         108 - Type Mismatch
 
@@ -290,12 +295,12 @@ class OperationOutcome(BaseOutcome):
     O_COMPLETED = \
         -1, _("O: Completed"), \
         _("The operation was successfully completed.")
-    X_TOKEN_NOT_FOUND = \
-        101, _("X: Token Not Found"), \
-        _("No enqueued token action found using the specified token.")
+    X_EXECODE_NOT_FOUND = \
+        101, _("X: Execode Not Found"), \
+        _("No enqueued Execode found.")
     X_KEYS_LACKING = \
         102, _("X: Keys Lacking"), \
-        _("There are keys lacking so that the token action cannot be completed.")
+        _("There are keys lacking so that the Execode cannot be completed.")
     X_COMPLETION_FAILED = \
         103, _("X: Completion Failed"), \
         _("The action completion was failed.")
@@ -305,15 +310,15 @@ class OperationOutcome(BaseOutcome):
     X_COMPLETION_ERROR = \
         105, _("X: Completion Error"), \
         _("An error occurred during action completion process.")
-    X_TOKEN_EMPTY = \
-        106, _("X: Empty Token"), \
-        _("The token is empty.")
+    X_EXECODE_EMPTY = \
+        106, _("X: Empty Execode"), \
+        _("The Execode is empty.")
     X_COLLATION_ERROR = \
         107, _("X: Collation Error"), \
         _("An error occurred during parameter collation process.")
-    X_TOKEN_TYPE_MISMATCH = \
-        108, _("X: Token Action type Mismatch"), \
-        _("The action type of the token doesn't match the desired token action type.")
+    X_EXECODE_TYPE_MISMATCH = \
+        108, _("X: Execode type Mismatch"), \
+        _("The type of the Execode doesn't match the desired one.")
     X_CHANNEL_NOT_FOUND = \
         201, _("X: Channel Not Found"), \
         _("Channel was not found using the given Channel ID.")
@@ -322,10 +327,10 @@ class OperationOutcome(BaseOutcome):
         _("Source user data is equal to the destination user data.")
     X_SRC_DATA_NOT_FOUND = \
         302, _("X: Source Data Not Found"), \
-        _("Source user data data not found.")
+        _("Source user data not found.")
     X_DEST_DATA_NOT_FOUND = \
         303, _("X: Destination Data Not Found"), \
-        _("Destination user data data not found.")
+        _("Destination user data not found.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")

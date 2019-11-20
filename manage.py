@@ -2,8 +2,6 @@ import os
 import sys
 
 from JellyBot.systemconfig import System
-from extutils import activate_ping_spam
-from extdiscord import run_server
 
 
 def django_main():
@@ -20,10 +18,14 @@ def django_main():
 
 
 def discord_main():
+    from extdiscord import run_server
+
     run_server()
 
 
 def ping_spam():
+    from extutils import activate_ping_spam
+
     activate_ping_spam(System.PingSpamWaitSeconds)
 
 

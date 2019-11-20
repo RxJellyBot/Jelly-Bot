@@ -14,7 +14,6 @@ from flags import Platform
 from extdiscord import handle_discord_main
 from extdiscord.logger import DISCORD
 from mongodb.factory import ChannelManager, ChannelCollectionManager
-from msghandle.botcmd.command import cmd_help
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
@@ -27,6 +26,8 @@ class DiscordClient(Client):
     # Events: https://discordpy.readthedocs.io/en/latest/api.html#event-reference
 
     async def on_ready(self):
+        from msghandle.botcmd.command import cmd_help
+
         DISCORD.logger.info(f"Logged on as {self.user}.")
 
         # Disabled as the DiscordBot is started on the Django server

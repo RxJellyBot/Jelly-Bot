@@ -13,12 +13,12 @@ class APICommand(FlagSingleEnum):
         12x - Tag controls:
             121: Query Tag Popularity
 
-    2xx - Token Action:
+    2xx - Execode:
         20x - Auto reply:
             201: Complete Addition
 
         29x - Miscellaneous
-            291: List all token actions
+            291: List all Execode
             299: Complete Action
 
     3xx - Data Query:
@@ -28,7 +28,7 @@ class APICommand(FlagSingleEnum):
 
     4xx - Management
         40x - Channel
-            401: Issue Channel Registration Token
+            401: Issue Channel Registration Execode
             403: Change Channel Name
 
     5xx - Special Services
@@ -46,14 +46,14 @@ class APICommand(FlagSingleEnum):
     AR_CONTENT_VALIDATE = 111, _("Auto-Reply - Content Validation")
     AR_TAG_POP = 121, _("Auto-Reply - Tag Popularity")
 
-    TOKEN_AR_ADD = 201, _("Token Action - Auto-Reply Addition")
-    TOKEN_LIST = 291, _("Token Action - List All")
-    TOKEN_COMPLETE = 299, _("Token Action - Complete Action")
+    EXECODE_AR_ADD = 201, _("Execode - Auto-Reply Addition")
+    EXECODE_LIST = 291, _("Execode - List All")
+    EXECODE_COMPLETE = 299, _("Execode - Complete Action")
 
     DATA_CHANNEL = 301, _("Data Query - Channel")
     DATA_PERMISSION = 302, _("Data Query - Permission")
 
-    MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Token")
+    MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Execode")
     MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")
 
     SERV_SHORTEN_URL = 501, _("Services - Shorten URL")

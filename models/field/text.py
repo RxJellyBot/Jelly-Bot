@@ -38,8 +38,12 @@ class UrlField(BaseField):
         return str
 
     def is_value_valid(self, value) -> bool:
+        return UrlField.is_valid_url(value)
+
+    @staticmethod
+    def is_valid_url(url) -> bool:
         try:
-            URLValidator()(value)
+            URLValidator()(url)
         except ValidationError:
             return False
 

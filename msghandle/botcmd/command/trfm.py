@@ -1,5 +1,6 @@
+from django.utils.translation import gettext_lazy as _
+
 from flags import BotFeature
-from msghandle.translation import gettext as _
 from msghandle.models import TextMessageEventObject
 
 from ._base_ import CommandNode

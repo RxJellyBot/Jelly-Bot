@@ -181,7 +181,7 @@ function formSubmitHandle() {
             showInputFailed(true);
             submitBtnDisable(false);
         } else {
-            if (regId === "arToken" || regId === "arChannel" || regId === "arMember") {
+            if (regId === "arExecode" || regId === "arChannel" || regId === "arMember") {
                 submitData(onSubmitCallback);
             } else {
                 console.error(`The registration method ${regId} is not handled.`);
@@ -218,7 +218,7 @@ function onSubmitCallback(response) {
     console.log(response);
 
     if (response.success) {
-        displayToken(response);
+        displayExecode(response);
 
         resetForm();
         showSubmissionSucceed(true);

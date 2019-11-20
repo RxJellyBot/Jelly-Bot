@@ -18,7 +18,7 @@ from .stats import (
     _inst3 as BotFeatureUsageDataManager
 )
 # noinspection PyPep8Naming
-from .tkact import _inst as TokenActionManager
+from .execode import _inst as ExecodeManager
 # noinspection PyPep8Naming
 from .exctnt import _inst as ExtraContentManager
 # noinspection PyPep8Naming
