@@ -47,7 +47,7 @@ class BotFeature(FlagDoubleEnum):
         1004, _("Text / Auto Reply / List (Usable)"), _("List all the usable auto-reply modules.")
     TXT_AR_LIST_KEYWORD = \
         1005, _("Text / Auto Reply / List (Keyword)"), \
-        _("List all the usable auto-reply modules with the provided keyword.")
+        _("List all the usable auto-reply modules which keyword includes the provided keyword.")
     TXT_AR_RESPOND = \
         1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
 
