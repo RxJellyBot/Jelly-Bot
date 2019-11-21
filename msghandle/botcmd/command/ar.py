@@ -178,6 +178,8 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
             "Failed to register the auto-reply module. Code: `{}`"
         ).format(add_result.outcome))]
 
+    ExecodeManager.remove_execode(execode)
+
     return [HandledMessageEventText(content=_("Auto-reply module registered."))]
 
 
