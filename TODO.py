@@ -3,6 +3,9 @@
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
 # FIXME: Bot Feature: Random generator (Percent, items, range) - Preset Pool (somehow same as AutoReply tags)
+# FIXME: [BUG]
+#   Line Bot cannot use "/help" (attempted to dump __proxy__ type - translation
+#   Discord Bot not reflecting language change on calling "/help"
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Info: Message count and flow for each channel
 # TODO: Account Management: API Key refresh

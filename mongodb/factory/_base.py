@@ -54,18 +54,19 @@ class ControlExtensionMixin(Collection):
                 for key, order in idx_info["key"]:
                     unique_keys.append(key)
 
-        filter_ = {}
+        # DEBUG: Cannot be a normal filter as `login` will failed because the token was not the same
+        or_list = []
         for unique_key in unique_keys:
             data = model_dict.get(unique_key)
             if data is not None:
                 if isinstance(data, list):
-                    filter_[unique_key] = {"$elemMatch": {"$in": data}}
+                    or_list.append({unique_key: {"$elemMatch": {"$in": data}}})
                 elif isinstance(data, dict):
-                    filter_[unique_key] = data
+                    or_list.append({unique_key: data})
                 else:
-                    filter_[unique_key] = data
+                    or_list.append({unique_key: data})
 
-        return self.find_one(filter_)[OID_KEY]
+        return self.find_one({"$or": or_list})[OID_KEY]
 
     def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
             -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
