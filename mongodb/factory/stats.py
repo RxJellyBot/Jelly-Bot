@@ -47,7 +47,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             message_type: MessageType, message_content: Any, proc_time_ms: float) -> MessageRecordResult:
         entry, outcome, ex = self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
-            MessageContent=repr(message_content)[:Database.MessageStats.MaxContentCharacter],
+            MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
             ProcessTimeMs=proc_time_ms
         )
 

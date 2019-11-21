@@ -9,14 +9,17 @@ from mongodb.factory.results import GetOutcome, AutoReplyContentAddResult, AutoR
 from mongodb.utils import case_insensitive_collation
 
 from ._base import BaseCollection
+from ._mixin import CacheMixin
 
 DB_NAME = "ar"
 
 
-class AutoReplyContentManager(BaseCollection):
+class AutoReplyContentManager(CacheMixin, BaseCollection):
     database_name = DB_NAME
     collection_name = "ctnt"
     model_class = AutoReplyContentModel
+
+    cache_name = f"{DB_NAME}.{collection_name}"
 
     def __init__(self):
         super().__init__()
@@ -26,15 +29,32 @@ class AutoReplyContentManager(BaseCollection):
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
         entry, outcome, ex = self.insert_one_data(Content=content, ContentType=type_)
 
+        self.set_cache(entry)
+
         return AutoReplyContentAddResult(outcome, entry, ex)
 
     def _get_content_(self, content: str, type_: AutoReplyContentType, case_insensitive: bool = False):
-        return self.find_one_casted(
+        q = self.empty_query()
+        ret = self.get_cache(
+            (q[AutoReplyContentModel.Content.key] == content) & (q[AutoReplyContentModel.ContentType.key] == type_),
+            parse_cls=AutoReplyContentModel
+        )
+
+        if ret:
+            return ret
+
+        ret = self.find_one_casted(
             {AutoReplyContentModel.Content.key: content, AutoReplyContentModel.ContentType.key: type_},
             parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
 
+        if ret:
+            self.set_cache(ret)
+
+        return ret
+
     @param_type_ensure
-    def get_content(self, content: str, type_: AutoReplyContentType = None, add_on_not_found=True, case_insensitive=True) \
+    def get_content(
+            self, content: str, type_: AutoReplyContentType = None, add_on_not_found=True, case_insensitive=True) \
             -> AutoReplyContentGetResult:
         if not content:
             return AutoReplyContentGetResult(GetOutcome.X_NO_CONTENT, None)
@@ -64,7 +84,18 @@ class AutoReplyContentManager(BaseCollection):
 
     @param_type_ensure
     def get_content_by_id(self, oid: ObjectId) -> Optional[AutoReplyContentModel]:
-        return self.find_one_casted({OID_KEY: oid}, parse_cls=AutoReplyContentModel)
+        q = self.empty_query()
+        ret = self.get_cache(q[OID_KEY] == oid, parse_cls=AutoReplyContentModel)
+
+        if ret:
+            return ret
+
+        ret = self.find_one_casted({OID_KEY: oid}, parse_cls=AutoReplyContentModel)
+
+        if ret:
+            self.set_cache(ret)
+
+        return ret
 
 
 _inst = AutoReplyContentManager()

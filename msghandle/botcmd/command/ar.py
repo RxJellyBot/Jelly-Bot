@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from extutils.utils import str_reduce_length
 from extutils.emailutils import MailSender
-from flags import BotFeature, CommandScopeCollection, Execode
+from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
 from models import AutoReplyModuleExecodeModel
 from mongodb.factory import AutoReplyManager, AutoReplyContentManager, ExecodeManager
 from mongodb.factory.results import WriteOutcome
@@ -23,7 +23,7 @@ __all__ = ["cmd_main", "cmd_old_add", "cmd_old_del"]
 # ----- New
 
 cmd_main = CommandNode(
-    codes=["ar"], order_idx=0, name=_("Auto Reply"),
+    codes=["ar", "auto"], order_idx=0, name=_("Auto Reply"),
     brief_description=_("Perform operations related to the auto-reply feature."),
     description=_(
         "Perform operations related to the auto-reply feature.\n"
@@ -44,6 +44,8 @@ cmd_main = CommandNode(
 )
 cmd_add = cmd_main.new_child_node(codes=["a", "aa", "add"])
 cmd_del = cmd_main.new_child_node(codes=["d", "del"])
+cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
+
 
 # ----- Old
 
@@ -251,7 +253,9 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 @cmd_old_del.command_function(
     feature_flag=BotFeature.TXT_AR_DEL,
     arg_count=1,
-    arg_help=[_("The keyword of the module to delete.")],
+    arg_help=[
+        _("The keyword of the module to delete.")
+    ],
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def delete_auto_reply_module_old(e: TextMessageEventObject, keyword: str):
@@ -268,7 +272,8 @@ def delete_auto_reply_module_old(e: TextMessageEventObject, keyword: str):
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
-    kw_ctnt_result = AutoReplyContentManager.get_content(keyword)
+    kw_ctnt_result = AutoReplyContentManager.get_content(
+        keyword, type_=AutoReplyContentType.TEXT, add_on_not_found=False)
     if not kw_ctnt_result.success:
         return [HandledMessageEventText(
             content=_("Failed to fetch the content ID of the **keyword**.\n"
@@ -292,3 +297,19 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
                           "Code: {}\n"
                           "Visit {} to see the code explanation.").format(
                     outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+
+
+@cmd_list.command_function(
+    feature_flag=BotFeature.TXT_AR_LIST_USABLE,
+    arg_count=0,
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def list_usable_auto_reply_module(e: TextMessageEventObject):
+    conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
+
+    if not conn_list.empty:
+        return [HandledMessageEventText(
+            content=_("Usable Keywords:") + "\n" + _(", ").join([conn.keyword for conn in conn_list])
+        )]
+    else:
+        return [HandledMessageEventText(content=_("No usable auto-reply module in this channel."))]

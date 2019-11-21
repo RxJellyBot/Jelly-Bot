@@ -1,5 +1,3 @@
-import time
-
 from django.utils.translation import activate, deactivate
 
 from mongodb.factory import MessageRecordStatisticsManager, ProfileManager
@@ -11,8 +9,6 @@ from .models.pipe_out import HandledMessageEventsHolder
 
 
 def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
-    _start_ = time.time()
-
     # Ensure User existence in channel
     ProfileManager.register_new_default(e.channel_model.id, e.user_model.id)
 
@@ -43,6 +39,6 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
 
     # Record message for stats
     MessageRecordStatisticsManager.record_message(
-        e.channel_model.id, e.user_model.id, e.message_type, e.content, time.time() - _start_)
+        e.channel_model.id, e.user_model.id, e.message_type, e.content, e.constructed_time)
 
     return ret

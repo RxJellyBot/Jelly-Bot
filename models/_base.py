@@ -247,6 +247,13 @@ class Model(MutableMapping, abc.ABC):
         return cls._CacheJson[cls.__qualname__]
 
     @classmethod
+    def cast_model(cls, obj):
+        if obj is not None and cls is not None and not isinstance(obj, cls):
+            return cls(**obj, from_db=True)
+
+        return obj
+
+    @classmethod
     def json_key_to_field(cls, json_key) -> str:
         if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
             d = {v.key: fk for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}

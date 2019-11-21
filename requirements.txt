@@ -17,3 +17,4 @@ line-bot-sdk
 sympy
 discord.py
 jieba
+tinydb

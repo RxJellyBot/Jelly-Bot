@@ -77,7 +77,7 @@ class ChannelManager(BaseCollection):
         try:
             if ret:
                 outcome = OperationOutcome.O_COMPLETED
-                ret = self.cast_model(ret, parse_cls=ChannelModel)
+                ret = ChannelModel.cast_model(ret)
             else:
                 outcome = OperationOutcome.X_CHANNEL_NOT_FOUND
         except Exception as e:

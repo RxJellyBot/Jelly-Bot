@@ -132,6 +132,21 @@ class AutoReplyModuleManager(BaseCollection):
 
         return None
 
+    def get_conn_list(
+            self, channel_oid: ObjectId, keyword_oids: List[ObjectId] = None, active_only: bool = True) \
+            -> CursorWithCount:
+        filter_ = {
+            AutoReplyModuleModel.ChannelId.key: channel_oid
+        }
+
+        if keyword_oids:
+            filter_[AutoReplyModuleModel.KeywordOid.key] = {"$in": keyword_oids}
+
+        if active_only:
+            filter_[AutoReplyModuleModel.Active.key] = True
+
+        return self.find_cursor_with_count(filter_, parse_cls=AutoReplyModuleModel)
+
 
 class AutoReplyModuleTagManager(BaseCollection):
     database_name = DB_NAME
@@ -328,6 +343,10 @@ class AutoReplyManager:
 
     def tag_get_insert(self, name, color=ColorFactory.BLACK) -> AutoReplyModuleTagGetResult:
         return self._tag.get_insert(name, color)
+
+    def get_conn_list(self, channel_oid: ObjectId, keyword_oids: List[ObjectId] = None, active_only: bool = True) \
+            -> CursorWithCount:
+        return self._mod.get_conn_list(channel_oid, keyword_oids, active_only)
 
 
 _inst = AutoReplyManager()

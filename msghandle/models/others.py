@@ -5,7 +5,13 @@ from flags import ImageContentType
 
 
 @dataclass
-class ImageContent:
+class BaseContent:
+    def __str__(self):
+        return self.__repr__()
+
+
+@dataclass
+class ImageContent(BaseContent):
     content: str
     content_type: ImageContentType
     comment: Optional[str] = None
@@ -20,7 +26,7 @@ class ImageContent:
 
 
 @dataclass
-class LineStickerContent:
+class LineStickerContent(BaseContent):
     package_id: Union[int, str]
     sticker_id: Union[int, str]
 

@@ -1,9 +1,8 @@
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
-# INCOMPLETE: Bot Feature / Auto Reply: Get usable module list
 # INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
-# INCOMPLETE: Bot Feature: Random generator (Percent, items, range) - Preset Pool (somehow same as AutoReply tags)
+# FIXME: Bot Feature: Random generator (Percent, items, range) - Preset Pool (somehow same as AutoReply tags)
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Info: Message count and flow for each channel
 # TODO: Account Management: API Key refresh
@@ -18,3 +17,4 @@
 # DRAFT: Bot Feature: Anonymous message
 # DRAFT: Group Management: Join/Leave - Ping when someone join/leave - send welcome/regret message
 # DRAFT: LINE Sticker: Utils like download stickers on the website
+# TODO: Email of Jelly-Bot's new feature
