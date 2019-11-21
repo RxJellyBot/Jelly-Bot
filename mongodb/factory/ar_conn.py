@@ -21,14 +21,17 @@ from mongodb.utils import CursorWithCount, case_insensitive_collation
 from mongodb.factory import ProfileManager, AutoReplyContentManager
 
 from ._base import BaseCollection
+from ._mixin import CacheMixin
 
 DB_NAME = "ar"
 
 
-class AutoReplyModuleManager(BaseCollection):
+class AutoReplyModuleManager(CacheMixin, BaseCollection):
     database_name = DB_NAME
     collection_name = "conn"
     model_class = AutoReplyModuleModel
+
+    cache_name = f"{database_name}.{collection_name}"
 
     def __init__(self):
         super().__init__()
@@ -112,19 +115,28 @@ class AutoReplyModuleManager(BaseCollection):
         return ret
 
     @param_type_ensure
-    def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId, case_insensitive: bool = True) -> \
+    def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId) -> \
             Optional[AutoReplyModuleModel]:
-        ret: Optional[AutoReplyModuleModel] = self.find_one_casted(
-            {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
-             AutoReplyModuleModel.ChannelId.key: channel_oid,
-             AutoReplyModuleModel.Active.key: True},
-            sort=[(OID_KEY, pymongo.DESCENDING)], parse_cls=AutoReplyModuleModel,
-            collation=case_insensitive_collation if case_insensitive else None)
+        ret: Optional[AutoReplyModuleModel]
+
+        q = self.empty_query()
+        ret = self.get_cache(
+            (q[AutoReplyModuleModel.KeywordOid.key] == keyword_oid) &
+            (q[AutoReplyModuleModel.ChannelId.key] == channel_oid) &
+            (q[AutoReplyModuleModel.Active.key]),
+            parse_cls=AutoReplyModuleModel
+        )
+
+        if not ret:
+            ret = self.find_one_casted(
+                {AutoReplyModuleModel.KeywordOid.key: keyword_oid,
+                 AutoReplyModuleModel.ChannelId.key: channel_oid,
+                 AutoReplyModuleModel.Active.key: True}, parse_cls=AutoReplyModuleModel)
 
         if ret:
             now = datetime.now(tz=timezone.utc)
             if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
-                self.update_one(
+                self.update_one_async(
                     {AutoReplyModuleModel.Id.key: ret.id},
                     {"$set": {AutoReplyModuleModel.LastUsed.key: now},
                      "$inc": {AutoReplyModuleModel.CalledCount.key: 1}})
@@ -294,13 +306,17 @@ class AutoReplyManager:
         :return: Empty list (length of 0) if no corresponding response.
                 [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
+        import time
+
+        _start_ = time.time()
+
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
         resp_ctnt = []
         resp_id_miss = []
 
         if ctnt_rst.success:
-            mod = self._mod.get_conn(ctnt_rst.model.id, channel_oid, case_insensitive)
+            mod = self._mod.get_conn(ctnt_rst.model.id, channel_oid)
 
         if mod:
             resp_ids = mod.response_oids

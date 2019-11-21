@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+from threading import Thread
 from typing import Any, Optional, Union, List
 
 import pymongo
@@ -105,6 +106,10 @@ class BotFeatureUsageDataManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "bot"
     model_class = BotFeatureUsageModel
+
+    @param_type_ensure
+    def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
+        Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()
 
     @param_type_ensure
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):

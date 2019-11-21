@@ -19,7 +19,7 @@ class AutoReplyContentManager(CacheMixin, BaseCollection):
     collection_name = "ctnt"
     model_class = AutoReplyContentModel
 
-    cache_name = f"{DB_NAME}.{collection_name}"
+    cache_name = f"{database_name}.{collection_name}"
 
     def __init__(self):
         super().__init__()

@@ -1,3 +1,4 @@
+from threading import Thread
 from typing import Type, Optional, Tuple
 
 from bson.errors import InvalidDocument
@@ -119,6 +120,10 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_NOT_FOUND
 
         return outcome
+
+    def update_one_async(self, filter_, update, upsert=False, collation=None):
+        Thread(
+            target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
 
     def find_cursor_with_count(self, filter_, *args, parse_cls=None, **kwargs) -> CursorWithCount:
         return CursorWithCount(
