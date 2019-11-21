@@ -1,6 +1,6 @@
 from typing import List
 
-from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
+from msghandle.models import TextMessageEventObject, HandledMessageEvent
 from msghandle.botcmd import handle_bot_cmd_main
 
 

@@ -125,17 +125,20 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def _ensure_user_idt_(platform: Platform, token: Union[int, str], traceback=None) -> Optional[RootUserModel]:
-        result = RootUserManager.register_onplat(platform, token)
-        if not result.success:
-            MailSender.send_email_async(
-                f"Platform: {platform} / Token: {token}<hr>"
-                f"Outcome: {result.outcome}<hr>"
-                f"Conn Outcome: {result.conn_outcome}<hr>"
-                f"Identity Registration Result: {result.idt_reg_result.serialize()}<hr>"
-                f"Exception: {traceback.format_exception(None, result.exception, result.exception.__traceback__)}",
-                subject="User Registration Failed")
+        if token:
+            result = RootUserManager.register_onplat(platform, token)
+            if not result.success:
+                MailSender.send_email_async(
+                    f"Platform: {platform} / Token: {token}<hr>"
+                    f"Outcome: {result.outcome}<hr>"
+                    f"Conn Outcome: {result.conn_outcome}<hr>"
+                    f"Identity Registration Result: {result.idt_reg_result.serialize()}<hr>"
+                    f"Exception: {traceback.format_exception(None, result.exception, result.exception.__traceback__)}",
+                    subject="User Registration Failed")
 
-        return result.model
+            return result.model
+        else:
+            return None
 
     @staticmethod
     def _ensure_channel_parent_(
