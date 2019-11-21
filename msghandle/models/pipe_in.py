@@ -1,3 +1,4 @@
+import time
 from abc import ABC
 from threading import Thread
 from typing import Any, Optional, Union
@@ -20,6 +21,8 @@ class Event(ABC):
         if not sys_ctype:
             sys_ctype = SysChannelType.identify(channel_model.platform, channel_model.token)
 
+        self._construct = time.time()
+
         self.raw = raw
         self.channel_model = channel_model
         self.channel_type = sys_ctype
@@ -38,6 +41,11 @@ class Event(ABC):
             return self.raw.author.id
         else:
             return None
+
+    @property
+    def constructed_time(self) -> float:
+        """The unit of this is milliseconds(ms)."""
+        return time.time() - self._construct
 
 
 class MessageEventObject(Event, ABC):
@@ -66,6 +74,8 @@ class TextMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
             sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+        text = text.strip()
+
         super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model)
         self.text = text
 

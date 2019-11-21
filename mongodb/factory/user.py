@@ -344,7 +344,7 @@ class RootUserManager(BaseCollection):
             return_document=ReturnDocument.AFTER)
 
         if updated:
-            updated = self.cast_model(updated, parse_cls=RootUserConfigModel)
+            updated = RootUserConfigModel.cast_model(updated)
             outcome = UpdateOutcome.O_UPDATED
         else:
             outcome = UpdateOutcome.X_NOT_FOUND

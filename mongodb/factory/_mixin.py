@@ -1,5 +1,11 @@
 import secrets
+from typing import Type
 
+from tinydb import TinyDB, Query
+from tinydb.storages import MemoryStorage
+from tinydb.database import Table
+
+from models import Model
 from ._base import BaseCollection
 
 
@@ -28,3 +34,36 @@ class GenerateTokenMixin(BaseCollection):
             token = self.generate_hex_token()
 
         return token
+
+
+cache_db = TinyDB(storage=MemoryStorage)
+
+
+class CacheMixin:
+    cache_name: str = None
+    cache_table: Table = None
+
+    @classmethod
+    def get_cache_table(cls) -> Table:
+        if cls.cache_name is None:
+            raise AttributeError(f"Assign a value to `cache_name` in {cls.__qualname__}.")
+        else:
+            cls.cache_table = cache_db.table(cls.cache_name)
+
+            return cls.cache_table
+
+    @classmethod
+    def set_cache(cls, item: Model):
+        cls.get_cache_table().insert(item)
+
+    @classmethod
+    def get_cache(cls, query: Query, parse_cls: Type[Model] = None):
+        ret = cls.get_cache_table().get(query)
+        if ret:
+            return parse_cls.cast_model(ret)
+        else:
+            return None
+
+    @staticmethod
+    def empty_query():
+        return Query()

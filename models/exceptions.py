@@ -7,7 +7,7 @@ class ModelConstructionError(Exception, ABC):
 
 class InvalidModelError(ModelConstructionError):
     def __init__(self, model_name, reason):
-        super().__init__(f"Invalid model `{model_name}``. Reason: {reason} - {reason.description}")
+        super().__init__(f"Invalid model `{model_name}``. Reason: {reason.code}")
 
 
 class RequiredKeyUnfilledError(ModelConstructionError):
