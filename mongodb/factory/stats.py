@@ -43,16 +43,22 @@ class MessageRecordStatisticsManager(BaseCollection):
     model_class = MessageRecordModel
 
     @param_type_ensure
+    def record_message_async(
+            self, channel_oid: ObjectId, user_root_oid: ObjectId,
+            message_type: MessageType, message_content: Any, proc_time_ms: float):
+        Thread(
+            target=self.record_message,
+            args=(channel_oid, user_root_oid, message_type, message_content, proc_time_ms)).start()
+
+    @param_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any, proc_time_ms: float) -> MessageRecordResult:
-        entry, outcome, ex = self.insert_one_data(
+            message_type: MessageType, message_content: Any, proc_time_ms: float):
+        self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
             MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
             ProcessTimeMs=proc_time_ms
         )
-
-        return MessageRecordResult(outcome, entry, ex)
 
     # Statistics
 

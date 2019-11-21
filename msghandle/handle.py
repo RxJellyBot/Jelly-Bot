@@ -10,7 +10,7 @@ from .models.pipe_out import HandledMessageEventsHolder
 
 def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
     # Ensure User existence in channel
-    ProfileManager.register_new_default(e.channel_model.id, e.user_model.id)
+    ProfileManager.register_new_default_async(e.channel_model.id, e.user_model.id)
 
     # Translation activation
     activate(e.user_model.config.language)
@@ -38,7 +38,7 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
     deactivate()
 
     # Record message for stats
-    MessageRecordStatisticsManager.record_message(
+    MessageRecordStatisticsManager.record_message_async(
         e.channel_model.id, e.user_model.id, e.message_type, e.content, e.constructed_time)
 
     return ret

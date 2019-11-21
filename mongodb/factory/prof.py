@@ -1,3 +1,4 @@
+from threading import Thread
 from typing import Optional, List
 
 import pymongo
@@ -162,6 +163,11 @@ class ProfileManager:
         self._prof = ProfileDataManager()
         self._promo = PermissionPromotionRecordHolder()
 
+    @param_type_ensure
+    def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
+        Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
+
+    @param_type_ensure
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
         default_prof = self._prof.get_default_profile(channel_oid)
         if default_prof.success:
