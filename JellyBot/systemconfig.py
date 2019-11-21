@@ -9,12 +9,16 @@ HostUrl = os.environ.get("HOST_URL") or "http://localhost:8000"
 
 class System:
     PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
+
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
     HerokuAppNameBeta = "newjellybot-beta"
     HerokuAppNameStable = "newjellybot"
+
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
     MaxSendContentLines = 20
+
+    NoUserTokenNotificationSeconds = 72 * 3600  # 12 Hrs
 
 
 class PlatformConfig(ABC):
