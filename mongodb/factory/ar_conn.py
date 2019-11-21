@@ -76,9 +76,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
             AutoReplyModuleModel.Active.key: True
         }
 
-        self.update_many(
-            filter_,
-            {"$set": {f"{AutoReplyModuleModel.Active.key}": False}})
+        self.update_many(filter_, self.remove_update_obj(creator_oid))
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
@@ -88,6 +86,14 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
+    @param_type_ensure
+    def remove_update_obj(self, remover_oid: ObjectId):
+        return {"$set": {
+            AutoReplyModuleModel.Active.key: False,
+            AutoReplyModuleModel.RemovedAt.key: datetime.now(tz=timezone.utc),
+            AutoReplyModuleModel.RemoverOid.key: remover_oid
+        }}
+
     def module_mark_inactive(self, kw_oid: ObjectId, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         access_to_pinned = AutoReplyModuleManager.has_access_to_pinned(channel_oid, remover_oid)
 
@@ -96,14 +102,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         if not access_to_pinned:
             filter_[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_one_outcome(
-            filter_,
-            {"$set": {
-                AutoReplyModuleModel.Active.key: False,
-                AutoReplyModuleModel.RemovedAt.key: datetime.now(tz=timezone.utc),
-                AutoReplyModuleModel.RemoverOid.key: remover_oid
-            }}
-        )
+        ret = self.update_one_outcome(filter_, self.remove_update_obj())
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
@@ -306,10 +305,6 @@ class AutoReplyManager:
         :return: Empty list (length of 0) if no corresponding response.
                 [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
-        import time
-
-        _start_ = time.time()
-
         ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
         mod = None
         resp_ctnt = []

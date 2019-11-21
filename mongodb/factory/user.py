@@ -49,6 +49,7 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
 
     def register(self, id_data: GoogleIdentityUserData) -> OnSiteUserRegistrationResult:
         token = None
+        # FIXME: [SHP] Check if root user data existed before OR try to remove "_get_duplicated_doc_id_"
         entry, outcome, ex = \
             self.insert_one_data(Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
 
