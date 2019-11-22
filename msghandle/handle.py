@@ -37,7 +37,7 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
 
     # User model could be `None` if user token is not provided. This happens on LINE.
     # Notify users when they attempted to use any features related of the Jelly Bot
-    if ret and not e.user_model:
+    if ret.has_item and not e.user_model:
         from .spec.no_utoken import handle_no_user_token
 
         return HandledMessageEventsHolder(handle_no_user_token(e))

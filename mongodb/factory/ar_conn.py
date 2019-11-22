@@ -102,7 +102,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         if not access_to_pinned:
             filter_[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_one_outcome(filter_, self.remove_update_obj())
+        ret = self.update_one_outcome(filter_, self.remove_update_obj(remover_oid))
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,

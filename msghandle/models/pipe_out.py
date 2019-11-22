@@ -91,6 +91,10 @@ class HandledMessageEventsHolder:
         for item in self._core:
             yield item
 
+    @property
+    def has_item(self) -> bool:
+        return len(self._core) > 0
+
     def to_json(self):
         return [item.to_json() for item in self._core]
 

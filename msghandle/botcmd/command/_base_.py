@@ -337,12 +337,17 @@ class CommandNode:
         else:
             return s.split(self.splittor, arg_count - 1)
 
+    @staticmethod
+    def _strip_args_(args_list: List[str]):
+        return [arg.strip() for arg in args_list]
+
     def parse_args(self, e: TextMessageEventObject, max_arg_count: int = None) -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
         s = e.content
         args = self._split_args_(s, max_arg_count)
+        args = self._strip_args_(args)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
