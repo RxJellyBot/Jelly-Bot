@@ -18,7 +18,7 @@ def process_imgur_upload(e: ImageMessageEventObject) -> List[HandledMessageEvent
 
         return [
             HandledMessageEventText(
-                content=_("Uploaded to imgur.\n\n"
+                content=_("Uploaded to imgur.com\n\n"
                           "Time consumed: *{:.2f} ms*\n"
                           "Link to the image below.").format(exec_result.execution_ms),
                 bypass_multiline_check=True),

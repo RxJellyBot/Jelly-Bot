@@ -231,17 +231,12 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
         return [HandledMessageEventText(
             content=_(
-                "Auto-Reply module successfully registered.\n\n"
-                "ID: `{}`\n"
+                "Auto-Reply module successfully registered.\n"
                 "Keyword: \n"
                 "    Type: {}\n"
-                "    Content: {}\n"
                 "Response: \n"
-                "    Type: {}\n"
-                "    Content: {}").format(
-                add_result.model.id,
-                kw_ctnt_result.model.content_type.key, kw_ctnt,
-                rep_ctnt_result.model.content_type.key, rep_ctnt),
+                "    Type: {}").format(
+                kw_ctnt_result.model.content_type.key, rep_ctnt_result.model.content_type.key),
             bypass_multiline_check=True)]
     else:
         return [
@@ -260,13 +255,6 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     ],
     scope=CommandScopeCollection.GROUP_ONLY
 )
-def delete_auto_reply_module_old(e: TextMessageEventObject, keyword: str):
-    ret = _get_deprecating_msgs_()
-    ret.extend(delete_auto_reply_module(e, keyword))
-
-    return ret
-
-
 @cmd_del.command_function(
     feature_flag=BotFeature.TXT_AR_DEL,
     arg_count=1,
