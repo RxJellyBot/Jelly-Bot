@@ -218,3 +218,26 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
         )]
     else:
         return [HandledMessageEventText(content=_("No usable auto-reply module in this channel."))]
+
+
+@cmd_list.command_function(
+    feature_flag=BotFeature.TXT_AR_LIST_KEYWORD,
+    arg_count=1,
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
+    ctnt_mdls = AutoReplyContentManager.get_contents_by_word(keyword)
+
+    if ctnt_mdls.empty:
+        return [HandledMessageEventText(
+            content=_("No content including the substring \"{}\" was found.").format(keyword))]
+
+    conn_list = AutoReplyManager.get_conn_list(e.channel_oid, [ctnt.id for ctnt in ctnt_mdls])
+
+    if not conn_list.empty:
+        return [HandledMessageEventText(
+            content=_("Usable Keywords:") + "\n" + _(", ").join([conn.keyword for conn in conn_list])
+        )]
+    else:
+        return [HandledMessageEventText(
+            content=_("Cannot find any auto-reply module including the substring {} in their keyword."))]

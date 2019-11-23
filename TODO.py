@@ -1,7 +1,6 @@
 # INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
 #   Daily Notifications on specific time
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
-# INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Info: Message count and flow for each channel
 # TODO: Account Management: API Key refresh

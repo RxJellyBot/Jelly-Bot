@@ -16,6 +16,9 @@ class QueryElement:
 
 
 class QueryElementOperator:
+    def __init__(self, value):
+        self.value = value
+
     def to_tinydb(self, lhs):
         raise NotImplementedError()
 
@@ -31,13 +34,24 @@ class MatchPair(QueryElement):
 
 class NotEqual(QueryElementOperator):
     def __init__(self, value):
-        self.value = value
+        super().__init__(value)
 
     def to_tinydb(self, lhs):
         return lhs != self.value
 
     def to_mongodb(self):
         return {"$ne": self.value}
+
+
+class StringContains(QueryElementOperator):
+    def __init__(self, value):
+        super().__init__(value)
+
+    def to_tinydb(self, lhs):
+        return lhs.search(self.value)
+
+    def to_mongodb(self):
+        return {"$regex": self.value, "$options": "i"}
 
 
 class Query:

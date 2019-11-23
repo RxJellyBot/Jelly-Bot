@@ -381,7 +381,7 @@ class CommandNode:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
-        if not args:
+        if args is None:
             args = self._split_args_(e.content, splittor, max_arg_count)
             args = self._sanitize_args_(args)
 
