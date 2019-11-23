@@ -93,6 +93,11 @@ class Bot:
     Prefix = "JC"
     Splittors = [" ", "\n"]
 
+    RandomChoiceSplittor = "  "
+    RandomChoiceWeightSplittor = " "
+    RandomChoiceOptionLimit = 20
+    RandomChoiceCountLimit = 300
+
     CaseInsensitive = True
     CaseInsensitivePrefix = True
 

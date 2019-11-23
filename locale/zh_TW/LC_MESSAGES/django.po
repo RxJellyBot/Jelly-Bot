@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-22 23:13-0600\n"
-"PO-Revision-Date: 2019-11-22 23:06-0600\n"
+"POT-Creation-Date: 2019-11-23 00:44-0600\n"
+"PO-Revision-Date: 2019-11-23 00:49-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -685,133 +685,149 @@ msgstr "LINE貼圖"
 msgid "Custom Signal"
 msgstr "自訂訊號"
 
-#: .\flags\botfeature.py:38
+#: .\flags\botfeature.py:41
 msgid "Undefined"
 msgstr "未定義"
 
-#: .\flags\botfeature.py:38
+#: .\flags\botfeature.py:41
 msgid "Undefined bot feature flag."
 msgstr "未定義的機器人功能。"
 
-#: .\flags\botfeature.py:41
+#: .\flags\botfeature.py:44
 msgid "Text / Auto Reply / Add"
 msgstr "文字 / 自動回覆 / 新增"
 
-#: .\flags\botfeature.py:41
+#: .\flags\botfeature.py:44
 msgid "Register an auto-reply module."
 msgstr "新增自動回覆組。"
 
-#: .\flags\botfeature.py:43
+#: .\flags\botfeature.py:46
 msgid "Text / Auto Reply / Delete"
 msgstr "文字 / 自動回覆 / 刪除"
 
-#: .\flags\botfeature.py:43
+#: .\flags\botfeature.py:46
 msgid "Delete an auto-reply module."
 msgstr "刪除自動回覆組。"
 
-#: .\flags\botfeature.py:45
+#: .\flags\botfeature.py:48
 msgid "Text / Auto Reply / Add (Execode)"
 msgstr "文字 / 自動回覆 / 新增 (執行碼)"
 
-#: .\flags\botfeature.py:45
+#: .\flags\botfeature.py:48
 msgid "Register an auto-reply module using Execode."
 msgstr "使用執行碼新增自動回覆組。"
 
-#: .\flags\botfeature.py:47
+#: .\flags\botfeature.py:50
 msgid "Text / Auto Reply / List (Usable)"
 msgstr "文字 / 自動回覆 / 列表 (可用)"
 
-#: .\flags\botfeature.py:47
+#: .\flags\botfeature.py:50
 msgid "List all the usable auto-reply modules."
 msgstr "列出所有可用的自動回覆組。"
 
-#: .\flags\botfeature.py:49
+#: .\flags\botfeature.py:52
 msgid "Text / Auto Reply / List (Keyword)"
 msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:50
+#: .\flags\botfeature.py:53
 msgid ""
 "List all the usable auto-reply modules which keyword includes the provided "
 "keyword."
 msgstr "列出所有含有提供的關鍵字的可用回覆組。"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:55
 msgid "Text / Auto Reply / Respond"
 msgstr "文字 / 自動回覆 / 回覆"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:55
 msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:58
 msgid "Text / Information / Check IDs"
 msgstr "文字 / 資訊 / 查看ID"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:58
 msgid "Check the ID of current channel and self."
 msgstr "查看自己和所在頻道的ID。"
 
-#: .\flags\botfeature.py:57
+#: .\flags\botfeature.py:60
 msgid "Text / Information / Channel"
 msgstr "文字 / 資訊 / 頻道"
 
-#: .\flags\botfeature.py:57
+#: .\flags\botfeature.py:60
 msgid "Check the channel info."
 msgstr "查閱頻道資訊。"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:62
 msgid "Text / Information / User"
 msgstr "文字 / 資訊 / 用戶"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:62
 msgid "Check the user info of self."
 msgstr "查閱自己的用戶資訊。"
 
-#: .\flags\botfeature.py:61
+#: .\flags\botfeature.py:64
 msgid "Text / Information / Help"
 msgstr "文字 / 資訊 / 幫助"
 
-#: .\flags\botfeature.py:61
+#: .\flags\botfeature.py:64
 msgid "Get help for how to use the bot and the related information."
 msgstr "查看此機器人的使用說明和相關資訊。"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:67
 msgid "Text / Transform / Newline"
 msgstr "文字 / 替換 / 換行字元"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:67
 msgid "Replace the real newline character to be the escaped character \\n."
 msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
 
-#: .\flags\botfeature.py:67
+#: .\flags\botfeature.py:70
+msgid "Text / Random / Choice (One)"
+msgstr "文字 / 隨機 / 選擇 (單個)"
+
+#: .\flags\botfeature.py:70
+msgid "Randomly pick an option among the provided options."
+msgstr "隨機從提供的選項中選出一個選項。"
+
+#: .\flags\botfeature.py:72
+msgid "Text / Random / Choice (Multi)"
+msgstr "文字 / 隨機 / 選擇 (多個)"
+
+#: .\flags\botfeature.py:73
+msgid "Randomly pick an option among the provided options multiple times."
+msgstr "隨機從提供的選項中，根據指定的次數多次選擇選項。"
+
+#: .\flags\botfeature.py:76
 msgid "Text / User Data Integration / Start"
 msgstr "文字 / 整合用戶資料 / 啟動"
 
-#: .\flags\botfeature.py:67
+#: .\flags\botfeature.py:76
 msgid "Issue an Execode for user data integration."
 msgstr "獲取一條執行碼以啟動用戶資訊整合手續。"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:78
 msgid "Text / Calculator"
 msgstr "文字 / 計算機"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:78
 msgid "Auto-detected calculator."
 msgstr "自動偵測並啟動的計算機。"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:80
 msgid "Text / Error Test"
 msgstr "文字 / 錯誤測試"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:80
 msgid "For the purpose of testing the error reporting system."
 msgstr "(測試錯誤回報系統用)"
 
-#: .\flags\botfeature.py:74
+#: .\flags\botfeature.py:83
 msgid "Image / imgur upload"
 msgstr "圖片 / 上傳imgur"
 
-#: .\flags\botfeature.py:74
+#: .\flags\botfeature.py:83
 msgid "Upload image to imgur.com."
 msgstr "將圖片上傳至 imgur.com。"
 
@@ -1940,6 +1956,58 @@ msgstr "所在頻道的訊息數量前{}名(7日):"
 msgid "Top {} Message Count in 7 Days in this channel collection:"
 msgstr "所在頻道組的訊息數量前{}名(7日):"
 
+#: .\msghandle\botcmd\command\rdm.py:13
+msgid "Random"
+msgstr "隨機"
+
+#: .\msghandle\botcmd\command\rdm.py:14
+msgid "Randomly generate a result."
+msgstr "隨機產生一個結果。"
+
+#: .\msghandle\botcmd\command\rdm.py:56
+msgid ""
+"Options to be picked. Use two continuous spaces/blanks (`{}`) to separate "
+"options.\n"
+"- The count of the options cannot exceed {}.\n"
+"- If **ALL** options exists single space/blank (`{}`), then this will be "
+"considered as a **weighted** option list. The options picked will base on "
+"their weight.\n"
+"- Weights can be either float, integer, or both.\n"
+"- Duplicated option will be automatically ignored.\n"
+"Example:\n"
+"- Option List **without** weights: A{}B{}C\n"
+"- Option List **with** weights: A{}0.7{}B{}0.5{}C{}0.9"
+msgstr ""
+"候選選項清單。使用雙空格 (`{}`) 以區分選項。\n"
+"- 選項總數不得超過{}個。\n"
+"- 如果**全部**的選項都含有單空格 (`{}`)，則選項清單會被判定為帶有比重的清單。"
+"隨機抽選時，會根據比重產生結果。\n"
+"- 比重可以是小數、整數，或是兩者都有。\n"
+"- 重複的選項會自動無視。\n"
+"範例:\n"
+"- **沒有**比重的選項清單: A{}B{}C\n"
+"- **有**比重的選項清單: A{}0.7{}B{}0.5{}C{}0.9"
+
+#: .\msghandle\botcmd\command\rdm.py:71
+msgid "Maximum count of options is {}."
+msgstr "選項清單最多只能有{}個選項。"
+
+#: .\msghandle\botcmd\command\rdm.py:73
+msgid "Maximum count of picking an option in a single command is {}."
+msgstr "單次指令中，最多可抽選次數為 {}。"
+
+#: .\msghandle\botcmd\command\rdm.py:91
+msgid "Option Picked: {}"
+msgstr "抽中選項: {}"
+
+#: .\msghandle\botcmd\command\rdm.py:100
+msgid ""
+"Count of how many times to randomly pick an option.\n"
+"This number cannot exceed {}."
+msgstr ""
+"隨機抽選次數。\n"
+"這個數字不能超過 {}。"
+
 #: .\msghandle\botcmd\command\trfm.py:9
 msgid "Transform/Replace"
 msgstr "轉型/替換"
@@ -2014,8 +2082,8 @@ msgstr "有LaTeX內容。"
 
 #: .\msghandle\models\out_plat.py:48
 msgid ""
-"{} content(s) was recorded to the database because of the following reason"
-"(s):{}\n"
+"{} content(s) was recorded to the database because of the following "
+"reason(s):{}\n"
 "URL: {}"
 msgstr ""
 "{}筆內容已因下列原因存至資料庫:{}\n"
@@ -2216,12 +2284,12 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
-"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
-"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
-"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
-"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
-"可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
+"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
+"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
+"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
+"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
+"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list_table.html:13
 #: .\templates\info\channel\search.html:49
@@ -2355,10 +2423,10 @@ msgid ""
 "on the account where you get the Execode will be discarded, only the data on "
 "the website will be kept. </p>"
 msgstr ""
-"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href=\"%"
-"(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代碼的"
-"帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設定所"
-"取代。 </p>"
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href="
+"\"%(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代"
+"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
+"定所取代。 </p>"
 
 #: .\templates\account\integrate.html:33
 msgid "Integration Execode here"
@@ -2737,8 +2805,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains '%(tag_splittor)"
-"s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains "
+"'%(tag_splittor)s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splittor)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:19
@@ -2973,8 +3041,7 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8
-#: .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -2986,17 +3053,17 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>%"
-"(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href=\"%"
-"(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
+"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
+"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
 "private.</li> </ul> If all the conditions match, but the error still occurs, "
 "please <a href=\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: %"
-"(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不"
-"是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出現"
-"在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
+"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
+"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
+"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
 "li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
 "聯絡網站開發者。</a>"
 
@@ -3044,8 +3111,8 @@ msgid ""
 "website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道代碼"
-"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -3057,12 +3124,12 @@ msgstr "找不到對應的頻道組資訊。"
 msgid ""
 "Please check that:<br> <ul> <li><code>%(chcoll_oid)s</code> is the Channel "
 "Collection ID, <b>NOT the channel collection token</b>.</li> </ul> If all "
-"the conditions match, but the error still occurs, please <a href=\"%"
-"(about_page)s\">contact the website developer.</a>"
+"the conditions match, but the error still occurs, please <a href="
+"\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(chcoll_oid)s</code>是頻道組ID，而<b>不是頻道組代"
-"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\profile_not_found.html:19
 msgid "User profile not found with the provided ID."
@@ -3076,8 +3143,8 @@ msgid ""
 "conditions match, but the error still occurs, please <a href=\"%(about_page)s"
 "\">contact the website developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: %"
-"(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
+"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\unknown.html:13
