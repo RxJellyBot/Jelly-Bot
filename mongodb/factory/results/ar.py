@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Optional
 
 from JellyBot.api.static import result
-from models import AutoReplyContentModel
 
 from ._base import ModelResult
 from ._outcome import WriteOutcome, GetOutcome

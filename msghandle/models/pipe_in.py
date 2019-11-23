@@ -72,16 +72,23 @@ class MessageEventObject(Event, ABC):
 
 class TextMessageEventObject(MessageEventObject):
     def __init__(
-            self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            self, raw: Any, text: str, channel_model: ChannelModel = None, user_model: RootUserModel = None,
             sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
         text = text.strip()
 
         super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model)
-        self.text = text
 
     @property
     def message_type(self) -> MessageType:
         return MessageType.TEXT
+
+    @property
+    def text(self) -> str:
+        return self.content
+
+    @text.setter
+    def text(self, value):
+        self.content = value
 
 
 class ImageMessageEventObject(MessageEventObject):

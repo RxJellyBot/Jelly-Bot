@@ -5,7 +5,7 @@ from .code import (
     APIActionCodeView, ExecodeCodeView
 )
 from .terms import TermsExplanationView
-from .botcmd import BotCommandMainView, BotCommandHelpView, BotOldCommandMainView, BotOldCommandHelpView
+from .botcmd import BotCommandMainView, BotCommandHelpView
 
 urlpatterns = [
     path('terms/', TermsExplanationView.as_view(), name="page.doc.terms"),
@@ -16,7 +16,5 @@ urlpatterns = [
     path('action/api/', APIActionCodeView.as_view(), name="page.doc.code.api"),
     path('action/execode/', ExecodeCodeView.as_view(), name="page.doc.code.excde"),
     path('botcmd/', BotCommandMainView.as_view(), name="page.doc.botcmd.main"),
-    path('botcmd/<str:code>/', BotCommandHelpView.as_view(), name="page.doc.botcmd.cmd"),
-    path('botcmd-old/', BotOldCommandMainView.as_view(), name="page.doc.botcmd.main.old"),
-    path('botcmd-old/<str:code>/', BotOldCommandHelpView.as_view(), name="page.doc.botcmd.cmd.old")
+    path('botcmd/<str:code>/', BotCommandHelpView.as_view(), name="page.doc.botcmd.cmd")
 ]

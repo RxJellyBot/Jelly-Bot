@@ -59,7 +59,7 @@ class ShortUrlTargetChangeResponse(SerializeResultExtraMixin, RequireSenderMixin
         return super().serialize_failed()
 
     def process_pass(self):
-        self._result = ShortUrlDataManager.update_target(self._sender_oid, self._target)
+        self._result = ShortUrlDataManager.update_target(self._sender_oid, self._code, self._target)
 
     @property
     def param_dict(self) -> dict:

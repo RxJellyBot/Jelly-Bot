@@ -90,12 +90,8 @@ class ExecodeManager:
 
 
 class Bot:
-    Prefix = "/"
-    Splittor = " ."
-
-    # DEPRECATE: Bot Command - Bot Prefix & Splittor
-    OldPrefix = "JC\n"
-    OldSplittor = "\n"
+    Prefix = "JC"
+    Splittors = [" ", "\n"]
 
     CaseInsensitive = True
     CaseInsensitivePrefix = True

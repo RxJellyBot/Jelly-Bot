@@ -38,7 +38,7 @@
                                 </h6>
                             {% endif %}
                             <p class="card-text">{{ cmd_node.brief_description|markdown }}</p>
-                            <a href="{% if is_old %}{% url "page.doc.botcmd.cmd.old" code=cmd_node.main_cmd_code %}{% else %}{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}{% endif %}"
+                            <a href="{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}"
                                class="card-link">{% trans "Command Usage" %}</a>
                         </div>
                     </div>
