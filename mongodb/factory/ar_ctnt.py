@@ -6,7 +6,7 @@ from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
 from mongodb.factory.results import GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
-from mongodb.utils import case_insensitive_collation, Query, MatchPair
+from mongodb.utils import case_insensitive_collation, Query, MatchPair, StringContains, CursorWithCount
 
 from ._base import BaseCollection
 from ._mixin import CacheMixin
@@ -68,6 +68,14 @@ class AutoReplyContentManager(CacheMixin, BaseCollection):
             outcome = GetOutcome.O_CACHE_DB
 
         return AutoReplyContentGetResult(outcome, ret_entry, on_add_result=add_result)
+
+    def get_contents_by_word(self, keyword: str, case_insensitive: bool = True) -> CursorWithCount:
+        q = Query(MatchPair(AutoReplyContentModel.Content.key, StringContains(keyword)))
+
+        return self.find_cursor_with_count(
+            q.to_mongo(),
+            collation=case_insensitive_collation if case_insensitive else None,
+            parse_cls=AutoReplyContentModel)
 
     @param_type_ensure
     def get_content_by_id(self, oid: ObjectId) -> Optional[AutoReplyContentModel]:
