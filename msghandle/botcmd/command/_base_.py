@@ -356,7 +356,15 @@ class CommandNode:
                 proc_s = ""
             elif is_quote(c):
                 in_quote = True
-            elif not is_splittor:
+            elif not(not in_quote and is_splittor):
+                """
+                In quote, is splittor, append string
+                
+                0 0 1
+                0 1 0
+                1 0 1
+                1 1 1
+                """
                 proc_s += c
 
         if proc_s:
