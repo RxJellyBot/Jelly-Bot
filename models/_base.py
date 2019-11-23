@@ -248,7 +248,8 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def cast_model(cls, obj):
-        if obj is not None and cls is not None and not isinstance(obj, cls):
+        """Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`."""
+        if obj is not None and not isinstance(obj, cls):
             return cls(**obj, from_db=True)
 
         return obj

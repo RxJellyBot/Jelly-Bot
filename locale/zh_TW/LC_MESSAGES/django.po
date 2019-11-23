@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-20 22:14-0600\n"
-"PO-Revision-Date: 2019-11-20 22:19-0600\n"
+"POT-Creation-Date: 2019-11-22 23:13-0600\n"
+"PO-Revision-Date: 2019-11-22 23:06-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -133,28 +133,14 @@ msgstr "新增自動回覆"
 msgid "Auto-Reply Home"
 msgstr "自動回覆 - 首頁"
 
-#: .\JellyBot\views\doc\botcmd.py:17 .\JellyBot\views\nav.py:143
+#: .\JellyBot\views\doc\botcmd.py:15 .\JellyBot\views\nav.py:139
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:30 .\JellyBot\views\nav.py:181
+#: .\JellyBot\views\doc\botcmd.py:28 .\JellyBot\views\nav.py:176
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
-
-#: .\JellyBot\views\doc\botcmd.py:42
-msgid ""
-"This way of using the bot command is deprecating. Please visit {} to see the "
-"usage of new command set."
-msgstr "此機器人指令使用方式即將廢止，請至 {} 查看新指令使用方式和可用指令。"
-
-#: .\JellyBot\views\doc\botcmd.py:54
-msgid "Bot Commands List (Old, DEPRECATING)"
-msgstr "機器人指令清單 (原 / 即將廢止)"
-
-#: .\JellyBot\views\doc\botcmd.py:70
-msgid "Bot Command - {} (DEPRECATING)"
-msgstr "機器人指令 - {} (即將廢止)"
 
 #: .\JellyBot\views\doc\code\action.py:11
 msgid "API Command Code"
@@ -168,7 +154,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:176
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:171
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -177,7 +163,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:164
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:159
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -185,7 +171,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:162
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:157
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -193,7 +179,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:166
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:161
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -201,11 +187,11 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:168
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:163
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:146
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:142
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
@@ -282,13 +268,13 @@ msgstr "總覽"
 msgid "Shortcut"
 msgstr "捷徑"
 
-#: .\JellyBot\views\nav.py:76 .\templates\account\main.html:113
-msgid "Settings"
-msgstr "設定"
-
-#: .\JellyBot\views\nav.py:79 .\templates\account\channel\list.html:8
+#: .\JellyBot\views\nav.py:77 .\templates\account\channel\list.html:8
 msgid "Channel List"
 msgstr "頻道清單"
+
+#: .\JellyBot\views\nav.py:80 .\templates\account\main.html:113
+msgid "Settings"
+msgstr "設定"
 
 #: .\JellyBot\views\nav.py:84
 msgid "Channel Registration"
@@ -298,7 +284,7 @@ msgstr "頻道登錄"
 msgid "Integrate Account"
 msgstr "整合帳號"
 
-#: .\JellyBot\views\nav.py:98 .\msghandle\botcmd\command\ar.py:26
+#: .\JellyBot\views\nav.py:98 .\msghandle\botcmd\command\ar.py:24
 #: .\templates\index.html:19
 msgid "Auto Reply"
 msgstr "自動回覆"
@@ -335,39 +321,31 @@ msgstr "頻道 - {}"
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:140
-msgid "Bot Commands List (Old usage)"
-msgstr "機器人指令清單 (原使用方式)"
-
-#: .\JellyBot\views\nav.py:150 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:146 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:155
+#: .\JellyBot\views\nav.py:151
 msgid "Bot - Deprecating"
 msgstr "機器人 - 即將廢止"
 
-#: .\JellyBot\views\nav.py:160
+#: .\JellyBot\views\nav.py:155
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:172
+#: .\JellyBot\views\nav.py:167
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:174
+#: .\JellyBot\views\nav.py:169
 msgid "API Command"
 msgstr "API指令"
 
 #: .\JellyBot\views\nav.py:184
-msgid "Bot Command - {} (Old, deprecating)"
-msgstr "機器人指令 - {} (原 / 即將廢止)"
-
-#: .\JellyBot\views\nav.py:192
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:194 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:186 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
 
@@ -1634,11 +1612,11 @@ msgstr "X: 不存在"
 msgid "The data for updating is not found."
 msgstr "執行失敗。找不到符合條件的資料更新。"
 
-#: .\msghandle\botcmd\command\_base_.py:282
+#: .\msghandle\botcmd\command\_base_.py:286
 msgid "No description provided."
 msgstr "沒有敘述。"
 
-#: .\msghandle\botcmd\command\_base_.py:395
+#: .\msghandle\botcmd\command\_base_.py:427
 msgid ""
 "Command not allowed to use under this channel type: {}\n"
 "Please use the command under either one of these channel types: {}"
@@ -1646,11 +1624,11 @@ msgstr ""
 "指令無法在此頻道種類中使用: {}\n"
 "請在下列任一種頻道種類中使用此指令: {}"
 
-#: .\msghandle\botcmd\command\ar.py:27
+#: .\msghandle\botcmd\command\ar.py:25
 msgid "Perform operations related to the auto-reply feature."
 msgstr "執行有關於 自動回覆 的指令。"
 
-#: .\msghandle\botcmd\command\ar.py:29
+#: .\msghandle\botcmd\command\ar.py:27
 msgid ""
 "Perform operations related to the auto-reply feature.\n"
 "\n"
@@ -1694,102 +1672,41 @@ msgstr ""
 "\n"
 "- 冷卻時間: `{}` 秒"
 
-#: .\msghandle\botcmd\command\ar.py:54
-msgid "Auto Reply - Add"
-msgstr "自動回覆 - 新增"
-
 #: .\msghandle\botcmd\command\ar.py:55
 msgid ""
-"**(DEPRECATING)**\n"
-"\n"
-"\n"
-"Register an auto-reply module which is 1 keyword to 1 response to the "
-"current channel."
-msgstr ""
-"**即將廢止**\n"
-"\n"
-"\n"
-"新增一組 1關鍵字 1回覆 的自動回覆組至目前所在頻道。"
+"The Execode obtained else where to complete the auto-reply module "
+"registration."
+msgstr "從其他地方獲取的登錄自動回覆組用的執行碼。"
 
-#: .\msghandle\botcmd\command\ar.py:58
-msgid ""
-"### DEPRECATING, PLEASE CHECK THE DOCUMENTATION TO SEE HOW TO USE THE "
-"COMMAND IN THE FUTURE\n"
-"\n"
-"\n"
-"Register an auto-reply module which is 1 keyword to 1 response to the "
-"current channel.\n"
-"\n"
-"The content type for both keyword and the response will be automatically "
-"determined.\n"
-"\n"
-"To specify more properties of the module which the related controls are not "
-"implemented / allowed here, please use the website to register.<hr>The "
-"properties of the auto-reply module created here will be defaulted as "
-"below:\n"
-"\n"
-"- Pinned: `{}`\n"
-"\n"
-"- Private: `{}`\n"
-"\n"
-"- Tags: `{}`\n"
-"\n"
-"- Cooldown: `{}` secs"
-msgstr ""
-"### 即將廢止，請查閱使用說明以了解未來的指令使用方式\n"
-"\n"
-"\n"
-"新增一組 1關鍵字 1回覆 的自動回覆組至目前所在頻道。\n"
-"\n"
-"系統會自動判斷 關鍵字 和 回覆 的內容種類。\n"
-"\n"
-"若欲指定更多自動回覆組的屬性，但是機器人指令無法完成 / 無法使用的話，請到網站"
-"上新增。<hr>使用機器人指令所製作的回覆組的屬性預設值如下:\n"
-"\n"
-"- 置頂: `{}`\n"
-"\n"
-"- 私人: `{}`\n"
-"\n"
-"- 標籤: `{}`\n"
-"\n"
-"- 冷卻時間: `{}` 秒"
-
-#: .\msghandle\botcmd\command\ar.py:73
-msgid "Auto Reply - Delete"
-msgstr "自動回覆 - 刪除"
+#: .\msghandle\botcmd\command\ar.py:65
+msgid "Failed to get the Execode data using the Execode `{}`. Code: `{}`"
+msgstr "找不到對應的執行碼 `{}` 的資料。執行結果代碼: `{}`"
 
 #: .\msghandle\botcmd\command\ar.py:74
 msgid ""
-"**(DEPRECATING)**\n"
-"\n"
-"\n"
-"Delete a module in the current channel."
+"The ID of the creator of this Execode: `{}` does not match your ID: `{}`.\n"
+"Only the creator of this Execode can complete this action."
 msgstr ""
-"**即將廢止**\n"
-"\n"
-"\n"
-"刪除於所在頻道的自動回覆組。"
+"執行碼 `{}` 登錄者ID不符合你的用戶ID: `{}`。\n"
+"只有執行碼登錄者可以完成此行為。"
 
-#: .\msghandle\botcmd\command\ar.py:77
+#: .\msghandle\botcmd\command\ar.py:92
 msgid ""
-"### DEPRECATING, PLEASE CHECK THE DOCUMENTATION TO SEE HOW TO USE THE "
-"COMMAND IN THE FUTURE\n"
-"\n"
-"\n"
-"Deleted a module in the current channel."
+"Failed to create auto-reply module. An error report was sent for "
+"investigation."
+msgstr "無法建立自動回覆組。錯誤報告已傳送給開發者以便除錯。"
+
+#: .\msghandle\botcmd\command\ar.py:106
+msgid "Failed to register the auto-reply module. Code: `{}`"
 msgstr ""
-"### 即將廢止，請查閱使用說明以了解未來的指令使用方式\n"
-"\n"
-"\n"
-"刪除於所在頻道的自動回覆組。"
+"自動回覆組登錄失敗。\n"
+"代碼: {}"
 
-#: .\msghandle\botcmd\command\ar.py:84
-msgid ""
-"The way to use this command is deprecating. Please visit {} to see how to "
-"use the command in the future."
-msgstr "此指令的使用方式即將廢止。請至 {} 查閱新的指令使用方式。"
+#: .\msghandle\botcmd\command\ar.py:111
+msgid "Auto-reply module registered."
+msgstr "自動回覆組已登錄。"
 
-#: .\msghandle\botcmd\command\ar.py:96 .\msghandle\botcmd\command\ar.py:188
+#: .\msghandle\botcmd\command\ar.py:118
 msgid ""
 "The message for the auto-reply module to be triggered.\n"
 "\n"
@@ -1803,72 +1720,7 @@ msgstr ""
 "\n"
 "否則，內容種類將會是 **文字** 。"
 
-#: .\msghandle\botcmd\command\ar.py:99
-msgid ""
-"The message for the auto-reply module to respond when triggered.<hr>If the "
-"content **is number**, the content type will be **LINE sticker**.\n"
-"\n"
-"If the content **endswith .jpg**, the content type will be **image**.\n"
-"\n"
-"Otherwise, the content type will be **text**.<hr>Notes:\n"
-"\n"
-"- For content **endswith .jpg** - Please ensure that the URL is an image "
-"when you open it, **NOT** a webpage. Otherwise, unexpected things may "
-"happen.\n"
-"- Please make sure that the newline **is escaped**, which means that the "
-"real newline characters are transformed to be \\n.\n"
-"\n"
-"Check the documentation of command code `{}` to see the convenience command "
-"to replace the newline character."
-msgstr ""
-"當自動回覆組被觸發時所回覆的訊息。<hr>如果內容是 **數字** ，則內容種類將會是 "
-"**LINE貼圖** 。\n"
-"\n"
-"如果內容種類 **以.jpg結尾** ，則內容種類將會是 **圖片** 。\n"
-"\n"
-"否則，內容種類將會是 **文字** 。<hr>備註:\n"
-"\n"
-"- 針對 **以.jpg結尾** 的內容 - 請確認開啟該網址時，瀏覽器顯示的只有圖片，而 "
-"**不是** 網頁，否則可能會發生不可預期的情況。\n"
-"- 請確認換行字元已使用\\n替代。\n"
-"\n"
-"查閱 `{}` 的使用說明以了解替換換行字元的懶人指令。"
-
-#: .\msghandle\botcmd\command\ar.py:127
-msgid ""
-"The Execode obtained else where to complete the auto-reply module "
-"registration."
-msgstr "從其他地方獲取的登錄自動回覆組用的執行碼。"
-
-#: .\msghandle\botcmd\command\ar.py:137
-msgid "Failed to get the Execode data using the Execode `{}`. Code: `{}`"
-msgstr "找不到對應的執行碼 `{}` 的資料。執行結果代碼: `{}`"
-
-#: .\msghandle\botcmd\command\ar.py:146
-msgid ""
-"The ID of the creator of this Execode: `{}` does not match your ID: `{}`.\n"
-"Only the creator of this Execode can complete this action."
-msgstr ""
-"執行碼 `{}` 登錄者ID不符合你的用戶ID: `{}`。\n"
-"只有執行碼登錄者可以完成此行為。"
-
-#: .\msghandle\botcmd\command\ar.py:164
-msgid ""
-"Failed to create auto-reply module. An error report was sent for "
-"investigation."
-msgstr "無法建立自動回覆組。錯誤報告已傳送給開發者以便除錯。"
-
-#: .\msghandle\botcmd\command\ar.py:178
-msgid "Failed to register the auto-reply module. Code: `{}`"
-msgstr ""
-"自動回覆組登錄失敗。\n"
-"代碼: {}"
-
-#: .\msghandle\botcmd\command\ar.py:181
-msgid "Auto-reply module registered."
-msgstr "自動回覆組已登錄。"
-
-#: .\msghandle\botcmd\command\ar.py:191
+#: .\msghandle\botcmd\command\ar.py:121
 msgid ""
 "The message for the auto-reply module to respond when triggered.<hr>If the "
 "content **is number**, the content type will be **LINE sticker**.\n"
@@ -1890,7 +1742,7 @@ msgstr ""
 "- 針對 **以.jpg結尾** 的內容 - 請確認開啟該網址時，瀏覽器顯示的只有圖片，而 "
 "**不是** 網頁，否則可能會發生不可預期的情況。"
 
-#: .\msghandle\botcmd\command\ar.py:206
+#: .\msghandle\botcmd\command\ar.py:136
 msgid ""
 "Failed to fetch the content ID of the **keyword**.\n"
 "Auto-Reply module not registered.\n"
@@ -1902,7 +1754,7 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:215
+#: .\msghandle\botcmd\command\ar.py:145
 msgid ""
 "Failed to fetch the content ID of the **response**.\n"
 "Auto-Reply module not registered.\n"
@@ -1914,43 +1766,31 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:232
+#: .\msghandle\botcmd\command\ar.py:159
 msgid ""
 "Auto-Reply module successfully registered.\n"
-"\n"
-"ID: `{}`\n"
-"Keyword: \n"
-"    Type: {}\n"
-"    Content: {}\n"
-"Response: \n"
-"    Type: {}\n"
-"    Content: {}"
+"Keyword Type: {}\n"
+"Response Type: {}"
 msgstr ""
 "自動回覆組登錄成功。\n"
-"\n"
-"ID: `{}`\n"
-"關鍵字:\n"
-"    種類: {}\n"
-"    內容: {}\n"
-"回覆:\n"
-"    種類: {}\n"
-"    內容: {}"
+"關鍵字種類: {}\n"
+"回覆種類: {}"
 
-#: .\msghandle\botcmd\command\ar.py:247
+#: .\msghandle\botcmd\command\ar.py:167
 msgid ""
 "Failed to register the Auto-Reply module.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
 msgstr ""
 "自動回覆組登錄失敗。\n"
-"代碼: {}\n"
+"代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:257 .\msghandle\botcmd\command\ar.py:271
+#: .\msghandle\botcmd\command\ar.py:176
 msgid "The keyword of the module to delete."
 msgstr "欲刪除的回覆組的關鍵字。"
 
-#: .\msghandle\botcmd\command\ar.py:279
+#: .\msghandle\botcmd\command\ar.py:184
 msgid ""
 "Failed to fetch the content ID of the **keyword**.\n"
 "Auto-Reply module not deleted.\n"
@@ -1962,7 +1802,7 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:288
+#: .\msghandle\botcmd\command\ar.py:193
 msgid ""
 "Auto-Reply Module deleted.\n"
 "Keyword: {}"
@@ -1970,15 +1810,15 @@ msgstr ""
 "自動回覆組已刪除。\n"
 "關鍵字: {}"
 
-#: .\msghandle\botcmd\command\ar.py:290
+#: .\msghandle\botcmd\command\ar.py:195
 msgid "Insufficient Permission to delete the auto-reply module."
 msgstr "權限不足，故無法刪除回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:292
+#: .\msghandle\botcmd\command\ar.py:197
 msgid "Auto-reply module of the keyword {} not found."
 msgstr "沒有找到關鍵字為 {} 的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:296
+#: .\msghandle\botcmd\command\ar.py:201
 msgid ""
 "Failed to delete the Auto-Reply module.\n"
 "Code: {}\n"
@@ -1988,15 +1828,15 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:312
+#: .\msghandle\botcmd\command\ar.py:217
 msgid "Usable Keywords:"
 msgstr "可用關鍵字:"
 
-#: .\msghandle\botcmd\command\ar.py:312
+#: .\msghandle\botcmd\command\ar.py:217
 msgid ", "
 msgstr "、"
 
-#: .\msghandle\botcmd\command\ar.py:315
+#: .\msghandle\botcmd\command\ar.py:220
 msgid "No usable auto-reply module in this channel."
 msgstr "此頻道沒有可用的自動回覆組。"
 
@@ -2008,7 +1848,7 @@ msgstr "幫助"
 msgid "See the documentation or bot related information."
 msgstr "查閱機器人的相關文件及資訊。"
 
-#: .\msghandle\botcmd\command\help.py:17
+#: .\msghandle\botcmd\command\help.py:20
 msgid ""
 "LINE BOT:\n"
 "Beta: http://rnnx.cc/LineBeta\n"
@@ -2144,20 +1984,14 @@ msgstr ""
 "結果: {}\n"
 "錯誤: {}"
 
-#: .\msghandle\botcmd\main.py:23
-msgid ""
-"This way of calling the command is deprecating. Please visit {} to see what "
-"is available and to use it for the new command set."
-msgstr "此使用指令的方式即將廢止。請至 {} 查閱新指令使用方式及可用指令。"
-
 #: .\msghandle\img\imgur.py:21
 msgid ""
-"Uploaded to imgur.\n"
+"Uploaded to imgur.com\n"
 "\n"
 "Time consumed: *{:.2f} ms*\n"
 "Link to the image below."
 msgstr ""
-"圖片已上傳至imgur.com。\n"
+"圖片已上傳至 imgur.com\n"
 "\n"
 "花費時間: *{:.2f} ms*\n"
 "圖片網址如下。"
@@ -2180,8 +2014,8 @@ msgstr "有LaTeX內容。"
 
 #: .\msghandle\models\out_plat.py:48
 msgid ""
-"{} content(s) was recorded to the database because of the following "
-"reason(s):{}\n"
+"{} content(s) was recorded to the database because of the following reason"
+"(s):{}\n"
 "URL: {}"
 msgstr ""
 "{}筆內容已因下列原因存至資料庫:{}\n"
@@ -2210,6 +2044,12 @@ msgstr ""
 "**自動計算機**\n"
 "表達式: {}\n"
 "結果: {}"
+
+#: .\msghandle\spec\error.py:27
+msgid ""
+"An error occurred while handling message. An error report was sent for "
+"investigation."
+msgstr "處理訊息時發生錯誤。錯誤報告已傳送給開發者以便除錯。"
 
 #: .\msghandle\spec\no_utoken.py:18
 msgid ""
@@ -2376,12 +2216,12 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
-"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
-"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
-"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
-"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
-"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
+"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
+"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
+"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
+"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
+"可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list_table.html:13
 #: .\templates\info\channel\search.html:49
@@ -2515,10 +2355,10 @@ msgid ""
 "on the account where you get the Execode will be discarded, only the data on "
 "the website will be kept. </p>"
 msgstr ""
-"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href="
-"\"%(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代"
-"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
-"定所取代。 </p>"
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href=\"%"
+"(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代碼的"
+"帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設定所"
+"取代。 </p>"
 
 #: .\templates\account\integrate.html:33
 msgid "Integration Execode here"
@@ -2785,23 +2625,24 @@ msgstr "表情貼 / LINE貼圖"
 #: .\templates\ar\add-notes.html:41
 msgid ""
 "<small>Refer to the \"LINE Sticker\" section for LINE Sticker.</small><br> "
-"<small> Discord emojis are treated as normal text. They are in the form of "
-"<code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>. Example: <code>&lt;:"
-"neut:554302047038734366&gt;</code><br> <ul> <li><code>EMOJI_NAME</code>: "
-"What you normally type in the chat window excluding the wrapping colons. If "
-"you type :neut: in the window, then \"neut\" is the name of the emoji.</li> "
-"<li><code>EMOJI_ID</code>: The number in the URL when you get the link of "
-"the emoji. On PC client, you can right click on the emoji and click \"Copy "
-"Link\" or \"Open Link\" to get the number / ID.</li> </ul> </small>"
+"<div> <small>Discord emojis are treated as normal text. They are in the form "
+"of <code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>. Example: <code>&lt;:"
+"neut:554302047038734366&gt;</code></small> <br> <ul> <li><code>EMOJI_NAME</"
+"code>: What you normally type in the chat window excluding the wrapping "
+"colons. If you type :neut: in the window, then \"neut\" is the name of the "
+"emoji.</li> <li><code>EMOJI_ID</code>: The number in the URL when you get "
+"the link of the emoji. On PC client, you can right click on the emoji and "
+"click \"Copy Link\" or \"Open Link\" to get the number / ID.</li> </ul> </"
+"div>"
 msgstr ""
-"<small>針對\"LINE貼圖\"，請查閱\"LINE貼圖\"內的說明。</small><br> <small> "
-"Discord的表情貼視為一般文字。這些表情貼的文字格式為 <code>&lt;:EMOJI_NAME:"
-"EMOJI_ID&gt;</code>。範例: <code>&lt;:neut:554302047038734366&gt;</code><br> "
-"<ul> <li><code>EMOJI_NAME</code>: 通常在聊天的時候，要使用表情貼時會輸入的內"
-"容。冒號除外。如果你輸入的是 :neut: ，則 \"neut\" 就是這個表情貼的名字。</"
-"li> <li><code>EMOJI_ID</code>: 獲得表情貼連結時，網址中的數字。於PC端上，使用"
-"滑鼠右鍵點擊表情貼後，點擊 \"開啟連結\" 或 \"複製連結\" 以獲取表情貼ID。</"
-"li> </ul> </small>"
+"<small>針對\"LINE貼圖\"，請查閱\"LINE貼圖\"內的說明。</"
+"small><br><div><small> Discord的表情貼視為一般文字。這些表情貼的文字格式為 "
+"<code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>。範例: <code>&lt;:"
+"neut:554302047038734366&gt;</code> </small><br> <ul> <li><code>EMOJI_NAME</"
+"code>: 通常在聊天的時候，要使用表情貼時會輸入的內容。冒號除外。如果你輸入的"
+"是 :neut: ，則 \"neut\" 就是這個表情貼的名字。</li> <li><code>EMOJI_ID</"
+"code>: 獲得表情貼連結時，網址中的數字。於PC端上，使用滑鼠右鍵點擊表情貼後，點"
+"擊 \"開啟連結\" 或 \"複製連結\" 以獲取表情貼ID。</li> </ul></div>"
 
 #: .\templates\ar\add-props.html:4
 msgid "Properties"
@@ -2896,8 +2737,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains "
-"'%(tag_splittor)s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains '%(tag_splittor)"
+"s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splittor)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:19
@@ -3132,7 +2973,8 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8
+#: .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3144,17 +2986,17 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
-"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
-"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>%"
+"(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href=\"%"
+"(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
 "private.</li> </ul> If all the conditions match, but the error still occurs, "
 "please <a href=\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
-"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
-"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
-"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: %"
+"(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不"
+"是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出現"
+"在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
 "li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
 "聯絡網站開發者。</a>"
 
@@ -3202,8 +3044,8 @@ msgid ""
 "website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道代碼"
-"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
-"\"%(about_page)s\">聯絡網站開發者。</a>"
+"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
+"(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -3215,12 +3057,12 @@ msgstr "找不到對應的頻道組資訊。"
 msgid ""
 "Please check that:<br> <ul> <li><code>%(chcoll_oid)s</code> is the Channel "
 "Collection ID, <b>NOT the channel collection token</b>.</li> </ul> If all "
-"the conditions match, but the error still occurs, please <a href="
-"\"%(about_page)s\">contact the website developer.</a>"
+"the conditions match, but the error still occurs, please <a href=\"%"
+"(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(chcoll_oid)s</code>是頻道組ID，而<b>不是頻道組代"
-"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
-"\"%(about_page)s\">聯絡網站開發者。</a>"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
+"(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\profile_not_found.html:19
 msgid "User profile not found with the provided ID."
@@ -3234,8 +3076,8 @@ msgid ""
 "conditions match, but the error still occurs, please <a href=\"%(about_page)s"
 "\">contact the website developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
-"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: %"
+"(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\unknown.html:13
@@ -3481,6 +3323,147 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid ""
+#~ "This way of using the bot command is deprecating. Please visit {} to see "
+#~ "the usage of new command set."
+#~ msgstr ""
+#~ "此機器人指令使用方式即將廢止，請至 {} 查看新指令使用方式和可用指令。"
+
+#~ msgid "Bot Commands List (Old, DEPRECATING)"
+#~ msgstr "機器人指令清單 (原 / 即將廢止)"
+
+#~ msgid "Bot Command - {} (DEPRECATING)"
+#~ msgstr "機器人指令 - {} (即將廢止)"
+
+#~ msgid "Bot Commands List (Old usage)"
+#~ msgstr "機器人指令清單 (原使用方式)"
+
+#~ msgid "Bot Command - {} (Old, deprecating)"
+#~ msgstr "機器人指令 - {} (原 / 即將廢止)"
+
+#~ msgid "Auto Reply - Add"
+#~ msgstr "自動回覆 - 新增"
+
+#~ msgid ""
+#~ "**(DEPRECATING)**\n"
+#~ "\n"
+#~ "\n"
+#~ "Register an auto-reply module which is 1 keyword to 1 response to the "
+#~ "current channel."
+#~ msgstr ""
+#~ "**即將廢止**\n"
+#~ "\n"
+#~ "\n"
+#~ "新增一組 1關鍵字 1回覆 的自動回覆組至目前所在頻道。"
+
+#~ msgid ""
+#~ "### DEPRECATING, PLEASE CHECK THE DOCUMENTATION TO SEE HOW TO USE THE "
+#~ "COMMAND IN THE FUTURE\n"
+#~ "\n"
+#~ "\n"
+#~ "Register an auto-reply module which is 1 keyword to 1 response to the "
+#~ "current channel.\n"
+#~ "\n"
+#~ "The content type for both keyword and the response will be automatically "
+#~ "determined.\n"
+#~ "\n"
+#~ "To specify more properties of the module which the related controls are "
+#~ "not implemented / allowed here, please use the website to register."
+#~ "<hr>The properties of the auto-reply module created here will be "
+#~ "defaulted as below:\n"
+#~ "\n"
+#~ "- Pinned: `{}`\n"
+#~ "\n"
+#~ "- Private: `{}`\n"
+#~ "\n"
+#~ "- Tags: `{}`\n"
+#~ "\n"
+#~ "- Cooldown: `{}` secs"
+#~ msgstr ""
+#~ "### 即將廢止，請查閱使用說明以了解未來的指令使用方式\n"
+#~ "\n"
+#~ "\n"
+#~ "新增一組 1關鍵字 1回覆 的自動回覆組至目前所在頻道。\n"
+#~ "\n"
+#~ "系統會自動判斷 關鍵字 和 回覆 的內容種類。\n"
+#~ "\n"
+#~ "若欲指定更多自動回覆組的屬性，但是機器人指令無法完成 / 無法使用的話，請到"
+#~ "網站上新增。<hr>使用機器人指令所製作的回覆組的屬性預設值如下:\n"
+#~ "\n"
+#~ "- 置頂: `{}`\n"
+#~ "\n"
+#~ "- 私人: `{}`\n"
+#~ "\n"
+#~ "- 標籤: `{}`\n"
+#~ "\n"
+#~ "- 冷卻時間: `{}` 秒"
+
+#~ msgid "Auto Reply - Delete"
+#~ msgstr "自動回覆 - 刪除"
+
+#~ msgid ""
+#~ "**(DEPRECATING)**\n"
+#~ "\n"
+#~ "\n"
+#~ "Delete a module in the current channel."
+#~ msgstr ""
+#~ "**即將廢止**\n"
+#~ "\n"
+#~ "\n"
+#~ "刪除於所在頻道的自動回覆組。"
+
+#~ msgid ""
+#~ "### DEPRECATING, PLEASE CHECK THE DOCUMENTATION TO SEE HOW TO USE THE "
+#~ "COMMAND IN THE FUTURE\n"
+#~ "\n"
+#~ "\n"
+#~ "Deleted a module in the current channel."
+#~ msgstr ""
+#~ "### 即將廢止，請查閱使用說明以了解未來的指令使用方式\n"
+#~ "\n"
+#~ "\n"
+#~ "刪除於所在頻道的自動回覆組。"
+
+#~ msgid ""
+#~ "The way to use this command is deprecating. Please visit {} to see how to "
+#~ "use the command in the future."
+#~ msgstr "此指令的使用方式即將廢止。請至 {} 查閱新的指令使用方式。"
+
+#~ msgid ""
+#~ "The message for the auto-reply module to respond when triggered.<hr>If "
+#~ "the content **is number**, the content type will be **LINE sticker**.\n"
+#~ "\n"
+#~ "If the content **endswith .jpg**, the content type will be **image**.\n"
+#~ "\n"
+#~ "Otherwise, the content type will be **text**.<hr>Notes:\n"
+#~ "\n"
+#~ "- For content **endswith .jpg** - Please ensure that the URL is an image "
+#~ "when you open it, **NOT** a webpage. Otherwise, unexpected things may "
+#~ "happen.\n"
+#~ "- Please make sure that the newline **is escaped**, which means that the "
+#~ "real newline characters are transformed to be \\n.\n"
+#~ "\n"
+#~ "Check the documentation of command code `{}` to see the convenience "
+#~ "command to replace the newline character."
+#~ msgstr ""
+#~ "當自動回覆組被觸發時所回覆的訊息。<hr>如果內容是 **數字** ，則內容種類將會"
+#~ "是 **LINE貼圖** 。\n"
+#~ "\n"
+#~ "如果內容種類 **以.jpg結尾** ，則內容種類將會是 **圖片** 。\n"
+#~ "\n"
+#~ "否則，內容種類將會是 **文字** 。<hr>備註:\n"
+#~ "\n"
+#~ "- 針對 **以.jpg結尾** 的內容 - 請確認開啟該網址時，瀏覽器顯示的只有圖片，"
+#~ "而 **不是** 網頁，否則可能會發生不可預期的情況。\n"
+#~ "- 請確認換行字元已使用\\n替代。\n"
+#~ "\n"
+#~ "查閱 `{}` 的使用說明以了解替換換行字元的懶人指令。"
+
+#~ msgid ""
+#~ "This way of calling the command is deprecating. Please visit {} to see "
+#~ "what is available and to use it for the new command set."
+#~ msgstr "此使用指令的方式即將廢止。請至 {} 查閱新指令使用方式及可用指令。"
 
 #~ msgid "JELLYBOT"
 #~ msgstr "小水母"

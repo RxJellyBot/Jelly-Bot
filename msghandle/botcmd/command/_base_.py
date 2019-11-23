@@ -50,7 +50,7 @@ class CommandFunction:
             s = self.cmd_node.get_usage()
 
             for i in range(1, self.arg_count + 1):
-                s += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
+                s += self.cmd_node.main_splittor + f"({self.prm_keys[i].name})"
 
             self._cache[k] = s.strip()
 
@@ -65,7 +65,7 @@ class CommandFunction:
 
             for usage in self.cmd_node.get_all_usage():
                 for i in range(1, self.arg_count + 1):
-                    usage += self.cmd_node.splittor + f"({self.prm_keys[i].name})"
+                    usage += self.cmd_node.main_splittor + f"({self.prm_keys[i].name})"
 
                 ret.append(usage.strip())
 
@@ -87,7 +87,7 @@ class CommandFunction:
 class CommandNode:
     # TEST: Test all bot commands by executing command functions
     def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
-                 is_root=False, splittor=None, prefix=None, parent=None, case_insensitive=True):
+                 is_root=False, splittors=None, prefix=None, parent=None, case_insensitive=True):
         if codes:
             self._codes = CommandNode.parse_code(codes)
         else:
@@ -95,17 +95,17 @@ class CommandNode:
                 raise ValueError(f"`codes` cannot be `None` if the command node is not root. "
                                  f"(Command Node: {self.__class__.__name__})")
 
-        if is_root and (not splittor or not prefix):
-            raise ValueError("`splittor` and `prefix` must be specified if the command node is root.")
+        if is_root and (not splittors or not prefix):
+            raise ValueError("`splittors` and `prefix` must be specified if the command node is root.")
 
-        if not is_root and (splittor or prefix):
-            raise ValueError("Specify `splittor` and `prefix` only when the node is root.")
+        if not is_root and (splittors or prefix):
+            raise ValueError("Specify `splittors` and `prefix` only when the node is root.")
 
         self._name = name
         self._description = description
         self._brief_description = brief_description or description
         self._is_root = is_root
-        self._splittor = splittor
+        self._splittors = splittors
         self._prefix = prefix
         self._order_idx = order_idx or 0
         self._parent = parent
@@ -125,11 +125,15 @@ class CommandNode:
         return self._is_root
 
     @property
-    def splittor(self) -> str:
+    def splittors(self) -> List[str]:
+        return self._splittors
+
+    @property
+    def main_splittor(self) -> str:
         if self.is_root:
-            return self._splittor
+            return self._splittors[0]
         elif self.parent:
-            return self.parent.splittor
+            return self.parent.main_splittor
         else:
             raise ValueError(
                 "Invalid node. Parent is not available while this node is not the root. "
@@ -188,26 +192,26 @@ class CommandNode:
 
         while current:
             if current.is_root:
-                s = current.prefix + s
+                s = current.prefix + current.main_splittor + s
                 break
             else:
-                s = current.splittor + s
+                s = current.main_splittor + s
                 s = current.main_cmd_code + s
 
             current = current.parent
 
-        s = s[:-len(self.splittor)]
+        s = s[:-len(self.main_splittor)]
 
         return s
 
     def _get_usage_all_code_(self, node, suffix):
         if node.is_root:
-            return [(node.prefix + suffix)[:-len(self.splittor)]]
+            return [(node.prefix + suffix)[:-len(self.main_splittor)]]
         else:
             ret = []
 
             for code in node.command_codes:
-                ret.extend(self._get_usage_all_code_(node.parent, code + node.splittor + suffix))
+                ret.extend(self._get_usage_all_code_(node.parent, code + node.main_splittor + suffix))
 
             return ret
 
@@ -329,25 +333,49 @@ class CommandNode:
         else:
             return None
 
-    def _split_args_(self, s: str, arg_count: int) -> List[str]:
+    @staticmethod
+    def _split_args_(s: str, splittor: str, arg_count: int) -> List[str]:
         if not s:
             return []
-        elif arg_count == -1:
-            return s.split(self.splittor)
-        else:
-            return s.split(self.splittor, arg_count - 1)
+
+        ret = []
+        in_quote = False
+        proc_s = ""
+
+        def is_quote(c_):
+            return c_ in ("'", "\"")
+
+        for idx, c in enumerate(s):
+            is_splittor = c == splittor
+            if (not in_quote and is_splittor) or (in_quote and is_quote(c)):
+                ret.append(proc_s)
+
+                if arg_count != -1 and len(ret) >= arg_count:
+                    break
+
+                proc_s = ""
+            elif is_quote(c):
+                in_quote = True
+            elif not is_splittor:
+                proc_s += c
+
+        if proc_s:
+            ret.append(proc_s)
+
+        return ret
 
     @staticmethod
-    def _strip_args_(args_list: List[str]):
-        return [arg.strip() for arg in args_list]
+    def _sanitize_args_(args_list: List[str]):
+        return [arg.strip() for arg in args_list if arg]
 
-    def parse_args(self, e: TextMessageEventObject, max_arg_count: int = None) -> List[HandledMessageEventText]:
+    def parse_args(self, e: TextMessageEventObject, splittor, max_arg_count: int = None, args: List[str] = None) \
+            -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
-        s = e.content
-        args = self._split_args_(s, max_arg_count)
-        args = self._strip_args_(args)
+        if not args:
+            args = self._split_args_(e.content, splittor, max_arg_count)
+            args = self._sanitize_args_(args)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
@@ -369,13 +397,12 @@ class CommandNode:
 
             return ret
 
-        if s:
+        if e.content:
             cmd_code, cmd_args = args[0], args[1:]
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
-                e.content = s[len(cmd_code) + len(self.splittor):]
-                return cmd_node.parse_args(e, cmd_node.max_arg_count)
+                return cmd_node.parse_args(e, splittor, cmd_node.max_arg_count, args=cmd_args)
 
         return []
 
@@ -412,5 +439,18 @@ class CommandHandler:
         # Remove prefix from the string content
         e.content = e.content[len(self._root.prefix):]
 
-        # Parse the command and return the response
-        return self._root.parse_args(e)
+        # Check what splittor to apply
+        splittor = None
+        for spltr in self._root.splittors:
+            if e.content.startswith(spltr):
+                splittor = spltr
+                break
+
+        if splittor:
+            # Remove splittor from the string content
+            e.content = e.content[len(splittor):]
+
+            # Parse the command and return the response
+            return self._root.parse_args(e, splittor)
+        else:
+            return []

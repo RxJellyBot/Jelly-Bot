@@ -49,22 +49,35 @@ class ControlExtensionMixin(Collection):
     def _get_duplicated_doc_id_(self, model_dict: dict):
         unique_keys = []
 
+        # Get unique indexes
         for idx_info in self.index_information().values():
             if idx_info.get("unique", False):
-                for key, order in idx_info["key"]:
-                    unique_keys.append(key)
+                unique_keys.append(idx_info["key"])
 
-        # DEBUG: Cannot be `or_list` as data with more unique indexes will catch unexpected things
         filter_ = {}
+        or_list = []
         for unique_key in unique_keys:
-            data = model_dict.get(unique_key)
-            if data is not None:
-                if isinstance(data, list):
-                    filter_[unique_key] = {"$elemMatch": {"$in": data}}
-                elif isinstance(data, dict):
-                    filter_[unique_key] = data
-                else:
-                    filter_[unique_key] = data
+            if len(unique_key) > 1:
+                # Compound Index
+                for key, order in unique_key:
+                    data = model_dict.get(key)
+                    if data is not None:
+                        if isinstance(data, list):
+                            filter_[key] = {"$elemMatch": {"$in": data}}
+                        else:
+                            filter_[key] = data
+            else:
+                key, order = unique_key[0]
+
+                data = model_dict.get(key)
+                if data is not None:
+                    if isinstance(data, list):
+                        or_list.append({key: {"$elemMatch": {"$in": data}}})
+                    else:
+                        or_list.append({key: data})
+
+        if or_list:
+            filter_["$or"] = or_list
 
         return self.find_one(filter_)[OID_KEY]
 
@@ -109,12 +122,12 @@ class ControlExtensionMixin(Collection):
 
         return model, outcome, ex
 
-    def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
-        update_result = self.update_one(filter_, update, upsert, collation)
+    def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
+        update_result = self.update_many(filter_, update, upsert, collation)
 
         if update_result.matched_count > 0:
             if update_result.modified_count > 0:
-                outcome = WriteOutcome.O_INSERTED
+                outcome = WriteOutcome.O_DATA_UPDATED
             else:
                 outcome = WriteOutcome.O_DATA_EXISTS
         else:

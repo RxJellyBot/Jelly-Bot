@@ -8,7 +8,7 @@ from pymongo.command_cursor import CommandCursor
 
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
-from mongodb.factory.results import RecordAPIStatisticsResult, MessageRecordResult
+from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel
 from JellyBot.systemconfig import Database
 

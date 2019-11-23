@@ -6,7 +6,7 @@ from extutils.checker import param_type_ensure
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel, OID_KEY
 from mongodb.factory.results import GetOutcome, AutoReplyContentAddResult, AutoReplyContentGetResult
-from mongodb.utils import case_insensitive_collation
+from mongodb.utils import case_insensitive_collation, Query, MatchPair
 
 from ._base import BaseCollection
 from ._mixin import CacheMixin
@@ -27,28 +27,15 @@ class AutoReplyContentManager(CacheMixin, BaseCollection):
                           name="Auto Reply Content Identity", unique=True)
 
     def add_content(self, content: str, type_: AutoReplyContentType) -> AutoReplyContentAddResult:
-        entry, outcome, ex = self.insert_one_data(Content=content, ContentType=type_)
-
-        self.set_cache(entry)
+        entry, outcome, ex = self.insert_one_data_cache(Content=content, ContentType=type_)
 
         return AutoReplyContentAddResult(outcome, entry, ex)
 
     def _get_content_(self, content: str, type_: AutoReplyContentType, case_insensitive: bool = False):
-        q = self.empty_query()
-        ret = self.get_cache(
-            (q[AutoReplyContentModel.Content.key] == content) & (q[AutoReplyContentModel.ContentType.key] == type_),
-            parse_cls=AutoReplyContentModel
-        )
-
-        if ret:
-            return ret
-
-        ret = self.find_one_casted(
-            {AutoReplyContentModel.Content.key: content, AutoReplyContentModel.ContentType.key: type_},
-            parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
-
-        if ret:
-            self.set_cache(ret)
+        q = Query(MatchPair(AutoReplyContentModel.Content.key, content),
+                  MatchPair(AutoReplyContentModel.ContentType.key, type_))
+        ret = self.get_cache_one(
+            q, parse_cls=AutoReplyContentModel, collation=case_insensitive_collation if case_insensitive else None)
 
         return ret
 
@@ -84,18 +71,7 @@ class AutoReplyContentManager(CacheMixin, BaseCollection):
 
     @param_type_ensure
     def get_content_by_id(self, oid: ObjectId) -> Optional[AutoReplyContentModel]:
-        q = self.empty_query()
-        ret = self.get_cache(q[OID_KEY] == oid, parse_cls=AutoReplyContentModel)
-
-        if ret:
-            return ret
-
-        ret = self.find_one_casted({OID_KEY: oid}, parse_cls=AutoReplyContentModel)
-
-        if ret:
-            self.set_cache(ret)
-
-        return ret
+        return self.get_cache_one(Query(MatchPair(OID_KEY, oid)), parse_cls=AutoReplyContentModel)
 
 
 _inst = AutoReplyContentManager()
