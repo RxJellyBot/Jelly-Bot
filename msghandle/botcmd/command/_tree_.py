@@ -26,7 +26,7 @@ cmd_root.attach_child_node(cmd_rdm)
 
 # DEPRECATE: Old command
 
-cmd_ar_old = cmd_root.new_child_node(codes=["a", "aa", "d", "del"])
+cmd_ar_old = cmd_root.new_child_node(codes=["a", "aa", "d", "del"], order_idx=99999999)
 cmd_root.attach_child_node(cmd_ar_old)
 
 
