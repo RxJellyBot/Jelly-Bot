@@ -53,15 +53,15 @@ class OptionList:
 
 
 elem_help_txt = _(
-    "Options to be picked. Use two continuous spaces/blanks (`{}`) to separate options.\n"
-    "- The count of the options cannot exceed {}.\n"
+    "Options to be picked. Use two continuous spaces/blanks (`{}`) to separate options.\n\n"
+    "- The count of the options cannot exceed {}.\n\n"
     "- If **ALL** options exists single space/blank (`{}`), then this "
-    "will be considered as a **weighted** option list. The options picked will base on their weight.\n"
-    "- Weights can be either float, integer, or both.\n"
-    "- Duplicated option will be automatically ignored."
-    "\n"
-    "Example:\n"
-    "- Option List **without** weights: A{}B{}C\n"
+    "will be considered as a **weighted** option list. The options picked will base on their weight.\n\n"
+    "- Weights can be either float, integer, or both.\n\n"
+    "- Duplicated option will be automatically ignored.\n\n"
+    "\n\n"
+    "Example:\n\n"
+    "- Option List **without** weights: A{}B{}C\n\n"
     "- Option List **with** weights: A{}0.7{}B{}0.5{}C{}0.9").format(
     Bot.RandomChoiceSplittor, Bot.RandomChoiceOptionLimit, Bot.RandomChoiceWeightSplittor,
     Bot.RandomChoiceSplittor, Bot.RandomChoiceSplittor,
