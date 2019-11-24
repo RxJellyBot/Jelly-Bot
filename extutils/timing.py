@@ -22,7 +22,7 @@ class ExecutionResult:
 
     @property
     def execution_ms(self) -> float:
-        return self.execution_us / 1000000
+        return self.execution_us / 1000
 
     def __repr__(self):
         return f"{self.execution_us:.2f} us - " \

@@ -343,7 +343,7 @@ class CommandNode:
         proc_s = ""
 
         def is_quote(c_):
-            return c_ in ("'", "\"")
+            return c_ in ("'", "\"", "“", "”")
 
         for idx, c in enumerate(s):
             is_splittor = c == splittor
