@@ -135,7 +135,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         if hours_within:
             days_collected = hours_within / 24
         else:
-            oldest = self.find_one({}, sort=[(OID_KEY, pymongo.ASCENDING)])
+            oldest = self.find_one(match_d, sort=[(OID_KEY, pymongo.ASCENDING)])
 
             if oldest:
                 # Offset-naive

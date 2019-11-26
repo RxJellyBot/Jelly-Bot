@@ -32,15 +32,17 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
 
         hours_within = safe_cast(request.GET.get("hours_within"), int) or ""
 
-        channel_members = ProfileManager.get_channel_members(channel_oid)
+        msg_intvflow_data = MessageRecordStatisticsManager.hourly_interval_message_count(
+                    channel_oid, hours_within)
+
+        channel_members = ProfileManager.get_channel_members(channel_oid)  # Reserved for per member analysis
 
         return render_template(
             self.request, _("Channel Message Stats - {}").format(channel_oid), "info/msgstats/main.html",
             {
                 "ch_name": channel_data.get_channel_name(get_root_oid(request)),
                 "channel_data": channel_data,
-                "hr_range": hours_within,
-                "msg_intvflow_data": MessageRecordStatisticsManager.hourly_interval_message_count(
-                    channel_oid, hours_within)
+                "hr_range": hours_within or msg_intvflow_data.hr_range,
+                "msg_intvflow_data": msg_intvflow_data
             },
             nav_param=kwargs)
