@@ -55,3 +55,5 @@ class HourlyIntervalAverageMessageResult:
 
         if days_collected > HourlyIntervalAverageMessageResult.DAYS_NONE:
             self.avg_data = list(map(lambda count: count / days_collected, self.avg_data))
+
+        self.hr_range = int(days_collected * 24)
