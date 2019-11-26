@@ -40,7 +40,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-form-label text-lg-right">
-                            <small>{% trans "Non-filled value with refresh means all-time record." %}</small>
+                            <small>{% trans "Leave this blank and refresh to get all-time record." %}</small>
                         </div>
                     </div>
                 </div>
@@ -109,6 +109,17 @@
         <div class="row">
             <div class="col-lg mb-3">
                 {% include "info/components/msg_stats_intvflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Member Message Count Ranking" %}</h5>
+                <p>{% trans "Total Count: " %}{{ channel_user_msg.msg_count }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_stats_table.html" with message_stats=channel_user_msg.member_stats only %}
             </div>
         </div>
     </div>

@@ -35,6 +35,8 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
         msg_intvflow_data = MessageRecordStatisticsManager.hourly_interval_message_count(
                     channel_oid, hours_within)
 
+        user_channel_messages = MessageStatsDataProcessor.get_user_channel_messages(channel_data, hours_within)
+
         channel_members = ProfileManager.get_channel_members(channel_oid)  # Reserved for per member analysis
 
         return render_template(
@@ -43,6 +45,7 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
                 "ch_name": channel_data.get_channel_name(get_root_oid(request)),
                 "channel_data": channel_data,
                 "hr_range": hours_within or msg_intvflow_data.hr_range,
-                "msg_intvflow_data": msg_intvflow_data
+                "msg_intvflow_data": msg_intvflow_data,
+                "channel_user_msg": user_channel_messages
             },
             nav_param=kwargs)

@@ -39,9 +39,9 @@ class ChannelInfoView(TemplateResponseMixin, View):
                     "ch_name": channel_data.get_channel_name(get_root_oid(request)),
                     "channel_data": channel_data,
                     "chcoll_data": chcoll_data,
-                    "user_message_data1d": sorted(msgdata_1d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "user_message_data1d": msgdata_1d.member_stats,
                     "msg_count1d": msgdata_1d.msg_count,
-                    "user_message_data7d": sorted(msgdata_7d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "user_message_data7d": msgdata_7d.member_stats,
                     "msg_count7d": msgdata_7d.msg_count,
                     "manageable": bool(
                         ProfileManager.get_user_profiles(channel_oid, get_root_oid(request)))
