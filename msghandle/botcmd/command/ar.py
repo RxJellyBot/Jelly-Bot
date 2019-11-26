@@ -214,7 +214,7 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
     ret = []
 
-    with ThreadPoolExecutor(max_workers=len(conn_list), thread_name_prefix="ConnList") as executor:
+    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="ConnList") as executor:
         futures = []
         for conn in conn_list:
             futures.append(executor.submit(conn.get_keyword_repr_in_cmd))

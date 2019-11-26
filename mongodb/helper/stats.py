@@ -25,6 +25,9 @@ class UserMessageStats:
     member_stats: List[UserMessageStatsEntry]
     msg_count: int
 
+    def __post_init__(self):
+        self.member_stats = list(sorted(self.member_stats, key=lambda x: x.message_count, reverse=True))
+
 
 @dataclass
 class UserMessageRanking:
@@ -50,7 +53,7 @@ class MessageStatsDataProcessor:
             total: int = sum(msg_rec.values())
 
             # Obtained from https://stackoverflow.com/a/40687012/11571888
-            with ThreadPoolExecutor(max_workers=len(msg_rec), thread_name_prefix="UserNameQuery") as executor:
+            with ThreadPoolExecutor(max_workers=4, thread_name_prefix="UserNameQuery") as executor:
                 futures = []
                 for uid, ct in msg_rec.items():
                     futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, ch_data))
