@@ -7,8 +7,9 @@ from django.utils.translation import gettext_lazy as _
 from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import BotFeatureUsageDataManager
-from extutils.checker import param_type_ensure
+from extutils.checker import param_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
 from extutils.logger import LoggerSkeleton
+from extutils.strtrans import type_translation
 
 logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
 
@@ -206,7 +207,7 @@ class CommandNode:
 
     def _get_usage_all_code_(self, node, suffix):
         if node.is_root:
-            return [(node.prefix + suffix)[:-len(self.main_splittor)]]
+            return [str(node.prefix + node.main_splittor + suffix)]
         else:
             ret = []
 
@@ -376,6 +377,17 @@ class CommandNode:
     def _sanitize_args_(args_list: List[str]):
         return [arg.strip() for arg in args_list if arg]
 
+    @staticmethod
+    def _merge_overlength_args_(args_list: List[str], splittor: str, max_count: int):
+        if 0 < max_count < len(args_list):
+            idx = max_count - 1
+            args_list[idx] = splittor.join(args_list[idx:])
+
+        if max_count > 0:
+            return args_list[:max_count]
+        else:
+            return args_list
+
     def parse_args(self, e: TextMessageEventObject, splittor, max_arg_count: int = None, args: List[str] = None) \
             -> List[HandledMessageEventText]:
         if not max_arg_count:
@@ -384,6 +396,8 @@ class CommandNode:
         if args is None:
             args = self._split_args_(e.content, splittor, max_arg_count)
             args = self._sanitize_args_(args)
+
+        args = self._merge_overlength_args_(args, splittor, max_arg_count)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
@@ -396,7 +410,14 @@ class CommandNode:
                         content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
             else:
                 BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
-                ret = param_type_ensure(cmd_fn.fn)(e, *args)
+                try:
+                    ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
+                except TypeCastingFailed as e:
+                    ret = [HandledMessageEventText(
+                        content=_("Incorrect type of data: `{}`.\n"
+                                  "Expected type: `{}` / Actual type: `{}`").format(
+                            e.data, type_translation(e.expected_type), type_translation(e.actual_type)
+                        ))]
 
             if isinstance(ret, str):
                 ret = [HandledMessageEventText(content=ret)]

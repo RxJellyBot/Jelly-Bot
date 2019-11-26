@@ -1,15 +1,17 @@
+from concurrent.futures.thread import ThreadPoolExecutor
 from typing import List
 import traceback
 
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from extutils.emailutils import MailSender
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
 from models import AutoReplyModuleExecodeModel
+from mongodb.utils import CursorWithCount
 from mongodb.factory import AutoReplyManager, AutoReplyContentManager, ExecodeManager
 from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
-from django.utils.translation import gettext_lazy as _
 from JellyBot.systemconfig import HostUrl, Bot
 
 from ._base_ import CommandNode
@@ -45,7 +47,7 @@ cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
 
 
-# ------------- Main Functions
+# ----------------------- Add
 
 
 @cmd_add.command_function(
@@ -170,6 +172,9 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                     add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
 
 
+# ----------------------- Delete
+
+
 @cmd_del.command_function(
     feature_flag=BotFeature.TXT_AR_DEL,
     arg_count=1,
@@ -204,6 +209,27 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
                     outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
 
 
+# ----------------------- List
+
+def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
+    ret = []
+
+    with ThreadPoolExecutor(max_workers=len(conn_list), thread_name_prefix="ConnList") as executor:
+        futures = []
+        for conn in conn_list:
+            futures.append(executor.submit(conn.get_keyword_repr_in_cmd))
+
+        # Non-lock call & Free resources when execution is done
+        executor.shutdown(False)
+
+        for completed in futures:
+            result = completed.result()
+            if result:
+                ret.append(result)
+
+    return ret
+
+
 @cmd_list.command_function(
     feature_flag=BotFeature.TXT_AR_LIST_USABLE,
     arg_count=0,
@@ -214,7 +240,7 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
 
     if not conn_list.empty:
         return [HandledMessageEventText(
-            content=_("Usable Keywords:") + "\n" + _(", ").join([conn.keyword for conn in conn_list])
+            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list))
         )]
     else:
         return [HandledMessageEventText(content=_("No usable auto-reply module in this channel."))]
@@ -236,8 +262,8 @@ def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
 
     if not conn_list.empty:
         return [HandledMessageEventText(
-            content=_("Usable Keywords:") + "\n" + _(", ").join([conn.keyword for conn in conn_list])
+            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list))
         )]
     else:
         return [HandledMessageEventText(
-            content=_("Cannot find any auto-reply module including the substring {} in their keyword."))]
+            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword."))]

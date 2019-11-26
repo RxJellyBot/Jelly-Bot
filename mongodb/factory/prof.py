@@ -85,6 +85,13 @@ class UserProfileManager(BaseCollection):
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
             parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)])
 
+    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
+        return self.find_cursor_with_count(
+            {f"{ChannelProfileConnectionModel.ProfileOids.key}.0": {"$exists": True},
+             ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
+            parse_cls=ChannelProfileConnectionModel
+        )
+
 
 class ProfileDataManager(BaseCollection):
     database_name = DB_NAME
@@ -267,6 +274,9 @@ class ProfileManager:
                            in PermissionCategoryDefault.get_admin_override() if perm_grant)
 
         return ret
+
+    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
+        return self._conn.get_channel_members(channel_oid)
 
 
 _inst = ProfileManager()

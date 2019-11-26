@@ -8,25 +8,25 @@ from flags import AutoReplyContentType, PermissionCategory, Platform
 
 
 def type_translation(type_: type):
-    if isinstance(type_, str):
+    if issubclass(type_, str):
         return _("String")
-    elif isinstance(type_, bool):
+    elif issubclass(type_, bool):
         return _("Boolean")
-    elif isinstance(type_, int):
+    elif issubclass(type_, int):
         return _("Integer")
-    elif isinstance(type_, AutoReplyContentType):
+    elif issubclass(type_, AutoReplyContentType):
         return _("Auto Reply Content Type")
-    elif isinstance(type_, PermissionCategory):
+    elif issubclass(type_, PermissionCategory):
         return _("Permission Category")
-    elif isinstance(type_, Platform):
+    elif issubclass(type_, Platform):
         return _("Platform")
-    elif isinstance(type_, datetime):
+    elif issubclass(type_, datetime):
         return _("Datetime")
-    elif isinstance(type_, ObjectId):
+    elif issubclass(type_, ObjectId):
         return _("ObjectId")
-    elif isinstance(type_, Iterable):
+    elif issubclass(type_, Iterable):
         return _("Iterable (e.g. List, Array, Dictionary...)")
-    elif isinstance(type_, type(None)):
+    elif issubclass(type_, type(None)):
         return _("(Null)")
     else:
         return type_.__qualname__

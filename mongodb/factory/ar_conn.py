@@ -159,6 +159,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
     def get_conn_list(
             self, channel_oid: ObjectId, keyword_oids: List[ObjectId] = None, active_only: bool = True) \
             -> CursorWithCount:
+        """Sort by used count (desc)."""
         filter_ = {
             AutoReplyModuleModel.ChannelId.key: channel_oid
         }
@@ -169,7 +170,8 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         if active_only:
             filter_[AutoReplyModuleModel.Active.key] = True
 
-        return self.find_cursor_with_count(filter_, parse_cls=AutoReplyModuleModel)
+        return self.find_cursor_with_count(
+            filter_, parse_cls=AutoReplyModuleModel).sort([AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING])
 
 
 class AutoReplyModuleTagManager(BaseCollection):
