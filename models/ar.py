@@ -99,7 +99,18 @@ class AutoReplyModuleModel(Model):
     def keyword(self) -> Optional[str]:
         from mongodb.factory import AutoReplyContentManager
         ctnt = AutoReplyContentManager.get_content_by_id(self.keyword_oid)
-        return str(ctnt.content) if ctnt else None
+        return str(ctnt.content) or None
+
+    def get_ctnt_mdl(self) -> AutoReplyContentModel:
+        from mongodb.factory import AutoReplyContentManager
+        return AutoReplyContentManager.get_content_by_id(self.keyword_oid)
+
+    def get_keyword_repr_in_cmd(self) -> Optional[str]:
+        ret = str(self.get_ctnt_mdl())
+        if ret:
+            return f"{ret} ({self.called_count})"
+        else:
+            return None
 
 
 class AutoReplyModuleExecodeModel(Model):

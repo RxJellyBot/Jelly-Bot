@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type, List, Union
+from typing import Any, Type, List, Union, Optional
 from inspect import signature, Parameter
 
 from bson import ObjectId
@@ -8,7 +8,22 @@ from extutils.flags import FlagCodeMixin
 from .logger import logger
 
 
-__all__ = ["param_type_ensure"]
+__all__ = [
+    "param_type_ensure", "TypeCastingFailed",
+    "BaseDataTypeConverter", "NonSafeDataTypeConverter"
+]
+
+
+class TypeCastingFailed(Exception):
+    def __init__(self, data: Any, dtype: type, exception: Exception):
+        self.data = data
+        self.expected_type = dtype
+        self.actual_type = type(data)
+        self.inner_exception = exception
+
+        super().__init__(
+            f"Type casting failed. (Data: {data} / Expected: {self.expected_type} / Actual: {self.actual_type} / "
+            f"Exception: {exception})")
 
 
 class BaseDataTypeConverter(ABC):
@@ -93,11 +108,43 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
         return data
 
 
-def param_type_ensure(fn):
-    def wrapper_in(*args_cast, **kwargs_cast):
-        return _type_ensure_(fn, GeneralDataTypeConverter, *args_cast, **kwargs_cast)
+class NonSafeDataTypeConverter(GeneralDataTypeConverter):
+    """Raises `TypeCastingFailed` on exception occurred during casting."""
+    valid_data_types = [int, str, bool, type, dict, ObjectId]
 
-    return wrapper_in
+    @classmethod
+    def _convert_(cls, data: Any, type_annt):
+        ret = super()._convert_(data, type_annt)
+        return ret
+
+    @staticmethod
+    def on_type_invalid(data: Any, dtype: type) -> Any:
+        if issubclass(dtype, FlagCodeMixin):
+            return dtype(int(data))
+        else:
+            return data
+
+    @staticmethod
+    def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
+        logger.logger.warning(f"Type casting failed. Data: {data} / Target Type: {dtype} / Exception: {e}")
+
+        raise TypeCastingFailed(data, dtype, e)
+
+
+def param_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
+    if fn:
+        def wrapper_in(*args_cast, **kwargs_cast):
+            return _type_ensure_(fn, converter, *args_cast, **kwargs_cast)
+
+        return wrapper_in
+    else:
+        def fn_wrap(fn_in):
+            def wrapper_in_2(*args_cast, **kwargs_cast):
+                return _type_ensure_(
+                    fn_in, converter, *args_cast, **kwargs_cast)
+
+            return wrapper_in_2
+        return fn_wrap
 
 
 def _type_ensure_(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwargs_cast):

@@ -73,6 +73,9 @@ class Database:
 class DataQuery:
     TagPopularitySearchCount = 10
 
+    UserNameCacheSize = 1000
+    UserNameExpirationSeconds = 129600  # 1.5 Days
+
 
 class ChannelConfig:
     VotesToPromoteMod = 7

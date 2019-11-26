@@ -26,10 +26,11 @@ class LineApiWrapper:
         self._core = line_api
 
     def reply_text(self, reply_token, message: Union[str, List[str]]):
+        # Force cast messages to `str` because sometimes it may be __proxy__
         if isinstance(message, str):
-            send_messages = TextSendMessage(text=message)
+            send_messages = TextSendMessage(text=str(message))
         elif isinstance(message, list):
-            send_messages = [TextSendMessage(text=msg) for msg in message]
+            send_messages = [TextSendMessage(text=str(msg)) for msg in message]
         else:
             raise ValueError("Message should be either in `list` of `str` or `str`.")
 
