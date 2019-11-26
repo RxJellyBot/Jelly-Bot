@@ -1,0 +1,34 @@
+{% load i18n %}
+
+{% include "components/chart.html" %}
+
+<canvas id="msgstats-intvflow"></canvas>
+
+<script type="text/javascript">
+    let ctx = document.getElementById("msgstats-intvflow").getContext("2d");
+    let chart = new Chart(ctx, {
+        type: "line",
+
+        data: {
+            labels: {{ msg_intvflow_data.hours_label }},
+            datasets: [{
+                label: "{% trans "Message Count / Day" %}",
+                borderColor: "rgb(50, 50, 50)",
+                pointBackgroundColor: "rgb(50, 50, 50)",
+                pointBorderColor: "rgb(50, 50, 50)",
+                pointRadius: 5,
+                pointHoverRadius: 10,
+                fill: false,
+                data: {{ msg_intvflow_data.avg_data }}
+            }]
+        },
+
+        options: {
+            elements: {
+                line: {
+                    tension: 0 // disables bezier curves
+                }
+            }
+        }
+    });
+</script>

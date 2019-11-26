@@ -10,7 +10,7 @@ from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel, ChannelCollectionModel
-from mongodb.factory import ChannelManager, ProfileManager, ChannelCollectionManager
+from mongodb.factory import ChannelManager, ProfileManager, MessageRecordStatisticsManager
 from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
 
 
@@ -26,23 +26,21 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
 
         channel_data: Optional[ChannelModel] = ChannelManager.get_channel_oid(channel_oid)
 
-        if channel_data:
-            channel_members = ProfileManager.get_channel_members(channel_oid)
-
-            return render_template(
-                self.request, _("Channel Message Stats - {}").format(channel_oid), "info/msgstats/main.html",
-                {
-                    "ch_name": channel_data.get_channel_name(get_root_oid(request)),
-                    "channel_data": channel_data,
-                    "chcoll_data": chcoll_data,
-                    "user_message_data1d": sorted(msgdata_1d.member_stats, key=lambda x: x.message_count, reverse=True),
-                    "msg_count1d": msgdata_1d.msg_count,
-                    "user_message_data7d": sorted(msgdata_7d.member_stats, key=lambda x: x.message_count, reverse=True),
-                    "msg_count7d": msgdata_7d.msg_count,
-                    "manageable": bool(
-                        ProfileManager.get_user_profiles(channel_oid, get_root_oid(request)))
-                },
-                nav_param=kwargs)
-        else:
+        if not channel_data:
             return WebsiteErrorView.website_error(
                 request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_oid_str}, nav_param=kwargs)
+
+        hours_within = safe_cast(request.GET.get("hours_within"), int) or ""
+
+        channel_members = ProfileManager.get_channel_members(channel_oid)
+
+        return render_template(
+            self.request, _("Channel Message Stats - {}").format(channel_oid), "info/msgstats/main.html",
+            {
+                "ch_name": channel_data.get_channel_name(get_root_oid(request)),
+                "channel_data": channel_data,
+                "hr_range": hours_within,
+                "msg_intvflow_data": MessageRecordStatisticsManager.hourly_interval_message_count(
+                    channel_oid, hours_within)
+            },
+            nav_param=kwargs)

@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 
 def cast_keep_none(obj, dest_type: type):
@@ -88,3 +89,9 @@ def demarkdown(markdown_str: str):
         .replace("<hr>", "----------")\
         .replace("<pre>", "```")\
         .replace("</pre>", "```")
+
+
+def rotate_list(l: List, n: int):
+    """`n` means elements to rotate from left to right"""
+    n = int(n)
+    return l[n:] + l[:n]
