@@ -14,7 +14,7 @@ from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConf
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 # noinspection PyUnresolvedReferences
-from .stats import APIStatisticModel, MessageRecordModel, BotFeatureUsageModel
+from .stats import APIStatisticModel, MessageRecordModel, BotFeatureUsageModel, HourlyIntervalAverageMessageResult
 # noinspection PyUnresolvedReferences
 from .execode import ExecodeEntryModel
 # noinspection PyUnresolvedReferences

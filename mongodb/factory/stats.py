@@ -9,7 +9,8 @@ from pymongo.command_cursor import CommandCursor
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
-from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel
+from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
+    HourlyIntervalAverageMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -62,6 +63,26 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     # Statistics
 
+    @staticmethod
+    def _channel_oids_filter_(channel_oids: Union[ObjectId, List[ObjectId]]):
+        if isinstance(channel_oids, ObjectId):
+            return {MessageRecordModel.ChannelOid.key: channel_oids}
+        elif isinstance(channel_oids, list):
+            return {MessageRecordModel.ChannelOid.key: {"$in": channel_oids}}
+        else:
+            raise ValueError("Must be either `ObjectId` or `List[ObjectId]`.")
+
+    @staticmethod
+    def _hours_within_filter_(hours_within: Optional[int] = None):
+        if hours_within:
+            return {
+                OID_KEY: {
+                    "$gt": ObjectId.from_datetime(
+                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
+                }}
+
+        return {}
+
     def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
         aggr = list(self.aggregate([
             {"$match": {
@@ -82,19 +103,8 @@ class MessageRecordStatisticsManager(BaseCollection):
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
             -> CommandCursor:
-        if isinstance(channel_oids, ObjectId):
-            match_d = {MessageRecordModel.ChannelOid.key: channel_oids}
-        elif isinstance(channel_oids, list):
-            match_d = {MessageRecordModel.ChannelOid.key: {"$in": channel_oids}}
-        else:
-            raise ValueError("Parameter `channel_oids` must be either `ObjectId` or `List[ObjectId]`.")
-
-        if hours_within:
-            match_d.update(**{
-                OID_KEY: {
-                    "$gt": ObjectId.from_datetime(
-                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
-                }})
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -106,6 +116,39 @@ class MessageRecordStatisticsManager(BaseCollection):
         ]
 
         return self.aggregate(aggr_pipeline)
+
+    def hourly_interval_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) -> \
+            HourlyIntervalAverageMessageResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {"$hour": {"$toDate": "$_id"}},
+                HourlyIntervalAverageMessageResult.KEY: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        if hours_within:
+            days_collected = hours_within / 24
+        else:
+            oldest = self.find_one({}, sort=[(OID_KEY, pymongo.ASCENDING)])
+
+            if oldest:
+                # Offset-naive
+                now = datetime.utcnow()
+                # Offset-aware
+                oldest_doc = ObjectId(oldest[OID_KEY]).generation_time
+
+                # Replace to let both be Offset-naive
+                days_collected = (now - oldest_doc.replace(tzinfo=None)).total_seconds() / 86400
+            else:
+                days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
+
+        return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), days_collected)
 
 
 class BotFeatureUsageDataManager(BaseCollection):
