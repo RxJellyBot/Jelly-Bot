@@ -37,6 +37,14 @@ class LineApiWrapper:
         self._core.reply_message(reply_token, send_messages)
 
     def reply_message(self, reply_token, messages: Union[SendMessage, List[SendMessage]]):
+        # Force cast messages to `str` because sometimes it may be __proxy__
+        if isinstance(messages, TextSendMessage):
+            messages = TextSendMessage(text=str(messages.text))
+        elif isinstance(messages, list):
+            messages = [TextSendMessage(text=str(msg.text)) for msg in messages]
+        else:
+            raise ValueError("Message should be either in `list` of `TextSendMessage` or `TextSendMessage`.")
+
         self._core.reply_message(reply_token, messages)
 
     def get_profile(self, uid, channel_data: Optional[ChannelModel] = None) -> Optional[Profile]:
