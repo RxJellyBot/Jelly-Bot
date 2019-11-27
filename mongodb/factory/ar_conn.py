@@ -171,7 +171,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
             filter_[AutoReplyModuleModel.Active.key] = True
 
         return self.find_cursor_with_count(
-            filter_, parse_cls=AutoReplyModuleModel).sort([AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING])
+            filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
 
 class AutoReplyModuleTagManager(BaseCollection):

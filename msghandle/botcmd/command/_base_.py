@@ -426,13 +426,15 @@ class CommandNode:
 
             return ret
 
-        if e.content:
+        if args:
             cmd_code, cmd_args = args[0], args[1:]
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
                 return cmd_node.parse_args(e, splittor, cmd_node.max_arg_count, args=cmd_args)
 
+        # INCOMPLETE: Bot Command: Check if is in the command parsing procedure. If it is, send error message indicates
+        #   the user that they need to check user manual
         return []
 
     @staticmethod

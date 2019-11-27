@@ -19,7 +19,7 @@ class OptionList:
         self.elements = list(set(txt.split(Bot.RandomChoiceSplittor)))
         self.weights = None
 
-        if all([Bot.RandomChoiceWeightSplittor in elem for elem in self.elements]):
+        if len(self.elements) > 1 and all([Bot.RandomChoiceWeightSplittor in elem for elem in self.elements]):
             temp = []
             self.weights = []
 
