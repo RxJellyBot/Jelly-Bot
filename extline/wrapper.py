@@ -41,7 +41,8 @@ class LineApiWrapper:
         if isinstance(messages, TextSendMessage):
             messages = TextSendMessage(text=str(messages.text))
         elif isinstance(messages, list):
-            messages = [TextSendMessage(text=str(msg.text)) for msg in messages]
+            messages = [TextSendMessage(text=str(msg.text)) if isinstance(msg, TextSendMessage) else msg
+                        for msg in messages]
         else:
             raise ValueError("Message should be either in `list` of `TextSendMessage` or `TextSendMessage`.")
 
