@@ -40,20 +40,28 @@ class HourlyIntervalAverageMessageResult:
     DAYS_NONE = 0
     KEY = "count"
 
-    def __init__(self, cursor, days_collected: float):
+    def __init__(self, cursor, days_collected: int):
         # Create hours label for webpage
         self.hours_label = [i for i in range(24)]
         # Initialize average data object
         self.avg_data = [0 for _ in range(24)]
 
-        tz_offset = int(timezone.get_current_timezone().utcoffset(dt=datetime.utcnow()).total_seconds() // 3600)
+        now = datetime.utcnow()
+        now_utc_hr = now.hour
+        tz_offset = int(timezone.get_current_timezone().utcoffset(dt=now).total_seconds() // 3600)
 
         for d in list(cursor):
             utc_hr = d["_id"]
-            current_hr = (utc_hr + tz_offset) % 24
-            self.avg_data[current_hr] = d[HourlyIntervalAverageMessageResult.KEY]
+            offset_hr = (utc_hr + tz_offset) % 24
 
-        if days_collected > HourlyIntervalAverageMessageResult.DAYS_NONE:
-            self.avg_data = list(map(lambda count: count / days_collected, self.avg_data))
+            if days_collected > HourlyIntervalAverageMessageResult.DAYS_NONE:
+                # Count 1 days more if the current hour passed the recording hour
+                denom = days_collected
+                if now_utc_hr > utc_hr:
+                    denom += 1
+
+                self.avg_data[offset_hr] = d[HourlyIntervalAverageMessageResult.KEY] / denom
+            else:
+                self.avg_data[offset_hr] = d[HourlyIntervalAverageMessageResult.KEY]
 
         self.hr_range = int(days_collected * 24)
