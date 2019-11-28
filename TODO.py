@@ -2,7 +2,6 @@
 #   Daily Notifications on specific time
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Statistics: Message flow of the user
-# INCOMPLETE: Info: Message count and flow for each channel
 # INCOMPLETE: Auto-Reply: Sync across channel
 # TODO: Optimize Performace on Channel List (website)
 # TODO: Account Management: API Key refresh

@@ -1,13 +1,17 @@
+from collections import defaultdict
 from dataclasses import dataclass, field
 from time import monotonic
 from typing import List, Dict, Optional, Union, Callable, Tuple
 from inspect import signature
 
+from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import BotFeatureUsageDataManager
+from JellyBot.systemconfig import HostUrl
 from extutils.checker import param_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
 from extutils.logger import LoggerSkeleton
 from extutils.strtrans import type_translation
@@ -35,14 +39,14 @@ class CommandFunction:
     description: str
     scope: CommandScope
     cooldown_sec: int
-    last_call: float = field(init=False)
+    last_call: Dict[ObjectId, float] = field(init=False)
     prm_keys: List[CommandParameter] = field(init=False)
 
     def __post_init__(self):
         # List of parameters for future reference
         self.prm_keys = [CommandParameter(name, prm.annotation.__name__)
                          for name, prm in signature(self.fn).parameters.items()]
-        self.last_call = -self.cooldown_sec
+        self.last_call = defaultdict(lambda: -self.cooldown_sec)
         self._cache = {}
 
     # Dynamically construct `usage` because `cmd_node.splittor` is required. Command structure wasn't ready
@@ -85,23 +89,21 @@ class CommandFunction:
 
     @property
     def function_id(self) -> int:
-        # For documentation use
+        # For documentation uniqueness identifying use
         return id(self.fn)
 
-    @property
-    def can_be_called(self) -> bool:
-        return (monotonic() - self.last_call) > self.cooldown_sec
+    def can_be_called(self, channel_oid: ObjectId) -> bool:
+        return (monotonic() - self.last_call[channel_oid]) > self.cooldown_sec
 
-    @property
-    def cd_sec_left(self) -> float:
-        return max(self.cooldown_sec - (monotonic() - self.last_call), 0)
+    def cd_sec_left(self, channel_oid: ObjectId) -> float:
+        return max(self.cooldown_sec - (monotonic() - self.last_call[channel_oid]), 0)
 
     @property
     def has_cooldown(self) -> int:
         return self.cooldown_sec > 0
 
-    def record_called(self):
-        self.last_call = monotonic()
+    def record_called(self, channel_oid: ObjectId):
+        self.last_call[channel_oid] = monotonic()
 
     def __eq__(self, other):
         return self.function_id == other.function_id
@@ -415,7 +417,9 @@ class CommandNode:
         else:
             return args_list
 
-    def parse_args(self, e: TextMessageEventObject, splittor, max_arg_count: int = None, args: List[str] = None) \
+    def parse_args(
+            self, e: TextMessageEventObject, splittor, max_arg_count: int = None,
+            args: List[str] = None, is_sub=False) \
             -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
@@ -435,16 +439,16 @@ class CommandNode:
                 ret = [
                     HandledMessageEventText(
                         content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
-            elif not cmd_fn.can_be_called:
+            elif not cmd_fn.can_be_called(e.channel_oid):
                 ret = [
                     HandledMessageEventText(
                         content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
-                            cmd_fn.cd_sec_left))]
+                            cmd_fn.cd_sec_left(e.channel_oid)))]
             else:
                 BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
                 try:
                     ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
-                    cmd_fn.record_called()
+                    cmd_fn.record_called(e.channel_oid)
                 except TypeCastingFailed as e:
                     ret = [HandledMessageEventText(
                         content=_("Incorrect type of data: `{}`.\n"
@@ -464,11 +468,14 @@ class CommandNode:
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
-                return cmd_node.parse_args(e, splittor, cmd_node.max_arg_count, args=cmd_args)
+                return cmd_node.parse_args(e, splittor, cmd_node.max_arg_count, args=cmd_args, is_sub=True)
 
-        # INCOMPLETE: Bot Command: Check if is in the command parsing procedure. If it is, send error message indicates
-        #   the user that they need to check user manual
-        return []
+        if is_sub:
+            return [HandledMessageEventText(
+                content=_("Executable command not found.\nVisit {}{} for more information.").format(
+                    HostUrl, reverse("page.doc.botcmd.main")))]
+        else:
+            return []
 
     @staticmethod
     def parse_code(codes) -> List[str]:
