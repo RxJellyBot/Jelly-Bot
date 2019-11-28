@@ -149,6 +149,8 @@ def _construct_docs_(current_path, parent, nav_param):
         NavHeader, label=_("Bot"), parent=docs_parent))
     docs_parent.add_item(cmd_list)
     docs_parent.add_item(nav_items_factory(
+        NavDivider, parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
         NavHeader, label=_("Outcome Code"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Get Outcome"), link=reverse("page.doc.code.get"), parent=docs_parent))

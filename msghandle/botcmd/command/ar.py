@@ -233,7 +233,8 @@ def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
 @cmd_list.command_function(
     feature_flag=BotFeature.TXT_AR_LIST_USABLE,
     arg_count=0,
-    scope=CommandScopeCollection.GROUP_ONLY
+    scope=CommandScopeCollection.GROUP_ONLY,
+    cooldown_sec=10
 )
 def list_usable_auto_reply_module(e: TextMessageEventObject):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
@@ -249,7 +250,10 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
 @cmd_list.command_function(
     feature_flag=BotFeature.TXT_AR_LIST_KEYWORD,
     arg_count=1,
-    scope=CommandScopeCollection.GROUP_ONLY
+    arg_help=[_("The search keyword to find the Auto-Reply module. "
+                "Auto-Reply module which keyword contains this will be returned.")],
+    scope=CommandScopeCollection.GROUP_ONLY,
+    cooldown_sec=10
 )
 def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
     ctnt_mdls = AutoReplyContentManager.get_contents_by_word(keyword)

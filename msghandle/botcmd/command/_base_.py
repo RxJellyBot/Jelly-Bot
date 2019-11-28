@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from time import monotonic
 from typing import List, Dict, Optional, Union, Callable, Tuple
 from inspect import signature
 
@@ -33,12 +34,15 @@ class CommandFunction:
     cmd_feature: BotFeature
     description: str
     scope: CommandScope
+    cooldown_sec: int
+    last_call: float = field(init=False)
     prm_keys: List[CommandParameter] = field(init=False)
 
     def __post_init__(self):
         # List of parameters for future reference
         self.prm_keys = [CommandParameter(name, prm.annotation.__name__)
                          for name, prm in signature(self.fn).parameters.items()]
+        self.last_call = -self.cooldown_sec
         self._cache = {}
 
     # Dynamically construct `usage` because `cmd_node.splittor` is required. Command structure wasn't ready
@@ -84,6 +88,27 @@ class CommandFunction:
         # For documentation use
         return id(self.fn)
 
+    @property
+    def can_be_called(self) -> bool:
+        return (monotonic() - self.last_call) > self.cooldown_sec
+
+    @property
+    def cd_sec_left(self) -> float:
+        return max(self.cooldown_sec - (monotonic() - self.last_call), 0)
+
+    @property
+    def has_cooldown(self) -> int:
+        return self.cooldown_sec > 0
+
+    def record_called(self):
+        self.last_call = monotonic()
+
+    def __eq__(self, other):
+        return self.function_id == other.function_id
+
+    def __hash__(self):
+        return self.function_id
+
 
 class CommandNode:
     # TEST: Test all bot commands by executing command functions
@@ -113,6 +138,7 @@ class CommandNode:
         self._child_nodes: Dict[str, CommandNode] = {}  # {<CMD_CODES>: <COMMAND_NODE>}
         self._fn: Dict[int, CommandFunction] = {}  # {<ARG_COUNT>: <FUNCTION>}
         self._case_insensitive = case_insensitive
+        self._fn_cache = {}
 
     def _register_(self, arg_count: int, fn: CommandFunction):
         if arg_count in self._fn:
@@ -286,7 +312,7 @@ class CommandNode:
             self, fn: Callable = None, *, arg_count: int = 0, arg_help: List[str] = None,
             description: str = _("No description provided."),
             scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED,
-            feature_flag: BotFeature = BotFeature.UNDEFINED):
+            feature_flag: BotFeature = BotFeature.UNDEFINED, cooldown_sec: int = 0):
         """
         Function used to decorate the function to be ready to execute command.
 
@@ -313,7 +339,8 @@ class CommandNode:
             # This length count needs to include the first parameter - e: TextEventObject for every function
             if len(s.parameters) > arg_count:
                 self._register_(
-                    arg_count, CommandFunction(arg_count, arg_help, f, self, feature_flag, description, scope))
+                    arg_count, CommandFunction(
+                        arg_count, arg_help, f, self, feature_flag, description, scope, cooldown_sec))
             else:
                 logger.logger.warning(
                     f"Function `{f.__qualname__}` not registered because its argument length is insufficient.")
@@ -408,10 +435,16 @@ class CommandNode:
                 ret = [
                     HandledMessageEventText(
                         content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
+            elif not cmd_fn.can_be_called:
+                ret = [
+                    HandledMessageEventText(
+                        content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
+                            cmd_fn.cd_sec_left))]
             else:
                 BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
                 try:
                     ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
+                    cmd_fn.record_called()
                 except TypeCastingFailed as e:
                     ret = [HandledMessageEventText(
                         content=_("Incorrect type of data: `{}`.\n"
