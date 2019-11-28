@@ -59,20 +59,10 @@
                                     </div>
                                 </td>
                                 <td class="mb-0">
-                                    {% if fn_entry.cmd_node.aliases %}
-                                        {% trans "Aliases: " %}
-                                        <code class="bg-light border border-light p-1 rounded">
-                                            {{ fn_entry.cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
-                                        </code>
-                                    {% endif %}
-                                    <hr>
-                                    {{ fn_entry.description|markdown }}
-                                    <hr>
-                                    {% trans "Available Scope" %}: {{ fn_entry.scope.name }}
-                                    <sub class="font-weight-bolder">{{ fn_entry.scope.list_channel_str }}</sub>
+                                    <div class="p-2">
+                                        {{ fn_entry.description|markdown }}
+                                    </div>
                                     {% if fn_entry.arg_count > 0 %}
-                                        <hr>
-
                                         <ul>
                                             {% for prm, prm_txt in fn_entry.parallel_param_list %}
                                                 <li>
@@ -81,6 +71,20 @@
                                             {% endfor %}
                                         </ul>
                                     {% endif %}
+                                    <hr>
+                                    {% if fn_entry.cmd_node.aliases %}
+                                        {% trans "Aliases: " %}
+                                        <code class="bg-light border border-light p-1 rounded">
+                                            {{ fn_entry.cmd_node.aliases|join:'</code>&nbsp;<code class="bg-light border border-light p-1 rounded">'|safe }}
+                                        </code>
+                                        <hr>
+                                    {% endif %}
+                                    {% if fn_entry.has_cooldown %}
+                                        {% trans "Command Cooldown: " %}<code class="h5">{{ fn_entry.cooldown_sec }}</code> {% trans "seconds" %}
+                                        <hr>
+                                    {% endif %}
+                                    {% trans "Available Scope" %}: {{ fn_entry.scope.name }}
+                                    <sub class="font-weight-bolder">{{ fn_entry.scope.list_channel_str }}</sub>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -9,9 +9,9 @@ from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
-from models import ChannelModel, ChannelCollectionModel
+from models import ChannelModel
 from mongodb.factory import ChannelManager, ProfileManager, MessageRecordStatisticsManager
-from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
+from mongodb.helper import MessageStatsDataProcessor
 
 
 class ChannelMessageStatsView(TemplateResponseMixin, View):
