@@ -4,10 +4,8 @@ from typing import Optional
 from bson import ObjectId
 from datetime import tzinfo
 
-from cachetools import TTLCache
 from pymongo import ReturnDocument
 
-from JellyBot.systemconfig import DataQuery
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.emailutils import MailSender
 from extutils.locales import default_locale, LocaleInfo
@@ -118,8 +116,6 @@ class RootUserManager(BaseCollection):
             RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
             partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
-        self._user_name_cache = TTLCache(maxsize=DataQuery.UserNameCacheSize, ttl=DataQuery.UserNameExpirationSeconds)
-
     def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                    oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False) \
             -> RootUserRegistrationResult:
@@ -187,32 +183,32 @@ class RootUserManager(BaseCollection):
 
         :return: namedtuple(user_oid, user_name)
         """
-        if root_oid not in self._user_name_cache:
-            udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
+        udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
 
-            # No user data found? Return None
-            if not udata:
-                return None
+        # No user data found? Return None
+        if not udata:
+            return None
 
-            UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
+        UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
 
-            # Name has been set?
-            if udata.config.name:
-                self._user_name_cache[root_oid] = UserNameQuery(user_id=root_oid, user_name=udata.config.name)
+        # Name has been set?
+        if udata.config.name:
+            return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
 
-            # On Platform Identity found?
-            if udata.has_onplat_data:
-                for onplatoid in udata.on_plat_oids:
-                    onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
+        # On Platform Identity found?
+        if udata.has_onplat_data:
+            for onplatoid in udata.on_plat_oids:
+                onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
 
-                    if onplat_data:
-                        self._user_name_cache[root_oid] = UserNameQuery(user_id=root_oid, user_name=onplat_data.get_name(channel_data))
-                    else:
-                        MailSender.send_email(
-                            f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
-                            f"corresponding On-Platform data found.")
+                if onplat_data:
+                    return UserNameQuery(
+                        user_id=root_oid, user_name=onplat_data.get_name(channel_data))
+                else:
+                    MailSender.send_email(
+                        f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
+                        f"corresponding On-Platform data found.")
 
-        return self._user_name_cache.get(root_oid)
+        return None
 
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
