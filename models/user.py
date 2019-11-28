@@ -3,6 +3,7 @@ from cachetools import TTLCache
 
 from models.exceptions import KeyNotExistedError
 from extutils.locales import default_locale, default_language
+from JellyBot.systemconfig import DataQuery
 from flags import ModelValidityCheckResult, Platform
 
 from ._base import Model, ModelDefaultValueExt
@@ -56,25 +57,30 @@ class APIUserModel(Model):
                       allow_none=False, must_have_content=True)
 
 
+_user_name_cache_ = TTLCache(maxsize=DataQuery.UserNameCacheSize, ttl=DataQuery.UserNameExpirationSeconds)
+
+
 class OnPlatformUserModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, allow_none=False, must_have_content=True)
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
     def get_name(self, channel_data=None) -> str:
-        n = None
+        if self.id not in _user_name_cache_:
+            n = None
 
-        if self.platform == Platform.LINE:
-            from extline import LineApiWrapper
+            if self.platform == Platform.LINE:
+                from extline import LineApiWrapper
 
-            if channel_data:
-                n = LineApiWrapper.get_user_name_safe(self.token, channel_data)
-            else:
-                n = LineApiWrapper.get_user_name_safe(self.token)
-        elif self.platform == Platform.DISCORD:
-            from extdiscord import DiscordClientWrapper
+                if channel_data:
+                    n = LineApiWrapper.get_user_name_safe(self.token, channel_data)
+                else:
+                    n = LineApiWrapper.get_user_name_safe(self.token)
+            elif self.platform == Platform.DISCORD:
+                from extdiscord import DiscordClientWrapper
 
-            n = DiscordClientWrapper.get_user_name_safe(self.token)
-        if not n:
-            n = f"{self.token} ({self.platform.key})"
+                n = DiscordClientWrapper.get_user_name_safe(self.token)
 
-        return n
+            if n:
+                _user_name_cache_[self.id] = n
+
+        return _user_name_cache_.get(self.id, f"{self.token} ({self.platform.key})")
