@@ -1,3 +1,4 @@
+import math
 from datetime import datetime, timezone, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List
@@ -148,7 +149,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             else:
                 days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
 
-        return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), days_collected)
+        return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), math.floor(days_collected))
 
 
 class BotFeatureUsageDataManager(BaseCollection):

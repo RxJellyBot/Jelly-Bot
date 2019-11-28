@@ -1,5 +1,8 @@
-# INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
-#   Daily Notifications on specific time
+# INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both bot-website)
+#   - Daily Notifications on specific time
+#   - Command: Add / Delete / List
+#   - Auto delete after expired
+#   - Periodical
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Auto-Reply: Sync across channel
