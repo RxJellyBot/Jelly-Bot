@@ -6,6 +6,7 @@ import pymongo
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
+from extutils.locales import now_utc_aware
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
@@ -138,13 +139,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             oldest = self.find_one(match_d, sort=[(OID_KEY, pymongo.ASCENDING)])
 
             if oldest:
-                # Offset-naive
-                now = datetime.utcnow()
-                # Offset-aware
-                oldest_doc = ObjectId(oldest[OID_KEY]).generation_time
-
                 # Replace to let both be Offset-naive
-                days_collected = (now - oldest_doc.replace(tzinfo=None)).total_seconds() / 86400
+                days_collected = (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
             else:
                 days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
 

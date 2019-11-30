@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Tuple, Union
 
 
 def cast_keep_none(obj, dest_type: type):
@@ -10,6 +10,21 @@ def cast_keep_none(obj, dest_type: type):
             return dest_type(obj)
     else:
         return None
+
+
+def cast_iterable(iterable: Union[List, Tuple], dest_type):
+    if isinstance(iterable, (list, tuple)):
+        ret = []
+
+        for item in iterable:
+            if isinstance(item, (list, tuple)):
+                ret.append(cast_iterable(item, dest_type))
+            else:
+                ret.append(dest_type(item))
+
+        return ret
+    else:
+        return dest_type(iterable)
 
 
 def safe_cast(obj, dest_type: type):

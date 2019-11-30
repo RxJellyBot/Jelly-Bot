@@ -1,4 +1,4 @@
-from datetime import timezone, timedelta
+from datetime import timedelta
 from typing import Tuple, Optional, List
 
 import math
@@ -10,6 +10,7 @@ from JellyBot.systemconfig import AutoReply, Database, DataQuery
 from extutils.emailutils import MailSender
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
+from extutils.locales import now_utc_aware
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel
@@ -109,7 +110,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
             Set(
                 {
                     AutoReplyModuleModel.Active.key: False,
-                    AutoReplyModuleModel.RemovedAt.key: datetime.now(tz=timezone.utc),
+                    AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
                     AutoReplyModuleModel.RemoverOid.key: remover_oid
                 }
             )
@@ -143,7 +144,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         ret: Optional[AutoReplyModuleModel] = self.get_cache_one(q, parse_cls=AutoReplyModuleModel)
 
         if ret:
-            now = datetime.now(tz=timezone.utc)
+            now = now_utc_aware()
             if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
                 q_found = Query(MatchPair(AutoReplyModuleModel.Id.key, ret.id))
                 u_query = UpdateOperation(

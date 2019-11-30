@@ -75,10 +75,6 @@ class AutoReplyModuleModel(Model):
     RemovedAt = DateTimeField("rm", allow_none=False)
 
     @property
-    def creation_time(self):
-        return self.id.generation_time
-
-    @property
     def refer_oid(self) -> Optional[ObjectId]:
         try:
             if self.is_reference:
