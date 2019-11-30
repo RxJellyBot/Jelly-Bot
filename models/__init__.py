@@ -26,3 +26,5 @@ from .prof import (
 from .exctnt import ExtraContentModel
 # noinspection PyUnresolvedReferences
 from .shorturl import ShortUrlRecordModel
+# noinspection PyUnresolvedReferences
+from .timer import TimerModel
