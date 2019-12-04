@@ -5,8 +5,10 @@
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature: Remote control in private channel
 # INCOMPLETE: Statistics: Message flow of the user
+# INCOMPLETE: Statistics: Bot Features Usage in Channel
 # INCOMPLETE: Auto-Reply: Sync across channel
 # INCOMPLETE: Auto-Reply: Redirect to webpage if its content is too long
+# INCOMPLETE: Bot Feature: Last Message
 # TODO: Website: Asynchronous channel list, memer message ranking
 # TODO: Account Management: API Key refresh
 # TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir
