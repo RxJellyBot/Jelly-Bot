@@ -43,7 +43,5 @@ def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
             logger.logger.debug(
                 f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")
             return []
-        except SyntaxError as e:
-            logger.logger.debug(
-                f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")
+        except SyntaxError:
             return []
