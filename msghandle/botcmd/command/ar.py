@@ -135,7 +135,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     kw_ctnt_result = AutoReplyContentManager.get_content(keyword)
     if not kw_ctnt_result.success:
         return [HandledMessageEventText(
-            content=_("Failed to fetch the content ID of the **keyword**.\n"
+            content=_("Failed to fetch / register the content ID of the **keyword**.\n"
                       "Auto-Reply module not registered.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
@@ -144,7 +144,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     rep_ctnt_result = AutoReplyContentManager.get_content(response)
     if not rep_ctnt_result.success:
         return [HandledMessageEventText(
-            content=_("Failed to fetch the content ID of the **response**.\n"
+            content=_("Failed to fetch / register the content ID of the **response**.\n"
                       "Auto-Reply module not registered.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
@@ -186,7 +186,7 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
         keyword, type_=AutoReplyContentType.TEXT, add_on_not_found=False)
     if not kw_ctnt_result.success:
         return [HandledMessageEventText(
-            content=_("Failed to fetch the content ID of the **keyword**.\n"
+            content=_("Failed to fetch / register the content ID of the **keyword**.\n"
                       "Auto-Reply module not deleted.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(

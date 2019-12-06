@@ -27,4 +27,4 @@ from .exctnt import ExtraContentModel
 # noinspection PyUnresolvedReferences
 from .shorturl import ShortUrlRecordModel
 # noinspection PyUnresolvedReferences
-from .timer import TimerModel
+from .timer import TimerModel, TimerListResult
