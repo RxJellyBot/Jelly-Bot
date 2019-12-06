@@ -2,7 +2,10 @@ from dataclasses import dataclass, field, InitVar
 from datetime import datetime
 from typing import List
 
-from extutils.dt import now_utc_aware
+from django.utils.translation import gettext_lazy as _
+from django.utils.timezone import localtime
+
+from extutils.dt import now_utc_aware, t_delta_str
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import CursorWithCount
@@ -55,3 +58,35 @@ class TimerListResult:
                     self.past_continue.append(mdl)
                 else:
                     self.past_done.append(mdl)
+
+    def to_string(self, user_model):
+        now = now_utc_aware()
+        tzinfo = user_model.config.tzinfo
+
+        ret = []
+
+        if self.future:
+            for tmr in self.future:
+                ret.append(
+                    _("[{diff}] to {event} (at {time})").format(
+                        event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
+                        time=localtime(tmr.target_time, tzinfo)
+                    ))
+            ret.append("")  # Separator
+
+        if self.past_continue:
+            for tmr in self.past_continue:
+                ret.append(
+                    _("[{diff}] past {event} (at {time})").format(
+                        event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
+                        time=localtime(tmr.target_time, tzinfo)
+                    ))
+            ret.append("")  # Separator
+
+        if self.past_done:
+            for tmr in self.past_done:
+                ret.append(
+                    _("{event} has ended (at {time})").format(
+                        event=tmr.title, time=localtime(tmr.target_time, tzinfo)))
+
+        return "\n".join(ret)

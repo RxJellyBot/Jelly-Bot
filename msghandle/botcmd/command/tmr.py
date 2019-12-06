@@ -20,6 +20,7 @@ cmd = CommandNode(
     description=_("Commands related to timer.\n\nFlag `countup` defaults to `False`.")
 )
 cmd_add = cmd.new_child_node(codes=["a", "aa", "add"])
+cmd_list = cmd.new_child_node(codes=["l", "list", "lst"])
 
 
 # ------------------------- Add -------------------------
@@ -92,3 +93,15 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
 def add_timer_smpl(e: TextMessageEventObject, keyword: str, title: str, dt: str) \
         -> List[HandledMessageEventText]:
     return add_timer(e, keyword, title, dt, false_word[0])
+
+
+@cmd_list.command_function(
+    feature_flag=BotFeature.TXT_TMR_LIST_ALL,
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def list_all_timer(e: TextMessageEventObject) \
+        -> List[HandledMessageEventText]:
+    tmrs = TimerManager.list_all_timer(e.channel_oid)
+
+    if tmrs.has_data:
+        return [HandledMessageEventText(content=_("All Timers in this Channel:\n") + tmrs.to_string(e.user_model))]

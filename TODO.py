@@ -1,6 +1,6 @@
 # FIXME: Bot Feature: Countdown / Countup Timer
 #   - Daily Notifications on specific time
-#   - Command: Delete / List
+#   - Command: Delete
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature: Remote control in private channel
 # INCOMPLETE: Statistics: Message flow of the user
