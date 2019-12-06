@@ -31,7 +31,7 @@ def process_timer(e: TextMessageEventObject) -> List[HandledMessageEvent]:
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
-            ret.append("\n")  # Separator
+            ret.append("")  # Separator
 
         if tmrs.past_continue:
             for tmr in tmrs.past_continue:
@@ -40,7 +40,7 @@ def process_timer(e: TextMessageEventObject) -> List[HandledMessageEvent]:
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
-            ret.append("\n")  # Separator
+            ret.append("")  # Separator
 
         if tmrs.past_done:
             for tmr in tmrs.past_done:
