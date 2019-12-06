@@ -40,7 +40,6 @@ def exec_timing(fn):
         exec_logger.logger.info(f"{_duration_ * 1000} ms - Line {caller.lineno} {caller.function} in {caller.filename}")
 
         return ret
-
     return inner
 
 
@@ -55,7 +54,6 @@ def exec_timing_ns(fn):
         exec_logger.logger.info(f"{_duration_} ns - Line {caller.lineno} {caller.function} in {caller.filename}")
 
         return ret
-
     return inner
 
 

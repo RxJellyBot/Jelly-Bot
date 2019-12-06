@@ -6,7 +6,7 @@ from .autoreply import process_auto_reply
 from .error_test import process_error_test
 from .calculator import process_calculator
 from .botcmd import process_bot_cmd
-from .timer import process_timer
+from .timer import process_timer_get, process_timer_notification
 
 
 def handle_text_event(e: TextMessageEventObject) -> List[HandledMessageEvent]:
@@ -20,7 +20,8 @@ def handle_text_event(e: TextMessageEventObject) -> List[HandledMessageEvent]:
         handle_fn.append(process_auto_reply)
 
     if e.channel_model.config.enable_timer:
-        handle_fn.append(process_timer)
+        handle_fn.append(process_timer_get)
+        handle_fn.append(process_timer_notification)
 
     if e.channel_model.config.enable_calculator:
         handle_fn.append(process_calculator)

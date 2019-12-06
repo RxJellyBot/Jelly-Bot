@@ -5,9 +5,10 @@ from bson import ObjectId
 
 from models import TimerModel, TimerListResult
 from mongodb.factory.results import WriteOutcome
+from mongodb.utils import CursorWithCount
 from extutils.checker import param_type_ensure
 from extutils.locales import UTC
-from extutils.dt import is_tz_naive
+from extutils.dt import is_tz_naive, now_utc_aware
 from JellyBot.systemconfig import Bot
 
 from ._base import BaseCollection
@@ -59,6 +60,25 @@ class TimerManager(BaseCollection):
                                          TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
         )
+
+    @param_type_ensure
+    def get_notify(self, channel_oid: ObjectId) -> CursorWithCount:
+        now = now_utc_aware()
+
+        filter_ = {
+            TimerModel.ChannelOid.key: channel_oid,
+            TimerModel.TargetTime.key: {"$lt": now + timedelta(hours=Bot.Timer.NotifyWithinHours),
+                                        "$gt": now},
+            TimerModel.Notified.key: False
+        }
+
+        ret = self \
+            .find_cursor_with_count(filter_, parse_cls=TimerModel)\
+            .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
+
+        self.update_many_async(filter_, {"$set": {TimerModel.Notified.key: True}})
+
+        return ret
 
 
 _inst = TimerManager()

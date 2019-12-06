@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 23:02-0600\n"
-"PO-Revision-Date: 2019-12-05 23:02-0600\n"
+"POT-Creation-Date: 2019-12-05 23:43-0600\n"
+"PO-Revision-Date: 2019-12-05 23:44-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1177,15 +1177,15 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\timer.py:71
+#: .\models\timer.py:72
 msgid "[{diff}] to {event} (at {time})"
 msgstr "距 {event} 還有 [{diff}] (時間: {time})"
 
-#: .\models\timer.py:80
+#: .\models\timer.py:81
 msgid "[{diff}] past {event} (at {time})"
 msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
 
-#: .\models\timer.py:89
+#: .\models\timer.py:90
 msgid "{event} has ended (at {time})"
 msgstr "{event} 已結束 (於 {time})"
 
@@ -2395,6 +2395,14 @@ msgid ""
 msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
+
+#: .\msghandle\text\timer.py:33
+msgid "**{} timer(s) will time up in less than {} hrs!**"
+msgstr "**{} 個計時器將於 {} 小時內時間到！**"
+
+#: .\msghandle\text\timer.py:36
+msgid "{event} will time up after [{diff}]! (at {time})"
+msgstr "{event} 將於 [{diff}] 後時間到！(於 {time})"
 
 #: .\templates\about.html:9
 msgid "Contact"

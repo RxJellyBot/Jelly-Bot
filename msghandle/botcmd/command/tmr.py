@@ -48,12 +48,10 @@ continue_help = _("A word that can indicate if the timer should keep counting up
 def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, countup: str) \
         -> List[HandledMessageEventText]:
     # Get content ID
-    kw_ctnt_result = AutoReplyContentManager.get_content(
-        keyword, type_=AutoReplyContentType.TEXT, add_on_not_found=False)
+    kw_ctnt_result = AutoReplyContentManager.get_content(keyword, type_=AutoReplyContentType.TEXT)
     if not kw_ctnt_result.success:
         return [HandledMessageEventText(
             content=_("Failed to fetch / register the content ID of the **keyword**.\n"
-                      "Auto-Reply module not deleted.\n"
                       "Code: `{}`\n"
                       "Visit {} to see the code explanation.").format(
                 kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]

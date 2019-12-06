@@ -21,4 +21,4 @@ def t_delta_str(t_delta: timedelta):
         return _("{} Days {} H {:02} M {:02} S").format(t_delta.days, h, m, s)
     else:
         h += t_delta.days * 24
-        return _("{} H {:02} M {:02} S").format(t_delta.days, h, m, s)
+        return _("{} H {:02} M {:02} S").format(h, m, s)

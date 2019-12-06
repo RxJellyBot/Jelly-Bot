@@ -135,6 +135,10 @@ class ControlExtensionMixin(Collection):
 
         return outcome
 
+    def update_many_async(self, filter_, update, upsert=False, collation=None):
+        Thread(
+            target=self.update_many, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
+
     def update_one_async(self, filter_, update, upsert=False, collation=None):
         Thread(
             target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
