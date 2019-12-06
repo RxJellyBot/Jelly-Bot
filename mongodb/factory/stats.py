@@ -120,7 +120,8 @@ class MessageRecordStatisticsManager(BaseCollection):
         return self.aggregate(aggr_pipeline)
 
     def hourly_interval_message_count(
-            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) -> \
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
+            tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
         match_d.update(**self._hours_within_filter_(hours_within))
@@ -128,7 +129,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         pipeline = [
             {"$match": match_d},
             {"$group": {
-                "_id": {"$hour": {"$toDate": "$_id"}},
+                "_id": {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
                 HourlyIntervalAverageMessageResult.KEY: {"$sum": 1}
             }},
             {"$sort": {"_id": pymongo.ASCENDING}}
