@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 18:46-0600\n"
-"PO-Revision-Date: 2019-11-27 19:51-0600\n"
+"POT-Creation-Date: 2019-12-05 20:23-0600\n"
+"PO-Revision-Date: 2019-12-05 20:24-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -457,11 +457,11 @@ msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...
 
 #: .\extutils\dt.py:21
 msgid "{} Days {} H {} M {} S"
-msgstr ""
+msgstr "{} 日 {} 時 {} 分 {} 秒"
 
 #: .\extutils\dt.py:24
 msgid "{} H {} M {} S"
-msgstr ""
+msgstr "{} 時 {} 分 {} 秒"
 
 #: .\extutils\line_sticker\main.py:16
 msgid "Animated Sticker"
@@ -752,36 +752,28 @@ msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
 #: .\flags\botfeature.py:62
-#, fuzzy
-#| msgid "Text / Auto Reply / Add"
 msgid "Text / Timer / Add"
-msgstr "文字 / 自動回覆 / 新增"
+msgstr "文字 / 計時器 / 新增"
 
 #: .\flags\botfeature.py:62
 msgid "Add a timer."
-msgstr ""
+msgstr "新增一個計時器。"
 
 #: .\flags\botfeature.py:64
-#, fuzzy
-#| msgid "Text / Auto Reply / List (Usable)"
 msgid "Text / Timer / List (All)"
-msgstr "文字 / 自動回覆 / 列表 (可用)"
+msgstr "文字 / 計時器 / 列表 (全部)"
 
 #: .\flags\botfeature.py:64
 msgid "List all timers."
-msgstr ""
+msgstr "列出全部的計時器。"
 
 #: .\flags\botfeature.py:66
-#, fuzzy
-#| msgid "Text / Auto Reply / List (Keyword)"
 msgid "Text / Timer / List (Keyword)"
-msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
+msgstr "文字 / 計時器 / 列表 (關鍵字)"
 
 #: .\flags\botfeature.py:66
-#, fuzzy
-#| msgid "Responded to the message origin with the designated response."
 msgid "Get the timer(s) with the designated keyword."
-msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
+msgstr "顯示關鍵字所對應的計時器。"
 
 #: .\flags\botfeature.py:69
 msgid "Text / Information / Check IDs"
@@ -1689,6 +1681,8 @@ msgid ""
 "Executable command not found.\n"
 "Visit {}{} for more information."
 msgstr ""
+"找不到可執行的指令。\n"
+"請瀏覽 {}{} 以獲得更多資訊。"
 
 #: .\msghandle\botcmd\command\_base_.py:498
 msgid ""
@@ -1873,37 +1867,25 @@ msgstr ""
 "**不是** 網頁，否則可能會發生不可預期的情況。"
 
 #: .\msghandle\botcmd\command\ar.py:138
-#, fuzzy
-#| msgid ""
-#| "Failed to fetch the content ID of the **keyword**.\n"
-#| "Auto-Reply module not registered.\n"
-#| "Code: `{}`\n"
-#| "Visit {} to see the code explanation."
 msgid ""
 "Failed to fetch / register the content ID of the **keyword**.\n"
 "Auto-Reply module not registered.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
 msgstr ""
-"無法獲取 **關鍵字** 的內容ID。\n"
+"無法獲取/登記 **關鍵字** 的內容ID。\n"
 "自動回覆組登錄失敗。\n"
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
 #: .\msghandle\botcmd\command\ar.py:147
-#, fuzzy
-#| msgid ""
-#| "Failed to fetch the content ID of the **response**.\n"
-#| "Auto-Reply module not registered.\n"
-#| "Code: `{}`\n"
-#| "Visit {} to see the code explanation."
 msgid ""
 "Failed to fetch / register the content ID of the **response**.\n"
 "Auto-Reply module not registered.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
 msgstr ""
-"無法獲取 **回覆** 的內容ID。\n"
+"無法獲取/登記 **回覆** 的內容ID。\n"
 "自動回覆組登錄失敗。\n"
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
@@ -1932,20 +1914,14 @@ msgstr ""
 msgid "The keyword of the module to delete."
 msgstr "欲刪除的回覆組的關鍵字。"
 
-#: .\msghandle\botcmd\command\ar.py:189 .\msghandle\botcmd\command\tmr.py:53
-#, fuzzy
-#| msgid ""
-#| "Failed to fetch the content ID of the **keyword**.\n"
-#| "Auto-Reply module not deleted.\n"
-#| "Code: `{}`\n"
-#| "Visit {} to see the code explanation."
+#: .\msghandle\botcmd\command\ar.py:189 .\msghandle\botcmd\command\tmr.py:54
 msgid ""
 "Failed to fetch / register the content ID of the **keyword**.\n"
 "Auto-Reply module not deleted.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
 msgstr ""
-"無法獲取 **關鍵字** 的內容ID。\n"
+"無法獲取/登記 **關鍵字** 的內容ID。\n"
 "自動回覆組刪除失敗。\n"
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
@@ -2174,30 +2150,36 @@ msgstr ""
 "隨機抽選次數。\n"
 "這個數字不能超過 {}。"
 
-#: .\msghandle\botcmd\command\tmr.py:19
-#, fuzzy
-#| msgid "Term"
+#: .\msghandle\botcmd\command\tmr.py:18
 msgid "Timer"
-msgstr "名詞"
+msgstr "計時器"
+
+#: .\msghandle\botcmd\command\tmr.py:19
+msgid "Commands related to timer."
+msgstr "與計時器有關的指令。"
 
 #: .\msghandle\botcmd\command\tmr.py:20
 msgid ""
 "Commands related to timer.\n"
 "\n"
-"Flag `continue_on_up` defaults to `False`."
+"Flag `countup` defaults to `False`."
 msgstr ""
+"與計時器有關的指令\n"
+"\n"
+"`往上計數` 的旗標預設為 `否`。"
 
-#: .\msghandle\botcmd\command\tmr.py:26
+#: .\msghandle\botcmd\command\tmr.py:27
 msgid ""
 "Keyword to get the timer. The bot will reply the timer status whenever the "
 "keyword has been detected in the designated channel."
 msgstr ""
-
-#: .\msghandle\botcmd\command\tmr.py:28
-msgid "Title of the timer."
-msgstr ""
+"獲取計時器的關鍵字。機器人會在偵測到關鍵字時，回應對應關鍵字的計時器狀態。"
 
 #: .\msghandle\botcmd\command\tmr.py:29
+msgid "Title of the timer."
+msgstr "計時器的標題。"
+
+#: .\msghandle\botcmd\command\tmr.py:30
 msgid ""
 "String of the target datetime of the timer.\n"
 "\n"
@@ -2209,8 +2191,16 @@ msgid ""
 "- If the timer is set to not to keep counting after it reaches the target "
 "time, the timer will be automatically permanently deleted after {} days."
 msgstr ""
+"計時器目標日期與時間點(字串)。\n"
+"\n"
+"- 沒有指定時區時，使用者所設定的時區將會套用。\n"
+"\n"
+"- 常見的日期時間格式通常可用。發生剖析錯誤時，請參閱[此頁面(英文)。](https://"
+"dateutil.readthedocs.io/en/stable/parser.html)\n"
+"\n"
+"- 如果計時器沒有設定為向上記數，則計時器將會在 {} 天後自動永久消除。"
 
-#: .\msghandle\botcmd\command\tmr.py:35
+#: .\msghandle\botcmd\command\tmr.py:36
 msgid ""
 "A word that can indicate if the timer should keep counting up or not.\n"
 "\n"
@@ -2218,29 +2208,29 @@ msgid ""
 "\n"
 "- Words that means NEGATIVE: {}"
 msgstr ""
+"代表此計時器是否要向上記數的字串。\n"
+"\n"
+"- 以下字詞代表 *是*: {}\n"
+"\n"
+"- 以下字詞代表 *否*: {}"
 
-#: .\msghandle\botcmd\command\tmr.py:63
-#, fuzzy
-#| msgid "Failed to register the auto-reply module. Code: `{}`"
+#: .\msghandle\botcmd\command\tmr.py:64
 msgid "Failed to parse the string of datetime. (`{}`)"
-msgstr ""
-"自動回覆組登錄失敗。\n"
-"代碼: {}"
+msgstr "日期時間點字串剖析失敗。(`{}`)"
 
-#: .\msghandle\botcmd\command\tmr.py:75
+#: .\msghandle\botcmd\command\tmr.py:76
 msgid ""
-"Unknown flag to indicate if the timer should continue on time up. (`{}`)"
-msgstr ""
+"Unknown flag to indicate if the timer will countup once the time is up. (`{}"
+"`)"
+msgstr "無法確認是否要向上計數。(`{}`)"
 
-#: .\msghandle\botcmd\command\tmr.py:80
+#: .\msghandle\botcmd\command\tmr.py:81
 msgid "Timer added."
-msgstr ""
+msgstr "計時器新增成功。"
 
-#: .\msghandle\botcmd\command\tmr.py:82
-#, fuzzy
-#| msgid "URL Failed to be shortened. Outcome code: "
+#: .\msghandle\botcmd\command\tmr.py:83
 msgid "Failed to add timer. Outcome code: `{}`"
-msgstr "網址縮短失敗。代碼: "
+msgstr "計時器新增失敗。代碼: `{}`"
 
 #: .\msghandle\botcmd\command\trfm.py:9
 msgid "Transform/Replace"
@@ -2315,13 +2305,13 @@ msgid "LaTeX available."
 msgstr "有LaTeX內容。"
 
 #: .\msghandle\models\out_plat.py:26
-msgid "Content was forced to be displayed on the website"
-msgstr ""
+msgid "Content was forced to be displayed on the website."
+msgstr "強制於網站顯示。"
 
 #: .\msghandle\models\out_plat.py:49
 msgid ""
-"{} content(s) was recorded to the database because of the following reason"
-"(s):{}\n"
+"{} content(s) was recorded to the database because of the following "
+"reason(s):{}\n"
 "URL: {}"
 msgstr ""
 "{}筆內容已因下列原因存至資料庫:{}\n"
@@ -2382,17 +2372,17 @@ msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
 
-#: .\msghandle\text\timer.py:27
-msgid "{} to {}"
-msgstr ""
+#: .\msghandle\text\timer.py:30
+msgid "[{diff}] to {event} (at {time})"
+msgstr "距 {event} 還有 [{diff}] (時間: {time})"
 
-#: .\msghandle\text\timer.py:32
-msgid "{} past {}"
-msgstr ""
+#: .\msghandle\text\timer.py:39
+msgid "[{diff}] past {event} (at {time})"
+msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
 
-#: .\msghandle\text\timer.py:37
-msgid "{} has ended"
-msgstr ""
+#: .\msghandle\text\timer.py:48
+msgid "{event} has ended (at {time})"
+msgstr "{event} 已結束 (於 {time})"
 
 #: .\templates\about.html:9
 msgid "Contact"
@@ -2534,12 +2524,12 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
-"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
-"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
-"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
-"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
-"可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
+"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
+"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
+"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
+"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
+"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list_table.html:13
 #: .\templates\info\channel\search.html:49
@@ -2674,10 +2664,10 @@ msgid ""
 "on the account where you get the Execode will be discarded, only the data on "
 "the website will be kept. </p>"
 msgstr ""
-"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href=\"%"
-"(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代碼的"
-"帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設定所"
-"取代。 </p>"
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href="
+"\"%(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代"
+"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
+"定所取代。 </p>"
 
 #: .\templates\account\integrate.html:33
 msgid "Integration Execode here"
@@ -3056,8 +3046,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains '%(tag_splittor)"
-"s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains "
+"'%(tag_splittor)s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splittor)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:19
@@ -3300,8 +3290,7 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8
-#: .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3313,17 +3302,17 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>%"
-"(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href=\"%"
-"(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
+"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
+"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
 "private.</li> </ul> If all the conditions match, but the error still occurs, "
 "please <a href=\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: %"
-"(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不"
-"是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出現"
-"在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
+"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
+"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
+"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
 "li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
 "聯絡網站開發者。</a>"
 
@@ -3371,8 +3360,8 @@ msgid ""
 "website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道代碼"
-"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -3384,12 +3373,12 @@ msgstr "找不到對應的頻道組資訊。"
 msgid ""
 "Please check that:<br> <ul> <li><code>%(chcoll_oid)s</code> is the Channel "
 "Collection ID, <b>NOT the channel collection token</b>.</li> </ul> If all "
-"the conditions match, but the error still occurs, please <a href=\"%"
-"(about_page)s\">contact the website developer.</a>"
+"the conditions match, but the error still occurs, please <a href="
+"\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(chcoll_oid)s</code>是頻道組ID，而<b>不是頻道組代"
-"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\profile_not_found.html:19
 msgid "User profile not found with the provided ID."
@@ -3403,8 +3392,8 @@ msgid ""
 "conditions match, but the error still occurs, please <a href=\"%(about_page)s"
 "\">contact the website developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: %"
-"(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
+"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\unknown.html:13
@@ -3454,15 +3443,13 @@ msgstr "詳細"
 msgid "Channel Info"
 msgstr "頻道資訊"
 
-#: .\templates\info\channel\main.html:16
-#: .\templates\info\msgstats\main.html:16
+#: .\templates\info\channel\main.html:16 .\templates\info\msgstats\main.html:16
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
 "channel will not update."
 msgstr "機器人已標記此頻道無法存取，所以此頻道的資訊不會再更新。"
 
-#: .\templates\info\channel\main.html:32
-#: .\templates\info\msgstats\main.html:65
+#: .\templates\info\channel\main.html:32 .\templates\info\msgstats\main.html:65
 msgid "Channel Name"
 msgstr "頻道名稱"
 
@@ -3696,6 +3683,9 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "{} to {}"
+#~ msgstr "距 {}"
 
 #~ msgid "Bot - Deprecating"
 #~ msgstr "機器人 - 即將廢止"

@@ -137,8 +137,8 @@ class Model(MutableMapping, abc.ABC):
     def __setattr__(self, fk_sc, value):
         if to_camel_case(fk_sc) in self.model_fields():
             self._inner_dict_update_(fk_sc, value)
-
-        raise KeyNotExistedError(fk_sc, self.__class__.__qualname__)
+        else:
+            raise KeyNotExistedError(fk_sc, self.__class__.__qualname__)
 
     def __getitem__(self, jk):
         # Must throw `KeyError` for `_id` if `_id` not defined. `pymongo` will check this to determine if

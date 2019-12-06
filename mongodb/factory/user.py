@@ -289,7 +289,7 @@ class RootUserManager(BaseCollection):
         if u_data is None:
             return default_locale.to_tzinfo()
         else:
-            return LocaleInfo.get_tzinfo(u_data.config.locale)
+            return u_data.config.tzinfo
 
     @param_type_ensure
     def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
