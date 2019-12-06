@@ -106,8 +106,10 @@ class Model(MutableMapping, abc.ABC):
                 self._dict_["id"].force_set(v)
             else:
                 self._dict_["id"] = self.Id.new(v)
-        else:
+        elif to_snake_case(fk) in self._dict_:
             self._dict_[to_snake_case(fk)].value = v
+        else:
+            self._inner_dict_create_(fk, v)
 
     def __setitem__(self, jk, v) -> None:
         if jk in self.model_json():
