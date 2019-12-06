@@ -17,7 +17,9 @@ from ._base_ import CommandNode
 
 cmd = CommandNode(
     codes=["tmr", "t", "timer"], order_idx=1100, name=_("Timer"),
-    description=_("Commands related to timer.\n\nFlag `continue_on_up` defaults to `False`."))
+    brief_description=_("Commands related to timer."),
+    description=_("Commands related to timer.\n\nFlag `countup` defaults to `False`.")
+)
 cmd_add = cmd.new_child_node(codes=["a", "aa", "add"])
 
 
@@ -43,7 +45,7 @@ continue_help = _("A word that can indicate if the timer should keep counting up
     arg_help=[add_kw_help, title_help, datetime_help, continue_help],
     scope=CommandScopeCollection.GROUP_ONLY
 )
-def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt_str: str, continue_on_up: str) \
+def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, countup: str) \
         -> List[HandledMessageEventText]:
     # Get content ID
     kw_ctnt_result = AutoReplyContentManager.get_content(
@@ -58,21 +60,21 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt_str: str, 
 
     # Parse datetime string
     try:
-        dt = parser.parse(dt_str, ignoretz=False)
+        dt = parser.parse(dt, ignoretz=False)
     except (ValueError, OverflowError):
-        return [HandledMessageEventText(content=_("Failed to parse the string of datetime. (`{}`)").format(dt_str))]
+        return [HandledMessageEventText(content=_("Failed to parse the string of datetime. (`{}`)").format(dt))]
 
     # Attach timezone if needed
     if is_tz_naive(dt):
         dt.replace(tzinfo=LocaleInfo.get_tzinfo(e.user_model.config.locale))
 
-    # Check `continue_on_up` flag
-    ctup = str_to_bool(continue_on_up)
+    # Check `countup` flag
+    ctup = str_to_bool(countup)
 
     if ctup == StrBoolResult.UNKNOWN:
         return [
             HandledMessageEventText(content=_(
-                "Unknown flag to indicate if the timer should continue on time up. (`{}`)").format(continue_on_up))]
+                "Unknown flag to indicate if the timer will countup once the time is up. (`{}`)").format(countup))]
 
     outcome = TimerManager.add_new_timer(e.channel_oid, kw_ctnt_result.model.id, title, dt, ctup.to_bool())
 
@@ -88,6 +90,6 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt_str: str, 
     arg_help=[add_kw_help, title_help, datetime_help],
     scope=CommandScopeCollection.GROUP_ONLY
 )
-def add_timer_smpl(e: TextMessageEventObject, keyword: str, title: str, dt_str: str) \
+def add_timer_smpl(e: TextMessageEventObject, keyword: str, title: str, dt: str) \
         -> List[HandledMessageEventText]:
-    return add_timer(e, keyword, title, dt_str, false_word[0])
+    return add_timer(e, keyword, title, dt, false_word[0])

@@ -28,7 +28,7 @@ class TimerManager(BaseCollection):
     @param_type_ensure
     def add_new_timer(
             self, ch_oid: ObjectId, kw_oid: ObjectId, title: str, target_time: datetime,
-            continue_on_timeup: bool = False, period_sec: int = 0) -> WriteOutcome:
+            countup: bool = False, period_sec: int = 0) -> WriteOutcome:
         """`target_time` is recommended to be tz-aware. Tzinfo will be forced to be UTC if tz-naive."""
         # Force target time to be tz-aware in UTC
         if is_tz_naive(target_time):
@@ -36,9 +36,9 @@ class TimerManager(BaseCollection):
 
         mdl = TimerModel(
             ChannelOid=ch_oid, KeywordOid=kw_oid, Title=title, TargetTime=target_time,
-            ContinueOnTimeUp=continue_on_timeup, PeriodSeconds=period_sec)
+            Countup=countup, PeriodSeconds=period_sec)
 
-        if not continue_on_timeup:
+        if not countup:
             mdl.deletion_time = target_time + timedelta(days=Bot.Timer.AutoDeletionDays)
 
         outcome, ex = self.insert_one_model(mdl)

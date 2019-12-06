@@ -14,7 +14,7 @@ class TimerModel(Model):
     Title = TextField("t", default=ModelDefaultValueExt.Required)
     TargetTime = DateTimeField("tt", default=ModelDefaultValueExt.Required)
     DeletionTime = DateTimeField("del",default=ModelDefaultValueExt.Optional)
-    ContinueOnTimeUp = BooleanField("c", default=False)
+    Countup = BooleanField("c", default=False)
     PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
 
     @property
@@ -48,7 +48,7 @@ class TimerListResult:
             if mdl.is_after(now):
                 self.Future.append(mdl)
             else:
-                if mdl.continue_on_time_up:
+                if mdl.countup:
                     self.PastContinue.append(mdl)
                 else:
                     self.PastDone.append(mdl)

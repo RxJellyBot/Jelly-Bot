@@ -26,6 +26,10 @@ def handle_text_event(e: TextMessageEventObject) -> List[HandledMessageEvent]:
         handle_fn.append(process_calculator)
 
     for fn in handle_fn:
-        responses.extend(fn(e))
+        resp = fn(e)
+        if isinstance(resp, HandledMessageEvent):
+            resp = [resp]
+        if isinstance(resp, (list, tuple)):
+            responses.extend(resp)
 
     return responses

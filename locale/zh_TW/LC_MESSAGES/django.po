@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 19:56-0600\n"
+"POT-Creation-Date: 2019-12-05 18:46-0600\n"
 "PO-Revision-Date: 2019-11-27 19:51-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
@@ -79,41 +79,41 @@ msgid ""
 "connections linked to the channel."
 msgstr "找不到你與該頻道的連結，故已將你重新導向至頻道資訊頁面。"
 
-#: .\JellyBot\views\account\control.py:21 .\JellyBot\views\nav.py:21
+#: .\JellyBot\views\account\control.py:22 .\JellyBot\views\nav.py:21
 msgid "Login"
 msgstr "登入"
 
-#: .\JellyBot\views\account\control.py:25
+#: .\JellyBot\views\account\control.py:26
 msgid "An unknown error occurred."
 msgstr "發生未知的錯誤。"
 
-#: .\JellyBot\views\account\control.py:35
+#: .\JellyBot\views\account\control.py:36
 msgid "Registration process not performed."
 msgstr "登錄程序未執行。"
 
-#: .\JellyBot\views\account\control.py:37
+#: .\JellyBot\views\account\control.py:38
 msgid "New user data creation failed."
 msgstr "新用戶資料創建失敗。"
 
-#: .\JellyBot\views\account\control.py:39
+#: .\JellyBot\views\account\control.py:40
 msgid "The data cannot be passed into the server."
 msgstr "資料無法傳送到伺服器中。"
 
-#: .\JellyBot\views\account\control.py:42
+#: .\JellyBot\views\account\control.py:43
 msgid ""
 "An unknown error occurred during the new user data registration. Code: {}."
 msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {}。"
 
-#: .\JellyBot\views\account\control.py:60
+#: .\JellyBot\views\account\control.py:61
 msgid "User token is null however login succeed. {}"
 msgstr "登入成功，但用戶編碼為空。 ({})"
 
-#: .\JellyBot\views\account\control.py:68 .\JellyBot\views\nav.py:63
+#: .\JellyBot\views\account\control.py:69 .\JellyBot\views\nav.py:63
 #: .\templates\account\main.html:116
 msgid "Logout"
 msgstr "登出"
 
-#: .\JellyBot\views\account\control.py:95 .\templates\account\settings.html:8
+#: .\JellyBot\views\account\control.py:96 .\templates\account\settings.html:8
 msgid "Account Settings"
 msgstr "帳號設定"
 
@@ -455,6 +455,14 @@ msgid ""
 "mod of a channel...etc."
 msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...等。"
 
+#: .\extutils\dt.py:21
+msgid "{} Days {} H {} M {} S"
+msgstr ""
+
+#: .\extutils\dt.py:24
+msgid "{} H {} M {} S"
+msgstr ""
+
 #: .\extutils\line_sticker\main.py:16
 msgid "Animated Sticker"
 msgstr "動態貼圖"
@@ -467,111 +475,111 @@ msgstr "有聲貼圖"
 msgid "Static Sticker"
 msgstr "靜態貼圖"
 
-#: .\extutils\locales.py:52
+#: .\extutils\locales.py:48
 msgid "Asia: Hong Kong"
 msgstr "亞洲: 香港"
 
-#: .\extutils\locales.py:53
+#: .\extutils\locales.py:49
 msgid "Asia: Kuala Lumpur, Malaysia"
 msgstr "亞洲: 馬來西亞 - 吉隆坡"
 
-#: .\extutils\locales.py:54
+#: .\extutils\locales.py:50
 msgid "Asia: Macau"
 msgstr "亞洲: 澳門"
 
-#: .\extutils\locales.py:55
+#: .\extutils\locales.py:51
 msgid "Asia: Seoul, South Korea"
 msgstr "亞洲: 南韓 - 首爾"
 
-#: .\extutils\locales.py:56
+#: .\extutils\locales.py:52
 msgid "Asia: Singapore"
 msgstr "亞洲: 新加坡"
 
-#: .\extutils\locales.py:57
+#: .\extutils\locales.py:53
 msgid "Asia: Taipei, Taiwan"
 msgstr "亞洲: 台灣 - 台北"
 
-#: .\extutils\locales.py:58
+#: .\extutils\locales.py:54
 msgid "Asia: Tokyo, Japan"
 msgstr "亞洲: 日本 - 東京"
 
-#: .\extutils\locales.py:59
+#: .\extutils\locales.py:55
 msgid "Europe: London, UK"
 msgstr "歐洲: 英國 - 倫敦"
 
-#: .\extutils\locales.py:60
+#: .\extutils\locales.py:56
 msgid "North America: Central Timezone, USA"
 msgstr "北美: 美國 - 中部時區"
 
-#: .\extutils\locales.py:61
+#: .\extutils\locales.py:57
 msgid "North America: Eastern Timezone, Canada"
 msgstr "北美: 加拿大 - 東部時區"
 
-#: .\extutils\locales.py:62
+#: .\extutils\locales.py:58
 msgid "North America: Eastern Timezone, USA"
 msgstr "北美: 美國 - 東部時區"
 
-#: .\extutils\locales.py:63
+#: .\extutils\locales.py:59
 msgid "North America: Los Angeles, USA"
 msgstr "北美: 美國 - 洛杉磯"
 
-#: .\extutils\locales.py:64
+#: .\extutils\locales.py:60
 msgid "North America: Mountain Timezone, USA"
 msgstr "北美: 美國 - 山地時區"
 
-#: .\extutils\locales.py:65
+#: .\extutils\locales.py:61
 msgid "North America: New York, USA"
 msgstr "北美: 美國 - 紐約"
 
-#: .\extutils\locales.py:66
+#: .\extutils\locales.py:62
 msgid "North America: Pacific Timezone, Canada"
 msgstr "北美: 加拿大 - 太平洋時區"
 
-#: .\extutils\locales.py:67
+#: .\extutils\locales.py:63
 msgid "North America: Pacific Timezone, USA"
 msgstr "北美: 美國 - 太平洋時區"
 
-#: .\extutils\locales.py:68
+#: .\extutils\locales.py:64
 msgid "North America: Toronto, Canada"
 msgstr "北美: 加拿大 - 多倫多"
 
-#: .\extutils\locales.py:69
+#: .\extutils\locales.py:65
 msgid "North America: Vancouver, Canada"
 msgstr "北美: 加拿大 - 溫哥華"
 
-#: .\extutils\locales.py:70
+#: .\extutils\locales.py:66
 msgid "Oceania: Adelaide, Australia"
 msgstr "大洋洲: 澳洲 - 阿德萊德"
 
-#: .\extutils\locales.py:71
+#: .\extutils\locales.py:67
 msgid "Oceania: Auckland, New Zealand"
 msgstr "大洋洲: 紐西蘭 - 奧克蘭"
 
-#: .\extutils\locales.py:72
+#: .\extutils\locales.py:68
 msgid "Oceania: Brisbane, Australia"
 msgstr "大洋洲: 澳洲 - 布里斯本"
 
-#: .\extutils\locales.py:73
+#: .\extutils\locales.py:69
 msgid "Oceania: Melbourne, Australia"
 msgstr "大洋洲: 澳洲 - 墨爾本"
 
-#: .\extutils\locales.py:74
+#: .\extutils\locales.py:70
 msgid "Oceania: Perth, Australia"
 msgstr "大洋洲: 澳洲 - 伯斯"
 
-#: .\extutils\locales.py:75
+#: .\extutils\locales.py:71
 msgid "Oceania: Sydney, Australia"
 msgstr "大洋洲: 澳洲 - 雪梨"
 
-#: .\extutils\locales.py:76
+#: .\extutils\locales.py:72
 msgid "Universal Time Coordinated"
 msgstr "世界標準時間"
 
-#: .\extutils\locales.py:88
+#: .\extutils\locales.py:84
 msgid "English (United States)"
 msgstr "英文 (美國)"
 
-#: .\extutils\locales.py:89
+#: .\extutils\locales.py:85
 msgid "Chinese (Taiwan)"
 msgstr "中文 (台灣)"
 
@@ -685,149 +693,181 @@ msgstr "LINE貼圖"
 msgid "Custom Signal"
 msgstr "自訂訊號"
 
-#: .\flags\botfeature.py:41
+#: .\flags\botfeature.py:45
 msgid "Undefined"
 msgstr "未定義"
 
-#: .\flags\botfeature.py:41
+#: .\flags\botfeature.py:45
 msgid "Undefined bot feature flag."
 msgstr "未定義的機器人功能。"
 
-#: .\flags\botfeature.py:44
+#: .\flags\botfeature.py:48
 msgid "Text / Auto Reply / Add"
 msgstr "文字 / 自動回覆 / 新增"
 
-#: .\flags\botfeature.py:44
+#: .\flags\botfeature.py:48
 msgid "Register an auto-reply module."
 msgstr "新增自動回覆組。"
 
-#: .\flags\botfeature.py:46
+#: .\flags\botfeature.py:50
 msgid "Text / Auto Reply / Delete"
 msgstr "文字 / 自動回覆 / 刪除"
 
-#: .\flags\botfeature.py:46
+#: .\flags\botfeature.py:50
 msgid "Delete an auto-reply module."
 msgstr "刪除自動回覆組。"
 
-#: .\flags\botfeature.py:48
+#: .\flags\botfeature.py:52
 msgid "Text / Auto Reply / Add (Execode)"
 msgstr "文字 / 自動回覆 / 新增 (執行碼)"
 
-#: .\flags\botfeature.py:48
+#: .\flags\botfeature.py:52
 msgid "Register an auto-reply module using Execode."
 msgstr "使用執行碼新增自動回覆組。"
 
-#: .\flags\botfeature.py:50
+#: .\flags\botfeature.py:54
 msgid "Text / Auto Reply / List (Usable)"
 msgstr "文字 / 自動回覆 / 列表 (可用)"
 
-#: .\flags\botfeature.py:50
+#: .\flags\botfeature.py:54
 msgid "List all the usable auto-reply modules."
 msgstr "列出所有可用的自動回覆組。"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:56
 msgid "Text / Auto Reply / List (Keyword)"
 msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:53
+#: .\flags\botfeature.py:57
 msgid ""
 "List all the usable auto-reply modules which keyword includes the provided "
 "keyword."
 msgstr "列出所有含有提供的關鍵字的可用回覆組。"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:59
 msgid "Text / Auto Reply / Respond"
 msgstr "文字 / 自動回覆 / 回覆"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:59
 msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
-#: .\flags\botfeature.py:58
+#: .\flags\botfeature.py:62
+#, fuzzy
+#| msgid "Text / Auto Reply / Add"
+msgid "Text / Timer / Add"
+msgstr "文字 / 自動回覆 / 新增"
+
+#: .\flags\botfeature.py:62
+msgid "Add a timer."
+msgstr ""
+
+#: .\flags\botfeature.py:64
+#, fuzzy
+#| msgid "Text / Auto Reply / List (Usable)"
+msgid "Text / Timer / List (All)"
+msgstr "文字 / 自動回覆 / 列表 (可用)"
+
+#: .\flags\botfeature.py:64
+msgid "List all timers."
+msgstr ""
+
+#: .\flags\botfeature.py:66
+#, fuzzy
+#| msgid "Text / Auto Reply / List (Keyword)"
+msgid "Text / Timer / List (Keyword)"
+msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
+
+#: .\flags\botfeature.py:66
+#, fuzzy
+#| msgid "Responded to the message origin with the designated response."
+msgid "Get the timer(s) with the designated keyword."
+msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
+
+#: .\flags\botfeature.py:69
 msgid "Text / Information / Check IDs"
 msgstr "文字 / 資訊 / 查看ID"
 
-#: .\flags\botfeature.py:58
+#: .\flags\botfeature.py:69
 msgid "Check the ID of current channel and self."
 msgstr "查看自己和所在頻道的ID。"
 
-#: .\flags\botfeature.py:60
+#: .\flags\botfeature.py:71
 msgid "Text / Information / Channel"
 msgstr "文字 / 資訊 / 頻道"
 
-#: .\flags\botfeature.py:60
+#: .\flags\botfeature.py:71
 msgid "Check the channel info."
 msgstr "查閱頻道資訊。"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:73
 msgid "Text / Information / User"
 msgstr "文字 / 資訊 / 用戶"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:73
 msgid "Check the user info of self."
 msgstr "查閱自己的用戶資訊。"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:75
 msgid "Text / Information / Help"
 msgstr "文字 / 資訊 / 幫助"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:75
 msgid "Get help for how to use the bot and the related information."
 msgstr "查看此機器人的使用說明和相關資訊。"
 
-#: .\flags\botfeature.py:67
+#: .\flags\botfeature.py:78
 msgid "Text / Transform / Newline"
 msgstr "文字 / 替換 / 換行字元"
 
-#: .\flags\botfeature.py:67
+#: .\flags\botfeature.py:78
 msgid "Replace the real newline character to be the escaped character \\n."
 msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
 
-#: .\flags\botfeature.py:70
+#: .\flags\botfeature.py:81
 msgid "Text / Random / Choice (One)"
 msgstr "文字 / 隨機 / 選擇 (單個)"
 
-#: .\flags\botfeature.py:70
+#: .\flags\botfeature.py:81
 msgid "Randomly pick an option among the provided options."
 msgstr "隨機從提供的選項中選出一個選項。"
 
-#: .\flags\botfeature.py:72
+#: .\flags\botfeature.py:83
 msgid "Text / Random / Choice (Multi)"
 msgstr "文字 / 隨機 / 選擇 (多個)"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:84
 msgid "Randomly pick an option among the provided options multiple times."
 msgstr "隨機從提供的選項中，根據指定的次數多次選擇選項。"
 
-#: .\flags\botfeature.py:76
+#: .\flags\botfeature.py:87
 msgid "Text / User Data Integration / Start"
 msgstr "文字 / 整合用戶資料 / 啟動"
 
-#: .\flags\botfeature.py:76
+#: .\flags\botfeature.py:87
 msgid "Issue an Execode for user data integration."
 msgstr "獲取一條執行碼以啟動用戶資訊整合手續。"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:89
 msgid "Text / Calculator"
 msgstr "文字 / 計算機"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:89
 msgid "Auto-detected calculator."
 msgstr "自動偵測並啟動的計算機。"
 
-#: .\flags\botfeature.py:80
+#: .\flags\botfeature.py:91
 msgid "Text / Error Test"
 msgstr "文字 / 錯誤測試"
 
-#: .\flags\botfeature.py:80
+#: .\flags\botfeature.py:91
 msgid "For the purpose of testing the error reporting system."
 msgstr "(測試錯誤回報系統用)"
 
-#: .\flags\botfeature.py:83
+#: .\flags\botfeature.py:94
 msgid "Image / imgur upload"
 msgstr "圖片 / 上傳imgur"
 
-#: .\flags\botfeature.py:83
+#: .\flags\botfeature.py:94
 msgid "Upload image to imgur.com."
 msgstr "將圖片上傳至 imgur.com。"
 
@@ -1658,11 +1698,11 @@ msgstr ""
 "指令無法在此頻道種類中使用: {}\n"
 "請在下列任一種頻道種類中使用此指令: {}"
 
-#: .\msghandle\botcmd\command\_tree_.py:33
+#: .\msghandle\botcmd\command\_tree_.py:35
 msgid "Dummy command for accomodating new command usage."
 msgstr "用於讓用戶適應新指令用法的假指令。"
 
-#: .\msghandle\botcmd\command\_tree_.py:34
+#: .\msghandle\botcmd\command\_tree_.py:36
 msgid ""
 "Please add 'AR' which means 'Auto-Reply' between JC and the command code.\n"
 "------\n"
@@ -1833,8 +1873,14 @@ msgstr ""
 "**不是** 網頁，否則可能會發生不可預期的情況。"
 
 #: .\msghandle\botcmd\command\ar.py:138
+#, fuzzy
+#| msgid ""
+#| "Failed to fetch the content ID of the **keyword**.\n"
+#| "Auto-Reply module not registered.\n"
+#| "Code: `{}`\n"
+#| "Visit {} to see the code explanation."
 msgid ""
-"Failed to fetch the content ID of the **keyword**.\n"
+"Failed to fetch / register the content ID of the **keyword**.\n"
 "Auto-Reply module not registered.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
@@ -1845,8 +1891,14 @@ msgstr ""
 "瀏覽 {} 以了解代碼的意思。"
 
 #: .\msghandle\botcmd\command\ar.py:147
+#, fuzzy
+#| msgid ""
+#| "Failed to fetch the content ID of the **response**.\n"
+#| "Auto-Reply module not registered.\n"
+#| "Code: `{}`\n"
+#| "Visit {} to see the code explanation."
 msgid ""
-"Failed to fetch the content ID of the **response**.\n"
+"Failed to fetch / register the content ID of the **response**.\n"
 "Auto-Reply module not registered.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
@@ -1880,9 +1932,15 @@ msgstr ""
 msgid "The keyword of the module to delete."
 msgstr "欲刪除的回覆組的關鍵字。"
 
-#: .\msghandle\botcmd\command\ar.py:189
+#: .\msghandle\botcmd\command\ar.py:189 .\msghandle\botcmd\command\tmr.py:53
+#, fuzzy
+#| msgid ""
+#| "Failed to fetch the content ID of the **keyword**.\n"
+#| "Auto-Reply module not deleted.\n"
+#| "Code: `{}`\n"
+#| "Visit {} to see the code explanation."
 msgid ""
-"Failed to fetch the content ID of the **keyword**.\n"
+"Failed to fetch / register the content ID of the **keyword**.\n"
 "Auto-Reply module not deleted.\n"
 "Code: `{}`\n"
 "Visit {} to see the code explanation."
@@ -2116,6 +2174,74 @@ msgstr ""
 "隨機抽選次數。\n"
 "這個數字不能超過 {}。"
 
+#: .\msghandle\botcmd\command\tmr.py:19
+#, fuzzy
+#| msgid "Term"
+msgid "Timer"
+msgstr "名詞"
+
+#: .\msghandle\botcmd\command\tmr.py:20
+msgid ""
+"Commands related to timer.\n"
+"\n"
+"Flag `continue_on_up` defaults to `False`."
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:26
+msgid ""
+"Keyword to get the timer. The bot will reply the timer status whenever the "
+"keyword has been detected in the designated channel."
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:28
+msgid "Title of the timer."
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:29
+msgid ""
+"String of the target datetime of the timer.\n"
+"\n"
+"- Timezone will be the user's configurated timezone if not specified.\n"
+"\n"
+"- General format should be accepted. If not, please visit [this page.]"
+"(https://dateutil.readthedocs.io/en/stable/parser.html)\n"
+"\n"
+"- If the timer is set to not to keep counting after it reaches the target "
+"time, the timer will be automatically permanently deleted after {} days."
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:35
+msgid ""
+"A word that can indicate if the timer should keep counting up or not.\n"
+"\n"
+"- Words that means POSITIVE: {}\n"
+"\n"
+"- Words that means NEGATIVE: {}"
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:63
+#, fuzzy
+#| msgid "Failed to register the auto-reply module. Code: `{}`"
+msgid "Failed to parse the string of datetime. (`{}`)"
+msgstr ""
+"自動回覆組登錄失敗。\n"
+"代碼: {}"
+
+#: .\msghandle\botcmd\command\tmr.py:75
+msgid ""
+"Unknown flag to indicate if the timer should continue on time up. (`{}`)"
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:80
+msgid "Timer added."
+msgstr ""
+
+#: .\msghandle\botcmd\command\tmr.py:82
+#, fuzzy
+#| msgid "URL Failed to be shortened. Outcome code: "
+msgid "Failed to add timer. Outcome code: `{}`"
+msgstr "網址縮短失敗。代碼: "
+
 #: .\msghandle\botcmd\command\trfm.py:9
 msgid "Transform/Replace"
 msgstr "轉型/替換"
@@ -2188,7 +2314,11 @@ msgstr "訊息行數過多。"
 msgid "LaTeX available."
 msgstr "有LaTeX內容。"
 
-#: .\msghandle\models\out_plat.py:48
+#: .\msghandle\models\out_plat.py:26
+msgid "Content was forced to be displayed on the website"
+msgstr ""
+
+#: .\msghandle\models\out_plat.py:49
 msgid ""
 "{} content(s) was recorded to the database because of the following reason"
 "(s):{}\n"
@@ -2197,21 +2327,21 @@ msgstr ""
 "{}筆內容已因下列原因存至資料庫:{}\n"
 "閱覽網址: {}"
 
-#: .\msghandle\models\out_plat.py:64
+#: .\msghandle\models\out_plat.py:65
 msgid ""
 "Content(s) is supposed to be recorded to database but failed. An error "
 "report should be sent for investigation."
 msgstr "訊息內容寫入資料庫失敗。錯誤報告已傳送給開發者以便除錯。"
 
-#: .\msghandle\models\out_plat.py:113
+#: .\msghandle\models\out_plat.py:123
 msgid "Image URL: {}"
 msgstr "圖片網址: {}"
 
-#: .\msghandle\models\out_plat.py:118
+#: .\msghandle\models\out_plat.py:128
 msgid "Sticker ID: {}"
 msgstr "貼圖ID: {}"
 
-#: .\msghandle\models\pipe_out.py:55
+#: .\msghandle\models\pipe_out.py:63
 msgid ""
 "**AUTO CALCULATOR**\n"
 "Expression: {}\n"
@@ -2251,6 +2381,18 @@ msgid ""
 msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
+
+#: .\msghandle\text\timer.py:27
+msgid "{} to {}"
+msgstr ""
+
+#: .\msghandle\text\timer.py:32
+msgid "{} past {}"
+msgstr ""
+
+#: .\msghandle\text\timer.py:37
+msgid "{} has ended"
+msgstr ""
 
 #: .\templates\about.html:9
 msgid "Contact"
