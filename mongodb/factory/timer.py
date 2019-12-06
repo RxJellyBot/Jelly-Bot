@@ -47,13 +47,13 @@ class TimerManager(BaseCollection):
 
     @param_type_ensure
     def list_all_timer(self) -> TimerListResult:
-        return TimerListResult(self.find_cursor_with_count({}).sort([(TimerModel.TargetTime, pymongo.ASCENDING)]))
+        return TimerListResult(self.find_cursor_with_count({}).sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
     @param_type_ensure
     def get_timer(self, kw_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.KeywordOid.key: kw_oid})
-                .sort([(TimerModel.TargetTime, pymongo.ASCENDING)])
+                .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
         )
 
 
