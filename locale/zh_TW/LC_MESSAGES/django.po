@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 20:36-0600\n"
-"PO-Revision-Date: 2019-12-05 20:36-0600\n"
+"POT-Creation-Date: 2019-12-05 21:24-0600\n"
+"PO-Revision-Date: 2019-12-05 21:28-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -133,12 +133,12 @@ msgstr "新增自動回覆"
 msgid "Auto-Reply Home"
 msgstr "自動回覆 - 首頁"
 
-#: .\JellyBot\views\doc\botcmd.py:15 .\JellyBot\views\nav.py:142
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:142
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:28 .\JellyBot\views\nav.py:175
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:175
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -624,6 +624,14 @@ msgstr "可循環/迭代物件(陣列、清單...等)"
 #: .\extutils\strtrans\type_trans.py:30
 msgid "(Null)"
 msgstr "(空)"
+
+#: .\extutils\utils.py:119
+msgid "(Newline)"
+msgstr "(換行)"
+
+#: .\extutils\utils.py:121
+msgid "(Space)"
+msgstr "(空格)"
 
 #: .\flags\apiact.py:43
 msgid "Unknown Action"
@@ -1168,6 +1176,18 @@ msgstr "資料模組因不明原因而無效。"
 #: .\flags\weberr.py:32 .\templates\err\info\profile_not_found.html:14
 msgid "Profile Not Found"
 msgstr "身份組不存在"
+
+#: .\models\timer.py:71
+msgid "[{diff}] to {event} (at {time})"
+msgstr "距 {event} 還有 [{diff}] (時間: {time})"
+
+#: .\models\timer.py:80
+msgid "[{diff}] past {event} (at {time})"
+msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
+
+#: .\models\timer.py:89
+msgid "{event} has ended (at {time})"
+msgstr "{event} 已結束 (於 {time})"
 
 #: .\mongodb\factory\prof.py:139
 msgid "Default Profile"
@@ -1914,7 +1934,7 @@ msgstr ""
 msgid "The keyword of the module to delete."
 msgstr "欲刪除的回覆組的關鍵字。"
 
-#: .\msghandle\botcmd\command\ar.py:189 .\msghandle\botcmd\command\tmr.py:54
+#: .\msghandle\botcmd\command\ar.py:189 .\msghandle\botcmd\command\tmr.py:55
 msgid ""
 "Failed to fetch / register the content ID of the **keyword**.\n"
 "Auto-Reply module not deleted.\n"
@@ -1974,7 +1994,7 @@ msgstr "搜尋自動回覆組的關鍵字。結果中只會有包含此關鍵字
 msgid "No content including the substring \"{}\" was found."
 msgstr "沒有找到任何含有 \"{}\" 的字詞。"
 
-#: .\msghandle\botcmd\command\ar.py:273
+#: .\msghandle\botcmd\command\ar.py:274
 msgid ""
 "Cannot find any auto-reply module including the substring `{}` in their "
 "keyword."
@@ -2168,18 +2188,18 @@ msgstr ""
 "\n"
 "`往上計數` 的旗標預設為 `否`。"
 
-#: .\msghandle\botcmd\command\tmr.py:27
+#: .\msghandle\botcmd\command\tmr.py:28
 msgid ""
 "Keyword to get the timer. The bot will reply the timer status whenever the "
 "keyword has been detected in the designated channel."
 msgstr ""
 "獲取計時器的關鍵字。機器人會在偵測到關鍵字時，回應對應關鍵字的計時器狀態。"
 
-#: .\msghandle\botcmd\command\tmr.py:29
+#: .\msghandle\botcmd\command\tmr.py:30
 msgid "Title of the timer."
 msgstr "計時器的標題。"
 
-#: .\msghandle\botcmd\command\tmr.py:30
+#: .\msghandle\botcmd\command\tmr.py:31
 msgid ""
 "String of the target datetime of the timer.\n"
 "\n"
@@ -2200,7 +2220,7 @@ msgstr ""
 "\n"
 "- 如果計時器沒有設定為向上記數，則計時器將會在 {} 天後自動永久消除。"
 
-#: .\msghandle\botcmd\command\tmr.py:36
+#: .\msghandle\botcmd\command\tmr.py:37
 msgid ""
 "A word that can indicate if the timer should keep counting up or not.\n"
 "\n"
@@ -2214,23 +2234,27 @@ msgstr ""
 "\n"
 "- 以下字詞代表 *否*: {}"
 
-#: .\msghandle\botcmd\command\tmr.py:64
+#: .\msghandle\botcmd\command\tmr.py:65
 msgid "Failed to parse the string of datetime. (`{}`)"
 msgstr "日期時間點字串剖析失敗。(`{}`)"
 
-#: .\msghandle\botcmd\command\tmr.py:76
+#: .\msghandle\botcmd\command\tmr.py:77
 msgid ""
 "Unknown flag to indicate if the timer will countup once the time is up. (`{}"
 "`)"
 msgstr "無法確認是否要向上計數。(`{}`)"
 
-#: .\msghandle\botcmd\command\tmr.py:81
+#: .\msghandle\botcmd\command\tmr.py:82
 msgid "Timer added."
 msgstr "計時器新增成功。"
 
-#: .\msghandle\botcmd\command\tmr.py:83
+#: .\msghandle\botcmd\command\tmr.py:84
 msgid "Failed to add timer. Outcome code: `{}`"
 msgstr "計時器新增失敗。代碼: `{}`"
+
+#: .\msghandle\botcmd\command\tmr.py:107
+msgid "All Timers in this Channel:\n"
+msgstr "本頻道內全部的計時器:\n"
 
 #: .\msghandle\botcmd\command\trfm.py:9
 msgid "Transform/Replace"
@@ -2371,18 +2395,6 @@ msgid ""
 msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
-
-#: .\msghandle\text\timer.py:30
-msgid "[{diff}] to {event} (at {time})"
-msgstr "距 {event} 還有 [{diff}] (時間: {time})"
-
-#: .\msghandle\text\timer.py:39
-msgid "[{diff}] past {event} (at {time})"
-msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
-
-#: .\msghandle\text\timer.py:48
-msgid "{event} has ended (at {time})"
-msgstr "{event} 已結束 (於 {time})"
 
 #: .\templates\about.html:9
 msgid "Contact"
@@ -3204,28 +3216,48 @@ msgstr "開關導引列"
 msgid "Search in site"
 msgstr "站內搜尋"
 
-#: .\templates\doc\botcmd_main.html:13
+#: .\templates\doc\botcmd_main.html:12
+#, python-format
+msgid "The prefix of the commands is&nbsp;<b>%(cmd_prefix)s</b>.&nbsp;"
+msgstr "指令的前綴為&nbsp;<b>%(cmd_prefix)s</b>。&nbsp;"
+
+#: .\templates\doc\botcmd_main.html:16
+msgid "This is&nbsp;<b>case-insensitive</b>&nbsp;."
+msgstr "指令前綴&nbsp;<b>無視大小寫</b>。"
+
+#: .\templates\doc\botcmd_main.html:18
+msgid "This is&nbsp;<b>case-sensitive</b>&nbsp;."
+msgstr "指令前綴&nbsp;<b>大小寫有別</b>。"
+
+#: .\templates\doc\botcmd_main.html:23
+#, python-format
+msgid ""
+"The splittor(s) between the command code and its arguments is/are&nbsp;"
+"%(splhtml)s.&nbsp;"
+msgstr "指令參數和指令代碼的分隔子為&nbsp;%(splhtml)s。&nbsp;"
+
+#: .\templates\doc\botcmd_main.html:29
+msgid ""
+"You should pick a splittor at your convenience and use it through the whole "
+"command, or some weird parsing problems may occur."
+msgstr ""
+"根據自己的習慣及便利性，於指令中選擇一個分隔子，並於指令中只使用該分隔子。若"
+"混用分隔子，小水母可能會於剖析指令時產生奇怪的錯誤。"
+
+#: .\templates\doc\botcmd_main.html:36
 msgid "Command codes are&nbsp;<b>case-insensitive</b>."
 msgstr "指令碼&nbsp;<b>無視大小寫</b>。"
 
-#: .\templates\doc\botcmd_main.html:15
+#: .\templates\doc\botcmd_main.html:38
 msgid "Command codes are&nbsp;<b>case-sensitive</b>."
 msgstr "指令碼&nbsp;<b>大小寫有別</b>。"
 
-#: .\templates\doc\botcmd_main.html:18
-msgid "Command prefix is&nbsp;<b>case-insensitive</b>."
-msgstr "指令前綴&nbsp;<b>無視大小寫</b>。"
-
-#: .\templates\doc\botcmd_main.html:20
-msgid "Command prefix is&nbsp;<b>case-sensitive</b>."
-msgstr "指令前綴&nbsp;<b>大小寫有別</b>。"
-
-#: .\templates\doc\botcmd_main.html:34 .\templates\doc\botcmd_node.html:17
+#: .\templates\doc\botcmd_main.html:52 .\templates\doc\botcmd_node.html:17
 #: .\templates\doc\botcmd_node.html:76
 msgid "Aliases: "
 msgstr "別名: "
 
-#: .\templates\doc\botcmd_main.html:42
+#: .\templates\doc\botcmd_main.html:60
 msgid "Command Usage"
 msgstr "指令使用方式"
 

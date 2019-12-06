@@ -1,6 +1,7 @@
 from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 
+from extutils import char_description
 from flags import WebsiteError
 from msghandle.botcmd.command import cmd_root
 from JellyBot.systemconfig import Bot
@@ -13,9 +14,17 @@ class BotCommandMainView(View):
     def get(self, request, *args, **kwargs):
         return render_template(
             request, _("Bot Commands List"), "doc/botcmd_main.html",
-            {"cmd_nodes": cmd_root.child_nodes,
-             "case_insensitive": cmd_root.case_insensitive,
-             "case_insensitive_prefix": Bot.CaseInsensitivePrefix})
+            {
+                "cmd_prefix": cmd_root.prefix,
+                "cmd_splittors_html":
+                    "<b>" +
+                    f"</b>&nbsp;{_('or')}&nbsp;<b>".join(
+                        [str(char_description(spl)) for spl in cmd_root.splittors]) +
+                    "</b>",
+                "cmd_nodes": cmd_root.child_nodes,
+                "case_insensitive": cmd_root.case_insensitive,
+                "case_insensitive_prefix": Bot.CaseInsensitivePrefix
+            })
 
 
 class BotCommandHelpView(View):

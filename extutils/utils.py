@@ -1,6 +1,8 @@
 import re
 from typing import List, Tuple, Union
 
+from django.utils.translation import gettext_lazy as _
+
 
 def cast_keep_none(obj, dest_type: type):
     if obj is not None:
@@ -110,3 +112,12 @@ def rotate_list(l: List, n: int):
     """`n` means elements to rotate from left to right"""
     n = int(n)
     return l[n:] + l[:n]
+
+
+def char_description(c: str):
+    if c == "\n":
+        return _("(Newline)")
+    elif c == " ":
+        return _("(Space)")
+    else:
+        return c
