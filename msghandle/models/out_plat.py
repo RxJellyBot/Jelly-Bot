@@ -19,11 +19,11 @@ from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder,
 
 
 class ToSiteReason:
-    TOO_LONG = _("Message length overlimit.")
-    TOO_MANY_RESPONSES = _("Responses length overlimit.")
-    TOO_MANY_LINES = _("Too many lines.")
-    LATEX_AVAILABLE = _("LaTeX available.")
-    FORCED_ONSITE = _("Content was forced to be displayed on the website.")
+    TOO_LONG = _("Message length overlimit")
+    TOO_MANY_RESPONSES = _("Responses length overlimit")
+    TOO_MANY_LINES = _("Too many lines")
+    LATEX_AVAILABLE = _("LaTeX available")
+    FORCED_ONSITE = _("Content was forced to be displayed on the website")
 
 
 class HandledEventsHolderPlatform:
@@ -46,7 +46,7 @@ class HandledEventsHolderPlatform:
 
                 self.to_send.append(
                     (MessageType.TEXT,
-                     _("{} content(s) was recorded to the database because of the following reason(s):{}\nURL: {}")
+                     _("{} content(s) needs to be viewed on the website because of the following reason(s):{}\nURL: {}")
                      .format(
                          len(self.to_site),
                          "".join([f"\n - {reason}" for reason, content in self.to_site]),
