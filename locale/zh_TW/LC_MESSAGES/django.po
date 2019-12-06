@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 21:37-0600\n"
-"PO-Revision-Date: 2019-12-05 21:38-0600\n"
+"POT-Creation-Date: 2019-12-05 23:02-0600\n"
+"PO-Revision-Date: 2019-12-05 23:02-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -248,7 +248,7 @@ msgstr "頻道資訊搜尋"
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:43 .\JellyBot\views\nav.py:125
+#: .\JellyBot\views\info\msgstats.py:46 .\JellyBot\views\nav.py:125
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -475,111 +475,111 @@ msgstr "有聲貼圖"
 msgid "Static Sticker"
 msgstr "靜態貼圖"
 
-#: .\extutils\locales.py:48
+#: .\extutils\locales.py:58
 msgid "Asia: Hong Kong"
 msgstr "亞洲: 香港"
 
-#: .\extutils\locales.py:49
+#: .\extutils\locales.py:59
 msgid "Asia: Kuala Lumpur, Malaysia"
 msgstr "亞洲: 馬來西亞 - 吉隆坡"
 
-#: .\extutils\locales.py:50
+#: .\extutils\locales.py:60
 msgid "Asia: Macau"
 msgstr "亞洲: 澳門"
 
-#: .\extutils\locales.py:51
+#: .\extutils\locales.py:61
 msgid "Asia: Seoul, South Korea"
 msgstr "亞洲: 南韓 - 首爾"
 
-#: .\extutils\locales.py:52
+#: .\extutils\locales.py:62
 msgid "Asia: Singapore"
 msgstr "亞洲: 新加坡"
 
-#: .\extutils\locales.py:53
+#: .\extutils\locales.py:63
 msgid "Asia: Taipei, Taiwan"
 msgstr "亞洲: 台灣 - 台北"
 
-#: .\extutils\locales.py:54
+#: .\extutils\locales.py:64
 msgid "Asia: Tokyo, Japan"
 msgstr "亞洲: 日本 - 東京"
 
-#: .\extutils\locales.py:55
+#: .\extutils\locales.py:65
 msgid "Europe: London, UK"
 msgstr "歐洲: 英國 - 倫敦"
 
-#: .\extutils\locales.py:56
+#: .\extutils\locales.py:66
 msgid "North America: Central Timezone, USA"
 msgstr "北美: 美國 - 中部時區"
 
-#: .\extutils\locales.py:57
+#: .\extutils\locales.py:67
 msgid "North America: Eastern Timezone, Canada"
 msgstr "北美: 加拿大 - 東部時區"
 
-#: .\extutils\locales.py:58
+#: .\extutils\locales.py:68
 msgid "North America: Eastern Timezone, USA"
 msgstr "北美: 美國 - 東部時區"
 
-#: .\extutils\locales.py:59
+#: .\extutils\locales.py:69
 msgid "North America: Los Angeles, USA"
 msgstr "北美: 美國 - 洛杉磯"
 
-#: .\extutils\locales.py:60
+#: .\extutils\locales.py:70
 msgid "North America: Mountain Timezone, USA"
 msgstr "北美: 美國 - 山地時區"
 
-#: .\extutils\locales.py:61
+#: .\extutils\locales.py:71
 msgid "North America: New York, USA"
 msgstr "北美: 美國 - 紐約"
 
-#: .\extutils\locales.py:62
+#: .\extutils\locales.py:72
 msgid "North America: Pacific Timezone, Canada"
 msgstr "北美: 加拿大 - 太平洋時區"
 
-#: .\extutils\locales.py:63
+#: .\extutils\locales.py:73
 msgid "North America: Pacific Timezone, USA"
 msgstr "北美: 美國 - 太平洋時區"
 
-#: .\extutils\locales.py:64
+#: .\extutils\locales.py:74
 msgid "North America: Toronto, Canada"
 msgstr "北美: 加拿大 - 多倫多"
 
-#: .\extutils\locales.py:65
+#: .\extutils\locales.py:75
 msgid "North America: Vancouver, Canada"
 msgstr "北美: 加拿大 - 溫哥華"
 
-#: .\extutils\locales.py:66
+#: .\extutils\locales.py:76
 msgid "Oceania: Adelaide, Australia"
 msgstr "大洋洲: 澳洲 - 阿德萊德"
 
-#: .\extutils\locales.py:67
+#: .\extutils\locales.py:77
 msgid "Oceania: Auckland, New Zealand"
 msgstr "大洋洲: 紐西蘭 - 奧克蘭"
 
-#: .\extutils\locales.py:68
+#: .\extutils\locales.py:78
 msgid "Oceania: Brisbane, Australia"
 msgstr "大洋洲: 澳洲 - 布里斯本"
 
-#: .\extutils\locales.py:69
+#: .\extutils\locales.py:79
 msgid "Oceania: Melbourne, Australia"
 msgstr "大洋洲: 澳洲 - 墨爾本"
 
-#: .\extutils\locales.py:70
+#: .\extutils\locales.py:80
 msgid "Oceania: Perth, Australia"
 msgstr "大洋洲: 澳洲 - 伯斯"
 
-#: .\extutils\locales.py:71
+#: .\extutils\locales.py:81
 msgid "Oceania: Sydney, Australia"
 msgstr "大洋洲: 澳洲 - 雪梨"
 
-#: .\extutils\locales.py:72
+#: .\extutils\locales.py:82
 msgid "Universal Time Coordinated"
 msgstr "世界標準時間"
 
-#: .\extutils\locales.py:84
+#: .\extutils\locales.py:94
 msgid "English (United States)"
 msgstr "英文 (美國)"
 
-#: .\extutils\locales.py:85
+#: .\extutils\locales.py:95
 msgid "Chinese (Taiwan)"
 msgstr "中文 (台灣)"
 
@@ -2571,7 +2571,7 @@ msgstr "查閱ID"
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\main.html:52
 #: .\templates\info\channel\search.html:78
-#: .\templates\info\msgstats\main.html:83 .\templates\info\profile.html:44
+#: .\templates\info\msgstats\main.html:84 .\templates\info\profile.html:44
 msgid "Channel ID"
 msgstr "頻道ID"
 
@@ -2584,7 +2584,7 @@ msgstr "頻道代碼"
 
 #: .\templates\account\channel\manage.html:15 .\templates\account\main.html:16
 #: .\templates\info\channel\main.html:25 .\templates\info\chcoll\main.html:15
-#: .\templates\info\msgstats\main.html:59 .\templates\info\profile.html:15
+#: .\templates\info\msgstats\main.html:60 .\templates\info\profile.html:15
 msgid "Basic Information"
 msgstr "基本資訊"
 
@@ -3252,12 +3252,19 @@ msgstr "指令碼&nbsp;<b>無視大小寫</b>。"
 msgid "Command codes are&nbsp;<b>case-sensitive</b>."
 msgstr "指令碼&nbsp;<b>大小寫有別</b>。"
 
-#: .\templates\doc\botcmd_main.html:52 .\templates\doc\botcmd_node.html:17
+#: .\templates\doc\botcmd_main.html:42
+msgid ""
+"Use double quotation mark to wrap around a single parameter if it contains "
+"any characters that is one of the splittor(s) to prevent parsing error."
+msgstr ""
+"使用 雙引號 將 內容含有 指令分隔子 的參數包圍起來，以避免指令剖析錯誤。"
+
+#: .\templates\doc\botcmd_main.html:57 .\templates\doc\botcmd_node.html:17
 #: .\templates\doc\botcmd_node.html:76
 msgid "Aliases: "
 msgstr "別名: "
 
-#: .\templates\doc\botcmd_main.html:60
+#: .\templates\doc\botcmd_main.html:65
 msgid "Command Usage"
 msgstr "指令使用方式"
 
@@ -3475,13 +3482,13 @@ msgstr "詳細"
 msgid "Channel Info"
 msgstr "頻道資訊"
 
-#: .\templates\info\channel\main.html:16 .\templates\info\msgstats\main.html:16
+#: .\templates\info\channel\main.html:16 .\templates\info\msgstats\main.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
 "channel will not update."
 msgstr "機器人已標記此頻道無法存取，所以此頻道的資訊不會再更新。"
 
-#: .\templates\info\channel\main.html:32 .\templates\info\msgstats\main.html:65
+#: .\templates\info\channel\main.html:32 .\templates\info\msgstats\main.html:66
 msgid "Channel Name"
 msgstr "頻道名稱"
 
@@ -3541,7 +3548,12 @@ msgstr "頻道組代碼"
 msgid "Child Channels"
 msgstr "子頻道"
 
-#: .\templates\info\components\msg_stats_intvflow.html:15
+#: .\templates\info\components\msg_stats_daily.html:12
+#: .\templates\info\components\msg_stats_table.html:9
+msgid "Message Count"
+msgstr "訊息數量"
+
+#: .\templates\info\components\msg_stats_intvflow.html:12
 msgid "Message Count / Day"
 msgstr "訊息數量 / 日"
 
@@ -3549,52 +3561,52 @@ msgstr "訊息數量 / 日"
 msgid "User Name"
 msgstr "用戶名稱"
 
-#: .\templates\info\components\msg_stats_table.html:9
-msgid "Message Count"
-msgstr "訊息數量"
-
 #: .\templates\info\components\msg_stats_table.html:10
 #, python-format
 msgid "Count %%"
 msgstr "佔比%%"
 
-#: .\templates\info\msgstats\main.html:9
+#: .\templates\info\msgstats\main.html:10
 msgid "Channel Message Statistics"
 msgstr "頻道訊息統計"
 
-#: .\templates\info\msgstats\main.html:24
+#: .\templates\info\msgstats\main.html:25
 msgid "Parameters"
 msgstr "參數"
 
-#: .\templates\info\msgstats\main.html:32
+#: .\templates\info\msgstats\main.html:33
 msgid "Range"
 msgstr "範圍"
 
-#: .\templates\info\msgstats\main.html:38
+#: .\templates\info\msgstats\main.html:39
 msgid "Hours"
 msgstr "小時"
 
-#: .\templates\info\msgstats\main.html:43
+#: .\templates\info\msgstats\main.html:44
 msgid "Leave this blank and refresh to get all-time record."
 msgstr "留空和重整頁面以獲得全時紀錄。"
 
-#: .\templates\info\msgstats\main.html:50
+#: .\templates\info\msgstats\main.html:51
 msgid "Refresh"
 msgstr "重整"
 
-#: .\templates\info\msgstats\main.html:101
+#: .\templates\info\msgstats\main.html:102
 msgid "Statistics"
 msgstr "統計"
 
-#: .\templates\info\msgstats\main.html:106
-msgid "Average Message Flow (Hour)"
-msgstr "平均訊息量 (每小時)"
+#: .\templates\info\msgstats\main.html:107
+msgid "Hour Average Message Flow"
+msgstr "每小時平均訊息量"
 
-#: .\templates\info\msgstats\main.html:116
+#: .\templates\info\msgstats\main.html:117
+msgid "Daily Message Flow"
+msgstr "每日訊息量"
+
+#: .\templates\info\msgstats\main.html:127
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
 
-#: .\templates\info\msgstats\main.html:117
+#: .\templates\info\msgstats\main.html:128
 msgid "Total Count: "
 msgstr "訊息總數: "
 

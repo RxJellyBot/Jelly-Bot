@@ -4,6 +4,7 @@
 {% load utils %}
 
 {% block content %}
+    {% include "components/chart.html" %}
     <div class="jumbotron">
         <div class="container">
             <div class="display-4 text-center">{% trans "Channel Message Statistics" %}</div>
@@ -103,12 +104,22 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Average Message Flow (Hour)" %}</h5>
+                <h5>{% trans "Hour Average Message Flow" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
                 {% include "info/components/msg_stats_intvflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Daily Message Flow" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_stats_daily.html" with msg_daily_data=msg_daily_data only %}
             </div>
         </div>
         <div class="row">

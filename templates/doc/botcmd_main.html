@@ -38,6 +38,11 @@
                 {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
             {% endif %}
         </div>
+        <div class="row mb-3">
+            {% blocktrans trimmed %}
+                Use double quotation mark to wrap around a single parameter if it contains any characters that is one of the splittor(s) to prevent parsing error.
+            {% endblocktrans %}
+        </div>
 
         <div class="row">
             {% for cmd_node in cmd_nodes %}
