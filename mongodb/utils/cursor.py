@@ -6,8 +6,10 @@ class CursorWithCount:
 
     def __iter__(self):
         for dict_ in self._cursor:
-            o = self._parse_cls(**dict_, from_db=True)
-            yield o
+            if self._parse_cls:
+                yield self._parse_cls(**dict_, from_db=True)
+            else:
+                yield dict_
 
     def __len__(self):
         return self._count

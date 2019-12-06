@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+from extutils.dt import is_tz_naive
+
 from ._base import BaseField, FieldInstance
 
 
@@ -22,4 +24,7 @@ class DateTimeField(BaseField):
 
 class DateTimeFieldInstance(FieldInstance):
     def force_set(self, value: datetime):
-        super().force_set(value.replace(tzinfo=timezone.utc))
+        if is_tz_naive(value):
+            value = value.replace(tzinfo=timezone.utc)
+
+        super().force_set(value)

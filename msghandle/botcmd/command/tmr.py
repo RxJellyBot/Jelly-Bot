@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from extutils.boolext import str_to_bool, true_word, false_word, StrBoolResult
 from extutils.dt import is_tz_naive
-from extutils.locales import LocaleInfo
 from flags import BotFeature, CommandScopeCollection, AutoReplyContentType
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import TimerManager, AutoReplyContentManager
@@ -66,7 +65,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
 
     # Attach timezone if needed
     if is_tz_naive(dt):
-        dt.replace(tzinfo=LocaleInfo.get_tzinfo(e.user_model.config.locale))
+        dt = dt.replace(tzinfo=e.user_model.config.tzinfo)
 
     # Check `countup` flag
     ctup = str_to_bool(countup)

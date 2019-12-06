@@ -23,7 +23,7 @@ class ToSiteReason:
     TOO_MANY_RESPONSES = _("Responses length overlimit.")
     TOO_MANY_LINES = _("Too many lines.")
     LATEX_AVAILABLE = _("LaTeX available.")
-    FORCED_ONSITE = _("Content was forced to be displayed on the website")
+    FORCED_ONSITE = _("Content was forced to be displayed on the website.")
 
 
 class HandledEventsHolderPlatform:

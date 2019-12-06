@@ -35,9 +35,10 @@ class TimerModel(Model):
 
 @dataclass
 class TimerListResult:
-    PastDone: List[TimerModel] = field(init=False, default_factory=list)
-    PastContinue: List[TimerModel] = field(init=False, default_factory=list)
-    Future: List[TimerModel] = field(init=False, default_factory=list)
+    past_done: List[TimerModel] = field(init=False, default_factory=list)
+    past_continue: List[TimerModel] = field(init=False, default_factory=list)
+    future: List[TimerModel] = field(init=False, default_factory=list)
+    has_data: bool = field(init=False, default=False)
 
     cursor: InitVar[CursorWithCount] = None
 
@@ -45,10 +46,12 @@ class TimerListResult:
         now = now_utc_aware()
 
         for mdl in cursor:
+            self.has_data = True
+
             if mdl.is_after(now):
-                self.Future.append(mdl)
+                self.future.append(mdl)
             else:
                 if mdl.countup:
-                    self.PastContinue.append(mdl)
+                    self.past_continue.append(mdl)
                 else:
-                    self.PastDone.append(mdl)
+                    self.past_done.append(mdl)

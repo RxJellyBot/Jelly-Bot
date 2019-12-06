@@ -40,6 +40,7 @@ class TimerManager(BaseCollection):
 
         if not countup:
             mdl.deletion_time = target_time + timedelta(days=Bot.Timer.AutoDeletionDays)
+            mdl.deletion_time = mdl.deletion_time.replace(tzinfo=target_time.tzinfo)
 
         outcome, ex = self.insert_one_model(mdl)
 
@@ -52,7 +53,7 @@ class TimerManager(BaseCollection):
     @param_type_ensure
     def get_timer(self, kw_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
-            self.find_cursor_with_count({TimerModel.KeywordOid.key: kw_oid})
+            self.find_cursor_with_count({TimerModel.KeywordOid.key: kw_oid}, parse_cls=TimerModel)
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
         )
 
