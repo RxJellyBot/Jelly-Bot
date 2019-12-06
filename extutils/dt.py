@@ -18,7 +18,7 @@ def t_delta_str(t_delta: timedelta):
     s = t_delta.seconds % 60
 
     if t_delta.days > 3:
-        return _("{} Days {} H {} M {} S").format(t_delta.days, h, m, s)
+        return _("{} Days {} H {:02} M {:02} S").format(t_delta.days, h, m, s)
     else:
         h += t_delta.days * 24
-        return _("{} H {} M {} S").format(t_delta.days, h, m, s)
+        return _("{} H {:02} M {:02} S").format(t_delta.days, h, m, s)

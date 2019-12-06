@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 20:23-0600\n"
-"PO-Revision-Date: 2019-12-05 20:24-0600\n"
+"POT-Creation-Date: 2019-12-05 20:36-0600\n"
+"PO-Revision-Date: 2019-12-05 20:36-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -456,12 +456,12 @@ msgid ""
 msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...等。"
 
 #: .\extutils\dt.py:21
-msgid "{} Days {} H {} M {} S"
-msgstr "{} 日 {} 時 {} 分 {} 秒"
+msgid "{} Days {} H {:02} M {:02} S"
+msgstr "{} 日 {} 時 {:02} 分 {:02} 秒"
 
 #: .\extutils\dt.py:24
-msgid "{} H {} M {} S"
-msgstr "{} 時 {} 分 {} 秒"
+msgid "{} H {:02} M {:02} S"
+msgstr "{} 時 {:02} 分 {:02} 秒"
 
 #: .\extutils\line_sticker\main.py:16
 msgid "Animated Sticker"

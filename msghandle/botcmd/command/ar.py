@@ -266,7 +266,8 @@ def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
 
     if not conn_list.empty:
         return [HandledMessageEventText(
-            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list))
+            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list)),
+            force_extra=True
         )]
     else:
         return [HandledMessageEventText(
