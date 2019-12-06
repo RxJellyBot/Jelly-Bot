@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 21:24-0600\n"
-"PO-Revision-Date: 2019-12-05 21:28-0600\n"
+"POT-Creation-Date: 2019-12-05 21:37-0600\n"
+"PO-Revision-Date: 2019-12-05 21:38-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1972,29 +1972,29 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:244 .\msghandle\botcmd\command\ar.py:269
+#: .\msghandle\botcmd\command\ar.py:244 .\msghandle\botcmd\command\ar.py:270
 msgid "Usable Keywords:"
 msgstr "可用關鍵字:"
 
-#: .\msghandle\botcmd\command\ar.py:244 .\msghandle\botcmd\command\ar.py:269
+#: .\msghandle\botcmd\command\ar.py:244 .\msghandle\botcmd\command\ar.py:270
 msgid ", "
 msgstr "、"
 
-#: .\msghandle\botcmd\command\ar.py:247
+#: .\msghandle\botcmd\command\ar.py:248
 msgid "No usable auto-reply module in this channel."
 msgstr "此頻道沒有可用的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:253
+#: .\msghandle\botcmd\command\ar.py:254
 msgid ""
 "The search keyword to find the Auto-Reply module. Auto-Reply module which "
 "keyword contains this will be returned."
 msgstr "搜尋自動回覆組的關鍵字。結果中只會有包含此關鍵字的回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:263
+#: .\msghandle\botcmd\command\ar.py:264
 msgid "No content including the substring \"{}\" was found."
 msgstr "沒有找到任何含有 \"{}\" 的字詞。"
 
-#: .\msghandle\botcmd\command\ar.py:274
+#: .\msghandle\botcmd\command\ar.py:275
 msgid ""
 "Cannot find any auto-reply module including the substring `{}` in their "
 "keyword."
@@ -2313,32 +2313,32 @@ msgstr ""
 "圖片網址如下。"
 
 #: .\msghandle\models\out_plat.py:22
-msgid "Message length overlimit."
-msgstr "訊息長度超過限制。"
+msgid "Message length overlimit"
+msgstr "訊息長度超過限制"
 
 #: .\msghandle\models\out_plat.py:23
-msgid "Responses length overlimit."
-msgstr "超過回覆內容長度限制。"
+msgid "Responses length overlimit"
+msgstr "超過回覆內容長度限制"
 
 #: .\msghandle\models\out_plat.py:24
-msgid "Too many lines."
-msgstr "訊息行數過多。"
+msgid "Too many lines"
+msgstr "訊息行數過多"
 
 #: .\msghandle\models\out_plat.py:25
-msgid "LaTeX available."
-msgstr "有LaTeX內容。"
+msgid "LaTeX available"
+msgstr "有LaTeX內容"
 
 #: .\msghandle\models\out_plat.py:26
-msgid "Content was forced to be displayed on the website."
-msgstr "強制於網站顯示。"
+msgid "Content was forced to be displayed on the website"
+msgstr "強制於網站顯示"
 
 #: .\msghandle\models\out_plat.py:49
 msgid ""
-"{} content(s) was recorded to the database because of the following "
+"{} content(s) needs to be viewed on the website because of the following "
 "reason(s):{}\n"
 "URL: {}"
 msgstr ""
-"{}筆內容已因下列原因存至資料庫:{}\n"
+"因下列原因，{}筆內容必須於網站上瀏覽:{}\n"
 "閱覽網址: {}"
 
 #: .\msghandle\models\out_plat.py:65
