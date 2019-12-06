@@ -19,6 +19,7 @@ class TimerModel(Model):
     DeletionTime = DateTimeField("del",default=ModelDefaultValueExt.Optional)
     Countup = BooleanField("c", default=False)
     PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
+    Notified = BooleanField("nt", default=False)
 
     @property
     def is_periodic(self) -> bool:

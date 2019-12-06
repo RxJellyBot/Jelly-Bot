@@ -1,13 +1,12 @@
 # FIXME: Bot Feature: Countdown / Countup Timer
-#   - Daily Notifications on specific time
 #   - Command: Delete
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature: Remote control in private channel
+# INCOMPLETE: Bot Feature: Last Message
 # INCOMPLETE: Statistics: Message flow of the user
 # INCOMPLETE: Statistics: Bot Features Usage in Channel
 # INCOMPLETE: Auto-Reply: Sync across channel
 # INCOMPLETE: Auto-Reply: Redirect to webpage if its content is too long
-# INCOMPLETE: Bot Feature: Last Message
 # TODO: Website: Timer
 #   - Add (Periodical)
 # TODO: Website: Asynchronous channel list, memer message ranking
