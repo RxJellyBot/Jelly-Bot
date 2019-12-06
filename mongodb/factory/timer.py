@@ -1,11 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import pymongo
 from bson import ObjectId
 
-from models import TimerModel
+from models import TimerModel, TimerListResult
 from mongodb.factory.results import WriteOutcome
 from extutils.checker import param_type_ensure
 from extutils.locales import UTC
+from extutils.dt import is_tz_naive
+from JellyBot.systemconfig import Bot
 
 from ._base import BaseCollection
 
@@ -19,23 +22,39 @@ class TimerManager(BaseCollection):
 
     def __init__(self):
         super().__init__()
+        self.create_index(TimerModel.KeywordOid.key)
+        self.create_index(TimerModel.DeletionTime.key, expireAfterSeconds=0)
 
     @param_type_ensure
     def add_new_timer(
-            self, kw_oid: ObjectId, title: str, target_time: datetime,
+            self, ch_oid: ObjectId, kw_oid: ObjectId, title: str, target_time: datetime,
             continue_on_timeup: bool = False, period_sec: int = 0) -> WriteOutcome:
         """`target_time` is recommended to be tz-aware. Tzinfo will be forced to be UTC if tz-naive."""
         # Force target time to be tz-aware in UTC
-        if target_time.tzinfo is None or target_time.tzinfo.utcoffset(datetime.now()) is None:
+        if is_tz_naive(target_time):
             target_time = target_time.replace(tzinfo=UTC.to_tzinfo())
 
-        model, outcome, ex = self.insert_one_data(
-            KeywordOid=kw_oid, Title=title, TargetTime=target_time, ContinueOnTimeUp=continue_on_timeup,
-            PeriodSeconds=period_sec)
+        mdl = TimerModel(
+            ChannelOid=ch_oid, KeywordOid=kw_oid, Title=title, TargetTime=target_time,
+            ContinueOnTimeUp=continue_on_timeup, PeriodSeconds=period_sec)
+
+        if not continue_on_timeup:
+            mdl.deletion_time = target_time + timedelta(days=Bot.Timer.AutoDeletionDays)
+
+        outcome, ex = self.insert_one_model(mdl)
 
         return outcome
 
     @param_type_ensure
-    def list_timer(self, kw_oid: ObjectId):
-        # FIXME: Custom Order
-        self.find_cursor_with_count({TimerModel.KeywordOid: kw_oid}).sort([(TimerModel.TargetTime)])
+    def list_all_timer(self) -> TimerListResult:
+        return TimerListResult(self.find_cursor_with_count({}).sort([(TimerModel.TargetTime, pymongo.ASCENDING)]))
+
+    @param_type_ensure
+    def get_timer(self, kw_oid: ObjectId) -> TimerListResult:
+        return TimerListResult(
+            self.find_cursor_with_count({TimerModel.KeywordOid: kw_oid})
+                .sort([(TimerModel.TargetTime, pymongo.ASCENDING)])
+        )
+
+
+_inst = TimerManager()

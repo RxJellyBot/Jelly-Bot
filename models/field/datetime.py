@@ -10,7 +10,7 @@ class DateTimeField(BaseField):
 
     @classmethod
     def none_obj(cls):
-        return datetime.min
+        return datetime.min.replace(tzinfo=timezone.utc)
 
     def is_value_valid(self, value) -> bool:
         return self.is_type_matched(value)

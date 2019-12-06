@@ -6,7 +6,7 @@ import pymongo
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
-from extutils.locales import now_utc_aware
+from extutils.dt import now_utc_aware
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult

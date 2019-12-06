@@ -111,3 +111,6 @@ class Bot:
         DefaultCooldownSecs = 0
 
         MaxContentResultLength = 100
+
+    class Timer:
+        AutoDeletionDays = 7

@@ -10,7 +10,7 @@ from JellyBot.systemconfig import AutoReply, Database, DataQuery
 from extutils.emailutils import MailSender
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
-from extutils.locales import now_utc_aware
+from extutils.dt import now_utc_aware
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel

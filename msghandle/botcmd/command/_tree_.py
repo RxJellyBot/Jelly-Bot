@@ -10,9 +10,10 @@ from .id import cmd as cmd_id
 from .ar import cmd_main as cmd_ar
 from .help import cmd as cmd_help
 from .rdm import cmd as cmd_rdm
+from .tmr import cmd as cmd_tmr
 
 # List all main command nodes for some pages to get the command data
-__all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help"]
+__all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr"]
 
 
 cmd_root = CommandNode(
@@ -23,6 +24,7 @@ cmd_root.attach_child_node(cmd_uintg)
 cmd_root.attach_child_node(cmd_ar)
 cmd_root.attach_child_node(cmd_help)
 cmd_root.attach_child_node(cmd_rdm)
+cmd_root.attach_child_node(cmd_tmr)
 
 # DEPRECATE: Old command
 

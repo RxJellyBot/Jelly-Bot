@@ -45,10 +45,6 @@ class PytzInfo(tzinfo):
         return f"UTC{int(self._base.utcoffset(datetime.utcnow()).total_seconds() // 3600):+d}"
 
 
-def now_utc_aware():
-    return datetime.utcnow().replace(tzinfo=pytz.UTC)
-
-
 HKG = LocaleInfo(_("Asia: Hong Kong"), "Asia/Hong_Kong")
 MYS = LocaleInfo(_("Asia: Kuala Lumpur, Malaysia"), "Asia/Kuala_Lumpur")
 MAC = LocaleInfo(_("Asia: Macau"), "Asia/Macau")

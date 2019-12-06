@@ -23,6 +23,8 @@ from .execode import _inst as ExecodeManager
 from .exctnt import _inst as ExtraContentManager
 # noinspection PyPep8Naming
 from .shorturl import _inst as ShortUrlDataManager
+# noinspection PyPep8Naming
+from .timer import _inst as TimerManager
 from ._base import BaseCollection
 
 

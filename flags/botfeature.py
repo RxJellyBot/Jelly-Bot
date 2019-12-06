@@ -12,6 +12,10 @@ class BotFeature(FlagDoubleEnum):
                 1002 - Delete
                 1003 - Add (Execode)
                 1009 - Respond
+            101 - Timer
+                1011 - Add
+                1012 - List (All)
+                1019 - List (Keyword)
 
         11 - Sub
             110 - Information
@@ -53,6 +57,13 @@ class BotFeature(FlagDoubleEnum):
         _("List all the usable auto-reply modules which keyword includes the provided keyword.")
     TXT_AR_RESPOND = \
         1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
+
+    TXT_TMR_ADD = \
+        1011, _("Text / Timer / Add"), _("Add a timer.")
+    TXT_TMR_LIST_ALL = \
+        1012, _("Text / Timer / List (All)"), _("List all timers.")
+    TXT_TMR_GET = \
+        1019, _("Text / Timer / List (Keyword)"), _("Get the timer(s) with the designated keyword.")
 
     TXT_INFO_ID = \
         1101, _("Text / Information / Check IDs"), _("Check the ID of current channel and self.")
