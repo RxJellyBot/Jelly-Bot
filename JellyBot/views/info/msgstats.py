@@ -4,6 +4,7 @@ from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
+from django.utils.timezone import get_current_timezone
 
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components import get_root_oid
@@ -34,6 +35,8 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
 
         msg_intvflow_data = MessageRecordStatisticsManager.hourly_interval_message_count(
                     channel_oid, hours_within)
+        msg_daily_data = MessageRecordStatisticsManager.daily_message_count(
+                    channel_oid, hours_within, get_current_timezone())
 
         user_channel_messages = MessageStatsDataProcessor.get_user_channel_messages(channel_data, hours_within)
 
@@ -46,6 +49,7 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
                 "channel_data": channel_data,
                 "hr_range": hours_within or msg_intvflow_data.hr_range,
                 "msg_intvflow_data": msg_intvflow_data,
+                "msg_daily_data": msg_daily_data,
                 "channel_user_msg": user_channel_messages
             },
             nav_param=kwargs)

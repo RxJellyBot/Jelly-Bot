@@ -7,7 +7,7 @@ from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
-from models import Model, ModelDefaultValueExt
+from models import Model, ModelDefaultValueExt, OID_KEY
 from extutils.utils import rotate_list
 
 
@@ -58,7 +58,7 @@ class HourlyIntervalAverageMessageResult:
         # Initialize count data array, index = utc hr
         count_data = [0] * 24
         for d in cursor:
-            count_data[d["_id"]] = d[HourlyIntervalAverageMessageResult.KEY]
+            count_data[d[OID_KEY]] = d[HourlyIntervalAverageMessageResult.KEY]
 
         # Days collected parameter provided
         avg_calculatable = d_collected_int > HourlyIntervalAverageMessageResult.DAYS_NONE
@@ -83,3 +83,15 @@ class HourlyIntervalAverageMessageResult:
                 self.avg_data[offset_hr] = count_data[utc_hr]
 
         self.hr_range = int(days_collected * 24)
+
+
+class DailyMessageResult:
+    KEY = "count"
+
+    def __init__(self, cursor):
+        self.date_label = []
+        self.date_count = []
+
+        for data in cursor:
+            self.date_label.append(data[OID_KEY])
+            self.date_count.append(data[DailyMessageResult.KEY])

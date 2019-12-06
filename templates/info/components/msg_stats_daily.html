@@ -1,22 +1,22 @@
 {% load i18n %}
 
-<canvas id="msgstats-intvflow"></canvas>
+<canvas id="msgstats-daily"></canvas>
 
 <script type="text/javascript">
-    new Chart(document.getElementById("msgstats-intvflow").getContext("2d"), {
+    new Chart(document.getElementById("msgstats-daily").getContext("2d"), {
         type: "line",
 
         data: {
-            labels: {{ msg_intvflow_data.hours_label }},
+            labels: {{ msg_daily_data.date_label|safe }},
             datasets: [{
-                label: "{% trans "Message Count / Day" %}",
+                label: "{% trans "Message Count" %}",
                 borderColor: "rgb(50, 50, 50)",
                 pointBackgroundColor: "rgb(50, 50, 50)",
                 pointBorderColor: "rgb(50, 50, 50)",
                 pointRadius: 5,
                 pointHoverRadius: 10,
                 fill: false,
-                data: {{ msg_intvflow_data.avg_data }}
+                data: {{ msg_daily_data.date_count }}
             }]
         },
 

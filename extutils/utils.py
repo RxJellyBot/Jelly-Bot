@@ -83,7 +83,7 @@ def str_reduce_length(s: str, max_: int):
     suffix = "..."
 
     if len(s) > max_ - len(suffix):
-        return s[:-3] + suffix
+        return s[:max_ - len(suffix)] + suffix
     else:
         return s
 

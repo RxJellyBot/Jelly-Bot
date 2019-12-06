@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, tzinfo
 from threading import Thread
 from typing import Any, Optional, Union, List
 
@@ -7,11 +7,12 @@ from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
 from extutils.dt import now_utc_aware
+from extutils.locales import UTC
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
-    HourlyIntervalAverageMessageResult
+    HourlyIntervalAverageMessageResult, DailyMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -145,6 +146,29 @@ class MessageRecordStatisticsManager(BaseCollection):
                 days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
 
         return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), days_collected)
+
+    def daily_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
+            tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
+            DailyMessageResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {
+                    "$dateToString":
+                        {"date": "$_id",
+                         "format": "%Y-%m-%d",
+                         "timezone": tzinfo_.tzname(datetime.utcnow())}
+                },
+                DailyMessageResult.KEY: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        return DailyMessageResult(self.aggregate(pipeline))
 
 
 class BotFeatureUsageDataManager(BaseCollection):

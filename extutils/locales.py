@@ -8,6 +8,16 @@ from datetime import datetime
 import pytz
 
 
+def sec_diff_to_utc_offset(s_diff: float):
+    """take `s_diff` and translate it into UTC offset string (example: +0500)."""
+    is_pos = s_diff >= 0
+    s_diff = int(abs(s_diff))
+    h = s_diff // 3600
+    m = (s_diff - h * 3600) // 60
+
+    return f"{'+' if is_pos else '-'}{h:02}{m:02}"
+
+
 @dataclass
 class LocaleInfo:
     description: str
@@ -15,7 +25,7 @@ class LocaleInfo:
 
     @property
     def current_utc_hr_offset(self) -> str:
-        return self.to_tzinfo().tzname(datetime.utcnow())
+        return f"UTC{self.to_tzinfo().tzname(datetime.utcnow())}"
 
     def to_tzinfo(self):
         return PytzInfo(pytz.timezone(self.pytz_code))
@@ -42,7 +52,7 @@ class PytzInfo(tzinfo):
         return self._base.dst(dt.replace(tzinfo=None))
 
     def tzname(self, dt):
-        return f"UTC{int(self._base.utcoffset(datetime.utcnow()).total_seconds() // 3600):+d}"
+        return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())
 
 
 HKG = LocaleInfo(_("Asia: Hong Kong"), "Asia/Hong_Kong")
