@@ -1,11 +1,8 @@
 from typing import List
 
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-
-from JellyBot.systemconfig import Bot, HostUrl
+from JellyBot.systemconfig import Bot
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
-from msghandle.botcmd.command import cmd_handler, cmd_handler_old
+from msghandle.botcmd.command import cmd_handler
 
 
 def handle_bot_cmd_main(e: TextMessageEventObject) -> List[HandledMessageEventText]:
@@ -14,15 +11,5 @@ def handle_bot_cmd_main(e: TextMessageEventObject) -> List[HandledMessageEventTe
         if e.content.startswith(Bot.Prefix) \
                 or (Bot.CaseInsensitivePrefix and e.content.lower().startswith(Bot.Prefix.lower())):
             return cmd_handler.handle(e)
-
-        # DEPRECATE: Bot Command - Parsing
-        elif e.content.startswith(Bot.OldPrefix) \
-                or (Bot.CaseInsensitivePrefix and e.content.lower().startswith(Bot.OldPrefix.lower())):
-            return [HandledMessageEventText(
-                content=_(
-                    "This way of calling the command is deprecating. "
-                    "Please visit {} to see what is available and to use it for the new command set."
-                ).format(f"{HostUrl}{reverse('page.doc.botcmd.main')}"))]\
-                   + cmd_handler_old.handle(e)
 
     return []

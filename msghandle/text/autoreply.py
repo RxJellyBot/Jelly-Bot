@@ -13,7 +13,7 @@ def process_auto_reply(e: TextMessageEventObject) -> List[HandledMessageEvent]:
         e.text, AutoReplyContentType.TEXT, e.channel_oid, case_insensitive=AutoReply.CaseInsensitive)
 
     if resps:
-        BotFeatureUsageDataManager.record_usage(BotFeature.TXT_AR_RESPOND, e.channel_oid, e.user_model.id)
+        BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_AR_RESPOND, e.channel_oid, e.user_model.id)
 
         for response_model, bypass_ml_check in resps:
             casted = HandledMessageEvent.auto_reply_model_to_handled(response_model, bypass_ml_check)

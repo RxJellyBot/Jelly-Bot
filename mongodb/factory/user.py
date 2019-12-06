@@ -191,23 +191,24 @@ class RootUserManager(BaseCollection):
 
         UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
 
-        # Name has been set? Return it
+        # Name has been set?
         if udata.config.name:
             return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
 
-        # On Platform Identity found? Try to find the name and return it
+        # On Platform Identity found?
         if udata.has_onplat_data:
             for onplatoid in udata.on_plat_oids:
                 onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
 
                 if onplat_data:
-                    return UserNameQuery(user_id=root_oid, user_name=onplat_data.get_name(channel_data))
+                    return UserNameQuery(
+                        user_id=root_oid, user_name=onplat_data.get_name(channel_data))
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
                         f"corresponding On-Platform data found.")
 
-        return UserNameQuery(user_id=root_oid, user_name=str(root_oid))
+        return None
 
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
@@ -288,7 +289,7 @@ class RootUserManager(BaseCollection):
         if u_data is None:
             return default_locale.to_tzinfo()
         else:
-            return LocaleInfo.get_tzinfo(u_data.config.locale)
+            return u_data.config.tzinfo
 
     @param_type_ensure
     def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
@@ -325,7 +326,7 @@ class RootUserManager(BaseCollection):
 
         ack_rm = self.delete_one({RootUserModel.Id.key: src_root_oid}).acknowledged
         if ack_rm:
-            outcome = self.update_one_outcome(
+            outcome = self.update_many_outcome(
                 {RootUserModel.Id.key: dest_data[RootUserModel.Id.key]},
                 {"$push": {RootUserModel.OnPlatOids.key: {"$each": src_data[RootUserModel.OnPlatOids.key]}}})
 
@@ -344,7 +345,7 @@ class RootUserManager(BaseCollection):
             return_document=ReturnDocument.AFTER)
 
         if updated:
-            updated = self.cast_model(updated, parse_cls=RootUserConfigModel)
+            updated = RootUserConfigModel.cast_model(updated)
             outcome = UpdateOutcome.O_UPDATED
         else:
             outcome = UpdateOutcome.X_NOT_FOUND

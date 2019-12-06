@@ -1,4 +1,7 @@
 import re
+from typing import List, Tuple, Union
+
+from django.utils.translation import gettext_lazy as _
 
 
 def cast_keep_none(obj, dest_type: type):
@@ -9,6 +12,21 @@ def cast_keep_none(obj, dest_type: type):
             return dest_type(obj)
     else:
         return None
+
+
+def cast_iterable(iterable: Union[List, Tuple], dest_type):
+    if isinstance(iterable, (list, tuple)):
+        ret = []
+
+        for item in iterable:
+            if isinstance(item, (list, tuple)):
+                ret.append(cast_iterable(item, dest_type))
+            else:
+                ret.append(dest_type(item))
+
+        return ret
+    else:
+        return dest_type(iterable)
 
 
 def safe_cast(obj, dest_type: type):
@@ -65,7 +83,7 @@ def str_reduce_length(s: str, max_: int):
     suffix = "..."
 
     if len(s) > max_ - len(suffix):
-        return s[:-3] + suffix
+        return s[:max_ - len(suffix)] + suffix
     else:
         return s
 
@@ -88,3 +106,18 @@ def demarkdown(markdown_str: str):
         .replace("<hr>", "----------")\
         .replace("<pre>", "```")\
         .replace("</pre>", "```")
+
+
+def rotate_list(l: List, n: int):
+    """`n` means elements to rotate from left to right"""
+    n = int(n)
+    return l[n:] + l[:n]
+
+
+def char_description(c: str):
+    if c == "\n":
+        return _("(Newline)")
+    elif c == " ":
+        return _("(Space)")
+    else:
+        return c

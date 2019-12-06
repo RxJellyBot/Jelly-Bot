@@ -35,8 +35,16 @@ class HandledMessageEvent(ABC):
 
 
 class HandledMessageEventText(HandledMessageEvent):
-    def __init__(self, content: str, bypass_multiline_check: bool = False):
+    def __init__(self, content: str, bypass_multiline_check: bool = False, force_extra: bool = False):
+        """
+        `bypass_multiline_check` | `force_extra` | Resulting action
+        F | F | Checking multiline, if over length then extra, else normal
+        F | T | Content will be stored as extra
+        T | F | Content will be stored as normal
+        T | T | Content will be stored as extra
+        """
         super().__init__(MessageType.TEXT, content)
+        self.force_extra = force_extra
         self.bypass_multiline_check = bypass_multiline_check
 
 
@@ -90,6 +98,10 @@ class HandledMessageEventsHolder:
     def __iter__(self):
         for item in self._core:
             yield item
+
+    @property
+    def has_item(self) -> bool:
+        return len(self._core) > 0
 
     def to_json(self):
         return [item.to_json() for item in self._core]

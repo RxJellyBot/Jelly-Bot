@@ -106,8 +106,10 @@ class Model(MutableMapping, abc.ABC):
                 self._dict_["id"].force_set(v)
             else:
                 self._dict_["id"] = self.Id.new(v)
-        else:
+        elif to_snake_case(fk) in self._dict_:
             self._dict_[to_snake_case(fk)].value = v
+        else:
+            self._inner_dict_create_(fk, v)
 
     def __setitem__(self, jk, v) -> None:
         if jk in self.model_json():
@@ -135,8 +137,8 @@ class Model(MutableMapping, abc.ABC):
     def __setattr__(self, fk_sc, value):
         if to_camel_case(fk_sc) in self.model_fields():
             self._inner_dict_update_(fk_sc, value)
-
-        raise KeyNotExistedError(fk_sc, self.__class__.__qualname__)
+        else:
+            raise KeyNotExistedError(fk_sc, self.__class__.__qualname__)
 
     def __getitem__(self, jk):
         # Must throw `KeyError` for `_id` if `_id` not defined. `pymongo` will check this to determine if
@@ -245,6 +247,14 @@ class Model(MutableMapping, abc.ABC):
             cls._CacheJson = {cls.__qualname__: s}
 
         return cls._CacheJson[cls.__qualname__]
+
+    @classmethod
+    def cast_model(cls, obj):
+        """Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`."""
+        if obj is not None and not isinstance(obj, cls):
+            return cls(**obj, from_db=True)
+
+        return obj
 
     @classmethod
     def json_key_to_field(cls, json_key) -> str:

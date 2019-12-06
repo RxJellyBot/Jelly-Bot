@@ -3,7 +3,9 @@ from linebot.models import (
     FollowEvent, UnfollowEvent, JoinEvent, LeaveEvent
 )
 
-from extline import LINE, ExtraKey, event_dest_fmt
+from extline import LINE, ExtraKey, event_dest_fmt, LineApiUtils
+from flags import Platform
+from mongodb.factory import ChannelManager
 
 __all__ = ["handle_self_main"]
 
@@ -19,11 +21,13 @@ def handle_unfollow(request, event, destination):
 
 
 def handle_join(request, event, destination):
+    ChannelManager.register(Platform.LINE, LineApiUtils.get_channel_id(event))
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot joined a group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
 def handle_leave(request, event, destination):
+    ChannelManager.deregister(Platform.LINE, LineApiUtils.get_channel_id(event))
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot left a group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 

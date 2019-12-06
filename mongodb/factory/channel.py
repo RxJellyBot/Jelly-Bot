@@ -44,14 +44,14 @@ class ChannelManager(BaseCollection):
 
     @param_type_ensure
     def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
-        return self.update_one_outcome(
+        return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
 
     @param_type_ensure
     def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
-        return self.update_one_outcome(
+        return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
         )
@@ -77,7 +77,7 @@ class ChannelManager(BaseCollection):
         try:
             if ret:
                 outcome = OperationOutcome.O_COMPLETED
-                ret = self.cast_model(ret, parse_cls=ChannelModel)
+                ret = ChannelModel.cast_model(ret)
             else:
                 outcome = OperationOutcome.X_CHANNEL_NOT_FOUND
         except Exception as e:
@@ -115,8 +115,10 @@ class ChannelManager(BaseCollection):
     @param_type_ensure
     def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
         filter_ = \
-            {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
-                    {"$regex": default_name, "$options": "i"}}
+            {
+                f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                    {"$regex": default_name, "$options": "i"}
+            }
 
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
@@ -197,13 +199,13 @@ class ChannelCollectionManager(BaseCollection):
 
     @param_type_ensure
     def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
-        return self.update_one_outcome(
+        return self.update_many_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
 
     @param_type_ensure
     def update_default_name(self, platform: Platform, token: str, new_default_name: str):
-        return self.update_one_outcome(
+        return self.update_many_outcome(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})
 

@@ -8,11 +8,13 @@ __all__ = ["handle_member_main"]
 
 
 def handle_member_join(request, event, destination):
+    # TODO: Group Management: Welcome Message
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "A user joined the group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
 def handle_member_left(request, event, destination):
+    # TODO: Group Management: Leave Message
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "A user left the group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 

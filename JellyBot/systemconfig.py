@@ -9,12 +9,16 @@ HostUrl = os.environ.get("HOST_URL") or "http://localhost:8000"
 
 class System:
     PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
+
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
     HerokuAppNameBeta = "newjellybot-beta"
     HerokuAppNameStable = "newjellybot"
+
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
     MaxSendContentLines = 20
+
+    NoUserTokenNotificationSeconds = 72 * 3600  # 12 Hrs
 
 
 class PlatformConfig(ABC):
@@ -69,6 +73,9 @@ class Database:
 class DataQuery:
     TagPopularitySearchCount = 10
 
+    UserNameCacheSize = 1000
+    UserNameExpirationSeconds = 129600  # 1.5 Days
+
 
 class ChannelConfig:
     VotesToPromoteMod = 7
@@ -86,12 +93,13 @@ class ExecodeManager:
 
 
 class Bot:
-    Prefix = "/"
-    Splittor = " ."
+    Prefix = "JC"
+    Splittors = [" ", "\n"]
 
-    # DEPRECATE: Bot Command - Bot Prefix & Splittor
-    OldPrefix = "JC\n"
-    OldSplittor = "\n"
+    RandomChoiceSplittor = "  "
+    RandomChoiceWeightSplittor = " "
+    RandomChoiceOptionLimit = 20
+    RandomChoiceCountLimit = 300
 
     CaseInsensitive = True
     CaseInsensitivePrefix = True
@@ -103,3 +111,7 @@ class Bot:
         DefaultCooldownSecs = 0
 
         MaxContentResultLength = 100
+
+    class Timer:
+        AutoDeletionDays = 7
+        NotifyWithinHours = 24

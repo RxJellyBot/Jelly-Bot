@@ -118,7 +118,7 @@
         <hr>
         <div class="row">
             <div class="col mb-3">
-                <span class="h3">{% trans "Message Statistics" %}</span>
+                <a class="h3" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">{% trans "Message Statistics" %}</a>
             </div>
         </div>
         <div class="row">

@@ -18,6 +18,7 @@ class ChannelConfigModel(Model):
     VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod)
     VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
     EnableAutoReply = BooleanField("e-ar", default=True)
+    EnableTimer = BooleanField("e-tmr", default=True)
     EnableCalculator = BooleanField("e-calc", default=True)
     EnableBotCommand = BooleanField("e-bot", default=True)
     EnableCreateProfile = BooleanField("e-crp", default=True)
