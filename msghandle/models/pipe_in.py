@@ -1,3 +1,4 @@
+import time
 from abc import ABC
 from threading import Thread
 from typing import Any, Optional, Union
@@ -20,6 +21,8 @@ class Event(ABC):
         if not sys_ctype:
             sys_ctype = SysChannelType.identify(channel_model.platform, channel_model.token)
 
+        self._construct = time.time()
+
         self.raw = raw
         self.channel_model = channel_model
         self.channel_type = sys_ctype
@@ -38,6 +41,11 @@ class Event(ABC):
             return self.raw.author.id
         else:
             return None
+
+    @property
+    def constructed_time(self) -> float:
+        """The unit of this is milliseconds(ms)."""
+        return time.time() - self._construct
 
 
 class MessageEventObject(Event, ABC):
@@ -64,14 +72,23 @@ class MessageEventObject(Event, ABC):
 
 class TextMessageEventObject(MessageEventObject):
     def __init__(
-            self, raw: Any, text: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            self, raw: Any, text: str, channel_model: ChannelModel = None, user_model: RootUserModel = None,
             sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+        text = text.strip()
+
         super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model)
-        self.text = text
 
     @property
     def message_type(self) -> MessageType:
         return MessageType.TEXT
+
+    @property
+    def text(self) -> str:
+        return self.content
+
+    @text.setter
+    def text(self, value):
+        self.content = value
 
 
 class ImageMessageEventObject(MessageEventObject):
@@ -115,17 +132,20 @@ class MessageEventObjectFactory:
 
     @staticmethod
     def _ensure_user_idt_(platform: Platform, token: Union[int, str], traceback=None) -> Optional[RootUserModel]:
-        result = RootUserManager.register_onplat(platform, token)
-        if not result.success:
-            MailSender.send_email_async(
-                f"Platform: {platform} / Token: {token}<hr>"
-                f"Outcome: {result.outcome}<hr>"
-                f"Conn Outcome: {result.conn_outcome}<hr>"
-                f"Identity Registration Result: {result.idt_reg_result.serialize()}<hr>"
-                f"Exception: {traceback.format_exception(None, result.exception, result.exception.__traceback__)}",
-                subject="User Registration Failed")
+        if token:
+            result = RootUserManager.register_onplat(platform, token)
+            if not result.success:
+                MailSender.send_email_async(
+                    f"Platform: {platform} / Token: {token}<hr>"
+                    f"Outcome: {result.outcome}<hr>"
+                    f"Conn Outcome: {result.conn_outcome}<hr>"
+                    f"Identity Registration Result: {result.idt_reg_result.serialize()}<hr>"
+                    f"Exception: {traceback.format_exception(None, result.exception, result.exception.__traceback__)}",
+                    subject="User Registration Failed")
 
-        return result.model
+            return result.model
+        else:
+            return None
 
     @staticmethod
     def _ensure_channel_parent_(

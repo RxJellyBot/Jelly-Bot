@@ -38,6 +38,12 @@ class AutoReplyContentModel(Model):
 
         return ModelValidityCheckResult.O_OK
 
+    def __str__(self):
+        if self.content_type != AutoReplyContentType.TEXT:
+            return f"({self.content_type.key} / {self.content})"
+        else:
+            return self.content
+
 
 class AutoReplyModuleModel(Model):
     # TODO: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
@@ -69,10 +75,6 @@ class AutoReplyModuleModel(Model):
     RemovedAt = DateTimeField("rm", allow_none=False)
 
     @property
-    def creation_time(self):
-        return self.id.generation_time
-
-    @property
     def refer_oid(self) -> Optional[ObjectId]:
         try:
             if self.is_reference:
@@ -88,6 +90,23 @@ class AutoReplyModuleModel(Model):
             return not self.is_field_none("ReferTo")
         except (KeyError, KeyNotExistedError, AttributeError):
             return False
+
+    @property
+    def keyword(self) -> Optional[str]:
+        from mongodb.factory import AutoReplyContentManager
+        ctnt = AutoReplyContentManager.get_content_by_id(self.keyword_oid)
+        return str(ctnt.content) or None
+
+    def get_ctnt_mdl(self) -> AutoReplyContentModel:
+        from mongodb.factory import AutoReplyContentManager
+        return AutoReplyContentManager.get_content_by_id(self.keyword_oid)
+
+    def get_keyword_repr_in_cmd(self) -> Optional[str]:
+        ret = str(self.get_ctnt_mdl())
+        if ret:
+            return f"{ret} ({self.called_count})"
+        else:
+            return None
 
 
 class AutoReplyModuleExecodeModel(Model):

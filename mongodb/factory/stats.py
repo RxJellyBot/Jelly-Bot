@@ -1,14 +1,18 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, tzinfo
+from threading import Thread
 from typing import Any, Optional, Union, List
 
 import pymongo
 from bson import ObjectId
 from pymongo.command_cursor import CommandCursor
 
+from extutils.dt import now_utc_aware
+from extutils.locales import UTC
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
-from mongodb.factory.results import RecordAPIStatisticsResult, MessageRecordResult
-from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel
+from mongodb.factory.results import RecordAPIStatisticsResult
+from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
+    HourlyIntervalAverageMessageResult, DailyMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -42,18 +46,44 @@ class MessageRecordStatisticsManager(BaseCollection):
     model_class = MessageRecordModel
 
     @param_type_ensure
+    def record_message_async(
+            self, channel_oid: ObjectId, user_root_oid: ObjectId,
+            message_type: MessageType, message_content: Any, proc_time_ms: float):
+        Thread(
+            target=self.record_message,
+            args=(channel_oid, user_root_oid, message_type, message_content, proc_time_ms)).start()
+
+    @param_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any, proc_time_ms: float) -> MessageRecordResult:
-        entry, outcome, ex = self.insert_one_data(
+            message_type: MessageType, message_content: Any, proc_time_ms: float):
+        self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
-            MessageContent=repr(message_content)[:Database.MessageStats.MaxContentCharacter],
+            MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
             ProcessTimeMs=proc_time_ms
         )
 
-        return MessageRecordResult(outcome, entry, ex)
-
     # Statistics
+
+    @staticmethod
+    def _channel_oids_filter_(channel_oids: Union[ObjectId, List[ObjectId]]):
+        if isinstance(channel_oids, ObjectId):
+            return {MessageRecordModel.ChannelOid.key: channel_oids}
+        elif isinstance(channel_oids, list):
+            return {MessageRecordModel.ChannelOid.key: {"$in": channel_oids}}
+        else:
+            raise ValueError("Must be either `ObjectId` or `List[ObjectId]`.")
+
+    @staticmethod
+    def _hours_within_filter_(hours_within: Optional[int] = None):
+        if hours_within:
+            return {
+                OID_KEY: {
+                    "$gt": ObjectId.from_datetime(
+                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
+                }}
+
+        return {}
 
     def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
         aggr = list(self.aggregate([
@@ -75,19 +105,8 @@ class MessageRecordStatisticsManager(BaseCollection):
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
             -> CommandCursor:
-        if isinstance(channel_oids, ObjectId):
-            match_d = {MessageRecordModel.ChannelOid.key: channel_oids}
-        elif isinstance(channel_oids, list):
-            match_d = {MessageRecordModel.ChannelOid.key: {"$in": channel_oids}}
-        else:
-            raise ValueError("Parameter `channel_oids` must be either `ObjectId` or `List[ObjectId]`.")
-
-        if hours_within:
-            match_d.update(**{
-                OID_KEY: {
-                    "$gt": ObjectId.from_datetime(
-                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
-                }})
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -100,11 +119,66 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return self.aggregate(aggr_pipeline)
 
+    def hourly_interval_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) -> \
+            HourlyIntervalAverageMessageResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {"$hour": {"$toDate": "$_id"}},
+                HourlyIntervalAverageMessageResult.KEY: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        if hours_within:
+            days_collected = hours_within / 24
+        else:
+            oldest = self.find_one(match_d, sort=[(OID_KEY, pymongo.ASCENDING)])
+
+            if oldest:
+                # Replace to let both be Offset-naive
+                days_collected = (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
+            else:
+                days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
+
+        return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), days_collected)
+
+    def daily_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
+            tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
+            DailyMessageResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        match_d.update(**self._hours_within_filter_(hours_within))
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {
+                    "$dateToString":
+                        {"date": "$_id",
+                         "format": "%Y-%m-%d",
+                         "timezone": tzinfo_.tzname(datetime.utcnow())}
+                },
+                DailyMessageResult.KEY: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        return DailyMessageResult(self.aggregate(pipeline))
+
 
 class BotFeatureUsageDataManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "bot"
     model_class = BotFeatureUsageModel
+
+    @param_type_ensure
+    def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
+        Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()
 
     @param_type_ensure
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):

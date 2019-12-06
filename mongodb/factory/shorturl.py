@@ -95,16 +95,16 @@ class ShortUrlDataManager(BaseCollection):
     @param_type_ensure
     def get_user_record(self, creator_oid: ObjectId) -> CursorWithCount:
         filter_ = {ShortUrlRecordModel.CreatorOid.key: creator_oid}
-        crs = CursorWithCount(self.find(filter_), self.count_documents(filter_),parse_cls=ShortUrlRecordModel)
+        crs = CursorWithCount(self.find(filter_), self.count_documents(filter_), parse_cls=ShortUrlRecordModel)
         return crs.sort([(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 
     @param_type_ensure
-    def update_target(self, creator_oid: ObjectId, new_target: str) -> bool:
+    def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:
         if not ShortUrlDataManager.is_valid_url(new_target):
             return False
 
-        return self.update_one_outcome(
-            {ShortUrlRecordModel.CreatorOid.key: creator_oid},
+        return self.update_many_outcome(
+            {ShortUrlRecordModel.CreatorOid.key: creator_oid, ShortUrlRecordModel.Code.key: code},
             {"$set": {ShortUrlRecordModel.Target.key: new_target}}
         ).is_success
 

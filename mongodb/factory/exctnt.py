@@ -8,6 +8,7 @@ from flags import ExtraContentType
 from models import ExtraContentModel, OID_KEY
 from mongodb.factory.results import RecordExtraContentResult, WriteOutcome
 from extutils.checker import param_type_ensure
+from extutils.utils import cast_iterable
 
 from ._base import BaseCollection
 
@@ -39,6 +40,8 @@ class ExtraContentManager(BaseCollection):
 
         if not content:
             return RecordExtraContentResult(WriteOutcome.X_NOT_EXECUTED)
+
+        content = cast_iterable(content, str)
 
         model, outcome, ex = self.insert_one_data(
              Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())

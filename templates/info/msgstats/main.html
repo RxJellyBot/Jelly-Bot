@@ -1,0 +1,141 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    {% include "components/chart.html" %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Channel Message Statistics" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        {% if not channel_data.bot_accessible %}
+            <div class="row">
+                <div class="col mb-3 h4">
+                    {% trans "The channel is marked inaccessible for Jelly Bot, so the data of this channel will not update." %}
+                </div>
+            </div>
+
+            <hr>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Parameters" %}</h3>
+            </div>
+        </div>
+
+        <form>
+            <div class="row">
+                <div class="col-lg mb-3">
+                    <div class="form-row mb-3">
+                        <label class="col-2 col-form-label text-right" for="range">{% trans "Range" %}</label>
+                        <div class="col-4">
+                            <div class="input-group">
+                                <input type="number" class="form-control border-dark" value="{{ hr_range }}"
+                                       name="hours_within" id="range">
+                                <div class="input-group-append"><span
+                                        class="input-group-text">{% trans "Hours" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-form-label text-lg-right">
+                            <small>{% trans "Leave this blank and refresh to get all-time record." %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col">
+                    <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Basic Information" %}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h4 class="card-header text-dark">{% trans "Channel Name" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h4">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
+                                    {% if ch_name %}
+                                        {{ ch_name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
+                    <div class="card-body">
+                        <div class="card-text h4">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code>{{ channel_data.id }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Statistics" %}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Hour Average Message Flow" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_stats_intvflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Daily Message Flow" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_stats_daily.html" with msg_daily_data=msg_daily_data only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Member Message Count Ranking" %}</h5>
+                <p>{% trans "Total Count: " %}{{ channel_user_msg.msg_count }}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_stats_table.html" with message_stats=channel_user_msg.member_stats only %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

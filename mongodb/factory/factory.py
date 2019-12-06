@@ -2,13 +2,11 @@ import os
 
 import pymongo
 
+from models import Model
 from mongodb.exceptions import MongoURLNotFoundException
 
-if int(os.environ.get("MONGO_LOCAL", 0)):
-    MONGO_CLIENT = pymongo.MongoClient("localhost", 27017)
-else:
-    _url = os.environ.get("MONGO_URL")
-    if _url is None:
-        raise MongoURLNotFoundException()
+_url = os.environ.get("MONGO_URL")
+if _url is None:
+    raise MongoURLNotFoundException()
 
-    MONGO_CLIENT = pymongo.MongoClient(_url)
+MONGO_CLIENT = pymongo.MongoClient(_url, document_class=Model)

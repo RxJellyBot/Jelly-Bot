@@ -9,16 +9,39 @@
             <h3 class="text-primary">{% trans "Bot Commands List" %}</h3>
         </div>
         <div class="row mb-3">
+            {% blocktrans trimmed %}
+                The prefix of the commands is&nbsp;<b>{{ cmd_prefix }}</b>.&nbsp;
+            {% endblocktrans %}
+            {% if case_insensitive_prefix %}
+                {% blocktrans trimmed %}This is&nbsp;<b>case-insensitive</b>&nbsp;.{% endblocktrans %}
+            {% else %}
+                {% blocktrans trimmed %}This is&nbsp;<b>case-sensitive</b>&nbsp;.{% endblocktrans %}
+            {% endif %}
+        </div>
+        <div class="row mb-1">
+            {% with splhtml=cmd_splittors_html|safe %}
+                {% blocktrans trimmed %}
+                    The splittor(s) between the command code and its arguments is/are&nbsp;{{ splhtml }}.&nbsp;
+                {% endblocktrans %}
+            {% endwith %}
+        </div>
+        <div class="row mb-3">
+            {% blocktrans trimmed %}
+                You should pick a splittor at your convenience and use it through the whole command, or some weird
+                parsing problems may occur.
+            {% endblocktrans %}
+        </div>
+        <div class="row mb-3">
             {% if case_insensitive %}
                 {% blocktrans trimmed %}Command codes are&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
             {% else %}
                 {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
             {% endif %}
-            {% if case_insensitive_prefix %}
-                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
-            {% else %}
-                {% blocktrans trimmed %}Command prefix is&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
-            {% endif %}
+        </div>
+        <div class="row mb-3">
+            {% blocktrans trimmed %}
+                Use double quotation mark to wrap around a single parameter if it contains any characters that is one of the splittor(s) to prevent parsing error.
+            {% endblocktrans %}
         </div>
 
         <div class="row">
@@ -38,7 +61,7 @@
                                 </h6>
                             {% endif %}
                             <p class="card-text">{{ cmd_node.brief_description|markdown }}</p>
-                            <a href="{% if is_old %}{% url "page.doc.botcmd.cmd.old" code=cmd_node.main_cmd_code %}{% else %}{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}{% endif %}"
+                            <a href="{% url "page.doc.botcmd.cmd" code=cmd_node.main_cmd_code %}"
                                class="card-link">{% trans "Command Usage" %}</a>
                         </div>
                     </div>

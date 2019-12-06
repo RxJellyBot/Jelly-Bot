@@ -72,12 +72,12 @@ def _construct_my_account_(current_path, parent, nav_param):
         NavDivider, parent=my_account_parent))
     my_account_parent.add_item(nav_items_factory(
         NavHeader, label=_("Shortcut"), parent=my_account_parent))
-    my_account_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
     my_account_parent.add_item(
         nav_items_factory(
             NavEntry, current_path, label=_("Channel List"),
             link=reverse("account.channel.list"), parent=my_account_parent))
+    my_account_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
 
     # Hidden Items
     __attach__(
@@ -122,6 +122,9 @@ def _construct_info_(current_path, parent, nav_param):
                _("Channel - {}").format(nav_param.get("channel_oid", "N/A")),
                "info.channel", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,
+               _("Channel Message Stats - {}").format(nav_param.get("channel_oid", "N/A")),
+               "info.channel.msgstats", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path,
                _("Profile Info - {}").format(nav_param.get("profile_oid", "N/A")),
                "info.profile", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,
@@ -135,10 +138,6 @@ def _construct_docs_(current_path, parent, nav_param):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
 
-    # DEPRECATE: Bot Command - Navbar
-    old_cmd_list = nav_items_factory(
-        NavEntry, current_path, label=_("Bot Commands List (Old usage)"), link=reverse("page.doc.botcmd.main.old"),
-        parent=docs_parent)
     cmd_list = nav_items_factory(
         NavEntry, current_path, label=_("Bot Commands List"), link=reverse("page.doc.botcmd.main"), parent=docs_parent)
 
@@ -149,11 +148,6 @@ def _construct_docs_(current_path, parent, nav_param):
     docs_parent.add_item(nav_items_factory(
         NavHeader, label=_("Bot"), parent=docs_parent))
     docs_parent.add_item(cmd_list)
-    docs_parent.add_item(nav_items_factory(
-        NavDivider, parent=docs_parent))
-    docs_parent.add_item(nav_items_factory(
-        NavHeader, label=_("Bot - Deprecating"), parent=docs_parent))
-    docs_parent.add_item(old_cmd_list)
     docs_parent.add_item(nav_items_factory(
         NavDivider, parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
@@ -180,9 +174,6 @@ def _construct_docs_(current_path, parent, nav_param):
     __attach__(
         docs_parent, NavHidden, current_path, _("Bot Command - {}").format(nav_param.get("code")),
         "page.doc.botcmd.cmd", nav_param, cmd_list)
-    __attach__(
-        docs_parent, NavHidden, current_path, _("Bot Command - {} (Old, deprecating)").format(nav_param.get("code")),
-        "page.doc.botcmd.cmd.old", nav_param, old_cmd_list)
 
     return docs_parent
 

@@ -6,8 +6,13 @@ class CursorWithCount:
 
     def __iter__(self):
         for dict_ in self._cursor:
-            o = self._parse_cls(**dict_, from_db=True)
-            yield o
+            if self._parse_cls:
+                yield self._parse_cls(**dict_, from_db=True)
+            else:
+                yield dict_
+
+    def __len__(self):
+        return self._count
 
     def sort(self, key_or_list, direction=None):
         self._cursor = self._cursor.sort(key_or_list, direction)
@@ -15,4 +20,4 @@ class CursorWithCount:
 
     @property
     def empty(self):
-        return self._count == 0
+        return len(self) == 0

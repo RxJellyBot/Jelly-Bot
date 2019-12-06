@@ -19,10 +19,11 @@ from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder,
 
 
 class ToSiteReason:
-    TOO_LONG = _("Message length overlimit.")
-    TOO_MANY_RESPONSES = _("Responses length overlimit.")
-    TOO_MANY_LINES = _("Too many lines.")
-    LATEX_AVAILABLE = _("LaTeX available.")
+    TOO_LONG = _("Message length overlimit")
+    TOO_MANY_RESPONSES = _("Responses length overlimit")
+    TOO_MANY_LINES = _("Too many lines")
+    LATEX_AVAILABLE = _("LaTeX available")
+    FORCED_ONSITE = _("Content was forced to be displayed on the website")
 
 
 class HandledEventsHolderPlatform:
@@ -45,7 +46,7 @@ class HandledEventsHolderPlatform:
 
                 self.to_send.append(
                     (MessageType.TEXT,
-                     _("{} content(s) was recorded to the database because of the following reason(s):{}\nURL: {}")
+                     _("{} content(s) needs to be viewed on the website because of the following reason(s):{}\nURL: {}")
                      .format(
                          len(self.to_site),
                          "".join([f"\n - {reason}" for reason, content in self.to_site]),
@@ -69,19 +70,28 @@ class HandledEventsHolderPlatform:
         for e in holder:
             if len(e.content) > config_class.max_content_length:
                 self.to_site.append((ToSiteReason.TOO_LONG, e.content))
+                continue
             elif len(self.to_send) > config_class.max_responses:
                 self.to_site.append((ToSiteReason.TOO_MANY_RESPONSES, e.content))
-            elif isinstance(e, HandledMessageEventText) \
-                    and not e.bypass_multiline_check \
-                    and len(self.to_send) > config_class.max_content_lines:
-                # TEST: Test if bypass multiline check is working. Setup an auto-reply with 20+ Line and trigger it.
-                #   Content should be displayed directly if working properly.
-                self.to_site.append((ToSiteReason.TOO_MANY_LINES, e.content))
-            elif isinstance(e, HandledMessageCalculateResult) and e.latex_available:
-                self.to_send.append((e.msg_type, e.content))
-                self.to_site.append((ToSiteReason.LATEX_AVAILABLE, e.latex_for_html))
-            else:
-                self.to_send.append((e.msg_type, e.content))
+                continue
+
+            if isinstance(e, HandledMessageEventText):
+                if e.force_extra:
+                    self.to_site.append((ToSiteReason.FORCED_ONSITE, e.content))
+                    continue
+                elif not e.bypass_multiline_check and len(self.to_send) > config_class.max_content_lines:
+                    # TEST: Test if bypass multiline check is working. Setup an auto-reply with 20+ Line and trigger it.
+                    #   Content should be displayed directly if working properly.
+                    self.to_site.append((ToSiteReason.TOO_MANY_LINES, e.content))
+                    continue
+
+            if isinstance(e, HandledMessageCalculateResult):
+                if e.latex_available:
+                    self.to_send.append((e.msg_type, e.content))
+                    self.to_site.append((ToSiteReason.LATEX_AVAILABLE, e.latex_for_html))
+                    continue
+
+            self.to_send.append((e.msg_type, e.content))
 
     def send_line(self, reply_token):
         if self.to_send:

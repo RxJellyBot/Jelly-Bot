@@ -1,14 +1,21 @@
-# INCOMPLETE: Bot Feature: Countdown / Countup Timer (can be queried on both sides)
-#   Daily Notifications on specific time
+# FIXME: Bot Feature: Countdown / Countup Timer
+#   - Command: Delete
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
-# INCOMPLETE: Bot Feature / Auto Reply: Get usable module list
-# INCOMPLETE: Bot Feature / Auto Reply: Search module (w/ and w/o disabled)
-# INCOMPLETE: Bot Feature: Random generator (Percent, items, range) - Preset Pool (somehow same as AutoReply tags)
+# INCOMPLETE: Bot Feature: Remote control in private channel
+# INCOMPLETE: Bot Feature: Last Message
 # INCOMPLETE: Statistics: Message flow of the user
-# INCOMPLETE: Info: Message count and flow for each channel
+# INCOMPLETE: Statistics: Bot Features Usage in Channel
+# INCOMPLETE: Auto-Reply: Sync across channel
+# INCOMPLETE: Auto-Reply: Redirect to webpage if its content is too long
+# TODO: Website: Timer
+#   - Add (Periodical)
+# TODO: Website: Asynchronous channel list, memer message ranking
 # TODO: Account Management: API Key refresh
 # TODO: Website: Customize 404.html 500.html 403.html 400.html to root template dir
 #  API should return json response instead.
+# TODO: Email: Jelly-Bot's new feature
+# TODO: Email: on capturing specific keyword
+# TODO: Bot Feature: State prefix and splittor on the command list page
 # DRAFT: API: Documentation
 # DRAFT: Auto Reply: Find on website (js interactive framework?)
 # DRAFT: Auto Reply: Features - Change History / Rec Creator & Modifier / Duplicate new

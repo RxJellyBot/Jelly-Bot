@@ -1,12 +1,17 @@
 import traceback
 
+from django.utils.translation import gettext_lazy as _
+
 from extutils.emailutils import MailSender
 from msghandle import handle_message_main
-from msghandle.models import Event, TextMessageEventObject, ImageMessageEventObject, HandledMessageEventsHolder
+from msghandle.models import (
+    Event, TextMessageEventObject, ImageMessageEventObject,
+    HandledMessageEventsHolder
+)
 
 from .logger import DISCORD
 
-__all__ = ["handle_discord_main"]
+__all__ = ["handle_discord_main", "handle_error"]
 
 
 def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
