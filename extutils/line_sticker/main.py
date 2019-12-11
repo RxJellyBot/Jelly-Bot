@@ -142,11 +142,11 @@ class LineStickerManager:
 
     @staticmethod
     def get_meta_url(pack_id: [int, str]) -> str:
-        return f"http://dl.stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/productInfo.meta"
+        return f"https://stickershop.line-scdn.net/products/0/0/1/{pack_id}/android/productInfo.meta"
 
     @staticmethod
     def get_sticker_url(sticker_id: [int, str]) -> str:
-        return f"http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/android/sticker.png"
+        return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker.png"
 
     @staticmethod
     def get_apng_url(pack_id: [int, str], sticker_id: [int, str]) -> str:
