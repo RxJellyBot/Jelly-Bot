@@ -39,10 +39,10 @@ class AutoReplyContentModel(Model):
         return ModelValidityCheckResult.O_OK
 
     def __str__(self):
-        if self.content_type != AutoReplyContentType.TEXT:
-            return f"({self.content_type.key} / {self.content})"
-        else:
+        if self.content_type == AutoReplyContentType.TEXT:
             return self.content
+        else:
+            return f"({self.content_type.key} / {self.content})"
 
 
 class AutoReplyModuleModel(Model):
@@ -96,12 +96,9 @@ class AutoReplyModuleModel(Model):
         except (KeyError, KeyNotExistedError, AttributeError):
             return False
 
-    def get_keyword_repr_in_cmd(self) -> Optional[str]:
-        ret = str(self.keyword)
-        if ret:
-            return f"{ret} ({self.called_count})"
-        else:
-            return None
+    @property
+    def keyword_repr(self) -> str:
+        return f"{str(self.keyword)} ({self.called_count})"
 
 
 class AutoReplyModuleExecodeModel(Model):
