@@ -1,3 +1,5 @@
+from typing import Type
+
 from bson import ObjectId
 from pymongo.collection import Collection
 
@@ -40,6 +42,26 @@ class ArrayField(BaseField):
         ack_push = collection_inst.update_many({self.key: {"$in": [old]}}, {"$push": {self.key: new}}).acknowledged
         ack_pull = collection_inst.update_many({self.key: {"$in": [old]}}, {"$pull": {self.key: old}}).acknowledged
         return ack_pull and ack_push
+
+
+class ModelArrayField(ArrayField):
+    def __init__(self, key, model_type, default=None, allow_none=False, max_len=0,
+                 readonly=False, auto_cast=True, allow_empty=True, stores_uid=False):
+        super().__init__(key, model_type, default, allow_none, max_len, readonly, auto_cast, allow_empty, stores_uid)
+        self._model_type = model_type
+
+    def is_value_valid(self, value) -> bool:
+        for v in value:
+            if not isinstance(v, self._elem_type):
+                try:
+                    self._model_type.cast_model(v)
+                except Exception:
+                    return False
+
+        if not self._allow_empty and len(value) == 0:
+            return False
+
+        return self.is_type_matched(value)
 
 
 class ArrayFieldInstance(FieldInstance):

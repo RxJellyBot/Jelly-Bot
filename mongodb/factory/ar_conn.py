@@ -7,7 +7,6 @@ from bson import ObjectId
 from datetime import datetime
 
 from JellyBot.systemconfig import AutoReply, Database, DataQuery
-from extutils.emailutils import MailSender
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
@@ -23,7 +22,7 @@ from mongodb.utils import (
     CursorWithCount, case_insensitive_collation,
     Query, MatchPair, UpdateOperation, Set, Increment, NotEqual
 )
-from mongodb.factory import ProfileManager, AutoReplyContentManager
+from mongodb.factory import ProfileManager
 
 from ._base import BaseCollection
 from ._mixin import CacheMixin
@@ -41,8 +40,9 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
     def __init__(self):
         super().__init__()
         self.create_index(
-            [(AutoReplyModuleModel.KeywordOid.key, 1),
-             (AutoReplyModuleModel.ResponseOids.key, 1),
+            [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
+             (AutoReplyModuleModel.KEY_KW_TYPE, 1),
+             (AutoReplyModuleModel.Responses.key, 1),
              (AutoReplyModuleModel.ChannelId.key, 1)],
             name="Auto Reply Module Identity", unique=True)
 
@@ -53,8 +53,8 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
 
     def add_conn_complete(
             self,
-            kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
-            pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
+            keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], creator_oid: ObjectId,
+            channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
         access_to_pinned = AutoReplyModuleManager.has_access_to_pinned(channel_oid, creator_oid)
 
@@ -64,13 +64,16 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
 
         # Terminate if someone cannot access pinned module but attempt to overwrite the existing one
         if not access_to_pinned and self.count_documents(
-                {AutoReplyModuleModel.KeywordOid.key: kw_oid, AutoReplyModuleModel.Pinned.key: True}) > 0:
+                {AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
+                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+                 AutoReplyModuleModel.Pinned.key: True}) > 0:
             return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
 
         model, outcome, ex = \
             self.insert_one_data_cache(
-                KeywordOid=kw_oid, ResponseOids=rep_oids, CreatorOid=creator_oid, Pinned=pinned,
-                Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids, ChannelId=channel_oid
+                Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type), Responses=responses,
+                CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
+                ChannelId=channel_oid
             )
 
         if outcome.data_found:
@@ -90,7 +93,8 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         if outcome.is_success:
             # Set other module with the same keyword to be inactive
             q = Query(MatchPair(AutoReplyModuleModel.Id.key, NotEqual(model.id)),
-                      MatchPair(AutoReplyModuleModel.KeywordOid.key, kw_oid),
+                      MatchPair(AutoReplyModuleModel.KEY_KW_TYPE, kw_type),
+                      MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
                       MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid),
                       MatchPair(AutoReplyModuleModel.Active.key, True))
 
@@ -116,8 +120,8 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
             )
         )
 
-    def module_mark_inactive(self, kw_oid: ObjectId, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
-        q = Query(MatchPair(AutoReplyModuleModel.KeywordOid.key, kw_oid),
+    def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+        q = Query(MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
                   MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid))
 
         if not AutoReplyModuleManager.has_access_to_pinned(channel_oid, remover_oid):
@@ -135,13 +139,18 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         return ret
 
     @param_type_ensure
-    def get_conn(self, keyword_oid: ObjectId, channel_oid: ObjectId) -> \
+    def get_conn(self, keyword: str, keyword_type: AutoReplyContentType,
+                 channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
-        q = Query(MatchPair(AutoReplyModuleModel.KeywordOid.key, keyword_oid),
+        q = Query(MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
+                  MatchPair(AutoReplyModuleModel.KEY_KW_TYPE, keyword_type),
                   MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid),
                   MatchPair(AutoReplyModuleModel.Active.key, True))
 
-        ret: Optional[AutoReplyModuleModel] = self.get_cache_one(q, parse_cls=AutoReplyModuleModel)
+        ret: Optional[AutoReplyModuleModel] = \
+            self.get_cache_one(q,
+                               parse_cls=AutoReplyModuleModel,
+                               collation=case_insensitive_collation if case_insensitive else None)
 
         if ret:
             now = now_utc_aware()
@@ -158,15 +167,15 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         return None
 
     def get_conn_list(
-            self, channel_oid: ObjectId, keyword_oids: List[ObjectId] = None, active_only: bool = True) \
+            self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
         """Sort by used count (desc)."""
         filter_ = {
             AutoReplyModuleModel.ChannelId.key: channel_oid
         }
 
-        if keyword_oids:
-            filter_[AutoReplyModuleModel.KeywordOid.key] = {"$in": keyword_oids}
+        if keyword:
+            filter_[AutoReplyModuleModel.KEY_KW_CONTENT] = {"$regex": keyword, "$options": "i"}
 
         if active_only:
             filter_[AutoReplyModuleModel.Active.key] = True
@@ -305,14 +314,15 @@ class AutoReplyManager:
         return self._mod.add_conn_by_model(model)
 
     def add_conn_complete(
-            self, kw_oid: ObjectId, rep_oids: Tuple[ObjectId], creator_oid: ObjectId, channel_oid: ObjectId,
-            pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
+            self, keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
+            creator_oid: ObjectId, channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId],
+            cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        return self._mod.add_conn_complete(kw_oid, rep_oids, creator_oid, channel_oid, pinned, private, tag_ids,
-                                           cooldown_sec)
+        return self._mod.add_conn_complete(keyword, kw_type, responses, creator_oid, channel_oid, pinned, private,
+                                           tag_ids, cooldown_sec)
 
-    def del_conn(self, kw_oid: ObjectId, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
-        return self._mod.module_mark_inactive(kw_oid, channel_oid, remover_oid)
+    def del_conn(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+        return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType,
@@ -321,36 +331,13 @@ class AutoReplyManager:
         :return: Empty list (length of 0) if no corresponding response.
                 [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
-        ctnt_rst = AutoReplyContentManager.get_content(keyword, keyword_type, False, case_insensitive)
-        mod = None
+        mod = self._mod.get_conn(keyword, keyword_type, channel_oid, case_insensitive=case_insensitive)
         resp_ctnt = []
-        resp_id_miss = []
-
-        if ctnt_rst.success:
-            mod = self._mod.get_conn(ctnt_rst.model.id, channel_oid)
 
         if mod:
-            resp_ids = mod.response_oids
-
-            for resp_id in resp_ids:
-                ctnt_mdl = AutoReplyContentManager.get_content_by_id(resp_id)
-                if ctnt_mdl:
-                    resp_ctnt.append((ctnt_mdl, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds))
-                else:
-                    resp_id_miss.append(resp_id)
-
-        if resp_id_miss and ctnt_rst.success:
-            content = f"""Malformed data detected.
-            <hr>
-            <h4>Parameters</h4><br>
-            Keyword: {keyword} / Type: {keyword_type} / Case Insensitive: {case_insensitive}<br>
-            <h4>Variables</h4><br>
-            Get content result (keyword): {ctnt_rst}<br>
-            Keyword connection model: {mod}<br>
-            Contents to response: {mod}<br>
-            Contents missing (id): {resp_id_miss}
-            """
-            MailSender.send_email_async(content, subject="Lossy data in auto reply database")
+            resp_ctnt = [(AutoReplyContentModel.cast_model(resp_mod),
+                          mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds)
+                         for resp_mod in mod.responses]
 
         return resp_ctnt
 
@@ -371,9 +358,9 @@ class AutoReplyManager:
     def tag_get_insert(self, name, color=ColorFactory.BLACK) -> AutoReplyModuleTagGetResult:
         return self._tag.get_insert(name, color)
 
-    def get_conn_list(self, channel_oid: ObjectId, keyword_oids: List[ObjectId] = None, active_only: bool = True) \
+    def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
-        return self._mod.get_conn_list(channel_oid, keyword_oids, active_only)
+        return self._mod.get_conn_list(channel_oid, keyword, active_only)
 
 
 _inst = AutoReplyManager()

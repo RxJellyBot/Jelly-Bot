@@ -1,4 +1,3 @@
-from concurrent.futures.thread import ThreadPoolExecutor
 from typing import List
 import traceback
 
@@ -7,9 +6,9 @@ from django.utils.translation import gettext_lazy as _
 
 from extutils.emailutils import MailSender
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
-from models import AutoReplyModuleExecodeModel
+from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
 from mongodb.utils import CursorWithCount
-from mongodb.factory import AutoReplyManager, AutoReplyContentManager, ExecodeManager
+from mongodb.factory import AutoReplyManager, ExecodeManager
 from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl, Bot
@@ -132,26 +131,12 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
-    kw_ctnt_result = AutoReplyContentManager.get_content(keyword)
-    if not kw_ctnt_result.success:
-        return [HandledMessageEventText(
-            content=_("Failed to fetch / register the content ID of the **keyword**.\n"
-                      "Auto-Reply module not registered.\n"
-                      "Code: `{}`\n"
-                      "Visit {} to see the code explanation.").format(
-                kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
-
-    rep_ctnt_result = AutoReplyContentManager.get_content(response)
-    if not rep_ctnt_result.success:
-        return [HandledMessageEventText(
-            content=_("Failed to fetch / register the content ID of the **response**.\n"
-                      "Auto-Reply module not registered.\n"
-                      "Code: `{}`\n"
-                      "Visit {} to see the code explanation.").format(
-                rep_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
+    kw_type = AutoReplyContentType.determine(keyword)
+    resp_type = AutoReplyContentType.determine(response)
 
     add_result = AutoReplyManager.add_conn_complete(
-        kw_ctnt_result.model.id, (rep_ctnt_result.model.id,), e.user_model.id, e.channel_oid,
+        keyword, kw_type, [AutoReplyContentModel(Content=response, ContentType=resp_type)],
+        e.user_model.id, e.channel_oid,
         Bot.AutoReply.DefaultPinned, Bot.AutoReply.DefaultPrivate, Bot.AutoReply.DefaultTags,
         Bot.AutoReply.DefaultCooldownSecs)
 
@@ -161,7 +146,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                 "Auto-Reply module successfully registered.\n"
                 "Keyword Type: {}\n"
                 "Response Type: {}").format(
-                kw_ctnt_result.model.content_type.key, rep_ctnt_result.model.content_type.key),
+                kw_type.key, resp_type.key),
             bypass_multiline_check=True)]
     else:
         return [
@@ -178,21 +163,13 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 @cmd_del.command_function(
     feature_flag=BotFeature.TXT_AR_DEL,
     arg_count=1,
-    arg_help=[_("The keyword of the module to delete.")],
+    arg_help=[_("The keyword of the module to delete. Note that this also deletes the keyword which type is NOT text. "
+                "For example, if there is a module which keyword 100(Text) and another module which keyword "
+                "is 100(Sticker), both modules will be deleted if this argument is 100.")],
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
-    kw_ctnt_result = AutoReplyContentManager.get_content(
-        keyword, type_=AutoReplyContentType.TEXT, add_on_not_found=False)
-    if not kw_ctnt_result.success:
-        return [HandledMessageEventText(
-            content=_("Failed to fetch / register the content ID of the **keyword**.\n"
-                      "Auto-Reply module not deleted.\n"
-                      "Code: `{}`\n"
-                      "Visit {} to see the code explanation.").format(
-                kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
-
-    outcome = AutoReplyManager.del_conn(kw_ctnt_result.model.id, e.channel_oid, e.user_model.id)
+    outcome = AutoReplyManager.del_conn(keyword, e.channel_oid, e.user_model.id)
 
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
@@ -212,22 +189,8 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 # ----------------------- List
 
 def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
-    ret = []
-
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="ConnList") as executor:
-        futures = []
-        for conn in conn_list:
-            futures.append(executor.submit(conn.get_keyword_repr_in_cmd))
-
-        # Non-lock call & Free resources when execution is done
-        executor.shutdown(False)
-
-        for completed in futures:
-            result = completed.result()
-            if result:
-                ret.append(result)
-
-    return ret
+    # Exhaust the cursor to avoid time consumed when looping the cursor
+    return [conn.keyword_repr for conn in list(conn_list)]
 
 
 @cmd_list.command_function(
@@ -257,13 +220,7 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     cooldown_sec=10
 )
 def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
-    ctnt_mdls = AutoReplyContentManager.get_contents_by_word(keyword)
-
-    if ctnt_mdls.empty:
-        return [HandledMessageEventText(
-            content=_("No content including the substring \"{}\" was found.").format(keyword))]
-
-    conn_list = AutoReplyManager.get_conn_list(e.channel_oid, [ctnt.id for ctnt in ctnt_mdls])
+    conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
 
     if not conn_list.empty:
         return [HandledMessageEventText(

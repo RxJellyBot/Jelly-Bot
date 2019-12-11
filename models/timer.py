@@ -12,8 +12,8 @@ from mongodb.utils import CursorWithCount
 
 
 class TimerModel(Model):
-    ChannelOid = ObjectIDField("ch")
-    KeywordOid = ObjectIDField("kw")
+    ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
+    Keyword = TextField("k", default=ModelDefaultValueExt.Required)
     Title = TextField("t", default=ModelDefaultValueExt.Required)
     TargetTime = DateTimeField("tt", default=ModelDefaultValueExt.Required)
     DeletionTime = DateTimeField("del",default=ModelDefaultValueExt.Optional)

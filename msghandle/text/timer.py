@@ -5,17 +5,13 @@ from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import Bot
 from extutils.dt import t_delta_str, now_utc_aware
-from flags import AutoReplyContentType, BotFeature
-from mongodb.factory import AutoReplyContentManager, TimerManager, BotFeatureUsageDataManager
+from flags import BotFeature
+from mongodb.factory import TimerManager, BotFeatureUsageDataManager
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
 
 
 def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    ctnt_res = AutoReplyContentManager.get_content(e.content, AutoReplyContentType.TEXT, add_on_not_found=False)
-    if not ctnt_res.model:
-        return []
-
-    tmrs = TimerManager.get_timer(e.channel_oid, ctnt_res.model.id)
+    tmrs = TimerManager.get_timer(e.channel_oid, e.content)
 
     if tmrs.has_data:
         BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_TMR_GET, e.channel_oid, e.user_model.id)
