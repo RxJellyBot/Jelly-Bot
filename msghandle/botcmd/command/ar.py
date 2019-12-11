@@ -189,7 +189,8 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 # ----------------------- List
 
 def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
-    return [conn.get_keyword_repr_in_cmd() for conn in conn_list]
+    # Exhaust the cursor to avoid time consumed when looping the cursor
+    return [conn.keyword_repr for conn in list(conn_list)]
 
 
 @cmd_list.command_function(

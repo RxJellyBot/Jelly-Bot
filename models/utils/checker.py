@@ -46,19 +46,19 @@ class ModelFieldChecker:
                 required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst.full_name)
                 repaired_write_holder = BulkWriteDataHolder(col_inst, Database.BulkWriteCount)
 
-                logger.logger.warning("Scanning potential repair requiring data...")
+                logger.logger.warning(f"Scanning potential repair requiring data ({col_inst.full_name})...")
 
                 _scan_data_(col_inst, potential_repair_needed, required_write_holder, repaired_write_holder)
 
                 if repaired_write_holder.holding_data:
-                    logger.logger.warning("Updating repaired data to database...")
+                    logger.logger.warning(f"Updating repaired data to database ({col_inst.full_name})...")
                     repaired_write_holder.complete()
 
                 if required_write_holder.holding_data:
-                    logger.logger.warning("Updating manual repairments required database...")
+                    logger.logger.warning(f"Updating manual repairments required database ({col_inst.full_name})...")
 
                     result = required_write_holder.complete()
-                    logger.logger.warning("Sending email notification...")
+                    logger.logger.warning(f"Sending email notification ({col_inst.full_name})...")
                     _send_mail_async_(col_inst, result, required_write_holder)
 
         logger.logger.info(f"Done scanning `{col_inst.full_name}`.")
