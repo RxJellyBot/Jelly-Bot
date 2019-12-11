@@ -1,5 +1,6 @@
 # FIXME: Bot Feature: Countdown / Countup Timer
 #   - Command: Delete
+# INCOMPLETE: Bot Feature: Fixed Word: Random Draw Score
 # INCOMPLETE: Website: Auto-Reply module list (Delete / Info / Modify)
 # INCOMPLETE: Bot Feature: Remote control in private channel
 # INCOMPLETE: Bot Feature: Last Message
