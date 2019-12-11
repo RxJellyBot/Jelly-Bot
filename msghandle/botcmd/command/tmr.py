@@ -2,14 +2,13 @@ from dateutil import parser
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
 
 from extutils.boolext import str_to_bool, true_word, false_word, StrBoolResult
 from extutils.dt import is_tz_naive
-from flags import BotFeature, CommandScopeCollection, AutoReplyContentType
+from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
-from mongodb.factory import TimerManager, AutoReplyContentManager
-from JellyBot.systemconfig import HostUrl, Bot
+from mongodb.factory import TimerManager
+from JellyBot.systemconfig import Bot
 
 from ._base_ import CommandNode
 
@@ -47,15 +46,6 @@ continue_help = _("A word that can indicate if the timer should keep counting up
 )
 def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, countup: str) \
         -> List[HandledMessageEventText]:
-    # Get content ID
-    kw_ctnt_result = AutoReplyContentManager.get_content(keyword, type_=AutoReplyContentType.TEXT)
-    if not kw_ctnt_result.success:
-        return [HandledMessageEventText(
-            content=_("Failed to fetch / register the content ID of the **keyword**.\n"
-                      "Code: `{}`\n"
-                      "Visit {} to see the code explanation.").format(
-                kw_ctnt_result.outcome, f"{HostUrl}{reverse('page.doc.code.get')}"))]
-
     # Parse datetime string
     try:
         dt = parser.parse(dt, ignoretz=False)
@@ -74,7 +64,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
             HandledMessageEventText(content=_(
                 "Unknown flag to indicate if the timer will countup once the time is up. (`{}`)").format(countup))]
 
-    outcome = TimerManager.add_new_timer(e.channel_oid, kw_ctnt_result.model.id, title, dt, ctup.to_bool())
+    outcome = TimerManager.add_new_timer(e.channel_oid, keyword, title, dt, ctup.to_bool())
 
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Timer added."))]
