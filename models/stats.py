@@ -44,14 +44,9 @@ class HourlyIntervalAverageMessageResult:
     def __init__(self, cursor, days_collected: float):
         # Create hours label for webpage
         self.hours_label = [i for i in range(24)]
-        # Initialize average data object
-        self.avg_data = [0.0 for _ in range(24)]
 
         now = datetime.utcnow()
         earliest = now - timedelta(days=days_collected)
-
-        # Offset hour of time zone
-        tz_offset = int(timezone.get_current_timezone().utcoffset(dt=now).total_seconds() // 3600)
 
         d_collected_int = math.floor(days_collected)
 
@@ -63,9 +58,9 @@ class HourlyIntervalAverageMessageResult:
         # Days collected parameter provided
         avg_calculatable = d_collected_int > HourlyIntervalAverageMessageResult.DAYS_NONE
 
+        # Pre-generate denominator (days collected in the hour interval)
         denom = []
         if avg_calculatable:
-            # Pre-generate denominator
             add_one_end = now.hour
             if earliest.hour > now.hour:
                 add_one_end += 24
@@ -74,13 +69,10 @@ class HourlyIntervalAverageMessageResult:
             for hr in range(earliest.hour, add_one_end + 1):
                 denom[hr % 24] += 1
 
-        for utc_hr in range(24):
-            offset_hr = (utc_hr + tz_offset) % 24
-
-            if avg_calculatable:
-                self.avg_data[offset_hr] = count_data[utc_hr] / denom[utc_hr]
-            else:
-                self.avg_data[offset_hr] = count_data[utc_hr]
+        if avg_calculatable:
+            self.avg_data = [ct / dm for ct, dm in zip(count_data, denom)]
+        else:
+            self.avg_data = count_data
 
         self.hr_range = int(days_collected * 24)
 
@@ -89,6 +81,9 @@ class DailyMessageResult:
     KEY = "count"
 
     def __init__(self, cursor):
+        # FIXME: Handle 0 message count
+        # FIXME: Deprecate the use of auto-reply content
+
         self.date_label = []
         self.date_count = []
 

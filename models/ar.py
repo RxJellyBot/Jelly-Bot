@@ -9,7 +9,7 @@ from models.utils import AutoReplyValidators
 
 from ._base import Model, ModelDefaultValueExt
 from .field import (
-    ObjectIDField, TextField, AutoReplyContentTypeField,
+    ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
     BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
 )
 
@@ -39,19 +39,24 @@ class AutoReplyContentModel(Model):
         return ModelValidityCheckResult.O_OK
 
     def __str__(self):
-        if self.content_type != AutoReplyContentType.TEXT:
-            return f"({self.content_type.key} / {self.content})"
-        else:
+        if self.content_type == AutoReplyContentType.TEXT:
             return self.content
+        else:
+            return f"({self.content_type.key} / {self.content})"
 
 
 class AutoReplyModuleModel(Model):
     # TODO: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
 
+    key_kw = "kw"
+
     # Main
-    KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                              max_len=systemconfig.AutoReply.MaxResponses)
+    Keyword = ModelField(key_kw, default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
+    Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
+                                max_len=systemconfig.AutoReply.MaxResponses)
+
+    KEY_KW_CONTENT = f"{key_kw}.{AutoReplyContentModel.Content.key}"
+    KEY_KW_TYPE = f"{key_kw}.{AutoReplyContentModel.ContentType.key}"
     ChannelId = ObjectIDField("ch")
     Active = BooleanField("at", default=True)
 
@@ -92,27 +97,15 @@ class AutoReplyModuleModel(Model):
             return False
 
     @property
-    def keyword(self) -> Optional[str]:
-        from mongodb.factory import AutoReplyContentManager
-        ctnt = AutoReplyContentManager.get_content_by_id(self.keyword_oid)
-        return str(ctnt.content) or None
-
-    def get_ctnt_mdl(self) -> AutoReplyContentModel:
-        from mongodb.factory import AutoReplyContentManager
-        return AutoReplyContentManager.get_content_by_id(self.keyword_oid)
-
-    def get_keyword_repr_in_cmd(self) -> Optional[str]:
-        ret = str(self.get_ctnt_mdl())
-        if ret:
-            return f"{ret} ({self.called_count})"
-        else:
-            return None
+    def keyword_repr(self) -> str:
+        return f"{str(self.keyword)} ({self.called_count})"
 
 
 class AutoReplyModuleExecodeModel(Model):
-    KeywordOid = ObjectIDField("k", default=ModelDefaultValueExt.Required, readonly=True)
-    ResponseOids = ArrayField("r", ObjectId, default=ModelDefaultValueExt.Required,
-                              max_len=systemconfig.AutoReply.MaxResponses)
+    Keyword = ModelField(AutoReplyModuleModel.key_kw,
+                         default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
+    Responses = ArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
+                           max_len=systemconfig.AutoReply.MaxResponses)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)

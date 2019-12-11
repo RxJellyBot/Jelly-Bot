@@ -8,9 +8,9 @@ from JellyBot.api.responses.mixin import (
 )
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, Execode
-from models import AutoReplyModuleModel, AutoReplyModuleExecodeModel
+from models import AutoReplyModuleModel, AutoReplyModuleExecodeModel, AutoReplyContentModel
 from mongodb.factory import (
-    AutoReplyManager, AutoReplyContentManager, ExecodeManager
+    AutoReplyManager, ExecodeManager
 )
 from mongodb.factory.results import WriteOutcome
 
@@ -46,11 +46,7 @@ class AutoReplyAddBaseResponse(
         self._handle_keyword_type_()
 
         k = result.AutoReplyResponse.KEYWORD
-        r = AutoReplyContentManager.get_content(self._keyword, self._keyword_type)
-        if r.success:
-            self._keyword = self._data[k] = r.model.id
-        else:
-            self._err[k] = r.serialize()
+        self._data[k] = self._keyword
 
     def _handle_keyword_type_(self):
         self._keyword_type = int(AutoReplyContentType.default() or self._keyword_type)
@@ -60,8 +56,6 @@ class AutoReplyAddBaseResponse(
 
     def _handle_responses_(self):
         k = result.AutoReplyResponse.RESPONSES
-        resp_err = list()
-        resp_list = list()
 
         if len(self._responses) > systemconfig.AutoReply.MaxContentLength:
             self._responses = self._responses[:systemconfig.AutoReply.MaxContentLength]
@@ -77,18 +71,9 @@ class AutoReplyAddBaseResponse(
             self._response_types = self._response_types[:-diff]
             self._info.append(info.AutoReply.RESPONSE_TYPES_SHORTENED)
 
-        for idx, resp in enumerate(self._responses):
-            r = AutoReplyContentManager.get_content(resp, self._response_types[idx])
-
-            if r.success:
-                resp_list.append(r.model.id)
-            else:
-                resp_err.append(r.serialize())
-
-        if len(resp_err) > 0:
-            self._err[k] = resp_err
-        else:
-            self._responses = self._data[k] = resp_list
+        self._responses = self._data[k] = \
+            [AutoReplyContentModel(Content=resp, ContentType=self._response_types[idx])
+             for idx, resp in enumerate(self._responses)]
 
     def _handle_private_(self):
         k = result.AutoReplyResponse.PRIVATE
@@ -147,7 +132,7 @@ class AutoReplyAddBaseResponse(
 class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = AutoReplyManager.add_conn_complete(
-            self._keyword, self._responses, self._sender_oid, self.get_channel_oid(),
+            self._keyword, self._keyword_type, self._responses, self._sender_oid, self.get_channel_oid(),
             self._pinned, self._private, self._tags, self._cooldown)
 
     def is_success(self) -> bool:
@@ -161,8 +146,9 @@ class AutoReplyAddExecodeResponse(AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = ExecodeManager.enqueue_execode(
             self._sender_oid, Execode.AR_ADD, AutoReplyModuleExecodeModel,
-            KeywordOid=self._keyword, ResponseOids=self._responses,
-            Pinned=self._pinned, Private=self._pinned, TagIds=self._tags, CooldownSec=self._cooldown)
+            Keyword=AutoReplyContentModel(Content=self._keyword, ContentType=self._keyword_type),
+            Responses=self._responses, Pinned=self._pinned, Private=self._pinned, TagIds=self._tags,
+            CooldownSec=self._cooldown)
 
     def is_success(self) -> bool:
         try:
