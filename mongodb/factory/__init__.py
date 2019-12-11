@@ -6,8 +6,6 @@ from .channel import _inst as ChannelManager, _inst2 as ChannelCollectionManager
 # noinspection PyPep8Naming
 from .prof import _inst as ProfileManager
 # noinspection PyPep8Naming
-from .ar_ctnt import _inst as AutoReplyContentManager
-# noinspection PyPep8Naming
 from .ar_conn import _inst as AutoReplyManager
 # noinspection PyPep8Naming
 from .user import _inst as RootUserManager

@@ -1,4 +1,4 @@
-from .array import ArrayField
+from .array import ArrayField, ModelArrayField
 from ._base import BaseField
 from .bool import BooleanField
 from .datetime import DateTimeField
