@@ -80,10 +80,10 @@ class UserProfileManager(BaseCollection):
         else:
             return None
 
-    def get_user_channel_profiles(self, root_uid: ObjectId) -> CursorWithCount:
-        return self.find_cursor_with_count(
+    def get_user_channel_profiles(self, root_uid: ObjectId) -> list:
+        return list(self.find_cursor_with_count(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
-            parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)])
+            parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)]))
 
     def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
         return self.find_cursor_with_count(
