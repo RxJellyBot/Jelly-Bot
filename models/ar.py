@@ -15,6 +15,8 @@ from .field import (
 
 
 class AutoReplyContentModel(Model):
+    WITH_OID = False
+
     Content = TextField(
         "c", default=ModelDefaultValueExt.Required, maxlen=systemconfig.AutoReply.MaxContentLength,
         allow_none=False, must_have_content=True)

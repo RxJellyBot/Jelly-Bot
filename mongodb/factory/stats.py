@@ -146,7 +146,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             else:
                 days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
 
-        return HourlyIntervalAverageMessageResult(self.aggregate(pipeline), days_collected)
+        return HourlyIntervalAverageMessageResult(list(self.aggregate(pipeline)), days_collected)
 
     def daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
@@ -169,7 +169,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
 
-        return DailyMessageResult(self.aggregate(pipeline))
+        return DailyMessageResult(list(self.aggregate(pipeline)))
 
 
 class BotFeatureUsageDataManager(BaseCollection):
