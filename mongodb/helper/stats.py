@@ -13,11 +13,11 @@ from mongodb.factory import RootUserManager, MessageRecordStatisticsManager
 class UserMessageStatsEntry:
     user_name: str
     message_count: int
-    message_percentage: float
+    message_ratio: float
 
     @property
-    def percent_str(self) -> str:
-        return f"{self.message_percentage:.02%}"
+    def ratio_pct_str(self) -> str:
+        return f"{self.message_ratio:.02%}"
 
 
 @dataclass
@@ -50,7 +50,7 @@ class MessageStatsDataProcessor:
         msg_rec = {d[OID_KEY]: d["count"] for d in list(msg_rec)}
 
         if msg_rec:
-            total: int = sum(msg_rec.values())
+            total: int = max(msg_rec.values())
 
             # Obtained from https://stackoverflow.com/a/40687012/11571888
             # Workers cannot be too big as it will suck out the connections of MongoDB Atlas
@@ -69,10 +69,10 @@ class MessageStatsDataProcessor:
 
                     entries.append(
                         UserMessageStatsEntry(
-                            user_name=result.user_name, message_count=count, message_percentage=count / total)
+                            user_name=result.user_name, message_count=count, message_ratio=count / total)
                     )
 
-            return UserMessageStats(member_stats=entries, msg_count=total)
+            return UserMessageStats(member_stats=entries, msg_count=sum(msg_rec.values()))
         else:
             return UserMessageStats(member_stats=[], msg_count=0)
 
