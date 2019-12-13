@@ -104,7 +104,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
-            -> CommandCursor:
+            -> list:
         match_d = self._channel_oids_filter_(channel_oids)
         match_d.update(**self._hours_within_filter_(hours_within))
 
@@ -117,7 +117,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}}
         ]
 
-        return self.aggregate(aggr_pipeline)
+        return list(self.aggregate(aggr_pipeline))
 
     def hourly_interval_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,

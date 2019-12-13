@@ -85,12 +85,20 @@ class UserProfileManager(BaseCollection):
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
             parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)]))
 
-    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
-        return self.find_cursor_with_count(
-            {f"{ChannelProfileConnectionModel.ProfileOids.key}.0": {"$exists": True},
-             ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
-            parse_cls=ChannelProfileConnectionModel
-        )
+    def get_channel_members(self, channel_oid: ObjectId, available_only=True) -> List[ChannelProfileConnectionModel]:
+        filter_ = {ChannelProfileConnectionModel.ChannelOid.key: channel_oid}
+
+        if available_only:
+            filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
+
+        return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
+
+    def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
+        self.update_one(
+            {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+             ChannelProfileConnectionModel.UserOid.key: root_oid},
+            {"$set": {
+                ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
 
 class ProfileDataManager(BaseCollection):
@@ -275,8 +283,11 @@ class ProfileManager:
 
         return ret
 
-    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
-        return self._conn.get_channel_members(channel_oid)
+    def get_channel_members(self, channel_oid: ObjectId, available_only=False) -> List[ChannelProfileConnectionModel]:
+        return self._conn.get_channel_members(channel_oid, available_only)
+
+    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
+        Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
 
 _inst = ProfileManager()

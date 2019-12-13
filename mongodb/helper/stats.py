@@ -3,10 +3,9 @@ from dataclasses import dataclass
 from typing import List, Optional, Union
 
 from bson import ObjectId
-from pymongo.command_cursor import CommandCursor
 
 from models import ChannelModel, ChannelCollectionModel, OID_KEY
-from mongodb.factory import RootUserManager, MessageRecordStatisticsManager
+from mongodb.factory import RootUserManager, MessageRecordStatisticsManager, ProfileManager
 
 
 @dataclass
@@ -44,10 +43,13 @@ class UserMessageRanking:
 
 class MessageStatsDataProcessor:
     @staticmethod
-    def _get_user_msg_stats_(msg_rec: CommandCursor, ch_data: ChannelModel = None) -> UserMessageStats:
+    def _get_user_msg_stats_(msg_rec_data: list, ch_data: ChannelModel = None) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
 
-        msg_rec = {d[OID_KEY]: d["count"] for d in list(msg_rec)}
+        msg_rec_d = {d[OID_KEY]: d["count"] for d in msg_rec_data}
+        msg_rec = {}
+        for member in ProfileManager.get_channel_members(ch_data.id, available_only=True):
+            msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, 0)
 
         if msg_rec:
             total: int = max(msg_rec.values())
