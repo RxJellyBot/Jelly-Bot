@@ -81,8 +81,6 @@ class DailyMessageResult:
     KEY = "count"
 
     def __init__(self, cursor):
-        # FIXME: Handle 0 message count
-        # FIXME: Deprecate the use of auto-reply content
         # FIXME: Optimize the speed of getting channel list
 
         self.date_label = []

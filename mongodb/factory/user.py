@@ -201,8 +201,6 @@ class RootUserManager(BaseCollection):
                 onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
 
                 if onplat_data:
-
-
                     return UserNameQuery(
                         user_id=root_oid, user_name=onplat_data.get_name(channel_data))
                 else:

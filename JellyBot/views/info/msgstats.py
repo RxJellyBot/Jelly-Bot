@@ -12,7 +12,7 @@ from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel
-from mongodb.factory import ChannelManager, MessageRecordStatisticsManager
+from mongodb.factory import ChannelManager, MessageRecordStatisticsManager, ProfileManager
 from mongodb.helper import MessageStatsDataProcessor
 
 KEY_MSG_INTV_FLOW = "msg_intvflow_data"
@@ -74,10 +74,11 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
         # channel_members = ProfileManager.get_channel_members(channel_oid)  # Reserved for per member analysis
 
         pkg = get_msg_stats_data_package(channel_data, hours_within, get_current_timezone())
+
         ctxt = {
             "ch_name": channel_data.get_channel_name(get_root_oid(request)),
             "channel_data": channel_data,
-            "hr_range": hours_within or pkg[KEY_MSG_INTV_FLOW].hr_range,
+            "hr_range": hours_within or pkg[KEY_MSG_INTV_FLOW].hr_range
         }
         ctxt.update(pkg)
 
