@@ -22,7 +22,6 @@ class LineStickerManager:
     def __init__(self):
         self._tmp_dir = tempfile.TemporaryFile(prefix="LineSticker")
 
-    # DRAFT: Line Sticker: Download Utils not completed
     # def _get_content_(self, sticker_type, pack_id, list_ids):
     #     """
     #     :param sticker_type: The type of the sticker

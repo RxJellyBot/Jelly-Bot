@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
     // noinspection JSUnusedGlobalSymbols
-    let tagSplittor = "{{ tag_splittor }}";  // Used in artag.js
+    let tagSplitter = "{{ tag_splitter }}";  // Used in artag.js
 
     function getChannelDataEndpointUrl(platVal, channel) {
         return `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
@@ -30,7 +30,6 @@
     }
 
     function hasChannelMembership(platVal, channel) {
-        // OPTIMIZE: Fix async XHR problem
         let url = getChannelDataEndpointUrl(platVal, channel);
 
         let xhr = new XMLHttpRequest();

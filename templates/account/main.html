@@ -22,6 +22,10 @@
                                 <td><code class="h6">{{ root_data.id }}</code></td>
                             </tr>
                             <tr>
+                                <th scope="row">{% trans "Account Created" %}</th>
+                                <td>{{ reg_time_str }}</td>
+                            </tr>
+                            <tr>
                                 <th scope="row">{% trans "Google Account" %}</th>
                                 <td>{{ api_user_data.email }}</td>
                             </tr>

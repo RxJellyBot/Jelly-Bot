@@ -16,15 +16,15 @@ cmd = CommandNode(
 
 class OptionList:
     def __init__(self, txt: str):
-        self.elements = list(set(txt.split(Bot.RandomChoiceSplittor)))
+        self.elements = list(set(txt.split(Bot.RandomChoiceSplitter)))
         self.weights = None
 
-        if len(self.elements) > 1 and all([Bot.RandomChoiceWeightSplittor in elem for elem in self.elements]):
+        if len(self.elements) > 1 and all([Bot.RandomChoiceWeightSplitter in elem for elem in self.elements]):
             temp = []
             self.weights = []
 
             for elem in self.elements:
-                option, weight = elem.split(Bot.RandomChoiceWeightSplittor, 2)
+                option, weight = elem.split(Bot.RandomChoiceWeightSplitter, 2)
 
                 self.weights.append(float(weight))
                 temp.append(option)
@@ -63,10 +63,10 @@ elem_help_txt = _(
     "Example:\n\n"
     "- Option List **without** weights: A{}B{}C\n\n"
     "- Option List **with** weights: A{}0.7{}B{}0.5{}C{}0.9").format(
-    Bot.RandomChoiceSplittor, Bot.RandomChoiceOptionLimit, Bot.RandomChoiceWeightSplittor,
-    Bot.RandomChoiceSplittor, Bot.RandomChoiceSplittor,
-    Bot.RandomChoiceSplittor, Bot.RandomChoiceWeightSplittor, Bot.RandomChoiceSplittor,
-    Bot.RandomChoiceWeightSplittor, Bot.RandomChoiceSplittor
+    Bot.RandomChoiceSplitter, Bot.RandomChoiceOptionLimit, Bot.RandomChoiceWeightSplitter,
+    Bot.RandomChoiceSplitter, Bot.RandomChoiceSplitter,
+    Bot.RandomChoiceSplitter, Bot.RandomChoiceWeightSplitter, Bot.RandomChoiceSplitter,
+    Bot.RandomChoiceWeightSplitter, Bot.RandomChoiceSplitter
 )
 option_overlimit_txt = _("Maximum count of options is {}.").format(Bot.RandomChoiceOptionLimit)
 pick_overlimit_txt = _(

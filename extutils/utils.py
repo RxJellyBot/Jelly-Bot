@@ -98,7 +98,6 @@ def list_insert_in_between(l: list, insert_obj):
 
 
 def demarkdown(markdown_str: str):
-    # OPTIMIZE: Regex?
     return markdown_str\
         .replace("\n\n", "\n")\
         .replace("<br>", "\n")\

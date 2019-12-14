@@ -99,5 +99,3 @@ languages = [
 ]
 
 default_language = ZH_TW
-
-# OPTIMIZE: Store `language` and `locale` in the database using code(int) instead of string

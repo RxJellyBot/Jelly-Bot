@@ -81,8 +81,6 @@ class DailyMessageResult:
     KEY = "count"
 
     def __init__(self, cursor):
-        # FIXME: Optimize the speed of getting channel list
-
         self.date_label = []
         self.date_count = []
 
