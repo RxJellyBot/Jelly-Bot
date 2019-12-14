@@ -170,7 +170,6 @@ def _construct_docs_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Execode"), link=reverse("page.doc.code.excde"), parent=docs_parent))
 
     # Hidden Items
-    # TODO: Navbar - Parent not in breadcrumb
     __attach__(
         docs_parent, NavHidden, current_path, _("Bot Command - {}").format(nav_param.get("code")),
         "page.doc.botcmd.cmd", nav_param, cmd_list)

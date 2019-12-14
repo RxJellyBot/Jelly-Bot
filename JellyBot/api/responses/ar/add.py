@@ -72,7 +72,7 @@ class AutoReplyAddBaseResponse(
             self._info.append(info.AutoReply.RESPONSE_TYPES_SHORTENED)
 
         self._responses = self._data[k] = \
-            [AutoReplyContentModel(Content=resp, ContentType=self._response_types[idx])
+            [AutoReplyContentModel(Content=resp, ContentType=int(self._response_types[idx]))
              for idx, resp in enumerate(self._responses)]
 
     def _handle_private_(self):
@@ -89,7 +89,7 @@ class AutoReplyAddBaseResponse(
         if self._tags:
             # Tag string to array
             # noinspection PyUnresolvedReferences
-            tags = self._tags.split(systemconfig.AutoReply.TagSplittor)
+            tags = self._tags.split(systemconfig.AutoReply.TagSplitter)
             tag_ids = []
 
             for tag in tags:

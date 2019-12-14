@@ -48,9 +48,3 @@ class ChannelCollectionRegistrationResult(ModelResult):
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)
-
-
-@dataclass
-class PermissionProfileRegistrationResult(ModelResult):
-    # TODO: User Profile: `PermissionProfileRegistrationResult` not completed
-    pass

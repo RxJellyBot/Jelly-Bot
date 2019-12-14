@@ -38,8 +38,6 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
             else:
                 access_no.append(channel_conn)
 
-        # TODO: In webpage, group channels by ChannelCollection
-
         return render_template(
             self.request, _("Channel Management"), "account/channel/list.html", {
                 "conn_access_ok": access_ok,

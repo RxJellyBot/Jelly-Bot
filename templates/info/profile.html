@@ -72,7 +72,7 @@
                     <h5 class="card-header text-dark">{% trans "Promotion Required" %}</h5>
                     <div class="card-body">
                         <div class="card-text h2">
-                            {% if profile_data.needs_promo %}
+                            {% if profile_data.promo_vote > 0 %}
                                 <span class="text-danger">{% trans "Yes" %}</span>
                             {% else %}
                                 <span class="text-success">{% trans "No" %}</span>

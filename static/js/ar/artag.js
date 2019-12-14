@@ -2,15 +2,13 @@ let selectedTags = [];
 
 let searchLock = false;
 
-// OPTIMIZE: Get tag's Object ID with the name during search and send oid back only
-
 function searchTag() {
     if (!searchLock) {
         searchLock = true;
 
         let txt = $("input#arTagKeyword").val();
 
-        if (txt.includes(tagSplittor) || txt.length === 0) {
+        if (txt.includes(tagSplitter) || txt.length === 0) {
             $("div#tagSearchErr").tooltip('enable').tooltip('show').tooltip('disable');
             searchLock = false;
             return;

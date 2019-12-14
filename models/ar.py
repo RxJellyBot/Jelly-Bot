@@ -48,8 +48,6 @@ class AutoReplyContentModel(Model):
 
 
 class AutoReplyModuleModel(Model):
-    # TODO: Bot Feature / Auto Reply: Auto expire (Auto disabled after certain time)
-
     key_kw = "kw"
 
     # Main

@@ -23,7 +23,7 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "platform_list": list(Platform),
                 "contenttype_list_kw": [t for t in list(AutoReplyContentType) if t != AutoReplyContentType.IMAGE],
                 "contenttype_list_rep": list(AutoReplyContentType),
-                "tag_splittor": AutoReply.TagSplittor,
+                "tag_splitter": AutoReply.TagSplitter,
                 "user_ch_list": ProfileManager.get_user_channel_profiles(root_uid),
                 "root_uid_str": str(root_uid),
                 "perm_pin_access": PermissionCategory.AR_ACCESS_PINNED_MODULE.code_num,

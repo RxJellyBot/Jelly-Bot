@@ -8,8 +8,6 @@ from models import APIStatisticModel
 from mongodb.factory import APIStatisticsManager
 
 
-# TODO: API Statistics: Google Analytics Protocol
-#   https://developers.google.com/analytics/devguides/collection/protocol/v1/
 class APIStatisticsCollector(MiddlewareMixin):
     # noinspection PyMethodMayBeStatic
     def process_response(self, request, response):

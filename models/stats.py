@@ -81,9 +81,6 @@ class DailyMessageResult:
     KEY = "count"
 
     def __init__(self, cursor):
-        # FIXME: Handle 0 message count
-        # FIXME: Deprecate the use of auto-reply content
-
         self.date_label = []
         self.date_count = []
 

@@ -62,8 +62,6 @@ class UserProfileManager(BaseCollection):
 
         return model
 
-    # TODO: User Profile: user_detach_profile and delete
-
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
@@ -85,12 +83,20 @@ class UserProfileManager(BaseCollection):
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
             parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)]))
 
-    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
-        return self.find_cursor_with_count(
-            {f"{ChannelProfileConnectionModel.ProfileOids.key}.0": {"$exists": True},
-             ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
-            parse_cls=ChannelProfileConnectionModel
-        )
+    def get_channel_members(self, channel_oid: ObjectId, available_only=True) -> List[ChannelProfileConnectionModel]:
+        filter_ = {ChannelProfileConnectionModel.ChannelOid.key: channel_oid}
+
+        if available_only:
+            filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
+
+        return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
+
+    def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
+        self.update_one(
+            {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+             ChannelProfileConnectionModel.UserOid.key: root_oid},
+            {"$set": {
+                ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
 
 class ProfileDataManager(BaseCollection):
@@ -151,17 +157,11 @@ class ProfileDataManager(BaseCollection):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
 
-    # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
-    # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change
-
 
 class PermissionPromotionRecordHolder(BaseCollection):
     database_name = DB_NAME
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
-
-    # TODO: User Profile: Profile Promotion - Keeps the promo record for a short period
-    # TODO: User Profile: Profile Promotion - Promote for any role who needs promotion or direct assignment
 
 
 class ProfileManager:
@@ -275,8 +275,11 @@ class ProfileManager:
 
         return ret
 
-    def get_channel_members(self, channel_oid: ObjectId) -> CursorWithCount:
-        return self._conn.get_channel_members(channel_oid)
+    def get_channel_members(self, channel_oid: ObjectId, available_only=False) -> List[ChannelProfileConnectionModel]:
+        return self._conn.get_channel_members(channel_oid, available_only)
+
+    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
+        Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
 
 _inst = ProfileManager()
