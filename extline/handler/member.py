@@ -14,7 +14,7 @@ def handle_member_join(request, event, destination):
     for user in event.joined.members:
         uid = user.user_id
 
-        udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, LineApiUtils.get_user_id(event))
+        udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
         cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 
         if udata_result.success and cdata:
