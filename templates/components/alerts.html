@@ -1,11 +1,15 @@
 <div class="container gen-alert">
-    <!-- Named messages so that the message utils in django can be used. https://stackoverflow.com/a/42039100 -->
+    <!-- Named `messages` so that the message utils in django can be used. https://stackoverflow.com/a/42039100 -->
     {% if messages %}
         {% for message in messages %}
             <div class="row">
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible col fade show"
+                <div class="alert alert-{{ message.level_tag }} alert-dismissible col fade show"
                      role="alert">
-                    {{ message }}
+                    {% if "safe" in message.extra_tags %}
+                        {{ message|safe }}
+                    {% else %}
+                        {{ message }}
+                    {% endif %}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

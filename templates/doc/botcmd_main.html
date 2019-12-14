@@ -19,15 +19,15 @@
             {% endif %}
         </div>
         <div class="row mb-1">
-            {% with splhtml=cmd_splittors_html|safe %}
+            {% with splhtml=cmd_splitters_html|safe %}
                 {% blocktrans trimmed %}
-                    The splittor(s) between the command code and its arguments is/are&nbsp;{{ splhtml }}.&nbsp;
+                    The splitter(s) between the command code and its arguments is/are&nbsp;{{ splhtml }}.&nbsp;
                 {% endblocktrans %}
             {% endwith %}
         </div>
         <div class="row mb-3">
             {% blocktrans trimmed %}
-                You should pick a splittor at your convenience and use it through the whole command, or some weird
+                You should pick a splitter at your convenience and use it through the whole command, or some weird
                 parsing problems may occur.
             {% endblocktrans %}
         </div>
@@ -40,7 +40,7 @@
         </div>
         <div class="row mb-3">
             {% blocktrans trimmed %}
-                Use double quotation mark to wrap around a single parameter if it contains any characters that is one of the splittor(s) to prevent parsing error.
+                Use double quotation mark to wrap around a single parameter if it contains any characters that is one of the splitter(s) to prevent parsing error.
             {% endblocktrans %}
         </div>
 

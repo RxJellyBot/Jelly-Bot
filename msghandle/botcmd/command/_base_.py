@@ -19,10 +19,6 @@ from extutils.strtrans import type_translation
 logger = LoggerSkeleton("sys.botcmd", logger_name_env="BOT_CMD")
 
 
-# TODO: Bot Command: Self generate help (1st arg is help then...)
-#  DE-MARKDOWN the description (extutils.utils.demarkdown())
-
-
 @dataclass
 class CommandParameter:
     name: str
@@ -49,7 +45,7 @@ class CommandFunction:
         self.last_call = defaultdict(lambda: -self.cooldown_sec)
         self._cache = {}
 
-    # Dynamically construct `usage` because `cmd_node.splittor` is required. Command structure wasn't ready
+    # Dynamically construct `usage` because `cmd_node.splitter` is required. Command structure wasn't ready
     # when executing __post_init__().
     @property
     def usage(self) -> str:
@@ -59,7 +55,7 @@ class CommandFunction:
             s = self.cmd_node.get_usage()
 
             for i in range(1, self.arg_count + 1):
-                s += self.cmd_node.main_splittor + f"({self.prm_keys[i].name})"
+                s += self.cmd_node.main_splitter + f"({self.prm_keys[i].name})"
 
             self._cache[k] = s.strip()
 
@@ -74,7 +70,7 @@ class CommandFunction:
 
             for usage in self.cmd_node.get_all_usage():
                 for i in range(1, self.arg_count + 1):
-                    usage += self.cmd_node.main_splittor + f"({self.prm_keys[i].name})"
+                    usage += self.cmd_node.main_splitter + f"({self.prm_keys[i].name})"
 
                 ret.append(usage.strip())
 
@@ -113,9 +109,8 @@ class CommandFunction:
 
 
 class CommandNode:
-    # TEST: Test all bot commands by executing command functions
     def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
-                 is_root=False, splittors=None, prefix=None, parent=None, case_insensitive=True):
+                 is_root=False, splitters=None, prefix=None, parent=None, case_insensitive=True):
         if codes:
             self._codes = CommandNode.parse_code(codes)
         else:
@@ -123,17 +118,17 @@ class CommandNode:
                 raise ValueError(f"`codes` cannot be `None` if the command node is not root. "
                                  f"(Command Node: {self.__class__.__name__})")
 
-        if is_root and (not splittors or not prefix):
-            raise ValueError("`splittors` and `prefix` must be specified if the command node is root.")
+        if is_root and (not splitters or not prefix):
+            raise ValueError("`splitters` and `prefix` must be specified if the command node is root.")
 
-        if not is_root and (splittors or prefix):
-            raise ValueError("Specify `splittors` and `prefix` only when the node is root.")
+        if not is_root and (splitters or prefix):
+            raise ValueError("Specify `splitters` and `prefix` only when the node is root.")
 
         self._name = name
         self._description = description
         self._brief_description = brief_description or description
         self._is_root = is_root
-        self._splittors = splittors
+        self._splitters = splitters
         self._prefix = prefix
         self._order_idx = order_idx or 0
         self._parent = parent
@@ -154,15 +149,15 @@ class CommandNode:
         return self._is_root
 
     @property
-    def splittors(self) -> List[str]:
-        return self._splittors
+    def splitters(self) -> List[str]:
+        return self._splitters
 
     @property
-    def main_splittor(self) -> str:
+    def main_splitter(self) -> str:
         if self.is_root:
-            return self._splittors[0]
+            return self._splitters[0]
         elif self.parent:
-            return self.parent.main_splittor
+            return self.parent.main_splitter
         else:
             raise ValueError(
                 "Invalid node. Parent is not available while this node is not the root. "
@@ -221,26 +216,26 @@ class CommandNode:
 
         while current:
             if current.is_root:
-                s = current.prefix + current.main_splittor + s
+                s = current.prefix + current.main_splitter + s
                 break
             else:
-                s = current.main_splittor + s
+                s = current.main_splitter + s
                 s = current.main_cmd_code + s
 
             current = current.parent
 
-        s = s[:-len(self.main_splittor)]
+        s = s[:-len(self.main_splitter)]
 
         return s
 
     def _get_usage_all_code_(self, node, suffix):
         if node.is_root:
-            return [str(node.prefix + node.main_splittor + suffix)]
+            return [str(node.prefix + node.main_splitter + suffix)]
         else:
             ret = []
 
             for code in node.command_codes:
-                ret.extend(self._get_usage_all_code_(node.parent, code + node.main_splittor + suffix))
+                ret.extend(self._get_usage_all_code_(node.parent, code + node.main_splitter + suffix))
 
             return ret
 
@@ -364,7 +359,7 @@ class CommandNode:
             return None
 
     @staticmethod
-    def _split_args_(s: str, splittor: str, arg_count: int) -> List[str]:
+    def _split_args_(s: str, splitter: str, arg_count: int) -> List[str]:
         if not s:
             return []
 
@@ -376,8 +371,8 @@ class CommandNode:
             return c_ in ("'", "\"", "“", "”")
 
         for idx, c in enumerate(s):
-            is_splittor = c == splittor
-            if (not in_quote and is_splittor) or (in_quote and is_quote(c)):
+            is_splitter = c == splitter
+            if (not in_quote and is_splitter) or (in_quote and is_quote(c)):
                 ret.append(proc_s)
 
                 if arg_count != -1 and len(ret) >= arg_count:
@@ -386,9 +381,9 @@ class CommandNode:
                 proc_s = ""
             elif is_quote(c):
                 in_quote = True
-            elif not(not in_quote and is_splittor):
+            elif not(not in_quote and is_splitter):
                 """
-                In quote, is splittor, append string
+                In quote, is splitter, append string
                 
                 0 0 1
                 0 1 0
@@ -407,10 +402,10 @@ class CommandNode:
         return [arg.strip() for arg in args_list if arg]
 
     @staticmethod
-    def _merge_overlength_args_(args_list: List[str], splittor: str, max_count: int):
+    def _merge_overlength_args_(args_list: List[str], splitter: str, max_count: int):
         if 0 < max_count < len(args_list):
             idx = max_count - 1
-            args_list[idx] = splittor.join(args_list[idx:])
+            args_list[idx] = splitter.join(args_list[idx:])
 
         if max_count > 0:
             return args_list[:max_count]
@@ -418,17 +413,17 @@ class CommandNode:
             return args_list
 
     def parse_args(
-            self, e: TextMessageEventObject, splittor, max_arg_count: int = None,
+            self, e: TextMessageEventObject, splitter, max_arg_count: int = None,
             args: List[str] = None, is_sub=False) \
             -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
         if args is None:
-            args = self._split_args_(e.content, splittor, max_arg_count)
+            args = self._split_args_(e.content, splitter, max_arg_count)
             args = self._sanitize_args_(args)
 
-        args = self._merge_overlength_args_(args, splittor, max_arg_count)
+        args = self._merge_overlength_args_(args, splitter, max_arg_count)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
@@ -468,7 +463,7 @@ class CommandNode:
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
-                return cmd_node.parse_args(e, splittor, cmd_node.max_arg_count, args=cmd_args, is_sub=True)
+                return cmd_node.parse_args(e, splitter, cmd_node.max_arg_count, args=cmd_args, is_sub=True)
 
         if is_sub:
             return [HandledMessageEventText(
@@ -510,18 +505,18 @@ class CommandHandler:
         # Remove prefix from the string content
         e.content = e.content[len(self._root.prefix):]
 
-        # Check what splittor to apply
-        splittor = None
-        for spltr in self._root.splittors:
+        # Check what splitter to apply
+        splitter = None
+        for spltr in self._root.splitters:
             if e.content.startswith(spltr):
-                splittor = spltr
+                splitter = spltr
                 break
 
-        if splittor:
-            # Remove splittor from the string content
-            e.content = e.content[len(splittor):]
+        if splitter:
+            # Remove splitter from the string content
+            e.content = e.content[len(splitter):]
 
             # Parse the command and return the response
-            return self._root.parse_args(e, splittor)
+            return self._root.parse_args(e, splitter)
         else:
             return []

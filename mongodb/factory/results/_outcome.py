@@ -3,8 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
-# OPTIMIZE: Integrate outcome
-
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     @property
     def code_prefix(self) -> str:

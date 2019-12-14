@@ -62,8 +62,6 @@ class UserProfileManager(BaseCollection):
 
         return model
 
-    # TODO: User Profile: user_detach_profile and delete
-
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
@@ -159,17 +157,11 @@ class ProfileDataManager(BaseCollection):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
 
-    # TODO: User Profile: Ensure mod/admin promotable if the mod/admin to be demoted is the last
-    # TODO: User Profile: Custom permission profile creation (name and color changable only) - create then change
-
 
 class PermissionPromotionRecordHolder(BaseCollection):
     database_name = DB_NAME
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
-
-    # TODO: User Profile: Profile Promotion - Keeps the promo record for a short period
-    # TODO: User Profile: Profile Promotion - Promote for any role who needs promotion or direct assignment
 
 
 class ProfileManager:

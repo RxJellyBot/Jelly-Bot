@@ -39,10 +39,14 @@ class Discord(PlatformConfig):
     max_content_lines = System.MaxSendContentLines
 
 
+class Website:
+    NewRegisterThresholdDays = 5
+
+
 class AutoReply:
     MaxResponses = 5
     MaxContentLength = System.MaxSendContentLength
-    TagSplittor = "|"
+    TagSplitter = "|"
     CaseInsensitive = True
     BypassMultilineCDThresholdSeconds = 20
 
@@ -94,10 +98,10 @@ class ExecodeManager:
 
 class Bot:
     Prefix = "JC"
-    Splittors = [" ", "\n"]
+    Splitters = [" ", "\n"]
 
-    RandomChoiceSplittor = "  "
-    RandomChoiceWeightSplittor = " "
+    RandomChoiceSplitter = "  "
+    RandomChoiceWeightSplitter = " "
     RandomChoiceOptionLimit = 20
     RandomChoiceCountLimit = 300
 

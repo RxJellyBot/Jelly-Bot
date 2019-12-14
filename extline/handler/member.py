@@ -10,7 +10,6 @@ __all__ = ["handle_member_main"]
 
 
 def handle_member_join(request, event, destination):
-    # TODO: Group Management: Welcome Message
     for user in event.joined.members:
         uid = user.user_id
 
@@ -25,7 +24,6 @@ def handle_member_join(request, event, destination):
 
 
 def handle_member_left(request, event, destination):
-    # TODO: Group Management: Leave Message
     for user in event.left.members:
         uid = user.user_id
 

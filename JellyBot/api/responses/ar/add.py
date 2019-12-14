@@ -89,7 +89,7 @@ class AutoReplyAddBaseResponse(
         if self._tags:
             # Tag string to array
             # noinspection PyUnresolvedReferences
-            tags = self._tags.split(systemconfig.AutoReply.TagSplittor)
+            tags = self._tags.split(systemconfig.AutoReply.TagSplitter)
             tag_ids = []
 
             for tag in tags:
