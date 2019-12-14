@@ -80,8 +80,6 @@ class HandledEventsHolderPlatform:
                     self.to_site.append((ToSiteReason.FORCED_ONSITE, e.content))
                     continue
                 elif not e.bypass_multiline_check and len(self.to_send) > config_class.max_content_lines:
-                    # TEST: Test if bypass multiline check is working. Setup an auto-reply with 20+ Line and trigger it.
-                    #   Content should be displayed directly if working properly.
                     self.to_site.append((ToSiteReason.TOO_MANY_LINES, e.content))
                     continue
 

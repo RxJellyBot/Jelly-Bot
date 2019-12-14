@@ -7,7 +7,7 @@
             <th scope="col">#</th>
             <th scope="col">{% trans "User Name" %}</th>
             <th scope="col">{% trans "Message Count" %}</th>
-            <th scope="col">{% trans "Count %" %}</th>
+            <th scope="col">{% trans "Ratio %" %}</th>
         </tr>
         </thead>
         <tbody>
@@ -18,7 +18,7 @@
                 <td class="align-middle text-center h5 font-weight-normal">{{ entry.message_count }}</td>
                 <td class="align-middle text-center">
                     <code class="h6">
-                        {{ entry.percent_str }}
+                        {{ entry.ratio_pct_str }}
                     </code>
                 </td>
             </tr>

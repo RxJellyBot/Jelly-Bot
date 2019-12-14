@@ -16,7 +16,6 @@ class ExecodeCompletor:
         action = execode_entry.action_type
         xparams = ExecodeParameterCollator.collate_parameters(Execode(action), xparams)
 
-        # TEST: Test Execodes
         if action == Execode.AR_ADD:
             return ExecodeCompletor._excde_ar_add_(execode_entry, xparams)
         elif action == Execode.REGISTER_CHANNEL:

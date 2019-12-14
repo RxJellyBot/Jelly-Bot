@@ -10,12 +10,11 @@ from ._base import Model, ModelDefaultValueExt
 
 
 class ChannelConfigModel(Model):
-    # TODO: Channel Config: Turn on/off features (Enable*) by votes if no mod/admin (% of 5 days active member)
-    # TODO: Channel Config: Vote = 0 means no promo
-
     WITH_OID = False
 
+    # Votes needed to promote a member to be moderator
     VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod)
+    # Votes needed to promote a member to be admin
     VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
     EnableAutoReply = BooleanField("e-ar", default=True)
     EnableTimer = BooleanField("e-tmr", default=True)

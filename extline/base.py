@@ -17,10 +17,6 @@ if not line_secret:
 line_parser = WebhookParser(line_secret)
 
 
-# TODO: Message: No lock - set timeout for message handle (Needs multithread)
-#  message -> (60+ sec) -> response: "OVERTIME, content stored at ..."
-#  https://stackoverflow.com/a/48478856
-
 def line_handle_event(request, body, signature):
     payload = line_parser.parse(body, signature, as_payload=True)
 

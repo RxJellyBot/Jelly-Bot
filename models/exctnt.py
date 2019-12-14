@@ -36,8 +36,6 @@ class ExtraContentHTMLTransformer:
 
     @staticmethod
     def _trans_ex_message_(model: ExtraContentModel) -> str:
-        # TODO: Extra Content: Use the design of this instead of the current one
-        #   https://getbootstrap.com/docs/4.3/components/scrollspy
         if model.content and len(model.content) > 0:
             tab_list: List[str] = []
             tab_content: List[str] = []

@@ -17,7 +17,7 @@ __all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr"]
 
 
 cmd_root = CommandNode(
-    is_root=True, splittors=Bot.Splittors, prefix=Bot.Prefix, case_insensitive=Bot.CaseInsensitive)
+    is_root=True, splitters=Bot.Splitters, prefix=Bot.Prefix, case_insensitive=Bot.CaseInsensitive)
 cmd_root.attach_child_node(cmd_trfm)
 cmd_root.attach_child_node(cmd_id)
 cmd_root.attach_child_node(cmd_uintg)
@@ -52,7 +52,7 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
         "C\n"
         "```\n"
         "\n"
-        "Additionally, you can now use **single space** as the command splittor.\n"
+        "Additionally, you can now use **single space** as the command splitter.\n"
         "For parameters that contains any spaces, "
         "use double quotation mark (`\"`) to wrap it. Example using the above command: `JC AA AR \"A B\" C`.\n"
         "For more command usage, visit {}.").format(HostUrl)

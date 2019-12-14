@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
+from extutils.dt import now_utc_aware, t_delta_str
 from JellyBot import keys
 from JellyBot.views import render_template
 from JellyBot.components.mixin import LoginRequiredMixin
@@ -17,4 +18,5 @@ class AccountMainPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         return render_template(
             self.request, _("Account Home"), "account/main.html",
             {"root_data": u_data.model, "api_user_data": u_data.model_api,
-             "execode_list": excde_list, "onplat_user_data_list": u_data.model_onplat_list})
+             "execode_list": excde_list, "onplat_user_data_list": u_data.model_onplat_list,
+             "reg_time_str": t_delta_str(now_utc_aware() - u_data.model.id.generation_time)})

@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from flags import PermissionCategory, PermissionCategoryDefault
 from models import Model, ChannelModel, ModelDefaultValueExt
-from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField
+from models.field import ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField, IntegerField
 
 
 class ChannelProfileModel(Model):
@@ -14,7 +14,7 @@ class ChannelProfileModel(Model):
     Color = ColorField("col")
     IsMod = BooleanField("m")
     IsAdmin = BooleanField("a")
-    NeedsPromo = BooleanField("promo")
+    PromoVote = IntegerField("promo")
     Permission = DictionaryField("perm", default=PermissionCategoryDefault.get_default_preset_dict(), allow_none=False)
 
     def pre_iter(self):

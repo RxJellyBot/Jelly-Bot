@@ -13,7 +13,7 @@ from extutils.emailutils import MailSender
 from flags import Platform
 from extdiscord import handle_discord_main
 from extdiscord.logger import DISCORD
-from mongodb.factory import ChannelManager, ChannelCollectionManager
+from mongodb.factory import ChannelManager, ChannelCollectionManager, RootUserManager, ProfileManager
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
@@ -111,11 +111,21 @@ class DiscordClient(Client):
                 DISCORD.logger.warning(warn_txt)
                 MailSender.send_email_async(warn_txt, subject="Discord guild channel name update failed")
 
+    # noinspection PyMethodMayBeStatic
     async def on_member_join(self, member: Member):
-        pass
+        udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
+        cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
+        if udata_result.success and cdata:
+            ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
+
+    # noinspection PyMethodMayBeStatic
     async def on_member_remove(self, member: Member):
-        pass
+        udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
+        cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
+
+        if udata_result.success and cdata:
+            ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
 
     async def on_guild_join(self, guild: Guild):
         pass

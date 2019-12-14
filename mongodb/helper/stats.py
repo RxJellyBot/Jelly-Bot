@@ -3,21 +3,20 @@ from dataclasses import dataclass
 from typing import List, Optional, Union
 
 from bson import ObjectId
-from pymongo.command_cursor import CommandCursor
 
 from models import ChannelModel, ChannelCollectionModel, OID_KEY
-from mongodb.factory import RootUserManager, MessageRecordStatisticsManager
+from mongodb.factory import RootUserManager, MessageRecordStatisticsManager, ProfileManager
 
 
 @dataclass
 class UserMessageStatsEntry:
     user_name: str
     message_count: int
-    message_percentage: float
+    message_ratio: float
 
     @property
-    def percent_str(self) -> str:
-        return f"{self.message_percentage:.02%}"
+    def ratio_pct_str(self) -> str:
+        return f"{self.message_ratio:.02%}"
 
 
 @dataclass
@@ -44,13 +43,16 @@ class UserMessageRanking:
 
 class MessageStatsDataProcessor:
     @staticmethod
-    def _get_user_msg_stats_(msg_rec: CommandCursor, ch_data: ChannelModel = None) -> UserMessageStats:
+    def _get_user_msg_stats_(msg_rec_data: list, ch_data: ChannelModel = None) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
 
-        msg_rec = {d[OID_KEY]: d["count"] for d in list(msg_rec)}
+        msg_rec_d = {d[OID_KEY]: d["count"] for d in msg_rec_data}
+        msg_rec = {}
+        for member in ProfileManager.get_channel_members(ch_data.id, available_only=True):
+            msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, 0)
 
         if msg_rec:
-            total: int = sum(msg_rec.values())
+            total: int = max(msg_rec.values())
 
             # Obtained from https://stackoverflow.com/a/40687012/11571888
             # Workers cannot be too big as it will suck out the connections of MongoDB Atlas
@@ -69,10 +71,10 @@ class MessageStatsDataProcessor:
 
                     entries.append(
                         UserMessageStatsEntry(
-                            user_name=result.user_name, message_count=count, message_percentage=count / total)
+                            user_name=result.user_name, message_count=count, message_ratio=count / total)
                     )
 
-            return UserMessageStats(member_stats=entries, msg_count=total)
+            return UserMessageStats(member_stats=entries, msg_count=sum(msg_rec.values()))
         else:
             return UserMessageStats(member_stats=[], msg_count=0)
 

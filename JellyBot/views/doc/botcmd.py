@@ -16,10 +16,10 @@ class BotCommandMainView(View):
             request, _("Bot Commands List"), "doc/botcmd_main.html",
             {
                 "cmd_prefix": cmd_root.prefix,
-                "cmd_splittors_html":
+                "cmd_splitters_html":
                     "<b>" +
                     f"</b>&nbsp;{_('or')}&nbsp;<b>".join(
-                        [str(char_description(spl)) for spl in cmd_root.splittors]) +
+                        [str(char_description(spl)) for spl in cmd_root.splitters]) +
                     "</b>",
                 "cmd_nodes": cmd_root.child_nodes,
                 "case_insensitive": cmd_root.case_insensitive,
