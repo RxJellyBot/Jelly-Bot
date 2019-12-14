@@ -11,25 +11,31 @@ __all__ = ["handle_member_main"]
 
 def handle_member_join(request, event, destination):
     # TODO: Group Management: Welcome Message
-    udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, LineApiUtils.get_user_id(event))
-    cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
+    for user in event.joined.members:
+        uid = user.user_id
 
-    if udata_result.success and cdata:
-        ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
+        udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, LineApiUtils.get_user_id(event))
+        cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "A user joined the group.",
+        if udata_result.success and cdata:
+            ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
+
+    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Join Group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
 def handle_member_left(request, event, destination):
     # TODO: Group Management: Leave Message
-    udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, LineApiUtils.get_user_id(event))
-    cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
+    for user in event.left.members:
+        uid = user.user_id
 
-    if udata_result.success and cdata:
-        ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
+        udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
+        cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "A user left the group.",
+        if udata_result.success and cdata:
+            ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
+
+    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Left Group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
