@@ -10,7 +10,7 @@ from JellyBot.components import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel, ChannelCollectionModel
-from mongodb.factory import ChannelManager, ProfileManager, ChannelCollectionManager
+from mongodb.factory import ChannelManager, ProfileManager, ChannelCollectionManager, BotFeatureUsageDataManager
 from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
 
 
@@ -44,7 +44,9 @@ class ChannelInfoView(TemplateResponseMixin, View):
                     "user_message_data7d": msgdata_7d.member_stats,
                     "msg_count7d": msgdata_7d.msg_count,
                     "manageable": bool(
-                        ProfileManager.get_user_profiles(channel_oid, get_root_oid(request)))
+                        ProfileManager.get_user_profiles(channel_oid, get_root_oid(request))),
+                    "bot_usage_7d": BotFeatureUsageDataManager.get_channel_usage(channel_oid, 144),
+                    "bot_usage_all": BotFeatureUsageDataManager.get_channel_usage(channel_oid)
                 },
                 nav_param=kwargs)
         else:
