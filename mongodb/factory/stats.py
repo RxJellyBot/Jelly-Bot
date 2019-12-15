@@ -1,10 +1,9 @@
-from datetime import datetime, timezone, timedelta, tzinfo
+from datetime import datetime, tzinfo
 from threading import Thread
 from typing import Any, Optional, Union, List
 
 import pymongo
 from bson import ObjectId
-from pymongo.command_cursor import CommandCursor
 
 from extutils.dt import now_utc_aware
 from extutils.locales import UTC
@@ -12,7 +11,7 @@ from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
-    HourlyIntervalAverageMessageResult, DailyMessageResult
+    HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -74,17 +73,6 @@ class MessageRecordStatisticsManager(BaseCollection):
         else:
             raise ValueError("Must be either `ObjectId` or `List[ObjectId]`.")
 
-    @staticmethod
-    def _hours_within_filter_(hours_within: Optional[int] = None):
-        if hours_within:
-            return {
-                OID_KEY: {
-                    "$gt": ObjectId.from_datetime(
-                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
-                }}
-
-        return {}
-
     def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
         aggr = list(self.aggregate([
             {"$match": {
@@ -106,7 +94,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
             -> list:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -124,7 +112,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         pipeline = [
             {"$match": match_d},
@@ -153,7 +141,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
             DailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         pipeline = [
             {"$match": match_d},
@@ -185,6 +173,24 @@ class BotFeatureUsageDataManager(BaseCollection):
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
         if feature_used != BotFeature.UNDEFINED:
             self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
+
+    def get_channel_usage(self, channel_oid: ObjectId, hours_within: int = None, incl_not_used: bool = False) \
+            -> BotFeatureUsageResult:
+        filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
+
+        if hours_within:
+            self._attach_hours_within_(filter_, hours_within)
+
+        pipeline = [
+            {"$match": filter_},
+            {"$group": {
+                OID_KEY: "$" + BotFeatureUsageModel.Feature.key,
+                BotFeatureUsageResult.KEY: {"$sum": 1}}
+            },
+            {"$sort": {BotFeatureUsageResult.KEY: pymongo.DESCENDING}}
+        ]
+
+        return BotFeatureUsageResult(list(self.aggregate(pipeline)), incl_not_used)
 
 
 _inst = APIStatisticsManager()

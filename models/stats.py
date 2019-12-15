@@ -1,14 +1,13 @@
 import math
+from collections import namedtuple
 from datetime import datetime, timedelta
 
-from django.utils import timezone
-
+from flags import BotFeature
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
 from models import Model, ModelDefaultValueExt, OID_KEY
-from extutils.utils import rotate_list
 
 
 class APIStatisticModel(Model):
@@ -87,3 +86,20 @@ class DailyMessageResult:
         for data in cursor:
             self.date_label.append(data[OID_KEY])
             self.date_count.append(data[DailyMessageResult.KEY])
+
+
+class BotFeatureUsageResult:
+    KEY = "count"
+
+    def __init__(self, cursor, incl_not_used: bool):
+        FeatureUsageEntry = namedtuple("FeatureUsageEntry", ["feature_name", "count"])
+
+        self.data = [
+            FeatureUsageEntry(feature_name=BotFeature.cast(d[OID_KEY]).key, count=d[BotFeatureUsageResult.KEY])
+            for d in cursor
+        ]
+
+        if incl_not_used:
+            diff = {feature for feature in BotFeature}.difference({BotFeature.cast(d[OID_KEY]) for d in cursor})
+            for diff_ in diff:
+                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0))

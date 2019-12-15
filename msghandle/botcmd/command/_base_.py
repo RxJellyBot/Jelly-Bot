@@ -384,7 +384,6 @@ class CommandNode:
             elif not(not in_quote and is_splitter):
                 """
                 In quote, is splitter, append string
-                
                 0 0 1
                 0 1 0
                 1 0 1

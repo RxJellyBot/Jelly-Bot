@@ -16,7 +16,7 @@ class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
 class WriteOutcome(BaseOutcome):
     """
     # SUCCESS
-    
+
     -2xx - Actually Inserted
         -201 - Inserted
 
@@ -173,10 +173,10 @@ class WriteOutcome(BaseOutcome):
 class GetOutcome(BaseOutcome):
     """
     # SUCCESS
- 
-    -2 - Already exists 
-    -1 - Inserted       
-        
+
+    -2 - Already exists
+    -1 - Inserted
+
     ================================
 
     # FAILED
@@ -355,7 +355,7 @@ class UpdateOutcome(BaseOutcome):
     ================================
 
     # FAILED
-    
+
     1xx - Problems related to Model
         101 - Model not found
 

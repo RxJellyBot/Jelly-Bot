@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-14 02:37-0600\n"
-"PO-Revision-Date: 2019-12-14 02:38-0600\n"
+"PO-Revision-Date: 2019-12-14 18:54-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2053,27 +2053,27 @@ msgstr "頻道組詳細資訊網址: {}{}"
 
 #: .\msghandle\botcmd\command\id.py:60
 msgid "Current Channel Message Count Ranking in 1 Day - {}"
-msgstr "所在頻道訊息數量排行(1日) - {}"
+msgstr "所在頻道訊息量排行(1日) - {}"
 
 #: .\msghandle\botcmd\command\id.py:64
 msgid "Current Channel Message Count Ranking in 7 Days - {}"
-msgstr "所在頻道訊息數量排行(7日) - {}"
+msgstr "所在頻道訊息量排行(7日) - {}"
 
 #: .\msghandle\botcmd\command\id.py:69
 msgid "Channel Collection Message Count Ranking in 1 Day - {}"
-msgstr "所在頻道組訊息數量排行(1日) - {}"
+msgstr "所在頻道組訊息量排行(1日) - {}"
 
 #: .\msghandle\botcmd\command\id.py:73
 msgid "Channel Collection Message Count Ranking in 7 Days - {}"
-msgstr "所在頻道組訊息數量排行(7日) - {}"
+msgstr "所在頻道組訊息量排行(7日) - {}"
 
 #: .\msghandle\botcmd\command\id.py:87
 msgid "Top {} Message Count in 7 Days in this channel:"
-msgstr "所在頻道的訊息數量前{}名(7日):"
+msgstr "所在頻道的訊息量前{}名(7日):"
 
 #: .\msghandle\botcmd\command\id.py:107
 msgid "Top {} Message Count in 7 Days in this channel collection:"
-msgstr "所在頻道組的訊息數量前{}名(7日):"
+msgstr "所在頻道組的訊息量前{}名(7日):"
 
 #: .\msghandle\botcmd\command\rdm.py:13
 msgid "Random"
@@ -2539,16 +2539,16 @@ msgstr "管理"
 
 #: .\templates\account\channel\list_table.html:29
 msgid "Check Info"
-msgstr "查閱資訊"
+msgstr "資訊"
 
 #: .\templates\account\channel\list_table.html:33
 msgid "Check Profiles"
-msgstr "查閱身分組"
+msgstr "身分組"
 
 #: .\templates\account\channel\list_table.html:37
 #: .\templates\info\channel\search.html:71
 msgid "Check ID"
-msgstr "查閱ID"
+msgstr "ID"
 
 #: .\templates\account\channel\list_table.html:57
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
@@ -3495,7 +3495,7 @@ msgstr "訊息統計"
 
 #: .\templates\info\channel\main.html:127 .\templates\info\chcoll\main.html:83
 msgid "Message Count in 1 Day"
-msgstr "訊息數量(1日)"
+msgstr "訊息量(1日)"
 
 #: .\templates\info\channel\main.html:129
 #: .\templates\info\channel\main.html:138 .\templates\info\chcoll\main.html:85
@@ -3505,7 +3505,7 @@ msgstr "總訊息量: "
 
 #: .\templates\info\channel\main.html:136 .\templates\info\chcoll\main.html:92
 msgid "Message Count in 7 Days"
-msgstr "訊息數量(7日)"
+msgstr "訊息量(7日)"
 
 #: .\templates\info\channel\search.html:17
 msgid ""
@@ -3540,11 +3540,11 @@ msgstr "子頻道"
 #: .\templates\info\components\msg_stats_daily.html:12
 #: .\templates\info\components\msg_stats_table.html:9
 msgid "Message Count"
-msgstr "訊息數量"
+msgstr "訊息量"
 
 #: .\templates\info\components\msg_stats_intvflow.html:12
 msgid "Message Count / Day"
-msgstr "訊息數量 / 日"
+msgstr "訊息量 / 日"
 
 #: .\templates\info\components\msg_stats_table.html:8
 msgid "User Name"
