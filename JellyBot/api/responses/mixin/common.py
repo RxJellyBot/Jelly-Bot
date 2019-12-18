@@ -49,8 +49,7 @@ class HandlePlatformMixin(BaseMixin, ABC):
             self._platform = self._flag[k] = Platform(int(self._platform))
 
     def pass_condition(self) -> bool:
-        return super().pass_condition() and \
-               self._platform is not None
+        return super().pass_condition() and self._platform is not None
 
 
 class HandleChannelOidMixin(HandleChannelMixin, HandlePlatformMixin, ABC):

@@ -1,18 +1,17 @@
-from datetime import datetime, timezone, timedelta, tzinfo
+from datetime import datetime, tzinfo
 from threading import Thread
 from typing import Any, Optional, Union, List
 
 import pymongo
 from bson import ObjectId
-from pymongo.command_cursor import CommandCursor
 
-from extutils.dt import now_utc_aware
 from extutils.locales import UTC
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
-    HourlyIntervalAverageMessageResult, DailyMessageResult
+    HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult, \
+    HourlyResult, BotFeaturePerUserUsageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -74,17 +73,6 @@ class MessageRecordStatisticsManager(BaseCollection):
         else:
             raise ValueError("Must be either `ObjectId` or `List[ObjectId]`.")
 
-    @staticmethod
-    def _hours_within_filter_(hours_within: Optional[int] = None):
-        if hours_within:
-            return {
-                OID_KEY: {
-                    "$gt": ObjectId.from_datetime(
-                        datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(hours=hours_within))
-                }}
-
-        return {}
-
     def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
         aggr = list(self.aggregate([
             {"$match": {
@@ -106,7 +94,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
             -> list:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -124,7 +112,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         pipeline = [
             {"$match": match_d},
@@ -135,25 +123,15 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
 
-        if hours_within:
-            days_collected = hours_within / 24
-        else:
-            oldest = self.find_one(match_d, sort=[(OID_KEY, pymongo.ASCENDING)])
-
-            if oldest:
-                # Replace to let both be Offset-naive
-                days_collected = (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
-            else:
-                days_collected = HourlyIntervalAverageMessageResult.DAYS_NONE
-
-        return HourlyIntervalAverageMessageResult(list(self.aggregate(pipeline)), days_collected)
+        return HourlyIntervalAverageMessageResult(
+            list(self.aggregate(pipeline)), HourlyResult.data_days_collected(self, match_d, hours_within))
 
     def daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
             tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
             DailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        match_d.update(**self._hours_within_filter_(hours_within))
+        self._attach_hours_within_(match_d, hours_within)
 
         pipeline = [
             {"$match": match_d},
@@ -185,6 +163,82 @@ class BotFeatureUsageDataManager(BaseCollection):
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
         if feature_used != BotFeature.UNDEFINED:
             self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
+
+    # Statistics
+
+    @param_type_ensure
+    def get_channel_usage(self, channel_oid: ObjectId, hours_within: int = None, incl_not_used: bool = False) \
+            -> BotFeatureUsageResult:
+        filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
+
+        self._attach_hours_within_(filter_, hours_within)
+
+        pipeline = [
+            {"$match": filter_},
+            {"$group": {
+                OID_KEY: "$" + BotFeatureUsageModel.Feature.key,
+                BotFeatureUsageResult.KEY: {"$sum": 1}
+            }},
+            {"$sort": {BotFeatureUsageResult.KEY: pymongo.DESCENDING}}
+        ]
+
+        return BotFeatureUsageResult(list(self.aggregate(pipeline)), incl_not_used)
+
+    @param_type_ensure
+    def get_channel_hourly_avg(
+            self, channel_oid: ObjectId, hours_within: int = None, incl_not_used: bool = False,
+            tzinfo_: tzinfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
+        filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
+
+        self._attach_hours_within_(filter_, hours_within)
+
+        pipeline = [
+            {"$match": filter_},
+            {"$group": {
+                OID_KEY: {
+                    BotFeatureHourlyAvgResult.KEY_FEATURE:
+                        "$" + BotFeatureUsageModel.Feature.key,
+                    BotFeatureHourlyAvgResult.KEY_HR:
+                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}}
+                },
+                BotFeatureHourlyAvgResult.KEY_COUNT: {"$sum": 1}
+            }}
+        ]
+
+        return BotFeatureHourlyAvgResult(
+            list(self.aggregate(pipeline)),
+            incl_not_used,
+            HourlyResult.data_days_collected(self, filter_, hours_within))
+
+    @param_type_ensure
+    def get_channel_per_user_usage(
+            self, channel_oid: ObjectId, hours_within: int = None, member_oid_list: Optional[List[ObjectId]] = None) \
+            -> BotFeaturePerUserUsageResult:
+        filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
+
+        if member_oid_list:
+            filter_[BotFeatureUsageModel.SenderRootOid.key] = {"$in": member_oid_list}
+
+        self._attach_hours_within_(filter_, hours_within)
+
+        pipeline = [
+            {"$match": filter_},
+            {"$group": {
+                OID_KEY: {
+                    BotFeaturePerUserUsageResult.KEY_FEATURE:
+                        "$" + BotFeatureUsageModel.Feature.key,
+                    BotFeaturePerUserUsageResult.KEY_UID:
+                        "$" + BotFeatureUsageModel.SenderRootOid.key
+                },
+                BotFeaturePerUserUsageResult.KEY_COUNT: {"$sum": 1}
+            }},
+            {"$sort": {
+                f"{OID_KEY}.{BotFeaturePerUserUsageResult.KEY_UID}": pymongo.ASCENDING,
+                f"{OID_KEY}.{BotFeaturePerUserUsageResult.KEY_FEATURE}": pymongo.ASCENDING
+            }}
+        ]
+
+        return BotFeaturePerUserUsageResult(list(self.aggregate(pipeline)))
 
 
 _inst = APIStatisticsManager()

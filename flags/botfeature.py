@@ -37,6 +37,10 @@ class BotFeature(FlagDoubleEnum):
     2 - Image
         200 - imgur
             2001 - imgur image upload
+
+    3 - Sticker
+        300 - LINE Sticker
+            3001 - Get info
     """
     @classmethod
     def default(cls):
@@ -92,3 +96,6 @@ class BotFeature(FlagDoubleEnum):
 
     IMG_IMGUR_UPLOAD = \
         2001, _("Image / imgur upload"), _("Upload image to imgur.com.")
+
+    STK_LINE_GET_INFO = \
+        2001, _("Sticker / LINE / Get Info"), _("Get the info of the sticker (mostly IDs).")

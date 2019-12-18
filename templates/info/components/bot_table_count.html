@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header" style="max-height: 25rem">
+    <table class="table table-hover table-bordered table-bordered mb-0">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">{% trans "Feature" %}</th>
+            <th scope="col">{% trans "Count" context "Usage count" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in bot_usage_data.data %}
+            <tr>
+                <td class="align-middle text-center">{{ forloop.counter }}</td>
+                <td class="align-middle text-center">{{ entry.feature_name }}</td>
+                <td class="align-middle text-center h5 font-weight-normal">{{ entry.count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

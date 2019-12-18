@@ -17,10 +17,10 @@ class BotCommandMainView(View):
             {
                 "cmd_prefix": cmd_root.prefix,
                 "cmd_splitters_html":
-                    "<b>" +
-                    f"</b>&nbsp;{_('or')}&nbsp;<b>".join(
-                        [str(char_description(spl)) for spl in cmd_root.splitters]) +
-                    "</b>",
+                    "<b>"
+                    + f"</b>&nbsp;{_('or')}&nbsp;<b>".join(
+                        [str(char_description(spl)) for spl in cmd_root.splitters])
+                    + "</b>",
                 "cmd_nodes": cmd_root.child_nodes,
                 "case_insensitive": cmd_root.case_insensitive,
                 "case_insensitive_prefix": Bot.CaseInsensitivePrefix

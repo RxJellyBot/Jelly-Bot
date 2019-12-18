@@ -1,4 +1,5 @@
 # Optional Environment Variables
+
 ### `LOGGER`
 Logger(s) to be used and printed in the console. Log level can be specified.
 

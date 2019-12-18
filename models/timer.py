@@ -16,7 +16,7 @@ class TimerModel(Model):
     Keyword = TextField("k", default=ModelDefaultValueExt.Required)
     Title = TextField("t", default=ModelDefaultValueExt.Required)
     TargetTime = DateTimeField("tt", default=ModelDefaultValueExt.Required)
-    DeletionTime = DateTimeField("del",default=ModelDefaultValueExt.Optional)
+    DeletionTime = DateTimeField("del", default=ModelDefaultValueExt.Optional)
     Countup = BooleanField("c", default=False)
     PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
     Notified = BooleanField("nt", default=False)

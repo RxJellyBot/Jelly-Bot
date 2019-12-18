@@ -9,7 +9,7 @@ from .execode import Execode, ExecodeCollationFailedReason, ExecodeCompletionOut
 # noinspection PyUnresolvedReferences
 from .apiact import APICommand
 # noinspection PyUnresolvedReferences
-from .result import *
+from .result import ModelValidityCheckResult
 # noinspection PyUnresolvedReferences
 from .msgtype import MessageType
 # noinspection PyUnresolvedReferences
