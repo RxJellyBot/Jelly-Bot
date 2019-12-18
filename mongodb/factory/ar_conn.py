@@ -1,12 +1,11 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Tuple, Optional, List
 
 import math
 import pymongo
 from bson import ObjectId
-from datetime import datetime
 
-from JellyBot.systemconfig import AutoReply, Database, DataQuery
+from JellyBot.systemconfig import AutoReply, Database, DataQuery, Bot
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
@@ -50,6 +49,22 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
     def has_access_to_pinned(channel_oid: ObjectId, user_oid: ObjectId):
         perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
         return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
+
+    def _delete_recent_module_(self, keyword):
+        """Delete modules which is created and marked inactive within `Bot.AutoReply.DeleteDataMins` minutes."""
+        now = now_utc_aware()
+
+        self.delete_many(
+            {
+                OID_KEY: {
+                    "$lt": ObjectId.from_datetime(now),
+                    "$gt": ObjectId.from_datetime(now - timedelta(minutes=Bot.AutoReply.DeleteDataMins))
+                },
+                AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
+                AutoReplyModuleModel.Active.key: False
+            },
+            collation=case_insensitive_collation if AutoReply.CaseInsensitive else None
+        )
 
     def add_conn_complete(
             self,
@@ -98,13 +113,17 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
                       MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid),
                       MatchPair(AutoReplyModuleModel.Active.key, True))
 
-            self.update_cache_db_async(q, self._remove_update_ops_(creator_oid))
+            self.update_cache_db_outcome(q, self._remove_update_ops_(creator_oid))
+            self._delete_recent_module_(keyword)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         model.clear_oid()
         outcome, ex = self.insert_one_model_cache(model)
+
+        if outcome.is_success:
+            self._delete_recent_module_(model.keyword.content)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 

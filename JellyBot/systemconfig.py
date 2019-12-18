@@ -116,6 +116,8 @@ class Bot:
 
         MaxContentResultLength = 100
 
+        DeleteDataMins = 3
+
     class Timer:
         AutoDeletionDays = 7
         NotifyWithinHours = 3

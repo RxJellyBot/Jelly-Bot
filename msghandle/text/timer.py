@@ -37,6 +37,9 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
             ))
 
     if not crs.empty:
+        if ret:
+            ret.append("-------------")
+
         now = now_utc_aware()
         ret.append(_("**{} timer(s) will time up in less than {} hrs!**").format(len(crs), Bot.Timer.NotifyWithinHours))
         ret.append("")
