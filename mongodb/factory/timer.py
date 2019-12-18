@@ -80,5 +80,23 @@ class TimerManager(BaseCollection):
 
         return ret
 
+    @param_type_ensure
+    def get_time_up(self, channel_oid: ObjectId) -> CursorWithCount:
+        now = now_utc_aware()
+
+        filter_ = {
+            TimerModel.ChannelOid.key: channel_oid,
+            TimerModel.TargetTime.key: {"$lt": now},
+            TimerModel.NotifiedExpired.key: False
+        }
+
+        ret = self \
+            .find_cursor_with_count(filter_, parse_cls=TimerModel)\
+            .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
+
+        self.update_many_async(filter_, {"$set": {TimerModel.NotifiedExpired.key: True}})
+
+        return ret
+
 
 _inst = TimerManager()

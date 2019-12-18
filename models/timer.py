@@ -20,6 +20,7 @@ class TimerModel(Model):
     Countup = BooleanField("c", default=False)
     PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
     Notified = BooleanField("nt", default=False)
+    NotifiedExpired = BooleanField("nt-e", default=False)
 
     @property
     def is_periodic(self) -> bool:
@@ -89,5 +90,9 @@ class TimerListResult:
                 ret.append(
                     _("{event} has ended (at {time})").format(
                         event=tmr.title, time=localtime(tmr.target_time, tzinfo)))
+
+        # Take out separator
+        if ret and ret[-1] == "":
+            ret = ret[:-1]
 
         return "\n".join(ret)
