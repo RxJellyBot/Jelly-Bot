@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-14 02:37-0600\n"
-"PO-Revision-Date: 2019-12-14 18:54-0600\n"
+"POT-Creation-Date: 2019-12-18 02:21-0600\n"
+"PO-Revision-Date: 2019-12-18 02:15-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -48,11 +48,11 @@ msgid ""
 "so the system dropped it."
 msgstr "因部分回覆種類找不到對應的回覆，故系統自動無視。"
 
-#: .\JellyBot\settings.py:176
+#: .\JellyBot\settings.py:175
 msgid "English"
 msgstr "英文"
 
-#: .\JellyBot\settings.py:177
+#: .\JellyBot\settings.py:176
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
@@ -133,12 +133,12 @@ msgstr "新增自動回覆"
 msgid "Auto-Reply Home"
 msgstr "自動回覆 - 首頁"
 
-#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:142
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:145
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:174
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:177
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -154,7 +154,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:170
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:173
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -163,7 +163,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:158
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:161
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -171,7 +171,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:156
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:159
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -179,7 +179,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:160
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:163
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -187,11 +187,11 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:162
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:165
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:145
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:148
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
@@ -244,15 +244,19 @@ msgstr ""
 msgid "Home Page"
 msgstr "首頁"
 
+#: .\JellyBot\views\info\botstats.py:87 .\JellyBot\views\nav.py:128
+msgid "Bot Usage Stats - {}"
+msgstr "機器人使用統計 - {}"
+
 #: .\JellyBot\views\info\channel.py:37
 msgid "Channel Info - {}"
 msgstr "頻道資訊 - {}"
 
-#: .\JellyBot\views\info\channel.py:65 .\templates\info\channel\search.html:9
+#: .\JellyBot\views\info\channel.py:67 .\templates\info\channel\search.html:9
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:35 .\JellyBot\views\nav.py:131
+#: .\JellyBot\views\info\chcoll.py:35 .\JellyBot\views\nav.py:134
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
@@ -260,7 +264,7 @@ msgstr "頻道組資訊 - {}"
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:24 .\JellyBot\views\nav.py:128
+#: .\JellyBot\views\info\profile.py:24 .\JellyBot\views\nav.py:131
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
@@ -329,31 +333,31 @@ msgstr "頻道"
 msgid "Channel - {}"
 msgstr "頻道 - {}"
 
-#: .\JellyBot\views\nav.py:139
+#: .\JellyBot\views\nav.py:142
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:149 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:152 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:154
+#: .\JellyBot\views\nav.py:157
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:166
+#: .\JellyBot\views\nav.py:169
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:168
+#: .\JellyBot\views\nav.py:171
 msgid "API Command"
 msgstr "API指令"
 
-#: .\JellyBot\views\nav.py:182
+#: .\JellyBot\views\nav.py:185
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:184 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:187 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
 
@@ -613,7 +617,7 @@ msgstr "權限分類"
 
 #: .\extutils\strtrans\type_trans.py:22 .\templates\account\main.html:73
 #: .\templates\ar\add-reg.html:68 .\templates\ar\add-reg.html:134
-#: .\templates\info\channel\main.html:82 .\templates\info\chcoll\main.html:47
+#: .\templates\info\channel\main.html:83 .\templates\info\chcoll\main.html:47
 msgid "Platform"
 msgstr "平台"
 
@@ -709,175 +713,183 @@ msgstr "LINE貼圖"
 msgid "Custom Signal"
 msgstr "自訂訊號"
 
-#: .\flags\botfeature.py:45
+#: .\flags\botfeature.py:49
 msgid "Undefined"
 msgstr "未定義"
 
-#: .\flags\botfeature.py:45
+#: .\flags\botfeature.py:49
 msgid "Undefined bot feature flag."
 msgstr "未定義的機器人功能。"
 
-#: .\flags\botfeature.py:48
+#: .\flags\botfeature.py:52
 msgid "Text / Auto Reply / Add"
 msgstr "文字 / 自動回覆 / 新增"
 
-#: .\flags\botfeature.py:48
+#: .\flags\botfeature.py:52
 msgid "Register an auto-reply module."
 msgstr "新增自動回覆組。"
 
-#: .\flags\botfeature.py:50
+#: .\flags\botfeature.py:54
 msgid "Text / Auto Reply / Delete"
 msgstr "文字 / 自動回覆 / 刪除"
 
-#: .\flags\botfeature.py:50
+#: .\flags\botfeature.py:54
 msgid "Delete an auto-reply module."
 msgstr "刪除自動回覆組。"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:56
 msgid "Text / Auto Reply / Add (Execode)"
 msgstr "文字 / 自動回覆 / 新增 (執行碼)"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:56
 msgid "Register an auto-reply module using Execode."
 msgstr "使用執行碼新增自動回覆組。"
 
-#: .\flags\botfeature.py:54
+#: .\flags\botfeature.py:58
 msgid "Text / Auto Reply / List (Usable)"
 msgstr "文字 / 自動回覆 / 列表 (可用)"
 
-#: .\flags\botfeature.py:54
+#: .\flags\botfeature.py:58
 msgid "List all the usable auto-reply modules."
 msgstr "列出所有可用的自動回覆組。"
 
-#: .\flags\botfeature.py:56
+#: .\flags\botfeature.py:60
 msgid "Text / Auto Reply / List (Keyword)"
 msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:57
+#: .\flags\botfeature.py:61
 msgid ""
 "List all the usable auto-reply modules which keyword includes the provided "
 "keyword."
 msgstr "列出所有含有提供的關鍵字的可用回覆組。"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Text / Auto Reply / Respond"
 msgstr "文字 / 自動回覆 / 回覆"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:66
 msgid "Text / Timer / Add"
 msgstr "文字 / 計時器 / 新增"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:66
 msgid "Add a timer."
 msgstr "新增一個計時器。"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:68
 msgid "Text / Timer / List (All)"
 msgstr "文字 / 計時器 / 列表 (全部)"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:68
 msgid "List all timers."
 msgstr "列出全部的計時器。"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Text / Timer / List (Keyword)"
 msgstr "文字 / 計時器 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Get the timer(s) with the designated keyword."
 msgstr "顯示關鍵字所對應的計時器。"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:73
 msgid "Text / Information / Check IDs"
 msgstr "文字 / 資訊 / 查看ID"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:73
 msgid "Check the ID of current channel and self."
 msgstr "查看自己和所在頻道的ID。"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:75
 msgid "Text / Information / Channel"
 msgstr "文字 / 資訊 / 頻道"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:75
 msgid "Check the channel info."
 msgstr "查閱頻道資訊。"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:77
 msgid "Text / Information / User"
 msgstr "文字 / 資訊 / 用戶"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:77
 msgid "Check the user info of self."
 msgstr "查閱自己的用戶資訊。"
 
-#: .\flags\botfeature.py:75
+#: .\flags\botfeature.py:79
 msgid "Text / Information / Help"
 msgstr "文字 / 資訊 / 幫助"
 
-#: .\flags\botfeature.py:75
+#: .\flags\botfeature.py:79
 msgid "Get help for how to use the bot and the related information."
 msgstr "查看此機器人的使用說明和相關資訊。"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:82
 msgid "Text / Transform / Newline"
 msgstr "文字 / 替換 / 換行字元"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:82
 msgid "Replace the real newline character to be the escaped character \\n."
 msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
 
-#: .\flags\botfeature.py:81
+#: .\flags\botfeature.py:85
 msgid "Text / Random / Choice (One)"
 msgstr "文字 / 隨機 / 選擇 (單個)"
 
-#: .\flags\botfeature.py:81
+#: .\flags\botfeature.py:85
 msgid "Randomly pick an option among the provided options."
 msgstr "隨機從提供的選項中選出一個選項。"
 
-#: .\flags\botfeature.py:83
+#: .\flags\botfeature.py:87
 msgid "Text / Random / Choice (Multi)"
 msgstr "文字 / 隨機 / 選擇 (多個)"
 
-#: .\flags\botfeature.py:84
+#: .\flags\botfeature.py:88
 msgid "Randomly pick an option among the provided options multiple times."
 msgstr "隨機從提供的選項中，根據指定的次數多次選擇選項。"
 
-#: .\flags\botfeature.py:87
+#: .\flags\botfeature.py:91
 msgid "Text / User Data Integration / Start"
 msgstr "文字 / 整合用戶資料 / 啟動"
 
-#: .\flags\botfeature.py:87
+#: .\flags\botfeature.py:91
 msgid "Issue an Execode for user data integration."
 msgstr "獲取一條執行碼以啟動用戶資訊整合手續。"
 
-#: .\flags\botfeature.py:89
+#: .\flags\botfeature.py:93
 msgid "Text / Calculator"
 msgstr "文字 / 計算機"
 
-#: .\flags\botfeature.py:89
+#: .\flags\botfeature.py:93
 msgid "Auto-detected calculator."
 msgstr "自動偵測並啟動的計算機。"
 
-#: .\flags\botfeature.py:91
+#: .\flags\botfeature.py:95
 msgid "Text / Error Test"
 msgstr "文字 / 錯誤測試"
 
-#: .\flags\botfeature.py:91
+#: .\flags\botfeature.py:95
 msgid "For the purpose of testing the error reporting system."
 msgstr "(測試錯誤回報系統用)"
 
-#: .\flags\botfeature.py:94
+#: .\flags\botfeature.py:98
 msgid "Image / imgur upload"
 msgstr "圖片 / 上傳imgur"
 
-#: .\flags\botfeature.py:94
+#: .\flags\botfeature.py:98
 msgid "Upload image to imgur.com."
 msgstr "將圖片上傳至 imgur.com。"
+
+#: .\flags\botfeature.py:101
+msgid "Sticker / LINE / Get Info"
+msgstr "貼圖 / LINE / 資訊"
+
+#: .\flags\botfeature.py:101
+msgid "Get the info of the sticker (mostly IDs)."
+msgstr "獲取貼圖的相關資訊(基本上都是ID)。"
 
 #: .\flags\chtype.py:18
 msgid "(Unknown Channel Type)"
@@ -1184,6 +1196,10 @@ msgstr "資料模組因不明原因而無效。"
 #: .\flags\weberr.py:32 .\templates\err\info\profile_not_found.html:14
 msgid "Profile Not Found"
 msgstr "身份組不存在"
+
+#: .\models\stats.py:194
+msgid "(Total)"
+msgstr "(總計)"
 
 #: .\models\timer.py:72
 msgid "[{diff}] to {event} (at {time})"
@@ -1692,11 +1708,11 @@ msgstr "執行失敗。找不到符合條件的資料更新。"
 msgid "No description provided."
 msgstr "沒有敘述。"
 
-#: .\msghandle\botcmd\command\_base_.py:440
+#: .\msghandle\botcmd\command\_base_.py:439
 msgid "Command is in cooldown. Call the command again after {:.2f} secs."
 msgstr "指令冷卻中。請於 {:.2f} 秒後重試。"
 
-#: .\msghandle\botcmd\command\_base_.py:449
+#: .\msghandle\botcmd\command\_base_.py:448
 msgid ""
 "Incorrect type of data: `{}`.\n"
 "Expected type: `{}` / Actual type: `{}`"
@@ -1704,7 +1720,7 @@ msgstr ""
 "`{}` 的資料型態不正確。\n"
 "預期: `{}` / 實際: `{}`"
 
-#: .\msghandle\botcmd\command\_base_.py:470
+#: .\msghandle\botcmd\command\_base_.py:469
 msgid ""
 "Executable command not found.\n"
 "Visit {}{} for more information."
@@ -1712,7 +1728,7 @@ msgstr ""
 "找不到可執行的指令。\n"
 "請瀏覽 {}{} 以獲得更多資訊。"
 
-#: .\msghandle\botcmd\command\_base_.py:493
+#: .\msghandle\botcmd\command\_base_.py:492
 msgid ""
 "Command not allowed to use under this channel type: {}\n"
 "Please use the command under either one of these channel types: {}"
@@ -1917,9 +1933,9 @@ msgstr ""
 #: .\msghandle\botcmd\command\ar.py:166
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
-"which type is NOT text. For example, if there is a module which keyword "
-"100(Text) and another module which keyword is 100(Sticker), both modules "
-"will be deleted if this argument is 100."
+"which type is NOT text. For example, if there is a module which keyword 100"
+"(Text) and another module which keyword is 100(Sticker), both modules will "
+"be deleted if this argument is 100."
 msgstr ""
 "要刪除的自動回覆組的關鍵字。請注意，此指令也會刪除關鍵字種類**並非**文字的回"
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
@@ -2363,7 +2379,7 @@ msgstr ""
 "此訊息於同一頻道內只會在有無法獲得代碼的使用者嘗試使用機器人功能時，每 {} 秒"
 "內發送一次。"
 
-#: .\msghandle\stk\info.py:14
+#: .\msghandle\stk\info.py:17
 msgid ""
 "Sticker ID: `{}`\n"
 "Package ID: `{}`"
@@ -2519,12 +2535,12 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
-"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
-"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
-"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
-"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
-"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
+"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
+"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
+"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
+"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
+"可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list_table.html:13
 #: .\templates\info\channel\search.html:49
@@ -2532,7 +2548,7 @@ msgid "Inaccessible for Jelly Bot"
 msgstr "機器人無法存取"
 
 #: .\templates\account\channel\list_table.html:25
-#: .\templates\info\channel\main.html:109
+#: .\templates\info\channel\main.html:110
 #: .\templates\info\channel\search.html:63
 msgid "Manage"
 msgstr "管理"
@@ -2552,7 +2568,8 @@ msgstr "ID"
 
 #: .\templates\account\channel\list_table.html:57
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
-#: .\templates\info\channel\main.html:52
+#: .\templates\info\botstats\main.html:84
+#: .\templates\info\channel\main.html:53
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\msgstats\main.html:84 .\templates\info\profile.html:44
 msgid "Channel ID"
@@ -2560,13 +2577,14 @@ msgstr "頻道ID"
 
 #: .\templates\account\channel\list_table.html:63
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
-#: .\templates\ar\add-reg.html:149 .\templates\info\channel\main.html:66
+#: .\templates\ar\add-reg.html:149 .\templates\info\channel\main.html:67
 #: .\templates\info\channel\search.html:84
 msgid "Channel Token"
 msgstr "頻道代碼"
 
 #: .\templates\account\channel\manage.html:15 .\templates\account\main.html:16
-#: .\templates\info\channel\main.html:25 .\templates\info\chcoll\main.html:15
+#: .\templates\info\botstats\main.html:60
+#: .\templates\info\channel\main.html:26 .\templates\info\chcoll\main.html:15
 #: .\templates\info\msgstats\main.html:60 .\templates\info\profile.html:15
 msgid "Basic Information"
 msgstr "基本資訊"
@@ -2659,10 +2677,10 @@ msgid ""
 "on the account where you get the Execode will be discarded, only the data on "
 "the website will be kept. </p>"
 msgstr ""
-"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href="
-"\"%(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代"
-"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
-"定所取代。 </p>"
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href=\"%"
+"(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代碼的"
+"帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設定所"
+"取代。 </p>"
 
 #: .\templates\account\integrate.html:33
 msgid "Integration Execode here"
@@ -3045,8 +3063,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains "
-"'%(tag_splitter)s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains '%(tag_splitter)"
+"s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splitter)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:18
@@ -3221,8 +3239,8 @@ msgstr "指令前綴&nbsp;<b>大小寫有別</b>。"
 #: .\templates\doc\botcmd_main.html:23
 #, python-format
 msgid ""
-"The splitter(s) between the command code and its arguments is/are&nbsp;"
-"%(splhtml)s.&nbsp;"
+"The splitter(s) between the command code and its arguments is/are&nbsp;%"
+"(splhtml)s.&nbsp;"
 msgstr "指令參數和指令代碼的分隔子為&nbsp;%(splhtml)s。&nbsp;"
 
 #: .\templates\doc\botcmd_main.html:29
@@ -3318,7 +3336,8 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8
+#: .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3330,17 +3349,17 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
-"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
-"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>%"
+"(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href=\"%"
+"(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
 "private.</li> </ul> If all the conditions match, but the error still occurs, "
 "please <a href=\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
-"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
-"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
-"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: %"
+"(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不"
+"是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出現"
+"在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
 "li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
 "聯絡網站開發者。</a>"
 
@@ -3388,8 +3407,8 @@ msgid ""
 "website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道代碼"
-"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
-"\"%(about_page)s\">聯絡網站開發者。</a>"
+"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
+"(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -3401,12 +3420,12 @@ msgstr "找不到對應的頻道組資訊。"
 msgid ""
 "Please check that:<br> <ul> <li><code>%(chcoll_oid)s</code> is the Channel "
 "Collection ID, <b>NOT the channel collection token</b>.</li> </ul> If all "
-"the conditions match, but the error still occurs, please <a href="
-"\"%(about_page)s\">contact the website developer.</a>"
+"the conditions match, but the error still occurs, please <a href=\"%"
+"(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(chcoll_oid)s</code>是頻道組ID，而<b>不是頻道組代"
-"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
-"\"%(about_page)s\">聯絡網站開發者。</a>"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
+"(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\profile_not_found.html:19
 msgid "User profile not found with the provided ID."
@@ -3420,8 +3439,8 @@ msgid ""
 "conditions match, but the error still occurs, please <a href=\"%(about_page)s"
 "\">contact the website developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
-"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: %"
+"(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\unknown.html:13
@@ -3467,45 +3486,108 @@ msgstr "(預留欄位)"
 msgid "More Details"
 msgstr "詳細"
 
-#: .\templates\info\channel\main.html:9
-msgid "Channel Info"
-msgstr "頻道資訊"
+#: .\templates\info\botstats\main.html:10
+msgid "Bot Feature Usage Statistics"
+msgstr "機器人使用統計"
 
-#: .\templates\info\channel\main.html:16 .\templates\info\msgstats\main.html:17
+#: .\templates\info\botstats\main.html:17
+#: .\templates\info\channel\main.html:17
+#: .\templates\info\msgstats\main.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
 "channel will not update."
 msgstr "機器人已標記此頻道無法存取，所以此頻道的資訊不會再更新。"
 
-#: .\templates\info\channel\main.html:32 .\templates\info\msgstats\main.html:66
+#: .\templates\info\botstats\main.html:25
+#: .\templates\info\msgstats\main.html:25
+msgid "Parameters"
+msgstr "參數"
+
+#: .\templates\info\botstats\main.html:33
+#: .\templates\info\msgstats\main.html:33
+msgid "Range"
+msgstr "範圍"
+
+#: .\templates\info\botstats\main.html:39
+#: .\templates\info\msgstats\main.html:39
+msgid "Hours"
+msgstr "小時"
+
+#: .\templates\info\botstats\main.html:44
+#: .\templates\info\msgstats\main.html:44
+msgid "Leave this blank and refresh to get all-time record."
+msgstr "留空和重整頁面以獲得全時紀錄。"
+
+#: .\templates\info\botstats\main.html:51
+#: .\templates\info\msgstats\main.html:51
+msgid "Refresh"
+msgstr "重整"
+
+#: .\templates\info\botstats\main.html:66
+#: .\templates\info\channel\main.html:33
+#: .\templates\info\msgstats\main.html:66
 msgid "Channel Name"
 msgstr "頻道名稱"
 
-#: .\templates\info\channel\main.html:94
+#: .\templates\info\botstats\main.html:102
+#: .\templates\info\msgstats\main.html:102
+msgid "Statistics"
+msgstr "統計"
+
+#: .\templates\info\botstats\main.html:107
+msgid "Hourly Average Feature Usage"
+msgstr "每小時平均使用"
+
+#: .\templates\info\botstats\main.html:117
+msgid "Feature Usage Count"
+msgstr "功能使用統計"
+
+#: .\templates\info\botstats\main.html:127
+#: .\templates\info\msgstats\main.html:127
+msgid "Member Message Count Ranking"
+msgstr "成員訊息量排行"
+
+#: .\templates\info\channel\main.html:10
+msgid "Channel Info"
+msgstr "頻道資訊"
+
+#: .\templates\info\channel\main.html:95
 msgid "Channel Collection ID: "
 msgstr "頻道組ID: "
 
-#: .\templates\info\channel\main.html:102
+#: .\templates\info\channel\main.html:103
 msgid "Controls"
 msgstr "頻道控制"
 
-#: .\templates\info\channel\main.html:121 .\templates\info\chcoll\main.html:77
+#: .\templates\info\channel\main.html:123 .\templates\info\chcoll\main.html:77
 msgid "Message Statistics"
 msgstr "訊息統計"
 
-#: .\templates\info\channel\main.html:127 .\templates\info\chcoll\main.html:83
+#: .\templates\info\channel\main.html:131 .\templates\info\chcoll\main.html:83
 msgid "Message Count in 1 Day"
 msgstr "訊息量(1日)"
 
-#: .\templates\info\channel\main.html:129
-#: .\templates\info\channel\main.html:138 .\templates\info\chcoll\main.html:85
+#: .\templates\info\channel\main.html:133
+#: .\templates\info\channel\main.html:142 .\templates\info\chcoll\main.html:85
 #: .\templates\info\chcoll\main.html:94
 msgid "Total Messages: "
 msgstr "總訊息量: "
 
-#: .\templates\info\channel\main.html:136 .\templates\info\chcoll\main.html:92
+#: .\templates\info\channel\main.html:140 .\templates\info\chcoll\main.html:92
 msgid "Message Count in 7 Days"
 msgstr "訊息量(7日)"
+
+#: .\templates\info\channel\main.html:152
+msgid "Bot Feature Usage"
+msgstr "機器人功能使用"
+
+#: .\templates\info\channel\main.html:160
+msgid "Usage in 7 Days"
+msgstr "7日內統計"
+
+#: .\templates\info\channel\main.html:168
+msgid "All time usage"
+msgstr "全時統計"
 
 #: .\templates\info\channel\search.html:17
 msgid ""
@@ -3537,20 +3619,34 @@ msgstr "頻道組代碼"
 msgid "Child Channels"
 msgstr "子頻道"
 
-#: .\templates\info\components\msg_stats_daily.html:12
-#: .\templates\info\components\msg_stats_table.html:9
+#: .\templates\info\components\bot_chart_usage.html:14
+msgid "Usage Count"
+msgstr "使用次數"
+
+#: .\templates\info\components\bot_table_count.html:8
+msgid "Feature"
+msgstr "功能"
+
+#: .\templates\info\components\bot_table_count.html:9
+msgctxt "Usage count"
+msgid "Count"
+msgstr "使用次數"
+
+#: .\templates\info\components\bot_table_member.html:7
+#: .\templates\info\components\msg_table_count.html:8
+msgid "Member Name"
+msgstr "成員名稱"
+
+#: .\templates\info\components\msg_chart_daily.html:12
+#: .\templates\info\components\msg_table_count.html:9
 msgid "Message Count"
 msgstr "訊息量"
 
-#: .\templates\info\components\msg_stats_intvflow.html:12
+#: .\templates\info\components\msg_chart_hrflow.html:12
 msgid "Message Count / Day"
 msgstr "訊息量 / 日"
 
-#: .\templates\info\components\msg_stats_table.html:8
-msgid "User Name"
-msgstr "用戶名稱"
-
-#: .\templates\info\components\msg_stats_table.html:10
+#: .\templates\info\components\msg_table_count.html:10
 #, python-format
 msgid "Ratio %%"
 msgstr "比例 %%"
@@ -3559,30 +3655,6 @@ msgstr "比例 %%"
 msgid "Channel Message Statistics"
 msgstr "頻道訊息統計"
 
-#: .\templates\info\msgstats\main.html:25
-msgid "Parameters"
-msgstr "參數"
-
-#: .\templates\info\msgstats\main.html:33
-msgid "Range"
-msgstr "範圍"
-
-#: .\templates\info\msgstats\main.html:39
-msgid "Hours"
-msgstr "小時"
-
-#: .\templates\info\msgstats\main.html:44
-msgid "Leave this blank and refresh to get all-time record."
-msgstr "留空和重整頁面以獲得全時紀錄。"
-
-#: .\templates\info\msgstats\main.html:51
-msgid "Refresh"
-msgstr "重整"
-
-#: .\templates\info\msgstats\main.html:102
-msgid "Statistics"
-msgstr "統計"
-
 #: .\templates\info\msgstats\main.html:107
 msgid "Hour Average Message Flow"
 msgstr "每小時平均訊息量"
@@ -3590,10 +3662,6 @@ msgstr "每小時平均訊息量"
 #: .\templates\info\msgstats\main.html:117
 msgid "Daily Message Flow"
 msgstr "每日訊息量"
-
-#: .\templates\info\msgstats\main.html:127
-msgid "Member Message Count Ranking"
-msgstr "成員訊息量排行"
 
 #: .\templates\info\msgstats\main.html:128
 msgid "Total Count: "

@@ -45,7 +45,7 @@ class ChannelInfoView(TemplateResponseMixin, View):
                     "msg_count7d": msgdata_7d.msg_count,
                     "manageable": bool(
                         ProfileManager.get_user_profiles(channel_oid, get_root_oid(request))),
-                    "bot_usage_7d": BotFeatureUsageDataManager.get_channel_usage(channel_oid, 144),
+                    "bot_usage_7d": BotFeatureUsageDataManager.get_channel_usage(channel_oid, 168),
                     "bot_usage_all": BotFeatureUsageDataManager.get_channel_usage(channel_oid)
                 },
                 nav_param=kwargs)

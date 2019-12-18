@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<canvas id="bot-usage"></canvas>
+
+<script type="text/javascript">
+    new Chart(document.getElementById("bot-usage").getContext("2d"), {
+        plugins: [ChartDataLabels],
+
+        type: "bar",
+
+        data: {
+            labels: {{ stats_data.chart_label|safe }},
+            datasets: [{
+                label: "{% trans "Usage Count" %}",
+                backgroundColor: "rgb(50, 50, 50, 0.5)",
+                fill: false,
+                data: {{ stats_data.chart_data }}
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    align: "top",
+                    offset: "9",
+                    color: "#AA0000"
+                }
+            }
+        },
+    });
+</script>

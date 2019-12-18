@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<canvas id="bot-hrflow"></canvas>
+
+<script type="text/javascript">
+    new Chart(document.getElementById("bot-hrflow").getContext("2d"), {
+        type: "line",
+
+        data: {
+            labels: {{ flow_data.label_hr }},
+            datasets: [
+                {% for subdata in flow_data.data %}
+                    {
+                        label: "{% firstof subdata.feature.key subdata.feature %}",
+                        borderColor: "{{ subdata.color }}",
+                        pointBackgroundColor: "{{ subdata.color }}",
+                        pointBorderColor: "{{ subdata.color }}",
+                        pointRadius: 3,
+                        pointHoverRadius: 7,
+                        fill: false,
+                        data: {{ subdata.data }},
+                        hidden: {{ subdata.hidden }}
+                    },
+                {% endfor %}
+            ]
+        },
+
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            elements: {
+                line: {
+                    tension: 0 // disables bezier curves
+                }
+            }
+        }
+    });
+</script>

@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header" style="max-height: 25rem">
+    <table class="table table-hover table-bordered table-bordered mb-0 datatable">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "Member Name" %}</th>
+            {% for feature in stats_data.features %}
+                <th scope="col" class="no-line-break"><small>{{ feature.key }}</small></th>
+            {% endfor trimmed %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in stats_data.data %}
+            <tr>
+                <td class="align-middle text-center">{{ entry.user_name }}</td>
+                {% for point in entry.data_points %}
+                    <td class="align-middle text-center">{{ point }}</td>
+                {% endfor trimmed %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,5 +1,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 <script type="text/javascript">
     Chart.defaults.global.defaultFontFamily = "\"Segoe UI\", \"Microsoft JhengHei UI\", \"Roboto\", serif, sans-serif;";
     Chart.defaults.global.defaultFontSize = 20;
+    // https://chartjs-plugin-datalabels.netlify.com/guide/getting-started.html#registration
+    Chart.plugins.unregister(ChartDataLabels);
 </script>
