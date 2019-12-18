@@ -2,6 +2,7 @@ import traceback
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
+from linebot.exceptions import LineBotApiError
 
 from extutils.emailutils import MailSender
 from extline.handler.error import handle_error as handle_line_error
@@ -22,6 +23,7 @@ def handle_error_main(e: MessageEventObject, ex: Exception) -> List[HandledMessa
                f"{traceback.format_exc()}</pre>\n"
         MailSender.send_email_async(html, subject=f"Error on Message Processing ({e.platform})")
 
-    return [
-        HandledMessageEventText(content=_(
-            "An error occurred while handling message. An error report was sent for investigation."))]
+    if not isinstance(ex, LineBotApiError) or not ex.status_code == 500:
+        return [
+            HandledMessageEventText(content=_(
+                "An error occurred while handling message. An error report was sent for investigation."))]
