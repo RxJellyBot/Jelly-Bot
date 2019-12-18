@@ -125,6 +125,9 @@ def _construct_info_(current_path, parent, nav_param):
                _("Channel Message Stats - {}").format(nav_param.get("channel_oid", "N/A")),
                "info.channel.msgstats", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,
+               _("Bot Usage Stats - {}").format(nav_param.get("channel_oid", "N/A")),
+               "info.channel.botstats", nav_param, info_parent)
+    __attach__(info_parent, NavHidden, current_path,
                _("Profile Info - {}").format(nav_param.get("profile_oid", "N/A")),
                "info.profile", nav_param, info_parent)
     __attach__(info_parent, NavHidden, current_path,

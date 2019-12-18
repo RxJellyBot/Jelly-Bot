@@ -131,7 +131,7 @@
                     <h4 class="card-header text-info">{% trans "Message Count in 1 Day" %}</h4>
                     <div class="card-body">
                         <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
-                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data1d %}
+                        {% include "info/components/msg_table_count.html" with message_stats=user_message_data1d %}
                     </div>
                 </div>
             </div>
@@ -140,15 +140,18 @@
                     <h4 class="card-header text-info">{% trans "Message Count in 7 Days" %}</h4>
                     <div class="card-body">
                         <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
-                        {% include "info/components/msg_stats_table.html" with message_stats=user_message_data7d %}
+                        {% include "info/components/msg_table_count.html" with message_stats=user_message_data7d %}
                     </div>
                 </div>
             </div>
         </div>
         <hr>
         <div class="row">
-            <div class="col mb-3 h3 text-success">
-                {% trans "Bot Feature Usage" %}
+            <div class="col mb-3 h3">
+                <a class="h3 text-success" href="{% url "info.channel.botstats" channel_oid=channel_data.id %}">
+                    {% trans "Bot Feature Usage" %}
+                    &#x1f517;
+                </a>
             </div>
         </div>
         <div class="row">
@@ -156,7 +159,7 @@
                 <div class="card border-success text-center">
                     <h4 class="card-header text-success">{% trans "Usage in 7 Days" %}</h4>
                     <div class="card-body">
-                        {% include "info/components/bot_usage_table.html" with bot_usage_data=bot_usage_7d only %}
+                        {% include "info/components/bot_table_count.html" with bot_usage_data=bot_usage_7d only %}
                     </div>
                 </div>
             </div>
@@ -164,7 +167,7 @@
                 <div class="card border-success text-center">
                     <h4 class="card-header text-success">{% trans "All time usage" %}</h4>
                     <div class="card-body">
-                        {% include "info/components/bot_usage_table.html" with bot_usage_data=bot_usage_all only %}
+                        {% include "info/components/bot_table_count.html" with bot_usage_data=bot_usage_all only %}
                     </div>
                 </div>
             </div>

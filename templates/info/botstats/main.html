@@ -7,7 +7,7 @@
     {% include "components/chart.html" %}
     <div class="jumbotron">
         <div class="container">
-            <div class="display-4 text-center">{% trans "Channel Message Statistics" %}</div>
+            <div class="display-4 text-center">{% trans "Bot Feature Usage Statistics" %}</div>
         </div>
     </div>
     <div class="container">
@@ -104,33 +104,32 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Hour Average Message Flow" %}</h5>
+                <h5>{% trans "Hourly Average Feature Usage" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_chart_hrflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+                {% include "info/components/bot_chart_hrflow.html" with flow_data=usage_hr_data only %}
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Daily Message Flow" %}</h5>
+                <h5>{% trans "Feature Usage Count" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_chart_daily.html" with msg_daily_data=msg_daily_data only %}
+                {% include "info/components/bot_chart_usage.html" with stats_data=total_usage only %}
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
                 <h5>{% trans "Member Message Count Ranking" %}</h5>
-                <p>{% trans "Total Count: " %}{{ channel_user_msg.msg_count }}</p>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_table_count.html" with message_stats=channel_user_msg.member_stats only %}
+                {% include "info/components/bot_table_member.html" with stats_data=member_usage only %}
             </div>
         </div>
     </div>
@@ -138,4 +137,10 @@
 
 {% block ex-style %}
     <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}

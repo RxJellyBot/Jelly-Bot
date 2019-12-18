@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Type, List, Union, Optional
+from typing import Any, Type, List, Union, Optional, Dict, Tuple
 from inspect import signature, Parameter
 
 from bson import ObjectId
@@ -61,7 +61,7 @@ class BaseDataTypeConverter(ABC):
             try:
                 if allowed_type is None:
                     return None
-                elif type(data) == allowed_type:
+                elif cls._data_is_allowed_type_(data, allowed_type):
                     return data
                 else:
                     return allowed_type(data)
@@ -69,6 +69,11 @@ class BaseDataTypeConverter(ABC):
                 last_e = e
 
         return cls.on_cast_fail(data, type_annt, last_e)
+
+    @classmethod
+    def _data_is_allowed_type_(cls, data, allowed_type):
+        t = type(data)
+        return t == allowed_type or (hasattr(allowed_type, "__origin__") and allowed_type.__origin__ is t)
 
     @classmethod
     def convert(cls, data: Any, type_annt):

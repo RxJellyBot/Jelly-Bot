@@ -118,4 +118,4 @@ class Bot:
 
     class Timer:
         AutoDeletionDays = 7
-        NotifyWithinHours = 24
+        NotifyWithinHours = 3

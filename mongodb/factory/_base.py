@@ -148,8 +148,7 @@ class ControlExtensionMixin(Collection):
 
     def find_cursor_with_count(
             self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None, **kwargs) -> CursorWithCount:
-        if hours_within:
-            self._attach_hours_within_(filter_, hours_within)
+        self._attach_hours_within_(filter_, hours_within)
 
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
@@ -159,13 +158,17 @@ class ControlExtensionMixin(Collection):
 
     @staticmethod
     def _attach_hours_within_(filter_: dict, hours_within: Optional[int] = None):
-        fltr = {"$gt": ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))}
+        fltr = {}
 
-        if OID_KEY in filter_:
-            filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
-            filter_[OID_KEY].update(fltr)
-        else:
-            filter_[OID_KEY] = fltr
+        if hours_within:
+            fltr["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+
+        if fltr:
+            if OID_KEY in filter_:
+                filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
+                filter_[OID_KEY].update(fltr)
+            else:
+                filter_[OID_KEY] = fltr
 
 
 class BaseCollection(ControlExtensionMixin, Collection):
