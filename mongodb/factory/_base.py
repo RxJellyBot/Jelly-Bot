@@ -1,12 +1,15 @@
+from datetime import timedelta
 from threading import Thread
 from typing import Type, Optional, Tuple
 
+from bson import ObjectId
 from bson.errors import InvalidDocument
 from django.conf import settings
 from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
 from extutils.mongo import get_codec_options
+from extutils.dt import now_utc_aware
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
@@ -143,12 +146,29 @@ class ControlExtensionMixin(Collection):
         Thread(
             target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
 
-    def find_cursor_with_count(self, filter_, *args, parse_cls=None, **kwargs) -> CursorWithCount:
+    def find_cursor_with_count(
+            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None, **kwargs) -> CursorWithCount:
+        self._attach_hours_within_(filter_, hours_within)
+
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_, *args, parse_cls: Type[Model] = None, **kwargs) -> Optional[Model]:
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
+
+    @staticmethod
+    def _attach_hours_within_(filter_: dict, hours_within: Optional[int] = None):
+        fltr = {}
+
+        if hours_within:
+            fltr["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+
+        if fltr:
+            if OID_KEY in filter_:
+                filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
+                filter_[OID_KEY].update(fltr)
+            else:
+                filter_[OID_KEY] = fltr
 
 
 class BaseCollection(ControlExtensionMixin, Collection):

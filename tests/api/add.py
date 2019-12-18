@@ -156,7 +156,7 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
                 p.AutoReply.PLATFORM: 1
             },
             f"Test - Add - Execode")
-        
+
         self.assertTrue(result[r.SUCCESS])
         self.assertTrue(r.ExecodeResponse.EXECODE in result[r.RESULT])
         self.__class__.EXECODE = result[r.RESULT][r.ExecodeResponse.EXECODE]

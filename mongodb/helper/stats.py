@@ -4,8 +4,9 @@ from typing import List, Optional, Union
 
 from bson import ObjectId
 
+from flags import BotFeature
 from models import ChannelModel, ChannelCollectionModel, OID_KEY
-from mongodb.factory import RootUserManager, MessageRecordStatisticsManager, ProfileManager
+from mongodb.factory import RootUserManager, MessageRecordStatisticsManager, ProfileManager, BotFeatureUsageDataManager
 
 
 @dataclass
@@ -59,7 +60,7 @@ class MessageStatsDataProcessor:
             # However, it also cannot be too small as this heavily impact the performance
             with ThreadPoolExecutor(max_workers=10, thread_name_prefix="UserNameQuery") as executor:
                 futures = []
-                for uid, ct in msg_rec.items():
+                for uid in msg_rec.keys():
                     futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, ch_data))
 
                 # Non-lock call & Free resources when execution is done
@@ -71,7 +72,8 @@ class MessageStatsDataProcessor:
 
                     entries.append(
                         UserMessageStatsEntry(
-                            user_name=result.user_name, message_count=count, message_ratio=count / total)
+                            user_name=result.user_name, message_count=count,
+                            message_ratio=count / total if total > 0 else 0)
                     )
 
             return UserMessageStats(member_stats=entries, msg_count=sum(msg_rec.values()))
@@ -115,3 +117,48 @@ class MessageStatsDataProcessor:
             chcoll_data: ChannelCollectionModel, root_oid: ObjectId, hours_within: Optional[int] = None) \
             -> UserMessageRanking:
         return MessageStatsDataProcessor._get_user_msg_ranking_(chcoll_data.child_channel_oids, root_oid, hours_within)
+
+
+@dataclass
+class PerMemberStatsEntry:
+    user_name: str
+    data_points: List[int]
+
+
+@dataclass
+class PerMemberStats:
+    data: List[PerMemberStatsEntry]
+    features: List[BotFeature]
+
+
+class BotUsageStatsDataProcessor:
+    @staticmethod
+    def get_per_user_bot_usage(
+            channel_data: ChannelModel, hours_within: Optional[int] = None) \
+            -> PerMemberStats:
+        data = []
+        features = [f for f in BotFeature]
+
+        members = ProfileManager.get_channel_members(channel_data.id, available_only=True)
+
+        usage_data = BotFeatureUsageDataManager.get_channel_per_user_usage(
+            channel_data.id, hours_within, [d.user_oid for d in members]).data
+
+        with ThreadPoolExecutor(max_workers=10, thread_name_prefix="BotUsage") as executor:
+            futures = []
+            for uid in usage_data.keys():
+                futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, channel_data))
+
+            # Non-lock call & Free resources when execution is done
+            executor.shutdown(False)
+
+            for completed in futures:
+                result = completed.result()
+                usage_dict = usage_data[result.user_id]
+
+                data.append(
+                    PerMemberStatsEntry(
+                        user_name=result.user_name, data_points=[usage_dict.get(ft, 0) for ft in features])
+                )
+
+        return PerMemberStats(data=data, features=features)
