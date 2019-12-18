@@ -23,10 +23,23 @@ def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
 
 def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessageEvent]:
     crs = TimerManager.get_notify(e.channel_oid)
+    crs2 = TimerManager.get_time_up(e.channel_oid)
+
+    ret = []
+
+    if not crs2.empty:
+        ret.append(_("**{} timer(s) have timed up!**").format(len(crs2)))
+        ret.append("")
+
+        for tmr in crs2:
+            ret.append(_("{event} has timed up! (at {time})").format(
+                event=tmr.title, time=localtime(tmr.target_time, e.user_model.config.tzinfo)
+            ))
 
     if not crs.empty:
         now = now_utc_aware()
-        ret = [_("**{} timer(s) will time up in less than {} hrs!**").format(len(crs), Bot.Timer.NotifyWithinHours), ""]
+        ret.append(_("**{} timer(s) will time up in less than {} hrs!**").format(len(crs), Bot.Timer.NotifyWithinHours))
+        ret.append("")
 
         for tmr in crs:
             ret.append(_("{event} will time up after [{diff}]! (at {time})").format(
@@ -34,6 +47,11 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
                 time=localtime(tmr.target_time, e.user_model.config.tzinfo)
             ))
 
-        return [HandledMessageEventText(content="\n".join(ret))]
+    if ret and ret[-1] == "":
+        ret = ret[:-1]
 
-    return []
+    if ret:
+        return [HandledMessageEventText(content="\n".join(ret))]
+    else:
+        return []
+
