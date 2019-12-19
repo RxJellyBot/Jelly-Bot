@@ -11,6 +11,7 @@ from .ar import cmd_main as cmd_ar
 from .help import cmd as cmd_help
 from .rdm import cmd as cmd_rdm
 from .tmr import cmd as cmd_tmr
+from .rct import cmd as cmd_rct
 
 # List all main command nodes for some pages to get the command data
 __all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr"]
@@ -25,6 +26,7 @@ cmd_root.attach_child_node(cmd_ar)
 cmd_root.attach_child_node(cmd_help)
 cmd_root.attach_child_node(cmd_rdm)
 cmd_root.attach_child_node(cmd_tmr)
+cmd_root.attach_child_node(cmd_rct)
 
 # DEPRECATE: Old command
 
@@ -58,16 +60,19 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
         "For more command usage, visit {}.").format(HostUrl)
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(description=_(), arg_count=0)
 def old_arg_0(e):
     return [HandledMessageEventText(content=txt)]
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(arg_count=1)
 def old_arg_1(e, dummy1):
     return [HandledMessageEventText(content=txt)]
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(arg_count=2)
 def old_arg_2(e, dummy1, dummy2):
     return [HandledMessageEventText(content=txt)]

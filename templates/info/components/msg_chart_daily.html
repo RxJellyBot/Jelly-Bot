@@ -2,21 +2,22 @@
 
 <canvas id="msgstats-daily"></canvas>
 
+<!--suppress JSUnresolvedFunction -->
 <script type="text/javascript">
     new Chart(document.getElementById("msgstats-daily").getContext("2d"), {
         type: "line",
 
         data: {
-            labels: {{ msg_daily_data.date_label|safe }},
+            labels: {{ msg_daily_data.label_date|safe }},
             datasets: [{
                 label: "{% trans "Message Count" %}",
                 borderColor: "rgb(50, 50, 50)",
                 pointBackgroundColor: "rgb(50, 50, 50)",
                 pointBorderColor: "rgb(50, 50, 50)",
-                pointRadius: 5,
-                pointHoverRadius: 10,
+                pointRadius: 4,
+                pointHoverRadius: 8,
                 fill: false,
-                data: {{ msg_daily_data.date_count }}
+                data: {{ msg_daily_data.data_sum }}
             }]
         },
 
@@ -31,6 +32,12 @@
             elements: {
                 line: {
                     tension: 0 // disables bezier curves
+                }
+            },
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
                 }
             }
         }

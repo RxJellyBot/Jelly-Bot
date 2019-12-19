@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.utils.translation import gettext as _
 
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelCollectionModel
@@ -37,9 +37,9 @@ class ChannelCollectionInfoView(TemplateResponseMixin, View):
                     "chcoll_data": chcoll_data,
                     "chcoll_cch_data":
                         InfoProcessor.collate_child_channel_data(get_root_oid(request), chcoll_data.child_channel_oids),
-                    "user_message_data1d": sorted(msgdata_1d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "user_message_data1d": msgdata_1d,
                     "msg_count1d": msgdata_1d.msg_count,
-                    "user_message_data7d": sorted(msgdata_7d.member_stats, key=lambda x: x.message_count, reverse=True),
+                    "user_message_data7d": msgdata_7d,
                     "msg_count7d": msgdata_7d.msg_count
                 },
                 nav_param=kwargs)

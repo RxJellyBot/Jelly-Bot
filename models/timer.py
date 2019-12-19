@@ -3,9 +3,8 @@ from datetime import datetime
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import localtime
 
-from extutils.dt import now_utc_aware, t_delta_str
+from extutils.dt import now_utc_aware, t_delta_str, localtime
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import CursorWithCount
@@ -40,12 +39,20 @@ class TimerModel(Model):
 
 @dataclass
 class TimerListResult:
-    past_done: List[TimerModel] = field(init=False, default_factory=list)
-    past_continue: List[TimerModel] = field(init=False, default_factory=list)
     future: List[TimerModel] = field(init=False, default_factory=list)
+    past_continue: List[TimerModel] = field(init=False, default_factory=list)
+    past_done: List[TimerModel] = field(init=False, default_factory=list)
     has_data: bool = field(init=False, default=False)
 
     cursor: InitVar[CursorWithCount] = None
+
+    def __iter__(self):
+        for t in self.future:
+            yield t
+        for t in self.past_continue:
+            yield t
+        for t in self.past_done:
+            yield t
 
     def __post_init__(self, cursor):
         now = now_utc_aware()
@@ -96,3 +103,10 @@ class TimerListResult:
             ret = ret[:-1]
 
         return "\n".join(ret)
+
+    def get_item(self, index: int):
+        for idx, item in enumerate(self):
+            if idx == index:
+                return item
+
+        return None

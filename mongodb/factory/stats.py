@@ -9,9 +9,10 @@ from extutils.locales import UTC
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
+from mongodb.utils import CursorWithCount
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult, \
-    HourlyResult, BotFeaturePerUserUsageResult
+    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -47,20 +48,26 @@ class MessageRecordStatisticsManager(BaseCollection):
     @param_type_ensure
     def record_message_async(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any, proc_time_ms: float):
+            message_type: MessageType, message_content: Any, proc_time_secs: float):
         Thread(
             target=self.record_message,
-            args=(channel_oid, user_root_oid, message_type, message_content, proc_time_ms)).start()
+            args=(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)).start()
 
     @param_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any, proc_time_ms: float):
+            message_type: MessageType, message_content: Any, proc_time_secs: float):
         self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
             MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
-            ProcessTimeMs=proc_time_ms
+            ProcessTimeSecs=proc_time_secs
         )
+
+    @param_type_ensure
+    def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+        return self.find_cursor_with_count(
+            {MessageRecordModel.ChannelOid.key: channel_oid}, parse_cls=MessageRecordModel
+        ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
 
     # Statistics
 
@@ -92,20 +99,22 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
-            -> list:
+            -> MemberMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
         self._attach_hours_within_(match_d, hours_within)
 
         aggr_pipeline = [
             {"$match": match_d},
             {"$group": {
-                OID_KEY: "$" + MessageRecordModel.UserRootOid.key,
-                "count": {"$sum": 1}
-            }},
-            {"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}}
+                OID_KEY: {
+                    MemberMessageResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key,
+                    MemberMessageResult.KEY_CATEGORY: "$" + MessageRecordModel.MessageType.key
+                },
+                MemberMessageResult.KEY_COUNT: {"$sum": 1}
+            }}
         ]
 
-        return list(self.aggregate(aggr_pipeline))
+        return MemberMessageResult(list(self.aggregate(aggr_pipeline)))
 
     def hourly_interval_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
@@ -117,8 +126,13 @@ class MessageRecordStatisticsManager(BaseCollection):
         pipeline = [
             {"$match": match_d},
             {"$group": {
-                "_id": {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
-                HourlyIntervalAverageMessageResult.KEY: {"$sum": 1}
+                "_id": {
+                    HourlyIntervalAverageMessageResult.KEY_HR:
+                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
+                    HourlyIntervalAverageMessageResult.KEY_CATEGORY:
+                        "$" + MessageRecordModel.MessageType.key
+                },
+                HourlyIntervalAverageMessageResult.KEY_COUNT: {"$sum": 1}
             }},
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
@@ -137,17 +151,27 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$match": match_d},
             {"$group": {
                 "_id": {
-                    "$dateToString":
-                        {"date": "$_id",
-                         "format": "%Y-%m-%d",
-                         "timezone": tzinfo_.tzname(datetime.utcnow())}
+                    DailyMessageResult.KEY_DATE: {
+                        "$dateToString": {
+                            "date": "$_id",
+                            "format": "%Y-%m-%d",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    },
+                    DailyMessageResult.KEY_HOUR: {
+                        "$hour": {
+                            "date": "$_id",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    }
                 },
-                DailyMessageResult.KEY: {"$sum": 1}
+                DailyMessageResult.KEY_COUNT: {"$sum": 1}
             }},
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
 
-        return DailyMessageResult(list(self.aggregate(pipeline)))
+        return DailyMessageResult(
+            list(self.aggregate(pipeline)), HourlyResult.data_days_collected(self, match_d, hours_within), tzinfo_)
 
 
 class BotFeatureUsageDataManager(BaseCollection):

@@ -43,7 +43,7 @@ class GetExecodeEntryResult(ModelResult):
     def __init__(self, outcome, action_model):
         """
         :type outcome: GetOutcome
-        :type action_model: ExecodeEntryModel
+        :type action_model: Optional[ExecodeEntryModel]
         """
         super().__init__(outcome, action_model, None)
 

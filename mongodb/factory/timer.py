@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pymongo
 from bson import ObjectId
 
-from models import TimerModel, TimerListResult
+from models import TimerModel, TimerListResult, OID_KEY
 from mongodb.factory.results import WriteOutcome
 from mongodb.utils import CursorWithCount
 from extutils.checker import param_type_ensure
@@ -48,13 +48,17 @@ class TimerManager(BaseCollection):
         return outcome
 
     @param_type_ensure
+    def del_timer(self, timer_oid: ObjectId) -> bool:
+        return self.delete_one({OID_KEY: timer_oid}).deleted_count > 0
+
+    @param_type_ensure
     def list_all_timer(self, channel_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
     @param_type_ensure
-    def get_timer(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
+    def get_timers(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.Keyword.key: keyword,
                                          TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)

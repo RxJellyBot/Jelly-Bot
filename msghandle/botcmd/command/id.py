@@ -78,16 +78,14 @@ def _user_ranking_section_(e: TextMessageEventObject):
 def _channel_msg_count_list_section_(e: TextMessageEventObject, limit):
     ret = []
 
-    mem_stats = list(
-        sorted(
-            MessageStatsDataProcessor.get_user_channel_messages(
-                e.channel_model, hours_within=168).member_stats,
-            key=lambda x: x.message_count, reverse=True))[:limit]
+    mem_stats = MessageStatsDataProcessor.get_user_channel_messages(
+        e.channel_model, hours_within=168).member_stats[:limit]
 
     ret.append(_("Top {} Message Count in 7 Days in this channel:").format(limit))
     ret.append("```")
     ret.append("\n".join(
-        [f"{entry.message_count:>6} ({entry.message_percentage:>7.02%}) - {entry.user_name}" for entry in mem_stats]))
+        [f"{entry.total_count:>6} ({_('Ratio %')} {entry.total_count_ratio:>7.02%}) - {entry.user_name}"
+         for entry in mem_stats]))
     ret.append("```")
 
     return ret
@@ -97,18 +95,15 @@ def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
     ret = []
 
     if e.chcoll_model:
-        mem_stats_chcoll = list(
-            sorted(
-                MessageStatsDataProcessor.get_user_chcoll_messages(
-                    e.chcoll_model, hours_within=168).member_stats,
-                key=lambda x: x.message_count, reverse=True))[:limit]
+        mem_stats_chcoll = MessageStatsDataProcessor.get_user_chcoll_messages(
+            e.chcoll_model, hours_within=168).member_stats[:limit]
 
         ret.append("")
         ret.append(_("Top {} Message Count in 7 Days in this channel collection:").format(limit))
         ret.append("```")
         ret.append("\n".join(
-            [f"{entry.message_count:>6} ({entry.message_percentage:>7.02%}) - {entry.user_name}" for entry in
-             mem_stats_chcoll]))
+            [f"{entry.total_count:>6} ({_('Ratio %')} {entry.total_count_ratio:>7.02%}) - {entry.user_name}"
+             for entry in mem_stats_chcoll]))
         ret.append("```")
 
     return ret

@@ -42,6 +42,9 @@ class Discord(PlatformConfig):
 class Website:
     NewRegisterThresholdDays = 5
 
+    class RecentActivity:
+        MaxMessageCount = 500
+
 
 class AutoReply:
     MaxResponses = 5
@@ -115,6 +118,12 @@ class Bot:
         DefaultCooldownSecs = 0
 
         MaxContentResultLength = 100
+
+        DeleteDataMins = 3
+
+    class RecentActivity:
+        CooldownSeconds = 30
+        DefaultLimitCount = 100
 
     class Timer:
         AutoDeletionDays = 7
