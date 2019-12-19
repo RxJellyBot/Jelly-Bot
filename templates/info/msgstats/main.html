@@ -104,7 +104,7 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Hour Average Message Flow" %}</h5>
+                <h5>#&nbsp;{% trans "Hour Average Message Flow" %}</h5>
             </div>
         </div>
         <div class="row">
@@ -114,7 +114,7 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Daily Message Flow" %}</h5>
+                <h5>#&nbsp;{% trans "Daily Message Flow" %}</h5>
             </div>
         </div>
         <div class="row">
@@ -124,13 +124,18 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Member Message Count Ranking" %}</h5>
-                <p>{% trans "Total Count: " %}{{ channel_user_msg.msg_count }}</p>
+                {% include "info/components/msg_table_daily.html" with msg_daily_data=msg_daily_data only %}
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_table_count.html" with message_stats=channel_user_msg.member_stats only %}
+                <h5>#&nbsp;{% trans "Member Message Count Ranking" %}</h5>
+                <p>{% trans "Total Count: " %}<span class="h4">{{ channel_user_msg.msg_count }}</span></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_table_count.html" with message_data=channel_user_msg simplified=False only %}
             </div>
         </div>
     </div>
@@ -138,4 +143,10 @@
 
 {% block ex-style %}
     <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}

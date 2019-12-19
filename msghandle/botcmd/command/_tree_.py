@@ -58,16 +58,19 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
         "For more command usage, visit {}.").format(HostUrl)
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(description=_(), arg_count=0)
 def old_arg_0(e):
     return [HandledMessageEventText(content=txt)]
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(arg_count=1)
 def old_arg_1(e, dummy1):
     return [HandledMessageEventText(content=txt)]
 
 
+# noinspection PyUnusedLocal
 @cmd_ar_old.command_function(arg_count=2)
 def old_arg_2(e, dummy1, dummy2):
     return [HandledMessageEventText(content=txt)]

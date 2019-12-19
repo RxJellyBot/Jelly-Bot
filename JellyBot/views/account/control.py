@@ -1,14 +1,13 @@
-from django.utils import timezone
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.utils.translation import gettext_lazy as _
 
 from JellyBot import keys
 from JellyBot.components.mixin import LoginRequiredMixin
-from JellyBot.components.utils import get_root_oid, get_post_keys
+from JellyBot.utils import get_root_oid, get_post_keys
 from JellyBot.views import render_template, simple_str_response
 from extutils.locales import locales, languages
-from extutils.dt import now_utc_aware
+from extutils.dt import now_utc_aware, localtime
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
 from mongodb.factory import RootUserManager
 from mongodb.factory.results import WriteOutcome
@@ -80,12 +79,12 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
         if update_result.success:
             return simple_str_response(
                 request,
-                f"success/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"success/{localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
                 f"{_('Account settings updated.')}")
         else:
             return simple_str_response(
                 request,
-                f"danger/{timezone.localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
+                f"danger/{localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
                 f"{_('Account settings failed to update.')}")
 
     # noinspection PyUnusedLocal

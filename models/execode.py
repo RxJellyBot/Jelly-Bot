@@ -1,8 +1,7 @@
 from datetime import timedelta, datetime
 from typing import Optional
 
-from django.utils import timezone
-
+from extutils.dt import localtime
 from JellyBot import systemconfig
 from models import Model, ModelDefaultValueExt
 from models.field import TextField, ExecodeField, DateTimeField, DictionaryField, ObjectIDField
@@ -20,4 +19,4 @@ class ExecodeEntryModel(Model):
 
     @property
     def expire_time(self) -> Optional[datetime]:
-        return timezone.localtime(self.timestamp) + timedelta(seconds=systemconfig.Database.ExecodeExpirySeconds)
+        return localtime(self.timestamp) + timedelta(seconds=systemconfig.Database.ExecodeExpirySeconds)

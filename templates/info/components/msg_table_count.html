@@ -1,26 +1,38 @@
 {% load i18n %}
 
-<div class="table-responsive table-freeze-header" style="max-height: 25rem">
-    <table class="table table-hover table-bordered table-bordered mb-0">
+<div class="table-responsive table-freeze-header table-freeze-first-col" style="max-height: 35rem">
+    <table class="table table-hover table-bordered table-bordered mb-0{% if not simplified %} datatable{% endif %}">
         <thead>
         <tr>
-            <th scope="col">#</th>
             <th scope="col">{% trans "Member Name" %}</th>
-            <th scope="col">{% trans "Message Count" %}</th>
-            <th scope="col">{% trans "Ratio %" %}</th>
+            <th scope="col">#</th>
+            <th scope="col" class="no-line-break">{% trans "Total Count" %}</th>
+            <th scope="col" class="no-line-break">{% trans "Total Ratio %" %}</th>
+            {% if not simplified %}
+                {% for entry in message_data.label_category %}
+                    <th scope="col" class="no-line-break">{{ entry.key }}</th>
+                    <th scope="col" class="no-line-break">{{ entry.key }}&nbsp;(%)</th>
+                {% endfor %}
+            {% endif %}
         </tr>
         </thead>
         <tbody>
-        {% for entry in message_stats %}
+        {% for entry in message_data.member_stats %}
             <tr>
+                <th class="align-middle text-center no-line-break">{{ entry.user_name }}</th>
                 <td class="align-middle text-center">{{ forloop.counter }}</td>
-                <td class="align-middle text-center">{{ entry.user_name }}</td>
-                <td class="align-middle text-center h5 font-weight-normal">{{ entry.message_count }}</td>
+                <td class="align-middle text-center h5 font-weight-normal">{{ entry.total_count }}</td>
                 <td class="align-middle text-center">
                     <code class="h6">
                         {{ entry.ratio_pct_str }}
                     </code>
                 </td>
+                {% if not simplified %}
+                    {% for point in entry.category_count %}
+                        <td class="align-middle text-center">{{ point.count }}</td>
+                        <td class="align-middle text-center text-danger">{{ point.percentage|stringformat:".2f" }}%</td>
+                    {% endfor %}
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

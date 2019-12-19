@@ -6,7 +6,7 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel, ChannelCollectionModel
@@ -39,9 +39,9 @@ class ChannelInfoView(TemplateResponseMixin, View):
                     "ch_name": channel_data.get_channel_name(get_root_oid(request)),
                     "channel_data": channel_data,
                     "chcoll_data": chcoll_data,
-                    "user_message_data1d": msgdata_1d.member_stats,
+                    "user_message_data1d": msgdata_1d,
                     "msg_count1d": msgdata_1d.msg_count,
-                    "user_message_data7d": msgdata_7d.member_stats,
+                    "user_message_data7d": msgdata_7d,
                     "msg_count7d": msgdata_7d.msg_count,
                     "manageable": bool(
                         ProfileManager.get_user_profiles(channel_oid, get_root_oid(request))),

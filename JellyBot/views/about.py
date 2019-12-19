@@ -1,12 +1,12 @@
 from dateutil import parser
 
-from django.utils.timezone import localtime
 from django.views.generic.base import View
 from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import System
 from JellyBot.views.render import render_template
 from extutils import HerokuWrapper, GithubWrapper
+from extutils.dt import localtime
 
 
 class AboutView(View):

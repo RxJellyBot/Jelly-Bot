@@ -10,22 +10,26 @@ from mongodb.factory import ChannelManager
 __all__ = ["handle_self_main"]
 
 
+# noinspection PyUnusedLocal
 def handle_follow(request, event, destination):
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot been followed.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
+# noinspection PyUnusedLocal
 def handle_unfollow(request, event, destination):
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot been unfollowed.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
+# noinspection PyUnusedLocal
 def handle_join(request, event, destination):
     ChannelManager.register(Platform.LINE, LineApiUtils.get_channel_id(event))
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot joined a group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
+# noinspection PyUnusedLocal
 def handle_leave(request, event, destination):
     ChannelManager.deregister(Platform.LINE, LineApiUtils.get_channel_id(event))
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot left a group.",

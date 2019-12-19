@@ -1,32 +1,35 @@
+from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import List, Optional, Union, NamedTuple
 
 from bson import ObjectId
 
-from flags import BotFeature
-from models import ChannelModel, ChannelCollectionModel, OID_KEY
+from flags import BotFeature, MessageType
+from models import ChannelModel, ChannelCollectionModel, OID_KEY, MemberMessageResult
 from mongodb.factory import RootUserManager, MessageRecordStatisticsManager, ProfileManager, BotFeatureUsageDataManager
 
 
 @dataclass
 class UserMessageStatsEntry:
     user_name: str
-    message_count: int
-    message_ratio: float
+    total_count: int
+    total_count_ratio: float
+    category_count: List[NamedTuple]
 
     @property
     def ratio_pct_str(self) -> str:
-        return f"{self.message_ratio:.02%}"
+        return f"{self.total_count_ratio:.02%}"
 
 
 @dataclass
 class UserMessageStats:
     member_stats: List[UserMessageStatsEntry]
     msg_count: int
+    label_category: List[MessageType]
 
     def __post_init__(self):
-        self.member_stats = list(sorted(self.member_stats, key=lambda x: x.message_count, reverse=True))
+        self.member_stats = list(sorted(self.member_stats, key=lambda x: x.total_count, reverse=True))
 
 
 @dataclass
@@ -44,16 +47,17 @@ class UserMessageRanking:
 
 class MessageStatsDataProcessor:
     @staticmethod
-    def _get_user_msg_stats_(msg_rec_data: list, ch_data: ChannelModel = None) -> UserMessageStats:
+    def _get_user_msg_stats_(msg_result: MemberMessageResult, ch_data: ChannelModel = None) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
 
-        msg_rec_d = {d[OID_KEY]: d["count"] for d in msg_rec_data}
+        msg_rec_d = {uid: d for uid, d in msg_result.data.items()}
         msg_rec = {}
         for member in ProfileManager.get_channel_members(ch_data.id, available_only=True):
-            msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, 0)
+            msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, msg_result.get_default_data_entry())
 
         if msg_rec:
-            total: int = max(msg_rec.values())
+            individual_msgs = [sum(vals.values()) for vals in msg_rec.values()]
+            max_individual_msg: int = max(individual_msgs)
 
             # Obtained from https://stackoverflow.com/a/40687012/11571888
             # Workers cannot be too big as it will suck out the connections of MongoDB Atlas
@@ -68,17 +72,27 @@ class MessageStatsDataProcessor:
 
                 for completed in futures:
                     result = completed.result()
-                    count = msg_rec[result.user_id]
+                    data_cat = msg_rec[result.user_id]
+
+                    sum_ = sum(data_cat.values())
+
+                    cat_count = []
+                    CategoryEntry = namedtuple("CategoryEntry", ["count", "percentage"])
+                    for cat in msg_result.label_category:
+                        ct = data_cat.get(cat, 0)
+                        cat_count.append(CategoryEntry(count=ct, percentage=ct / sum_ * 100 if sum_ > 0 else 0))
 
                     entries.append(
                         UserMessageStatsEntry(
-                            user_name=result.user_name, message_count=count,
-                            message_ratio=count / total if total > 0 else 0)
+                            user_name=result.user_name, category_count=cat_count,
+                            total_count=sum_, total_count_ratio=sum_ / max_individual_msg if max_individual_msg > 0 else 0)
                     )
 
-            return UserMessageStats(member_stats=entries, msg_count=sum(msg_rec.values()))
+            return UserMessageStats(
+                member_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
         else:
-            return UserMessageStats(member_stats=[], msg_count=0)
+            return UserMessageStats(
+                member_stats=[], msg_count=0, label_category=msg_result.label_category)
 
     @staticmethod
     def _get_user_msg_ranking_(
@@ -123,6 +137,7 @@ class MessageStatsDataProcessor:
 class PerMemberStatsEntry:
     user_name: str
     data_points: List[int]
+    data_sum: int
 
 
 @dataclass
@@ -158,7 +173,8 @@ class BotUsageStatsDataProcessor:
 
                 data.append(
                     PerMemberStatsEntry(
-                        user_name=result.user_name, data_points=[usage_dict.get(ft, 0) for ft in features])
+                        user_name=result.user_name, data_points=[usage_dict.get(ft, 0) for ft in features],
+                        data_sum=sum(usage_dict.values()))
                 )
 
         return PerMemberStats(data=data, features=features)

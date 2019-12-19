@@ -8,7 +8,7 @@ from django.views.generic.base import TemplateResponseMixin
 from django.utils.timezone import get_current_timezone
 
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelModel
@@ -55,7 +55,7 @@ def get_bot_stats_data_package(channel_data, hours_within, tzinfo):
 
 
 class ChannelBotUsageStatsView(TemplateResponseMixin, View):
-    # noinspection PyUnusedLocal
+    # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
         # `kwargs` will be used as `nav_param` so extract channel_oid from `kwargs` instead of creating param.
 

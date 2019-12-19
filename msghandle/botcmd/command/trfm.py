@@ -11,6 +11,7 @@ cmd = CommandNode(
 cmd_nl = cmd.new_child_node(codes=["nl", "newline"])
 
 
+# noinspection PyUnusedLocal
 @cmd_nl.command_function(
     arg_count=1, arg_help=[_("String to be replaced.")],
     feature_flag=BotFeature.TXT_TRF_REPL_NEWLINE)
