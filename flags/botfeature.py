@@ -15,6 +15,7 @@ class BotFeature(FlagDoubleEnum):
             101 - Timer
                 1011 - Add
                 1012 - List (All)
+                1013 - Delete
                 1019 - List (Keyword)
 
         11 - Sub
@@ -66,6 +67,8 @@ class BotFeature(FlagDoubleEnum):
         1011, _("Text / Timer / Add"), _("Add a timer.")
     TXT_TMR_LIST_ALL = \
         1012, _("Text / Timer / List (All)"), _("List all timers.")
+    TXT_TMR_DEL = \
+        1013, _("Text / Timer / Delete"), _("Delete a timer.")
     TXT_TMR_GET = \
         1019, _("Text / Timer / List (Keyword)"), _("Get the timer(s) with the designated keyword.")
 

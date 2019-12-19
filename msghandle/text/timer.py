@@ -10,7 +10,7 @@ from msghandle.models import TextMessageEventObject, HandledMessageEvent, Handle
 
 
 def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    tmrs = TimerManager.get_timer(e.channel_oid, e.content)
+    tmrs = TimerManager.get_timers(e.channel_oid, e.content)
 
     if tmrs.has_data:
         BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_TMR_GET, e.channel_oid, e.user_model.id)
