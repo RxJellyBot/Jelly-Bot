@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div class="row">
+    <div class="col-lg mb-3">
+        <h3>{% trans "Basic Information" %}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg mb-3">
+        <div class="card border-dark text-center">
+            <h4 class="card-header text-dark">{% trans "Channel Name" %}</h4>
+            <div class="card-body">
+                <div class="card-text h4">
+                    <div class="row justify-content-lg-center">
+                        <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
+                            {% if channel_name %}
+                                {{ channel_name }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg mb-3">
+        <div class="card border-dark text-center">
+            <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
+            <div class="card-body">
+                <div class="card-text h4">
+                    <div class="row justify-content-lg-center">
+                        <div class="col-lg-auto">
+                            <a href="{% url "info.channel" channel_oid=channel_data.id %}"><code>{{ channel_data.id }}</code></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views import View
 
 from JellyBot.keys import Session
-from JellyBot.components.utils import get_root_oid
+from JellyBot.utils import get_root_oid
 from extutils.serializer import JellyBotSerializer
 
 

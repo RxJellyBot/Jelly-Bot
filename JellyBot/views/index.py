@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from extutils.dt import now_utc_aware
 from JellyBot.systemconfig import Website, HostUrl
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from JellyBot.views.render import render_template
 from msghandle.botcmd.command import cmd_uintg
 

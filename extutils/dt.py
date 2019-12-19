@@ -1,11 +1,16 @@
 from datetime import datetime, timedelta
 
 import pytz
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
 def now_utc_aware():
     return datetime.utcnow().replace(tzinfo=pytz.UTC)
+
+
+def localtime(dt=None, tz=None):
+    return timezone.localtime(dt, tz)
 
 
 def is_tz_naive(dt) -> bool:

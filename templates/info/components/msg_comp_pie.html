@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<canvas id="msg-comp"></canvas>
+
+<!--suppress JSUnresolvedFunction -->
+<script type="text/javascript">
+
+    new Chart(document.getElementById("msg-comp").getContext("2d"), {
+        type: "doughnut",
+
+        data: {
+            labels: {{ comp_data.label_type|safe }},
+            datasets: [
+                {
+                    backgroundColor: chartBorderColors,
+                    data: {{ comp_data.label_count }}
+                }
+            ]
+        },
+
+        options: {
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
+                }
+            }
+        }
+    });
+</script>

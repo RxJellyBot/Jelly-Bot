@@ -21,102 +21,35 @@
             <hr>
         {% endif %}
 
+        {% include "info/components/info_adv.html" with channel_data=channel_data channel_name=channel_name chcoll_data=chcoll_data manageable=manageable only %}
+
+        <hr>
+
         <div class="row">
-            <div class="col mb-3">
-                <span class="h3">{% trans "Basic Information" %}</span>
+            <div class="col mb-3 h3">
+                {% trans "Shortcuts" %}
+            </div>
+        </div>
+        <div class="row btn-group">
+            <div class="col-md mb-3">
+                <a class="btn btn-info btn-block p-3" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">
+                    <span class="h4">{% trans "Message Statistics" %}</span>
+                </a>
+            </div>
+            <div class="col-md mb-3">
+                <a class="btn btn-success btn-block p-3" href="{% url "info.channel.botstats" channel_oid=channel_data.id %}">
+                    <span class="h4">{% trans "Bot Feature Usage" %}</span>
+                </a>
+            </div>
+            <div class="col-md mb-3">
+                <a class="btn btn-warning btn-block p-3" href="{% url "info.channel.recent.message" channel_oid=channel_data.id %}">
+                    <span class="h4">{% trans "Recent Messages" %}</span>
+                </a>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg mb-3">
-                <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Channel Name" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h2">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
-                                    {% if ch_name %}
-                                        {{ ch_name }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg mb-3">
-                <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Channel ID" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h2">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto">
-                                    <code>{{ channel_data.id }}</code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg mb-3">
-                <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Channel Token" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h2">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto">
-                                    <code>{{ channel_data.token }}</code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg mb-3">
-                <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Platform" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h4">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto">
-                                    {{ channel_data.platform.key }}
-                                </div>
-                            </div>
-                        </div>
-                        {% if chcoll_data %}
-                            <a class="mt-3 btn btn-outline-primary btn-lg btn-block"
-                               href="{% url "info.chcoll" chcoll_oid=chcoll_data.id %}" target="_blank">
-                                {% trans "Channel Collection ID: " %}<code class="text-dark">{{ chcoll_data.id }}</code>
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg mb-3">
-                <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Controls" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h5">
-                            {% if manageable %}
-                                <div class="col-lg-auto">
-                                    <a class="btn btn-outline-primary"
-                                       href="{% url "account.channel.manage" channel_oid=channel_data.id %}">
-                                        {% trans "Manage" %}
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <hr>
+
         <div class="row">
             <div class="col mb-3">
                 <a class="h3 text-info" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">
@@ -131,7 +64,7 @@
                     <h4 class="card-header text-info">{% trans "Message Count in 1 Day" %}</h4>
                     <div class="card-body">
                         <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
-                        {% include "info/components/msg_table_count.html" with message_stats=user_message_data1d %}
+                        {% include "info/components/msg_table_count.html" with message_data=user_message_data1d simplified=True only %}
                     </div>
                 </div>
             </div>
@@ -140,16 +73,18 @@
                     <h4 class="card-header text-info">{% trans "Message Count in 7 Days" %}</h4>
                     <div class="card-body">
                         <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
-                        {% include "info/components/msg_table_count.html" with message_stats=user_message_data7d %}
+                        {% include "info/components/msg_table_count.html" with message_data=user_message_data7d simplified=True only %}
                     </div>
                 </div>
             </div>
         </div>
+
         <hr>
+
         <div class="row">
             <div class="col mb-3 h3">
                 <a class="h3 text-success" href="{% url "info.channel.botstats" channel_oid=channel_data.id %}">
-                    {% trans "Bot Feature Usage" %}
+                    {% trans "Bot Feature Usage Statistics" %}
                     &#x1f517;
                 </a>
             </div>

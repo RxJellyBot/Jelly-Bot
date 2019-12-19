@@ -2,6 +2,7 @@
 
 <canvas id="bot-usage"></canvas>
 
+<!--suppress JSUnresolvedFunction, JSUnresolvedVariable -->
 <script type="text/javascript">
     new Chart(document.getElementById("bot-usage").getContext("2d"), {
         plugins: [ChartDataLabels],
@@ -23,6 +24,12 @@
                     align: "top",
                     offset: "9",
                     color: "#AA0000"
+                }
+            },
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
                 }
             }
         },

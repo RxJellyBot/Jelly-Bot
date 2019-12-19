@@ -1,17 +1,16 @@
 from typing import List
 
-from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import Bot
-from extutils.dt import t_delta_str, now_utc_aware
+from extutils.dt import t_delta_str, now_utc_aware, localtime
 from flags import BotFeature
 from mongodb.factory import TimerManager, BotFeatureUsageDataManager
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
 
 
 def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    tmrs = TimerManager.get_timer(e.channel_oid, e.content)
+    tmrs = TimerManager.get_timers(e.channel_oid, e.content)
 
     if tmrs.has_data:
         BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_TMR_GET, e.channel_oid, e.user_model.id)
@@ -37,6 +36,9 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
             ))
 
     if not crs.empty:
+        if ret:
+            ret.append("-------------")
+
         now = now_utc_aware()
         ret.append(_("**{} timer(s) will time up in less than {} hrs!**").format(len(crs), Bot.Timer.NotifyWithinHours))
         ret.append("")

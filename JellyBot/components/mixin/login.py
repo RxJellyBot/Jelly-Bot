@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views import View
 
 from JellyBot import keys
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 
 
 class LoginRequiredMixin(UserPassesTestMixin, View):

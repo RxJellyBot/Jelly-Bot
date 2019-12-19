@@ -2,6 +2,7 @@
 
 <canvas id="bot-hrflow"></canvas>
 
+<!--suppress JSUnresolvedFunction -->
 <script type="text/javascript">
     new Chart(document.getElementById("bot-hrflow").getContext("2d"), {
         type: "line",
@@ -9,17 +10,17 @@
         data: {
             labels: {{ flow_data.label_hr }},
             datasets: [
-                {% for subdata in flow_data.data %}
+                {% for entry in flow_data.data %}
                     {
-                        label: "{% firstof subdata.feature.key subdata.feature %}",
-                        borderColor: "{{ subdata.color }}",
-                        pointBackgroundColor: "{{ subdata.color }}",
-                        pointBorderColor: "{{ subdata.color }}",
-                        pointRadius: 3,
-                        pointHoverRadius: 7,
+                        label: "{% firstof entry.feature.key entry.feature %}",
+                        borderColor: "{{ entry.color }}",
+                        pointBackgroundColor: "{{ entry.color }}",
+                        pointBorderColor: "{{ entry.color }}",
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
                         fill: false,
-                        data: {{ subdata.data }},
-                        hidden: {{ subdata.hidden }}
+                        data: {{ entry.data }},
+                        hidden: {{ entry.hidden }}
                     },
                 {% endfor %}
             ]
@@ -36,6 +37,12 @@
             elements: {
                 line: {
                     tension: 0 // disables bezier curves
+                }
+            },
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
                 }
             }
         }

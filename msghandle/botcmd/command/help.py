@@ -10,6 +10,7 @@ cmd = CommandNode(
     description=_("See the documentation or bot related information."))
 
 
+# noinspection PyUnusedLocal
 @cmd.command_function(feature_flag=BotFeature.TXT_BOT_HELP)
 def help_text(e: TextMessageEventObject):
     # For some reason, translation needs to be casted to `str` explicitly, or:

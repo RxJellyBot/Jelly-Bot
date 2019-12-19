@@ -1,7 +1,5 @@
 import traceback
 
-from django.utils.translation import gettext_lazy as _
-
 from extutils.emailutils import MailSender
 from msghandle import handle_message_main
 from msghandle.models import (

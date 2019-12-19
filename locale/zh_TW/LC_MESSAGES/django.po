@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 02:21-0600\n"
-"PO-Revision-Date: 2019-12-18 02:15-0600\n"
+"POT-Creation-Date: 2019-12-18 23:18-0600\n"
+"PO-Revision-Date: 2019-12-18 23:20-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -79,41 +79,41 @@ msgid ""
 "connections linked to the channel."
 msgstr "找不到你與該頻道的連結，故已將你重新導向至頻道資訊頁面。"
 
-#: .\JellyBot\views\account\control.py:22 .\JellyBot\views\nav.py:21
+#: .\JellyBot\views\account\control.py:21 .\JellyBot\views\nav.py:21
 msgid "Login"
 msgstr "登入"
 
-#: .\JellyBot\views\account\control.py:26
+#: .\JellyBot\views\account\control.py:25
 msgid "An unknown error occurred."
 msgstr "發生未知的錯誤。"
 
-#: .\JellyBot\views\account\control.py:36
+#: .\JellyBot\views\account\control.py:35
 msgid "Registration process not performed."
 msgstr "登錄程序未執行。"
 
-#: .\JellyBot\views\account\control.py:38
+#: .\JellyBot\views\account\control.py:37
 msgid "New user data creation failed."
 msgstr "新用戶資料創建失敗。"
 
-#: .\JellyBot\views\account\control.py:40
+#: .\JellyBot\views\account\control.py:39
 msgid "The data cannot be passed into the server."
 msgstr "資料無法傳送到伺服器中。"
 
-#: .\JellyBot\views\account\control.py:43
+#: .\JellyBot\views\account\control.py:42
 msgid ""
 "An unknown error occurred during the new user data registration. Code: {}."
 msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {}。"
 
-#: .\JellyBot\views\account\control.py:61
+#: .\JellyBot\views\account\control.py:60
 msgid "User token is null however login succeed. {}"
 msgstr "登入成功，但用戶編碼為空。 ({})"
 
-#: .\JellyBot\views\account\control.py:69 .\JellyBot\views\nav.py:63
+#: .\JellyBot\views\account\control.py:68 .\JellyBot\views\nav.py:63
 #: .\templates\account\main.html:120
 msgid "Logout"
 msgstr "登出"
 
-#: .\JellyBot\views\account\control.py:96 .\templates\account\settings.html:8
+#: .\JellyBot\views\account\control.py:95 .\templates\account\settings.html:8
 msgid "Account Settings"
 msgstr "帳號設定"
 
@@ -467,11 +467,11 @@ msgid ""
 "mod of a channel...etc."
 msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...等。"
 
-#: .\extutils\dt.py:21
+#: .\extutils\dt.py:26
 msgid "{} Days {} H {:02} M {:02} S"
 msgstr "{} 日 {} 時 {:02} 分 {:02} 秒"
 
-#: .\extutils\dt.py:24
+#: .\extutils\dt.py:29
 msgid "{} H {:02} M {:02} S"
 msgstr "{} 時 {:02} 分 {:02} 秒"
 
@@ -1197,7 +1197,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:194
+#: .\models\stats.py:121 .\models\stats.py:296
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -1213,7 +1213,7 @@ msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "{event} has ended (at {time})"
 msgstr "{event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:145
+#: .\mongodb\factory\prof.py:144
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -1933,9 +1933,9 @@ msgstr ""
 #: .\msghandle\botcmd\command\ar.py:166
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
-"which type is NOT text. For example, if there is a module which keyword 100"
-"(Text) and another module which keyword is 100(Sticker), both modules will "
-"be deleted if this argument is 100."
+"which type is NOT text. For example, if there is a module which keyword "
+"100(Text) and another module which keyword is 100(Sticker), both modules "
+"will be deleted if this argument is 100."
 msgstr ""
 "要刪除的自動回覆組的關鍵字。請注意，此指令也會刪除關鍵字種類**並非**文字的回"
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
@@ -1999,7 +1999,7 @@ msgstr "幫助"
 msgid "See the documentation or bot related information."
 msgstr "查閱機器人的相關文件及資訊。"
 
-#: .\msghandle\botcmd\command\help.py:20
+#: .\msghandle\botcmd\command\help.py:21
 msgid ""
 "LINE BOT:\n"
 "Beta: http://rnnx.cc/LineBeta\n"
@@ -2083,11 +2083,11 @@ msgstr "所在頻道組訊息量排行(1日) - {}"
 msgid "Channel Collection Message Count Ranking in 7 Days - {}"
 msgstr "所在頻道組訊息量排行(7日) - {}"
 
-#: .\msghandle\botcmd\command\id.py:87
+#: .\msghandle\botcmd\command\id.py:84
 msgid "Top {} Message Count in 7 Days in this channel:"
 msgstr "所在頻道的訊息量前{}名(7日):"
 
-#: .\msghandle\botcmd\command\id.py:107
+#: .\msghandle\botcmd\command\id.py:102
 msgid "Top {} Message Count in 7 Days in this channel collection:"
 msgstr "所在頻道組的訊息量前{}名(7日):"
 
@@ -2149,11 +2149,11 @@ msgstr "選項清單最多只能有{}個選項。"
 msgid "Maximum count of picking an option in a single command is {}."
 msgstr "單次指令中，最多可抽選次數為 {}。"
 
-#: .\msghandle\botcmd\command\rdm.py:91
+#: .\msghandle\botcmd\command\rdm.py:92
 msgid "Option Picked: {}"
 msgstr "抽中選項: {}"
 
-#: .\msghandle\botcmd\command\rdm.py:100
+#: .\msghandle\botcmd\command\rdm.py:102
 msgid ""
 "Count of how many times to randomly pick an option.\n"
 "This number cannot exceed {}."
@@ -2255,7 +2255,7 @@ msgstr "轉型/替換"
 msgid "Transform/Replace the given text."
 msgstr "轉型/替換提供的文字。"
 
-#: .\msghandle\botcmd\command\trfm.py:15
+#: .\msghandle\botcmd\command\trfm.py:16
 msgid "String to be replaced."
 msgstr "要被替換的文字。"
 
@@ -2356,7 +2356,7 @@ msgstr ""
 "表達式: {}\n"
 "結果: {}"
 
-#: .\msghandle\spec\error.py:27
+#: .\msghandle\spec\error.py:29
 msgid ""
 "An error occurred while handling message. An error report was sent for "
 "investigation."
@@ -2387,11 +2387,19 @@ msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
 
-#: .\msghandle\text\timer.py:29
+#: .\msghandle\text\timer.py:30
+msgid "**{} timer(s) have timed up!**"
+msgstr "**{} 個計時器時間到！**"
+
+#: .\msghandle\text\timer.py:34
+msgid "{event} has timed up! (at {time})"
+msgstr "{event} 結束於 {time}！"
+
+#: .\msghandle\text\timer.py:43
 msgid "**{} timer(s) will time up in less than {} hrs!**"
 msgstr "**{} 個計時器將於 {} 小時內時間到！**"
 
-#: .\msghandle\text\timer.py:32
+#: .\msghandle\text\timer.py:47
 msgid "{event} will time up after [{diff}]! (at {time})"
 msgstr "{event} 將於 [{diff}] 後時間到！(於 {time})"
 
@@ -2535,12 +2543,12 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
-"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
-"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
-"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
-"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
-"可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
+"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
+"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
+"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
+"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
+"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list_table.html:13
 #: .\templates\info\channel\search.html:49
@@ -2568,8 +2576,7 @@ msgstr "ID"
 
 #: .\templates\account\channel\list_table.html:57
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
-#: .\templates\info\botstats\main.html:84
-#: .\templates\info\channel\main.html:53
+#: .\templates\info\botstats\main.html:84 .\templates\info\channel\main.html:53
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\msgstats\main.html:84 .\templates\info\profile.html:44
 msgid "Channel ID"
@@ -2583,9 +2590,9 @@ msgid "Channel Token"
 msgstr "頻道代碼"
 
 #: .\templates\account\channel\manage.html:15 .\templates\account\main.html:16
-#: .\templates\info\botstats\main.html:60
-#: .\templates\info\channel\main.html:26 .\templates\info\chcoll\main.html:15
-#: .\templates\info\msgstats\main.html:60 .\templates\info\profile.html:15
+#: .\templates\info\botstats\main.html:60 .\templates\info\channel\main.html:26
+#: .\templates\info\chcoll\main.html:15 .\templates\info\msgstats\main.html:60
+#: .\templates\info\profile.html:15
 msgid "Basic Information"
 msgstr "基本資訊"
 
@@ -2677,10 +2684,10 @@ msgid ""
 "on the account where you get the Execode will be discarded, only the data on "
 "the website will be kept. </p>"
 msgstr ""
-"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href=\"%"
-"(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代碼的"
-"帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設定所"
-"取代。 </p>"
+"<p>於下方輸入啟動用戶資料整合手續時，獲取的執行碼。<br> 查閱 <a href="
+"\"%(cmd_url)s\">此頁面</a> 以了解如何啟動用戶資料整合手續。<br> 綁定於獲取代"
+"碼的帳號上的帳號相關資料，例如地區設定，將會自動被此網站上的用戶資料的帳號設"
+"定所取代。 </p>"
 
 #: .\templates\account\integrate.html:33
 msgid "Integration Execode here"
@@ -2951,24 +2958,23 @@ msgstr "表情貼 / LINE貼圖"
 #: .\templates\ar\add-notes.html:40
 msgid ""
 "<small>Refer to the \"LINE Sticker\" section for LINE Sticker.</small><br> "
-"<div> <small>Discord emojis are treated as normal text. They are in the form "
-"of <code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>. Example: <code>&lt;:"
-"neut:554302047038734366&gt;</code></small> <br> <ul> <li><code>EMOJI_NAME</"
+"<small> Discord emojis are treated as normal text. They are in the form of "
+"<code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>. Example: <code>&lt;:"
+"neut:554302047038734366&gt;</code> </small><br> <ul> <li><code>EMOJI_NAME</"
 "code>: What you normally type in the chat window excluding the wrapping "
 "colons. If you type :neut: in the window, then \"neut\" is the name of the "
-"emoji.</li> <li><code>EMOJI_ID</code>: The number in the URL when you get "
+"emoji. </li> <li><code>EMOJI_ID</code>: The number in the URL when you get "
 "the link of the emoji. On PC client, you can right click on the emoji and "
-"click \"Copy Link\" or \"Open Link\" to get the number / ID.</li> </ul> </"
-"div>"
+"click \"Copy Link\" or \"Open Link\" to get the number / ID. </li> </ul>"
 msgstr ""
-"<small>針對\"LINE貼圖\"，請查閱\"LINE貼圖\"內的說明。</"
-"small><br><div><small> Discord的表情貼視為一般文字。這些表情貼的文字格式為 "
-"<code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</code>。範例: <code>&lt;:"
-"neut:554302047038734366&gt;</code> </small><br> <ul> <li><code>EMOJI_NAME</"
-"code>: 通常在聊天的時候，要使用表情貼時會輸入的內容。冒號除外。如果你輸入的"
-"是 :neut: ，則 \"neut\" 就是這個表情貼的名字。</li> <li><code>EMOJI_ID</"
-"code>: 獲得表情貼連結時，網址中的數字。於PC端上，使用滑鼠右鍵點擊表情貼後，點"
-"擊 \"開啟連結\" 或 \"複製連結\" 以獲取表情貼ID。</li> </ul></div>"
+"<small>針對\"LINE貼圖\"，請查閱\"LINE貼圖\"內的說明。</small><br><small> "
+"Discord的表情貼視為一般文字。這些表情貼的文字格式為 <code>&lt;:EMOJI_NAME:"
+"EMOJI_ID&gt;</code>。範例: <code>&lt;:neut:554302047038734366&gt;</code> </"
+"small><br> <ul> <li><code>EMOJI_NAME</code>: 通常在聊天的時候，要使用表情貼時"
+"會輸入的內容。冒號除外。如果你輸入的是 :neut: ，則 \"neut\" 就是這個表情貼的"
+"名字。</li> <li><code>EMOJI_ID</code>: 獲得表情貼連結時，網址中的數字。於PC端"
+"上，使用滑鼠右鍵點擊表情貼後，點擊 \"開啟連結\" 或 \"複製連結\" 以獲取表情貼"
+"ID。</li> </ul>"
 
 #: .\templates\ar\add-props.html:4
 msgid "Properties"
@@ -3063,8 +3069,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains '%(tag_splitter)"
-"s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains "
+"'%(tag_splitter)s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splitter)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:18
@@ -3239,8 +3245,8 @@ msgstr "指令前綴&nbsp;<b>大小寫有別</b>。"
 #: .\templates\doc\botcmd_main.html:23
 #, python-format
 msgid ""
-"The splitter(s) between the command code and its arguments is/are&nbsp;%"
-"(splhtml)s.&nbsp;"
+"The splitter(s) between the command code and its arguments is/are&nbsp;"
+"%(splhtml)s.&nbsp;"
 msgstr "指令參數和指令代碼的分隔子為&nbsp;%(splhtml)s。&nbsp;"
 
 #: .\templates\doc\botcmd_main.html:29
@@ -3336,8 +3342,7 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8
-#: .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3349,17 +3354,17 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>%"
-"(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href=\"%"
-"(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
+"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
+"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
+"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
+"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
 "private.</li> </ul> If all the conditions match, but the error still occurs, "
 "please <a href=\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: %"
-"(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不"
-"是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出現"
-"在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
+"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
+"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
+"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
 "li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
 "聯絡網站開發者。</a>"
 
@@ -3407,8 +3412,8 @@ msgid ""
 "website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<b>不是頻道代碼"
-"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -3420,12 +3425,12 @@ msgstr "找不到對應的頻道組資訊。"
 msgid ""
 "Please check that:<br> <ul> <li><code>%(chcoll_oid)s</code> is the Channel "
 "Collection ID, <b>NOT the channel collection token</b>.</li> </ul> If all "
-"the conditions match, but the error still occurs, please <a href=\"%"
-"(about_page)s\">contact the website developer.</a>"
+"the conditions match, but the error still occurs, please <a href="
+"\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(chcoll_oid)s</code>是頻道組ID，而<b>不是頻道組代"
-"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"碼</b>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\profile_not_found.html:19
 msgid "User profile not found with the provided ID."
@@ -3439,8 +3444,8 @@ msgid ""
 "conditions match, but the error still occurs, please <a href=\"%(about_page)s"
 "\">contact the website developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: %"
-"(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
+"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\unknown.html:13
@@ -3490,8 +3495,7 @@ msgstr "詳細"
 msgid "Bot Feature Usage Statistics"
 msgstr "機器人使用統計"
 
-#: .\templates\info\botstats\main.html:17
-#: .\templates\info\channel\main.html:17
+#: .\templates\info\botstats\main.html:17 .\templates\info\channel\main.html:17
 #: .\templates\info\msgstats\main.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
@@ -3523,8 +3527,7 @@ msgstr "留空和重整頁面以獲得全時紀錄。"
 msgid "Refresh"
 msgstr "重整"
 
-#: .\templates\info\botstats\main.html:66
-#: .\templates\info\channel\main.html:33
+#: .\templates\info\botstats\main.html:66 .\templates\info\channel\main.html:33
 #: .\templates\info\msgstats\main.html:66
 msgid "Channel Name"
 msgstr "頻道名稱"
@@ -3543,9 +3546,8 @@ msgid "Feature Usage Count"
 msgstr "功能使用統計"
 
 #: .\templates\info\botstats\main.html:127
-#: .\templates\info\msgstats\main.html:127
-msgid "Member Message Count Ranking"
-msgstr "成員訊息量排行"
+msgid "Feature Usage Count Per Member"
+msgstr "成員功能使用統計"
 
 #: .\templates\info\channel\main.html:10
 msgid "Channel Info"
@@ -3619,7 +3621,7 @@ msgstr "頻道組代碼"
 msgid "Child Channels"
 msgstr "子頻道"
 
-#: .\templates\info\components\bot_chart_usage.html:14
+#: .\templates\info\components\bot_chart_usage.html:15
 msgid "Usage Count"
 msgstr "使用次數"
 
@@ -3633,23 +3635,30 @@ msgid "Count"
 msgstr "使用次數"
 
 #: .\templates\info\components\bot_table_member.html:7
-#: .\templates\info\components\msg_table_count.html:8
+#: .\templates\info\components\msg_table_count.html:7
 msgid "Member Name"
 msgstr "成員名稱"
 
-#: .\templates\info\components\msg_chart_daily.html:12
-#: .\templates\info\components\msg_table_count.html:9
+#: .\templates\info\components\bot_table_member.html:8
+msgid "Total Usage"
+msgstr "總計使用次數"
+
+#: .\templates\info\components\msg_chart_daily.html:13
 msgid "Message Count"
 msgstr "訊息量"
 
-#: .\templates\info\components\msg_chart_hrflow.html:12
-msgid "Message Count / Day"
-msgstr "訊息量 / 日"
+#: .\templates\info\components\msg_table_count.html:9
+msgid "Total Count"
+msgstr "總計次數"
 
 #: .\templates\info\components\msg_table_count.html:10
 #, python-format
-msgid "Ratio %%"
-msgstr "比例 %%"
+msgid "Total Ratio %%"
+msgstr "總計比例 %%"
+
+#: .\templates\info\components\msg_table_daily.html:7
+msgid "Date"
+msgstr "日期"
 
 #: .\templates\info\msgstats\main.html:10
 msgid "Channel Message Statistics"
@@ -3663,7 +3672,11 @@ msgstr "每小時平均訊息量"
 msgid "Daily Message Flow"
 msgstr "每日訊息量"
 
-#: .\templates\info\msgstats\main.html:128
+#: .\templates\info\msgstats\main.html:132
+msgid "Member Message Count Ranking"
+msgstr "成員訊息量排行"
+
+#: .\templates\info\msgstats\main.html:133
 msgid "Total Count: "
 msgstr "訊息總數: "
 
@@ -3784,3 +3797,6 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "Message Count / Day"
+#~ msgstr "訊息量 / 日"

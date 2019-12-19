@@ -3,7 +3,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 from JellyBot.keys import Session
 from JellyBot.api.static import result
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from models import APIStatisticModel
 from mongodb.factory import APIStatisticsManager
 
