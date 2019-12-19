@@ -2,22 +2,28 @@
 
 <canvas id="msgstats-intvflow"></canvas>
 
+<!--suppress JSUnresolvedFunction -->
 <script type="text/javascript">
     new Chart(document.getElementById("msgstats-intvflow").getContext("2d"), {
         type: "line",
 
         data: {
-            labels: {{ msg_intvflow_data.hours_label }},
-            datasets: [{
-                label: "{% trans "Message Count / Day" %}",
-                borderColor: "rgb(50, 50, 50)",
-                pointBackgroundColor: "rgb(50, 50, 50)",
-                pointBorderColor: "rgb(50, 50, 50)",
-                pointRadius: 5,
-                pointHoverRadius: 10,
-                fill: false,
-                data: {{ msg_intvflow_data.avg_data }}
-            }]
+            labels: {{ msg_intvflow_data.label_hr }},
+            datasets: [
+                {% for entry in msg_intvflow_data.data %}
+                    {
+                        label: "{{ entry.category_name }}",
+                        borderColor: "{{ entry.color }}",
+                        pointBackgroundColor: "{{ entry.color }}",
+                        pointBorderColor: "{{ entry.color }}",
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        fill: false,
+                        data: {{ entry.data }},
+                        hidden: {{ entry.hidden }}
+                    },
+                {% endfor %}
+            ]
         },
 
         options: {

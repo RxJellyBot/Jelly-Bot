@@ -30,12 +30,6 @@ class DiscordClient(Client):
 
         DISCORD.logger.info(f"Logged on as {self.user}.")
 
-        # Disabled as the DiscordBot is started on the Django server
-        #
-        # # Load server for possible reverse() call
-        # from JellyBot.components.utils import load_server
-        # load_server()
-
         initialize(self.user.id)
 
         await self.change_presence(activity=Activity(name=cmd_help.get_usage(), type=ActivityType.watching))

@@ -1,10 +1,11 @@
 {% load i18n %}
 
-<div class="table-responsive table-freeze-header" style="max-height: 25rem">
+<div class="table-responsive table-freeze-header table-freeze-first-col" style="max-height: 35rem">
     <table class="table table-hover table-bordered table-bordered mb-0 datatable">
         <thead>
         <tr>
             <th scope="col">{% trans "Member Name" %}</th>
+            <th scope="col" class="no-line-break">{% trans "Total Usage" %}</th>
             {% for feature in stats_data.features %}
                 <th scope="col" class="no-line-break"><small>{{ feature.key }}</small></th>
             {% endfor trimmed %}
@@ -13,7 +14,8 @@
         <tbody>
         {% for entry in stats_data.data %}
             <tr>
-                <td class="align-middle text-center">{{ entry.user_name }}</td>
+                <th class="align-middle text-center no-line-break">{{ entry.user_name }}</th>
+                <td class="align-middle text-center">{{ entry.data_sum }}</td>
                 {% for point in entry.data_points %}
                     <td class="align-middle text-center">{{ point }}</td>
                 {% endfor trimmed %}

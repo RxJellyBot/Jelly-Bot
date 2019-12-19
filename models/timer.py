@@ -3,9 +3,8 @@ from datetime import datetime
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import localtime
 
-from extutils.dt import now_utc_aware, t_delta_str
+from extutils.dt import now_utc_aware, t_delta_str, localtime
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import CursorWithCount

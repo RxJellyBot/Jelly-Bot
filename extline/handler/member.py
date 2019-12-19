@@ -9,6 +9,7 @@ from mongodb.factory import RootUserManager, ChannelManager, ProfileManager
 __all__ = ["handle_member_main"]
 
 
+# noinspection PyUnusedLocal
 def handle_member_join(request, event, destination):
     for user in event.joined.members:
         uid = user.user_id
@@ -23,6 +24,7 @@ def handle_member_join(request, event, destination):
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 
 
+# noinspection PyUnusedLocal
 def handle_member_left(request, event, destination):
     for user in event.left.members:
         uid = user.user_id

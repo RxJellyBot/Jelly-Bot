@@ -11,7 +11,7 @@ from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult, \
-    HourlyResult, BotFeaturePerUserUsageResult
+    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -92,20 +92,22 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def get_user_messages(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None) \
-            -> list:
+            -> MemberMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
         self._attach_hours_within_(match_d, hours_within)
 
         aggr_pipeline = [
             {"$match": match_d},
             {"$group": {
-                OID_KEY: "$" + MessageRecordModel.UserRootOid.key,
-                "count": {"$sum": 1}
-            }},
-            {"$sort": {"count": pymongo.DESCENDING, OID_KEY: pymongo.ASCENDING}}
+                OID_KEY: {
+                    MemberMessageResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key,
+                    MemberMessageResult.KEY_CATEGORY: "$" + MessageRecordModel.MessageType.key
+                },
+                MemberMessageResult.KEY_COUNT: {"$sum": 1}
+            }}
         ]
 
-        return list(self.aggregate(aggr_pipeline))
+        return MemberMessageResult(list(self.aggregate(aggr_pipeline)))
 
     def hourly_interval_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
@@ -117,8 +119,13 @@ class MessageRecordStatisticsManager(BaseCollection):
         pipeline = [
             {"$match": match_d},
             {"$group": {
-                "_id": {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
-                HourlyIntervalAverageMessageResult.KEY: {"$sum": 1}
+                "_id": {
+                    HourlyIntervalAverageMessageResult.KEY_HR:
+                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
+                    HourlyIntervalAverageMessageResult.KEY_CATEGORY:
+                        "$" + MessageRecordModel.MessageType.key
+                },
+                HourlyIntervalAverageMessageResult.KEY_COUNT: {"$sum": 1}
             }},
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
@@ -137,17 +144,27 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$match": match_d},
             {"$group": {
                 "_id": {
-                    "$dateToString":
-                        {"date": "$_id",
-                         "format": "%Y-%m-%d",
-                         "timezone": tzinfo_.tzname(datetime.utcnow())}
+                    DailyMessageResult.KEY_DATE: {
+                        "$dateToString": {
+                            "date": "$_id",
+                            "format": "%Y-%m-%d",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    },
+                    DailyMessageResult.KEY_HOUR: {
+                        "$hour": {
+                            "date": "$_id",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    }
                 },
-                DailyMessageResult.KEY: {"$sum": 1}
+                DailyMessageResult.KEY_COUNT: {"$sum": 1}
             }},
             {"$sort": {"_id": pymongo.ASCENDING}}
         ]
 
-        return DailyMessageResult(list(self.aggregate(pipeline)))
+        return DailyMessageResult(
+            list(self.aggregate(pipeline)), HourlyResult.data_days_collected(self, match_d, hours_within), tzinfo_)
 
 
 class BotFeatureUsageDataManager(BaseCollection):

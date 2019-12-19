@@ -12,7 +12,7 @@ from flags import WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
 from msghandle.botcmd.command import cmd_id
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.systemconfig import ExecodeManager
 

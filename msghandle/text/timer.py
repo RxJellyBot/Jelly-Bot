@@ -1,10 +1,9 @@
 from typing import List
 
-from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import Bot
-from extutils.dt import t_delta_str, now_utc_aware
+from extutils.dt import t_delta_str, now_utc_aware, localtime
 from flags import BotFeature
 from mongodb.factory import TimerManager, BotFeatureUsageDataManager
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
