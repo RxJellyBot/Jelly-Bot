@@ -33,7 +33,7 @@ class MessageRecordModel(Model):
     UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
     MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
-    ProcessTimeMs = FloatField("pt", default=ModelDefaultValueExt.Optional)
+    ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
 
 
 class BotFeatureUsageModel(Model):
@@ -173,11 +173,11 @@ class DailyMessageResult:
     def _prepare_label_data_(days_collected, tzinfo):
         ret = []
 
-        now = localtime(now_utc_aware(), tz=tzinfo)
-        cur = now - timedelta(days=days_collected)
-        while cur < now:
-            ret.append(cur.strftime("%Y-%m-%d"))
-            cur += timedelta(days=1)
+        _end_ = localtime(now_utc_aware(), tz=tzinfo)
+        _start_ = (_end_ - timedelta(days=days_collected)).date()
+
+        for i in range((_end_.date() - _start_).days + 1):
+            ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
 
         return ret
 

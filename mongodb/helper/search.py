@@ -1,11 +1,12 @@
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict, Iterable
 
 from bson import ObjectId
 
 from extutils.emailutils import MailSender
 from models import ChannelModel
-from mongodb.factory import ChannelManager, MessageRecordStatisticsManager
+from mongodb.factory import ChannelManager, MessageRecordStatisticsManager, RootUserManager
 
 
 @dataclass
@@ -43,5 +44,23 @@ class IdentitySearcher:
                 f"Channel OID have no corresponding channel data in message record.\n"
                 f"{' | '.join([str(i) for i in missing])}",
                 subject="Missing Channel Data")
+
+        return ret
+
+    @staticmethod
+    def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: ChannelModel) -> Dict[ObjectId, str]:
+        ret = {}
+
+        with ThreadPoolExecutor(max_workers=10, thread_name_prefix="GetUserNames") as executor:
+            futures = []
+            for uid in user_oids:
+                futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, channel_data))
+
+            # Non-lock call & Free resources when execution is done
+            executor.shutdown(False)
+
+            for completed in futures:
+                result = completed.result()
+                ret[result.user_id] = result.user_name
 
         return ret

@@ -1,18 +1,15 @@
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional
 
-from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.utils.timezone import get_current_timezone
 
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid
+from JellyBot.utils import get_root_oid, get_channel_data
 from extutils import safe_cast
 from flags import WebsiteError
-from models import ChannelModel
-from mongodb.factory import ChannelManager, BotFeatureUsageDataManager
+from mongodb.factory import BotFeatureUsageDataManager
 from mongodb.helper import BotUsageStatsDataProcessor
 
 KEY_HR_FLOW = "usage_hr_data"
@@ -57,32 +54,25 @@ def get_bot_stats_data_package(channel_data, hours_within, tzinfo):
 class ChannelBotUsageStatsView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
-        # `kwargs` will be used as `nav_param` so extract channel_oid from `kwargs` instead of creating param.
+        channel_data = get_channel_data(kwargs)
 
-        # `channel_oid` may be misformatted.
-        # If so, `safe_cast` will yield `None` while the original parameter needs to be kept for the case of not found.
-        channel_oid_str = kwargs.get("channel_oid", "")
-        channel_oid = safe_cast(channel_oid_str, ObjectId)
-
-        channel_data: Optional[ChannelModel] = ChannelManager.get_channel_oid(channel_oid)
-
-        if not channel_data:
+        if not channel_data.ok:
             return WebsiteErrorView.website_error(
-                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_oid_str}, nav_param=kwargs)
+                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
 
-        hours_within = safe_cast(request.GET.get("hours_within"), int) or ""
+        hours_within = safe_cast(request.GET.get("hours_within"), int)
 
         # channel_members = ProfileManager.get_channel_members(channel_oid)  # Reserved for per member analysis
 
-        pkg = get_bot_stats_data_package(channel_data, hours_within, get_current_timezone())
+        pkg = get_bot_stats_data_package(channel_data.model, hours_within, get_current_timezone())
 
         ctxt = {
-            "ch_name": channel_data.get_channel_name(get_root_oid(request)),
-            "channel_data": channel_data,
+            "channel_name": channel_data.model.get_channel_name(get_root_oid(request)),
+            "channel_data": channel_data.model,
             "hr_range": hours_within or pkg[KEY_HR_FLOW].hr_range
         }
         ctxt.update(pkg)
 
         return render_template(
-            self.request, _("Bot Usage Stats - {}").format(channel_oid),
+            self.request, _("Bot Usage Stats - {}").format(channel_data.model.id),
             "info/botstats/main.html", ctxt, nav_param=kwargs)
