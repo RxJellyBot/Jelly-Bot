@@ -29,6 +29,8 @@ class BotFeature(FlagDoubleEnum):
             112 - Random
                 1121 - Choice - Once
                 1122 - Choice - Multiple
+            113 - Recent Activities
+                1131 - Message
 
         19 - Functional
                 1901 - User data integration
@@ -89,6 +91,9 @@ class BotFeature(FlagDoubleEnum):
     TXT_RDM_CHOICE_MULTI = \
         1122, _("Text / Random / Choice (Multi)"), \
         _("Randomly pick an option among the provided options multiple times.")
+
+    TXT_RCT_MESSAGE = \
+        1131, _("Text / Recent / Message"), _("Get recent messages including the recalled ones.")
 
     TXT_FN_UDI_START = \
         1901, _("Text / User Data Integration / Start"), _("Issue an Execode for user data integration.")

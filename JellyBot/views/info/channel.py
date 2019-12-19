@@ -36,7 +36,7 @@ class ChannelInfoView(TemplateResponseMixin, View):
             return render_template(
                 self.request, _("Channel Info - {}").format(channel_oid), "info/channel/main.html",
                 {
-                    "ch_name": channel_data.get_channel_name(get_root_oid(request)),
+                    "channel_name": channel_data.get_channel_name(get_root_oid(request)),
                     "channel_data": channel_data,
                     "chcoll_data": chcoll_data,
                     "user_message_data1d": msgdata_1d,
