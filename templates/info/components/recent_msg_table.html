@@ -8,7 +8,7 @@
             <th scope="col" class="text-center no-line-break">{% trans "Sender Name" %}</th>
             <th scope="col" class="text-center no-line-break">{% trans "Content Type" %}</th>
             <th scope="col" class="text-center no-line-break">{% trans "Content" %}</th>
-            <th scope="col" class="text-center no-line-break">{% trans "Process Time (sec)" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Process Time (ms)" %}</th>
         </tr>
         </thead>
         <tbody>
@@ -18,7 +18,7 @@
                 <td class="align-middle text-center">{{ entry.user_name }}</td>
                 <td class="align-middle text-center">{{ entry.content_type.key }}</td>
                 <td class="align-middle text-center">{{ entry.content_html|safe }}</td>
-                <td class="align-middle text-center">{{ entry.model.process_time_secs|stringformat:".4f" }}</td>
+                <td class="align-middle text-center">{{ entry.process_time_ms|stringformat:".2f" }}</td>
             </tr>
         {% endfor %}
         </tbody>

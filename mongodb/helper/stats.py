@@ -56,11 +56,13 @@ class HandledMessageRecordEntry:
     timestamp: str = field(init=False)
     content_type: MessageType = field(init=False)
     content_html: str = field(init=False)
+    process_time_ms: float = field(init=False)
 
     def __post_init__(self):
         self.timestamp = ObjectId(self.model.id).generation_time.strftime("%Y-%m-%d %H:%M:%S")
         self.content_type = self.model.message_type
         self.content_html = self.model.message_content.replace("\n", "<br>")
+        self.process_time_ms = self.model.process_time_secs * 1000
 
 
 @dataclass

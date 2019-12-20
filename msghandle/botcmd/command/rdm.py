@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from django.utils.translation import gettext_lazy as _
 
+from extutils import safe_cast
 from flags import BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import Bot
@@ -18,16 +19,22 @@ class OptionList:
     def __init__(self, txt: str):
         self.elements = list(set(txt.split(Bot.RandomChoiceSplitter)))
         self.weights = None
+        self.elem_ignored = False
 
         if len(self.elements) > 1 and all([Bot.RandomChoiceWeightSplitter in elem for elem in self.elements]):
             temp = []
             self.weights = []
 
             for elem in self.elements:
-                option, weight = elem.split(Bot.RandomChoiceWeightSplitter, 2)
+                option, weight = elem.split(Bot.RandomChoiceWeightSplitter, 1)
 
-                self.weights.append(float(weight))
-                temp.append(option)
+                weight = safe_cast(weight, float)
+
+                if weight:
+                    self.weights.append(weight)
+                    temp.append(option)
+                else:
+                    self.elem_ignored = True
 
             self.elements = temp
 
@@ -87,11 +94,13 @@ def random_once(e: TextMessageEventObject, elements: str):
             HandledMessageEventText(
                 content=option_overlimit_txt)]
 
-    return [
-        HandledMessageEventText(
-            content=_("Option Picked: {}").format(option_list.pick_one())
-        )
-    ]
+    ctnt = [_("Option Picked: {}").format(option_list.pick_one())]
+
+    if option_list.elem_ignored:
+        ctnt.append("")
+        ctnt.append(_("*There are element(s) ignored possibly because the options are misformatted.*"))
+
+    return [HandledMessageEventText(content="\n".join([str(c) for c in ctnt]))]
 
 
 # noinspection PyUnusedLocal
@@ -103,6 +112,8 @@ def random_once(e: TextMessageEventObject, elements: str):
                 "This number cannot exceed {}.").format(Bot.RandomChoiceCountLimit)]
 )
 def random_multi(e: TextMessageEventObject, elements: str, times: int):
+    ret = []
+
     if times > Bot.RandomChoiceCountLimit:
         return [HandledMessageEventText(content=pick_overlimit_txt)]
 
@@ -113,9 +124,9 @@ def random_multi(e: TextMessageEventObject, elements: str, times: int):
 
     results = sorted(option_list.pick_multi(times).items(), key=lambda kv: kv[1], reverse=True)
 
-    return [
-        HandledMessageEventText(
-            content="\n".join(
-                [f"{option}: {count} ({count / times:.2%})" for option, count in results])
-        )
-    ]
+    if option_list.elem_ignored:
+        ret.append(_("There are element(s) ignored possibly because the options are misformatted."))
+
+    ret.append("\n".join([f"{option}: {count} ({count / times:.2%})" for option, count in results]))
+
+    return [HandledMessageEventText(content=ctnt) for ctnt in ret]
