@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 import pymongo
 from bson import ObjectId
@@ -66,12 +67,13 @@ class TimerManager(BaseCollection):
         )
 
     @param_type_ensure
-    def get_notify(self, channel_oid: ObjectId) -> CursorWithCount:
+    def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> CursorWithCount:
         now = now_utc_aware()
 
         filter_ = {
             TimerModel.ChannelOid.key: channel_oid,
-            TimerModel.TargetTime.key: {"$lt": now + timedelta(hours=Bot.Timer.NotifyWithinHours),
+            TimerModel.TargetTime.key: {"$lt": now + timedelta(
+                seconds=within_secs if within_secs else Bot.Timer.MaxNotifyRangeSeconds),
                                         "$gt": now},
             TimerModel.Notified.key: False
         }
@@ -101,6 +103,10 @@ class TimerManager(BaseCollection):
         self.update_many_async(filter_, {"$set": {TimerModel.NotifiedExpired.key: True}})
 
         return ret
+
+    @staticmethod
+    def get_notify_within_secs(message_frequency: float):
+        return message_frequency * 13.5 + 495
 
 
 _inst = TimerManager()

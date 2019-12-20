@@ -26,6 +26,18 @@ Website:
 
 <hr>
 
+### Links
+
+[Features/Issues that has done implementing but not yet uploaded](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Atype-awaiting-pr)
+
+[Features/Issues that is currently working on](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Amark-working)
+
+[Features/Issues that should be started soon](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Apriority-9)
+
+[Known Bugs](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Atype-bug)
+
+<hr>
+
 ### Timeline
 
 `May 17 2019` - Website Started.
