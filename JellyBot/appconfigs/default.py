@@ -1,8 +1,10 @@
 from django.apps import AppConfig
 
+from msghandle import load_handling_functions
+
 
 class JellyBotAppConfig(AppConfig):
     name = "JellyBot"
 
     def ready(self):
-        pass
+        load_handling_functions()
