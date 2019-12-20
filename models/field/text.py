@@ -15,10 +15,10 @@ class TextField(BaseField):
 
     def is_value_valid(self, value) -> bool:
         return self.is_type_matched(value) \
-               and ((self.allow_none and value is None)
-                    or ((self._regex is None or re.match(self._regex, value)) and len(value) < self._maxlen)
-                    or self.is_none(value)) \
-               and (not self._must_have_content or (self._must_have_content and len(value) > 0))
+            and ((self.allow_none and value is None)
+                 or ((self._regex is None or re.match(self._regex, value)) and len(value) < self._maxlen)
+                 or self.is_none(value)) \
+            and (not self._must_have_content or (self._must_have_content and len(value) > 0))
 
     @classmethod
     def none_obj(cls):

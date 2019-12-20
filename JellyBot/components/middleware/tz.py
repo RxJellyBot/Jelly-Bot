@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
 
 from extutils.locales import default_locale
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 
 from mongodb.factory import RootUserManager
 

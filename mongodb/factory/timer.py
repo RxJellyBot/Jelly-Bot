@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
 import pymongo
 from bson import ObjectId
 
-from models import TimerModel, TimerListResult
+from models import TimerModel, TimerListResult, OID_KEY
 from mongodb.factory.results import WriteOutcome
 from mongodb.utils import CursorWithCount
 from extutils.checker import param_type_ensure
@@ -48,13 +49,17 @@ class TimerManager(BaseCollection):
         return outcome
 
     @param_type_ensure
+    def del_timer(self, timer_oid: ObjectId) -> bool:
+        return self.delete_one({OID_KEY: timer_oid}).deleted_count > 0
+
+    @param_type_ensure
     def list_all_timer(self, channel_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
     @param_type_ensure
-    def get_timer(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
+    def get_timers(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.Keyword.key: keyword,
                                          TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
@@ -62,12 +67,13 @@ class TimerManager(BaseCollection):
         )
 
     @param_type_ensure
-    def get_notify(self, channel_oid: ObjectId) -> CursorWithCount:
+    def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> CursorWithCount:
         now = now_utc_aware()
 
         filter_ = {
             TimerModel.ChannelOid.key: channel_oid,
-            TimerModel.TargetTime.key: {"$lt": now + timedelta(hours=Bot.Timer.NotifyWithinHours),
+            TimerModel.TargetTime.key: {"$lt": now + timedelta(
+                seconds=within_secs if within_secs else Bot.Timer.MaxNotifyRangeSeconds),
                                         "$gt": now},
             TimerModel.Notified.key: False
         }
@@ -79,6 +85,28 @@ class TimerManager(BaseCollection):
         self.update_many_async(filter_, {"$set": {TimerModel.Notified.key: True}})
 
         return ret
+
+    @param_type_ensure
+    def get_time_up(self, channel_oid: ObjectId) -> CursorWithCount:
+        now = now_utc_aware()
+
+        filter_ = {
+            TimerModel.ChannelOid.key: channel_oid,
+            TimerModel.TargetTime.key: {"$lt": now},
+            TimerModel.NotifiedExpired.key: False
+        }
+
+        ret = self \
+            .find_cursor_with_count(filter_, parse_cls=TimerModel)\
+            .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
+
+        self.update_many_async(filter_, {"$set": {TimerModel.NotifiedExpired.key: True}})
+
+        return ret
+
+    @staticmethod
+    def get_notify_within_secs(message_frequency: float):
+        return message_frequency * 13.5 + 495
 
 
 _inst = TimerManager()

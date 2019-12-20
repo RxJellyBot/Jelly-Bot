@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header table-freeze-first-col" style="max-height: 35rem">
+    <table class="table table-hover table-bordered table-bordered mb-0 datatable">
+        <thead>
+        <tr>
+            <th scope="col" class="text-center">{% trans "Timestamp" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Sender Name" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Content Type" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Content" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Process Time (sec)" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in msg_data.data %}
+            <tr>
+                <td class="align-middle text-center no-line-break">{{ entry.timestamp }}</td>
+                <td class="align-middle text-center">{{ entry.user_name }}</td>
+                <td class="align-middle text-center">{{ entry.content_type.key }}</td>
+                <td class="align-middle text-center">{{ entry.content_html|safe }}</td>
+                <td class="align-middle text-center">{{ entry.model.process_time_secs|stringformat:".4f" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

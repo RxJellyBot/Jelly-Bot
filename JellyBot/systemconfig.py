@@ -42,6 +42,9 @@ class Discord(PlatformConfig):
 class Website:
     NewRegisterThresholdDays = 5
 
+    class RecentActivity:
+        MaxMessageCount = 500
+
 
 class AutoReply:
     MaxResponses = 5
@@ -72,6 +75,7 @@ class Database:
 
     class MessageStats:
         MaxContentCharacter = 500
+        MessageRecordExpirySeconds = 86400 * 365  # 365 Days
 
 
 class DataQuery:
@@ -116,6 +120,13 @@ class Bot:
 
         MaxContentResultLength = 100
 
+        DeleteDataMins = 3
+
+    class RecentActivity:
+        CooldownSeconds = 30
+        DefaultLimitCount = 100
+
     class Timer:
         AutoDeletionDays = 7
-        NotifyWithinHours = 24
+        MaxNotifyRangeSeconds = 14400
+        MessageLimitForNotification = 300

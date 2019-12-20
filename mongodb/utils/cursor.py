@@ -18,6 +18,11 @@ class CursorWithCount:
         self._cursor = self._cursor.sort(key_or_list, direction)
         return self
 
+    def limit(self, limit):
+        if limit:
+            self._cursor = self._cursor.limit(limit)
+        return self
+
     @property
     def empty(self):
         return len(self) == 0

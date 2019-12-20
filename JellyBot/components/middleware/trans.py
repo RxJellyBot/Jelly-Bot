@@ -1,7 +1,7 @@
 from django.utils.translation import activate, deactivate
 from django.utils.deprecation import MiddlewareMixin
 
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 
 from mongodb.factory import RootUserManager
 

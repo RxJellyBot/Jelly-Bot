@@ -1,12 +1,25 @@
-.table-freeze-header {
+div.table-freeze-header {
     overflow-y: auto;
 }
 
-.table-freeze-header thead th {
+div.table-freeze-header thead th {
+    position: -webkit-sticky; /* for Safari */
     position: sticky;
     top: 0;
 }
 
-.table-freeze-header th {
+div.table-freeze-header th {
     background-color: #eeeeee;
+}
+
+div.table-freeze-first-col thead th:first-child {
+    left: 0;
+    z-index: 1;
+}
+
+div.table-freeze-first-col tbody th {
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    left: 0;
+    border-right: 1px solid #CCC;
 }

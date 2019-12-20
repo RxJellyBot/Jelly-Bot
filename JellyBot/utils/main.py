@@ -1,12 +1,14 @@
-from typing import Optional
-from collections import OrderedDict
+from typing import Optional, NamedTuple
+from collections import OrderedDict, namedtuple
 
 from django.apps import apps
 from django.conf import settings
 from bson import ObjectId
 
+from extutils import safe_cast
 from flags import Platform
-from mongodb.factory import RootUserManager
+from models import ChannelModel
+from mongodb.factory import RootUserManager, ChannelManager
 from JellyBot.keys import Session, ParamDictPrefix
 from JellyBot.api.static.param import Common
 
@@ -37,6 +39,18 @@ def get_root_oid(request) -> Optional[ObjectId]:
 def get_post_keys(qd):
     return {k.replace(ParamDictPrefix.PostKey, ""): v for k, v in qd.items()
             if k.startswith(ParamDictPrefix.PostKey)}
+
+
+ChannelDataGetResult = namedtuple("ResultTemplate", ["ok", "model", "oid_org"])
+
+
+def get_channel_data(kwargs) -> ChannelDataGetResult:
+    channel_oid_str = kwargs.get("channel_oid", "")
+    channel_oid = safe_cast(channel_oid_str, ObjectId)
+
+    model = ChannelManager.get_channel_oid(channel_oid)
+
+    return ChannelDataGetResult(ok=model is not None, model=model, oid_org=channel_oid_str)
 
 
 # Obtained and modified from https://stackoverflow.com/a/57897422

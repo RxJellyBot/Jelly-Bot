@@ -17,6 +17,8 @@ class ChannelProfileModel(Model):
     PromoVote = IntegerField("promo")
     Permission = DictionaryField("perm", default=PermissionCategoryDefault.get_default_preset_dict(), allow_none=False)
 
+    EmailKeyword = ArrayField("e-kw", str)
+
     def pre_iter(self):
         if self.is_admin:
             f = PermissionCategoryDefault.get_admin

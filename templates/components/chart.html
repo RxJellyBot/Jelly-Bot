@@ -1,5 +1,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
+<!--suppress JSUnresolvedVariable, ES6ModulesDependencies, JSCheckFunctionSignatures -->
 <script type="text/javascript">
     Chart.defaults.global.defaultFontFamily = "\"Segoe UI\", \"Microsoft JhengHei UI\", \"Roboto\", serif, sans-serif;";
     Chart.defaults.global.defaultFontSize = 20;
+    // https://chartjs-plugin-datalabels.netlify.com/guide/getting-started.html#registration
+    Chart.plugins.unregister(ChartDataLabels);
+
+    let chartBgColors = [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(201, 203, 207, 0.2)"
+    ];
+    let chartBorderColors = [
+        "rgb(255, 99, 132)",
+        "rgb(255, 159, 64)",
+        "rgb(255, 205, 86)",
+        "rgb(75, 192, 192)",
+        "rgb(54, 162, 235)",
+        "rgb(153, 102, 255)",
+        "rgb(201, 203, 207)"
+    ]
+
+    let defaults = {
+        labels: {
+            fontFamily: "\"Segoe UI\", \"Microsoft JhengHei UI\", \"Roboto\", serif, sans-serif",
+            fontSize: 13
+        }
+    }
 </script>

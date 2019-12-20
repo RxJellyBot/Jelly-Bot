@@ -219,7 +219,7 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=10
 )
-def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
+def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: str):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
 
     if not conn_list.empty:
@@ -229,4 +229,5 @@ def list_usable_auto_reply_module(e: TextMessageEventObject, keyword: str):
         )]
     else:
         return [HandledMessageEventText(
-            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword."))]
+            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword.")
+                .format(keyword))]

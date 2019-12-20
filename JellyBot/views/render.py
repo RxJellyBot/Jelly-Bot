@@ -7,7 +7,7 @@ from JellyBot import keys
 from JellyBot.systemconfig import System
 from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from extutils import HerokuWrapper
 from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
 
