@@ -6,7 +6,6 @@ from JellyBot.systemconfig import Bot
 from extutils.dt import t_delta_str, now_utc_aware, localtime
 from flags import BotFeature
 from mongodb.factory import TimerManager, BotFeatureUsageDataManager, MessageRecordStatisticsManager
-from mongodb.helper import MessageStatsDataProcessor
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
 
 
@@ -24,7 +23,7 @@ def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
 def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessageEvent]:
     within_secs = min(
         TimerManager.get_notify_within_secs(
-            MessageRecordStatisticsManager.get_message_frequency(e.channel_oid, Bot.Timer.MessageLimitForNotification)
+            MessageRecordStatisticsManager.get_message_frequency(e.channel_oid, Bot.Timer.MessageFrequencyRangeMin)
         ),
         Bot.Timer.MaxNotifyRangeSeconds
     )
