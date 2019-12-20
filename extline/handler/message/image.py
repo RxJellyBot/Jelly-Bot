@@ -3,6 +3,7 @@ from msghandle import handle_message_main
 from msghandle.models import MessageEventObjectFactory
 
 
+# noinspection PyUnusedLocal
 def handle_image(request, event, destination):
     e = MessageEventObjectFactory.from_line(event)
 

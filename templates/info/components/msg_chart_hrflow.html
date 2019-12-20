@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<canvas id="msgstats-intvflow"></canvas>
+
+<!--suppress JSUnresolvedFunction -->
+<script type="text/javascript">
+    new Chart(document.getElementById("msgstats-intvflow").getContext("2d"), {
+        type: "line",
+
+        data: {
+            labels: {{ msg_intvflow_data.label_hr }},
+            datasets: [
+                {% for entry in msg_intvflow_data.data %}
+                    {
+                        label: "{{ entry.category_name }}",
+                        borderColor: "{{ entry.color }}",
+                        pointBackgroundColor: "{{ entry.color }}",
+                        pointBorderColor: "{{ entry.color }}",
+                        pointRadius: 4,
+                        pointHoverRadius: 8,
+                        fill: false,
+                        data: {{ entry.data }},
+                        hidden: {{ entry.hidden }}
+                    },
+                {% endfor %}
+            ]
+        },
+
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            elements: {
+                line: {
+                    tension: 0 // disables bezier curves
+                }
+            },
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
+                }
+            }
+        }
+    });
+</script>

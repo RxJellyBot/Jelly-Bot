@@ -1,5 +1,3 @@
-from typing import Type
-
 from bson import ObjectId
 from pymongo.collection import Collection
 

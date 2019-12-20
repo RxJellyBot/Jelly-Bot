@@ -3,9 +3,8 @@ from datetime import datetime
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import localtime
 
-from extutils.dt import now_utc_aware, t_delta_str
+from extutils.dt import now_utc_aware, t_delta_str, localtime
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import CursorWithCount
@@ -16,10 +15,11 @@ class TimerModel(Model):
     Keyword = TextField("k", default=ModelDefaultValueExt.Required)
     Title = TextField("t", default=ModelDefaultValueExt.Required)
     TargetTime = DateTimeField("tt", default=ModelDefaultValueExt.Required)
-    DeletionTime = DateTimeField("del",default=ModelDefaultValueExt.Optional)
+    DeletionTime = DateTimeField("del", default=ModelDefaultValueExt.Optional)
     Countup = BooleanField("c", default=False)
     PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
     Notified = BooleanField("nt", default=False)
+    NotifiedExpired = BooleanField("nt-e", default=False)
 
     @property
     def is_periodic(self) -> bool:
@@ -39,12 +39,20 @@ class TimerModel(Model):
 
 @dataclass
 class TimerListResult:
-    past_done: List[TimerModel] = field(init=False, default_factory=list)
-    past_continue: List[TimerModel] = field(init=False, default_factory=list)
     future: List[TimerModel] = field(init=False, default_factory=list)
+    past_continue: List[TimerModel] = field(init=False, default_factory=list)
+    past_done: List[TimerModel] = field(init=False, default_factory=list)
     has_data: bool = field(init=False, default=False)
 
     cursor: InitVar[CursorWithCount] = None
+
+    def __iter__(self):
+        for t in self.future:
+            yield t
+        for t in self.past_continue:
+            yield t
+        for t in self.past_done:
+            yield t
 
     def __post_init__(self, cursor):
         now = now_utc_aware()
@@ -90,4 +98,15 @@ class TimerListResult:
                     _("{event} has ended (at {time})").format(
                         event=tmr.title, time=localtime(tmr.target_time, tzinfo)))
 
+        # Take out separator
+        if ret and ret[-1] == "":
+            ret = ret[:-1]
+
         return "\n".join(ret)
+
+    def get_item(self, index: int):
+        for idx, item in enumerate(self):
+            if idx == index:
+                return item
+
+        return None

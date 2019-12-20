@@ -1,0 +1,138 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    {% include "components/chart.html" %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Recent Messages" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        {% if not channel_data.bot_accessible %}
+            <div class="row">
+                <div class="col mb-3 h4">
+                    {% trans "The channel is marked inaccessible for Jelly Bot, so the data of this channel will not update." %}
+                </div>
+            </div>
+
+            <hr>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Parameters" %}</h3>
+            </div>
+        </div>
+
+        <form>
+            <div class="row">
+                <div class="col-lg mb-3">
+                    <div class="form-row mb-3">
+                        <label class="col-2 col-form-label text-right" for="limit">{% trans "Limit" %}</label>
+                        <div class="col-4">
+                            <div class="input-group">
+                                <input type="number" class="form-control border-dark" value="{{ recent_msg_limit }}"
+                                       name="limit" id="limit">
+                                <div class="input-group-append"><span
+                                        class="input-group-text">{% trans "messages" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-form-label text-lg-right">
+                            <small>
+                                {% blocktrans trimmed %}
+                                    The record to display on this page cannot exceed {{ recent_msg_limit_max }}.<br>
+                                    Leaving this blank and refresh will get the maximum count of the records.
+                                {% endblocktrans %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col">
+                    <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+
+        {% include "info/components/info_basic.html" with channel_data=channel_data channel_name=channel_name only %}
+
+        <hr>
+
+        <div class="row">
+            <div class="col-lg mb-3 h4">
+                {% trans "Summary" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Average Processing Time" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ recent_msg_data.avg_processing_secs|stringformat:".4f" }}</code>&nbsp;{% trans "secs" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Unique Sender" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ recent_msg_data.unique_sender_count }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Message Frequency" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ recent_msg_data.message_frequency|stringformat:".3f" }}</code>&nbsp;{% trans "secs" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_comp_pie.html" with comp_data=recent_msg_data.msg_composition only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3 h4">
+                {% trans "Recent Messages" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/recent_msg_table.html" with msg_data=recent_msg_data only %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

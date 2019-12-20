@@ -283,7 +283,7 @@ class CommandNode:
         :rtype: CommandNode
         """
         for code in cmd_node.command_codes:
-            if code in self._child_nodes:
+            if code in self._child_nodes and id(self._child_nodes[code]) != id(cmd_node):
                 logger.logger.warning(f"Code {code} has a corresponding command node ({repr(self._child_nodes[code])}) "
                                       f"registered. This will be replaced by {repr(cmd_node)}")
 
@@ -384,7 +384,6 @@ class CommandNode:
             elif not(not in_quote and is_splitter):
                 """
                 In quote, is splitter, append string
-                
                 0 0 1
                 0 1 0
                 1 0 1

@@ -48,3 +48,8 @@ pre {
     user-select: all;
     cursor: pointer;
 }
+
+img.line-sticker {
+    height: 2em;
+    width: 2em;
+}

@@ -1,0 +1,108 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    {% include "components/chart.html" %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Bot Feature Usage Statistics" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        {% if not channel_data.bot_accessible %}
+            <div class="row">
+                <div class="col mb-3 h4">
+                    {% trans "The channel is marked inaccessible for Jelly Bot, so the data of this channel will not update." %}
+                </div>
+            </div>
+
+            <hr>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Parameters" %}</h3>
+            </div>
+        </div>
+
+        <form>
+            <div class="row">
+                <div class="col-lg mb-3">
+                    <div class="form-row mb-3">
+                        <label class="col-2 col-form-label text-right" for="range">{% trans "Range" %}</label>
+                        <div class="col-4">
+                            <div class="input-group">
+                                <input type="number" class="form-control border-dark" value="{{ hr_range }}"
+                                       name="hours_within" id="range">
+                                <div class="input-group-append"><span
+                                        class="input-group-text">{% trans "Hours" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-form-label text-lg-right">
+                            <small>{% trans "Leave this blank and refresh to get all-time record." %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col">
+                    <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+
+        {% include "info/components/info_basic.html" with channel_data=channel_data channel_name=channel_name only %}
+
+        <hr>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Statistics" %}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Hourly Average Feature Usage" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/bot_chart_hrflow.html" with flow_data=usage_hr_data only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Feature Usage Count" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/bot_chart_usage.html" with stats_data=total_usage only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Feature Usage Count Per Member" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/bot_table_member.html" with stats_data=member_usage only %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
+{% endblock %}

@@ -73,6 +73,7 @@ pick_overlimit_txt = _(
     "Maximum count of picking an option in a single command is {}.").format(Bot.RandomChoiceCountLimit)
 
 
+# noinspection PyUnusedLocal
 @cmd.command_function(
     feature_flag=BotFeature.TXT_RDM_CHOICE_ONE,
     arg_count=1,
@@ -93,6 +94,7 @@ def random_once(e: TextMessageEventObject, elements: str):
     ]
 
 
+# noinspection PyUnusedLocal
 @cmd.command_function(
     feature_flag=BotFeature.TXT_RDM_CHOICE_MULTI,
     arg_count=2,

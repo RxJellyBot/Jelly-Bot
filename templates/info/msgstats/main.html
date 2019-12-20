@@ -55,45 +55,7 @@
 
         <hr>
 
-        <div class="row">
-            <div class="col-lg mb-3">
-                <h3>{% trans "Basic Information" %}</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg mb-3">
-                <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Channel Name" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h4">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto {% if not channel_data.bot_accessible %}text-danger{% endif %}">
-                                    {% if ch_name %}
-                                        {{ ch_name }}
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg mb-3">
-                <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
-                    <div class="card-body">
-                        <div class="card-text h4">
-                            <div class="row justify-content-lg-center">
-                                <div class="col-lg-auto">
-                                    <code>{{ channel_data.id }}</code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "info/components/info_basic.html" with channel_data=channel_data channel_name=channel_name only %}
 
         <hr>
 
@@ -102,35 +64,77 @@
                 <h3>{% trans "Statistics" %}</h3>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-lg mb-3 h5">#&nbsp;{% trans "Summary" %}</div>
+        </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Hour Average Message Flow" %}</h5>
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Total Message Count" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ channel_user_msg.msg_count }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Message Frequency" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ message_frequency|stringformat:".3f" }}</code>&nbsp;{% trans "secs" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Hour Average Message Flow" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_stats_intvflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+                {% include "info/components/msg_chart_hrflow.html" with msg_intvflow_data=msg_intvflow_data only %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Daily Message Flow" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Daily Message Flow" %}</h5>
+                {% include "info/components/msg_chart_daily.html" with msg_daily_data=msg_daily_data only %}
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_stats_daily.html" with msg_daily_data=msg_daily_data only %}
+                {% include "info/components/msg_table_daily.html" with msg_daily_data=msg_daily_data only %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Member Message Count Ranking" %}</h5>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                <h5>{% trans "Member Message Count Ranking" %}</h5>
-                <p>{% trans "Total Count: " %}{{ channel_user_msg.msg_count }}</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg mb-3">
-                {% include "info/components/msg_stats_table.html" with message_stats=channel_user_msg.member_stats only %}
+                {% include "info/components/msg_table_count.html" with message_data=channel_user_msg simplified=False only %}
             </div>
         </div>
     </div>
@@ -138,4 +142,10 @@
 
 {% block ex-style %}
     <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}

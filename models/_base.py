@@ -9,7 +9,7 @@ from models import OID_KEY
 from models.field import BaseField
 from extutils.utils import to_snake_case, to_camel_case
 
-from .exceptions import *
+from .exceptions import InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, KeyNotExistedError
 from .field import ObjectIDField, ModelField
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
 
@@ -276,8 +276,9 @@ class Model(MutableMapping, abc.ABC):
         if fk.lower() == "Id":
             return cls.WITH_OID
         else:
-            return fk[0].isupper() and not fk.isupper() and \
-                   fk in cls.__dict__ and isinstance(cls.__dict__[fk], BaseField)
+            return fk[0].isupper() and not fk.isupper() \
+                and fk in cls.__dict__ \
+                and isinstance(cls.__dict__[fk], BaseField)
 
     @staticmethod
     def _camelcase_kwargs_(**kwargs):

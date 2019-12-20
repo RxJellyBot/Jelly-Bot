@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from JellyBot.components import get_root_oid
+from JellyBot.utils import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.views import render_template
 from mongodb.factory import ShortUrlDataManager

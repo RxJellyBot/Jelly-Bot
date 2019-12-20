@@ -126,6 +126,9 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 class FlagEnumMixin:
     @classmethod
     def cast(cls, item: Union[str, int]):
+        if isinstance(item, cls):
+            return item
+
         if not isinstance(item, (str, int)):
             raise ValueError(f"Source type ({type(item)}) for casting not handled.")
 

@@ -44,7 +44,7 @@ class ExtraContentManager(BaseCollection):
         content = cast_iterable(content, str)
 
         model, outcome, ex = self.insert_one_data(
-             Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())
+            Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())
 
         return RecordExtraContentResult(outcome, model, ex)
 
