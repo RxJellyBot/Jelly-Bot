@@ -1,3 +1,5 @@
+import os
+import warnings
 from datetime import timedelta
 from threading import Thread
 from typing import Type, Optional, Tuple
@@ -17,6 +19,12 @@ from models.utils import ModelFieldChecker
 from mongodb.utils import CursorWithCount
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
+
+
+single_db_name = os.environ.get("MONGO_DB")
+if single_db_name:
+    warnings.warn("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
+    warnings.warn(f"MongoDB single database name: {single_db_name}")
 
 
 class ControlExtensionMixin(Collection):
@@ -178,6 +186,9 @@ class BaseCollection(ControlExtensionMixin, Collection):
 
     @classmethod
     def get_db_name(cls):
+        if single_db_name:
+            return single_db_name
+
         if cls.database_name is None:
             raise AttributeError(f"Define `database_name` as class variable for {cls.__qualname__}.")
         else:
@@ -188,7 +199,10 @@ class BaseCollection(ControlExtensionMixin, Collection):
         if cls.collection_name is None:
             raise AttributeError(f"Define `collection_name` as class variable for {cls.__qualname__}.")
         else:
-            return cls.collection_name
+            if single_db_name:
+                return f"{cls.database_name}.{cls.collection_name}"
+            else:
+                return cls.collection_name
 
     @classmethod
     def get_model_cls(cls):
@@ -199,6 +213,7 @@ class BaseCollection(ControlExtensionMixin, Collection):
 
     def __init__(self):
         self._db = MONGO_CLIENT.get_database(self.get_db_name())
+
         super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
         self._data_model = self.get_model_cls()
 
