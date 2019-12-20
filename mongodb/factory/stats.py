@@ -6,6 +6,7 @@ import pymongo
 from bson import ObjectId
 
 from extutils.locales import UTC
+from extutils.dt import now_utc_aware
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
@@ -45,6 +46,11 @@ class MessageRecordStatisticsManager(BaseCollection):
     collection_name = "msg"
     model_class = MessageRecordModel
 
+    def __init__(self):
+        super().__init__()
+        self.create_index(MessageRecordModel.Timestamp.key,
+                          expireAfterSeconds=Database.MessageStats.MessageRecordExpirySeconds, name="Timestamp")
+
     @param_type_ensure
     def record_message_async(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
@@ -60,7 +66,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
             MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
-            ProcessTimeSecs=proc_time_secs
+            ProcessTimeSecs=proc_time_secs, Timestamp=now_utc_aware()
         )
 
     @param_type_ensure
