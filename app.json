@@ -18,6 +18,10 @@
       "description": "Connection string for pymongo to connect to mongoDB.",
       "required": true
     },
+    "MONGO_DB": {
+      "description": "The database name of MongoDB. Set this when single db is needed, e.g. using mLab MongoDB on Heroku.",
+      "required": false
+    },
     "PRODUCTION": {
       "description": "Flag indicates that if the app is in production.",
       "required": false
