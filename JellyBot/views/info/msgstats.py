@@ -65,10 +65,14 @@ class ChannelMessageStatsView(TemplateResponseMixin, View):
 
         pkg = get_msg_stats_data_package(channel_data.model, hours_within, get_current_timezone())
 
+        hours_within = hours_within or pkg[KEY_MSG_INTV_FLOW].hr_range
+        msg_count = pkg[KEY_MSG_USER_CHANNEL].msg_count
+
         ctxt = {
             "channel_name": channel_data.model.get_channel_name(get_root_oid(request)),
             "channel_data": channel_data.model,
-            "hr_range": hours_within or pkg[KEY_MSG_INTV_FLOW].hr_range
+            "hr_range": hours_within,
+            "message_frequency": (hours_within * 3600) / msg_count if msg_count > 0 else 0
         }
         ctxt.update(pkg)
 
