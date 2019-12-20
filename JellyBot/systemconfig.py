@@ -75,6 +75,7 @@ class Database:
 
     class MessageStats:
         MaxContentCharacter = 500
+        MessageRecordExpirySeconds = 86400 * 365  # 365 Days
 
 
 class DataQuery:
