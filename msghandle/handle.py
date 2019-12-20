@@ -6,6 +6,21 @@ from .models.pipe_in import (
     MessageEventObject, TextMessageEventObject, ImageMessageEventObject, LineStickerMessageEventObject
 )
 from .models.pipe_out import HandledMessageEventsHolder
+from .logger import logger
+
+
+# Creating this because some imports cannot be import before the django framework has been fully loaded
+fn_box = {}
+
+
+def load_handling_functions():
+    from .text.main import handle_text_event
+    from .img.main import handle_image_event
+    from .stk.main import handle_line_sticker_event
+
+    fn_box[TextMessageEventObject] = handle_text_event
+    fn_box[ImageMessageEventObject] = handle_image_event
+    fn_box[LineStickerMessageEventObject] = handle_line_sticker_event
 
 
 def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
@@ -18,21 +33,10 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
             activate(e.user_model.config.language)
 
         # Main handle process
-        if isinstance(e, TextMessageEventObject):
-            from .text.main import handle_text_event
-
-            ret = HandledMessageEventsHolder(handle_text_event(e))
-        elif isinstance(e, ImageMessageEventObject):
-            from .img.main import handle_image_event
-
-            ret = HandledMessageEventsHolder(handle_image_event(e))
-        elif isinstance(e, LineStickerMessageEventObject):
-            from .stk.main import handle_line_sticker_event
-
-            ret = HandledMessageEventsHolder(handle_line_sticker_event(e))
+        event_type = type(e)
+        if event_type in fn_box:
+            ret = HandledMessageEventsHolder(fn_box[event_type](e))
         else:
-            from .logger import logger
-
             logger.logger.info(f"Message handle object not handled. Raw: {e.raw}")
             ret = HandledMessageEventsHolder()
 
