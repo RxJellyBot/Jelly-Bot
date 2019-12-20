@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from JellyBot.systemconfig import Bot
 from extutils.dt import t_delta_str, now_utc_aware, localtime
 from flags import BotFeature
-from mongodb.factory import TimerManager, BotFeatureUsageDataManager
+from mongodb.factory import TimerManager, BotFeatureUsageDataManager, MessageRecordStatisticsManager
 from mongodb.helper import MessageStatsDataProcessor
 from msghandle.models import TextMessageEventObject, HandledMessageEvent, HandledMessageEventText
 
@@ -22,8 +22,12 @@ def process_timer_get(e: TextMessageEventObject) -> List[HandledMessageEvent]:
 
 
 def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessageEvent]:
-    rct_msg = MessageStatsDataProcessor.get_recent_messages(e.channel_model, Bot.Timer.MessageLimitForNotification)
-    within_secs = min(TimerManager.get_notify_within_secs(rct_msg.message_frequency), Bot.Timer.MaxNotifyRangeSeconds)
+    within_secs = min(
+        TimerManager.get_notify_within_secs(
+            MessageRecordStatisticsManager.get_message_frequency(e.channel_oid, Bot.Timer.MessageLimitForNotification)
+        ),
+        Bot.Timer.MaxNotifyRangeSeconds
+    )
 
     crs = TimerManager.get_notify(e.channel_oid, within_secs)
     crs2 = TimerManager.get_time_up(e.channel_oid)

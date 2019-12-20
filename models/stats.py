@@ -34,6 +34,7 @@ class MessageRecordModel(Model):
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
     MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
     ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
+    Timestamp = DateTimeField("ts")
 
 
 class BotFeatureUsageModel(Model):
