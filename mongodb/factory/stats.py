@@ -1,4 +1,4 @@
-from datetime import datetime, tzinfo
+from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List
 
@@ -76,14 +76,16 @@ class MessageRecordStatisticsManager(BaseCollection):
         ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
 
     @param_type_ensure
-    def get_message_frequency(self, channel_oid: ObjectId, limit: Optional[int] = None):
-        rct_msg = list(self.get_recent_messages(channel_oid, limit))
+    def get_message_frequency(self, channel_oid: ObjectId, within_mins: Union[float, int] = 720) -> float:
+        """Get message frequency in terms of seconds per message."""
+        rct_msg_count = self.count_documents(
+            {MessageRecordModel.ChannelOid.key: channel_oid,
+             OID_KEY: {"$gt": ObjectId.from_datetime(now_utc_aware() - timedelta(minutes=within_mins))}})
 
-        rct_msglen = len(rct_msg)
-        if rct_msglen > 0:
-            return abs((rct_msg[0].id.generation_time - rct_msg[-1].id.generation_time).total_seconds()) / rct_msglen
+        if rct_msg_count > 0:
+            return (within_mins * 60) / rct_msg_count
         else:
-            return 0
+            return 0.0
 
     # Statistics
 
