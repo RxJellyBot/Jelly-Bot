@@ -64,6 +64,42 @@
                 <h3>{% trans "Statistics" %}</h3>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-lg mb-3 h5">#&nbsp;{% trans "Summary" %}</div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Total Message Count" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ channel_user_msg.msg_count }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg mb-3">
+                <div class="card border-dark text-center">
+                    <h5 class="card-header text-dark">{% trans "Message Frequency" %}</h5>
+                    <div class="card-body">
+                        <div class="card-text">
+                            <div class="row justify-content-lg-center">
+                                <div class="col-lg-auto">
+                                    <code class="h4">{{ message_frequency|stringformat:".3f" }}</code>&nbsp;{% trans "secs" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-lg mb-3">
                 <h5>#&nbsp;{% trans "Hour Average Message Flow" %}</h5>
@@ -74,6 +110,7 @@
                 {% include "info/components/msg_chart_hrflow.html" with msg_intvflow_data=msg_intvflow_data only %}
             </div>
         </div>
+
         <div class="row">
             <div class="col-lg mb-3">
                 <h5>#&nbsp;{% trans "Daily Message Flow" %}</h5>
@@ -89,10 +126,10 @@
                 {% include "info/components/msg_table_daily.html" with msg_daily_data=msg_daily_data only %}
             </div>
         </div>
+
         <div class="row">
             <div class="col-lg mb-3">
                 <h5>#&nbsp;{% trans "Member Message Count Ranking" %}</h5>
-                <p>{% trans "Total Count: " %}<span class="h4">{{ channel_user_msg.msg_count }}</span></p>
             </div>
         </div>
         <div class="row">

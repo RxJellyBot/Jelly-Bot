@@ -229,4 +229,5 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
         )]
     else:
         return [HandledMessageEventText(
-            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword."))]
+            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword.")
+                .format(keyword))]

@@ -127,4 +127,5 @@ class Bot:
 
     class Timer:
         AutoDeletionDays = 7
-        NotifyWithinHours = 3
+        MaxNotifyRangeSeconds = 14400
+        MessageLimitForNotification = 300
