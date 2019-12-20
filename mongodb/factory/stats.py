@@ -75,6 +75,16 @@ class MessageRecordStatisticsManager(BaseCollection):
             {MessageRecordModel.ChannelOid.key: channel_oid}, parse_cls=MessageRecordModel
         ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
 
+    @param_type_ensure
+    def get_message_frequency(self, channel_oid: ObjectId, limit: Optional[int] = None):
+        rct_msg = list(self.get_recent_messages(channel_oid, limit))
+
+        rct_msglen = len(rct_msg)
+        if rct_msglen > 0:
+            return abs((rct_msg[0].id.generation_time - rct_msg[-1].id.generation_time).total_seconds()) / rct_msglen
+        else:
+            return 0
+
     # Statistics
 
     @staticmethod
