@@ -1,5 +1,4 @@
 import os
-import warnings
 from datetime import timedelta
 from threading import Thread
 from typing import Type, Optional, Tuple
@@ -23,8 +22,8 @@ from mongodb.factory.results import WriteOutcome
 
 single_db_name = os.environ.get("MONGO_DB")
 if single_db_name:
-    warnings.warn("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
-    warnings.warn(f"MongoDB single database name: {single_db_name}")
+    print("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
+    print(f"MongoDB single database name: {single_db_name}")
 
 
 class ControlExtensionMixin(Collection):
