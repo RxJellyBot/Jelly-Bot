@@ -5,8 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from sympy import latex, Rational
 
 from extutils import safe_cast
+from extutils.emailutils import MailSender
 from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
+from models.utils import AutoReplyValidators
 from models import AutoReplyContentModel
 
 
@@ -25,6 +27,15 @@ class HandledMessageEvent(ABC):
 
         :return: Casted `HandledMessageEvent`. Return `None` if no corresponding `HandledMessageEvent`.
         """
+        valid = \
+            AutoReplyValidators.is_valid_content(response_model.content_type, response_model.content, online_check=True)
+
+        if not valid:
+            MailSender.send_email_async(f"Invalid auto-reply content detected.\n\n"
+                                        f"Content: {response_model.content}\n"
+                                        f"Content Type: {response_model.content_type.key}")
+            return None
+
         if response_model.content_type == AutoReplyContentType.TEXT:
             return HandledMessageEventText(content=response_model.content, bypass_multiline_check=bypass_ml_check)
         elif response_model.content_type == AutoReplyContentType.IMAGE:
