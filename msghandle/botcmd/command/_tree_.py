@@ -10,6 +10,7 @@ from .id import cmd as cmd_id
 from .ar import cmd_main as cmd_ar
 from .help import cmd as cmd_help
 from .rdm import cmd as cmd_rdm
+from .rmc import cmd as cmd_rmc
 from .tmr import cmd as cmd_tmr
 from .rct import cmd as cmd_rct
 
@@ -27,6 +28,7 @@ cmd_root.attach_child_node(cmd_help)
 cmd_root.attach_child_node(cmd_rdm)
 cmd_root.attach_child_node(cmd_tmr)
 cmd_root.attach_child_node(cmd_rct)
+cmd_root.attach_child_node(cmd_rmc)
 
 # DEPRECATE: Old command
 

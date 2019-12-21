@@ -125,7 +125,7 @@ def random_multi(e: TextMessageEventObject, elements: str, times: int):
     results = sorted(option_list.pick_multi(times).items(), key=lambda kv: kv[1], reverse=True)
 
     if option_list.elem_ignored:
-        ret.append(_("There are element(s) ignored possibly because the options are misformatted."))
+        ret.append(_("*There are element(s) ignored possibly because the options are misformatted.*"))
 
     ret.append("\n".join([f"{option}: {count} ({count / times:.2%})" for option, count in results]))
 
