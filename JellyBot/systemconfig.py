@@ -130,3 +130,6 @@ class Bot:
         AutoDeletionDays = 7
         MaxNotifyRangeSeconds = 14400
         MessageFrequencyRangeMin = 1440  # 1 Day
+
+    class RemoteControl:
+        IdleDeactivateSeconds = 600  # 10 mins

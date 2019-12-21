@@ -117,7 +117,7 @@ class MessageStatsDataProcessor:
             msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, msg_result.get_default_data_entry())
 
         if msg_rec:
-            individual_msgs = [sum(vals.values()) for vals in msg_rec.values()]
+            individual_msgs = [vals.total for vals in msg_rec.values()]
             max_individual_msg: int = max(individual_msgs)
 
             uid_handled = IdentitySearcher.get_batch_user_name(msg_rec.keys(), ch_data)
@@ -125,12 +125,12 @@ class MessageStatsDataProcessor:
             for uid, name in uid_handled.items():
                 data_cat = msg_rec[uid]
 
-                sum_ = sum(data_cat.values())
+                sum_ = data_cat.total
 
                 cat_count = []
                 CategoryEntry = namedtuple("CategoryEntry", ["count", "percentage"])
                 for cat in msg_result.label_category:
-                    ct = data_cat.get(cat, 0)
+                    ct = data_cat.get_count(cat)
                     cat_count.append(CategoryEntry(count=ct, percentage=ct / sum_ * 100 if sum_ > 0 else 0))
 
                 entries.append(
@@ -148,9 +148,11 @@ class MessageStatsDataProcessor:
     @staticmethod
     def _get_user_msg_ranking_(
             channel_oids: Union[List[ObjectId], ObjectId], root_oid: ObjectId, hours_within: Optional[int] = None):
-        data = list(MessageRecordStatisticsManager.get_user_messages(channel_oids, hours_within))
-        for idx, entry in enumerate(data, start=1):
-            if entry[OID_KEY] == root_oid:
+        data = sorted(MessageRecordStatisticsManager.get_user_messages(channel_oids, hours_within).data.items(),
+                      key=lambda _: _[1].total, reverse=True)
+        for idx, item in enumerate(data, start=1):
+            oid, entry = item
+            if oid == root_oid:
                 return UserMessageRanking(rank=idx, total=len(data))
 
         return UserMessageRanking(rank=-1, total=len(data))

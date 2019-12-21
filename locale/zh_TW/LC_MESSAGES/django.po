@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-19 06:49-0600\n"
-"PO-Revision-Date: 2019-12-19 06:57-0600\n"
+"POT-Creation-Date: 2019-12-20 08:06-0600\n"
+"PO-Revision-Date: 2019-12-20 08:07-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -260,7 +260,7 @@ msgstr "頻道資訊搜尋"
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:76 .\JellyBot\views\nav.py:125
+#: .\JellyBot\views\info\msgstats.py:80 .\JellyBot\views\nav.py:125
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -1218,7 +1218,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:121 .\models\stats.py:296
+#: .\models\stats.py:122 .\models\stats.py:297
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -2128,15 +2128,15 @@ msgstr "查閱近期訊息的最大數量。"
 msgid "Visit {}{}?{} to see the most recent {} messages."
 msgstr "瀏覽 {}{}?{} 以查閱最新 {} 則訊息。"
 
-#: .\msghandle\botcmd\command\rdm.py:13
+#: .\msghandle\botcmd\command\rdm.py:14
 msgid "Random"
 msgstr "隨機"
 
-#: .\msghandle\botcmd\command\rdm.py:14
+#: .\msghandle\botcmd\command\rdm.py:15
 msgid "Randomly generate a result."
 msgstr "隨機產生一個結果。"
 
-#: .\msghandle\botcmd\command\rdm.py:56
+#: .\msghandle\botcmd\command\rdm.py:63
 msgid ""
 "Options to be picked. Use two continuous spaces/blanks (`{}`) to separate "
 "options.\n"
@@ -2178,19 +2178,24 @@ msgstr ""
 "\n"
 "- **有**比重的選項清單: A{}0.7{}B{}0.5{}C{}0.9"
 
-#: .\msghandle\botcmd\command\rdm.py:71
+#: .\msghandle\botcmd\command\rdm.py:78
 msgid "Maximum count of options is {}."
 msgstr "選項清單最多只能有{}個選項。"
 
-#: .\msghandle\botcmd\command\rdm.py:73
+#: .\msghandle\botcmd\command\rdm.py:80
 msgid "Maximum count of picking an option in a single command is {}."
 msgstr "單次指令中，最多可抽選次數為 {}。"
 
-#: .\msghandle\botcmd\command\rdm.py:92
+#: .\msghandle\botcmd\command\rdm.py:97
 msgid "Option Picked: {}"
 msgstr "抽中選項: {}"
 
-#: .\msghandle\botcmd\command\rdm.py:102
+#: .\msghandle\botcmd\command\rdm.py:101 .\msghandle\botcmd\command\rdm.py:128
+msgid ""
+"*There are element(s) ignored possibly because the options are misformatted.*"
+msgstr "*部分選項已略過。選項清單可能存在格式錯誤。*"
+
+#: .\msghandle\botcmd\command\rdm.py:111
 msgid ""
 "Count of how many times to randomly pick an option.\n"
 "This number cannot exceed {}."
@@ -2456,19 +2461,19 @@ msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
 
-#: .\msghandle\text\timer.py:30
+#: .\msghandle\text\timer.py:37
 msgid "**{} timer(s) have timed up!**"
 msgstr "**{} 個計時器時間到！**"
 
-#: .\msghandle\text\timer.py:34
+#: .\msghandle\text\timer.py:41
 msgid "{event} has timed up! (at {time})"
 msgstr "{event} 結束於 {time}！"
 
-#: .\msghandle\text\timer.py:43
-msgid "**{} timer(s) will time up in less than {} hrs!**"
-msgstr "**{} 個計時器將於 {} 小時內時間到！**"
+#: .\msghandle\text\timer.py:50
+msgid "**{} timer(s) will time up in less than {:.0f} minutes!**"
+msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 
-#: .\msghandle\text\timer.py:47
+#: .\msghandle\text\timer.py:54
 msgid "{event} will time up after [{diff}]! (at {time})"
 msgstr "{event} 將於 [{diff}] 後時間到！(於 {time})"
 
@@ -3733,8 +3738,8 @@ msgid "Message Count"
 msgstr "訊息量"
 
 #: .\templates\info\components\msg_table_count.html:9
-msgid "Total Count"
-msgstr "總計次數"
+msgid "Total Messages"
+msgstr "總訊息數"
 
 #: .\templates\info\components\msg_table_count.html:10
 #, python-format
@@ -3758,28 +3763,44 @@ msgid "Content"
 msgstr "內容"
 
 #: .\templates\info\components\recent_msg_table.html:11
-msgid "Process Time (sec)"
-msgstr "處理耗時(秒)"
+msgid "Process Time (ms)"
+msgstr "處理耗時(毫秒"
 
 #: .\templates\info\msgstats\main.html:10
 msgid "Channel Message Statistics"
 msgstr "頻道訊息統計"
 
 #: .\templates\info\msgstats\main.html:69
+#: .\templates\info\recent\message.html:69
+msgid "Summary"
+msgstr "概要"
+
+#: .\templates\info\msgstats\main.html:74
+msgid "Total Message Count"
+msgstr "總訊息量"
+
+#: .\templates\info\msgstats\main.html:89
+#: .\templates\info\recent\message.html:105
+msgid "Message Frequency"
+msgstr "訊息頻率"
+
+#: .\templates\info\msgstats\main.html:94
+#: .\templates\info\recent\message.html:80
+#: .\templates\info\recent\message.html:110
+msgid "secs"
+msgstr "秒"
+
+#: .\templates\info\msgstats\main.html:105
 msgid "Hour Average Message Flow"
 msgstr "每小時平均訊息量"
 
-#: .\templates\info\msgstats\main.html:79
+#: .\templates\info\msgstats\main.html:116
 msgid "Daily Message Flow"
 msgstr "每日訊息量"
 
-#: .\templates\info\msgstats\main.html:94
+#: .\templates\info\msgstats\main.html:132
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
-
-#: .\templates\info\msgstats\main.html:95
-msgid "Total Count: "
-msgstr "訊息總數: "
 
 #: .\templates\info\profile.html:9
 msgid "Channel Profile Info"
@@ -3839,26 +3860,13 @@ msgstr ""
 "此頁面所顯示的近期訊息紀錄無法超過 %(recent_msg_limit_max)s則。<br> 留空此欄"
 "位並刷新頁面以獲得最多可獲得的訊息紀錄。"
 
-#: .\templates\info\recent\message.html:69
-msgid "Summary"
-msgstr "概要"
-
 #: .\templates\info\recent\message.html:75
 msgid "Average Processing Time"
 msgstr "平均處理耗時"
 
-#: .\templates\info\recent\message.html:80
-#: .\templates\info\recent\message.html:110
-msgid "secs"
-msgstr "秒"
-
 #: .\templates\info\recent\message.html:90
 msgid "Unique Sender"
 msgstr "發送者數量"
-
-#: .\templates\info\recent\message.html:105
-msgid "Message Frequency"
-msgstr "訊息頻率"
 
 #: .\templates\services\shorturl\main-js.html:38
 msgid "URL copied to the clipboard"
@@ -3937,6 +3945,12 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "Total Count"
+#~ msgstr "總計次數"
+
+#~ msgid "Total Count: "
+#~ msgstr "訊息總數: "
 
 #~ msgid "Message Count / Day"
 #~ msgstr "訊息量 / 日"
