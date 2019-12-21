@@ -58,7 +58,7 @@ class FlagCodeMixin(FlagMixin):
 
     @property
     def code_str(self) -> str:
-        return f"_{self._code}"
+        return f"{self._code}"
 
     # noinspection PyUnresolvedReferences
     def __str__(self):

@@ -8,6 +8,10 @@ class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     def code_prefix(self) -> str:
         raise NotImplementedError()
 
+    @property
+    def code_str(self) -> str:
+        return f"{self.code_prefix}-{self._code}"
+
     @classmethod
     def default(cls):
         raise NotImplementedError()
@@ -72,7 +76,7 @@ class WriteOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "I "
+        return "I"
 
     @classmethod
     def default(cls):
@@ -209,7 +213,7 @@ class GetOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "G "
+        return "G"
 
     @classmethod
     def default(cls):
@@ -292,7 +296,7 @@ class OperationOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "O "
+        return "O"
 
     @classmethod
     def default(cls):
@@ -374,7 +378,7 @@ class UpdateOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "U "
+        return "U"
 
     @classmethod
     def default(cls):
