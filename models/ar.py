@@ -30,7 +30,7 @@ class AutoReplyContentModel(Model):
         if self.is_field_none("Content"):
             return ModelValidityCheckResult.X_AR_CONTENT_EMPTY
 
-        valid = AutoReplyValidators.is_valid_content(self.content_type, self.content)
+        valid = AutoReplyValidators.is_valid_content(self.content_type, self.content, False)
 
         if not valid:
             if self.content_type == AutoReplyContentType.IMAGE:
