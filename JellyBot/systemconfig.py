@@ -43,7 +43,7 @@ class Website:
     NewRegisterThresholdDays = 5
 
     class RecentActivity:
-        MaxMessageCount = 500
+        MaxMessageCount = 1000
 
 
 class AutoReply:
