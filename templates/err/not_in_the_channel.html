@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Error" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row text-center text-danger">
+            <div class="col-lg display-4">
+                {% trans "Not in the Channel" %}
+            </div>
+        </div>
+        <div class="row text-center text-danger">
+            <div class="col-lg align-self-center">
+                {% trans "Access denied because the system indicated that you are not in the channel." %}
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                {% blocktrans trimmed %}
+                    You will only allowed to view this page if you are in the channel which ID is <code>{{ channel_oid }}</code>.
+                {% endblocktrans %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

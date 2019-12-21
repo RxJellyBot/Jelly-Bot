@@ -8,6 +8,7 @@ class WebsiteError(FlagSingleEnum):
     0 - System
         0 - Unknown
         1 - Extra Content not found
+        2 - Not in the channel
 
     100 - Identity Data
         100 - Profile link not found
@@ -26,6 +27,7 @@ class WebsiteError(FlagSingleEnum):
     UNKNOWN = 0, _("Unknown")
 
     EXTRA_CONTENT_NOT_FOUND = 1, _("Extra Content Not Found")
+    NOT_IN_THE_CHANNEL = 2, _("Not in the Channel")
 
     PROFILE_LINK_NOT_FOUND = 100, _("Profile Link Not Found")
     CHANNEL_NOT_FOUND = 101, _("Profile Link Not Found")

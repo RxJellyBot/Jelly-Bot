@@ -36,6 +36,10 @@ Website:
 
 [Known Bugs](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Atype-bug)
 
+[Brief view of the current project progress](https://github.com/RaenonX/Jelly-Bot/labels)
+
+[Categorized project progresses](https://github.com/RaenonX/Jelly-Bot/projects)
+
 <hr>
 
 ### Timeline

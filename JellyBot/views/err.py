@@ -14,6 +14,8 @@ class WebsiteErrorView:
         d = {
             WebsiteError.EXTRA_CONTENT_NOT_FOUND:
                 (_("Extra Content Not Found"), "err/exctnt_not_found.html"),
+            WebsiteError.NOT_IN_THE_CHANNEL:
+                (_("Not in the Channel"), "err/not_in_the_channel.html"),
             WebsiteError.PROFILE_LINK_NOT_FOUND:
                 (_("Profile Link Not Found"), "err/account/proflink_not_found.html"),
             WebsiteError.CHANNEL_NOT_FOUND:
