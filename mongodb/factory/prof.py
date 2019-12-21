@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import pymongo
 from bson import ObjectId
@@ -77,7 +77,7 @@ class UserProfileManager(BaseCollection):
         else:
             return None
 
-    def get_user_channel_profiles(self, root_uid: ObjectId) -> list:
+    def get_user_channel_profiles(self, root_uid: ObjectId) -> List[ChannelProfileConnectionModel]:
         return list(self.find_cursor_with_count(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
             parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)]))
@@ -112,6 +112,10 @@ class ProfileDataManager(BaseCollection):
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
+
+    def get_profile_dict(self, profile_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelProfileModel]:
+        return {model.id: model for model
+                in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
@@ -196,6 +200,8 @@ class ProfileManager:
             return []
 
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId]) -> List[ChannelProfileListEntry]:
+        from time import time
+
         if root_uid is None:
             return []
 
@@ -204,31 +210,42 @@ class ProfileManager:
         not_found_channel = []
         not_found_prof_oids_dict = {}
 
-        crs = self._conn.get_user_channel_profiles(root_uid)
+        channel_oid_list = []
+        profile_oid_list = []
+        prof_conns = []
+        for d in self._conn.get_user_channel_profiles(root_uid):
+            channel_oid_list.append(d.channel_oid)
+            profile_oid_list.extend(d.profile_oids)
+            prof_conns.append(d)
 
-        for d in crs:
+        channel_dict = ChannelManager.get_channel_dict(channel_oid_list)
+        profile_dict = self._prof.get_profile_dict(profile_oid_list)
+
+        for prof_conn in prof_conns:
+            _start_ = time()
             not_found_prof_oids = []
 
             # Get Channel Model
-            cnl = ChannelManager.get_channel_oid(d.channel_oid)
+            cnl_oid = prof_conn.channel_oid
+            cnl = channel_dict.get(cnl_oid)
 
             if cnl is None:
-                not_found_channel.append(d.channel_oid)
+                not_found_channel.append(cnl_oid)
                 continue
 
             # Get Profile Model
             prof = []
-            for p in d.profile_oids:
-                pm = self._prof.get_profile(p)
+            for p in prof_conn.profile_oids:
+                pm = profile_dict.get(p)
                 if pm:
                     prof.append(pm)
                 else:
                     not_found_prof_oids.append(p)
 
             if len(prof) == 0:
-                not_found_prof_oids_dict[d.channel_oid] = []
+                not_found_prof_oids_dict[cnl_oid] = []
             elif len(not_found_prof_oids) > 0:
-                not_found_prof_oids_dict[d.channel_oid] = not_found_prof_oids
+                not_found_prof_oids_dict[cnl_oid] = not_found_prof_oids
             else:
                 ret.append(
                     ChannelProfileListEntry(

@@ -33,7 +33,8 @@ class HandledMessageEvent(ABC):
         if not valid:
             MailSender.send_email_async(f"Invalid auto-reply content detected.\n\n"
                                         f"Content: {response_model.content}\n"
-                                        f"Content Type: {response_model.content_type.key}")
+                                        f"Content Type: {response_model.content_type.key}",
+                                        subject="Invalid auto-reply content detected")
             return None
 
         if response_model.content_type == AutoReplyContentType.TEXT:
