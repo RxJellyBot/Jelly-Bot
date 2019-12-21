@@ -42,6 +42,8 @@ class WriteOutcome(BaseOutcome):
         108 - Connecting API User ID
         109 - Config Setting Failed
         110 - Invalid URL
+        111 - (Auto Reply) Invalid keyword content
+        112 - (Auto Reply) Invalid response content
 
     2xx - Problems related to the model
         201 - Not Serializable
@@ -115,6 +117,12 @@ class WriteOutcome(BaseOutcome):
     X_INVALID_URL = \
         110, _("X: Invalid URL"), \
         _("The URL is invalid. Maybe missing the schema or the URL did not return 200.")
+    X_AR_INVALID_KEYWORD = \
+        110, _("X: (Auto Reply) Invalid Keyword"), \
+        _("The keyword contains invalid content.")
+    X_AR_INVALID_RESPONSE = \
+        111, _("X: (Auto Reply) Invalid Response"), \
+        _("One or more of the responses contains invalid content.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")
