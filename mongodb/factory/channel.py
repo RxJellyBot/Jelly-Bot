@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional, Dict, List
 
 from bson import ObjectId
 from pymongo import ReturnDocument
 
 from extutils.checker import param_type_ensure
 from flags import Platform
-from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel
+from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel, OID_KEY
 from mongodb.utils import CursorWithCount
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
@@ -111,6 +111,10 @@ class ChannelManager(BaseCollection):
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
         return self.find_one_casted(filter_, parse_cls=ChannelModel)
+
+    def get_channel_dict(self, channel_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelModel]:
+        return {model.id: model for model
+                in self.find_cursor_with_count({OID_KEY: {"$in": channel_oid_list}}, parse_cls=ChannelModel)}
 
     @param_type_ensure
     def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
