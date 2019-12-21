@@ -189,6 +189,12 @@ class Model(MutableMapping, abc.ABC):
         for v in self._dict_.values():
             yield v.base.key
 
+    def __eq__(self, other):
+        return hasattr(self, "id") and hasattr(other, "id") and self.id == other.id and type(self) == type(other)
+
+    def __hash__(self):
+        return super().__hash__()
+
     def pre_iter(self):
         pass
 

@@ -2,6 +2,7 @@ from abc import ABC
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
+from sympy import latex, Rational
 
 from extutils import safe_cast
 from flags import MessageType, Platform, AutoReplyContentType
@@ -59,13 +60,18 @@ class HandledMessageEventLineSticker(HandledMessageEvent):
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):
-    def __init__(self, calc_result: str, latex: str, calc_expr: str):
-        super().__init__(_("**AUTO CALCULATOR**\n"
-                           "Expression: {}\n"
-                           "Result: {}").format(calc_expr, calc_result))
-        self.latex = latex
-        self.calc_result = calc_result
-        self.calc_expr = calc_expr
+    def __init__(self, expr_before: str, expr_after):
+        content = str(_("**AUTO CALCULATOR**\n"
+                        "Expression: `{}`\n"
+                        "Result: `{}`").format(expr_before, expr_after))
+
+        if isinstance(expr_after, Rational):
+            content += "\n" + str(_("Evaluated: `{}`").format(float(expr_after)))
+
+        super().__init__(content)
+        self.latex = latex(expr_after)
+        self.calc_result = str(expr_after)
+        self.calc_expr = expr_before
 
     @property
     def latex_available(self) -> bool:

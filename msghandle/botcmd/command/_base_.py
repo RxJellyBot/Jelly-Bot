@@ -109,6 +109,8 @@ class CommandFunction:
 
 
 class CommandNode:
+    NO_DESCRIPTION = _("No description provided.")
+
     def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
                  is_root=False, splitters=None, prefix=None, parent=None, case_insensitive=True):
         if codes:
@@ -307,7 +309,7 @@ class CommandNode:
 
     def command_function(
             self, fn: Callable = None, *, arg_count: int = 0, arg_help: List[str] = None,
-            description: str = _("No description provided."),
+            description: str = NO_DESCRIPTION,
             scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED,
             feature_flag: BotFeature = BotFeature.UNDEFINED, cooldown_sec: int = 0):
         """
@@ -325,7 +327,10 @@ class CommandNode:
             arg_help = []
 
         if feature_flag != BotFeature.UNDEFINED:
-            description = feature_flag.description
+            if description and description != CommandNode.NO_DESCRIPTION:
+                description = f"{feature_flag.description}\n\n{description}"
+            else:
+                description = feature_flag.description
 
         # Check the length of arg help and fill it with empty string if len(arg_help) is shorter.
         if len(arg_help) < arg_count:
@@ -429,7 +434,7 @@ class CommandNode:
             ret: List[HandledMessageEventText]
 
             # checks
-            if not cmd_fn.scope.is_in_scope(e.channel_type):
+            if not e.remote_activated and not cmd_fn.scope.is_in_scope(e.channel_type):
                 ret = [
                     HandledMessageEventText(
                         content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
