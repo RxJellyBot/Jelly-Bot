@@ -13,12 +13,11 @@ cmd = CommandNode(
     brief_description=_("Controls related to the remote control system."),
     description=_(
         "Controls related to the remote control system.\n\n"
-        "- By activating this, the channel (source channel) where the user execute any commands will "
+        "- By activating this, the channel (source channel) where the user have any activites will "
         "be assumed that it is executed the designated channel (target channel).\n\n"
         "- Automatically deactivate when the source channel has idled for {} seconds.\n\n"
         "- These commands are only executable in private channels.\n\n"
-        "- This **surpasses the scope limit** of the command. You will be able to execute group only command in the "
-        "private channel.").format(
+        "- This **surpasses the scope limit** of the command.").format(
         Bot.RemoteControl.IdleDeactivateSeconds)
 )
 

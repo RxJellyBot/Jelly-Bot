@@ -7,7 +7,9 @@ from JellyBot.utils import get_root_oid, get_channel_data
 from JellyBot.systemconfig import Website
 from extutils import safe_cast
 from flags import WebsiteError
+from models import ChannelProfileConnectionModel
 from mongodb.helper import MessageStatsDataProcessor
+from mongodb.factory import ProfileManager
 
 
 class RecentMessagesView(TemplateResponseMixin, View):
@@ -15,10 +17,19 @@ class RecentMessagesView(TemplateResponseMixin, View):
     def get(self, request, *args, **kwargs):
         channel_data = get_channel_data(kwargs)
 
+        # Check if the channel data exists
         if not channel_data.ok:
             return WebsiteErrorView.website_error(
                 request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
 
+        # Check if the user is in the channel
+        root_oid = get_root_oid(request)
+        profs = ProfileManager.get_user_profiles(channel_data.model.id, root_oid)
+        if not profs or profs == ChannelProfileConnectionModel.ProfileOids.none_obj():
+            return WebsiteErrorView.website_error(
+                request, WebsiteError.NOT_IN_THE_CHANNEL, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
+
+        # Process the necessary data
         limit = safe_cast(request.GET.get("limit"), int)
         if limit:
             limit = min(limit, Website.RecentActivity.MaxMessageCount)
@@ -26,7 +37,7 @@ class RecentMessagesView(TemplateResponseMixin, View):
             limit = Website.RecentActivity.MaxMessageCount
 
         ctxt = {
-            "channel_name": channel_data.model.get_channel_name(get_root_oid(request)),
+            "channel_name": channel_data.model.get_channel_name(root_oid),
             "channel_data": channel_data.model,
             "recent_msg_limit": limit or "",
             "recent_msg_limit_max": Website.RecentActivity.MaxMessageCount,
