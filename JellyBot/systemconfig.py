@@ -43,7 +43,7 @@ class Website:
     NewRegisterThresholdDays = 5
 
     class RecentActivity:
-        MaxMessageCount = 500
+        MaxMessageCount = 1000
 
 
 class AutoReply:
@@ -81,7 +81,7 @@ class Database:
 class DataQuery:
     TagPopularitySearchCount = 10
 
-    UserNameCacheSize = 1000
+    UserNameCacheSize = 3000
     UserNameExpirationSeconds = 129600  # 1.5 Days
 
 
@@ -130,3 +130,6 @@ class Bot:
         AutoDeletionDays = 7
         MaxNotifyRangeSeconds = 14400
         MessageFrequencyRangeMin = 1440  # 1 Day
+
+    class RemoteControl:
+        IdleDeactivateSeconds = 600  # 10 mins

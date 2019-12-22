@@ -29,6 +29,7 @@ class APICommand(FlagSingleEnum):
     4xx - Management
         40x - Channel
             401: Issue Channel Registration Execode
+            402: Change Channel Star
             403: Change Channel Name
 
     5xx - Special Services
@@ -54,6 +55,7 @@ class APICommand(FlagSingleEnum):
     DATA_PERMISSION = 302, _("Data Query - Permission")
 
     MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Execode")
+    MG_CHANNEL_STAR_CHANGE = 402, _("Management - Change Channel Star")
     MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")
 
     SERV_SHORTEN_URL = 501, _("Services - Shorten URL")

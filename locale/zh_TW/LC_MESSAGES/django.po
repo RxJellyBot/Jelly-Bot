@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-19 06:49-0600\n"
-"PO-Revision-Date: 2019-12-19 06:57-0600\n"
+"POT-Creation-Date: 2019-12-22 01:49-0600\n"
+"PO-Revision-Date: 2019-12-22 01:49-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -196,35 +196,40 @@ msgstr "更新結果"
 msgid "Terms Explanation"
 msgstr "名詞解釋"
 
-#: .\JellyBot\views\err.py:16 .\flags\weberr.py:28
+#: .\JellyBot\views\err.py:16 .\flags\weberr.py:29
 #: .\templates\err\exctnt_not_found.html:14
 msgid "Extra Content Not Found"
 msgstr "額外內容不存在"
 
-#: .\JellyBot\views\err.py:18 .\flags\weberr.py:30 .\flags\weberr.py:31
+#: .\JellyBot\views\err.py:18 .\flags\weberr.py:30
+#: .\templates\err\not_in_the_channel.html:14
+msgid "Not in the Channel"
+msgstr "不在頻道內"
+
+#: .\JellyBot\views\err.py:20 .\flags\weberr.py:32 .\flags\weberr.py:33
 #: .\templates\err\account\proflink_not_found.html:14
 msgid "Profile Link Not Found"
 msgstr "無對應身份組連結"
 
-#: .\JellyBot\views\err.py:20
+#: .\JellyBot\views\err.py:22
 msgid "Channel Data Not Found"
 msgstr "頻道資料不存在"
 
-#: .\JellyBot\views\err.py:22
+#: .\JellyBot\views\err.py:24
 msgid "Profile Data Not Found"
 msgstr "身份組不存在"
 
-#: .\JellyBot\views\err.py:24 .\flags\weberr.py:33
+#: .\JellyBot\views\err.py:26 .\flags\weberr.py:35
 #: .\templates\err\info\chcoll_not_found.html:14
 msgid "Channel Collection Not Found"
 msgstr "頻道組不存在"
 
-#: .\JellyBot\views\err.py:26 .\flags\weberr.py:35
+#: .\JellyBot\views\err.py:28 .\flags\weberr.py:37
 msgid "Bot Command Not Found"
 msgstr "機器人指令不存在"
 
-#: .\JellyBot\views\err.py:28 .\flags\execode.py:25 .\flags\msgtype.py:11
-#: .\flags\weberr.py:26
+#: .\JellyBot\views\err.py:30 .\flags\execode.py:25 .\flags\msgtype.py:11
+#: .\flags\weberr.py:27
 msgid "Unknown"
 msgstr "不明行為"
 
@@ -260,7 +265,7 @@ msgstr "頻道資訊搜尋"
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:76 .\JellyBot\views\nav.py:125
+#: .\JellyBot\views\info\msgstats.py:80 .\JellyBot\views\nav.py:125
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -268,7 +273,7 @@ msgstr "頻道訊息統計 - {}"
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
-#: .\JellyBot\views\info\recent.py:37 .\JellyBot\views\nav.py:131
+#: .\JellyBot\views\info\recent.py:48 .\JellyBot\views\nav.py:131
 msgid "Recent Messages - {}"
 msgstr "近期訊息 - {}"
 
@@ -650,55 +655,59 @@ msgstr "(換行)"
 msgid "(Space)"
 msgstr "(空格)"
 
-#: .\flags\apiact.py:43
+#: .\flags\apiact.py:44
 msgid "Unknown Action"
 msgstr "不明指令"
 
-#: .\flags\apiact.py:45
+#: .\flags\apiact.py:46
 msgid "Auto-Reply - Addition"
 msgstr "自動回覆 - 新增"
 
-#: .\flags\apiact.py:46
+#: .\flags\apiact.py:47
 msgid "Auto-Reply - Content Validation"
 msgstr "自動回覆 - 內容驗證"
 
-#: .\flags\apiact.py:47
+#: .\flags\apiact.py:48
 msgid "Auto-Reply - Tag Popularity"
 msgstr "自動回覆 - 熱門標籤"
 
-#: .\flags\apiact.py:49
+#: .\flags\apiact.py:50
 msgid "Execode - Auto-Reply Addition"
 msgstr "執行碼 - 自動回覆 - 新增"
 
-#: .\flags\apiact.py:50
+#: .\flags\apiact.py:51
 msgid "Execode - List All"
 msgstr "執行碼 - 列出全部"
 
-#: .\flags\apiact.py:51
+#: .\flags\apiact.py:52
 msgid "Execode - Complete Action"
 msgstr "執行碼 - 完成"
 
-#: .\flags\apiact.py:53
+#: .\flags\apiact.py:54
 msgid "Data Query - Channel"
 msgstr "資料查詢 - 頻道"
 
-#: .\flags\apiact.py:54
+#: .\flags\apiact.py:55
 msgid "Data Query - Permission"
 msgstr "資料查詢 - 權限"
 
-#: .\flags\apiact.py:56
+#: .\flags\apiact.py:57
 msgid "Management - Issue Channel Registration Execode"
 msgstr "管理 - 發給頻道登錄用執行碼"
 
-#: .\flags\apiact.py:57
+#: .\flags\apiact.py:58
+msgid "Management - Change Channel Star"
+msgstr "管理 - 更改頻道最愛"
+
+#: .\flags\apiact.py:59
 msgid "Management - Change Channel Name"
 msgstr "管理 - 更改頻道名稱"
 
-#: .\flags\apiact.py:59
+#: .\flags\apiact.py:61
 msgid "Services - Shorten URL"
 msgstr "服務 - 短網址"
 
-#: .\flags\apiact.py:60
+#: .\flags\apiact.py:62
 msgid "Services - Update Target"
 msgstr "服務 - 更新目標網址"
 
@@ -718,197 +727,221 @@ msgstr "LINE貼圖"
 msgid "Custom Signal"
 msgstr "自訂訊號"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:56
 msgid "Undefined"
 msgstr "未定義"
 
-#: .\flags\botfeature.py:52
+#: .\flags\botfeature.py:56
 msgid "Undefined bot feature flag."
 msgstr "未定義的機器人功能。"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:59
 msgid "Text / Auto Reply / Add"
 msgstr "文字 / 自動回覆 / 新增"
 
-#: .\flags\botfeature.py:55
+#: .\flags\botfeature.py:59
 msgid "Register an auto-reply module."
 msgstr "新增自動回覆組。"
 
-#: .\flags\botfeature.py:57
+#: .\flags\botfeature.py:61
 msgid "Text / Auto Reply / Delete"
 msgstr "文字 / 自動回覆 / 刪除"
 
-#: .\flags\botfeature.py:57
+#: .\flags\botfeature.py:61
 msgid "Delete an auto-reply module."
 msgstr "刪除自動回覆組。"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Text / Auto Reply / Add (Execode)"
 msgstr "文字 / 自動回覆 / 新增 (執行碼)"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Register an auto-reply module using Execode."
 msgstr "使用執行碼新增自動回覆組。"
 
-#: .\flags\botfeature.py:61
+#: .\flags\botfeature.py:65
 msgid "Text / Auto Reply / List (Usable)"
 msgstr "文字 / 自動回覆 / 列表 (可用)"
 
-#: .\flags\botfeature.py:61
+#: .\flags\botfeature.py:65
 msgid "List all the usable auto-reply modules."
 msgstr "列出所有可用的自動回覆組。"
 
-#: .\flags\botfeature.py:63
+#: .\flags\botfeature.py:67
 msgid "Text / Auto Reply / List (Keyword)"
 msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:68
 msgid ""
 "List all the usable auto-reply modules which keyword includes the provided "
 "keyword."
 msgstr "列出所有含有提供的關鍵字的可用回覆組。"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Text / Auto Reply / Respond"
 msgstr "文字 / 自動回覆 / 回覆"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:73
 msgid "Text / Timer / Add"
 msgstr "文字 / 計時器 / 新增"
 
-#: .\flags\botfeature.py:69
+#: .\flags\botfeature.py:73
 msgid "Add a timer."
 msgstr "新增一個計時器。"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:75
 msgid "Text / Timer / List (All)"
 msgstr "文字 / 計時器 / 列表 (全部)"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:75
 msgid "List all timers."
 msgstr "列出全部的計時器。"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:77
 msgid "Text / Timer / Delete"
 msgstr "文字 / 計時器 / 刪除"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:77
 msgid "Delete a timer."
 msgstr "刪除一個計時器。"
 
-#: .\flags\botfeature.py:75
+#: .\flags\botfeature.py:79
 msgid "Text / Timer / List (Keyword)"
 msgstr "文字 / 計時器 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:75
+#: .\flags\botfeature.py:79
 msgid "Get the timer(s) with the designated keyword."
 msgstr "顯示關鍵字所對應的計時器。"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:82
 msgid "Text / Information / Check IDs"
 msgstr "文字 / 資訊 / 查看ID"
 
-#: .\flags\botfeature.py:78
+#: .\flags\botfeature.py:82
 msgid "Check the ID of current channel and self."
 msgstr "查看自己和所在頻道的ID。"
 
-#: .\flags\botfeature.py:80
+#: .\flags\botfeature.py:84
 msgid "Text / Information / Channel"
 msgstr "文字 / 資訊 / 頻道"
 
-#: .\flags\botfeature.py:80
+#: .\flags\botfeature.py:84
 msgid "Check the channel info."
 msgstr "查閱頻道資訊。"
 
-#: .\flags\botfeature.py:82
+#: .\flags\botfeature.py:86
 msgid "Text / Information / User"
 msgstr "文字 / 資訊 / 用戶"
 
-#: .\flags\botfeature.py:82
+#: .\flags\botfeature.py:86
 msgid "Check the user info of self."
 msgstr "查閱自己的用戶資訊。"
 
-#: .\flags\botfeature.py:84
+#: .\flags\botfeature.py:88
 msgid "Text / Information / Help"
 msgstr "文字 / 資訊 / 幫助"
 
-#: .\flags\botfeature.py:84
+#: .\flags\botfeature.py:88
 msgid "Get help for how to use the bot and the related information."
 msgstr "查看此機器人的使用說明和相關資訊。"
 
-#: .\flags\botfeature.py:87
+#: .\flags\botfeature.py:91
 msgid "Text / Transform / Newline"
 msgstr "文字 / 替換 / 換行字元"
 
-#: .\flags\botfeature.py:87
+#: .\flags\botfeature.py:91
 msgid "Replace the real newline character to be the escaped character \\n."
 msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
 
-#: .\flags\botfeature.py:90
+#: .\flags\botfeature.py:94
 msgid "Text / Random / Choice (One)"
 msgstr "文字 / 隨機 / 選擇 (單個)"
 
-#: .\flags\botfeature.py:90
+#: .\flags\botfeature.py:94
 msgid "Randomly pick an option among the provided options."
 msgstr "隨機從提供的選項中選出一個選項。"
 
-#: .\flags\botfeature.py:92
+#: .\flags\botfeature.py:96
 msgid "Text / Random / Choice (Multi)"
 msgstr "文字 / 隨機 / 選擇 (多個)"
 
-#: .\flags\botfeature.py:93
+#: .\flags\botfeature.py:97
 msgid "Randomly pick an option among the provided options multiple times."
 msgstr "隨機從提供的選項中，根據指定的次數多次選擇選項。"
 
-#: .\flags\botfeature.py:96
+#: .\flags\botfeature.py:100
 msgid "Text / Recent / Message"
 msgstr "文字 / 近期 / 訊息"
 
-#: .\flags\botfeature.py:96
+#: .\flags\botfeature.py:100
 msgid "Get recent messages including the recalled ones."
 msgstr "獲取近期訊息。這些訊息中包含已經收回的訊息。"
 
-#: .\flags\botfeature.py:99
+#: .\flags\botfeature.py:103
+msgid "Text / Remote / Activate"
+msgstr "文字 / 遙控 / 啟動"
+
+#: .\flags\botfeature.py:103
+msgid "Activate the remote control system."
+msgstr "啟動訊息遙控系統。"
+
+#: .\flags\botfeature.py:105
+msgid "Text / Remote / Deactivate"
+msgstr "文字 / 遙控 / 停用"
+
+#: .\flags\botfeature.py:105
+msgid "Deactivate the remore control system."
+msgstr "停止訊息遙控系統。"
+
+#: .\flags\botfeature.py:107
+msgid "Text / Remote / Status"
+msgstr "文字 / 遙控 / 狀態"
+
+#: .\flags\botfeature.py:107
+msgid "View the current status of the remote control system."
+msgstr "查閱目前訊息遙控系統的狀態。"
+
+#: .\flags\botfeature.py:110
 msgid "Text / User Data Integration / Start"
 msgstr "文字 / 整合用戶資料 / 啟動"
 
-#: .\flags\botfeature.py:99
+#: .\flags\botfeature.py:110
 msgid "Issue an Execode for user data integration."
 msgstr "獲取一條執行碼以啟動用戶資訊整合手續。"
 
-#: .\flags\botfeature.py:101
+#: .\flags\botfeature.py:112
 msgid "Text / Calculator"
 msgstr "文字 / 計算機"
 
-#: .\flags\botfeature.py:101
+#: .\flags\botfeature.py:112
 msgid "Auto-detected calculator."
 msgstr "自動偵測並啟動的計算機。"
 
-#: .\flags\botfeature.py:103
+#: .\flags\botfeature.py:114
 msgid "Text / Error Test"
 msgstr "文字 / 錯誤測試"
 
-#: .\flags\botfeature.py:103
+#: .\flags\botfeature.py:114
 msgid "For the purpose of testing the error reporting system."
 msgstr "(測試錯誤回報系統用)"
 
-#: .\flags\botfeature.py:106
+#: .\flags\botfeature.py:117
 msgid "Image / imgur upload"
 msgstr "圖片 / 上傳imgur"
 
-#: .\flags\botfeature.py:106
+#: .\flags\botfeature.py:117
 msgid "Upload image to imgur.com."
 msgstr "將圖片上傳至 imgur.com。"
 
-#: .\flags\botfeature.py:109
+#: .\flags\botfeature.py:120
 msgid "Sticker / LINE / Get Info"
 msgstr "貼圖 / LINE / 資訊"
 
-#: .\flags\botfeature.py:109
+#: .\flags\botfeature.py:120
 msgid "Get the info of the sticker (mostly IDs)."
 msgstr "獲取貼圖的相關資訊(基本上都是ID)。"
 
@@ -1068,7 +1101,7 @@ msgstr "無法整合用戶資訊。"
 msgid "X: Model - Construction"
 msgstr "X: 資料模組 - 建構"
 
-#: .\flags\execode.py:112 .\mongodb\factory\results\_outcome.py:334
+#: .\flags\execode.py:112 .\mongodb\factory\results\_outcome.py:346
 msgid "An error occurred during model construction."
 msgstr "於建構資料模組時發生錯誤。"
 
@@ -1214,11 +1247,11 @@ msgstr "X: 未分類"
 msgid "Model is invalid for uncategorized reason."
 msgstr "資料模組因不明原因而無效。"
 
-#: .\flags\weberr.py:32 .\templates\err\info\profile_not_found.html:14
+#: .\flags\weberr.py:34 .\templates\err\info\profile_not_found.html:14
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:121 .\models\stats.py:296
+#: .\models\stats.py:124 .\models\stats.py:322
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -1234,506 +1267,522 @@ msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "{event} has ended (at {time})"
 msgstr "{event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:144
+#: .\mongodb\factory\prof.py:165
 msgid "Default Profile"
 msgstr "預設身份組"
 
-#: .\mongodb\factory\results\_outcome.py:80
-#: .\mongodb\factory\results\_outcome.py:214
+#: .\mongodb\factory\results\_outcome.py:86
+#: .\mongodb\factory\results\_outcome.py:226
 msgid "O: Inserted"
 msgstr "O: 已新增"
 
-#: .\mongodb\factory\results\_outcome.py:80
+#: .\mongodb\factory\results\_outcome.py:86
 msgid "The system returned OK with data inserted to the database."
 msgstr "執行成功。資料已新增至系統。"
 
-#: .\mongodb\factory\results\_outcome.py:82
+#: .\mongodb\factory\results\_outcome.py:88
 msgid "O: Updated"
 msgstr "O: 更新成功"
 
-#: .\mongodb\factory\results\_outcome.py:82
+#: .\mongodb\factory\results\_outcome.py:88
 msgid "The system returned OK with data updated in the database."
 msgstr "執行成功。資料已更新。"
 
-#: .\mongodb\factory\results\_outcome.py:84
+#: .\mongodb\factory\results\_outcome.py:90
 msgid "O: Existed"
 msgstr "O: 已存在"
 
-#: .\mongodb\factory\results\_outcome.py:84
+#: .\mongodb\factory\results\_outcome.py:90
 msgid "The system returned OK with data already existed in the database."
 msgstr "執行成功。資料已存在於系統中。"
 
-#: .\mongodb\factory\results\_outcome.py:86
+#: .\mongodb\factory\results\_outcome.py:92
 msgid "O: Uncategorized"
 msgstr "O: 未分類"
 
-#: .\mongodb\factory\results\_outcome.py:86
+#: .\mongodb\factory\results\_outcome.py:92
 msgid "The system returned OK with uncategorized reason."
 msgstr "執行成功。原因未分類。"
 
-#: .\mongodb\factory\results\_outcome.py:88
+#: .\mongodb\factory\results\_outcome.py:94
 msgid "X: Insufficient Permission"
 msgstr "X: 權限不足"
 
-#: .\mongodb\factory\results\_outcome.py:89
+#: .\mongodb\factory\results\_outcome.py:95
 msgid "The insertion was failed becuase the permission is insufficient."
 msgstr "執行失敗。使用者權限不足。"
 
-#: .\mongodb\factory\results\_outcome.py:91
+#: .\mongodb\factory\results\_outcome.py:97
 msgid "X: Channel Type Unidentifiable"
 msgstr "X: 頻道種類無法辨識"
 
-#: .\mongodb\factory\results\_outcome.py:92
+#: .\mongodb\factory\results\_outcome.py:98
 msgid ""
 "The channel type is unidentifiable using the provided token and platform."
 msgstr "無法使用既有的頻道代碼和平台辨認頻道種類。"
 
-#: .\mongodb\factory\results\_outcome.py:94
+#: .\mongodb\factory\results\_outcome.py:100
 msgid "X: Pinned Module Existed"
 msgstr "X: 已存在置頂回覆組"
 
-#: .\mongodb\factory\results\_outcome.py:95
+#: .\mongodb\factory\results\_outcome.py:101
 msgid ""
 "A pinned module has already existed. You have to have the permission of "
 "accessing the pinned module to overwrite."
 msgstr ""
 "已存在相同關鍵字的置頂自動回覆組。你必須擁有更動置頂回覆組的權限以覆寫。"
 
-#: .\mongodb\factory\results\_outcome.py:98
+#: .\mongodb\factory\results\_outcome.py:104
 msgid "X: on Registering Channel"
 msgstr "X: 頻道登錄處理"
 
-#: .\mongodb\factory\results\_outcome.py:99
+#: .\mongodb\factory\results\_outcome.py:105
 msgid "The insertion was failed while registering the identity of channel."
 msgstr "執行失敗。於登錄頻道時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:101
+#: .\mongodb\factory\results\_outcome.py:107
 msgid "X: on Registering OnPlatform User"
 msgstr "X: 登錄平台用戶身份"
 
-#: .\mongodb\factory\results\_outcome.py:102
+#: .\mongodb\factory\results\_outcome.py:108
 msgid ""
 "The insertion was failed while registering the identity of on-platform user."
 msgstr "執行失敗。於登錄平台用戶身份時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:104
+#: .\mongodb\factory\results\_outcome.py:110
 msgid "X: on Registering API User"
 msgstr "X: 登錄API用戶身份"
 
-#: .\mongodb\factory\results\_outcome.py:105
+#: .\mongodb\factory\results\_outcome.py:111
 msgid "The insertion was failed while registering the identity of API user."
 msgstr "執行失敗。於登錄API用戶身份時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:107
+#: .\mongodb\factory\results\_outcome.py:113
 msgid "X: on Connecting OnPlatform User"
 msgstr "X: 連結平台用戶身份"
 
-#: .\mongodb\factory\results\_outcome.py:108
+#: .\mongodb\factory\results\_outcome.py:114
 msgid ""
 "The insertion was failed while connecting the identity of on-platform user."
 msgstr "執行失敗。於連結平台用戶身份時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:110
+#: .\mongodb\factory\results\_outcome.py:116
 msgid "X: on Connecting API User"
 msgstr "X: 連結API用戶身份"
 
-#: .\mongodb\factory\results\_outcome.py:111
+#: .\mongodb\factory\results\_outcome.py:117
 msgid "The insertion was failed while connecting the identity of API user."
 msgstr "執行失敗。於連結API用戶身份時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:113
+#: .\mongodb\factory\results\_outcome.py:119
 msgid "X: on Setting Config"
 msgstr "X: 設定配置"
 
-#: .\mongodb\factory\results\_outcome.py:114
+#: .\mongodb\factory\results\_outcome.py:120
 msgid ""
 "An error occurred when trying to set the config after the default profile is "
 "generated."
 msgstr "產生預設身份組後，嘗試更改頻道設定時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:116
+#: .\mongodb\factory\results\_outcome.py:122
 msgid "X: Invalid URL"
 msgstr "X: 無效網址"
 
-#: .\mongodb\factory\results\_outcome.py:117
+#: .\mongodb\factory\results\_outcome.py:123
 msgid ""
 "The URL is invalid. Maybe missing the schema or the URL did not return 200."
 msgstr ""
 "此網址無效。可能是因為網址沒有包含通訊協定(http、httos...等)，或是該網址並沒"
 "有回傳200 (OK)。"
 
-#: .\mongodb\factory\results\_outcome.py:119
+#: .\mongodb\factory\results\_outcome.py:125
+msgid "X: (Auto Reply) Invalid Keyword"
+msgstr "X: 自動回覆 - 無效的關鍵字"
+
+#: .\mongodb\factory\results\_outcome.py:126
+msgid "The keyword contains invalid content."
+msgstr "關鍵字內含有無效內容。"
+
+#: .\mongodb\factory\results\_outcome.py:128
+msgid "X: (Auto Reply) Invalid Response"
+msgstr "X: 自動回覆 - 無效的回覆"
+
+#: .\mongodb\factory\results\_outcome.py:129
+msgid "One or more of the responses contains invalid content."
+msgstr "一個或以上回覆中含有無效內容。"
+
+#: .\mongodb\factory\results\_outcome.py:131
 msgid "X: Not Serializable"
 msgstr "X: 無法封裝"
 
-#: .\mongodb\factory\results\_outcome.py:120
+#: .\mongodb\factory\results\_outcome.py:132
 msgid "The processed data cannot be serialized."
 msgstr "執行失敗。資料無法封裝。"
 
-#: .\mongodb\factory\results\_outcome.py:122
+#: .\mongodb\factory\results\_outcome.py:134
 msgid "X: Not Acknowledged"
 msgstr "X: 資料庫不接受"
 
-#: .\mongodb\factory\results\_outcome.py:123
+#: .\mongodb\factory\results\_outcome.py:135
 msgid "The database did not acknowledge the inserted data."
 msgstr "執行失敗。資料庫未接受要新增的資料。"
 
-#: .\mongodb\factory\results\_outcome.py:125
+#: .\mongodb\factory\results\_outcome.py:137
 msgid "X: Not Found"
 msgstr "X: 不存在"
 
-#: .\mongodb\factory\results\_outcome.py:126
+#: .\mongodb\factory\results\_outcome.py:138
 msgid "The condition to update/insert does not match any data in the database."
 msgstr "執行失敗。指定的更新/新增條件不符合任何資料庫中的資料。"
 
-#: .\mongodb\factory\results\_outcome.py:128
+#: .\mongodb\factory\results\_outcome.py:140
 msgid "X: Not Model"
 msgstr "X: 非資料模組"
 
-#: .\mongodb\factory\results\_outcome.py:129
+#: .\mongodb\factory\results\_outcome.py:141
 msgid "The processed data is not in the shape of a data model."
 msgstr "執行失敗。資料結構和預定的資料模組不符。"
 
-#: .\mongodb\factory\results\_outcome.py:131
+#: .\mongodb\factory\results\_outcome.py:143
 msgid "X: Invalid Model"
 msgstr "X: 無效資料模組"
 
-#: .\mongodb\factory\results\_outcome.py:132
+#: .\mongodb\factory\results\_outcome.py:144
 msgid "Some data of the model is invalid."
 msgstr "部分資料模組內的資訊無效。"
 
-#: .\mongodb\factory\results\_outcome.py:134
+#: .\mongodb\factory\results\_outcome.py:146
 msgid "X: Readonly"
 msgstr "X: 唯讀"
 
-#: .\mongodb\factory\results\_outcome.py:135
+#: .\mongodb\factory\results\_outcome.py:147
 msgid "There are some fields that are being attempted to modify are read-only."
 msgstr "執行失敗。嘗試更改唯讀的資料欄位。"
 
-#: .\mongodb\factory\results\_outcome.py:137
+#: .\mongodb\factory\results\_outcome.py:149
 msgid "X: Type Mismatch"
 msgstr "X: 型態不符"
 
-#: .\mongodb\factory\results\_outcome.py:138
+#: .\mongodb\factory\results\_outcome.py:150
 msgid ""
 "The type of the data to update does not match the type of the field to be "
 "modified."
 msgstr "執行失敗。資料欄位的資料型態與預期不符。"
 
-#: .\mongodb\factory\results\_outcome.py:140
+#: .\mongodb\factory\results\_outcome.py:152
 msgid "X: Invalid Data"
 msgstr "X: 資料無效"
 
-#: .\mongodb\factory\results\_outcome.py:141
+#: .\mongodb\factory\results\_outcome.py:153
 msgid "The data to be updated is invalid for the field."
 msgstr "執行失敗。欲更新的資料無效。"
 
-#: .\mongodb\factory\results\_outcome.py:143
+#: .\mongodb\factory\results\_outcome.py:155
 msgid "X: Casting Failed"
 msgstr "X: 轉型失敗"
 
-#: .\mongodb\factory\results\_outcome.py:144
+#: .\mongodb\factory\results\_outcome.py:156
 msgid ""
 "The data cannot be casted to the desired type. Check the datatype of the "
 "provided data."
 msgstr "資料無法被轉成目標資料型態。請檢查資料的資料型態。"
 
-#: .\mongodb\factory\results\_outcome.py:146
+#: .\mongodb\factory\results\_outcome.py:158
 msgid "X: Missing in Cache, Attempted Insertion"
 msgstr "X: 快取內不存在/已嘗試新增"
 
-#: .\mongodb\factory\results\_outcome.py:147
-#: .\mongodb\factory\results\_outcome.py:218
+#: .\mongodb\factory\results\_outcome.py:159
+#: .\mongodb\factory\results\_outcome.py:230
 msgid ""
 "The data was not found and the system has attempted to insert a new data but "
 "failed."
 msgstr "執行失敗。資料不存在於系統快取中，已嘗試新增但失敗。"
 
-#: .\mongodb\factory\results\_outcome.py:149
+#: .\mongodb\factory\results\_outcome.py:161
 msgid "X: Missing in Cache, Aborted Insertion"
 msgstr "X: 快取內不存在/未嘗試新增"
 
-#: .\mongodb\factory\results\_outcome.py:150
-#: .\mongodb\factory\results\_outcome.py:221
+#: .\mongodb\factory\results\_outcome.py:162
+#: .\mongodb\factory\results\_outcome.py:233
 msgid "The data was not found and the system aborted to insert a new data."
 msgstr "執行失敗。資料不存在於系統快取中，系統未嘗試新增。"
 
-#: .\mongodb\factory\results\_outcome.py:152
+#: .\mongodb\factory\results\_outcome.py:164
 msgid "X: Model Construction Unknown"
 msgstr "X: 不明(資料建構)"
 
-#: .\mongodb\factory\results\_outcome.py:153
+#: .\mongodb\factory\results\_outcome.py:165
 msgid "An unknown occurred during the construction of a data model."
 msgstr "執行失敗。於資料建構的過程中發生不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:155
+#: .\mongodb\factory\results\_outcome.py:167
 msgid "X: Insertion Unknown"
 msgstr "X: 不明(新增資料)"
 
-#: .\mongodb\factory\results\_outcome.py:156
+#: .\mongodb\factory\results\_outcome.py:168
 msgid "An unknown occurred while inserting the data."
 msgstr "執行失敗。於新增資料的過程中發生不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:158
-#: .\mongodb\factory\results\_outcome.py:244
-#: .\mongodb\factory\results\_outcome.py:336
-#: .\mongodb\factory\results\_outcome.py:382
+#: .\mongodb\factory\results\_outcome.py:170
+#: .\mongodb\factory\results\_outcome.py:256
+#: .\mongodb\factory\results\_outcome.py:348
+#: .\mongodb\factory\results\_outcome.py:394
 msgid "X: Not Executed"
 msgstr "X: 未執行"
 
-#: .\mongodb\factory\results\_outcome.py:159
+#: .\mongodb\factory\results\_outcome.py:171
 msgid "The insertion process had not been executed."
 msgstr "資料新增程序未執行。"
 
-#: .\mongodb\factory\results\_outcome.py:161
+#: .\mongodb\factory\results\_outcome.py:173
 msgid "X: Exception Occurred"
 msgstr "X: 發生錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:162
+#: .\mongodb\factory\results\_outcome.py:174
 msgid "An exception occurred during execution."
 msgstr "執行時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:211
+#: .\mongodb\factory\results\_outcome.py:223
 msgid "O: From Cache/DB"
 msgstr "O: 資料庫/快取中"
 
-#: .\mongodb\factory\results\_outcome.py:212
+#: .\mongodb\factory\results\_outcome.py:224
 msgid "The data was found in either Cache or Database."
 msgstr "資料於快取或資料庫中被找到。"
 
-#: .\mongodb\factory\results\_outcome.py:215
+#: .\mongodb\factory\results\_outcome.py:227
 msgid "The data was not found yet the data has been inserted to the database."
 msgstr "資料不存在，但系統已自動新增置資料庫。"
 
-#: .\mongodb\factory\results\_outcome.py:217
+#: .\mongodb\factory\results\_outcome.py:229
 msgid "X: Not Found, Attempted Insertion"
 msgstr "X: 不存在/已嘗試新增"
 
-#: .\mongodb\factory\results\_outcome.py:220
+#: .\mongodb\factory\results\_outcome.py:232
 msgid "X: Not Found, Aborted Insertion"
 msgstr "X: 不存在/未嘗試新增"
 
-#: .\mongodb\factory\results\_outcome.py:223
+#: .\mongodb\factory\results\_outcome.py:235
 msgid "X: Not found on 1st query"
 msgstr "X: 第一指令"
 
-#: .\mongodb\factory\results\_outcome.py:224
+#: .\mongodb\factory\results\_outcome.py:236
 msgid "The data was not found for the 1st query."
 msgstr "執行失敗。第一次獲取指令找不到資料。"
 
-#: .\mongodb\factory\results\_outcome.py:226
+#: .\mongodb\factory\results\_outcome.py:238
 msgid "X: Not found on 2nd query"
 msgstr "X: 第二指令"
 
-#: .\mongodb\factory\results\_outcome.py:227
+#: .\mongodb\factory\results\_outcome.py:239
 msgid "The data was not found for the 2nd query."
 msgstr "執行失敗。第二次獲取指令找不到資料。"
 
-#: .\mongodb\factory\results\_outcome.py:229
+#: .\mongodb\factory\results\_outcome.py:241
 msgid "X: Empty Content"
 msgstr "X:  無內容"
 
-#: .\mongodb\factory\results\_outcome.py:230
+#: .\mongodb\factory\results\_outcome.py:242
 msgid "The content in the parameter is empty."
 msgstr "參數的內容為空。"
 
-#: .\mongodb\factory\results\_outcome.py:232
-#: .\mongodb\factory\results\_outcome.py:321
+#: .\mongodb\factory\results\_outcome.py:244
+#: .\mongodb\factory\results\_outcome.py:333
 msgid "X: Channel Not Found"
 msgstr "X: 頻道不存在"
 
-#: .\mongodb\factory\results\_outcome.py:233
+#: .\mongodb\factory\results\_outcome.py:245
 msgid ""
 "Channel data not found. Use the channel token and platform to register the "
 "channel first."
 msgstr "沒有找到對應的頻道資訊。請先提供頻道代碼和所在平台以登錄頻道資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:235
+#: .\mongodb\factory\results\_outcome.py:247
 msgid "X: Config Error"
 msgstr "X: 設定錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:236
+#: .\mongodb\factory\results\_outcome.py:248
 msgid "An error occurred when getting configuration from the channel data."
 msgstr "於獲得頻道設定時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:238
+#: .\mongodb\factory\results\_outcome.py:250
 msgid "X: Default Profile Error"
 msgstr "X: 預設身份組錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:239
+#: .\mongodb\factory\results\_outcome.py:251
 msgid "An error occurred when creating a default profile."
 msgstr "於創建預設身份組時發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:241
+#: .\mongodb\factory\results\_outcome.py:253
 msgid "X: Incorrect Execode type"
 msgstr "X: 執行碼種類錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:242
+#: .\mongodb\factory\results\_outcome.py:254
 msgid "The type of the given Execode doesn't match the desired one."
 msgstr "執行碼種類與預期的不符。"
 
-#: .\mongodb\factory\results\_outcome.py:245
+#: .\mongodb\factory\results\_outcome.py:257
 msgid "The acquiring process had not been executed."
 msgstr "資料獲取程序未執行。"
 
-#: .\mongodb\factory\results\_outcome.py:294
+#: .\mongodb\factory\results\_outcome.py:306
 msgid "O: Completed"
 msgstr "O: 已完成"
 
-#: .\mongodb\factory\results\_outcome.py:295
+#: .\mongodb\factory\results\_outcome.py:307
 msgid "The operation was successfully completed."
 msgstr "程序執行完成。"
 
-#: .\mongodb\factory\results\_outcome.py:297
+#: .\mongodb\factory\results\_outcome.py:309
 msgid "X: Execode Not Found"
 msgstr "X: 執行碼不存在"
 
-#: .\mongodb\factory\results\_outcome.py:298
+#: .\mongodb\factory\results\_outcome.py:310
 msgid "No enqueued Execode found."
 msgstr "沒有找到已登記的執行碼。"
 
-#: .\mongodb\factory\results\_outcome.py:300
+#: .\mongodb\factory\results\_outcome.py:312
 msgid "X: Keys Lacking"
 msgstr "X: 參數短少"
 
-#: .\mongodb\factory\results\_outcome.py:301
+#: .\mongodb\factory\results\_outcome.py:313
 msgid "There are keys lacking so that the Execode cannot be completed."
 msgstr "因完成執行碼所需要的參數有缺，故完成手續失敗。"
 
-#: .\mongodb\factory\results\_outcome.py:303
+#: .\mongodb\factory\results\_outcome.py:315
 msgid "X: Completion Failed"
 msgstr "X: 完成手續失敗"
 
-#: .\mongodb\factory\results\_outcome.py:304
+#: .\mongodb\factory\results\_outcome.py:316
 msgid "The action completion was failed."
 msgstr "完成手續執行失敗。"
 
-#: .\mongodb\factory\results\_outcome.py:306
+#: .\mongodb\factory\results\_outcome.py:318
 msgid "X: No Complete Action"
 msgstr "X: 無對應完成手續"
 
-#: .\mongodb\factory\results\_outcome.py:307
+#: .\mongodb\factory\results\_outcome.py:319
 msgid "No complete action implemented yet for the provided action type."
 msgstr "對應的完成手續尚未實作完成。"
 
-#: .\mongodb\factory\results\_outcome.py:309
+#: .\mongodb\factory\results\_outcome.py:321
 msgid "X: Completion Error"
 msgstr "X: 完成手續錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:310
+#: .\mongodb\factory\results\_outcome.py:322
 msgid "An error occurred during action completion process."
 msgstr "執行完成手續時發生了不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:312
+#: .\mongodb\factory\results\_outcome.py:324
 msgid "X: Empty Execode"
 msgstr "X: 空執行碼"
 
-#: .\mongodb\factory\results\_outcome.py:313
+#: .\mongodb\factory\results\_outcome.py:325
 msgid "The Execode is empty."
 msgstr "執行碼為空。"
 
-#: .\mongodb\factory\results\_outcome.py:315
+#: .\mongodb\factory\results\_outcome.py:327
 msgid "X: Collation Error"
 msgstr "X: 校勘錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:316
+#: .\mongodb\factory\results\_outcome.py:328
 msgid "An error occurred during parameter collation process."
 msgstr "於參數校勘的過程中發生了不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:318
+#: .\mongodb\factory\results\_outcome.py:330
 msgid "X: Execode type Mismatch"
 msgstr "X: 執行碼種類不符"
 
-#: .\mongodb\factory\results\_outcome.py:319
+#: .\mongodb\factory\results\_outcome.py:331
 msgid "The type of the Execode doesn't match the desired one."
 msgstr "執行碼種類與預期不符。"
 
-#: .\mongodb\factory\results\_outcome.py:322
+#: .\mongodb\factory\results\_outcome.py:334
 msgid "Channel was not found using the given Channel ID."
 msgstr "頻道ID沒有對應的頻道資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:324
+#: .\mongodb\factory\results\_outcome.py:336
 msgid "X: Source = Destination"
 msgstr "X: 來源和目標相同"
 
-#: .\mongodb\factory\results\_outcome.py:325
+#: .\mongodb\factory\results\_outcome.py:337
 msgid "Source user data is equal to the destination user data."
 msgstr "來源用戶資訊和目標用戶資訊相同。"
 
-#: .\mongodb\factory\results\_outcome.py:327
+#: .\mongodb\factory\results\_outcome.py:339
 msgid "X: Source Data Not Found"
 msgstr "X: 找不到來源用戶資訊"
 
-#: .\mongodb\factory\results\_outcome.py:328
+#: .\mongodb\factory\results\_outcome.py:340
 msgid "Source user data not found."
 msgstr "找不到來源用戶資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:330
+#: .\mongodb\factory\results\_outcome.py:342
 msgid "X: Destination Data Not Found"
 msgstr "X: 找不到目標用戶資訊"
 
-#: .\mongodb\factory\results\_outcome.py:331
+#: .\mongodb\factory\results\_outcome.py:343
 msgid "Destination user data not found."
 msgstr "找不到目標用戶資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:333
+#: .\mongodb\factory\results\_outcome.py:345
 msgid "X: Construction Error"
 msgstr "X: 建構錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:337
-#: .\mongodb\factory\results\_outcome.py:383
+#: .\mongodb\factory\results\_outcome.py:349
+#: .\mongodb\factory\results\_outcome.py:395
 msgid "The operation had not been executed."
 msgstr "程序未執行。"
 
-#: .\mongodb\factory\results\_outcome.py:339
+#: .\mongodb\factory\results\_outcome.py:351
 msgid "X: Not Updated"
 msgstr "X: 未更新"
 
-#: .\mongodb\factory\results\_outcome.py:340
+#: .\mongodb\factory\results\_outcome.py:352
 msgid "Update operation not performed."
 msgstr "更新處理未完成。"
 
-#: .\mongodb\factory\results\_outcome.py:342
+#: .\mongodb\factory\results\_outcome.py:354
 msgid "X: Not Deleted"
 msgstr "X: 未刪除"
 
-#: .\mongodb\factory\results\_outcome.py:343
+#: .\mongodb\factory\results\_outcome.py:355
 msgid "Delete operation not performed."
 msgstr "刪除處理未完成。"
 
-#: .\mongodb\factory\results\_outcome.py:345
+#: .\mongodb\factory\results\_outcome.py:357
 msgid "X: Error"
 msgstr "X: 錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:346
+#: .\mongodb\factory\results\_outcome.py:358
 msgid "An error has occurred during the process execution."
 msgstr "於程序執行中發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:376
+#: .\mongodb\factory\results\_outcome.py:388
 msgid "O: Success"
 msgstr "O: 成功"
 
-#: .\mongodb\factory\results\_outcome.py:377
+#: .\mongodb\factory\results\_outcome.py:389
 msgid "The updating operation succeed."
 msgstr "更新手續執行成功。"
 
-#: .\mongodb\factory\results\_outcome.py:379
+#: .\mongodb\factory\results\_outcome.py:391
 msgid "X: Not found"
 msgstr "X: 不存在"
 
-#: .\mongodb\factory\results\_outcome.py:380
+#: .\mongodb\factory\results\_outcome.py:392
 msgid "The data for updating is not found."
 msgstr "執行失敗。找不到符合條件的資料更新。"
 
-#: .\msghandle\botcmd\command\_base_.py:310
+#: .\msghandle\botcmd\command\_base_.py:112
 msgid "No description provided."
 msgstr "沒有敘述。"
 
-#: .\msghandle\botcmd\command\_base_.py:439
+#: .\msghandle\botcmd\command\_base_.py:444
 msgid "Command is in cooldown. Call the command again after {:.2f} secs."
 msgstr "指令冷卻中。請於 {:.2f} 秒後重試。"
 
-#: .\msghandle\botcmd\command\_base_.py:448
+#: .\msghandle\botcmd\command\_base_.py:453
 msgid ""
 "Incorrect type of data: `{}`.\n"
 "Expected type: `{}` / Actual type: `{}`"
@@ -1741,7 +1790,7 @@ msgstr ""
 "`{}` 的資料型態不正確。\n"
 "預期: `{}` / 實際: `{}`"
 
-#: .\msghandle\botcmd\command\_base_.py:469
+#: .\msghandle\botcmd\command\_base_.py:474
 msgid ""
 "Executable command not found.\n"
 "Visit {}{} for more information."
@@ -1749,7 +1798,7 @@ msgstr ""
 "找不到可執行的指令。\n"
 "請瀏覽 {}{} 以獲得更多資訊。"
 
-#: .\msghandle\botcmd\command\_base_.py:492
+#: .\msghandle\botcmd\command\_base_.py:497
 msgid ""
 "Command not allowed to use under this channel type: {}\n"
 "Please use the command under either one of these channel types: {}"
@@ -1757,11 +1806,11 @@ msgstr ""
 "指令無法在此頻道種類中使用: {}\n"
 "請在下列任一種頻道種類中使用此指令: {}"
 
-#: .\msghandle\botcmd\command\_tree_.py:37
+#: .\msghandle\botcmd\command\_tree_.py:39
 msgid "Dummy command for accomodating new command usage."
 msgstr "用於讓用戶適應新指令用法的假指令。"
 
-#: .\msghandle\botcmd\command\_tree_.py:38
+#: .\msghandle\botcmd\command\_tree_.py:40
 msgid ""
 "Please add 'AR' which means 'Auto-Reply' between JC and the command code.\n"
 "------\n"
@@ -1988,25 +2037,29 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:207 .\msghandle\botcmd\command\ar.py:227
-msgid "Usable Keywords:"
-msgstr "可用關鍵字:"
+#: .\msghandle\botcmd\command\ar.py:205
+msgid "Usable Keywords ({}):"
+msgstr "可用關鍵字 ({}):"
 
-#: .\msghandle\botcmd\command\ar.py:207 .\msghandle\botcmd\command\ar.py:227
+#: .\msghandle\botcmd\command\ar.py:205 .\msghandle\botcmd\command\ar.py:225
 msgid ", "
 msgstr "、"
 
-#: .\msghandle\botcmd\command\ar.py:211
+#: .\msghandle\botcmd\command\ar.py:209
 msgid "No usable auto-reply module in this channel."
 msgstr "此頻道沒有可用的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:217
+#: .\msghandle\botcmd\command\ar.py:215
 msgid ""
 "The search keyword to find the Auto-Reply module. Auto-Reply module which "
 "keyword contains this will be returned."
 msgstr "搜尋自動回覆組的關鍵字。結果中只會有包含此關鍵字的回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:232
+#: .\msghandle\botcmd\command\ar.py:225
+msgid "Usable Keywords:"
+msgstr "可用關鍵字:"
+
+#: .\msghandle\botcmd\command\ar.py:230
 msgid ""
 "Cannot find any auto-reply module including the substring `{}` in their "
 "keyword."
@@ -2128,15 +2181,15 @@ msgstr "查閱近期訊息的最大數量。"
 msgid "Visit {}{}?{} to see the most recent {} messages."
 msgstr "瀏覽 {}{}?{} 以查閱最新 {} 則訊息。"
 
-#: .\msghandle\botcmd\command\rdm.py:13
+#: .\msghandle\botcmd\command\rdm.py:14
 msgid "Random"
 msgstr "隨機"
 
-#: .\msghandle\botcmd\command\rdm.py:14
+#: .\msghandle\botcmd\command\rdm.py:15
 msgid "Randomly generate a result."
 msgstr "隨機產生一個結果。"
 
-#: .\msghandle\botcmd\command\rdm.py:56
+#: .\msghandle\botcmd\command\rdm.py:63
 msgid ""
 "Options to be picked. Use two continuous spaces/blanks (`{}`) to separate "
 "options.\n"
@@ -2178,25 +2231,100 @@ msgstr ""
 "\n"
 "- **有**比重的選項清單: A{}0.7{}B{}0.5{}C{}0.9"
 
-#: .\msghandle\botcmd\command\rdm.py:71
+#: .\msghandle\botcmd\command\rdm.py:78
 msgid "Maximum count of options is {}."
 msgstr "選項清單最多只能有{}個選項。"
 
-#: .\msghandle\botcmd\command\rdm.py:73
+#: .\msghandle\botcmd\command\rdm.py:80
 msgid "Maximum count of picking an option in a single command is {}."
 msgstr "單次指令中，最多可抽選次數為 {}。"
 
-#: .\msghandle\botcmd\command\rdm.py:92
+#: .\msghandle\botcmd\command\rdm.py:97
 msgid "Option Picked: {}"
 msgstr "抽中選項: {}"
 
-#: .\msghandle\botcmd\command\rdm.py:102
+#: .\msghandle\botcmd\command\rdm.py:101 .\msghandle\botcmd\command\rdm.py:128
+msgid ""
+"*There are element(s) ignored possibly because the options are misformatted.*"
+msgstr "*部分選項已略過。選項清單可能存在格式錯誤。*"
+
+#: .\msghandle\botcmd\command\rdm.py:111
 msgid ""
 "Count of how many times to randomly pick an option.\n"
 "This number cannot exceed {}."
 msgstr ""
 "隨機抽選次數。\n"
 "這個數字不能超過 {}。"
+
+#: .\msghandle\botcmd\command\rmc.py:12
+msgid "Remote Control"
+msgstr "訊息遙控"
+
+#: .\msghandle\botcmd\command\rmc.py:13
+msgid "Controls related to the remote control system."
+msgstr "和訊息遙控有關的操作。"
+
+#: .\msghandle\botcmd\command\rmc.py:15
+msgid ""
+"Controls related to the remote control system.\n"
+"\n"
+"- By activating this, the channel (source channel) where the user have any "
+"activites will be assumed that it is executed the designated channel (target "
+"channel).\n"
+"\n"
+"- Automatically deactivate when the source channel has idled for {} "
+"seconds.\n"
+"\n"
+"- These commands are only executable in private channels.\n"
+"\n"
+"- This **surpasses the scope limit** of the command."
+msgstr ""
+"和訊息遙控有關的操作。\n"
+"\n"
+"- 啟動這個系統後，於原始頻道中的任何行為將會被認為是在目標頻道中操作。\n"
+"\n"
+"- 此系統將會在沒有收到任何訊息的{}秒內後自動停用。\n"
+"\n"
+"- 所有和訊息遙控系統有關的操作只能在私人頻道中使用。\n"
+"\n"
+"- 使用此系統時，將**不受限於指令使用範圍限制**。"
+
+#: .\msghandle\botcmd\command\rmc.py:31
+msgid ""
+"Target channel will be replaced if the system has already been activated."
+msgstr "如果此系統已經啟動，則重複啟動時，目標頻道將會被覆蓋。"
+
+#: .\msghandle\botcmd\command\rmc.py:33
+msgid "The ID of the remote control target channel."
+msgstr "遙控目標頻道的頻道ID。"
+
+#: .\msghandle\botcmd\command\rmc.py:40
+msgid "Remote control activated."
+msgstr "訊息遙控系統已啟動。"
+
+#: .\msghandle\botcmd\command\rmc.py:42
+msgid "Target channel not found. Failed to activate remote control."
+msgstr "沒有找到目標頻道。無法啟動訊息遙控系統。"
+
+#: .\msghandle\botcmd\command\rmc.py:51
+msgid "Remote control deactivated."
+msgstr "訊息遙控系統已停用。"
+
+#: .\msghandle\botcmd\command\rmc.py:64
+msgid ""
+"Remote control is activated.\n"
+"Target Channel ID: `{}`\n"
+"Target Channel Platform & Name: *{} / {}*\n"
+"Will be deactivated at `{}`."
+msgstr ""
+"訊息遙控系統啟動中。\n"
+"目標頻道ID: `{}`\n"
+"目標頻道平台 & 名稱: *{} / {}*\n"
+"系統將於 `{}` 後自動停用。"
+
+#: .\msghandle\botcmd\command\rmc.py:72
+msgid "Remote control is not activated."
+msgstr "訊息遙控系統未啟動。"
 
 #: .\msghandle\botcmd\command\tmr.py:17
 msgid "Timer"
@@ -2415,15 +2543,19 @@ msgstr "圖片網址: {}"
 msgid "Sticker ID: {}"
 msgstr "貼圖ID: {}"
 
-#: .\msghandle\models\pipe_out.py:63
+#: .\msghandle\models\pipe_out.py:76
 msgid ""
 "**AUTO CALCULATOR**\n"
-"Expression: {}\n"
-"Result: {}"
+"Expression: `{}`\n"
+"Result: `{}`"
 msgstr ""
 "**自動計算機**\n"
-"表達式: {}\n"
-"結果: {}"
+"表達式: `{}`\n"
+"結果: `{}`"
+
+#: .\msghandle\models\pipe_out.py:81
+msgid "Evaluated: `{}`"
+msgstr "運算: `{}`"
 
 #: .\msghandle\spec\error.py:29
 msgid ""
@@ -2456,19 +2588,19 @@ msgstr ""
 "貼圖ID: `{}`\n"
 "貼圖包ID: `{}`"
 
-#: .\msghandle\text\timer.py:30
+#: .\msghandle\text\timer.py:37
 msgid "**{} timer(s) have timed up!**"
 msgstr "**{} 個計時器時間到！**"
 
-#: .\msghandle\text\timer.py:34
+#: .\msghandle\text\timer.py:41
 msgid "{event} has timed up! (at {time})"
 msgstr "{event} 結束於 {time}！"
 
-#: .\msghandle\text\timer.py:43
-msgid "**{} timer(s) will time up in less than {} hrs!**"
-msgstr "**{} 個計時器將於 {} 小時內時間到！**"
+#: .\msghandle\text\timer.py:50
+msgid "**{} timer(s) will time up in less than {:.0f} minutes!**"
+msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 
-#: .\msghandle\text\timer.py:47
+#: .\msghandle\text\timer.py:54
 msgid "{event} will time up after [{diff}]! (at {time})"
 msgstr "{event} 將於 [{diff}] 後時間到！(於 {time})"
 
@@ -2619,31 +2751,36 @@ msgstr ""
 "用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
 "者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
-#: .\templates\account\channel\list_table.html:13
-#: .\templates\info\channel\search.html:49
-msgid "Inaccessible for Jelly Bot"
-msgstr "機器人無法存取"
+#: .\templates\account\channel\list_table.html:16
+#: .\templates\info\components\info_adv.html:12
+#: .\templates\info\components\info_basic.html:11
+msgid "Channel Name"
+msgstr "頻道名稱"
 
-#: .\templates\account\channel\list_table.html:25
+#: .\templates\account\channel\list_table.html:19
+msgid "Star"
+msgstr "最愛"
+
+#: .\templates\account\channel\list_table.html:27
 #: .\templates\info\channel\search.html:63
 #: .\templates\info\components\info_adv.html:89
 msgid "Manage"
 msgstr "管理"
 
-#: .\templates\account\channel\list_table.html:29
+#: .\templates\account\channel\list_table.html:31
 msgid "Check Info"
 msgstr "資訊"
 
-#: .\templates\account\channel\list_table.html:33
+#: .\templates\account\channel\list_table.html:35
 msgid "Check Profiles"
 msgstr "身分組"
 
-#: .\templates\account\channel\list_table.html:37
+#: .\templates\account\channel\list_table.html:39
 #: .\templates\info\channel\search.html:71
 msgid "Check ID"
 msgstr "ID"
 
-#: .\templates\account\channel\list_table.html:57
+#: .\templates\account\channel\list_table.html:59
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\components\info_adv.html:32
@@ -2652,7 +2789,7 @@ msgstr "ID"
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:63
+#: .\templates\account\channel\list_table.html:65
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
 #: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
 #: .\templates\info\components\info_adv.html:46
@@ -3414,7 +3551,8 @@ msgstr "範例"
 #: .\templates\err\exctnt_not_found.html:8
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
-#: .\templates\err\info\profile_not_found.html:8 .\templates\err\unknown.html:7
+#: .\templates\err\info\profile_not_found.html:8
+#: .\templates\err\not_in_the_channel.html:8 .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3519,6 +3657,18 @@ msgstr ""
 "請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
 "%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
+
+#: .\templates\err\not_in_the_channel.html:19
+msgid ""
+"Access denied because the system indicated that you are not in the channel."
+msgstr "因不存在於頻道中，拒絕存取。"
+
+#: .\templates\err\not_in_the_channel.html:24
+#, python-format
+msgid ""
+"You will only allowed to view this page if you are in the channel which ID "
+"is <code>%(channel_oid)s</code>."
+msgstr "此頁面將會於加入頻道ID為<code>%(channel_oid)s</code>的頻道後開放。"
 
 #: .\templates\err\unknown.html:13
 msgid "Unknown Website Error"
@@ -3677,6 +3827,10 @@ msgstr "設為私人的頻道將<b>不會</b>出現在清單中。"
 msgid "Enter keyword to search"
 msgstr "輸入搜尋關鍵字"
 
+#: .\templates\info\channel\search.html:49
+msgid "Inaccessible for Jelly Bot"
+msgstr "機器人無法存取"
+
 #: .\templates\info\chcoll\main.html:9
 msgid "Channel Collection Info"
 msgstr "頻道組資訊"
@@ -3715,11 +3869,6 @@ msgstr "成員名稱"
 msgid "Total Usage"
 msgstr "總計使用次數"
 
-#: .\templates\info\components\info_adv.html:12
-#: .\templates\info\components\info_basic.html:11
-msgid "Channel Name"
-msgstr "頻道名稱"
-
 #: .\templates\info\components\info_adv.html:74
 msgid "Channel Collection ID: "
 msgstr "頻道組ID: "
@@ -3733,8 +3882,8 @@ msgid "Message Count"
 msgstr "訊息量"
 
 #: .\templates\info\components\msg_table_count.html:9
-msgid "Total Count"
-msgstr "總計次數"
+msgid "Total Messages"
+msgstr "總訊息數"
 
 #: .\templates\info\components\msg_table_count.html:10
 #, python-format
@@ -3758,28 +3907,44 @@ msgid "Content"
 msgstr "內容"
 
 #: .\templates\info\components\recent_msg_table.html:11
-msgid "Process Time (sec)"
-msgstr "處理耗時(秒)"
+msgid "Process Time (ms)"
+msgstr "處理耗時(毫秒)"
 
 #: .\templates\info\msgstats\main.html:10
 msgid "Channel Message Statistics"
 msgstr "頻道訊息統計"
 
 #: .\templates\info\msgstats\main.html:69
+#: .\templates\info\recent\message.html:69
+msgid "Summary"
+msgstr "概要"
+
+#: .\templates\info\msgstats\main.html:74
+msgid "Total Message Count"
+msgstr "總訊息量"
+
+#: .\templates\info\msgstats\main.html:89
+#: .\templates\info\recent\message.html:105
+msgid "Message Frequency"
+msgstr "訊息頻率"
+
+#: .\templates\info\msgstats\main.html:94
+#: .\templates\info\recent\message.html:80
+#: .\templates\info\recent\message.html:110
+msgid "secs"
+msgstr "秒"
+
+#: .\templates\info\msgstats\main.html:105
 msgid "Hour Average Message Flow"
 msgstr "每小時平均訊息量"
 
-#: .\templates\info\msgstats\main.html:79
+#: .\templates\info\msgstats\main.html:116
 msgid "Daily Message Flow"
 msgstr "每日訊息量"
 
-#: .\templates\info\msgstats\main.html:94
+#: .\templates\info\msgstats\main.html:132
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
-
-#: .\templates\info\msgstats\main.html:95
-msgid "Total Count: "
-msgstr "訊息總數: "
 
 #: .\templates\info\profile.html:9
 msgid "Channel Profile Info"
@@ -3839,26 +4004,13 @@ msgstr ""
 "此頁面所顯示的近期訊息紀錄無法超過 %(recent_msg_limit_max)s則。<br> 留空此欄"
 "位並刷新頁面以獲得最多可獲得的訊息紀錄。"
 
-#: .\templates\info\recent\message.html:69
-msgid "Summary"
-msgstr "概要"
-
 #: .\templates\info\recent\message.html:75
 msgid "Average Processing Time"
 msgstr "平均處理耗時"
 
-#: .\templates\info\recent\message.html:80
-#: .\templates\info\recent\message.html:110
-msgid "secs"
-msgstr "秒"
-
 #: .\templates\info\recent\message.html:90
 msgid "Unique Sender"
 msgstr "發送者數量"
-
-#: .\templates\info\recent\message.html:105
-msgid "Message Frequency"
-msgstr "訊息頻率"
 
 #: .\templates\services\shorturl\main-js.html:38
 msgid "URL copied to the clipboard"
@@ -3937,6 +4089,12 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "Total Count"
+#~ msgstr "總計次數"
+
+#~ msgid "Total Count: "
+#~ msgstr "訊息總數: "
 
 #~ msgid "Message Count / Day"
 #~ msgstr "訊息量 / 日"

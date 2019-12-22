@@ -31,6 +31,10 @@ class BotFeature(FlagDoubleEnum):
                 1122 - Choice - Multiple
             113 - Recent Activities
                 1131 - Message
+            114 - Remote Control
+                1141 - Activate
+                1142 - Deactivate
+                1143 - Current Status
 
         19 - Functional
                 1901 - User data integration
@@ -94,6 +98,13 @@ class BotFeature(FlagDoubleEnum):
 
     TXT_RCT_MESSAGE = \
         1131, _("Text / Recent / Message"), _("Get recent messages including the recalled ones.")
+
+    TXT_RMC_ACTIVATE = \
+        1141, _("Text / Remote / Activate"), _("Activate the remote control system.")
+    TXT_RMC_DEACTIVATE = \
+        1142, _("Text / Remote / Deactivate"), _("Deactivate the remore control system.")
+    TXT_RMC_STATUS = \
+        1143, _("Text / Remote / Status"), _("View the current status of the remote control system.")
 
     TXT_FN_UDI_START = \
         1901, _("Text / User Data Integration / Start"), _("Issue an Execode for user data integration.")

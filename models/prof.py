@@ -38,10 +38,12 @@ class ChannelProfileListEntry:
     channel_data: ChannelModel
     channel_name: str
     profiles: List[ChannelProfileModel]
+    starred: bool
 
 
 class ChannelProfileConnectionModel(Model):
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
+    Starred = BooleanField("s", default=False)
     UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
     ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=False)
 
