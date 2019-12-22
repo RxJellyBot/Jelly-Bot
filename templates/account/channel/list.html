@@ -72,27 +72,29 @@
 {% block ex-script %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $("input.channel-name").keyup(function (e) {
-                let elem = $(this);
-                elem.removeClass("is-valid is-invalid");
-
-                if (e.which === 13) {
-                    let url = `{% url "api.id.channel.name_change" %}`;
-                    let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
-
-                    let xhr = new XMLHttpRequest();
-                    xhr.open("POST", url);
-                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    xhr.responseType = "json";
-                    xhr.onload = function () {
-                        let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
-
-                        onNameChangeLoad(success, xhr.response, elem);
-                    };
-                    xhr.send(params);
-                }
-            })
+            $("input.channel-name").keyup(onChannelNameKeyup);
         });
+
+        function onChannelNameKeyup(e) {
+            let elem = $(this);
+            elem.removeClass("is-valid is-invalid");
+
+            if (e.which === 13) {
+                let url = `{% url "api.id.channel.name_change" %}`;
+                let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", url);
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhr.responseType = "json";
+                xhr.onload = function () {
+                    let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+
+                    onNameChangeLoad(success, xhr.response, elem);
+                };
+                xhr.send(params);
+            }
+        }
 
         function onNameChangeLoad(success, response, elem) {
             elem.addClass(success ? "is-valid" : "is-invalid");
@@ -101,5 +103,17 @@
                 console.log(response);
             }
         }
+
+        function changeStar(channel_oid, new_val) {
+            let url = `{% url "api.id.channel.star_change" %}`;
+            let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channel_oid}&{{ static_keys_param.Manage.Channel.STAR }}=${new_val}&{{ static_keys_param.LOCAL_REFER }}=true`;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.responseType = "json";
+            xhr.send(params);
+        }
     </script>
+    <script type="text/javascript" src="{% static "js/account/channel_list.js" %}"></script>
 {% endblock %}

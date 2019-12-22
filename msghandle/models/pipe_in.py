@@ -61,10 +61,15 @@ class Event(ABC):
 
 class MessageEventObject(Event, ABC):
     def __init__(
-            self, raw: Any, content: Any, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            self, raw: Any, content: Any, channel_model: ChannelModel = None,
+            user_model: Optional[RootUserModel] = None,
             sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
         src_ch = None
-        rmc = RemoteControl.get_current(user_model.id, channel_model.id)
+
+        rmc = None
+        if user_model:
+            rmc = RemoteControl.get_current(user_model.id, channel_model.id)
+
         if rmc:
             src_ch = channel_model
             channel_model = rmc.target_channel
@@ -83,13 +88,16 @@ class MessageEventObject(Event, ABC):
         return self.channel_model.id
 
     @property
-    def root_oid(self) -> ObjectId:
-        return self.user_model.id
+    def root_oid(self) -> Optional[ObjectId]:
+        if self.user_model:
+            return self.user_model.id
+        else:
+            return None
 
 
 class TextMessageEventObject(MessageEventObject):
     def __init__(
-            self, raw: Any, text: str, channel_model: ChannelModel = None, user_model: RootUserModel = None,
+            self, raw: Any, text: str, channel_model: ChannelModel = None, user_model: Optional[RootUserModel] = None,
             sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
         text = text.strip()
 
@@ -111,7 +119,7 @@ class TextMessageEventObject(MessageEventObject):
 class ImageMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, image: ImageContent, channel_model: ChannelModel = None,
-            user_model: RootUserModel = None, sys_ctype: SysChannelType = None,
+            user_model: Optional[RootUserModel] = None, sys_ctype: SysChannelType = None,
             ch_parent_model: ChannelCollectionModel = None):
         super().__init__(raw, image, channel_model, user_model, sys_ctype, ch_parent_model)
 
@@ -123,7 +131,7 @@ class ImageMessageEventObject(MessageEventObject):
 class LineStickerMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, sticker: LineStickerContent, channel_model: ChannelModel = None,
-            user_model: RootUserModel = None, sys_ctype: SysChannelType = None,
+            user_model: Optional[RootUserModel] = None, sys_ctype: SysChannelType = None,
             ch_parent_model: ChannelCollectionModel = None):
         super().__init__(raw, sticker, channel_model, user_model, sys_ctype, ch_parent_model)
 

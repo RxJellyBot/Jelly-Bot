@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-21 08:47-0600\n"
-"PO-Revision-Date: 2019-12-21 09:05-0600\n"
+"POT-Creation-Date: 2019-12-22 01:49-0600\n"
+"PO-Revision-Date: 2019-12-22 01:49-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -655,55 +655,59 @@ msgstr "(換行)"
 msgid "(Space)"
 msgstr "(空格)"
 
-#: .\flags\apiact.py:43
+#: .\flags\apiact.py:44
 msgid "Unknown Action"
 msgstr "不明指令"
 
-#: .\flags\apiact.py:45
+#: .\flags\apiact.py:46
 msgid "Auto-Reply - Addition"
 msgstr "自動回覆 - 新增"
 
-#: .\flags\apiact.py:46
+#: .\flags\apiact.py:47
 msgid "Auto-Reply - Content Validation"
 msgstr "自動回覆 - 內容驗證"
 
-#: .\flags\apiact.py:47
+#: .\flags\apiact.py:48
 msgid "Auto-Reply - Tag Popularity"
 msgstr "自動回覆 - 熱門標籤"
 
-#: .\flags\apiact.py:49
+#: .\flags\apiact.py:50
 msgid "Execode - Auto-Reply Addition"
 msgstr "執行碼 - 自動回覆 - 新增"
 
-#: .\flags\apiact.py:50
+#: .\flags\apiact.py:51
 msgid "Execode - List All"
 msgstr "執行碼 - 列出全部"
 
-#: .\flags\apiact.py:51
+#: .\flags\apiact.py:52
 msgid "Execode - Complete Action"
 msgstr "執行碼 - 完成"
 
-#: .\flags\apiact.py:53
+#: .\flags\apiact.py:54
 msgid "Data Query - Channel"
 msgstr "資料查詢 - 頻道"
 
-#: .\flags\apiact.py:54
+#: .\flags\apiact.py:55
 msgid "Data Query - Permission"
 msgstr "資料查詢 - 權限"
 
-#: .\flags\apiact.py:56
+#: .\flags\apiact.py:57
 msgid "Management - Issue Channel Registration Execode"
 msgstr "管理 - 發給頻道登錄用執行碼"
 
-#: .\flags\apiact.py:57
+#: .\flags\apiact.py:58
+msgid "Management - Change Channel Star"
+msgstr "管理 - 更改頻道最愛"
+
+#: .\flags\apiact.py:59
 msgid "Management - Change Channel Name"
 msgstr "管理 - 更改頻道名稱"
 
-#: .\flags\apiact.py:59
+#: .\flags\apiact.py:61
 msgid "Services - Shorten URL"
 msgstr "服務 - 短網址"
 
-#: .\flags\apiact.py:60
+#: .\flags\apiact.py:62
 msgid "Services - Update Target"
 msgstr "服務 - 更新目標網址"
 
@@ -1263,7 +1267,7 @@ msgstr "距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "{event} has ended (at {time})"
 msgstr "{event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:148
+#: .\mongodb\factory\prof.py:165
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2747,31 +2751,36 @@ msgstr ""
 "用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
 "者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
-#: .\templates\account\channel\list_table.html:13
-#: .\templates\info\channel\search.html:49
-msgid "Inaccessible for Jelly Bot"
-msgstr "機器人無法存取"
+#: .\templates\account\channel\list_table.html:16
+#: .\templates\info\components\info_adv.html:12
+#: .\templates\info\components\info_basic.html:11
+msgid "Channel Name"
+msgstr "頻道名稱"
 
-#: .\templates\account\channel\list_table.html:25
+#: .\templates\account\channel\list_table.html:19
+msgid "Star"
+msgstr "最愛"
+
+#: .\templates\account\channel\list_table.html:27
 #: .\templates\info\channel\search.html:63
 #: .\templates\info\components\info_adv.html:89
 msgid "Manage"
 msgstr "管理"
 
-#: .\templates\account\channel\list_table.html:29
+#: .\templates\account\channel\list_table.html:31
 msgid "Check Info"
 msgstr "資訊"
 
-#: .\templates\account\channel\list_table.html:33
+#: .\templates\account\channel\list_table.html:35
 msgid "Check Profiles"
 msgstr "身分組"
 
-#: .\templates\account\channel\list_table.html:37
+#: .\templates\account\channel\list_table.html:39
 #: .\templates\info\channel\search.html:71
 msgid "Check ID"
 msgstr "ID"
 
-#: .\templates\account\channel\list_table.html:57
+#: .\templates\account\channel\list_table.html:59
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\components\info_adv.html:32
@@ -2780,7 +2789,7 @@ msgstr "ID"
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:63
+#: .\templates\account\channel\list_table.html:65
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
 #: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
 #: .\templates\info\components\info_adv.html:46
@@ -3818,6 +3827,10 @@ msgstr "設為私人的頻道將<b>不會</b>出現在清單中。"
 msgid "Enter keyword to search"
 msgstr "輸入搜尋關鍵字"
 
+#: .\templates\info\channel\search.html:49
+msgid "Inaccessible for Jelly Bot"
+msgstr "機器人無法存取"
+
 #: .\templates\info\chcoll\main.html:9
 msgid "Channel Collection Info"
 msgstr "頻道組資訊"
@@ -3855,11 +3868,6 @@ msgstr "成員名稱"
 #: .\templates\info\components\bot_table_member.html:8
 msgid "Total Usage"
 msgstr "總計使用次數"
-
-#: .\templates\info\components\info_adv.html:12
-#: .\templates\info\components\info_basic.html:11
-msgid "Channel Name"
-msgstr "頻道名稱"
 
 #: .\templates\info\components\info_adv.html:74
 msgid "Channel Collection ID: "

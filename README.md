@@ -48,4 +48,4 @@ Website:
 
 `Sep 11 2019` - LINE/Discord bot started.
 
-`Nov 27 2019` - Formal release. Only advertised in developer-owned main active group.
+`Nov 27 2019` - Formal release. Only advertised in the developer-owned main active groups.
