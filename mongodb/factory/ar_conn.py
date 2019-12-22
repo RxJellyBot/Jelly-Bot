@@ -13,6 +13,7 @@ from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel
 from models.field import DateTimeField
+from models.utils import AutoReplyValidators
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
@@ -50,6 +51,19 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
         return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
 
+    @staticmethod
+    def validate_content(
+            keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], online_check) \
+            -> WriteOutcome:
+        if not AutoReplyValidators.is_valid_content(kw_type, keyword, online_check):
+            return WriteOutcome.X_AR_INVALID_KEYWORD
+
+        for response in responses:
+            if not AutoReplyValidators.is_valid_content(response.content_type, response.content, online_check):
+                return WriteOutcome.X_AR_INVALID_RESPONSE
+
+        return WriteOutcome.O_MISC
+
     def _delete_recent_module_(self, keyword):
         """Delete modules which is created and marked inactive within `Bot.AutoReply.DeleteDataMins` minutes."""
         now = now_utc_aware()
@@ -83,6 +97,11 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
                  AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
                  AutoReplyModuleModel.Pinned.key: True}) > 0:
             return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
+
+        validate_outcome = AutoReplyModuleManager.validate_content(keyword, kw_type, responses, online_check=True)
+
+        if not validate_outcome.is_success:
+            return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         model, outcome, ex = \
             self.insert_one_data_cache(
@@ -118,8 +137,15 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
-    def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
+    def add_conn_by_model(self, model: AutoReplyModuleModel, online_check=True) -> AutoReplyModuleAddResult:
         model.clear_oid()
+
+        validate_outcome = AutoReplyModuleManager.validate_content(
+            model.keyword.content, model.keyword.content_type, model.responses, online_check)
+
+        if not validate_outcome.is_success:
+            return AutoReplyModuleAddResult(validate_outcome, None, None)
+
         outcome, ex = self.insert_one_model_cache(model)
 
         if outcome.is_success:

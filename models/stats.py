@@ -1,7 +1,9 @@
 import abc
 import math
 from collections import namedtuple
+from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta
+from typing import Dict, Optional, List
 
 import pymongo
 from bson import ObjectId
@@ -183,6 +185,29 @@ class DailyMessageResult:
         return ret
 
 
+@dataclass
+class MemeberMessageEntry:
+    label_category: InitVar[List[MessageType]]
+    data: Optional[Dict[MessageType, int]] = None
+    total: int = field(init=False)
+
+    def __post_init__(self, label_category):
+        if not self.data:
+            self.data = {lbl: 0 for lbl in label_category}
+
+        self.total = sum(self.data.values())
+
+    def add(self, category: MessageType, count: int):
+        if category not in self.data:
+            raise ValueError("Message type not initialized in the data dict.")
+
+        self.data[category] += count
+        self.total += count
+
+    def get_count(self, category: MessageType):
+        return self.data.get(category, 0)
+
+
 class MemberMessageResult:
     KEY_MEMBER_ID = "uid"
     KEY_CATEGORY = "cat"
@@ -190,7 +215,7 @@ class MemberMessageResult:
     KEY_COUNT = "ct"
 
     def __init__(self, cursor):
-        # Hand typing this to create custom order without consuming system performance
+        # Hand typing this to create custom order without additional implementations
         self.label_category = [
             MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
@@ -207,10 +232,10 @@ class MemberMessageResult:
 
             count = d[MemberMessageResult.KEY_COUNT]
 
-            self.data[uid][cat] += count
+            self.data[uid].add(cat, count)
 
     def get_default_data_entry(self):
-        return {lbl: 0 for lbl in self.label_category}
+        return MemeberMessageEntry(self.label_category)
 
 
 class BotFeatureUsageResult:

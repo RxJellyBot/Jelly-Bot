@@ -189,8 +189,7 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 # ----------------------- List
 
 def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
-    # Exhaust the cursor to avoid time consumed when looping the cursor
-    return [conn.keyword_repr for conn in list(conn_list)]
+    return [conn.keyword_repr for conn in conn_list]
 
 
 @cmd_list.command_function(
@@ -203,10 +202,9 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
 
     if not conn_list.empty:
-        return [HandledMessageEventText(
-            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list)),
-            force_extra=True
-        )]
+        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) + "\n" + _(", ").join(get_list_of_keyword(conn_list))
+
+        return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
         return [HandledMessageEventText(content=_("No usable auto-reply module in this channel."))]
 

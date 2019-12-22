@@ -1,3 +1,5 @@
+from threading import Thread
+
 from bson import ObjectId
 from cachetools import TTLCache
 
@@ -62,6 +64,40 @@ class APIUserModel(Model):
 
 
 _user_name_cache_ = TTLCache(maxsize=DataQuery.UserNameCacheSize, ttl=DataQuery.UserNameExpirationSeconds)
+
+
+def load_user_name_cache():
+    def fn():
+        from mongodb.factory import RootUserManager, ProfileManager, ChannelManager
+
+        dict_onplat = RootUserManager.get_onplat_data_dict()
+        dict_to_root = RootUserManager.get_onplat_to_root_dict()
+        dict_user_channel = ProfileManager.get_users_exist_channel_dict(list(dict_to_root.values()))
+        all_cid = set()
+        for cid_set in dict_user_channel.values():
+            all_cid.update(cid_set)
+        dict_channel = ChannelManager.get_channel_dict(list(all_cid))
+
+        for onplat_oid, onplat_data in dict_onplat.items():
+            root_oid = dict_to_root.get(onplat_oid)
+            if not root_oid:
+                continue
+
+            channel_set = dict_user_channel.get(root_oid)
+            if not channel_set:
+                continue
+
+            channel_id = channel_set.pop()
+            if not channel_id:
+                continue
+
+            channel_model = dict_channel.get(channel_id)
+            if not channel_model:
+                continue
+
+            _user_name_cache_[onplat_oid] = onplat_data.get_name(channel_model)
+
+    Thread(target=fn).start()
 
 
 class OnPlatformUserModel(Model):

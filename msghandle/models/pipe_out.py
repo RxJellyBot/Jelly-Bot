@@ -2,10 +2,13 @@ from abc import ABC
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
+from sympy import latex, Rational
 
 from extutils import safe_cast
+from extutils.emailutils import MailSender
 from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
+from models.utils import AutoReplyValidators
 from models import AutoReplyContentModel
 
 
@@ -24,6 +27,16 @@ class HandledMessageEvent(ABC):
 
         :return: Casted `HandledMessageEvent`. Return `None` if no corresponding `HandledMessageEvent`.
         """
+        valid = \
+            AutoReplyValidators.is_valid_content(response_model.content_type, response_model.content, online_check=True)
+
+        if not valid:
+            MailSender.send_email_async(f"Invalid auto-reply content detected.\n\n"
+                                        f"Content: {response_model.content}\n"
+                                        f"Content Type: {response_model.content_type.key}",
+                                        subject="Invalid auto-reply content detected")
+            return None
+
         if response_model.content_type == AutoReplyContentType.TEXT:
             return HandledMessageEventText(content=response_model.content, bypass_multiline_check=bypass_ml_check)
         elif response_model.content_type == AutoReplyContentType.IMAGE:
@@ -59,13 +72,18 @@ class HandledMessageEventLineSticker(HandledMessageEvent):
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):
-    def __init__(self, calc_result: str, latex: str, calc_expr: str):
-        super().__init__(_("**AUTO CALCULATOR**\n"
-                           "Expression: {}\n"
-                           "Result: {}").format(calc_expr, calc_result))
-        self.latex = latex
-        self.calc_result = calc_result
-        self.calc_expr = calc_expr
+    def __init__(self, expr_before: str, expr_after):
+        content = str(_("**AUTO CALCULATOR**\n"
+                        "Expression: `{}`\n"
+                        "Result: `{}`").format(expr_before, expr_after))
+
+        if isinstance(expr_after, Rational):
+            content += "\n" + str(_("Evaluated: `{}`").format(float(expr_after)))
+
+        super().__init__(content)
+        self.latex = latex(expr_after)
+        self.calc_result = str(expr_after)
+        self.calc_expr = expr_before
 
     @property
     def latex_available(self) -> bool:

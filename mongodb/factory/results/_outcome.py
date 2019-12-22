@@ -8,6 +8,10 @@ class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     def code_prefix(self) -> str:
         raise NotImplementedError()
 
+    @property
+    def code_str(self) -> str:
+        return f"{self.code_prefix}-{self._code}"
+
     @classmethod
     def default(cls):
         raise NotImplementedError()
@@ -42,6 +46,8 @@ class WriteOutcome(BaseOutcome):
         108 - Connecting API User ID
         109 - Config Setting Failed
         110 - Invalid URL
+        111 - (Auto Reply) Invalid keyword content
+        112 - (Auto Reply) Invalid response content
 
     2xx - Problems related to the model
         201 - Not Serializable
@@ -70,7 +76,7 @@ class WriteOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "I "
+        return "I"
 
     @classmethod
     def default(cls):
@@ -115,6 +121,12 @@ class WriteOutcome(BaseOutcome):
     X_INVALID_URL = \
         110, _("X: Invalid URL"), \
         _("The URL is invalid. Maybe missing the schema or the URL did not return 200.")
+    X_AR_INVALID_KEYWORD = \
+        110, _("X: (Auto Reply) Invalid Keyword"), \
+        _("The keyword contains invalid content.")
+    X_AR_INVALID_RESPONSE = \
+        111, _("X: (Auto Reply) Invalid Response"), \
+        _("One or more of the responses contains invalid content.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")
@@ -201,7 +213,7 @@ class GetOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "G "
+        return "G"
 
     @classmethod
     def default(cls):
@@ -284,7 +296,7 @@ class OperationOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "O "
+        return "O"
 
     @classmethod
     def default(cls):
@@ -366,7 +378,7 @@ class UpdateOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "U "
+        return "U"
 
     @classmethod
     def default(cls):
