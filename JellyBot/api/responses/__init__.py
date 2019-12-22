@@ -4,7 +4,8 @@ from .ar import (
     AutoReplyTagPopularityResponse
 )
 from .id import (
-    ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, PermissionQueryResponse
+    ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, PermissionQueryResponse,
+    ChannelStarChangeResponse
 )
 from .execode import ExecodeCompleteApiResponse, ExecodeListApiResponse
 from .services import ShortUrlShortenResponse

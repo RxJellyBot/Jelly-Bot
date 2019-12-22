@@ -1,6 +1,6 @@
 from JellyBot.api.static import param
 from JellyBot.api.responses import (
-    ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse
+    ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, ChannelStarChangeResponse
 )
 from JellyBot.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
 from JellyBot.components.views import APIJsonResponseView
@@ -36,3 +36,13 @@ class ChannelNameChangeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPar
 
     def mandatory_keys(self) -> set:
         return {param.Manage.Channel.NEW_NAME, param.Manage.Channel.CHANNEL_OID}
+
+
+class ChannelStarChangeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+    post_response_class = ChannelStarChangeResponse
+
+    def get_api_action(self):
+        return APICommand.MG_CHANNEL_STAR_CHANGE
+
+    def mandatory_keys(self) -> set:
+        return {param.Manage.Channel.STAR, param.Manage.Channel.CHANNEL_OID}

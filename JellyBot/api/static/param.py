@@ -50,6 +50,7 @@ class Manage:
     class Channel:
         CHANNEL_OID = Common.CHANNEL_OID
         NEW_NAME = "name"
+        STAR = "star"
 
 
 class Service:

@@ -43,7 +43,7 @@ class ModelFieldChecker:
             potential_repair_needed = col_inst.find({"$or": or_list})
 
             if potential_repair_needed.count() > 0:
-                required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst.full_name)
+                required_write_holder = PendingRepairDataManager.new_bulk_holder(col_inst)
                 repaired_write_holder = BulkWriteDataHolder(col_inst, Database.BulkWriteCount)
 
                 logger.logger.warning(f"Scanning potential repair requiring data ({col_inst.full_name})...")
