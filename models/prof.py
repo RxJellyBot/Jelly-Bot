@@ -38,6 +38,7 @@ class ChannelProfileListEntry:
     channel_data: ChannelModel
     channel_name: str
     profiles: List[ChannelProfileModel]
+    starred: bool
 
 
 class ChannelProfileConnectionModel(Model):

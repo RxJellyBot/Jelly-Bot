@@ -9,15 +9,17 @@
                 <div class="card-body rounded{% if not channel_conn.channel_data.bot_accessible %} border border-danger{% endif %}">
                     <h5 class="card-title">
                         {{ channel_conn.channel_data.platform.key }}
-                        {% if not channel_conn.channel_data.bot_accessible %}
-                            -&nbsp;<small>{% trans "Inaccessible for Jelly Bot" %}</small>
-                        {% endif %}
                     </h5>
-                    <p>
-                        <!--suppress HtmlFormInputWithoutLabel -->
+                    <div class="input-group mb-3">
                         <input type="text" class="form-control channel-name" value="{{ channel_conn.channel_name }}"
-                               data-channel="{{ channel_conn.channel_data.id }}">
-                    </p>
+                               data-channel="{{ channel_conn.channel_data.id }}"
+                               aria-label="{% trans "Channel Name" %}">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary {% if channel_conn.starred %}active{% endif %} star-btn" type="button" data-cid="{{ channel_conn.channel_data.id }}">
+                                {% trans "Star" %}
+                            </button>
+                        </div>
+                    </div>
                     <div class="align-middle text-center">
                         <div class="btn-group">
                             <a class="btn btn-outline-primary"
