@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Set
 
 import pymongo
 from bson import ObjectId
@@ -80,7 +80,13 @@ class UserProfileManager(BaseCollection):
     def get_user_channel_profiles(self, root_uid: ObjectId) -> List[ChannelProfileConnectionModel]:
         return list(self.find_cursor_with_count(
             {ChannelProfileConnectionModel.UserOid.key: root_uid},
-            parse_cls=ChannelProfileConnectionModel).sort([(ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)]))
+            parse_cls=ChannelProfileConnectionModel
+        ).sort(
+            [
+                (ChannelProfileConnectionModel.Starred.key, pymongo.DESCENDING),
+                (ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)
+            ]
+        ))
 
     def get_channel_members(self, channel_oid: ObjectId, available_only=True) -> List[ChannelProfileConnectionModel]:
         filter_ = {ChannelProfileConnectionModel.ChannelOid.key: channel_oid}
@@ -90,12 +96,42 @@ class UserProfileManager(BaseCollection):
 
         return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
 
+    def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        k = "in_channel"
+        ret = {}
+
+        pipeline = [
+            {"$match": {
+                "u": {"$in": user_oids}
+            }},
+            {"$group": {
+                "_id": "$u",
+                k: {"$addToSet": "$c"}
+            }}
+        ]
+
+        for d in self.aggregate(pipeline):
+            ret[d[OID_KEY]] = d[k]
+
+        return ret
+
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
              ChannelProfileConnectionModel.UserOid.key: root_oid},
             {"$set": {
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
+
+    def change_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
+        return self.update_one(
+            {
+                ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+                ChannelProfileConnectionModel.UserOid.key: root_oid
+            },
+            {
+                "$set": {ChannelProfileConnectionModel.Starred.key: star}
+            }
+        ).modified_count > 0
 
 
 class ProfileDataManager(BaseCollection):
@@ -249,7 +285,9 @@ class ProfileManager:
             else:
                 ret.append(
                     ChannelProfileListEntry(
-                        channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof))
+                        channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
+                        starred=prof_conn.starred
+                    ))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
@@ -269,6 +307,9 @@ class ProfileManager:
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self._prof.get_profile(profile_oid)
+
+    def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        return self._conn.get_users_exist_channel_dict(user_oids)
 
     # noinspection PyMethodMayBeStatic
     def get_permissions(self, profiles: List[ChannelProfileModel]) -> List[PermissionCategory]:
@@ -296,6 +337,9 @@ class ProfileManager:
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
+
+    def change_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
+        return self._conn.change_star(channel_oid, root_oid, star)
 
 
 _inst = ProfileManager()
