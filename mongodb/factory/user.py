@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional
+from typing import Optional, Dict
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -243,6 +243,22 @@ class RootUserManager(BaseCollection):
                     subject="On Platform Data not found")
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
+
+    def get_onplat_data_dict(self) -> Dict[ObjectId, OnPlatformUserModel]:
+        ret = {}
+        for d in self._mgr_onplat.find_cursor_with_count({}, parse_cls=OnPlatformUserModel):
+            ret[d.id] = d
+
+        return ret
+
+    def get_onplat_to_root_dict(self) -> Dict[ObjectId, ObjectId]:
+        ret = {}
+        for d in self.find_cursor_with_count({}, parse_cls=RootUserModel):
+            if d.has_onplat_data:
+                for onplat_oid in d.on_plat_oids:
+                    ret[onplat_oid] = d.id
+
+        return ret
 
     @param_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:

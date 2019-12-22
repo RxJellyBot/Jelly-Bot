@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Set
 
 import pymongo
 from bson import ObjectId
@@ -95,6 +95,25 @@ class UserProfileManager(BaseCollection):
             filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
 
         return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
+
+    def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        k = "in_channel"
+        ret = {}
+
+        pipeline = [
+            {"$match": {
+                "u": {"$in": user_oids}
+            }},
+            {"$group": {
+                "_id": "$u",
+                k: {"$addToSet": "$c"}
+            }}
+        ]
+
+        for d in self.aggregate(pipeline):
+            ret[d[OID_KEY]] = d[k]
+
+        return ret
 
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
@@ -288,6 +307,9 @@ class ProfileManager:
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self._prof.get_profile(profile_oid)
+
+    def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        return self._conn.get_users_exist_channel_dict(user_oids)
 
     # noinspection PyMethodMayBeStatic
     def get_permissions(self, profiles: List[ChannelProfileModel]) -> List[PermissionCategory]:

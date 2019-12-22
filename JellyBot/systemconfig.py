@@ -81,7 +81,7 @@ class Database:
 class DataQuery:
     TagPopularitySearchCount = 10
 
-    UserNameCacheSize = 1000
+    UserNameCacheSize = 3000
     UserNameExpirationSeconds = 129600  # 1.5 Days
 
 
