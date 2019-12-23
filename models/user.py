@@ -95,7 +95,7 @@ def load_user_name_cache():
             if not channel_model:
                 continue
 
-            _user_name_cache_[onplat_oid] = onplat_data.get_name(channel_model, mark_x_on_not_found=False)
+            _user_name_cache_[onplat_oid] = onplat_data.get_name(channel_model)
 
     Thread(target=fn).start()
 
@@ -104,7 +104,7 @@ class OnPlatformUserModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, allow_none=False, must_have_content=True)
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
-    def get_name(self, channel_data=None, mark_x_on_not_found=True) -> str:
+    def get_name(self, channel_data=None) -> str:
         if self.id not in _user_name_cache_:
             n = None
 
@@ -122,7 +122,7 @@ class OnPlatformUserModel(Model):
 
             if n:
                 _user_name_cache_[self.id] = n
-            elif mark_x_on_not_found:
+            else:
                 # Mark unavailable
                 from mongodb.factory import ProfileManager, RootUserManager
 
