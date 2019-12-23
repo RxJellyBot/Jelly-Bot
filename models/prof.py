@@ -45,7 +45,8 @@ class ChannelProfileConnectionModel(Model):
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
     Starred = BooleanField("s", default=False)
     UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
-    ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=False)
+    # ProfileOids will be empty list if the user is not in the channel
+    ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=True)
 
 
 class PermissionPromotionRecordModel(Model):
