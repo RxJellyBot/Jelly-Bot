@@ -102,11 +102,12 @@ class UserProfileManager(BaseCollection):
 
         pipeline = [
             {"$match": {
-                "u": {"$in": user_oids}
+                ChannelProfileConnectionModel.UserOid.key: {"$in": user_oids},
+                ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}
             }},
             {"$group": {
-                "_id": "$u",
-                k: {"$addToSet": "$c"}
+                "_id": "$" + ChannelProfileConnectionModel.UserOid.key,
+                k: {"$addToSet": "$" + ChannelProfileConnectionModel.ChannelOid.key}
             }}
         ]
 
