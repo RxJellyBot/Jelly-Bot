@@ -40,7 +40,7 @@
         <div class="row">
             {% for channel_data in channel_list %}
                 {% with channel_model=channel_data.channel_model channel_name=channel_data.channel_name %}
-                    <div class="col-6">
+                    <div class="col-lg-6">
                         <div class="card mb-3">
                             <div class="card-body rounded{% if not channel_model.bot_accessible %} border border-danger{% endif %}">
                                 <h5 class="card-title">
