@@ -202,7 +202,7 @@ class RootUserManager(BaseCollection):
 
                 if onplat_data:
                     return UserNameQuery(
-                        user_id=root_oid, user_name=onplat_data.get_name(channel_data, mark_x_on_not_found=True))
+                        user_id=root_oid, user_name=onplat_data.get_name(channel_data))
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
