@@ -11,6 +11,9 @@ class BotFeature(FlagDoubleEnum):
                 1001 - Add
                 1002 - Delete
                 1003 - Add (Execode)
+                1004 - List (Usable)
+                1005 - List (Keyword)
+                1006 - Ranking
                 1009 - Respond
             101 - Timer
                 1011 - Add
@@ -66,6 +69,9 @@ class BotFeature(FlagDoubleEnum):
     TXT_AR_LIST_KEYWORD = \
         1005, _("Text / Auto Reply / List (Keyword)"), \
         _("List all the usable auto-reply modules which keyword includes the provided keyword.")
+    TXT_AR_RANKING = \
+        1006, _("Text / Auto Reply / Ranking"), \
+        _("Get the auto-reply module usage ranking and the unique keyword usage ranking.")
     TXT_AR_RESPOND = \
         1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
 

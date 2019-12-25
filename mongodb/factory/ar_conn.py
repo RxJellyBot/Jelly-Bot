@@ -11,7 +11,7 @@ from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
-    AutoReplyContentModel
+    AutoReplyContentModel, UniqueKeywordCountResult
 from models.field import DateTimeField
 from models.utils import AutoReplyValidators
 from mongodb.factory.results import (
@@ -228,6 +228,36 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         return self.find_cursor_with_count(
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+        ret = self.find_cursor_with_count(
+            {AutoReplyModuleModel.ChannelId.key: channel_oid},
+            parse_cls=AutoReplyModuleModel
+        ).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+
+        if limit:
+            ret = ret.limit(limit)
+
+        return ret
+
+    def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> UniqueKeywordCountResult:
+        pipeline = [
+            {"$match": {AutoReplyModuleModel.ChannelId.key: channel_oid}},
+            {"$group": {
+                OID_KEY: {
+                    UniqueKeywordCountResult.KEY_WORD: "$" + AutoReplyModuleModel.KEY_KW_CONTENT,
+                    UniqueKeywordCountResult.KEY_WORD_TYPE: "$" + AutoReplyModuleModel.KEY_KW_TYPE
+                },
+                UniqueKeywordCountResult.KEY_COUNT: {"$sum": "$" + AutoReplyModuleModel.CalledCount.key}
+            }},
+            {"$sort": {UniqueKeywordCountResult.KEY_COUNT: pymongo.DESCENDING}}
+        ]
+
+        if limit:
+            pipeline.append({"$limit": limit})
+
+        return UniqueKeywordCountResult(self.aggregate(pipeline), limit)
+
 
 class AutoReplyModuleTagManager(BaseCollection):
     database_name = DB_NAME
@@ -406,6 +436,13 @@ class AutoReplyManager:
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
         return self._mod.get_conn_list(channel_oid, keyword, active_only)
+
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+        return self._mod.get_module_count_stats(channel_oid, limit)
+
+    def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> UniqueKeywordCountResult:
+        return self._mod.get_unique_keyword_count_stats(channel_oid, limit)
 
 
 _inst = AutoReplyManager()
