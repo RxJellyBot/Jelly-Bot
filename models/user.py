@@ -1,4 +1,5 @@
 from threading import Thread
+from typing import Optional
 
 from bson import ObjectId
 from cachetools import TTLCache
@@ -95,7 +96,11 @@ def load_user_name_cache():
             if not channel_model:
                 continue
 
-            _user_name_cache_[onplat_oid] = onplat_data.get_name(channel_model)
+            n = onplat_data.get_name(channel_model)
+            if not n:
+                continue
+
+            _user_name_cache_[onplat_oid] = n
 
     Thread(target=fn).start()
 
@@ -104,7 +109,7 @@ class OnPlatformUserModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, allow_none=False, must_have_content=True)
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
-    def get_name(self, channel_data=None) -> str:
+    def get_name(self, channel_data=None) -> Optional[str]:
         if self.id not in _user_name_cache_:
             n = None
 
@@ -130,4 +135,12 @@ class OnPlatformUserModel(Model):
                 if root_data_result.success:
                     ProfileManager.mark_unavailable_async(channel_data.id, root_data_result.model.id)
 
-        return _user_name_cache_.get(self.id, f"{self.token} ({self.platform.key})")
+        return _user_name_cache_.get(self.id)
+
+    def get_name_str(self, channel_data=None) -> str:
+        n = self.get_name(channel_data)
+
+        if n:
+            return n
+        else:
+            return f"{self.token} ({self.platform.key})"
