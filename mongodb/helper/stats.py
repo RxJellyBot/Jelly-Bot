@@ -192,6 +192,10 @@ class MessageStatsDataProcessor:
         uids = {msg.user_root_oid for msg in msgs}
         uids_handled = IdentitySearcher.get_batch_user_name(uids, channel_data)
 
+        # FIXME: - Timestamp using UTC in last messages
+        # FIXME: - Extra Content pass token to surpass user check
+        # FIXME: - User channel existence check failed
+
         for msg in msgs:
             ret.append(HandledMessageRecordEntry(model=msg, user_name=uids_handled[msg.user_root_oid]))
 
