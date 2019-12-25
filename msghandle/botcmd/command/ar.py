@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from extutils.emailutils import MailSender
+from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
 from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
 from mongodb.utils import CursorWithCount
@@ -44,6 +45,7 @@ cmd_main = CommandNode(
 cmd_add = cmd_main.new_child_node(codes=["a", "aa", "add"])
 cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
+cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
 
 
 # ----------------------- Add
@@ -229,3 +231,38 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
         return [HandledMessageEventText(
             content=_("Cannot find any auto-reply module including the substring `{}` in their keyword.")
                 .format(keyword))]
+
+
+@cmd_rk.command_function(
+    feature_flag=BotFeature.TXT_AR_RANKING,
+    scope=CommandScopeCollection.GROUP_ONLY,
+    cooldown_sec=120
+)
+def auto_reply_ranking(e: TextMessageEventObject):
+    ret = [_("Auto-Reply TOP{} ranking").format(Bot.AutoReply.RankingMaxCount)]
+
+    module_stats = AutoReplyManager.get_module_count_stats(e.channel_oid, Bot.AutoReply.RankingMaxCount)
+    if not module_stats.empty:
+        ret.append("")
+        ret.append(_("# Module usage ranking"))
+
+        for idx, module in enumerate(module_stats, start=1):
+            reduced_kw = str_reduce_length(module.keyword.content.replace("\n", "\\n"),
+                                           Bot.AutoReply.RankingMaxContentLength)
+            reduced_rs1 = str_reduce_length(module.responses[0].content.replace("\n", "\\n"),
+                                            Bot.AutoReply.RankingMaxContentLength)
+
+            ret.append(f"#{idx} - {reduced_kw} → {reduced_rs1} ({module.called_count})")
+
+    unique_kw = AutoReplyManager.get_unique_keyword_count_stats(e.channel_oid, Bot.AutoReply.RankingMaxCount)
+    if unique_kw.data:
+        ret.append("")
+        ret.append(_("# Unique keyword ranking"))
+
+        for idx, data in enumerate(unique_kw.data, start=1):
+            ret.append(f"#{idx} - {data.word_str} ({data.count})")
+
+    if len(ret) > 1:
+        return [HandledMessageEventText(content="\n".join([str(s) for s in ret]))]
+    else:
+        return [HandledMessageEventText(content=_("No ranking data available for now."))]
