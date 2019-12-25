@@ -1,9 +1,11 @@
+from dataclasses import dataclass
 from typing import Optional
 
 from bson import ObjectId
 
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
+from models import OID_KEY
 from models.exceptions import KeyNotExistedError
 from models.utils import AutoReplyValidators
 
@@ -12,6 +14,13 @@ from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
     BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
 )
+
+
+def _content_to_str_(content_type, content):
+    if content_type == AutoReplyContentType.TEXT:
+        return content
+    else:
+        return f"({content_type.key} / {content})"
 
 
 class AutoReplyContentModel(Model):
@@ -41,10 +50,7 @@ class AutoReplyContentModel(Model):
         return ModelValidityCheckResult.O_OK
 
     def __str__(self):
-        if self.content_type == AutoReplyContentType.TEXT:
-            return self.content
-        else:
-            return f"({self.content_type.key} / {self.content})"
+        return _content_to_str_(self.content_type, self.content)
 
 
 class AutoReplyModuleModel(Model):
@@ -98,7 +104,7 @@ class AutoReplyModuleModel(Model):
 
     @property
     def keyword_repr(self) -> str:
-        return f"{str(self.keyword)} ({self.called_count})"
+        return f"{str(self.keyword)}"
 
 
 class AutoReplyModuleExecodeModel(Model):
@@ -127,3 +133,38 @@ class AutoReplyTagPopularityDataModel(Model):
     WeightedAppearances = FloatField("w_appearances")
     Appearances = IntegerField("u_appearances")
     Score = FloatField("score")
+
+
+@dataclass
+class UniqueKeywordCountEntry:
+    word: str
+    word_type: AutoReplyContentType
+    count: int
+
+    def __post_init__(self):
+        self.word_type = AutoReplyContentType.cast(self.word_type)
+
+    @property
+    def word_str(self):
+        return _content_to_str_(self.word_type, self.word)
+
+
+class UniqueKeywordCountResult:
+    KEY_WORD = "w"
+    KEY_WORD_TYPE = "wt"
+
+    KEY_COUNT = "ct"
+
+    def __init__(self, crs, limit: Optional[int] = None):
+        self.data = []
+
+        for d in crs:
+            self.data.append(
+                UniqueKeywordCountEntry(
+                    word=d[OID_KEY][UniqueKeywordCountResult.KEY_WORD],
+                    word_type=d[OID_KEY][UniqueKeywordCountResult.KEY_WORD_TYPE],
+                    count=d[UniqueKeywordCountResult.KEY_COUNT]
+                )
+            )
+
+        self.limit = limit

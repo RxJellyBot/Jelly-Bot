@@ -244,10 +244,17 @@ class BotFeatureUsageResult:
     def __init__(self, cursor, incl_not_used: bool):
         FeatureUsageEntry = namedtuple("FeatureUsageEntry", ["feature_name", "count"])
 
-        self.data = [
-            FeatureUsageEntry(feature_name=BotFeature.cast(d[OID_KEY]).key, count=d[BotFeatureUsageResult.KEY])
-            for d in cursor
-        ]
+        self.data = []
+        for d in cursor:
+            try:
+                feature = BotFeature.cast(d[OID_KEY]).key
+
+                self.data.append(
+                    FeatureUsageEntry(feature_name=BotFeature.cast(d[OID_KEY]).key, count=d[BotFeatureUsageResult.KEY])
+                )
+            except TypeError:
+                # Skip if the code has been added in the newer build but not in the current executing build
+                pass
 
         if incl_not_used:
             diff = {feature for feature in BotFeature}.difference({BotFeature.cast(d[OID_KEY]) for d in cursor})
