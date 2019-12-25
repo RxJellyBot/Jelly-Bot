@@ -122,6 +122,9 @@ class Bot:
 
         DeleteDataMins = 3
 
+        RankingMaxCount = 15
+        RankingMaxContentLength = 20
+
     class RecentActivity:
         CooldownSeconds = 30
         DefaultLimitCount = 100

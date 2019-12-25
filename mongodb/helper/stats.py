@@ -1,12 +1,13 @@
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from typing import List, Optional, Union, NamedTuple, Dict
+from datetime import tzinfo
 
 from bson import ObjectId
 
-from extutils.dt import now_utc_aware
+from extutils.dt import now_utc_aware, localtime
 from flags import BotFeature, MessageType
-from models import ChannelModel, ChannelCollectionModel, OID_KEY, MemberMessageResult, MessageRecordModel
+from models import ChannelModel, ChannelCollectionModel, MemberMessageResult, MessageRecordModel
 from mongodb.factory import (
     MessageRecordStatisticsManager, ProfileManager, BotFeatureUsageDataManager
 )
@@ -58,8 +59,10 @@ class HandledMessageRecordEntry:
     content_html: str = field(init=False)
     process_time_ms: float = field(init=False)
 
-    def __post_init__(self):
-        self.timestamp = ObjectId(self.model.id).generation_time.strftime("%Y-%m-%d %H:%M:%S")
+    tz: InitVar[Optional[tzinfo]]
+
+    def __post_init__(self, tz: Optional[tzinfo]):
+        self.timestamp = localtime(ObjectId(self.model.id).generation_time, tz).strftime("%Y-%m-%d %H:%M:%S")
         self.content_type = self.model.message_type
         self.content_html = self.model.message_content.replace("\n", "<br>")
         self.process_time_ms = self.model.process_time_secs * 1000
@@ -186,18 +189,16 @@ class MessageStatsDataProcessor:
         return MessageStatsDataProcessor._get_user_msg_ranking_(chcoll_data.child_channel_oids, root_oid, hours_within)
 
     @staticmethod
-    def get_recent_messages(channel_data: ChannelModel, limit: Optional[int] = None) -> HandledMessageRecords:
+    def get_recent_messages(
+            channel_data: ChannelModel, limit: Optional[int] = None, tz: Optional[tzinfo] = None) \
+            -> HandledMessageRecords:
         ret = []
         msgs = list(MessageRecordStatisticsManager.get_recent_messages(channel_data.id, limit))
         uids = {msg.user_root_oid for msg in msgs}
         uids_handled = IdentitySearcher.get_batch_user_name(uids, channel_data)
 
-        # FIXME: - Timestamp using UTC in last messages
-        # FIXME: - Extra Content pass token to surpass user check
-        # FIXME: - User channel existence check failed
-
         for msg in msgs:
-            ret.append(HandledMessageRecordEntry(model=msg, user_name=uids_handled[msg.user_root_oid]))
+            ret.append(HandledMessageRecordEntry(model=msg, user_name=uids_handled[msg.user_root_oid], tz=tz))
 
         return HandledMessageRecords(data=ret)
 
