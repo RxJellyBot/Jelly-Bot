@@ -1,0 +1,7 @@
+.ar-content > img {
+    max-height: 3em;
+}
+
+.ar-content > p {
+    margin: 0;
+}
