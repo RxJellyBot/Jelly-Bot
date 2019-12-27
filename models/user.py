@@ -133,6 +133,14 @@ class OnPlatformUserModel(Model):
 
                 root_data_result = RootUserManager.get_root_data_onplat(self.platform, self.token, auto_register=False)
                 if root_data_result.success:
+                    # TEMP: Sending notification if this code triggers
+                    from extutils.emailutils import MailSender
+                    MailSender.send_email_async(
+                        f"Platform: {self.platform}<br>"
+                        f"Token: {self.token}<br>"
+                        f"Marked unavailable in Channel {channel_data.id}.",
+                        subject="Marking unavailable by get_name")
+
                     ProfileManager.mark_unavailable_async(channel_data.id, root_data_result.model.id)
 
         return _user_name_cache_.get(self.id)
