@@ -250,7 +250,7 @@ class BotFeatureUsageResult:
                 feature = BotFeature.cast(d[OID_KEY]).key
 
                 self.data.append(
-                    FeatureUsageEntry(feature_name=BotFeature.cast(d[OID_KEY]).key, count=d[BotFeatureUsageResult.KEY])
+                    FeatureUsageEntry(feature_name=feature, count=d[BotFeatureUsageResult.KEY])
                 )
             except TypeError:
                 # Skip if the code has been added in the newer build but not in the current executing build
