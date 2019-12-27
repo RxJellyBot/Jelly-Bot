@@ -32,18 +32,25 @@
         </div>
         <div class="row btn-group">
             <div class="col-md mb-3">
-                <a class="btn btn-info btn-block p-3" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">
+                <a class="btn btn-outline-info btn-block p-3" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">
                     <span class="h4">{% trans "Message Statistics" %}</span>
                 </a>
             </div>
             <div class="col-md mb-3">
-                <a class="btn btn-success btn-block p-3" href="{% url "info.channel.botstats" channel_oid=channel_data.id %}">
+                <a class="btn btn-outline-success btn-block p-3" href="{% url "info.channel.botstats" channel_oid=channel_data.id %}">
                     <span class="h4">{% trans "Bot Feature Usage" %}</span>
                 </a>
             </div>
+        </div>
+        <div class="row btn-group">
             <div class="col-md mb-3">
-                <a class="btn btn-warning btn-block p-3" href="{% url "info.channel.recent.message" channel_oid=channel_data.id %}">
+                <a class="btn btn-outline-warning btn-block p-3" href="{% url "info.channel.recent.message" channel_oid=channel_data.id %}">
                     <span class="h4">{% trans "Recent Messages" %}</span>
+                </a>
+            </div>
+            <div class="col-md mb-3">
+                <a class="btn btn-outline-danger btn-block p-3" href="{% url "page.ar.ranking.channel" channel_oid=channel_data.id %}">
+                    <span class="h4">{% trans "Auto-Reply Ranking" %}</span>
                 </a>
             </div>
         </div>
