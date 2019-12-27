@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -257,6 +257,14 @@ class RootUserManager(BaseCollection):
             if d.has_onplat_data:
                 for onplat_oid in d.on_plat_oids:
                     ret[onplat_oid] = d.id
+
+        return ret
+
+    def get_root_to_onplat_dict(self) -> Dict[ObjectId, List[ObjectId]]:
+        ret = {}
+        for d in self.find_cursor_with_count(
+                {RootUserModel.OnPlatOids.key: {"$exists": True}}, parse_cls=RootUserModel):
+            ret[d.id] = d.on_plat_oids
 
         return ret
 
