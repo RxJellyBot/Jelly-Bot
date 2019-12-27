@@ -12,7 +12,7 @@
         <tbody>
         {% for entry in bot_usage_data.data %}
             <tr>
-                <td class="align-middle text-center">{{ forloop.counter }}</td>
+                <td class="align-middle text-center">{{ entry.rank }}</td>
                 <td class="align-middle text-center">{{ entry.feature_name }}</td>
                 <td class="align-middle text-center h5 font-weight-normal">{{ entry.count }}</td>
             </tr>

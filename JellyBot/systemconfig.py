@@ -42,6 +42,9 @@ class Discord(PlatformConfig):
 class Website:
     NewRegisterThresholdDays = 5
 
+    class AutoReply:
+        RankingMaxCount = 200
+
     class RecentActivity:
         MaxMessageCount = 1000
 
@@ -82,7 +85,7 @@ class DataQuery:
     TagPopularitySearchCount = 10
 
     UserNameCacheSize = 3000
-    UserNameExpirationSeconds = 129600  # 1.5 Days
+    UserNameExpirationSeconds = 1  # 1.5 Days / 129600 secs
 
 
 class ChannelConfig:
@@ -122,8 +125,8 @@ class Bot:
 
         DeleteDataMins = 3
 
-        RankingMaxCount = 15
-        RankingMaxContentLength = 20
+        RankingMaxCount = 10
+        RankingMaxContentLength = 35
 
     class RecentActivity:
         CooldownSeconds = 30

@@ -11,11 +11,12 @@ from extutils.emailutils import MailSender
 
 
 def _perform_existence_check_(set_name_to_cache: bool):
+    list_prof_conn = list(ProfileManager.get_available_connections())
+
     def fn():
-        list_prof_conn = list(ProfileManager.get_available_connections())
         dict_onplat_oids = RootUserManager.get_root_to_onplat_dict()
         dict_onplat_data = RootUserManager.get_onplat_data_dict()
-        dict_channel = ChannelManager.get_channel_dict([p.channel_oid for p in list_prof_conn])
+        dict_channel = ChannelManager.get_channel_dict([p.channel_oid for p in list_prof_conn], accessbible_only=True)
 
         with ThreadPoolExecutor(max_workers=4, thread_name_prefix="ExstCheck") as executor:
             futures = [
@@ -30,7 +31,7 @@ def _perform_existence_check_(set_name_to_cache: bool):
             for completed in futures:
                 completed.result()
 
-    print("Performing user channel existence check...")
+    print(f"Performing user channel existence check on {len(list_prof_conn)} connections...")
 
     result = exec_timing_result(fn)
 
@@ -50,11 +51,6 @@ def _check_on_prof_conn_(
 
     model_channel = dict_channel.get(prof_conn.channel_oid)
     if not model_channel:
-        MailSender.send_email_async(
-            f"Missing channel data of channel ID: {prof_conn.channel_oid}<br>"
-            f"Profile Connection ID: {prof_conn.id}",
-            subject="Missing Channel Data in Profile Connection"
-        )
         return
 
     attempts = 0
@@ -81,7 +77,6 @@ def _check_on_prof_conn_(
         attempts += 1
 
     if attempts >= attempts_allowed:
-        print(f"Attempts: {attempts} / {attempts_allowed}: Mark Unavailable")
         ProfileManager.mark_unavailable_async(model_channel.id, oid_user)
 
 
