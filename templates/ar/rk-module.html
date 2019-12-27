@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header" style="max-height: 35rem">
+    <table class="table table-hover table-bordered table-bordered mb-0">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Count" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Keyword Type" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Keyword" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "First Response Type" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "First Response" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rank, module in module_list %}
+            <tr class="{% if not module.active %}table-danger{% endif %}">
+                <td class="align-middle text-center">{{ rank }}</td>
+                <td class="align-middle text-center no-line-break"><code class="h5">{{ module.called_count }}</code></td>
+                <td class="align-middle text-center no-line-break">{{ module.keyword.content_type.key }}</td>
+                <td class="align-middle text-left no-line-break ar-content">{{ module.keyword.content_html|safe }}</td>
+                <td class="align-middle text-center no-line-break">{{ module.responses.0.content_type.key }}</td>
+                <td class="align-middle text-left no-line-break ar-content">{{ module.responses.0.content_html|safe }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

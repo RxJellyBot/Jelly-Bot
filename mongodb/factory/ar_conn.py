@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Generator, Union
 
 import math
 import pymongo
 from bson import ObjectId
 
 from JellyBot.systemconfig import AutoReply, Database, DataQuery, Bot
+from extutils.utils import enumerate_ranking
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
@@ -248,9 +249,10 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
                     UniqueKeywordCountResult.KEY_WORD: "$" + AutoReplyModuleModel.KEY_KW_CONTENT,
                     UniqueKeywordCountResult.KEY_WORD_TYPE: "$" + AutoReplyModuleModel.KEY_KW_TYPE
                 },
-                UniqueKeywordCountResult.KEY_COUNT: {"$sum": "$" + AutoReplyModuleModel.CalledCount.key}
+                UniqueKeywordCountResult.KEY_COUNT_USAGE: {"$sum": "$" + AutoReplyModuleModel.CalledCount.key},
+                UniqueKeywordCountResult.KEY_COUNT_MODULE: {"$sum": 1}
             }},
-            {"$sort": {UniqueKeywordCountResult.KEY_COUNT: pymongo.DESCENDING}}
+            {"$sort": {UniqueKeywordCountResult.KEY_COUNT_USAGE: pymongo.DESCENDING}}
         ]
 
         if limit:
@@ -437,8 +439,10 @@ class AutoReplyManager:
             -> CursorWithCount:
         return self._mod.get_conn_list(channel_oid, keyword, active_only)
 
-    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
-        return self._mod.get_module_count_stats(channel_oid, limit)
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> Generator[Tuple[Union[int, str], AutoReplyModuleModel], None, None]:
+        return enumerate_ranking(self._mod.get_module_count_stats(channel_oid, limit),
+                                 is_equal=lambda cur, prv: cur.called_count == prv.called_count)
 
     def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> UniqueKeywordCountResult:

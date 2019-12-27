@@ -1,13 +1,15 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 from bson import ObjectId
 
+from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
 from models.exceptions import KeyNotExistedError
 from models.utils import AutoReplyValidators
+from extutils.utils import enumerate_ranking
 
 from ._base import Model, ModelDefaultValueExt
 from .field import (
@@ -23,6 +25,17 @@ def _content_to_str_(content_type, content):
         return f"({content_type.key} / {content})"
 
 
+def _content_to_html_(content_type, content):
+    if content_type == AutoReplyContentType.TEXT:
+        return content.replace("\n", "<br>").replace(" ", "&nbsp;")
+    elif content_type == AutoReplyContentType.IMAGE:
+        return f'<img src="{content}"/>'
+    elif content_type == AutoReplyContentType.LINE_STICKER:
+        return f'<img src="{LineStickerManager.get_sticker_url(content)}"/>'
+    else:
+        return content
+
+
 class AutoReplyContentModel(Model):
     WITH_OID = False
 
@@ -30,6 +43,10 @@ class AutoReplyContentModel(Model):
         "c", default=ModelDefaultValueExt.Required, maxlen=systemconfig.AutoReply.MaxContentLength,
         allow_none=False, must_have_content=True)
     ContentType = AutoReplyContentTypeField("t")
+
+    @property
+    def content_html(self):
+        return _content_to_html_(self.content_type, self.content)
 
     # noinspection PyAttributeOutsideInit
     def perform_validity_check(self) -> ModelValidityCheckResult:
@@ -138,11 +155,14 @@ class AutoReplyTagPopularityDataModel(Model):
 @dataclass
 class UniqueKeywordCountEntry:
     word: str
-    word_type: AutoReplyContentType
-    count: int
+    word_type: Union[int, AutoReplyContentType]
+    count_usage: int
+    count_module: int
+    rank: int
 
     def __post_init__(self):
         self.word_type = AutoReplyContentType.cast(self.word_type)
+        self.word = _content_to_html_(self.word_type, self.word)
 
     @property
     def word_str(self):
@@ -153,17 +173,22 @@ class UniqueKeywordCountResult:
     KEY_WORD = "w"
     KEY_WORD_TYPE = "wt"
 
-    KEY_COUNT = "ct"
+    KEY_COUNT_USAGE = "cu"
+    KEY_COUNT_MODULE = "cm"
 
     def __init__(self, crs, limit: Optional[int] = None):
         self.data = []
 
-        for d in crs:
+        usage_key = UniqueKeywordCountResult.KEY_COUNT_USAGE
+
+        for rank, d in enumerate_ranking(crs, is_equal=lambda cur, prv: cur[usage_key] == prv[usage_key]):
             self.data.append(
                 UniqueKeywordCountEntry(
                     word=d[OID_KEY][UniqueKeywordCountResult.KEY_WORD],
                     word_type=d[OID_KEY][UniqueKeywordCountResult.KEY_WORD_TYPE],
-                    count=d[UniqueKeywordCountResult.KEY_COUNT]
+                    count_usage=d[UniqueKeywordCountResult.KEY_COUNT_USAGE],
+                    count_module=d[UniqueKeywordCountResult.KEY_COUNT_MODULE],
+                    rank=rank
                 )
             )
 

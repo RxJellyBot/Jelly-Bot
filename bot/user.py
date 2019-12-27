@@ -16,7 +16,7 @@ def _perform_existence_check_(set_name_to_cache: bool):
     def fn():
         dict_onplat_oids = RootUserManager.get_root_to_onplat_dict()
         dict_onplat_data = RootUserManager.get_onplat_data_dict()
-        dict_channel = ChannelManager.get_channel_dict([p.channel_oid for p in list_prof_conn])
+        dict_channel = ChannelManager.get_channel_dict([p.channel_oid for p in list_prof_conn], accessbible_only=True)
 
         with ThreadPoolExecutor(max_workers=4, thread_name_prefix="ExstCheck") as executor:
             futures = [
@@ -51,11 +51,6 @@ def _check_on_prof_conn_(
 
     model_channel = dict_channel.get(prof_conn.channel_oid)
     if not model_channel:
-        MailSender.send_email_async(
-            f"Missing channel data of channel ID: {prof_conn.channel_oid}<br>"
-            f"Profile Connection ID: {prof_conn.id}",
-            subject="Missing Channel Data in Profile Connection"
-        )
         return
 
     attempts = 0

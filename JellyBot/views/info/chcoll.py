@@ -27,22 +27,22 @@ class ChannelCollectionInfoView(TemplateResponseMixin, View):
 
         chcoll_data: Optional[ChannelCollectionModel] = ChannelCollectionManager.get_chcoll_oid(chcoll_oid)
 
-        if chcoll_data:
-            msgdata_1d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 24)
-            msgdata_7d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 168)
-
-            return render_template(
-                self.request, _("Channel Collection Info - {}").format(chcoll_oid), "info/chcoll/main.html",
-                {
-                    "chcoll_data": chcoll_data,
-                    "chcoll_cch_data":
-                        InfoProcessor.collate_child_channel_data(get_root_oid(request), chcoll_data.child_channel_oids),
-                    "user_message_data1d": msgdata_1d,
-                    "msg_count1d": msgdata_1d.msg_count,
-                    "user_message_data7d": msgdata_7d,
-                    "msg_count7d": msgdata_7d.msg_count
-                },
-                nav_param=kwargs)
-        else:
+        if not chcoll_data:
             return WebsiteErrorView.website_error(
                 request, WebsiteError.CHANNEL_COLLECTION_NOT_FOUND, {"chcoll_oid": chcoll_oid_str}, nav_param=kwargs)
+
+        msgdata_1d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 24)
+        msgdata_7d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 168)
+
+        return render_template(
+            self.request, _("Channel Collection Info - {}").format(chcoll_oid), "info/chcoll/main.html",
+            {
+                "chcoll_data": chcoll_data,
+                "chcoll_cch_data":
+                    InfoProcessor.collate_child_channel_data(get_root_oid(request), chcoll_data.child_channel_oids),
+                "user_message_data1d": msgdata_1d,
+                "msg_count1d": msgdata_1d.msg_count,
+                "user_message_data7d": msgdata_7d,
+                "msg_count7d": msgdata_7d.msg_count
+            },
+            nav_param=kwargs)
