@@ -11,6 +11,7 @@ from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
+from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
     ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
@@ -115,6 +116,11 @@ class UserProfileManager(BaseCollection):
             ret[d[OID_KEY]] = d[k]
 
         return ret
+
+    def get_available_connections(self) -> CursorWithCount:
+        return self.find_cursor_with_count(
+            {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
+            parse_cls=ChannelProfileConnectionModel)
 
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
@@ -341,6 +347,9 @@ class ProfileManager:
 
     def change_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self._conn.change_star(channel_oid, root_oid, star)
+
+    def get_available_connections(self) -> CursorWithCount:
+        return self._conn.get_available_connections()
 
 
 _inst = ProfileManager()
