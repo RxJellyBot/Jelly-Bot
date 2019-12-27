@@ -10,7 +10,7 @@ from .ar import (
     AutoReplyTagPopularityDataModel, UniqueKeywordCountResult
 )
 # noinspection PyUnresolvedReferences
-from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, load_user_name_cache
+from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, set_uname_cache
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 # noinspection PyUnresolvedReferences
