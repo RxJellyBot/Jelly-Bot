@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-30 16:15+0800\n"
+"POT-Creation-Date: 2019-12-30 17:55+0800\n"
 "PO-Revision-Date: 2019-12-28 17:18+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
@@ -48,15 +48,15 @@ msgid ""
 "so the system dropped it."
 msgstr "因部分回覆種類找不到對應的回覆，故系統自動無視。"
 
-#: .\JellyBot\settings.py:175
+#: .\JellyBot\settings.py:173
 msgid "English"
 msgstr "英文"
 
-#: .\JellyBot\settings.py:176
+#: .\JellyBot\settings.py:174
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
-#: .\JellyBot\views\about.py:18 .\JellyBot\views\nav.py:25
+#: .\JellyBot\views\about.py:17 .\JellyBot\views\nav.py:25
 msgid "About"
 msgstr "關於"
 
@@ -2120,29 +2120,10 @@ msgstr "查閱機器人的相關文件及資訊。"
 
 #: .\msghandle\botcmd\command\help.py:21
 msgid ""
-"LINE BOT:\n"
-"Beta: http://rnnx.cc/LineBeta\n"
-"Stable: http://rnnx.cc/LineStable\n"
-"\n"
-"Discord:\n"
-"Beta: http://rnnx.cc/DiscordBeta\n"
-"Stable: http://rnnx.cc/DiscordStable\n"
-"\n"
-"Website:\n"
-"Beta: http://rnnx.cc/WebsiteBeta\n"
-"Stable: http://rnnx.cc/WebsiteStable"
+"LINE: http://rnnx.cc/Line\n"
+"Discord: http://rnnx.cc/Discord\n"
+"Website: http://rnnx.cc/Website"
 msgstr ""
-"LINE機器人:\n"
-"測試: http://rnnx.cc/LineBeta\n"
-"穩定: http://rnnx.cc/LineStable\n"
-"\n"
-"Discord:\n"
-"測試: http://rnnx.cc/DiscordBeta\n"
-"穩定: http://rnnx.cc/DiscordStable\n"
-"\n"
-"網站:\n"
-"測試: http://rnnx.cc/WebsiteBeta\n"
-"穩定: http://rnnx.cc/WebsiteStable"
 
 #: .\msghandle\botcmd\command\id.py:12
 msgid "Information"
@@ -2658,90 +2639,50 @@ msgid "Email"
 msgstr "電子信箱"
 
 #: .\templates\about.html:23
-msgid "Build"
-msgstr "組建"
-
-#: .\templates\about.html:25 .\templates\index.html:34
-#: .\templates\index.html:35
-msgid "Beta"
-msgstr "測試"
-
-#: .\templates\about.html:26
-msgid ""
-"Usually, this build has new features, but contains more bugs than Stable."
-"<br> Some translations may be incompleted."
+msgid "App-related info"
 msgstr ""
-"通常，此版本會有新的功能，但是可能比穩定版有更多的Bug。<br>部分內容的翻譯可能"
-"未完成。"
 
-#: .\templates\about.html:30 .\templates\about.html:53
+#: .\templates\about.html:25
 msgid "Deployed on "
 msgstr "部署於 "
 
-#: .\templates\about.html:31 .\templates\about.html:54
+#: .\templates\about.html:26
 msgid "Heroku Released on "
 msgstr "Heroku部署於 "
 
-#: .\templates\about.html:32 .\templates\about.html:55
+#: .\templates\about.html:27
 msgid "Commit: "
 msgstr "Commit: "
 
-#: .\templates\about.html:40 .\templates\about.html:63
+#: .\templates\about.html:36
 msgid "Website"
 msgstr "網站"
 
-#: .\templates\about.html:48 .\templates\index.html:38
-#: .\templates\index.html:39
-msgid "Stable"
-msgstr "穩定"
-
-#: .\templates\about.html:49
-msgid ""
-"Only features believed that will not cause problems will appear on this "
-"build.<br> Bugs should be less than the Beta build, and the translations "
-"should be completed."
-msgstr ""
-"只有確定穩定的功能會出現在這個版本。<br>這個版本會有比較少的Bug，並且通常不會"
-"有未翻譯的文本。"
-
-#: .\templates\about.html:72
-msgid ""
-"Both Beta and Stable build share the same database.<br> If an operation on "
-"the Beta build caused the data corrupted, the data will be temporarily "
-"removed for pending repair, and it will be temporarily inaccessible. Please "
-"contact the website developer as soon as possible if you think this "
-"happened. The data will be added back to the database once the website "
-"developer fixed it."
-msgstr ""
-"測試版和穩定版使用同一個資料庫。<br>如果在測試版上執行一個指令，並造成資料損"
-"毀，資料會暫時從資料庫移除，並等待修復。該筆資料會暫時無法存取。若發生此情"
-"形，請盡速聯絡開發者。資料將會在修復後回到資料庫中。"
-
-#: .\templates\about.html:86
+#: .\templates\about.html:48
 msgid "System"
 msgstr "系統"
 
-#: .\templates\about.html:90
+#: .\templates\about.html:52
 msgid "GitHub Repository"
 msgstr "GitHub Repo"
 
-#: .\templates\about.html:92
+#: .\templates\about.html:54
 msgid "Deployed on"
 msgstr "部署於"
 
-#: .\templates\about.html:94 .\templates\account\settings.html:58
+#: .\templates\about.html:56 .\templates\account\settings.html:58
 msgid "Language"
 msgstr "語言"
 
-#: .\templates\about.html:96
+#: .\templates\about.html:58
 msgid "Backend Framework"
 msgstr "後台框架"
 
-#: .\templates\about.html:98 .\templates\about.html:100
+#: .\templates\about.html:60 .\templates\about.html:62
 msgid "Frontend framework"
 msgstr "前台框架"
 
-#: .\templates\about.html:102
+#: .\templates\about.html:64
 msgid "Database"
 msgstr "資料庫"
 
@@ -3537,24 +3478,20 @@ msgid "Jelly Bot"
 msgstr "小水母"
 
 #: .\templates\base\footer.html:7
+#, fuzzy
+#| msgid ""
+#| "Development started on May 18, 2019. Beta test started from Sep 11, "
+#| "2019. / Made by RaenonX"
 msgid ""
-"Development started on May 18, 2019. Beta test started from Sep 11, 2019. / "
-"Made by RaenonX"
+"Development started on May 18, 2019. Started from Sep 11, 2019. / Made by "
+"RaenonX"
 msgstr "2019年05月18日開始開發；2019年09月11日開始試營運。 / 由 醜兔/水母 製作"
 
 #: .\templates\base\footer.html:12
-msgid "Beta ver."
-msgstr "測試版"
-
-#: .\templates\base\footer.html:12 .\templates\base\footer.html:15
 msgid "updated at"
 msgstr "更新於"
 
 #: .\templates\base\footer.html:15
-msgid "Stable ver."
-msgstr "穩定版"
-
-#: .\templates\base\footer.html:18
 #, python-format
 msgid "Booted on %(boot_dt)s."
 msgstr "於 %(boot_dt)s 開機。"
@@ -3837,11 +3774,11 @@ msgstr "支援LINE和Discord。將它們加入至你的群組以真正使用小�
 msgid "Command Manual"
 msgstr "指令說明書"
 
-#: .\templates\index.html:43 .\templates\index.html:44
+#: .\templates\index.html:39 .\templates\index.html:40
 msgid "(Preserve)"
 msgstr "(預留欄位)"
 
-#: .\templates\index.html:45
+#: .\templates\index.html:41
 msgid "More Details"
 msgstr "詳細"
 
@@ -4194,6 +4131,73 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid ""
+#~ "LINE BOT:\n"
+#~ "Beta: http://rnnx.cc/LineBeta\n"
+#~ "Stable: http://rnnx.cc/LineStable\n"
+#~ "\n"
+#~ "Discord:\n"
+#~ "Beta: http://rnnx.cc/DiscordBeta\n"
+#~ "Stable: http://rnnx.cc/DiscordStable\n"
+#~ "\n"
+#~ "Website:\n"
+#~ "Beta: http://rnnx.cc/WebsiteBeta\n"
+#~ "Stable: http://rnnx.cc/WebsiteStable"
+#~ msgstr ""
+#~ "LINE機器人:\n"
+#~ "測試: http://rnnx.cc/LineBeta\n"
+#~ "穩定: http://rnnx.cc/LineStable\n"
+#~ "\n"
+#~ "Discord:\n"
+#~ "測試: http://rnnx.cc/DiscordBeta\n"
+#~ "穩定: http://rnnx.cc/DiscordStable\n"
+#~ "\n"
+#~ "網站:\n"
+#~ "測試: http://rnnx.cc/WebsiteBeta\n"
+#~ "穩定: http://rnnx.cc/WebsiteStable"
+
+#~ msgid "Build"
+#~ msgstr "組建"
+
+#~ msgid "Beta"
+#~ msgstr "測試"
+
+#~ msgid ""
+#~ "Usually, this build has new features, but contains more bugs than Stable."
+#~ "<br> Some translations may be incompleted."
+#~ msgstr ""
+#~ "通常，此版本會有新的功能，但是可能比穩定版有更多的Bug。<br>部分內容的翻譯"
+#~ "可能未完成。"
+
+#~ msgid "Stable"
+#~ msgstr "穩定"
+
+#~ msgid ""
+#~ "Only features believed that will not cause problems will appear on this "
+#~ "build.<br> Bugs should be less than the Beta build, and the translations "
+#~ "should be completed."
+#~ msgstr ""
+#~ "只有確定穩定的功能會出現在這個版本。<br>這個版本會有比較少的Bug，並且通常"
+#~ "不會有未翻譯的文本。"
+
+#~ msgid ""
+#~ "Both Beta and Stable build share the same database.<br> If an operation "
+#~ "on the Beta build caused the data corrupted, the data will be temporarily "
+#~ "removed for pending repair, and it will be temporarily inaccessible. "
+#~ "Please contact the website developer as soon as possible if you think "
+#~ "this happened. The data will be added back to the database once the "
+#~ "website developer fixed it."
+#~ msgstr ""
+#~ "測試版和穩定版使用同一個資料庫。<br>如果在測試版上執行一個指令，並造成資料"
+#~ "損毀，資料會暫時從資料庫移除，並等待修復。該筆資料會暫時無法存取。若發生此"
+#~ "情形，請盡速聯絡開發者。資料將會在修復後回到資料庫中。"
+
+#~ msgid "Beta ver."
+#~ msgstr "測試版"
+
+#~ msgid "Stable ver."
+#~ msgstr "穩定版"
 
 #~ msgid "Total Count: "
 #~ msgstr "訊息總數: "
