@@ -7,10 +7,10 @@ from .rpdata import PendingRepairDataModel
 # noinspection PyUnresolvedReferences
 from .ar import (
     AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleExecodeModel,
-    AutoReplyTagPopularityDataModel
+    AutoReplyTagPopularityDataModel, UniqueKeywordCountResult
 )
 # noinspection PyUnresolvedReferences
-from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel
+from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, set_uname_cache
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 # noinspection PyUnresolvedReferences

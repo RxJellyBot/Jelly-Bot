@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bson import ObjectId
 from cachetools import TTLCache
 
@@ -64,11 +66,15 @@ class APIUserModel(Model):
 _user_name_cache_ = TTLCache(maxsize=DataQuery.UserNameCacheSize, ttl=DataQuery.UserNameExpirationSeconds)
 
 
+def set_uname_cache(onplat_oid: ObjectId, name: str):
+    _user_name_cache_[onplat_oid] = name
+
+
 class OnPlatformUserModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, allow_none=False, must_have_content=True)
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
-    def get_name(self, channel_data=None) -> str:
+    def get_name(self, channel_data=None) -> Optional[str]:
         if self.id not in _user_name_cache_:
             n = None
 
@@ -85,13 +91,14 @@ class OnPlatformUserModel(Model):
                 n = DiscordClientWrapper.get_user_name_safe(self.token)
 
             if n:
-                _user_name_cache_[self.id] = n
-            else:
-                # Mark unavailable
-                from mongodb.factory import ProfileManager, RootUserManager
+                set_uname_cache(self.id, n)
 
-                root_data_result = RootUserManager.get_root_data_onplat(self.platform, self.token, auto_register=False)
-                if root_data_result.success:
-                    ProfileManager.mark_unavailable_async(channel_data.id, root_data_result.model.id)
+        return _user_name_cache_.get(self.id)
 
-        return _user_name_cache_.get(self.id, f"{self.token} ({self.platform.key})")
+    def get_name_str(self, channel_data=None) -> str:
+        n = self.get_name(channel_data)
+
+        if n:
+            return n
+        else:
+            return f"{self.token} ({self.platform.key})"

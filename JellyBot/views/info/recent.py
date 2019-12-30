@@ -2,17 +2,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
+from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid, get_channel_data
+from JellyBot.utils import get_root_oid, get_channel_data, get_limit
 from JellyBot.systemconfig import Website
-from extutils import safe_cast
+
 from flags import WebsiteError
 from models import ChannelProfileConnectionModel
 from mongodb.helper import MessageStatsDataProcessor
 from mongodb.factory import ProfileManager
 
 
-class RecentMessagesView(TemplateResponseMixin, View):
+class RecentMessagesView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         channel_data = get_channel_data(kwargs)
@@ -30,14 +31,12 @@ class RecentMessagesView(TemplateResponseMixin, View):
                 request, WebsiteError.NOT_IN_THE_CHANNEL, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
 
         # Process the necessary data
-        limit = safe_cast(request.GET.get("limit"), int)
-        if limit:
-            limit = min(limit, Website.RecentActivity.MaxMessageCount)
-        else:
-            limit = Website.RecentActivity.MaxMessageCount
+        channel_name = channel_data.model.get_channel_name(root_oid)
+
+        limit = get_limit(request.GET, Website.RecentActivity.MaxMessageCount)
 
         ctxt = {
-            "channel_name": channel_data.model.get_channel_name(root_oid),
+            "channel_name": channel_name,
             "channel_data": channel_data.model,
             "recent_msg_limit": limit or "",
             "recent_msg_limit_max": Website.RecentActivity.MaxMessageCount,
@@ -45,5 +44,5 @@ class RecentMessagesView(TemplateResponseMixin, View):
         }
 
         return render_template(
-            self.request, _("Recent Messages - {}").format(channel_data.model.id),
+            self.request, _("Recent Messages - {}").format(channel_name),
             "info/recent/message.html", ctxt, nav_param=kwargs)

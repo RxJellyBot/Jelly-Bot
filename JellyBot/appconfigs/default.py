@@ -1,10 +1,10 @@
 from django.apps import AppConfig
 
-from msghandle import load_handling_functions
+from bot.event import signal_django_ready
 
 
 class JellyBotAppConfig(AppConfig):
     name = "JellyBot"
 
     def ready(self):
-        load_handling_functions()
+        signal_django_ready()
