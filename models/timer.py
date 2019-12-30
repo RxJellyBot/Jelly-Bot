@@ -77,7 +77,7 @@ class TimerListResult:
         if self.future:
             for tmr in self.future:
                 ret.append(
-                    _("[{diff}] to {event} (at {time})").format(
+                    _("- [{diff}] to {event} (at {time})").format(
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
@@ -86,7 +86,7 @@ class TimerListResult:
         if self.past_continue:
             for tmr in self.past_continue:
                 ret.append(
-                    _("[{diff}] past {event} (at {time})").format(
+                    _("- [{diff}] past {event} (at {time})").format(
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
@@ -95,7 +95,7 @@ class TimerListResult:
         if self.past_done:
             for tmr in self.past_done:
                 ret.append(
-                    _("{event} has ended (at {time})").format(
+                    _("- {event} has ended (at {time})").format(
                         event=tmr.title, time=localtime(tmr.target_time, tzinfo)))
 
         # Take out separator

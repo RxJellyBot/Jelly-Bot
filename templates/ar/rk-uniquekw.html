@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header" style="max-height: 35rem">
+    <table class="table table-hover table-bordered table-bordered mb-0">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Usage Count" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Keyword Type" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Keyword" %}</th>
+            <th scope="col" class="no-line-break text-center">{% trans "Module Count" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in result.data %}
+            <tr>
+                <td class="align-middle text-center">{{ entry.rank }}</td>
+                <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_usage }}</code></td>
+                <td class="align-middle text-center no-line-break">{{ entry.word_type.key }}</td>
+                <td class="align-middle text-left no-line-break ar-content">{{ entry.word|safe }}</td>
+                <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_module }}</code></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -56,11 +56,11 @@ class LineApiWrapper:
 
         try:
             if ctype == ChannelType.GROUP_PUB_TEXT:
-                return self._core.get_group_member_profile(channel_data.token, uid)
+                return self._core.get_group_member_profile(channel_data.token, uid, timeout=1000)
             elif ctype == ChannelType.GROUP_PRV_TEXT:
-                return self._core.get_room_member_profile(channel_data.token, uid)
+                return self._core.get_room_member_profile(channel_data.token, uid, timeout=1000)
             else:
-                return self._core.get_profile(uid)
+                return self._core.get_profile(uid, timeout=1000)
         except LineBotApiError as ex:
             if ex.status_code == 404:
                 return None

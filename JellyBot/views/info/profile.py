@@ -18,13 +18,13 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         profile_data = ProfileManager.get_profile(profile_oid)
 
-        if profile_data:
-            # noinspection PyTypeChecker
-            return render_template(
-                self.request, _("Profile Info - {}").format(profile_data.name), "info/profile.html", {
-                    "profile_data": profile_data,
-                    "perm_cats": list(PermissionCategory)
-                }, nav_param=kwargs)
-        else:
+        if not profile_data:
             return WebsiteErrorView.website_error(
                 request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid})
+
+        # noinspection PyTypeChecker
+        return render_template(
+            self.request, _("Profile Info - {}").format(profile_data.name), "info/profile.html", {
+                "profile_data": profile_data,
+                "perm_cats": list(PermissionCategory)
+            }, nav_param=kwargs)

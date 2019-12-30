@@ -1,0 +1,29 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Auto-Reply Ranking Channel List" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            {% for entry in channel_list %}
+            <div class="col-lg-6 mb-3">
+                <a class="btn {% if not entry.channel_data.bot_accessible %}btn-outline-danger{% elif entry.starred %}btn-outline-primary{% else %}btn-outline-dark{% endif %} w-100"
+                   href="{% url "page.ar.ranking.channel" channel_oid=entry.channel_data.id %}">
+                    {{ entry.channel_data.platform.key }}&nbsp;/&nbsp;{{ entry.channel_name }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/ar-html-content.css" %}">
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

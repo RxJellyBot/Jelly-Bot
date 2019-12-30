@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Generator, Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -97,16 +97,6 @@ def list_insert_in_between(l: list, insert_obj):
     return ret
 
 
-def demarkdown(markdown_str: str):
-    return markdown_str\
-        .replace("\n\n", "\n")\
-        .replace("<br>", "\n")\
-        .replace("<br/>", "\n")\
-        .replace("<hr>", "----------")\
-        .replace("<pre>", "```")\
-        .replace("</pre>", "```")
-
-
 def rotate_list(l: List, n: int):
     """`n` means elements to rotate from left to right"""
     n = int(n)
@@ -120,3 +110,36 @@ def char_description(c: str):
         return _("(Space)")
     else:
         return c
+
+
+def enumerate_ranking(iterable, start=1, t_prefix=True, is_equal: callable = lambda cur, prv: cur == prv) -> \
+        Generator[Tuple[Union[int, str], Any], None, None]:
+    _null_ = object()
+
+    iterator = iter(iterable)
+
+    prev = next(iterator, _null_)
+    rank = start
+    temp = []
+
+    while prev != _null_:
+        curr = next(iterator, _null_)
+
+        while curr != _null_ and is_equal(curr, prev):
+            temp.append(prev)
+
+            prev = curr
+            curr = next(iterator, _null_)
+
+        for d in temp:
+            yield f"T{rank}" if t_prefix else rank, d
+
+        if len(temp) > 0:
+            yield f"T{rank}", prev
+        else:
+            yield str(rank) if t_prefix else rank, prev
+
+        rank += 1 + len(temp)
+        prev = curr
+
+        temp = []

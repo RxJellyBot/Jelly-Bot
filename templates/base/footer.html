@@ -14,5 +14,10 @@
         <div class="col-md">
             <a href="http://jelly.raenonx.cc" target="_blank">{% trans "Stable ver." %}</a>&nbsp;{% trans "updated at" %}&nbsp;{{ stable_update }}
         </div>
+        <div class="col-md">
+            {% blocktrans trimmed %}
+                Booted on {{ boot_dt }}.
+            {% endblocktrans %}
+        </div>
     </div>
 </footer>
