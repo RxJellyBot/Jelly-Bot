@@ -7,12 +7,15 @@ from .exceptions import FieldReadOnly, FieldTypeMismatch, MaxLengthReachedError
 
 class ArrayField(BaseField):
     def __init__(self, key, elem_type: type, default=None, allow_none=False, max_len=0,
-                 readonly=False, auto_cast=True, allow_empty=True, stores_uid=False):
+                 readonly=False, auto_cast=True, allow_empty=True, stores_uid=False, inst_cls=None):
+        if not inst_cls:
+            inst_cls = ArrayFieldInstance
+
         self._elem_type = elem_type
         self._max_len = max_len
         self._allow_empty = allow_empty
         super().__init__(key, default, allow_none=allow_none, readonly=readonly,
-                         auto_cast=auto_cast, inst_cls=ArrayFieldInstance, stores_uid=stores_uid)
+                         auto_cast=auto_cast, inst_cls=inst_cls, stores_uid=stores_uid)
 
     def is_value_valid(self, value) -> bool:
         for v in value:
@@ -45,7 +48,8 @@ class ArrayField(BaseField):
 class ModelArrayField(ArrayField):
     def __init__(self, key, model_type, default=None, allow_none=False, max_len=0,
                  readonly=False, auto_cast=True, allow_empty=True, stores_uid=False):
-        super().__init__(key, model_type, default, allow_none, max_len, readonly, auto_cast, allow_empty, stores_uid)
+        super().__init__(key, model_type, default, allow_none, max_len, readonly, auto_cast, allow_empty, stores_uid,
+                         inst_cls=ModelArrayFieldInstanceFactory.generate(model_type))
         self._model_type = model_type
 
     def is_value_valid(self, value) -> bool:
@@ -77,3 +81,20 @@ class ArrayFieldInstance(FieldInstance):
                 self.value.append(item)
         else:
             self.value = [item]
+
+
+class ModelArrayFieldInstanceFactory:
+    @staticmethod
+    def generate(model_type):
+        def get_val(self):
+            return [model_type.cast_model(v) for v in self._value]
+
+        def set_val(self, value):
+            if self.base.read_only:
+                raise FieldReadOnly(self.base.__class__.__qualname__)
+
+            self.force_set(value)
+
+        return type(f"{model_type.__name__}ModelArrayInstance",
+                    (FieldInstance,),
+                    {"value": property(fget=get_val, fset=set_val)},)

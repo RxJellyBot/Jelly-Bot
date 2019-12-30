@@ -1,17 +1,18 @@
 from datetime import datetime, timedelta
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Generator, Union
 
 import math
 import pymongo
 from bson import ObjectId
 
 from JellyBot.systemconfig import AutoReply, Database, DataQuery, Bot
+from extutils.utils import enumerate_ranking
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
-    AutoReplyContentModel
+    AutoReplyContentModel, UniqueKeywordCountResult
 from models.field import DateTimeField
 from models.utils import AutoReplyValidators
 from mongodb.factory.results import (
@@ -228,6 +229,37 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         return self.find_cursor_with_count(
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+        ret = self.find_cursor_with_count(
+            {AutoReplyModuleModel.ChannelId.key: channel_oid},
+            parse_cls=AutoReplyModuleModel
+        ).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+
+        if limit:
+            ret = ret.limit(limit)
+
+        return ret
+
+    def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> UniqueKeywordCountResult:
+        pipeline = [
+            {"$match": {AutoReplyModuleModel.ChannelId.key: channel_oid}},
+            {"$group": {
+                OID_KEY: {
+                    UniqueKeywordCountResult.KEY_WORD: "$" + AutoReplyModuleModel.KEY_KW_CONTENT,
+                    UniqueKeywordCountResult.KEY_WORD_TYPE: "$" + AutoReplyModuleModel.KEY_KW_TYPE
+                },
+                UniqueKeywordCountResult.KEY_COUNT_USAGE: {"$sum": "$" + AutoReplyModuleModel.CalledCount.key},
+                UniqueKeywordCountResult.KEY_COUNT_MODULE: {"$sum": 1}
+            }},
+            {"$sort": {UniqueKeywordCountResult.KEY_COUNT_USAGE: pymongo.DESCENDING}}
+        ]
+
+        if limit:
+            pipeline.append({"$limit": limit})
+
+        return UniqueKeywordCountResult(self.aggregate(pipeline), limit)
+
 
 class AutoReplyModuleTagManager(BaseCollection):
     database_name = DB_NAME
@@ -406,6 +438,15 @@ class AutoReplyManager:
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
         return self._mod.get_conn_list(channel_oid, keyword, active_only)
+
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> Generator[Tuple[Union[int, str], AutoReplyModuleModel], None, None]:
+        return enumerate_ranking(self._mod.get_module_count_stats(channel_oid, limit),
+                                 is_equal=lambda cur, prv: cur.called_count == prv.called_count)
+
+    def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> UniqueKeywordCountResult:
+        return self._mod.get_unique_keyword_count_stats(channel_oid, limit)
 
 
 _inst = AutoReplyManager()

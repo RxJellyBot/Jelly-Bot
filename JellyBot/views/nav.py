@@ -37,7 +37,7 @@ def construct_nav(request, nav_param):
     else:
         nav.add_item(login_item)
 
-    nav.add_item(_construct_auto_reply_(current_path, home_item))
+    nav.add_item(_construct_auto_reply_(current_path, home_item, nav_param))
     nav.add_item(_construct_info_(current_path, home_item, nav_param))
     nav.add_item(_construct_docs_(current_path, home_item, nav_param))
     nav.add_item(_construct_services_(current_path, home_item))
@@ -93,7 +93,7 @@ def _construct_my_account_(current_path, parent, nav_param):
     return my_account_parent
 
 
-def _construct_auto_reply_(current_path, parent):
+def _construct_auto_reply_(current_path, parent, nav_param):
     auto_reply_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Auto Reply"), parent=parent, link=reverse("page.ar.main"))
     auto_reply_parent.add_item(nav_items_factory(
@@ -106,6 +106,13 @@ def _construct_auto_reply_(current_path, parent):
         NavHeader, label=_("Functions"), parent=auto_reply_parent))
     auto_reply_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Add"), link=reverse("page.ar.add"), parent=auto_reply_parent))
+    auto_reply_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Ranking"), link=reverse("page.ar.ranking.list"), parent=auto_reply_parent))
+
+    # Hidden Items
+    __attach__(auto_reply_parent, NavHidden, current_path,
+               _("Auto-Reply Ranking - {}").format(nav_param.get("channel_oid", "N/A")),
+               "page.ar.ranking.channel", nav_param, auto_reply_parent)
 
     return auto_reply_parent
 

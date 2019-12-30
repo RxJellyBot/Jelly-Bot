@@ -1,0 +1,97 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Auto-Reply Ranking" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        {% if not channel_current.bot_accessible %}
+            <div class="row">
+                <div class="col mb-3 h4">
+                    {% trans "The channel is marked inaccessible for Jelly Bot, so the data of this channel will not update." %}
+                </div>
+            </div>
+
+            <hr>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Parameters" %}</h3>
+            </div>
+        </div>
+
+        <form>
+            <div class="row">
+                <div class="col-lg mb-3">
+                    <div class="form-row mb-3">
+                        <label class="col-2 col-form-label text-right" for="limit">{% trans "Limit" %}</label>
+                        <div class="col-4">
+                            <div class="input-group">
+                                <input type="number" class="form-control border-dark" value="{{ limit }}"
+                                       name="limit" id="limit">
+                                <div class="input-group-append"><span
+                                        class="input-group-text">{% trans "results" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-form-label text-lg-right">
+                            <small>
+                                {% blocktrans trimmed %}
+                                    Leaving this blank and refresh will get the maximum count of the results.<br>
+                                    This cannot exceed {{ max }}.
+                                {% endblocktrans %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col">
+                    <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h3>{% trans "Parameters" %}</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Module Usage Ranking" %}</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "ar/rk-module.html" with module_list=rk_module only %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>{% trans "Unique Keyword Ranking" %}</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "ar/rk-uniquekw.html" with result=rk_ukw only %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/ar-html-content.css" %}">
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+{% endblock %}

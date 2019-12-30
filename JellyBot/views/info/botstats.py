@@ -64,15 +64,17 @@ class ChannelBotUsageStatsView(TemplateResponseMixin, View):
 
         # channel_members = ProfileManager.get_channel_members(channel_oid)  # Reserved for per member analysis
 
+        channel_name = channel_data.model.get_channel_name(get_root_oid(request))
+
         pkg = get_bot_stats_data_package(channel_data.model, hours_within, get_current_timezone())
 
         ctxt = {
-            "channel_name": channel_data.model.get_channel_name(get_root_oid(request)),
+            "channel_name": channel_name,
             "channel_data": channel_data.model,
             "hr_range": hours_within or pkg[KEY_HR_FLOW].hr_range
         }
         ctxt.update(pkg)
 
         return render_template(
-            self.request, _("Bot Usage Stats - {}").format(channel_data.model.id),
+            self.request, _("Bot Usage Stats - {}").format(channel_name),
             "info/botstats/main.html", ctxt, nav_param=kwargs)
