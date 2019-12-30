@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-27 16:16+0800\n"
-"PO-Revision-Date: 2019-12-27 16:20+0800\n"
+"POT-Creation-Date: 2019-12-28 17:24+0800\n"
+"PO-Revision-Date: 2019-12-28 17:18+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -133,16 +133,20 @@ msgstr "新增自動回覆"
 msgid "Auto-Reply Home"
 msgstr "自動回覆 - 首頁"
 
-#: .\JellyBot\views\ar\ranking.py:30
+#: .\JellyBot\views\ar\ranking.py:26
 msgid "Auto-Reply ranking in {}"
 msgstr "{} 中的自動回覆排名"
 
-#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:153
+#: .\JellyBot\views\ar\ranking.py:42
+msgid "Auto-Reply ranking channel list"
+msgstr "自動回覆排名頻道清單"
+
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:155
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:185
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:187
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -158,7 +162,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:181
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:183
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -167,7 +171,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:169
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:171
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -175,7 +179,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:167
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:169
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -183,7 +187,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:171
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:173
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -191,11 +195,11 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:173
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:175
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:156
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:158
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
@@ -253,7 +257,7 @@ msgstr ""
 msgid "Home Page"
 msgstr "首頁"
 
-#: .\JellyBot\views\info\botstats.py:79 .\JellyBot\views\nav.py:133
+#: .\JellyBot\views\info\botstats.py:79 .\JellyBot\views\nav.py:135
 msgid "Bot Usage Stats - {}"
 msgstr "機器人使用統計 - {}"
 
@@ -265,19 +269,19 @@ msgstr "頻道資訊 - {}"
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:142
+#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:144
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:82 .\JellyBot\views\nav.py:130
+#: .\JellyBot\views\info\msgstats.py:82 .\JellyBot\views\nav.py:132
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:139
+#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:141
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
-#: .\JellyBot\views\info\recent.py:46 .\JellyBot\views\nav.py:136
+#: .\JellyBot\views\info\recent.py:47 .\JellyBot\views\nav.py:138
 msgid "Recent Messages - {}"
 msgstr "近期訊息 - {}"
 
@@ -334,47 +338,51 @@ msgstr "功能"
 msgid "Add"
 msgstr "新增"
 
-#: .\JellyBot\views\nav.py:112
+#: .\JellyBot\views\nav.py:110
+msgid "Ranking"
+msgstr "排名"
+
+#: .\JellyBot\views\nav.py:114
 msgid "Auto-Reply Ranking - {}"
 msgstr "自動回覆排名 - {}"
 
-#: .\JellyBot\views\nav.py:120 .\templates\info\channel\search.html:67
+#: .\JellyBot\views\nav.py:122 .\templates\info\channel\search.html:67
 msgid "Info"
 msgstr "資訊查詢"
 
-#: .\JellyBot\views\nav.py:123
+#: .\JellyBot\views\nav.py:125
 msgid "Channel"
 msgstr "頻道"
 
-#: .\JellyBot\views\nav.py:127
+#: .\JellyBot\views\nav.py:129
 msgid "Channel - {}"
 msgstr "頻道 - {}"
 
-#: .\JellyBot\views\nav.py:150
+#: .\JellyBot\views\nav.py:152
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:160 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:162 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:165
+#: .\JellyBot\views\nav.py:167
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:177
+#: .\JellyBot\views\nav.py:179
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:179
+#: .\JellyBot\views\nav.py:181
 msgid "API Command"
 msgstr "API指令"
 
-#: .\JellyBot\views\nav.py:193
+#: .\JellyBot\views\nav.py:195
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:195 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:197 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
 
@@ -655,11 +663,11 @@ msgstr "可循環/迭代物件(陣列、清單...等)"
 msgid "(Null)"
 msgstr "(空)"
 
-#: .\extutils\utils.py:118
+#: .\extutils\utils.py:108
 msgid "(Newline)"
 msgstr "(換行)"
 
-#: .\extutils\utils.py:120
+#: .\extutils\utils.py:110
 msgid "(Space)"
 msgstr "(空格)"
 
@@ -1268,7 +1276,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:124 .\models\stats.py:329
+#: .\models\stats.py:125 .\models\stats.py:331
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -1284,7 +1292,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:191
+#: .\mongodb\factory\prof.py:197
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2020,9 +2028,9 @@ msgstr ""
 #: .\msghandle\botcmd\command\ar.py:168
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
-"which type is NOT text. For example, if there is a module which keyword "
-"100(Text) and another module which keyword is 100(Sticker), both modules "
-"will be deleted if this argument is 100."
+"which type is NOT text. For example, if there is a module which keyword 100"
+"(Text) and another module which keyword is 100(Sticker), both modules will "
+"be deleted if this argument is 100."
 msgstr ""
 "要刪除的自動回覆組的關鍵字。請注意，此指令也會刪除關鍵字種類**並非**文字的回"
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
@@ -2090,15 +2098,15 @@ msgstr "自動回覆 前{} 排名"
 msgid "# Module usage ranking"
 msgstr "# 自動回覆組使用排行"
 
-#: .\msghandle\botcmd\command\ar.py:262
+#: .\msghandle\botcmd\command\ar.py:265
 msgid "# Unique keyword ranking"
-msgstr "# 回復組關鍵字排行"
+msgstr "# 回覆組關鍵字排行"
 
-#: .\msghandle\botcmd\command\ar.py:269
+#: .\msghandle\botcmd\command\ar.py:272
 msgid "For more ranking data, please visit {}{}."
 msgstr "瀏覽 {}{} 以獲取詳細資訊。"
 
-#: .\msghandle\botcmd\command\ar.py:276
+#: .\msghandle\botcmd\command\ar.py:279
 msgid "No ranking data available for now."
 msgstr "無可用排行資訊。"
 
@@ -3135,6 +3143,7 @@ msgid "Main Settings"
 msgstr "主設定"
 
 #: .\templates\ar\add-main.html:8 .\templates\ar\add-main.html:9
+#: .\templates\ar\rk-module.html:10 .\templates\ar\rk-uniquekw.html:10
 msgid "Keyword"
 msgstr "關鍵字"
 
@@ -3230,7 +3239,7 @@ msgstr "屬性"
 msgid ""
 "You must have the access pinned module permission in the channel to "
 "configure this."
-msgstr "你必須擁有更動置頂回復組的權限以調整此設定。"
+msgstr "你必須擁有更動置頂回覆組的權限以調整此設定。"
 
 #: .\templates\ar\add-props.html:12
 msgid "Pinned"
@@ -3436,6 +3445,84 @@ msgstr "提交中..."
 msgid "Last Submission Status Updated on "
 msgstr "提交狀態更新時間: "
 
+#: .\templates\ar\rk-channel.html:9 .\templates\info\channel\main.html:53
+msgid "Auto-Reply Ranking"
+msgstr "自動回覆排行"
+
+#: .\templates\ar\rk-channel.html:16 .\templates\info\botstats\main.html:17
+#: .\templates\info\channel\main.html:17
+#: .\templates\info\msgstats\main.html:17
+#: .\templates\info\recent\message.html:17
+msgid ""
+"The channel is marked inaccessible for Jelly Bot, so the data of this "
+"channel will not update."
+msgstr "機器人已標記此頻道無法存取，所以此頻道的資訊不會再更新。"
+
+#: .\templates\ar\rk-channel.html:24 .\templates\ar\rk-channel.html:64
+#: .\templates\info\botstats\main.html:25
+#: .\templates\info\msgstats\main.html:25
+#: .\templates\info\recent\message.html:25
+msgid "Parameters"
+msgstr "參數"
+
+#: .\templates\ar\rk-channel.html:32 .\templates\info\recent\message.html:33
+msgid "Limit"
+msgstr "最高限制"
+
+#: .\templates\ar\rk-channel.html:38
+msgid "results"
+msgstr "個結果"
+
+#: .\templates\ar\rk-channel.html:44
+#, python-format
+msgid ""
+"Leaving this blank and refresh will get the maximum count of the results."
+"<br> This cannot exceed %(max)s."
+msgstr "此欄留空併重整頁面以獲得最多結果。<br>最多顯示%(max)s個結果。"
+
+#: .\templates\ar\rk-channel.html:55 .\templates\info\botstats\main.html:51
+#: .\templates\info\msgstats\main.html:51
+#: .\templates\info\recent\message.html:56
+msgid "Refresh"
+msgstr "重整"
+
+#: .\templates\ar\rk-channel.html:70
+msgid "Module Usage Ranking"
+msgstr "自動回覆組使用排行"
+
+#: .\templates\ar\rk-channel.html:82
+msgid "Unique Keyword Ranking"
+msgstr "回覆組關鍵字排行"
+
+#: .\templates\ar\rk-list.html:9
+msgid "Auto-Reply Ranking Channel List"
+msgstr "自動回覆排行頻道清單"
+
+#: .\templates\ar\rk-module.html:8
+msgid "Count"
+msgstr "次數"
+
+#: .\templates\ar\rk-module.html:9 .\templates\ar\rk-uniquekw.html:9
+msgid "Keyword Type"
+msgstr "關鍵字種類"
+
+#: .\templates\ar\rk-module.html:11
+msgid "First Response Type"
+msgstr "第一回覆種類"
+
+#: .\templates\ar\rk-module.html:12
+msgid "First Response"
+msgstr "第一回覆"
+
+#: .\templates\ar\rk-uniquekw.html:8
+#: .\templates\info\components\bot_chart_usage.html:15
+msgid "Usage Count"
+msgstr "使用次數"
+
+#: .\templates\ar\rk-uniquekw.html:11
+msgid "Module Count"
+msgstr "回覆組數量"
+
 #: .\templates\base\base.html:9
 msgid "Auto reply-based web application."
 msgstr "以自動回覆為基礎的線上應用程式。"
@@ -3466,6 +3553,11 @@ msgstr "更新於"
 #: .\templates\base\footer.html:15
 msgid "Stable ver."
 msgstr "穩定版"
+
+#: .\templates\base\footer.html:18
+#, python-format
+msgid "Booted on %(boot_dt)s."
+msgstr "於 %(boot_dt)s 開機。"
 
 #: .\templates\components\navbar.html:10
 msgid "Toggle Nav Bar"
@@ -3753,23 +3845,10 @@ msgstr "(預留欄位)"
 msgid "More Details"
 msgstr "詳細"
 
-#: .\templates\info\botstats\main.html:10 .\templates\info\channel\main.html:87
+#: .\templates\info\botstats\main.html:10
+#: .\templates\info\channel\main.html:94
 msgid "Bot Feature Usage Statistics"
 msgstr "機器人使用統計"
-
-#: .\templates\info\botstats\main.html:17 .\templates\info\channel\main.html:17
-#: .\templates\info\msgstats\main.html:17
-#: .\templates\info\recent\message.html:17
-msgid ""
-"The channel is marked inaccessible for Jelly Bot, so the data of this "
-"channel will not update."
-msgstr "機器人已標記此頻道無法存取，所以此頻道的資訊不會再更新。"
-
-#: .\templates\info\botstats\main.html:25
-#: .\templates\info\msgstats\main.html:25
-#: .\templates\info\recent\message.html:25
-msgid "Parameters"
-msgstr "參數"
 
 #: .\templates\info\botstats\main.html:33
 #: .\templates\info\msgstats\main.html:33
@@ -3785,12 +3864,6 @@ msgstr "小時"
 #: .\templates\info\msgstats\main.html:44
 msgid "Leave this blank and refresh to get all-time record."
 msgstr "留空和重整頁面以獲得全時紀錄。"
-
-#: .\templates\info\botstats\main.html:51
-#: .\templates\info\msgstats\main.html:51
-#: .\templates\info\recent\message.html:56
-msgid "Refresh"
-msgstr "重整"
 
 #: .\templates\info\botstats\main.html:64
 #: .\templates\info\msgstats\main.html:64
@@ -3817,7 +3890,7 @@ msgstr "頻道資訊"
 msgid "Shortcuts"
 msgstr "捷徑"
 
-#: .\templates\info\channel\main.html:36 .\templates\info\channel\main.html:56
+#: .\templates\info\channel\main.html:36 .\templates\info\channel\main.html:63
 #: .\templates\info\chcoll\main.html:77
 msgid "Message Statistics"
 msgstr "訊息統計"
@@ -3826,30 +3899,30 @@ msgstr "訊息統計"
 msgid "Bot Feature Usage"
 msgstr "機器人功能使用"
 
-#: .\templates\info\channel\main.html:46
+#: .\templates\info\channel\main.html:48
 #: .\templates\info\recent\message.html:10
 #: .\templates\info\recent\message.html:125
 msgid "Recent Messages"
 msgstr "近期訊息"
 
-#: .\templates\info\channel\main.html:64 .\templates\info\chcoll\main.html:83
+#: .\templates\info\channel\main.html:71 .\templates\info\chcoll\main.html:83
 msgid "Message Count in 1 Day"
 msgstr "訊息量(1日)"
 
-#: .\templates\info\channel\main.html:66 .\templates\info\channel\main.html:75
+#: .\templates\info\channel\main.html:73 .\templates\info\channel\main.html:82
 #: .\templates\info\chcoll\main.html:85 .\templates\info\chcoll\main.html:94
 msgid "Total Messages: "
 msgstr "總訊息量: "
 
-#: .\templates\info\channel\main.html:73 .\templates\info\chcoll\main.html:92
+#: .\templates\info\channel\main.html:80 .\templates\info\chcoll\main.html:92
 msgid "Message Count in 7 Days"
 msgstr "訊息量(7日)"
 
-#: .\templates\info\channel\main.html:95
+#: .\templates\info\channel\main.html:102
 msgid "Usage in 7 Days"
 msgstr "7日內統計"
 
-#: .\templates\info\channel\main.html:103
+#: .\templates\info\channel\main.html:110
 msgid "All time usage"
 msgstr "全時統計"
 
@@ -3886,10 +3959,6 @@ msgstr "頻道組代碼"
 #: .\templates\info\chcoll\main.html:59
 msgid "Child Channels"
 msgstr "子頻道"
-
-#: .\templates\info\components\bot_chart_usage.html:15
-msgid "Usage Count"
-msgstr "使用次數"
 
 #: .\templates\info\components\bot_table_count.html:8
 msgid "Feature"
@@ -4026,10 +4095,6 @@ msgstr "否"
 msgid "Permissions"
 msgstr "權限"
 
-#: .\templates\info\recent\message.html:33
-msgid "Limit"
-msgstr "最高限制"
-
 #: .\templates\info\recent\message.html:39
 msgid "messages"
 msgstr "則訊息"
@@ -4129,9 +4194,6 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
-
-#~ msgid "Total Count"
-#~ msgstr "總計次數"
 
 #~ msgid "Total Count: "
 #~ msgstr "訊息總數: "

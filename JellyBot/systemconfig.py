@@ -85,7 +85,7 @@ class DataQuery:
     TagPopularitySearchCount = 10
 
     UserNameCacheSize = 3000
-    UserNameExpirationSeconds = 1  # 1.5 Days / 129600 secs
+    UserNameExpirationSeconds = 129600  # 1.5 Days
 
 
 class ChannelConfig:
