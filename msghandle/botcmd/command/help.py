@@ -18,17 +18,9 @@ def help_text(e: TextMessageEventObject):
     #   - Discord will not change the language
     return [
         HandledMessageEventText(
-            content=str(_("LINE BOT:\n"
-                          "Beta: http://rnnx.cc/LineBeta\n"
-                          "Stable: http://rnnx.cc/LineStable\n"
-                          "\n"
-                          "Discord:\n"
-                          "Beta: http://rnnx.cc/DiscordBeta\n"
-                          "Stable: http://rnnx.cc/DiscordStable\n"
-                          "\n"
-                          "Website:\n"
-                          "Beta: http://rnnx.cc/WebsiteBeta\n"
-                          "Stable: http://rnnx.cc/WebsiteStable")),
+            content=str(_("LINE: http://rnnx.cc/Line\n"
+                          "Discord: http://rnnx.cc/Discord\n"
+                          "Website: http://rnnx.cc/Website")),
             bypass_multiline_check=True
         )
     ]
