@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-12-30 17:55+0800\n"
-"PO-Revision-Date: 2019-12-28 17:18+0800\n"
+"PO-Revision-Date: 2019-12-30 18:02+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -2028,9 +2028,9 @@ msgstr ""
 #: .\msghandle\botcmd\command\ar.py:168
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
-"which type is NOT text. For example, if there is a module which keyword 100"
-"(Text) and another module which keyword is 100(Sticker), both modules will "
-"be deleted if this argument is 100."
+"which type is NOT text. For example, if there is a module which keyword "
+"100(Text) and another module which keyword is 100(Sticker), both modules "
+"will be deleted if this argument is 100."
 msgstr ""
 "要刪除的自動回覆組的關鍵字。請注意，此指令也會刪除關鍵字種類**並非**文字的回"
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
@@ -2124,6 +2124,9 @@ msgid ""
 "Discord: http://rnnx.cc/Discord\n"
 "Website: http://rnnx.cc/Website"
 msgstr ""
+"LINE: http://rnnx.cc/Line\n"
+"Discord: http://rnnx.cc/Discord\n"
+"Website: http://rnnx.cc/Website"
 
 #: .\msghandle\botcmd\command\id.py:12
 msgid "Information"
@@ -2640,7 +2643,7 @@ msgstr "電子信箱"
 
 #: .\templates\about.html:23
 msgid "App-related info"
-msgstr ""
+msgstr "程式相關資訊"
 
 #: .\templates\about.html:25
 msgid "Deployed on "
@@ -3391,8 +3394,7 @@ msgid "Auto-Reply Ranking"
 msgstr "自動回覆排行"
 
 #: .\templates\ar\rk-channel.html:16 .\templates\info\botstats\main.html:17
-#: .\templates\info\channel\main.html:17
-#: .\templates\info\msgstats\main.html:17
+#: .\templates\info\channel\main.html:17 .\templates\info\msgstats\main.html:17
 #: .\templates\info\recent\message.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
@@ -3478,14 +3480,10 @@ msgid "Jelly Bot"
 msgstr "小水母"
 
 #: .\templates\base\footer.html:7
-#, fuzzy
-#| msgid ""
-#| "Development started on May 18, 2019. Beta test started from Sep 11, "
-#| "2019. / Made by RaenonX"
 msgid ""
 "Development started on May 18, 2019. Started from Sep 11, 2019. / Made by "
 "RaenonX"
-msgstr "2019年05月18日開始開發；2019年09月11日開始試營運。 / 由 醜兔/水母 製作"
+msgstr "2019年05月18日開始開發；2019年09月11日開始營運。 / 由 醜兔/水母 製作"
 
 #: .\templates\base\footer.html:12
 msgid "updated at"
@@ -3782,8 +3780,7 @@ msgstr "(預留欄位)"
 msgid "More Details"
 msgstr "詳細"
 
-#: .\templates\info\botstats\main.html:10
-#: .\templates\info\channel\main.html:94
+#: .\templates\info\botstats\main.html:10 .\templates\info\channel\main.html:94
 msgid "Bot Feature Usage Statistics"
 msgstr "機器人使用統計"
 
