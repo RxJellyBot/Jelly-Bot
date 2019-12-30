@@ -38,7 +38,7 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
         ret.append("")
 
         for tmr in crs2:
-            ret.append(_("{event} has timed up! (at {time})").format(
+            ret.append(_("- {event} has timed up! (at {time})").format(
                 event=tmr.title, time=localtime(tmr.target_time, e.user_model.config.tzinfo)
             ))
 
@@ -51,7 +51,7 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
         ret.append("")
 
         for tmr in crs:
-            ret.append(_("{event} will time up after [{diff}]! (at {time})").format(
+            ret.append(_("- {event} will time up after [{diff}]! (at {time})").format(
                 event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                 time=localtime(tmr.target_time, e.user_model.config.tzinfo)
             ))

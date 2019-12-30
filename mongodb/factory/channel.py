@@ -112,9 +112,15 @@ class ChannelManager(BaseCollection):
 
         return self.find_one_casted(filter_, parse_cls=ChannelModel)
 
-    def get_channel_dict(self, channel_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelModel]:
+    def get_channel_dict(self, channel_oid_list: List[ObjectId], accessbible_only: bool = False) \
+            -> Dict[ObjectId, ChannelModel]:
+        filter_ = {OID_KEY: {"$in": channel_oid_list}}
+
+        if accessbible_only:
+            filter_[ChannelModel.BotAccessible.key] = True
+
         return {model.id: model for model
-                in self.find_cursor_with_count({OID_KEY: {"$in": channel_oid_list}}, parse_cls=ChannelModel)}
+                in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
 
     @param_type_ensure
     def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:

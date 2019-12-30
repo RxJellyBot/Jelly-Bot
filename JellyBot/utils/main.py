@@ -53,6 +53,14 @@ def get_channel_data(kwargs) -> ChannelDataGetResult:
     return ChannelDataGetResult(ok=model is not None, model=model, oid_org=channel_oid_str)
 
 
+def get_limit(param_dict, max_: Optional[int] = None):
+    limit = safe_cast(param_dict.get("limit"), int)
+    if limit and max_:
+        return min(limit, max_)
+    else:
+        return max_
+
+
 # Obtained and modified from https://stackoverflow.com/a/57897422
 def load_server():
     apps.app_configs = OrderedDict()

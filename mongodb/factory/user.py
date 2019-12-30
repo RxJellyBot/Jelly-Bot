@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -202,7 +202,7 @@ class RootUserManager(BaseCollection):
 
                 if onplat_data:
                     return UserNameQuery(
-                        user_id=root_oid, user_name=onplat_data.get_name(channel_data))
+                        user_id=root_oid, user_name=onplat_data.get_name_str(channel_data))
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
@@ -257,6 +257,14 @@ class RootUserManager(BaseCollection):
             if d.has_onplat_data:
                 for onplat_oid in d.on_plat_oids:
                     ret[onplat_oid] = d.id
+
+        return ret
+
+    def get_root_to_onplat_dict(self) -> Dict[ObjectId, List[ObjectId]]:
+        ret = {}
+        for d in self.find_cursor_with_count(
+                {RootUserModel.OnPlatOids.key: {"$exists": True}}, parse_cls=RootUserModel):
+            ret[d.id] = d.on_plat_oids
 
         return ret
 

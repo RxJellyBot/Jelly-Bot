@@ -9,6 +9,7 @@ import pymongo
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
+from extutils.utils import enumerate_ranking
 from extutils.dt import now_utc_aware, localtime
 from flags import BotFeature, MessageType
 from models.field import (
@@ -242,17 +243,25 @@ class BotFeatureUsageResult:
     KEY = "count"
 
     def __init__(self, cursor, incl_not_used: bool):
-        FeatureUsageEntry = namedtuple("FeatureUsageEntry", ["feature_name", "count"])
+        FeatureUsageEntry = namedtuple("FeatureUsageEntry", ["feature_name", "count", "rank"])
 
-        self.data = [
-            FeatureUsageEntry(feature_name=BotFeature.cast(d[OID_KEY]).key, count=d[BotFeatureUsageResult.KEY])
-            for d in cursor
-        ]
+        self.data = []
+        for rank, d in enumerate_ranking(
+                cursor, is_equal=lambda cur, prv: cur[BotFeatureUsageResult.KEY] == prv[BotFeatureUsageResult.KEY]):
+            try:
+                feature = BotFeature.cast(d[OID_KEY]).key
+
+                self.data.append(
+                    FeatureUsageEntry(feature_name=feature, count=d[BotFeatureUsageResult.KEY], rank=rank)
+                )
+            except TypeError:
+                # Skip if the code has been added in the newer build but not in the current executing build
+                pass
 
         if incl_not_used:
             diff = {feature for feature in BotFeature}.difference({BotFeature.cast(d[OID_KEY]) for d in cursor})
             for diff_ in diff:
-                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0))
+                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0, rank=1))
 
         self.chart_label = [d.feature_name for d in self.data]
         self.chart_data = [d.count for d in self.data]
