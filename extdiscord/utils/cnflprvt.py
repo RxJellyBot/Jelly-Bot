@@ -4,18 +4,17 @@ from discord import Guild, Status
 
 __all__ = ["initialize", "prioritized_bot_exists"]
 
-print("Discord Bot Conflict Preventer is active. "
+print("Discord Bot Conflict Preventer is active.\n"
       "Disable this by deleting the usage of `log_bot_presence` and `prioritized_bot_exists` in `extdiscord.core` "
-      "if you forked the code repository.")
+      "if you don't have 1+ Discord bot.")
 
 LOCAL_BOT_ID = 623262302510252032
-BETA_BOT_ID = 621537611026137118
-STABLE_BOT_ID = 621539717841944587
+STABLE_BOT_ID = 621537611026137118
 
 
 id_list_checked = False
 
-id_to_check = [LOCAL_BOT_ID, BETA_BOT_ID, STABLE_BOT_ID]
+id_to_check = [LOCAL_BOT_ID, STABLE_BOT_ID]
 
 
 def prioritized_bot_exists(dc_guild: Optional[Guild]):
