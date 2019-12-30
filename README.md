@@ -4,23 +4,11 @@ Supported on Discord and LINE. Feel free to add it to your group!
 
 
 
-LINE Bot:
+LINE Bot: http://rnnx.cc/Line
 
-- Beta: http://rnnx.cc/LineBeta
+Discord Bot: http://rnnx.cc/Discord
 
-- Stable: http://rnnx.cc/LineStable
-
-Discord:
-
-- Beta: http://rnnx.cc/DiscordBeta
-
-- Stable: http://rnnx.cc/DiscordStable
-
-Website:
-
-- Beta: http://rnnx.cc/WebsiteBeta
-
-- Stable: http://rnnx.cc/WebsiteStable
+Website: http://rnnx.cc/Website
 
 ### See [Latest Release](https://github.com/RaenonX/Jelly-Bot/releases/latest) for the latest features list!
 

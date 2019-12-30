@@ -4,15 +4,12 @@
 <footer class="container" style="font-size: small">
     <div class="row">
         <div class="col">
-            {% trans "Development started on May 18, 2019. Beta test started from Sep 11, 2019. / Made by RaenonX" %}
+            {% trans "Development started on May 18, 2019. Started from Sep 11, 2019. / Made by RaenonX" %}
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md">
-            <a href="http://jelly.beta.raenonx.cc" target="_blank">{% trans "Beta ver." %}</a>&nbsp;{% trans "updated at" %}&nbsp;{{ beta_update }}
-        </div>
-        <div class="col-md">
-            <a href="http://jelly.raenonx.cc" target="_blank">{% trans "Stable ver." %}</a>&nbsp;{% trans "updated at" %}&nbsp;{{ stable_update }}
+            {% trans "updated at" %}&nbsp;{{ app_update }}
         </div>
         <div class="col-md">
             {% blocktrans trimmed %}

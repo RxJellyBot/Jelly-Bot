@@ -60,11 +60,9 @@ ALLOWED_HOSTS = [
     'testserver',
     'localhost',
     '127.0.0.1',
-    'jelly.raenonx.cc',
-    'jelly.beta.raenonx.cc',
+    'bot.raenonx.cc',
     # Allowed URLs of Heroku's for LINE Bot webhook
-    'newjellybot.herokuapp.com',
-    'newjellybot-beta.herokuapp.com'
+    'newjellybot.herokuapp.com'
 ]
 
 INSTALLED_APPS = [
