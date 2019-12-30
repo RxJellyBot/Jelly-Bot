@@ -7,6 +7,7 @@ from discord import (
     GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel,
     Activity, ActivityType)
 
+from bot.event import signal_discord_ready
 from extdiscord.utils import channel_full_repr
 from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
@@ -28,9 +29,10 @@ class DiscordClient(Client):
     async def on_ready(self):
         from msghandle.botcmd.command import cmd_help
 
-        DISCORD.logger.info(f"Logged on as {self.user}.")
+        DISCORD.logger.info(f"Logged in as {self.user}.")
 
         initialize(self.user.id)
+        signal_discord_ready()
 
         await self.change_presence(activity=Activity(name=cmd_help.get_usage(), type=ActivityType.watching))
 
