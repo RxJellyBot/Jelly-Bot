@@ -14,6 +14,8 @@ def _perform_existence_check_(set_name_to_cache: bool):
     list_prof_conn = list(ProfileManager.get_available_connections())
 
     def fn():
+        marked_unavailable = 0
+
         dict_onplat_oids = RootUserManager.get_root_to_onplat_dict()
         dict_onplat_data = RootUserManager.get_onplat_data_dict()
         dict_channel = ChannelManager.get_channel_dict([p.channel_oid for p in list_prof_conn], accessbible_only=True)
@@ -29,7 +31,11 @@ def _perform_existence_check_(set_name_to_cache: bool):
             executor.shutdown(False)
 
             for completed in futures:
-                completed.result()
+                ret = completed.result()
+                if ret:
+                    marked_unavailable += 1
+
+        print(f"Marked {marked_unavailable} connections unavailable.")
 
     print(f"Performing user channel existence check on {len(list_prof_conn)} connections...")
 
@@ -43,15 +49,16 @@ def _check_on_prof_conn_(
         set_name_to_cache: bool,
         dict_onplat_oids: Dict[ObjectId, List[ObjectId]],
         dict_onplat_data: Dict[ObjectId, OnPlatformUserModel],
-        dict_channel: Dict[ObjectId, ChannelModel]):
+        dict_channel: Dict[ObjectId, ChannelModel]) -> bool:
+    """Return `True` if marked unavailable. Otherwise `False`."""
     oid_user = prof_conn.user_oid
     list_onplat_oids = dict_onplat_oids.get(oid_user)
     if not list_onplat_oids:
-        return
+        return False
 
     model_channel = dict_channel.get(prof_conn.channel_oid)
     if not model_channel:
-        return
+        return False
 
     attempts = 0
     attempts_allowed = len(list_onplat_oids)
@@ -78,6 +85,8 @@ def _check_on_prof_conn_(
 
     if attempts >= attempts_allowed:
         ProfileManager.mark_unavailable_async(model_channel.id, oid_user)
+
+    return attempts >= attempts_allowed
 
 
 def perform_existence_check(set_name_to_cache: bool):
