@@ -13,8 +13,7 @@ class System:
     PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
 
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
-    HerokuAppNameBeta = "newjellybot-beta"
-    HerokuAppNameStable = "newjellybot"
+    HerokuAppName = "newjellybot"
 
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000
