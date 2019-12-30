@@ -10,5 +10,5 @@ class JellyBotAppConfig(AppConfig):
 
     def ready(self):
         load_handling_functions()
-        perform_existence_check(set_name_to_cache=True)  # This may need to be executed after the app is fully prepared.
+        # perform_existence_check(set_name_to_cache=True)
         record_boot_dt()
