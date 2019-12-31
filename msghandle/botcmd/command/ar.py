@@ -8,6 +8,7 @@ from extutils.emailutils import MailSender
 from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
 from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
+from models.utils import AutoReplyValidators
 from mongodb.utils import CursorWithCount
 from mongodb.factory import AutoReplyManager, ExecodeManager
 from mongodb.factory.results import WriteOutcome
@@ -18,9 +19,7 @@ from ._base_ import CommandNode
 
 __all__ = ["cmd_main"]
 
-# ------------- Command Nodes
-
-# ----- New
+# ----------------------- Command Nodes
 
 cmd_main = CommandNode(
     codes=["ar", "auto"], order_idx=0, name=_("Auto Reply"),
@@ -134,6 +133,10 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
 )
 def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
     kw_type = AutoReplyContentType.determine(keyword)
+    # Issue #124
+    if not AutoReplyValidators.is_valid_content(kw_type, keyword, online_check=True):
+        kw_type = AutoReplyContentType.TEXT
+
     resp_type = AutoReplyContentType.determine(response)
 
     add_result = AutoReplyManager.add_conn_complete(
