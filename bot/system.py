@@ -1,8 +1,15 @@
 from extutils.dt import now_utc_aware
 
-boot_dt_utc = None
+
+__all__ = ["get_boot_dt", "record_boot_dt"]
+
+
+boot_dt_utc = {"dt": None}
+
+
+def get_boot_dt():
+    return boot_dt_utc["dt"]
 
 
 def record_boot_dt():
-    global boot_dt_utc
-    boot_dt_utc = now_utc_aware()
+    boot_dt_utc["dt"] = now_utc_aware()
