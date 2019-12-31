@@ -138,6 +138,9 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
         kw_type = AutoReplyContentType.TEXT
 
     resp_type = AutoReplyContentType.determine(response)
+    # Issue #124
+    if not AutoReplyValidators.is_valid_content(resp_type, response, online_check=True):
+        resp_type = AutoReplyContentType.TEXT
 
     add_result = AutoReplyManager.add_conn_complete(
         keyword, kw_type, [AutoReplyContentModel(Content=response, ContentType=resp_type)],
