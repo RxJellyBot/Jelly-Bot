@@ -1,8 +1,16 @@
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        $("table.datatable").DataTable({
-            paging: false
-        });
+        $("table.datatable").each(function () {
+            let config = {
+                paging: false
+            };
+
+            if ($(this).hasClass("datatable-sort")) {
+                config["order"] = [[parseInt($(this).data("sortidx")), $(this).data("sortorder")]]
+            }
+
+            $(this).DataTable(config);
+        })
     });
 </script>
