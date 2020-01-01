@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<div class="table-responsive table-freeze-header table-freeze-first-col" style="max-height: 35rem">
+    <table class="table table-hover table-bordered table-bordered mb-0 datatable datatable-sort"
+           data-sortidx="1" data-sortorder="desc">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "Member Name" %}</th>
+            <th scope="col" class="text-center no-line-break">{% trans "Total Count" %}</th>
+            {% for date in message_data.label_dates %}
+                <th scope="col" class="text-center no-line-break">{{ date }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for entry in message_data.entries %}
+            <tr>
+                <th class="align-middle text-center no-line-break">{{ entry.member_name }}</th>
+                <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_total }}</code></td>
+                {% for ct in entry.count_list %}
+                    <td class="align-middle text-center h5 font-weight-normal">{{ ct }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

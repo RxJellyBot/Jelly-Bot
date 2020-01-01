@@ -62,8 +62,8 @@
       "description": "Token for discord bot.",
       "required": true
     },
-    "HOST_URL": {
-      "description": "The URL of the app. Including protocol. Excluding slash.",
+    "HTTP_HOST": {
+      "description": "The domain of the app excluding protocol and the ending slash. For example, bot.raenonx.cc",
       "required": true
     },
     "SERVICE_SHORT_URL": {

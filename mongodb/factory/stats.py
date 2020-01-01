@@ -13,7 +13,7 @@ from mongodb.factory.results import RecordAPIStatisticsResult
 from mongodb.utils import CursorWithCount
 from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult, \
-    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult
+    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult, MemberDailyMessageResult
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -189,6 +189,33 @@ class MessageRecordStatisticsManager(BaseCollection):
         ]
 
         return DailyMessageResult(
+            list(self.aggregate(pipeline)), HourlyResult.data_days_collected(self, match_d, hours_within), tzinfo_)
+
+    def member_daily_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], hours_within: Optional[int] = None,
+            tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
+            MemberDailyMessageResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        self._attach_hours_within_(match_d, hours_within)
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {
+                    MemberDailyMessageResult.KEY_DATE: {
+                        "$dateToString": {
+                            "date": "$_id",
+                            "format": "%Y-%m-%d",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    },
+                    MemberDailyMessageResult.KEY_MEMBER: "$" + MessageRecordModel.UserRootOid.key
+                },
+                MemberDailyMessageResult.KEY_COUNT: {"$sum": 1}
+            }}
+        ]
+
+        return MemberDailyMessageResult(
             list(self.aggregate(pipeline)), HourlyResult.data_days_collected(self, match_d, hours_within), tzinfo_)
 
 
