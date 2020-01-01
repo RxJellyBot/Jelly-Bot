@@ -6,6 +6,7 @@ from datetime import tzinfo
 from bson import ObjectId
 
 from extutils.dt import now_utc_aware, localtime
+from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import ChannelModel, ChannelCollectionModel, MemberMessageResult, MessageRecordModel
 from mongodb.factory import (
@@ -21,20 +22,32 @@ class UserMessageStatsEntry:
     total_count: int
     total_count_ratio: float
     category_count: List[NamedTuple]
+    rank: int = field(default=1, init=False)
 
     @property
     def ratio_pct_str(self) -> str:
         return f"{self.total_count_ratio:.02%}"
 
+    def set_rank(self, rank: int):
+        self.rank = rank
+
 
 @dataclass
 class UserMessageStats:
-    member_stats: List[UserMessageStatsEntry]
+    org_stats: InitVar[List[UserMessageStatsEntry]]
+    member_stats: List[UserMessageStatsEntry] = field(init=False)
     msg_count: int
     label_category: List[MessageType]
 
-    def __post_init__(self):
-        self.member_stats = list(sorted(self.member_stats, key=lambda x: x.total_count, reverse=True))
+    def __post_init__(self, org_stats: List[UserMessageStatsEntry]):
+        self.member_stats = []
+        # Disabling T-prefix for datatable sorting in the webpage
+        for rank, data in enumerate_ranking(
+                list(sorted(org_stats, key=lambda x: x.total_count, reverse=True)),
+                is_equal=lambda cur, prv: cur.total_count == prv.total_count,
+                t_prefix=False):
+            data.set_rank(rank)
+            self.member_stats.append(data)
 
 
 @dataclass
@@ -143,10 +156,10 @@ class MessageStatsDataProcessor:
                 )
 
             return UserMessageStats(
-                member_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
+                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
         else:
             return UserMessageStats(
-                member_stats=[], msg_count=0, label_category=msg_result.label_category)
+                org_stats=[], msg_count=0, label_category=msg_result.label_category)
 
     @staticmethod
     def _get_user_msg_ranking_(
