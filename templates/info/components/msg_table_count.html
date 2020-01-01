@@ -20,7 +20,7 @@
         {% for entry in message_data.member_stats %}
             <tr>
                 <th class="align-middle text-center no-line-break">{{ entry.user_name }}</th>
-                <td class="align-middle text-center">{{ forloop.counter }}</td>
+                <td class="align-middle text-center">{{ entry.rank }}</td>
                 <td class="align-middle text-center h5 font-weight-normal">{{ entry.total_count }}</td>
                 <td class="align-middle text-center">
                     <code class="h6">
