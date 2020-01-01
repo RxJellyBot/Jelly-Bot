@@ -137,6 +137,16 @@
                 {% include "info/components/msg_table_count.html" with message_data=channel_user_msg simplified=False only %}
             </div>
         </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Member Daily Message Count" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_table_user_daily.html" with message_data=msg_daily_user only %}
+            </div>
+        </div>
     </div>
 {% endblock %}
 

@@ -8,6 +8,7 @@ from extutils.emailutils import MailSender
 from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
 from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
+from models.utils import AutoReplyValidators
 from mongodb.utils import CursorWithCount
 from mongodb.factory import AutoReplyManager, ExecodeManager
 from mongodb.factory.results import WriteOutcome
@@ -18,9 +19,7 @@ from ._base_ import CommandNode
 
 __all__ = ["cmd_main"]
 
-# ------------- Command Nodes
-
-# ----- New
+# ----------------------- Command Nodes
 
 cmd_main = CommandNode(
     codes=["ar", "auto"], order_idx=0, name=_("Auto Reply"),
@@ -133,8 +132,22 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
+    ret = []
     kw_type = AutoReplyContentType.determine(keyword)
+    # Issue #124
+    if not AutoReplyValidators.is_valid_content(kw_type, keyword, online_check=True):
+        kw_type = AutoReplyContentType.TEXT
+        ret.append(HandledMessageEventText(
+            content=_("The type of the keyword has been automatically set to `TEXT` "
+                      "because the validation was failed.")))
+
     resp_type = AutoReplyContentType.determine(response)
+    # Issue #124
+    if not AutoReplyValidators.is_valid_content(resp_type, response, online_check=True):
+        resp_type = AutoReplyContentType.TEXT
+        ret.append(HandledMessageEventText(
+            content=_("The type of the response has been automatically set to `TEXT` "
+                      "because the validation was failed.")))
 
     add_result = AutoReplyManager.add_conn_complete(
         keyword, kw_type, [AutoReplyContentModel(Content=response, ContentType=resp_type)],
@@ -143,20 +156,21 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
         Bot.AutoReply.DefaultCooldownSecs)
 
     if add_result.outcome.is_success:
-        return [HandledMessageEventText(
+        ret.append(HandledMessageEventText(
             content=_(
                 "Auto-Reply module successfully registered.\n"
                 "Keyword Type: {}\n"
                 "Response Type: {}").format(
                 kw_type.key, resp_type.key),
-            bypass_multiline_check=True)]
+            bypass_multiline_check=True))
     else:
-        return [
-            HandledMessageEventText(
+        ret.append(HandledMessageEventText(
                 content=_("Failed to register the Auto-Reply module.\n"
                           "Code: `{}`\n"
                           "Visit {} to see the code explanation.").format(
-                    add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+                    add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
+
+    return ret
 
 
 # ----------------------- Delete

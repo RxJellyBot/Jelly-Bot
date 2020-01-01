@@ -6,6 +6,7 @@ from datetime import tzinfo
 from bson import ObjectId
 
 from extutils.dt import now_utc_aware, localtime
+from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import ChannelModel, ChannelCollectionModel, MemberMessageResult, MessageRecordModel
 from mongodb.factory import (
@@ -21,20 +22,32 @@ class UserMessageStatsEntry:
     total_count: int
     total_count_ratio: float
     category_count: List[NamedTuple]
+    rank: int = field(default=1, init=False)
 
     @property
     def ratio_pct_str(self) -> str:
         return f"{self.total_count_ratio:.02%}"
 
+    def set_rank(self, rank: int):
+        self.rank = rank
+
 
 @dataclass
 class UserMessageStats:
-    member_stats: List[UserMessageStatsEntry]
+    org_stats: InitVar[List[UserMessageStatsEntry]]
+    member_stats: List[UserMessageStatsEntry] = field(init=False)
     msg_count: int
     label_category: List[MessageType]
 
-    def __post_init__(self):
-        self.member_stats = list(sorted(self.member_stats, key=lambda x: x.total_count, reverse=True))
+    def __post_init__(self, org_stats: List[UserMessageStatsEntry]):
+        self.member_stats = []
+        # Disabling T-prefix for datatable sorting in the webpage
+        for rank, data in enumerate_ranking(
+                list(sorted(org_stats, key=lambda x: x.total_count, reverse=True)),
+                is_equal=lambda cur, prv: cur.total_count == prv.total_count,
+                t_prefix=False):
+            data.set_rank(rank)
+            self.member_stats.append(data)
 
 
 @dataclass
@@ -109,6 +122,22 @@ class HandledMessageRecords:
             self.message_frequency = 0.0
 
 
+@dataclass
+class UserDailyMessageEntry:
+    member_name: str
+    count_list: List[int]
+    count_total: int = field(init=False)
+
+    def __post_init__(self):
+        self.count_total = sum(self.count_list)
+
+
+@dataclass
+class UserDailyMessageResult:
+    label_dates: List[str]
+    entries: List[UserDailyMessageEntry]
+
+
 class MessageStatsDataProcessor:
     @staticmethod
     def _get_user_msg_stats_(msg_result: MemberMessageResult, ch_data: ChannelModel = None) -> UserMessageStats:
@@ -143,10 +172,10 @@ class MessageStatsDataProcessor:
                 )
 
             return UserMessageStats(
-                member_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
+                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
         else:
             return UserMessageStats(
-                member_stats=[], msg_count=0, label_category=msg_result.label_category)
+                org_stats=[], msg_count=0, label_category=msg_result.label_category)
 
     @staticmethod
     def _get_user_msg_ranking_(
@@ -159,6 +188,26 @@ class MessageStatsDataProcessor:
                 return UserMessageRanking(rank=idx, total=len(data))
 
         return UserMessageRanking(rank=-1, total=len(data))
+
+    @staticmethod
+    def get_user_daily_message(channel_data: ChannelModel, hours_within: Optional[int] = None,
+                               tz: Optional[tzinfo] = None) \
+            -> UserDailyMessageResult:
+        uname_dict = IdentitySearcher.get_batch_user_name(
+            [d.user_oid for d in ProfileManager.get_channel_members(channel_data.id, available_only=True)],
+            channel_data)
+        result = MessageRecordStatisticsManager.member_daily_message_count(channel_data.id, hours_within, tz)
+
+        count_proc = {oid: [] for oid in uname_dict.keys()}
+        for date in result.dates:
+            data_of_date = result.data[date]
+            for oid in count_proc.keys():
+                count_proc[oid].append(data_of_date.get(oid, 0))
+
+        entries = [UserDailyMessageEntry(member_name=name, count_list=count_proc[oid])
+                   for oid, name in uname_dict.items()]
+
+        return UserDailyMessageResult(label_dates=result.dates, entries=entries)
 
     @staticmethod
     def get_user_channel_messages(

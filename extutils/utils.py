@@ -135,7 +135,7 @@ def enumerate_ranking(iterable, start=1, t_prefix=True, is_equal: callable = lam
             yield f"T{rank}" if t_prefix else rank, d
 
         if len(temp) > 0:
-            yield f"T{rank}", prev
+            yield f"T{rank}" if t_prefix else rank, prev
         else:
             yield str(rank) if t_prefix else rank, prev
 
