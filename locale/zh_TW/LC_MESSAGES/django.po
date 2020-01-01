@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-30 17:55+0800\n"
-"PO-Revision-Date: 2019-12-30 18:02+0800\n"
+"POT-Creation-Date: 2020-01-02 05:18+0800\n"
+"PO-Revision-Date: 2020-01-02 05:21+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -273,7 +273,7 @@ msgstr "頻道資訊搜尋"
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:82 .\JellyBot\views\nav.py:132
+#: .\JellyBot\views\info\msgstats.py:88 .\JellyBot\views\nav.py:132
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -317,7 +317,7 @@ msgstr "頻道登錄"
 msgid "Integrate Account"
 msgstr "整合帳號"
 
-#: .\JellyBot\views\nav.py:98 .\msghandle\botcmd\command\ar.py:26
+#: .\JellyBot\views\nav.py:98 .\msghandle\botcmd\command\ar.py:25
 #: .\templates\index.html:19
 msgid "Auto Reply"
 msgstr "自動回覆"
@@ -1276,7 +1276,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:125 .\models\stats.py:331
+#: .\models\stats.py:141 .\models\stats.py:349
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -1887,11 +1887,11 @@ msgstr ""
 "\"A B\" C`。\n"
 "查閱更多指令使用方法，請瀏覽 {}。"
 
-#: .\msghandle\botcmd\command\ar.py:27
+#: .\msghandle\botcmd\command\ar.py:26
 msgid "Perform operations related to the auto-reply feature."
 msgstr "執行有關於 自動回覆 的指令。"
 
-#: .\msghandle\botcmd\command\ar.py:29
+#: .\msghandle\botcmd\command\ar.py:28
 msgid ""
 "Perform operations related to the auto-reply feature.\n"
 "\n"
@@ -1935,17 +1935,17 @@ msgstr ""
 "\n"
 "- 冷卻時間: `{}` 秒"
 
-#: .\msghandle\botcmd\command\ar.py:58
+#: .\msghandle\botcmd\command\ar.py:57
 msgid ""
 "The Execode obtained else where to complete the auto-reply module "
 "registration."
 msgstr "從其他地方獲取的登錄自動回覆組用的執行碼。"
 
-#: .\msghandle\botcmd\command\ar.py:68
+#: .\msghandle\botcmd\command\ar.py:67
 msgid "Failed to get the Execode data using the Execode `{}`. Code: `{}`"
 msgstr "找不到對應的執行碼 `{}` 的資料。執行結果代碼: `{}`"
 
-#: .\msghandle\botcmd\command\ar.py:77
+#: .\msghandle\botcmd\command\ar.py:76
 msgid ""
 "The ID of the creator of this Execode: `{}` does not match your ID: `{}`.\n"
 "Only the creator of this Execode can complete this action."
@@ -1953,23 +1953,23 @@ msgstr ""
 "執行碼 `{}` 登錄者ID不符合你的用戶ID: `{}`。\n"
 "只有執行碼登錄者可以完成此行為。"
 
-#: .\msghandle\botcmd\command\ar.py:95
+#: .\msghandle\botcmd\command\ar.py:94
 msgid ""
 "Failed to create auto-reply module. An error report was sent for "
 "investigation."
 msgstr "無法建立自動回覆組。錯誤報告已傳送給開發者以便除錯。"
 
-#: .\msghandle\botcmd\command\ar.py:109
+#: .\msghandle\botcmd\command\ar.py:108
 msgid "Failed to register the auto-reply module. Code: `{}`"
 msgstr ""
 "自動回覆組登錄失敗。\n"
 "代碼: {}"
 
-#: .\msghandle\botcmd\command\ar.py:114
+#: .\msghandle\botcmd\command\ar.py:113
 msgid "Auto-reply module registered."
 msgstr "自動回覆組已登錄。"
 
-#: .\msghandle\botcmd\command\ar.py:121
+#: .\msghandle\botcmd\command\ar.py:120
 msgid ""
 "The message for the auto-reply module to be triggered.\n"
 "\n"
@@ -1983,7 +1983,7 @@ msgstr ""
 "\n"
 "否則，內容種類將會是 **文字** 。"
 
-#: .\msghandle\botcmd\command\ar.py:124
+#: .\msghandle\botcmd\command\ar.py:123
 msgid ""
 "The message for the auto-reply module to respond when triggered.<hr>If the "
 "content **is number**, the content type will be **LINE sticker**.\n"
@@ -2005,7 +2005,19 @@ msgstr ""
 "- 針對 **以.jpg結尾** 的內容 - 請確認開啟該網址時，瀏覽器顯示的只有圖片，而 "
 "**不是** 網頁，否則可能會發生不可預期的情況。"
 
-#: .\msghandle\botcmd\command\ar.py:148
+#: .\msghandle\botcmd\command\ar.py:141
+msgid ""
+"The type of the keyword has been automatically set to `TEXT` because the "
+"validation was failed."
+msgstr "關鍵字驗證失敗。關鍵字種類已自動變更為 `文字`。"
+
+#: .\msghandle\botcmd\command\ar.py:149
+msgid ""
+"The type of the response has been automatically set to `TEXT` because the "
+"validation was failed."
+msgstr "回覆內容驗證失敗。回覆內容種類已自動變更為 `文字`。"
+
+#: .\msghandle\botcmd\command\ar.py:161
 msgid ""
 "Auto-Reply module successfully registered.\n"
 "Keyword Type: {}\n"
@@ -2015,7 +2027,7 @@ msgstr ""
 "關鍵字種類: {}\n"
 "回覆種類: {}"
 
-#: .\msghandle\botcmd\command\ar.py:156
+#: .\msghandle\botcmd\command\ar.py:168
 msgid ""
 "Failed to register the Auto-Reply module.\n"
 "Code: `{}`\n"
@@ -2025,7 +2037,7 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:168
+#: .\msghandle\botcmd\command\ar.py:182
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
 "which type is NOT text. For example, if there is a module which keyword "
@@ -2036,7 +2048,7 @@ msgstr ""
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
 "100(貼圖)。如果這個參數是\"100\"的話，以上這兩組自動回覆組都會被刪除。"
 
-#: .\msghandle\botcmd\command\ar.py:177
+#: .\msghandle\botcmd\command\ar.py:191
 msgid ""
 "Auto-Reply Module deleted.\n"
 "Keyword: {}"
@@ -2044,15 +2056,15 @@ msgstr ""
 "自動回覆組已刪除。\n"
 "關鍵字: {}"
 
-#: .\msghandle\botcmd\command\ar.py:179
+#: .\msghandle\botcmd\command\ar.py:193
 msgid "Insufficient Permission to delete the auto-reply module."
 msgstr "權限不足，故無法刪除回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:181
+#: .\msghandle\botcmd\command\ar.py:195
 msgid "Auto-reply module of the keyword {} not found."
 msgstr "沒有找到關鍵字為 {} 的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:185
+#: .\msghandle\botcmd\command\ar.py:199
 msgid ""
 "Failed to delete the Auto-Reply module.\n"
 "Code: {}\n"
@@ -2062,51 +2074,51 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:207
+#: .\msghandle\botcmd\command\ar.py:221
 msgid "Usable Keywords ({}):"
 msgstr "可用關鍵字 ({}):"
 
-#: .\msghandle\botcmd\command\ar.py:207 .\msghandle\botcmd\command\ar.py:227
+#: .\msghandle\botcmd\command\ar.py:221 .\msghandle\botcmd\command\ar.py:241
 msgid ", "
 msgstr "、"
 
-#: .\msghandle\botcmd\command\ar.py:211
+#: .\msghandle\botcmd\command\ar.py:225
 msgid "No usable auto-reply module in this channel."
 msgstr "此頻道沒有可用的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:217
+#: .\msghandle\botcmd\command\ar.py:231
 msgid ""
 "The search keyword to find the Auto-Reply module. Auto-Reply module which "
 "keyword contains this will be returned."
 msgstr "搜尋自動回覆組的關鍵字。結果中只會有包含此關鍵字的回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:227
+#: .\msghandle\botcmd\command\ar.py:241
 msgid "Usable Keywords:"
 msgstr "可用關鍵字:"
 
-#: .\msghandle\botcmd\command\ar.py:232
+#: .\msghandle\botcmd\command\ar.py:246
 msgid ""
 "Cannot find any auto-reply module including the substring `{}` in their "
 "keyword."
 msgstr "沒有找到任何關鍵字含有 `{}` 的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:242
+#: .\msghandle\botcmd\command\ar.py:256
 msgid "Auto-Reply TOP{} ranking"
 msgstr "自動回覆 前{} 排名"
 
-#: .\msghandle\botcmd\command\ar.py:248
+#: .\msghandle\botcmd\command\ar.py:262
 msgid "# Module usage ranking"
 msgstr "# 自動回覆組使用排行"
 
-#: .\msghandle\botcmd\command\ar.py:265
+#: .\msghandle\botcmd\command\ar.py:279
 msgid "# Unique keyword ranking"
 msgstr "# 回覆組關鍵字排行"
 
-#: .\msghandle\botcmd\command\ar.py:272
+#: .\msghandle\botcmd\command\ar.py:286
 msgid "For more ranking data, please visit {}{}."
 msgstr "瀏覽 {}{} 以獲取詳細資訊。"
 
-#: .\msghandle\botcmd\command\ar.py:279
+#: .\msghandle\botcmd\command\ar.py:293
 msgid "No ranking data available for now."
 msgstr "無可用排行資訊。"
 
@@ -3904,7 +3916,8 @@ msgid "Count"
 msgstr "使用次數"
 
 #: .\templates\info\components\bot_table_member.html:7
-#: .\templates\info\components\msg_table_count.html:7
+#: .\templates\info\components\msg_table_count.html:8
+#: .\templates\info\components\msg_table_user_daily.html:8
 msgid "Member Name"
 msgstr "成員名稱"
 
@@ -3924,11 +3937,11 @@ msgstr "頻道控制"
 msgid "Message Count"
 msgstr "訊息量"
 
-#: .\templates\info\components\msg_table_count.html:9
+#: .\templates\info\components\msg_table_count.html:10
 msgid "Total Messages"
 msgstr "總訊息數"
 
-#: .\templates\info\components\msg_table_count.html:10
+#: .\templates\info\components\msg_table_count.html:11
 #, python-format
 msgid "Total Ratio %%"
 msgstr "總計比例 %%"
@@ -3936,6 +3949,10 @@ msgstr "總計比例 %%"
 #: .\templates\info\components\msg_table_daily.html:7
 msgid "Date"
 msgstr "日期"
+
+#: .\templates\info\components\msg_table_user_daily.html:9
+msgid "Total Count"
+msgstr "訊息總數"
 
 #: .\templates\info\components\recent_msg_table.html:7
 msgid "Timestamp"
@@ -3988,6 +4005,10 @@ msgstr "每日訊息量"
 #: .\templates\info\msgstats\main.html:132
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
+
+#: .\templates\info\msgstats\main.html:142
+msgid "Member Daily Message Count"
+msgstr "成員每日訊息量"
 
 #: .\templates\info\profile.html:9
 msgid "Channel Profile Info"
@@ -4195,9 +4216,6 @@ msgstr "更新目標網址 及 刪除 的功能尚未實作。"
 
 #~ msgid "Stable ver."
 #~ msgstr "穩定版"
-
-#~ msgid "Total Count: "
-#~ msgstr "訊息總數: "
 
 #~ msgid "Message Count / Day"
 #~ msgstr "訊息量 / 日"

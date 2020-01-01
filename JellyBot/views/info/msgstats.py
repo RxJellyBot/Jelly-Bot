@@ -14,6 +14,7 @@ from mongodb.helper import MessageStatsDataProcessor
 
 KEY_MSG_INTV_FLOW = "msg_intvflow_data"
 KEY_MSG_DAILY = "msg_daily_data"
+KEY_MSG_DAILY_USER = "msg_daily_user"
 KEY_MSG_USER_CHANNEL = "channel_user_msg"
 
 
@@ -27,6 +28,10 @@ def _msg_daily_(channel_oid, hours_within, tzinfo):
         channel_oid, hours_within, tzinfo)
 
 
+def _msg_user_daily_(channel_data, hours_within, tzinfo):
+    return KEY_MSG_DAILY_USER, MessageStatsDataProcessor.get_user_daily_message(channel_data, hours_within, tzinfo)
+
+
 def _channel_user_msg_(channel_data, hours_within):
     return KEY_MSG_USER_CHANNEL, MessageStatsDataProcessor.get_user_channel_messages(channel_data, hours_within)
 
@@ -37,6 +42,7 @@ def get_msg_stats_data_package(channel_data, hours_within, tzinfo):
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="MsgStats") as executor:
         futures = [executor.submit(_msg_intv_flow_, channel_data.id, hours_within, tzinfo),
                    executor.submit(_msg_daily_, channel_data.id, hours_within, tzinfo),
+                   executor.submit(_msg_user_daily_, channel_data, hours_within, tzinfo),
                    executor.submit(_channel_user_msg_, channel_data, hours_within)]
 
         # Non-lock call & Free resources when execution is done
