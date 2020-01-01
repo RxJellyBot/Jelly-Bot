@@ -42,7 +42,7 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
                 event=tmr.title, time=localtime(tmr.target_time, e.user_model.config.tzinfo)
             ))
 
-    if not crs.empty:
+    if crs:
         if ret:
             ret.append("-------------")
 
