@@ -14,7 +14,7 @@
         </thead>
         <tbody>
         {% for entry in message_data.entries %}
-            <tr>
+            <tr {% if not entry.available %}class="table-danger" {% endif %}>
                 <th class="align-middle text-center no-line-break">{{ entry.member_name }}</th>
                 <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_total }}</code></td>
                 {% for ct in entry.count_list %}

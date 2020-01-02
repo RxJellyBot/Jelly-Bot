@@ -256,8 +256,8 @@ def auto_reply_ranking(e: TextMessageEventObject):
     ret = [_("Auto-Reply TOP{} ranking").format(Bot.AutoReply.RankingMaxCount)]
 
     # Attach module stats section
-    module_stats = AutoReplyManager.get_module_count_stats(e.channel_oid, Bot.AutoReply.RankingMaxCount)
-    if not module_stats.empty:
+    module_stats = list(AutoReplyManager.get_module_count_stats(e.channel_oid, Bot.AutoReply.RankingMaxCount))
+    if module_stats:
         ret.append("")
         ret.append(_("# Module usage ranking"))
 

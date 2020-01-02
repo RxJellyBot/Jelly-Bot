@@ -110,6 +110,10 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
         return f"{self.code_prefix}{self._code}"
 
     @property
+    def code_str(self) -> str:
+        return f"{self.code_prefix}{self._code}"
+
+    @property
     def code_num(self) -> int:
         return self._code
 
@@ -137,7 +141,7 @@ class FlagEnumMixin:
             if i.code == item:
                 return i
 
-        raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
+        raise TypeError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
 
     @classmethod
     def contains(cls, item):

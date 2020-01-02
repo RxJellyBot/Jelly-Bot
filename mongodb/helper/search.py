@@ -48,13 +48,14 @@ class IdentitySearcher:
         return ret
 
     @staticmethod
-    def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: ChannelModel) -> Dict[ObjectId, str]:
+    def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: ChannelModel,
+                            on_not_found: Optional[str] = None) -> Dict[ObjectId, str]:
         ret = {}
 
         with ThreadPoolExecutor(max_workers=10, thread_name_prefix="GetUserNames") as executor:
             futures = []
             for uid in user_oids:
-                futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, channel_data))
+                futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, channel_data, on_not_found))
 
             # Non-lock call & Free resources when execution is done
             executor.shutdown(False)

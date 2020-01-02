@@ -32,7 +32,7 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         access_ok = []
         access_no = []
-        for channel_conn in ProfileManager.get_user_channel_profiles(root_oid):
+        for channel_conn in ProfileManager.get_user_channel_profiles(root_oid, accessbible_only=False):
             if channel_conn.channel_data.bot_accessible:
                 access_ok.append(channel_conn)
             else:
