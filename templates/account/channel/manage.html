@@ -61,7 +61,7 @@
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            {% with "account/channel/perm/"|concat:perm_cat.code_num|concat:".html" as template %}
+                            {% with "account/channel/perm/"|concat:perm_cat.code|concat:".html" as template %}
                                 {% include template %}
                             {% endwith %}
                         </div>
