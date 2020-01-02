@@ -269,7 +269,7 @@ class ProfileManager:
             profile_oid_list.extend(d.profile_oids)
             prof_conns.append(d)
 
-        channel_dict = ChannelManager.get_channel_dict(channel_oid_list, accessbible_only)
+        channel_dict = ChannelManager.get_channel_dict(channel_oid_list, accessbible_only=False)
         profile_dict = self._prof.get_profile_dict(profile_oid_list)
 
         for prof_conn in prof_conns:
@@ -282,6 +282,8 @@ class ProfileManager:
 
             if cnl is None:
                 not_found_channel.append(cnl_oid)
+                continue
+            elif accessbible_only and not cnl.bot_accessible:
                 continue
 
             # Get Profile Model
