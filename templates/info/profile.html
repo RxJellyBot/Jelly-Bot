@@ -92,7 +92,7 @@
                 <div class="col-lg-4 col-6 list-group-item list-group-item-action mb-0">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ perm_cat.key }}</h5>
-                        {% if profile_data.permission|get_val:perm_cat.code %}
+                        {% if profile_data.permission|get_val:perm_cat.code_str %}
                         <span class="dot bg-success"></span>
                         {% else %}
                         <span class="dot bg-danger"></span>
