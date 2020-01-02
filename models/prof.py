@@ -48,6 +48,10 @@ class ChannelProfileConnectionModel(Model):
     # ProfileOids will be empty list if the user is not in the channel
     ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=True)
 
+    @property
+    def available(self):
+        return len(self.profile_oids) > 0
+
 
 class PermissionPromotionRecordModel(Model):
     SupporterOid = ObjectIDField("s", stores_uid=True)

@@ -19,7 +19,7 @@
         </thead>
         <tbody>
         {% for entry in message_data.member_stats %}
-            <tr>
+            <tr {% if not entry.available %}class="table-danger" {% endif %}>
                 <th class="align-middle text-center no-line-break">{{ entry.user_name }}</th>
                 <td class="align-middle text-center">{{ entry.rank }}</td>
                 <td class="align-middle text-center h5 font-weight-normal">{{ entry.total_count }}</td>
