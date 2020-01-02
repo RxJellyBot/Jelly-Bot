@@ -46,6 +46,13 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-lg mb-3 custom-control custom-checkbox text-center">
+                    <input type="checkbox" class="custom-control-input" name="incl_unav" id="incl-unav" {% if incl_unav %}checked{% endif %}>
+                    <label class="custom-control-label"
+                           for="incl-unav">{% trans "Including Unavailable Members" %}</label>
+                </div>
+            </div>
             <div class="row text-right">
                 <div class="col">
                     <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
