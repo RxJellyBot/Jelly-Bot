@@ -175,11 +175,11 @@ class WriteOutcome(BaseOutcome):
 
     @property
     def is_inserted(self):
-        return self.code_num < -200
+        return self.code < -200
 
     @property
     def data_found(self):
-        return -199 < self.code_num < -100
+        return -199 < self.code < -100
 
 
 class GetOutcome(BaseOutcome):
