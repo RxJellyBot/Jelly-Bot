@@ -114,6 +114,21 @@
             xhr.responseType = "json";
             xhr.send(params);
         }
+
+        function detachProfile(profile_oid) {
+            let url = `{% url "api.id.profile.detach" %}`;
+            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}&{{ static_keys_param.LOCAL_REFER }}=true`;
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.responseType = "json";
+            xhr.send(params);
+        }
+
+        function detachConfirmMesage(name) {
+            return `{% blocktrans trimmed %}Are you sure to detach this profile ${name}?{% endblocktrans %}`;
+        }
     </script>
     <script type="text/javascript" src="{% static "js/account/channel_list.js" %}"></script>
 {% endblock %}
