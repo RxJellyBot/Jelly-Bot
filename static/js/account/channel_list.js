@@ -10,7 +10,7 @@ function onStarBtnClick() {
 }
 
 function onDetachClick() {
-    if (confirm(detachConfirmMesage($(this).data("pname")))) {
+    if (confirm(detachConfirmMessage($(this).data("pname")))) {
         detachProfile($(this).data("poid"));
     }
 }

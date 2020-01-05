@@ -12,7 +12,7 @@ class APIStatisticsCollector(MiddlewareMixin):
     # noinspection PyMethodMayBeStatic
     def process_response(self, request, response):
         api_action = request.session.pop(Session.APIStatisticsCollection.API_ACTION,
-                                         APIStatisticModel.APIAction.default_value)
+                                         APIStatisticModel.ApiAction.default_value)
         dict_response = request.session.pop(Session.APIStatisticsCollection.DICT_RESPONSE,
                                             APIStatisticModel.Response.default_value)
         dict_params = request.session.pop(Session.APIStatisticsCollection.DICT_PARAMS,

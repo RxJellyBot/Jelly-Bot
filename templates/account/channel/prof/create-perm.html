@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<div class="card border-success mb-3">
+    <div class="card-header text-center">{% trans "Permissions" %}</div>
+    <div class="card-body text-success">
+        {% for perm_cat in perm_cats %}
+            <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" name="x-Permission.{{ perm_cat.code }}"
+                           id="Perm.{{ perm_cat.code }}" {% if perm_cat not in perm_cats_controllable %}disabled{% endif %}>
+                    <label class="custom-control-label" for="Perm.{{ perm_cat.code }}">{{ perm_cat.key }}</label>
+                </div>
+            <div class="row mb-2">
+                <div class="col-lg {% if perm_cat not in perm_cats_controllable %}text-secondary{% endif %}">
+                    <small>{{ perm_cat.description }}</small>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

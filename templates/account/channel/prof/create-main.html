@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div class="card border-primary mb-3">
+    <div class="card-header text-center">{% trans "Main Settings" %}</div>
+    <div class="card-body text-primary">
+        <div class="row mb-3">
+            <label class="col-sm-4 col-form-label text-center" for="name">{% trans "Name" %}</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="name" name="x-Name" required>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-sm-4 col-form-label text-center" for="color">{% trans "Color" %}</label>
+            <div class="col-sm-8 input-group">
+                <input type="text" class="form-control" id="color" name="x-Color" value="{{ default_color }}"
+                       pattern="#[0-9a-fA-F]{6}" required>
+                <div class="input-group-append">
+                    <span class="input-group-text" id="colorSample">&nbsp;&nbsp;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

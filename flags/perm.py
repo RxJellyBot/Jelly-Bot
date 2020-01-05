@@ -1,15 +1,15 @@
-from typing import Dict
+from typing import Dict, Generator, Set
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from extutils.flags import FlagDoubleEnum, FlagSingleEnum
 
 
 class PermissionCategory(FlagDoubleEnum):
     """
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !! Add corresponding HTML file under `templates/account/channel/perm` with code as the name of the file. !!
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     0xx - Miscellaneous
         1 - Normal
@@ -55,75 +55,62 @@ class PermissionCategory(FlagDoubleEnum):
         _("User who has this permission can change the privacy of the channel info.")
 
 
+class PermissionLevel(FlagSingleEnum):
+    @classmethod
+    def default(cls):
+        return PermissionLevel.NORMAL
+
+    @classmethod
+    def lowest(cls):
+        return PermissionLevel.NORMAL
+
+    @classmethod
+    def highest(cls):
+        return PermissionLevel.ADMIN
+
+    NORMAL = 0, _("Normal")
+    MOD = 1, _("Moderator")
+    ADMIN = 2, _("Admin")
+
+    @property
+    def iter_to_max(self) -> Generator['PermissionLevel', None, None]:
+        # noinspection PyTypeChecker
+        for i in list(self.__class__):
+            yield i
+            if i == self:
+                return
+
+
 class PermissionCategoryDefault:
     _Cache = {}
 
-    _Preset = (
-        (PermissionCategory.NORMAL, True),
-        (PermissionCategory.AR_ACCESS_PINNED_MODULE, False),
-        (PermissionCategory.MBR_CHANGE_MEMBERS, False),
-        (PermissionCategory.CNL_ADJUST_FEATURES, False),
-        (PermissionCategory.CNL_ADJUST_VOTES, False)
-    )
+    _Default = {
+        PermissionCategory.NORMAL
+    }
 
-    _ModOverride = (
-        (PermissionCategory.AR_ACCESS_PINNED_MODULE, True),
-    )
-
-    _AdminOverride = (
-        (PermissionCategory.MBR_CHANGE_MEMBERS, True),
-    )
+    # noinspection PyTypeChecker
+    _Override = {
+        PermissionLevel.MOD: {
+            PermissionCategory.AR_ACCESS_PINNED_MODULE
+        },
+        PermissionLevel.highest(): set(PermissionCategory)
+    }
 
     @staticmethod
-    def get_default_preset() -> Dict[PermissionCategory, bool]:
-        if "default" not in PermissionCategoryDefault._Cache:
-            PermissionCategoryDefault._Cache["default"] = {k: v for k, v in PermissionCategoryDefault._Preset}
-        return PermissionCategoryDefault._Cache["default"]
+    def get_overridden_permissions(highest_perm_lv: PermissionLevel) -> Set[PermissionCategory]:
+        if highest_perm_lv not in PermissionCategoryDefault._Cache:
+            perms = PermissionCategoryDefault._Default
+            for perm_lv in highest_perm_lv.iter_to_max:
+                perms.symmetric_difference_update(PermissionCategoryDefault._Override.get(perm_lv, set()))
+
+            PermissionCategoryDefault._Cache[highest_perm_lv] = perms
+
+        return PermissionCategoryDefault._Cache[highest_perm_lv]
 
     @staticmethod
-    def get_default_preset_dict() -> Dict[str, bool]:
-        return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_preset().items()}
+    def get_default_dict() -> Dict[PermissionCategory, bool]:
+        return {perm_cat: perm_cat in PermissionCategoryDefault._Default for perm_cat in PermissionCategory}
 
     @staticmethod
-    def get_default(category: PermissionCategory):
-        return PermissionCategoryDefault.get_default_preset().get(category, False)
-
-    @staticmethod
-    def get_mod_preset():
-        if "mod" not in PermissionCategoryDefault._Cache:
-            d = PermissionCategoryDefault.get_default_preset()
-
-            for cat, val in PermissionCategoryDefault._ModOverride:
-                d[cat] = val
-
-            PermissionCategoryDefault._Cache["mod"] = d
-
-        return PermissionCategoryDefault._Cache["mod"]
-
-    @staticmethod
-    def get_mod_override():
-        return PermissionCategoryDefault._ModOverride
-
-    @staticmethod
-    def get_mod(category: PermissionCategory):
-        return PermissionCategoryDefault.get_mod_preset().get(category, False)
-
-    @staticmethod
-    def get_admin_preset():
-        if "admin" not in PermissionCategoryDefault._Cache:
-            d = PermissionCategoryDefault.get_mod_preset()
-
-            for cat, val in PermissionCategoryDefault._AdminOverride:
-                d[cat] = val
-
-            PermissionCategoryDefault._Cache["admin"] = d
-
-        return PermissionCategoryDefault._Cache["admin"]
-
-    @staticmethod
-    def get_admin_override():
-        return PermissionCategoryDefault._AdminOverride
-
-    @staticmethod
-    def get_admin(category: PermissionCategory):
-        return PermissionCategoryDefault.get_admin_preset().get(category, False)
+    def get_default_code_str_dict() -> Dict[str, bool]:
+        return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_dict().items()}

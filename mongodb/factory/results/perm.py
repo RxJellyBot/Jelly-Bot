@@ -20,7 +20,7 @@ class CreatePermissionProfileResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
         :type outcome: WriteOutcome
-        :type model: Optional[ChannelPermissionProfileModel]
+        :type model: Optional[ChannelProfileModel]
         :type exception: Optional[Exception]
         """
         super().__init__(outcome, model, exception)

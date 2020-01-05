@@ -126,8 +126,8 @@
             xhr.send(params);
         }
 
-        function detachConfirmMesage(name) {
-            return `{% blocktrans trimmed %}Are you sure to detach this profile ${name}?{% endblocktrans %}`;
+        function detachConfirmMessage(name) {
+            return `{% blocktrans trimmed %}Are you sure to detach this profile (${name})?{% endblocktrans %}`;
         }
     </script>
     <script type="text/javascript" src="{% static "js/account/channel_list.js" %}"></script>

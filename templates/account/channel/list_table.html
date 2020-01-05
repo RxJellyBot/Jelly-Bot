@@ -45,21 +45,27 @@
                     <div class="collapse" id="profile{{ channel_conn.channel_data.id }}">
                         <div class="mt-3">
                             {% for profile_data in channel_conn.profiles %}
-                                <div class="btn-group mr-1">
-                                    <a class="btn btn-outline-dark mb-1"
+                                <div class="btn-group mr-2 mb-2">
+                                    <a class="btn btn-outline-dark"
                                        href="{% url "info.profile" profile_oid=profile_data.id %}">
                                         <span class="sm-dot"
                                               style="background-color: {{ profile_data.color.color_hex }}"></span>
                                         {{ profile_data.name }}
                                     </a>
                                     {% if profile_data.id != channel_conn.default_profile_oid %}
-                                    <a class="btn btn-outline-danger text-danger mb-1 detach-profile"
-                                       data-poid="{{ profile_data.id }}" data-pname="{{ profile_data.name }}">
-                                        {% trans "Detach" %}
-                                    </a>
+                                        <a class="btn btn-outline-danger text-danger detach-profile"
+                                           data-poid="{{ profile_data.id }}" data-pname="{{ profile_data.name }}">
+                                            {% trans "Detach" %}
+                                        </a>
                                     {% endif %}
                                 </div>
                             {% endfor %}
+                            {% if channel_conn.channel_data.config.enable_create_profile %}
+                                <a class="btn btn-outline-success mb-2"
+                                   href="{% url "account.profile.create" channel_oid=channel_conn.channel_data.id %}">
+                                    {% trans "Create" %}
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
 

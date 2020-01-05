@@ -35,7 +35,7 @@ class APIStatisticsManager(BaseCollection):
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
                      org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
         entry, outcome, ex = self.insert_one_data(
-            APIAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
+            ApiAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
             Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
 
         return RecordAPIStatisticsResult(outcome, entry, ex)

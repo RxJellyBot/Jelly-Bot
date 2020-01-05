@@ -1,11 +1,11 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import List, Optional, Set, Dict, Iterable
+from typing import List, Optional, Set, Dict, Iterable, Union
 
 from bson import ObjectId
 
 from extutils.emailutils import MailSender
-from models import ChannelModel
+from models import ChannelModel, ChannelCollectionModel
 from mongodb.factory import ChannelManager, MessageRecordStatisticsManager, RootUserManager
 
 
@@ -48,7 +48,7 @@ class IdentitySearcher:
         return ret
 
     @staticmethod
-    def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: ChannelModel,
+    def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: Union[ChannelModel, ChannelCollectionModel],
                             on_not_found: Optional[str] = None) -> Dict[ObjectId, str]:
         ret = {}
 
