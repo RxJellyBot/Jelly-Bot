@@ -52,6 +52,9 @@ class Manage:
         NEW_NAME = "name"
         STAR = "star"
 
+    class Profile:
+        PROFILE_OID = "poid"
+
 
 class Service:
     class ShortUrl:

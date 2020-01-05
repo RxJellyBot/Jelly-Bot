@@ -15,7 +15,8 @@
                                data-channel="{{ channel_conn.channel_data.id }}"
                                aria-label="{% trans "Channel Name" %}">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary {% if channel_conn.starred %}active{% endif %} star-btn" type="button" data-cid="{{ channel_conn.channel_data.id }}">
+                            <button class="btn btn-outline-secondary {% if channel_conn.starred %}active{% endif %} star-btn"
+                                    type="button" data-cid="{{ channel_conn.channel_data.id }}">
                                 {% trans "Star" %}
                             </button>
                         </div>
@@ -44,12 +45,20 @@
                     <div class="collapse" id="profile{{ channel_conn.channel_data.id }}">
                         <div class="mt-3">
                             {% for profile_data in channel_conn.profiles %}
-                                <a class="btn btn-outline-dark mr-1 mb-1"
-                                   href="{% url "info.profile" profile_oid=profile_data.id %}">
-                                <span class="sm-dot"
-                                      style="background-color: {{ profile_data.color.color_hex }}"></span>
-                                    {{ profile_data.name }}
-                                </a>
+                                <div class="btn-group mr-1">
+                                    <a class="btn btn-outline-dark mb-1"
+                                       href="{% url "info.profile" profile_oid=profile_data.id %}">
+                                        <span class="sm-dot"
+                                              style="background-color: {{ profile_data.color.color_hex }}"></span>
+                                        {{ profile_data.name }}
+                                    </a>
+                                    {% if profile_data.id != channel_conn.default_profile_oid %}
+                                    <a class="btn btn-outline-danger text-danger mb-1 detach-profile"
+                                       data-poid="{{ profile_data.id }}" data-pname="{{ profile_data.name }}">
+                                        {% trans "Detach" %}
+                                    </a>
+                                    {% endif %}
+                                </div>
                             {% endfor %}
                         </div>
                     </div>

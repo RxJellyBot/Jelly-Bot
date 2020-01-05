@@ -39,6 +39,7 @@ class ChannelProfileListEntry:
     channel_name: str
     profiles: List[ChannelProfileModel]
     starred: bool
+    default_profile_oid: ObjectId
 
 
 class ChannelProfileConnectionModel(Model):

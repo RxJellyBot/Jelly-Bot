@@ -135,6 +135,12 @@ class UserProfileManager(BaseCollection):
             {"$set": {
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
+    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
+        self.update_one(
+            {ChannelProfileConnectionModel.UserOid.key: user_oid},
+            {"$pull": {
+                ChannelProfileConnectionModel.ProfileOids.key: profile_oid}})
+
     def change_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self.update_one(
             {
@@ -286,6 +292,8 @@ class ProfileManager:
             elif accessbible_only and not cnl.bot_accessible:
                 continue
 
+            default_profile_oid = cnl.config.default_profile_oid
+
             # Get Profile Model
             prof = []
             for p in prof_conn.profile_oids:
@@ -303,7 +311,7 @@ class ProfileManager:
                 ret.append(
                     ChannelProfileListEntry(
                         channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
-                        starred=prof_conn.starred
+                        starred=prof_conn.starred, default_profile_oid=default_profile_oid
                     ))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
@@ -360,6 +368,9 @@ class ProfileManager:
 
     def get_available_connections(self) -> CursorWithCount:
         return self._conn.get_available_connections()
+
+    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
+        return self._conn.detach_profile(user_oid, profile_oid)
 
 
 _inst = ProfileManager()
