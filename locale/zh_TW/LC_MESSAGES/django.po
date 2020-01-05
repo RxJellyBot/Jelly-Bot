@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 05:18+0800\n"
-"PO-Revision-Date: 2020-01-02 05:21+0800\n"
+"POT-Creation-Date: 2020-01-06 07:45+0800\n"
+"PO-Revision-Date: 2020-01-06 07:48+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -125,6 +125,19 @@ msgstr "整合: 用戶資訊"
 msgid "Account Home"
 msgstr "帳號首頁"
 
+#: .\JellyBot\views\account\prof.py:29 .\JellyBot\views\nav.py:93
+#: .\templates\account\channel\prof\create.html:8
+msgid "Create Profile"
+msgstr "建立身分組"
+
+#: .\JellyBot\views\account\prof.py:46
+msgid "Profile successfully created."
+msgstr "身分組創建成功。"
+
+#: .\JellyBot\views\account\prof.py:48
+msgid "Failed to create the profile."
+msgstr "身分組創建失敗。"
+
 #: .\JellyBot\views\ar\add.py:19
 msgid "Add an Auto-Reply"
 msgstr "新增自動回覆"
@@ -141,12 +154,12 @@ msgstr "{} 中的自動回覆排名"
 msgid "Auto-Reply ranking channel list"
 msgstr "自動回覆排名頻道清單"
 
-#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:155
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:158
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:187
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:190
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -162,7 +175,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:183
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:186
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -171,7 +184,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:171
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:174
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -179,7 +192,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:169
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:172
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -187,7 +200,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:173
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:176
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -195,11 +208,11 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:175
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:178
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:158
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:161
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
@@ -257,7 +270,7 @@ msgstr ""
 msgid "Home Page"
 msgstr "首頁"
 
-#: .\JellyBot\views\info\botstats.py:79 .\JellyBot\views\nav.py:135
+#: .\JellyBot\views\info\botstats.py:79 .\JellyBot\views\nav.py:138
 msgid "Bot Usage Stats - {}"
 msgstr "機器人使用統計 - {}"
 
@@ -269,19 +282,19 @@ msgstr "頻道資訊 - {}"
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:144
+#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:147
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:88 .\JellyBot\views\nav.py:132
+#: .\JellyBot\views\info\msgstats.py:94 .\JellyBot\views\nav.py:135
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:141
+#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:144
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
-#: .\JellyBot\views\info\recent.py:47 .\JellyBot\views\nav.py:138
+#: .\JellyBot\views\info\recent.py:47 .\JellyBot\views\nav.py:141
 msgid "Recent Messages - {}"
 msgstr "近期訊息 - {}"
 
@@ -317,72 +330,72 @@ msgstr "頻道登錄"
 msgid "Integrate Account"
 msgstr "整合帳號"
 
-#: .\JellyBot\views\nav.py:98 .\msghandle\botcmd\command\ar.py:25
+#: .\JellyBot\views\nav.py:101 .\msghandle\botcmd\command\ar.py:25
 #: .\templates\index.html:19
 msgid "Auto Reply"
 msgstr "自動回覆"
 
-#: .\JellyBot\views\nav.py:100
+#: .\JellyBot\views\nav.py:103
 msgid "Introduction"
 msgstr "簡介"
 
-#: .\JellyBot\views\nav.py:102
+#: .\JellyBot\views\nav.py:105
 msgid "Main Intro"
 msgstr "主要介紹"
 
-#: .\JellyBot\views\nav.py:106
+#: .\JellyBot\views\nav.py:109
 msgid "Functions"
 msgstr "功能"
 
-#: .\JellyBot\views\nav.py:108
+#: .\JellyBot\views\nav.py:111
 msgid "Add"
 msgstr "新增"
 
-#: .\JellyBot\views\nav.py:110
+#: .\JellyBot\views\nav.py:113
 msgid "Ranking"
 msgstr "排名"
 
-#: .\JellyBot\views\nav.py:114
+#: .\JellyBot\views\nav.py:117
 msgid "Auto-Reply Ranking - {}"
 msgstr "自動回覆排名 - {}"
 
-#: .\JellyBot\views\nav.py:122 .\templates\info\channel\search.html:67
+#: .\JellyBot\views\nav.py:125 .\templates\info\channel\search.html:67
 msgid "Info"
 msgstr "資訊查詢"
 
-#: .\JellyBot\views\nav.py:125
+#: .\JellyBot\views\nav.py:128
 msgid "Channel"
 msgstr "頻道"
 
-#: .\JellyBot\views\nav.py:129
+#: .\JellyBot\views\nav.py:132
 msgid "Channel - {}"
 msgstr "頻道 - {}"
 
-#: .\JellyBot\views\nav.py:152
+#: .\JellyBot\views\nav.py:155
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:162 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:165 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:167
+#: .\JellyBot\views\nav.py:170
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:179
+#: .\JellyBot\views\nav.py:182
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:181
+#: .\JellyBot\views\nav.py:184
 msgid "API Command"
 msgstr "API指令"
 
-#: .\JellyBot\views\nav.py:195
+#: .\JellyBot\views\nav.py:198
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:197 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:200 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
 
@@ -671,59 +684,63 @@ msgstr "(換行)"
 msgid "(Space)"
 msgstr "(空格)"
 
-#: .\flags\apiact.py:44
+#: .\flags\apiact.py:46
 msgid "Unknown Action"
 msgstr "不明指令"
 
-#: .\flags\apiact.py:46
+#: .\flags\apiact.py:48
 msgid "Auto-Reply - Addition"
 msgstr "自動回覆 - 新增"
 
-#: .\flags\apiact.py:47
+#: .\flags\apiact.py:49
 msgid "Auto-Reply - Content Validation"
 msgstr "自動回覆 - 內容驗證"
 
-#: .\flags\apiact.py:48
+#: .\flags\apiact.py:50
 msgid "Auto-Reply - Tag Popularity"
 msgstr "自動回覆 - 熱門標籤"
 
-#: .\flags\apiact.py:50
+#: .\flags\apiact.py:52
 msgid "Execode - Auto-Reply Addition"
 msgstr "執行碼 - 自動回覆 - 新增"
 
-#: .\flags\apiact.py:51
+#: .\flags\apiact.py:53
 msgid "Execode - List All"
 msgstr "執行碼 - 列出全部"
 
-#: .\flags\apiact.py:52
+#: .\flags\apiact.py:54
 msgid "Execode - Complete Action"
 msgstr "執行碼 - 完成"
 
-#: .\flags\apiact.py:54
+#: .\flags\apiact.py:56
 msgid "Data Query - Channel"
 msgstr "資料查詢 - 頻道"
 
-#: .\flags\apiact.py:55
+#: .\flags\apiact.py:57
 msgid "Data Query - Permission"
 msgstr "資料查詢 - 權限"
 
-#: .\flags\apiact.py:57
+#: .\flags\apiact.py:59
 msgid "Management - Issue Channel Registration Execode"
 msgstr "管理 - 發給頻道登錄用執行碼"
 
-#: .\flags\apiact.py:58
+#: .\flags\apiact.py:60
 msgid "Management - Change Channel Star"
 msgstr "管理 - 更改頻道最愛"
 
-#: .\flags\apiact.py:59
+#: .\flags\apiact.py:61
 msgid "Management - Change Channel Name"
 msgstr "管理 - 更改頻道名稱"
 
-#: .\flags\apiact.py:61
+#: .\flags\apiact.py:63
+msgid "Management - Detach Profile"
+msgstr "管理 - 解除身分組"
+
+#: .\flags\apiact.py:65
 msgid "Services - Shorten URL"
 msgstr "服務 - 短網址"
 
-#: .\flags\apiact.py:62
+#: .\flags\apiact.py:66
 msgid "Services - Update Target"
 msgstr "服務 - 更新目標網址"
 
@@ -1158,60 +1175,68 @@ msgstr "貼圖"
 msgid "File"
 msgstr "檔案"
 
-#: .\flags\perm.py:36
+#: .\flags\perm.py:34 .\flags\perm.py:71
 msgid "Normal"
 msgstr "一般"
 
-#: .\flags\perm.py:37
+#: .\flags\perm.py:35
 msgid "User who has this permission can do all normal operations."
 msgstr "擁有此權限的用戶可以使用所有一般功能。"
 
-#: .\flags\perm.py:40
+#: .\flags\perm.py:38
 msgid "Auto-Reply: Access Pinned Module"
 msgstr "自動回覆: 存取置頂回覆組"
 
-#: .\flags\perm.py:41
+#: .\flags\perm.py:39
 msgid ""
 "User who has this permission can access the Pinned property of the Auto-"
 "Reply modules."
 msgstr "擁有此權限的用戶可以存取回覆組的屬性。"
 
-#: .\flags\perm.py:44
+#: .\flags\perm.py:42
 msgid "Members: Change Managers"
 msgstr "成員管理: 更動管理者"
 
-#: .\flags\perm.py:45
+#: .\flags\perm.py:43
 msgid "User who has this permission can change the members of managers."
 msgstr "擁有此權限的用戶可以更改管理員的組成。"
 
-#: .\flags\perm.py:48
+#: .\flags\perm.py:46
 msgid "Channel: Features availability"
 msgstr "頻道: 開關功能"
 
-#: .\flags\perm.py:49
+#: .\flags\perm.py:47
 msgid ""
 "User who has this permission can change the availability of the certain "
 "features."
 msgstr "擁有此權限的用戶可以開關特定功能。"
 
-#: .\flags\perm.py:52
+#: .\flags\perm.py:50
 msgid "Channel: Vote for managers"
 msgstr "頻道: 開關票選管理員功能"
 
-#: .\flags\perm.py:53
+#: .\flags\perm.py:51
 msgid ""
 "User who has this permission can change the availability of voting to "
 "promote members."
 msgstr "擁有此權限的用戶可以開關票選管理員的功能。"
 
-#: .\flags\perm.py:56
+#: .\flags\perm.py:54
 msgid "Channel: Info Privacy"
 msgstr "頻道: 資訊隱私"
 
-#: .\flags\perm.py:57
+#: .\flags\perm.py:55
 msgid ""
 "User who has this permission can change the privacy of the channel info."
 msgstr "擁有此權限的用戶可以更改頻道資訊是否隱藏。"
+
+#: .\flags\perm.py:72 .\templates\info\profile.html:62
+msgid "Moderator"
+msgstr "副管"
+
+#: .\flags\perm.py:73 .\templates\info\profile.html:60
+msgid "Admin"
+msgstr "管理員"
 
 #: .\flags\platforms.py:11
 msgid "Unknown Platform"
@@ -1292,7 +1317,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:197
+#: .\mongodb\factory\prof.py:210
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2685,7 +2710,7 @@ msgstr "GitHub Repo"
 msgid "Deployed on"
 msgstr "部署於"
 
-#: .\templates\about.html:56 .\templates\account\settings.html:58
+#: .\templates\about.html:56 .\templates\account\settings.html:57
 msgid "Language"
 msgstr "語言"
 
@@ -2752,36 +2777,48 @@ msgstr ""
 "用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
 "者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
+#: .\templates\account\channel\list.html:130
+msgid "Are you sure to detach this profile (${name})?"
+msgstr "確定要解除這個身分組嗎(${name})？"
+
 #: .\templates\account\channel\list_table.html:16
 #: .\templates\info\components\info_adv.html:12
 #: .\templates\info\components\info_basic.html:11
 msgid "Channel Name"
 msgstr "頻道名稱"
 
-#: .\templates\account\channel\list_table.html:19
+#: .\templates\account\channel\list_table.html:20
 msgid "Star"
 msgstr "最愛"
 
-#: .\templates\account\channel\list_table.html:27
+#: .\templates\account\channel\list_table.html:28
 #: .\templates\info\channel\search.html:63
 #: .\templates\info\components\info_adv.html:89
 msgid "Manage"
 msgstr "管理"
 
-#: .\templates\account\channel\list_table.html:31
+#: .\templates\account\channel\list_table.html:32
 msgid "Check Info"
 msgstr "資訊"
 
-#: .\templates\account\channel\list_table.html:35
+#: .\templates\account\channel\list_table.html:36
 msgid "Check Profiles"
 msgstr "身分組"
 
-#: .\templates\account\channel\list_table.html:39
+#: .\templates\account\channel\list_table.html:40
 #: .\templates\info\channel\search.html:71
 msgid "Check ID"
 msgstr "ID"
 
-#: .\templates\account\channel\list_table.html:59
+#: .\templates\account\channel\list_table.html:58
+msgid "Detach"
+msgstr "解除"
+
+#: .\templates\account\channel\list_table.html:66
+msgid "Create"
+msgstr "建立"
+
+#: .\templates\account\channel\list_table.html:74
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\components\info_adv.html:32
@@ -2790,7 +2827,7 @@ msgstr "ID"
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:65
+#: .\templates\account\channel\list_table.html:80
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
 #: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
 #: .\templates\info\components\info_adv.html:46
@@ -2816,6 +2853,38 @@ msgstr "權限 / 相關控制"
 #: .\templates\account\channel\perm\1.html:2
 msgid "No operations available."
 msgstr "無可用操作。"
+
+#: .\templates\account\channel\prof\create-main.html:4
+#: .\templates\ar\add-main.html:4
+msgid "Main Settings"
+msgstr "主設定"
+
+#: .\templates\account\channel\prof\create-main.html:7
+#: .\templates\ar\add-reg.html:65 .\templates\info\profile.html:21
+msgid "Name"
+msgstr "名稱"
+
+#: .\templates\account\channel\prof\create-main.html:13
+msgid "Color"
+msgstr "顏色"
+
+#: .\templates\account\channel\prof\create-perm.html:4
+#: .\templates\info\profile.html:87
+msgid "Permissions"
+msgstr "權限"
+
+#: .\templates\account\channel\prof\create-prop.html:4
+msgid "Property"
+msgstr "屬性"
+
+#: .\templates\account\channel\prof\create-prop.html:7
+msgid "Permission Level"
+msgstr "權限等級"
+
+#: .\templates\account\channel\prof\create.html:28
+#: .\templates\account\integrate.html:37 .\templates\ar\add.html:45
+msgid "Submit"
+msgstr "提交"
 
 #: .\templates\account\channel\register.html:8
 msgid "Confirm Channel Membership"
@@ -2905,10 +2974,6 @@ msgstr "於此輸入執行碼"
 #: .\templates\account\integrate.html:34
 msgid "Integration Execode"
 msgstr "用戶資訊整合用執行碼"
-
-#: .\templates\account\integrate.html:37 .\templates\ar\add.html:45
-msgid "Submit"
-msgstr "提交"
 
 #: .\templates\account\integrate.html:42
 msgid "Provide an Execode to complete user data integration."
@@ -3046,27 +3111,27 @@ msgid "Profile"
 msgstr "個人資料"
 
 #: .\templates\account\settings.html:22
-msgctxt "Profile Name"
+msgctxt "User Name"
 msgid "Name"
-msgstr "名稱"
+msgstr "使用者名稱"
 
 #: .\templates\account\settings.html:35
 msgid "Preferences"
 msgstr "偏好設定"
 
-#: .\templates\account\settings.html:41
+#: .\templates\account\settings.html:40
 msgid "This will affect the displays of the timezone."
 msgstr "此設定會影響顯示的時區。"
 
-#: .\templates\account\settings.html:41
+#: .\templates\account\settings.html:40
 msgid "Locale"
 msgstr "地區"
 
-#: .\templates\account\settings.html:58
+#: .\templates\account\settings.html:57
 msgid "This will affect the displays of the language."
 msgstr "此設定會影響顯示的語言。"
 
-#: .\templates\account\settings.html:79
+#: .\templates\account\settings.html:78
 #: .\templates\services\shorturl\main.html:70
 msgid "Update"
 msgstr "更新"
@@ -3093,10 +3158,6 @@ msgid ""
 "register the module."
 msgstr ""
 "請於 註冊 > 頻道成員 中選擇此回覆組的所屬頻道，或是使用其他方法登錄回覆組。"
-
-#: .\templates\ar\add-main.html:4
-msgid "Main Settings"
-msgstr "主設定"
 
 #: .\templates\ar\add-main.html:8 .\templates\ar\add-main.html:9
 #: .\templates\ar\rk-module.html:10 .\templates\ar\rk-uniquekw.html:10
@@ -3345,10 +3406,6 @@ msgstr "選擇一個頻道"
 msgid "ID: "
 msgstr "ID: "
 
-#: .\templates\ar\add-reg.html:65 .\templates\info\profile.html:21
-msgid "Name"
-msgstr "名稱"
-
 #: .\templates\ar\add-reg.html:113
 msgid ""
 "The Execode for registering the module will appear below once the task is "
@@ -3436,7 +3493,7 @@ msgid ""
 msgstr "此欄留空併重整頁面以獲得最多結果。<br>最多顯示%(max)s個結果。"
 
 #: .\templates\ar\rk-channel.html:55 .\templates\info\botstats\main.html:51
-#: .\templates\info\msgstats\main.html:51
+#: .\templates\info\msgstats\main.html:58
 #: .\templates\info\recent\message.html:56
 msgid "Refresh"
 msgstr "重整"
@@ -3812,7 +3869,7 @@ msgid "Leave this blank and refresh to get all-time record."
 msgstr "留空和重整頁面以獲得全時紀錄。"
 
 #: .\templates\info\botstats\main.html:64
-#: .\templates\info\msgstats\main.html:64
+#: .\templates\info\msgstats\main.html:71
 msgid "Statistics"
 msgstr "統計"
 
@@ -3974,39 +4031,43 @@ msgstr "處理耗時(毫秒)"
 msgid "Channel Message Statistics"
 msgstr "頻道訊息統計"
 
-#: .\templates\info\msgstats\main.html:69
+#: .\templates\info\msgstats\main.html:53
+msgid "Including Unavailable Members"
+msgstr "包含不在頻道內的成員"
+
+#: .\templates\info\msgstats\main.html:76
 #: .\templates\info\recent\message.html:69
 msgid "Summary"
 msgstr "概要"
 
-#: .\templates\info\msgstats\main.html:74
+#: .\templates\info\msgstats\main.html:81
 msgid "Total Message Count"
 msgstr "總訊息量"
 
-#: .\templates\info\msgstats\main.html:89
+#: .\templates\info\msgstats\main.html:96
 #: .\templates\info\recent\message.html:105
 msgid "Message Frequency"
 msgstr "訊息頻率"
 
-#: .\templates\info\msgstats\main.html:94
+#: .\templates\info\msgstats\main.html:101
 #: .\templates\info\recent\message.html:80
 #: .\templates\info\recent\message.html:110
 msgid "secs"
 msgstr "秒"
 
-#: .\templates\info\msgstats\main.html:105
+#: .\templates\info\msgstats\main.html:112
 msgid "Hour Average Message Flow"
 msgstr "每小時平均訊息量"
 
-#: .\templates\info\msgstats\main.html:116
+#: .\templates\info\msgstats\main.html:123
 msgid "Daily Message Flow"
 msgstr "每日訊息量"
 
-#: .\templates\info\msgstats\main.html:132
+#: .\templates\info\msgstats\main.html:139
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
 
-#: .\templates\info\msgstats\main.html:142
+#: .\templates\info\msgstats\main.html:149
 msgid "Member Daily Message Count"
 msgstr "成員每日訊息量"
 
@@ -4021,14 +4082,6 @@ msgstr "身分組ID"
 #: .\templates\info\profile.html:56
 msgid "Privilege"
 msgstr "特權等級"
-
-#: .\templates\info\profile.html:60
-msgid "Admin"
-msgstr "管理員"
-
-#: .\templates\info\profile.html:62
-msgid "Moderator"
-msgstr "副管"
 
 #: .\templates\info\profile.html:64
 msgid "N/A"
@@ -4045,10 +4098,6 @@ msgstr "是"
 #: .\templates\info\profile.html:78
 msgid "No"
 msgstr "否"
-
-#: .\templates\info\profile.html:87
-msgid "Permissions"
-msgstr "權限"
 
 #: .\templates\info\recent\message.html:39
 msgid "messages"
@@ -4149,6 +4198,10 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgctxt "Profile Name"
+#~ msgid "Name"
+#~ msgstr "名稱"
 
 #~ msgid ""
 #~ "LINE BOT:\n"

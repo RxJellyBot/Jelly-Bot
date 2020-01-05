@@ -1,0 +1,37 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Create Profile" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <form class="enable-login d-none" id="createProfile" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-6">
+                    <input type="hidden" name="x-ChannelOid" value="{{ channel_oid }}">
+
+                    {% include "account/channel/prof/create-main.html" %}
+                    {% include "account/channel/prof/create-prop.html" %}
+                </div>
+                <div class="col-lg-6">
+                    {% include "account/channel/prof/create-perm.html" %}
+                </div>
+            </div>
+            <div class="row text-right">
+                <div class="col d-inline">
+                    <button type="submit" class="btn btn-outline-dark" id="submit">{% trans "Submit" %}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block ex-script %}
+    <script src="{% static "js/utils/generator.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/account/profile/create.js" %}" type="text/javascript"></script>
+{% endblock %}

@@ -22,7 +22,7 @@ from models import Model, ModelDefaultValueExt, OID_KEY
 class APIStatisticModel(Model):
     Timestamp = DateTimeField("t", default=ModelDefaultValueExt.Required, allow_none=False)
     SenderOid = ObjectIDField("sd", default=ModelDefaultValueExt.Optional, allow_none=True, stores_uid=True)
-    APIAction = APICommandField("a")
+    ApiAction = APICommandField("a")
     Parameter = DictionaryField("p", allow_none=True)
     PathParameter = DictionaryField("pp", allow_none=True)
     Response = DictionaryField("r", allow_none=True)

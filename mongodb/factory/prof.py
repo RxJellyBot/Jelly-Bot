@@ -1,21 +1,22 @@
 from threading import Thread
-from typing import Optional, List, Dict, Set
+from typing import Optional, List, Dict, Set, Union
 
 import pymongo
 from bson import ObjectId
 
 from django.utils.translation import gettext_lazy as _
 
+from extutils.color import ColorFactory
 from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
-from flags import PermissionCategory, PermissionCategoryDefault
+from flags import PermissionCategory, PermissionCategoryDefault, PermissionLevel
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
 from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
-    Model)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
+)
 
 from ._base import BaseCollection
 
@@ -36,7 +37,7 @@ class UserProfileManager(BaseCollection):
             unique=True)
 
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oid: ObjectId) \
-            -> Model:
+            -> ChannelProfileConnectionModel:
         """
         Attach `ChannelPermissionProfileModel` and return the attached data.
         """
@@ -46,13 +47,15 @@ class UserProfileManager(BaseCollection):
             {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}}, upsert=True).upserted_id
 
         if id_:
-            model = self.find_one_casted(
+            # noinspection PyTypeChecker
+            model: ChannelProfileConnectionModel = self.find_one_casted(
                 {OID_KEY: id_}, parse_cls=ChannelProfileConnectionModel)
 
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
         else:
-            model = self.find_one_casted(
+            # noinspection PyTypeChecker
+            model: ChannelProfileConnectionModel = self.find_one_casted(
                 {ChannelProfileConnectionModel.UserOid.key: root_uid},
                 parse_cls=ChannelProfileConnectionModel)
 
@@ -95,8 +98,12 @@ class UserProfileManager(BaseCollection):
             ]
         ))
 
-    def get_channel_members(self, channel_oid: ObjectId, available_only=True) -> List[ChannelProfileConnectionModel]:
-        filter_ = {ChannelProfileConnectionModel.ChannelOid.key: channel_oid}
+    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=True) \
+            -> List[ChannelProfileConnectionModel]:
+        if isinstance(channel_oid, ObjectId):
+            filter_ = {ChannelProfileConnectionModel.ChannelOid.key: {"$in": [channel_oid]}}
+        else:
+            filter_ = {ChannelProfileConnectionModel.ChannelOid.key: {"$in": channel_oid}}
 
         if available_only:
             filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
@@ -211,6 +218,11 @@ class ProfileDataManager(BaseCollection):
 
         return CreatePermissionProfileResult(outcome, default_profile, ex)
 
+    def create_profile(self, kwargs) -> CreatePermissionProfileResult:
+        model, outcome, ex = self.insert_one_data(**kwargs)
+
+        return CreatePermissionProfileResult(outcome, model, ex)
+
     def _create_profile_(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
@@ -238,6 +250,46 @@ class ProfileManager:
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
+    # Used for sanitizing webpage form data
+    # noinspection PyMethodMayBeStatic
+    def process_profile_kwargs(self, profile_kwargs: dict):
+        # --- Collate `PermissionLevel`
+        perm_lv = PermissionLevel.cast(profile_kwargs["PermissionLevel"])
+        profile_kwargs["PermissionLevel"] = perm_lv
+
+        # --- Collate `Permission`
+        perm_dict = {}
+        # Fill turned-on permissions
+        for k, v in profile_kwargs.items():
+            if k.startswith("Permission."):
+                perm_dict[k[len("Permission."):]] = True
+                del profile_kwargs[k]
+
+        # Fill default overriden permissions by permission level
+        for perm in PermissionCategoryDefault.get_overridden_permissions(perm_lv):
+            perm_dict[perm.code_str] = True
+
+        # Fill the rest of the permissions
+        for perm_cat in PermissionCategory:
+            if perm_cat.code_str not in perm_dict:
+                perm_dict[perm_cat.code_str] = False
+
+        profile_kwargs["Permission"] = perm_dict
+
+        # --- Collate `Color`
+        profile_kwargs["Color"] = ColorFactory.from_hex(profile_kwargs["Color"])
+
+        return profile_kwargs
+
+    # noinspection PyTypeChecker
+    @param_type_ensure
+    def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
+        create_result = self._prof.create_profile(profile_kwargs)
+        if create_result.success:
+            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+
+        return create_result.model
+
     @param_type_ensure
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
@@ -253,6 +305,16 @@ class ProfileManager:
                     in conn.profile_oids if not None]
         else:
             return []
+
+    # noinspection PyMethodMayBeStatic
+    def highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:
+        current_max = PermissionLevel.lowest()
+
+        for profile in profiles:
+            if profile.permission_level > current_max:
+                current_max = profile.permission_level
+
+        return current_max
 
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId], inside_only: bool = True,
                                   accessbible_only: bool = True) \
@@ -345,19 +407,13 @@ class ProfileManager:
                         for perm_cat, perm_grant
                         in prof.permission.items() if perm_grant])
 
-            if prof.is_mod:
-                ret.extend(PermissionCategory.cast(perm_cat)
-                           for perm_cat, perm_grant
-                           in PermissionCategoryDefault.get_mod_override() if perm_grant)
-
-            if prof.is_admin:
-                ret.extend(PermissionCategory.cast(perm_cat)
-                           for perm_cat, perm_grant
-                           in PermissionCategoryDefault.get_admin_override() if perm_grant)
+            highest_perm_lv = self.highest_permission_level(profiles)
+            ret.extend(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv))
 
         return ret
 
-    def get_channel_members(self, channel_oid: ObjectId, available_only=False) -> List[ChannelProfileConnectionModel]:
+    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False)\
+            -> List[ChannelProfileConnectionModel]:
         return self._conn.get_channel_members(channel_oid, available_only)
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):

@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -11,7 +11,8 @@ from extutils.emailutils import MailSender
 from extutils.locales import default_locale
 from extutils.checker import param_type_ensure
 from flags import Platform
-from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel
+from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel, \
+    ChannelCollectionModel
 from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
@@ -117,7 +118,8 @@ class RootUserManager(BaseCollection):
             partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
     def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
-                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False) \
+                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
+                   on_exist=None) \
             -> RootUserRegistrationResult:
         user_reg_result = u_reg_func(*args)
         user_reg_oid = None
@@ -145,6 +147,8 @@ class RootUserManager(BaseCollection):
                     build_conn_outcome = WriteOutcome.X_CACHE_MISSING_ATTEMPTED_INSERT
                 else:
                     overall_outcome = WriteOutcome.O_DATA_EXISTS
+                    if on_exist:
+                        on_exist()
         else:
             overall_outcome = oc_onreg_failed
 
@@ -164,9 +168,14 @@ class RootUserManager(BaseCollection):
                                (platform, user_token), hint="OnPlatform", conn_arg_list=True)
 
     def register_google(self, id_data: GoogleIdentityUserData) -> RootUserRegistrationResult:
+        def on_exist():
+            self._mgr_api.update_many_async({APIUserModel.GoogleUid.key: id_data.uid,
+                                             APIUserModel.Email.key: {"$ne": id_data.email}},
+                                            {"$set": {APIUserModel.Email.key: id_data.email}})
+
         return self._register_(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
                                "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
-                               (id_data,), hint="APIUser", conn_arg_list=False)
+                               (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
 
     @param_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
@@ -174,7 +183,7 @@ class RootUserManager(BaseCollection):
 
     @param_type_ensure
     def get_root_data_uname(
-            self, root_oid: ObjectId, channel_data: Optional[ChannelModel] = None,
+            self, root_oid: ObjectId, channel_data: Union[ChannelModel, ChannelCollectionModel, None] = None,
             str_not_found: Optional[str] = None) -> Optional[namedtuple]:
         """
         Get the name of the user with UID = `root_oid`.

@@ -142,14 +142,23 @@ class UserDailyMessageResult:
 
 class MessageStatsDataProcessor:
     @staticmethod
-    def _get_user_msg_stats_(msg_result: MemberMessageResult, ch_data: ChannelModel = None,
+    def _get_user_msg_stats_(msg_result: MemberMessageResult,
+                             ch_data: Union[ChannelModel, ChannelCollectionModel] = None,
                              available_only: bool = True) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
+
+        if isinstance(ch_data, ChannelModel):
+            ch_oids = [ch_data.id]
+        elif isinstance(ch_data, ChannelCollectionModel):
+            ch_oids = ch_data.child_channel_oids
+        else:
+            raise ValueError(f"The type of `ch_data` must either be `ChannelModel` or `ChannelCollectionModel`. "
+                             f"({type(ch_data)})")
 
         msg_rec_d = {uid: d for uid, d in msg_result.data.items()}
         msg_rec = {}
         available_dict = {}
-        for member in ProfileManager.get_channel_members(ch_data.id, available_only=available_only):
+        for member in ProfileManager.get_channel_members(ch_oids, available_only=available_only):
             msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, msg_result.get_default_data_entry())
             available_dict[member.user_oid] = member.available
 
@@ -157,7 +166,8 @@ class MessageStatsDataProcessor:
             individual_msgs = [vals.total for vals in msg_rec.values()]
             max_individual_msg: int = max(individual_msgs)
 
-            uid_handled = IdentitySearcher.get_batch_user_name(msg_rec.keys(), ch_data, on_not_found="(N/A)")
+            uid_handled = IdentitySearcher.get_batch_user_name(
+                msg_rec.keys(), ch_data, on_not_found="(N/A)")
 
             for uid, name in uid_handled.items():
                 data_cat = msg_rec[uid]
@@ -231,7 +241,7 @@ class MessageStatsDataProcessor:
             -> UserMessageStats:
         return MessageStatsDataProcessor._get_user_msg_stats_(
             MessageRecordStatisticsManager.get_user_messages(chcoll_data.child_channel_oids, hours_within),
-            available_only=available_only
+            chcoll_data, available_only=available_only
         )
 
     @staticmethod

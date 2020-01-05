@@ -1,5 +1,6 @@
 from extutils.flags import FlagCodeEnum
-from flags import APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType, MessageType, BotFeature
+from flags import APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType, MessageType, BotFeature, \
+    PermissionLevel
 from .int import IntegerField
 
 
@@ -62,3 +63,7 @@ class MessageTypeField(FlagField):
 
 class BotFeatureField(FlagField):
     FLAG_TYPE = BotFeature
+
+
+class PermissionLevelField(FlagField):
+    FLAG_TYPE = PermissionLevel

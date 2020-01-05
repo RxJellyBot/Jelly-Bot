@@ -10,7 +10,7 @@ from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
 from JellyBot.utils import get_root_oid
 from extutils import HerokuWrapper
-from extutils.flags import FlagCodeMixin, FlagSingleMixin, FlagDoubleMixin
+from extutils.flags import is_flag_class, is_flag_single, is_flag_double
 
 
 def render_template(request, title, template_name, context=None, content_type=None, status=None,
@@ -51,16 +51,16 @@ def render_template(request, title, template_name, context=None, content_type=No
 
 
 # noinspection PyTypeChecker
-def render_flag_table(request, title: str, table_title: str, flag_enum: type(FlagCodeMixin), context: dict = None,
+def render_flag_table(request, title: str, table_title: str, flag_enum, context: dict = None,
                       content_type=None, status=None, using=None) -> HttpResponse:
     if context is None:
         context = dict()
 
-    if not issubclass(flag_enum, FlagCodeMixin):
-        raise ValueError(f"flag_enum ({flag_enum}) is not the subclass of `Flag`.")
+    if not is_flag_class(flag_enum):
+        raise ValueError(f"flag_enum ({type(flag_enum)}) is not the subclass of `Flag`.")
 
-    context["has_key"] = issubclass(flag_enum, FlagSingleMixin)
-    context["has_description"] = issubclass(flag_enum, FlagDoubleMixin)
+    context["has_key"] = is_flag_single(flag_enum)
+    context["has_description"] = is_flag_double(flag_enum)
 
     context.update(**{"table_title": table_title,
                       "flags": list(flag_enum)})

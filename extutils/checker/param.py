@@ -4,7 +4,7 @@ from inspect import signature, Parameter
 
 from bson import ObjectId
 
-from extutils.flags import FlagCodeMixin
+from extutils.flags import is_flag_class
 from .logger import logger
 
 
@@ -101,7 +101,7 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
 
     @staticmethod
     def on_type_invalid(data: Any, dtype: type) -> Any:
-        if issubclass(dtype, FlagCodeMixin):
+        if is_flag_class(dtype):
             return dtype(int(data))
         else:
             return data
@@ -124,7 +124,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
 
     @staticmethod
     def on_type_invalid(data: Any, dtype: type) -> Any:
-        if issubclass(dtype, FlagCodeMixin):
+        if is_flag_class(dtype):
             return dtype(int(data))
         else:
             return data

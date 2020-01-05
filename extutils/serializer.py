@@ -1,7 +1,7 @@
 from bson import ObjectId
 from django.core.serializers.json import DjangoJSONEncoder
 
-from extutils.flags import FlagCodeMixin
+from extutils.flags import is_flag_instance
 from mongodb.factory.results import BaseResult
 from models import Model
 
@@ -14,7 +14,7 @@ class JellyBotSerializer(DjangoJSONEncoder):
             return o.serialize()
         elif isinstance(o, ObjectId):
             return repr(o)
-        elif isinstance(o, FlagCodeMixin):
+        elif is_flag_instance(o):
             return int(o)
         elif isinstance(o, set):
             return list(o)

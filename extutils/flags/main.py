@@ -4,7 +4,26 @@ from typing import Union
 from .mongo import register_encoder
 
 
-__all__ = ["FlagCodeEnum", "FlagSingleEnum", "FlagDoubleEnum", "FlagPrefixedDoubleEnum", "FlagOutcomeMixin"]
+__all__ = [
+    "FlagCodeEnum", "FlagSingleEnum", "FlagDoubleEnum", "FlagPrefixedDoubleEnum", "FlagOutcomeMixin",
+    "is_flag_class", "is_flag_single", "is_flag_double"
+]
+
+
+def is_flag_instance(inst):
+    return isinstance(inst, FlagCodeMixin)
+
+
+def is_flag_class(cls):
+    return issubclass(cls, FlagCodeMixin)
+
+
+def is_flag_single(cls):
+    return issubclass(cls, FlagSingleMixin)
+
+
+def is_flag_double(cls):
+    return issubclass(cls, FlagDoubleMixin)
 
 
 class FlagMixin:
