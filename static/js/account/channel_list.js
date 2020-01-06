@@ -12,5 +12,6 @@ function onStarBtnClick() {
 function onDetachClick() {
     if (confirm(detachConfirmMessage($(this).data("pname")))) {
         detachProfile($(this).data("poid"));
+        location.reload();
     }
 }

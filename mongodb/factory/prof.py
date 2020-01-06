@@ -143,8 +143,9 @@ class UserProfileManager(BaseCollection):
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
     def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
-        self.update_one(
-            {ChannelProfileConnectionModel.UserOid.key: user_oid},
+        self.update_many_async(
+            {ChannelProfileConnectionModel.UserOid.key: user_oid,
+             ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
             {"$pull": {
                 ChannelProfileConnectionModel.ProfileOids.key: profile_oid}})
 
