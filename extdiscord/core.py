@@ -2,6 +2,8 @@ import asyncio
 from typing import Optional, Union
 import threading
 
+from django.utils.translation import gettext_lazy as _
+
 from discord import (
     Client, Member, User, Guild, ChannelType,
     GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel,
@@ -115,6 +117,10 @@ class DiscordClient(Client):
         if udata_result.success and cdata:
             ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
 
+        sys_channel = member.guild.system_channel
+        if sys_channel:
+            await sys_channel.send(_("{} joined the server.").format(member.mention))
+
     # noinspection PyMethodMayBeStatic
     async def on_member_remove(self, member: Member):
         udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
@@ -122,6 +128,10 @@ class DiscordClient(Client):
 
         if udata_result.success and cdata:
             ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
+
+        sys_channel = member.guild.system_channel
+        if sys_channel:
+            await sys_channel.send(_("{} left the server.").format(member.mention))
 
     async def on_guild_join(self, guild: Guild):
         pass

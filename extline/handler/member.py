@@ -1,9 +1,11 @@
 import logging
 
+from django.utils.translation import gettext_lazy as _
+
 from linebot.models import MemberJoinedEvent, MemberLeftEvent
 
 from flags import Platform
-from extline import LINE, ExtraKey, event_dest_fmt, LineApiUtils
+from extline import LINE, ExtraKey, event_dest_fmt, LineApiUtils, LineApiWrapper
 from mongodb.factory import RootUserManager, ChannelManager, ProfileManager
 
 __all__ = ["handle_member_main"]
@@ -11,17 +13,25 @@ __all__ = ["handle_member_main"]
 
 # noinspection PyUnusedLocal
 def handle_member_join(request, event, destination):
+    cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
+    joined_names = []
+
     for user in event.joined.members:
         uid = user.user_id
 
         udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
-        cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 
         if udata_result.success and cdata:
             ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
 
+            uname = RootUserManager.get_root_data_uname(udata_result.model.get_oid(), cdata).user_name
+            if uname:
+                joined_names.append(uname)
+
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Join Group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+
+    LineApiWrapper.reply_text(event.reply_token, _("{} joined the group.").format(" & ".join(joined_names)))
 
 
 # noinspection PyUnusedLocal
