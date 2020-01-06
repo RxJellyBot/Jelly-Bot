@@ -18,7 +18,7 @@ class PermissionQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
 
 
 class ProfileDetachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    get_response_class = ProfileDetachResponse
+    post_response_class = ProfileDetachResponse
 
     def get_api_action(self):
         return APICommand.MG_PROFILE_DETACH
