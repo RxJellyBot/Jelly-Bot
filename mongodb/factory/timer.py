@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 
 import pymongo
 from bson import ObjectId
@@ -67,7 +67,7 @@ class TimerManager(BaseCollection):
         )
 
     @param_type_ensure
-    def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> CursorWithCount:
+    def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> List[TimerModel]:
         now = now_utc_aware()
 
         filter_ = {
@@ -78,9 +78,9 @@ class TimerManager(BaseCollection):
             TimerModel.Notified.key: False
         }
 
-        ret = self \
-            .find_cursor_with_count(filter_, parse_cls=TimerModel)\
-            .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
+        ret = list(self
+                   .find_cursor_with_count(filter_, parse_cls=TimerModel)
+                   .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
         self.update_many_async(filter_, {"$set": {TimerModel.Notified.key: True}})
 

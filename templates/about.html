@@ -12,7 +12,7 @@
                             <a class="list-group-item list-group-item-action text-primary"
                                href="http://line.me/ti/p/~RaenonX">{% trans "LINE" %}</a>
                             <a class="list-group-item list-group-item-action text-primary">{% trans "Discord" %}:
-                                レノンクス#8787
+                                レノンクス 醜醜兔#8787
                             </a>
                             <a class="list-group-item list-group-item-action text-primary"
                                href="mailto:maplestory0710@gmail.com">{% trans "Email" %}</a>
@@ -20,64 +20,26 @@
                     </div>
                 </div>
                 <div class="card border-info">
-                    <h4 class="card-header text-info text-center">{% trans "Build" %}</h4>
+                    <h4 class="card-header text-info text-center">{% trans "App-related info" %}</h4>
                     <div class="card-body text-info">
-                        <h5 class="text-center">{% trans "Beta" %}</h5>
-                        {% blocktrans trimmed %}
-                            Usually, this build has new features, but contains more bugs than Stable.<br>
-                            Some translations may be incompleted.
-                        {% endblocktrans %}<br>
-                        <small>{% trans "Deployed on " %}</small><code>{{ beta_deploy }}</code><br>
-                        <small>{% trans "Heroku Released on " %}</small><code>{{ beta_update_about }}</code><br>
-                        <small>{% trans "Commit: " %}</small><a href="{{ beta_commit_url }}" target="_blank"><code>{{ beta_commit }}</code></a>
+                        <small>{% trans "Deployed on " %}</small><code>{{ deploy }}</code><br>
+                        <small>{% trans "Heroku Released on " %}</small><code>{{ heroku_release_dt }}</code><br>
+                        <small>{% trans "Commit: " %}</small><a href="{{ commit_url }}"
+                                                                target="_blank"><code>{{ commit }}</code></a>
                         <div class="row mt-3">
                             <div class="col-lg-4">
                                 <a class="btn btn-outline-info btn-block" target="_blank"
-                                   href="http://rnnx.cc/LineBeta">LINE</a>
-                            </div>
-                            <div class="col-lg-4">
-                                <a class="btn btn-outline-info btn-block"
-                                   href="http://rnnx.cc/WebsiteBeta">{% trans "Website" %}</a>
+                                   href="http://rnnx.cc/Line">LINE</a>
                             </div>
                             <div class="col-lg-4">
                                 <a class="btn btn-outline-info btn-block" target="_blank"
-                                   href="http://rnnx.cc/DiscordBeta">Discord</a>
+                                   href="http://rnnx.cc/Website">{% trans "Website" %}</a>
+                            </div>
+                            <div class="col-lg-4">
+                                <a class="btn btn-outline-info btn-block" target="_blank"
+                                   href="http://rnnx.cc/Discord">Discord</a>
                             </div>
                         </div>
-                        <hr>
-                        <h5 class="text-center">{% trans "Stable" %}</h5>
-                        {% blocktrans trimmed %}
-                            Only features believed that will not cause problems will appear on this build.<br>
-                            Bugs should be less than the Beta build, and the translations should be completed.
-                        {% endblocktrans %}<br>
-                        <small>{% trans "Deployed on " %}</small><code>{{ stable_deploy }}</code><br>
-                        <small>{% trans "Heroku Released on " %}</small><code>{{ stable_update_about }}</code><br>
-                        <small>{% trans "Commit: " %}</small><a href="{{ stable_commit_url }}" target="_blank"><code>{{ stable_commit }}</code></a>
-                        <div class="row mt-3">
-                            <div class="col-lg-4">
-                                <a class="btn btn-outline-info btn-block" target="_blank"
-                                   href="http://rnnx.cc/LineStable">LINE</a>
-                            </div>
-                            <div class="col-lg-4">
-                                <a class="btn btn-outline-info btn-block" target="_blank"
-                                   href="http://rnnx.cc/WebsiteStable">{% trans "Website" %}</a>
-                            </div>
-                            <div class="col-lg-4">
-                                <a class="btn btn-outline-info btn-block" target="_blank"
-                                   href="http://rnnx.cc/DiscordStable">Discord</a>
-                            </div>
-                        </div>
-                        <hr>
-                        <small>
-                            {% blocktrans trimmed %}
-                                Both Beta and Stable build share the same database.<br>
-                                If an operation on the Beta build caused the data corrupted, the data will be
-                                temporarily removed for pending repair,
-                                and it will be temporarily inaccessible. Please contact the website developer as soon as
-                                possible if you think this happened.
-                                The data will be added back to the database once the website developer fixed it.
-                            {% endblocktrans %}
-                        </small>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.template import Template, RequestContext
 from django.utils import timezone
 
-from bot.system import boot_dt_utc
+from bot.system import get_boot_dt
 from JellyBot import keys
 from JellyBot.systemconfig import System
 from JellyBot.views.nav import construct_nav
@@ -35,11 +35,9 @@ def render_template(request, title, template_name, context=None, content_type=No
     context["root_oid"] = get_root_oid(request)
 
     # Append version numbers for footer
-    context["beta_update"] = timezone.localtime(
-        HerokuWrapper.latest_succeeded_release(System.HerokuAppNameBeta).updated_at).strftime("%m/%d %H:%M (UTC%z)")
-    context["stable_update"] = timezone.localtime(
-        HerokuWrapper.latest_succeeded_release(System.HerokuAppNameStable).updated_at).strftime("%m/%d %H:%M (UTC%z)")
-    context["boot_dt"] = timezone.localtime(boot_dt_utc).strftime("%m/%d %H:%M (UTC%z)")
+    context["app_update"] = timezone.localtime(
+        HerokuWrapper.latest_succeeded_release(System.HerokuAppName).updated_at).strftime("%m/%d %H:%M (UTC%z)")
+    context["boot_dt"] = timezone.localtime(get_boot_dt()).strftime("%m/%d %H:%M (UTC%z)")
 
     # Append backend vars
     unlock_classes = []

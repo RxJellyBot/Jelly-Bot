@@ -83,6 +83,22 @@ class HourlyResult(abc.ABC):
                 return HourlyResult.DAYS_NONE
 
 
+class DailyResult(abc.ABC):
+    KEY_DATE = "dt"
+
+    @staticmethod
+    def date_list(days_collected, tzinfo):
+        ret = []
+
+        _end_ = localtime(now_utc_aware(), tz=tzinfo)
+        _start_ = (_end_ - timedelta(days=days_collected)).date()
+
+        for i in range((_end_.date() - _start_).days + 1):
+            ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
+
+        return ret
+
+
 class HourlyIntervalAverageMessageResult(HourlyResult):
     KEY_CATEGORY = "cat"
     KEY_HR = "hr"
@@ -134,8 +150,7 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
         self.hr_range = int(days_collected * 24)
 
 
-class DailyMessageResult:
-    KEY_DATE = "dt"
+class DailyMessageResult(DailyResult):
     KEY_HOUR = "hr"
 
     KEY_COUNT = "ct"
@@ -145,7 +160,7 @@ class DailyMessageResult:
         DataPoint = namedtuple("DataPoint", ["count", "percentage", "is_max"])
 
         self.label_hr = [h for h in range(24)]
-        self.label_date = self._prepare_label_data_(days_collected, tzinfo)
+        self.label_date = self.date_list(days_collected, tzinfo)
 
         data_sum = {dt: 0 for dt in self.label_date}
         data = {dt: [0] * 24 for dt in self.label_date}
@@ -173,17 +188,20 @@ class DailyMessageResult:
         self.data = [ResultEntry(date=date, data=data[date])
                      for date in sorted(data.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
 
-    @staticmethod
-    def _prepare_label_data_(days_collected, tzinfo):
-        ret = []
 
-        _end_ = localtime(now_utc_aware(), tz=tzinfo)
-        _start_ = (_end_ - timedelta(days=days_collected)).date()
+class MemberDailyMessageResult(DailyResult):
+    KEY_MEMBER = "mbr"
 
-        for i in range((_end_.date() - _start_).days + 1):
-            ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
+    KEY_COUNT = "ct"
 
-        return ret
+    def __init__(self, cursor, days_collected, tzinfo):
+        self.dates = self.date_list(days_collected, tzinfo)
+        self.data = {date: {} for date in self.dates}
+        for d in cursor:
+            _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]
+            _member_ = d[OID_KEY][MemberDailyMessageResult.KEY_MEMBER]
+            _count_ = d[MemberDailyMessageResult.KEY_COUNT]
+            self.data[_date_][_member_] = _count_
 
 
 @dataclass

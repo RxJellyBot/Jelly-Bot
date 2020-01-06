@@ -27,6 +27,6 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "user_ch_list": ProfileManager.get_user_channel_profiles(
                     root_uid, inside_only=True, accessbible_only=True),
                 "root_uid_str": str(root_uid),
-                "perm_pin_access": PermissionCategory.AR_ACCESS_PINNED_MODULE.code_num,
+                "perm_pin_access": PermissionCategory.AR_ACCESS_PINNED_MODULE.code,
                 "oid_key": OID_KEY
             })

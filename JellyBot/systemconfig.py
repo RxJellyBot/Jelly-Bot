@@ -4,15 +4,16 @@ import math
 import os
 
 
-HostUrl = os.environ.get("HOST_URL") or "http://localhost:8000"
+HostUrl = os.environ.get("HTTP_HOST") or "http://localhost:8000"
+if "HTTP_HOST" in os.environ:
+    HostUrl = f"http://{HostUrl}"
 
 
 class System:
     PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
 
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
-    HerokuAppNameBeta = "newjellybot-beta"
-    HerokuAppNameStable = "newjellybot"
+    HerokuAppName = "newjellybot"
 
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000

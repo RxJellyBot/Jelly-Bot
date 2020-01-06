@@ -4,23 +4,11 @@ Supported on Discord and LINE. Feel free to add it to your group!
 
 
 
-LINE Bot:
+LINE Bot: http://rnnx.cc/Line
 
-- Beta: http://rnnx.cc/LineBeta
+Discord Bot: http://rnnx.cc/Discord
 
-- Stable: http://rnnx.cc/LineStable
-
-Discord:
-
-- Beta: http://rnnx.cc/DiscordBeta
-
-- Stable: http://rnnx.cc/DiscordStable
-
-Website:
-
-- Beta: http://rnnx.cc/WebsiteBeta
-
-- Stable: http://rnnx.cc/WebsiteStable
+Website: http://rnnx.cc/Website
 
 ### See [Latest Release](https://github.com/RaenonX/Jelly-Bot/releases/latest) for the latest features list!
 
@@ -49,3 +37,7 @@ Website:
 `Sep 11 2019` - LINE/Discord bot started.
 
 `Nov 27 2019` - Formal release. Only advertised in the developer-owned main active groups.
+
+`Dec 30 2019` - Shutdown the stable build and merge the beta build to be the stable build.
+
+- Because the user count of the stable build is significantly less than beta build.
