@@ -46,6 +46,13 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-lg mb-3 custom-control custom-checkbox text-center">
+                    <input type="checkbox" class="custom-control-input" name="incl_unav" id="incl-unav" {% if incl_unav %}checked{% endif %}>
+                    <label class="custom-control-label"
+                           for="incl-unav">{% trans "Including Unavailable Members" %}</label>
+                </div>
+            </div>
             <div class="row text-right">
                 <div class="col">
                     <button class="btn btn-dark" type="submit">{% trans "Refresh" %}</button>
@@ -135,6 +142,16 @@
         <div class="row">
             <div class="col-lg mb-3">
                 {% include "info/components/msg_table_count.html" with message_data=channel_user_msg simplified=False only %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Member Daily Message Count" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_table_user_daily.html" with message_data=msg_daily_user only %}
             </div>
         </div>
     </div>

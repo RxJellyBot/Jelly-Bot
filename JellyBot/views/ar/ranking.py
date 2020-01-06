@@ -42,5 +42,5 @@ class AutoReplyRankingChannelListView(LoginRequiredMixin, TemplateResponseMixin,
             request, _("Auto-Reply ranking channel list"), "ar/rk-list.html",
             {
                 "channel_list": ProfileManager.get_user_channel_profiles(
-                    root_uid, inside_only=True, accessbible_only=False)
+                    root_uid, inside_only=True, accessbible_only=True)
             }, nav_param=kwargs)

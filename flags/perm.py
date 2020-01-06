@@ -1,9 +1,11 @@
+from typing import Dict
+
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagPrefixedDoubleEnum
+from extutils.flags import FlagDoubleEnum
 
 
-class PermissionCategory(FlagPrefixedDoubleEnum):
+class PermissionCategory(FlagDoubleEnum):
     """
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !! Add corresponding HTML file under `templates/account/channel/perm` with code as the name of the file. !!
@@ -23,10 +25,6 @@ class PermissionCategory(FlagPrefixedDoubleEnum):
         302 - Adjust Votes
         303 - Adjust Info Privacy
     """
-
-    @property
-    def code_prefix(self) -> str:
-        return "_"
 
     @classmethod
     def default(cls):
@@ -77,13 +75,13 @@ class PermissionCategoryDefault:
     )
 
     @staticmethod
-    def get_default_preset() -> dict:
+    def get_default_preset() -> Dict[PermissionCategory, bool]:
         if "default" not in PermissionCategoryDefault._Cache:
             PermissionCategoryDefault._Cache["default"] = {k: v for k, v in PermissionCategoryDefault._Preset}
         return PermissionCategoryDefault._Cache["default"]
 
     @staticmethod
-    def get_default_preset_dict() -> dict:
+    def get_default_preset_dict() -> Dict[str, bool]:
         return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_preset().items()}
 
     @staticmethod

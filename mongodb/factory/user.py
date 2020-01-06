@@ -174,7 +174,8 @@ class RootUserManager(BaseCollection):
 
     @param_type_ensure
     def get_root_data_uname(
-            self, root_oid: ObjectId, channel_data: Optional[ChannelModel] = None) -> Optional[namedtuple]:
+            self, root_oid: ObjectId, channel_data: Optional[ChannelModel] = None,
+            str_not_found: Optional[str] = None) -> Optional[namedtuple]:
         """
         Get the name of the user with UID = `root_oid`.
 
@@ -201,8 +202,15 @@ class RootUserManager(BaseCollection):
                 onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
 
                 if onplat_data:
+                    uname = onplat_data.get_name(channel_data)
+                    if not uname:
+                        if str_not_found:
+                            uname = str_not_found
+                        else:
+                            uname = onplat_data.get_name_str(channel_data)
+
                     return UserNameQuery(
-                        user_id=root_oid, user_name=onplat_data.get_name_str(channel_data))
+                        user_id=root_oid, user_name=uname)
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "

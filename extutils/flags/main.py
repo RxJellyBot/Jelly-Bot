@@ -4,6 +4,9 @@ from typing import Union
 from .mongo import register_encoder
 
 
+__all__ = ["FlagCodeEnum", "FlagSingleEnum", "FlagDoubleEnum", "FlagPrefixedDoubleEnum", "FlagOutcomeMixin"]
+
+
 class FlagMixin:
     @classmethod
     def default(cls):
@@ -38,6 +41,8 @@ class FlagCodeMixin(FlagMixin):
     def __eq__(self, other):
         if isinstance(other, int):
             return self.code == other
+        elif isinstance(other, str) and other.isnumeric():
+            return self.code == int(other)
         else:
             return super().__eq__(other)
 
@@ -91,6 +96,24 @@ class FlagDoubleMixin(FlagSingleMixin):
     def description(self):
         return self._desc
 
+    @property
+    def code_str(self) -> str:
+        return f"{self._code}"
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            eq = self.code_str == other
+            if eq:
+                return eq
+
+            if other.isnumeric():
+                return self.code == int(other)
+
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return hash((self.__class__, self._code))
+
 
 class FlagPrefixedDoubleMixin(FlagDoubleMixin):
     def __init__(self, code: int, key: str, description: str):
@@ -106,21 +129,14 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
         return self._desc
 
     @property
-    def code(self) -> str:
+    def code_str(self) -> str:
         return f"{self.code_prefix}{self._code}"
-
-    @property
-    def code_num(self) -> int:
-        return self._code
 
     def __hash__(self):
         return hash((self.__class__, self._code))
 
     def __eq__(self, other):
-        if isinstance(other, str):
-            return self.code == other
-        else:
-            return super().__eq__(other)
+        return super().__eq__(other)
 
 
 class FlagEnumMixin:
@@ -134,13 +150,13 @@ class FlagEnumMixin:
 
         # noinspection PyTypeChecker
         for i in list(cls):
-            if i.code == item:
+            if i == item:
                 return i
 
         if silent_fail:
             return None
         else:
-            raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
+            raise TypeError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
 
     @classmethod
     def contains(cls, item):
