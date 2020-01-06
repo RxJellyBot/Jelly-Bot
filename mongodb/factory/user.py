@@ -155,10 +155,6 @@ class RootUserManager(BaseCollection):
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
 
-    @param_type_ensure
-    def _get_onplat_data_(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
-        return self._mgr_onplat.get_onplat(platform, user_token)
-
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
 
@@ -261,6 +257,10 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
 
+    @param_type_ensure
+    def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
+        return self._mgr_onplat.get_onplat(platform, user_token)
+
     def get_onplat_data_dict(self) -> Dict[ObjectId, OnPlatformUserModel]:
         ret = {}
         for d in self._mgr_onplat.find_cursor_with_count({}, parse_cls=OnPlatformUserModel):
@@ -290,14 +290,14 @@ class RootUserManager(BaseCollection):
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
 
     def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
-        on_plat_data = self._get_onplat_data_(platform, user_token)
+        on_plat_data = self.get_onplat_data(platform, user_token)
         rt_user_data = None
 
         if on_plat_data is None and auto_register:
             on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
 
             if on_plat_reg_result.success:
-                on_plat_data = self._get_onplat_data_(platform, user_token)
+                on_plat_data = self.get_onplat_data(platform, user_token)
 
         if on_plat_data is None:
             outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
