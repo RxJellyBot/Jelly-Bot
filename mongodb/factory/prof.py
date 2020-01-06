@@ -331,19 +331,22 @@ class ProfileManager:
         ret = []
 
         for prof in profiles:
-            ret.extend([PermissionCategory.cast(perm_cat)
-                        for perm_cat, perm_grant
-                        in prof.permission.items() if perm_grant])
+            for perm_cat, perm_grant in prof.permission.items():
+                perm = PermissionCategory.cast(perm_cat, silent_fail=True)
+                if perm_grant and perm:
+                    ret.append(perm)
 
             if prof.is_mod:
-                ret.extend(PermissionCategory.cast(perm_cat)
-                           for perm_cat, perm_grant
-                           in PermissionCategoryDefault.get_mod_override() if perm_grant)
+                for perm_cat, perm_grant in PermissionCategoryDefault.get_mod_override():
+                    perm = PermissionCategory.cast(perm_cat, silent_fail=True)
+                    if perm_grant and perm:
+                        ret.append(perm)
 
             if prof.is_admin:
-                ret.extend(PermissionCategory.cast(perm_cat)
-                           for perm_cat, perm_grant
-                           in PermissionCategoryDefault.get_admin_override() if perm_grant)
+                for perm_cat, perm_grant in  PermissionCategoryDefault.get_admin_override():
+                    perm = PermissionCategory.cast(perm_cat, silent_fail=True)
+                    if perm_grant and perm:
+                        ret.append(perm)
 
         return ret
 

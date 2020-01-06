@@ -125,7 +125,7 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 
 class FlagEnumMixin:
     @classmethod
-    def cast(cls, item: Union[str, int]):
+    def cast(cls, item: Union[str, int], silent_fail=False):
         if isinstance(item, cls):
             return item
 
@@ -137,7 +137,10 @@ class FlagEnumMixin:
             if i.code == item:
                 return i
 
-        raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
+        if silent_fail:
+            return None
+        else:
+            raise TypeError(f"`FlagEnum` casting failed. Target: {cls} Item: {item}")
 
     @classmethod
     def contains(cls, item):
