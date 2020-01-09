@@ -85,8 +85,12 @@ class LineApiUtils:
         return event.source.sender_id
 
     @staticmethod
-    def get_user_id(event):
-        return event.source.user_id
+    def get_user_id(event, destination=None):
+        ret = event.source.user_id
+        if not ret:
+            ret = destination
+
+        return ret
 
     @staticmethod
     def get_channel_type(channel_token: str):

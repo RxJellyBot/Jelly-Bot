@@ -2,23 +2,18 @@ from django.views.generic.base import View, TemplateResponseMixin
 from django.utils.translation import gettext_lazy as _
 
 from mongodb.factory import AutoReplyManager, ProfileManager
-from flags import WebsiteError
 from JellyBot.systemconfig import Website
-from JellyBot.utils import get_channel_data, get_limit, get_root_oid
-from JellyBot.components.mixin import LoginRequiredMixin
-from JellyBot.views import WebsiteErrorView
+from JellyBot.utils import get_limit, get_root_oid
+from JellyBot.components.mixin import LoginRequiredMixin, ChannelOidRequiredMixin
 from JellyBot.views.render import render_template
 
 
-class AutoReplyChannelRankingView(LoginRequiredMixin, TemplateResponseMixin, View):
+class AutoReplyChannelRankingView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
         root_uid = get_root_oid(request)
 
-        channel_data = get_channel_data(kwargs)
-        if not channel_data.ok:
-            return WebsiteErrorView.website_error(
-                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
+        channel_data = self.get_channel_data(*args, **kwargs)
 
         limit = get_limit(request.GET, Website.AutoReply.RankingMaxCount)
 

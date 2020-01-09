@@ -27,6 +27,7 @@ class Results:
 
 class SenderIdentity:
     SENDER = "sender"
+    PERMISSION = "permission"
 
 
 class AutoReplyResponse:

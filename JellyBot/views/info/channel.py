@@ -4,22 +4,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid, get_channel_data
-from flags import WebsiteError
+from JellyBot.views import render_template
+from JellyBot.utils import get_root_oid
+from JellyBot.components.mixin import ChannelOidRequiredMixin
 from models import ChannelCollectionModel
 from mongodb.factory import ProfileManager, ChannelCollectionManager, BotFeatureUsageDataManager
 from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
 
 
-class ChannelInfoView(TemplateResponseMixin, View):
+class ChannelInfoView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        channel_data = get_channel_data(kwargs)
-
-        if not channel_data.ok:
-            return WebsiteErrorView.website_error(
-                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
+        channel_data = self.get_channel_data(*args, **kwargs)
 
         chcoll_data: Optional[ChannelCollectionModel] = \
             ChannelCollectionManager.get_chcoll_child_channel(channel_data.model.id)

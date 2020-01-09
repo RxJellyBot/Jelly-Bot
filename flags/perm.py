@@ -24,6 +24,11 @@ class PermissionCategory(FlagDoubleEnum):
         301 - Adjust features
         302 - Adjust Votes
         303 - Adjust Info Privacy
+
+    4xx - Profile Control
+        401 - Create Profile
+        402 - Delete Profile
+        403 - Attach on Member
     """
 
     @classmethod
@@ -53,6 +58,18 @@ class PermissionCategory(FlagDoubleEnum):
     CNL_ADJUST_PRIVACY = \
         303, _("Channel: Info Privacy"), \
         _("User who has this permission can change the privacy of the channel info.")
+
+    PRF_CREATE_ATTACH = \
+        401, _("Profile: Create/Attach"), \
+        _("User who has this permission can create profiles or attach profiles to themselves.")
+
+    PRF_DELETE = \
+        402, _("Profile: Delete"), \
+        _("User who has this permission can delete profiles.")
+
+    PRF_ATTACH_MEMBER = \
+        403, _("Profile: Attach on Member"), \
+        _("User who has this permission can attach profiles to the other members.")
 
 
 class PermissionLevel(FlagSingleEnum):
@@ -101,7 +118,7 @@ class PermissionCategoryDefault:
         if highest_perm_lv not in PermissionCategoryDefault._Cache:
             perms = PermissionCategoryDefault._Default
             for perm_lv in highest_perm_lv.iter_to_max:
-                perms.symmetric_difference_update(PermissionCategoryDefault._Override.get(perm_lv, set()))
+                perms = perms.union(PermissionCategoryDefault._Override.get(perm_lv, set()))
 
             PermissionCategoryDefault._Cache[highest_perm_lv] = perms
 

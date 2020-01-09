@@ -52,7 +52,30 @@ class HandlePlatformMixin(BaseMixin, ABC):
         return super().pass_condition() and self._platform is not None
 
 
-class HandleChannelOidMixin(HandleChannelMixin, HandlePlatformMixin, ABC):
+class HandleChannelOidMixin(BaseMixin, ABC):
+    def __init__(self, param_dict, sender_oid):
+        super().__init__(param_dict, sender_oid)
+
+        self._param_dict.update(**{
+            param.Common.CHANNEL_OID: param_dict.get(param.Common.CHANNEL_OID)
+        })
+
+        self._channel_oid = self._param_dict[param.Common.CHANNEL_OID] = param_dict.get(param.Common.CHANNEL_OID)
+
+    def _handle_channel_oid_(self):
+        if not self._channel_oid:
+            self._err[param.Common.CHANNEL_OID] = self._channel_oid
+
+    def pre_process(self):
+        super().pre_process()
+
+        self._handle_channel_oid_()
+
+    def pass_condition(self) -> bool:
+        return super().pass_condition() and self._channel_oid is not None
+
+
+class HandleChannelRegisterOidMixin(HandleChannelMixin, HandlePlatformMixin, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
@@ -68,8 +91,14 @@ class RequireSenderMixin(BaseMixin, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
-        if sender_oid is None:
-            self._err[result.SenderIdentity.SENDER] = sender_oid
+    def _handle_sender_oid_(self):
+        if self._sender_oid is None:
+            self._err[result.SenderIdentity.SENDER] = self._sender_oid
+
+    def pre_process(self):
+        super().pre_process()
+
+        self._handle_sender_oid_()
 
     def pass_condition(self) -> bool:
         return super().pass_condition() and self._sender_oid is not None

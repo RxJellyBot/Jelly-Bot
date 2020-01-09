@@ -1,5 +1,6 @@
 $(document).ready(function () {
     $("input#color").keyup(onColorKeyup);
+    $("input#name").keyup(onNameKeyup);
     onColorKeyup();
 });
 
@@ -20,6 +21,14 @@ function onColorKeyup() {
     }
 
     enableSubmit(validColor);
+}
+
+function onNameKeyup() {
+    checkNameValidity($("input#channelOid").val(), $(this).val(), function(pass) {
+        enableSubmit(pass);
+
+        $("input#name").removeClass("is-valid is-invalid").addClass(pass ? "is-valid" : "is-invalid");
+    });
 }
 
 function enableSubmit(enable) {

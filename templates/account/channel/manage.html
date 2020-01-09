@@ -34,7 +34,10 @@
                             <div class="list-group">
                                 {% for prof in user_profiles %}
                                     <a class="list-group-item list-group-item-action text-success"
-                                       href="{% url "info.profile" profile_oid=prof.id %}">{{ prof.name }}</a>
+                                       href="{% url "info.profile" profile_oid=prof.id %}">
+                                    <span class="dot" style="background-color: {{ prof.color.color_hex }}"></span>
+                                        {{ prof.name }}
+                                    </a>
                                 {% endfor %}
                             </div>
                         </div>

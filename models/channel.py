@@ -20,7 +20,6 @@ class ChannelConfigModel(Model):
     EnableTimer = BooleanField("e-tmr", default=True)
     EnableCalculator = BooleanField("e-calc", default=True)
     EnableBotCommand = BooleanField("e-bot", default=True)
-    EnableCreateProfile = BooleanField("e-crp", default=True)
     InfoPrivate = BooleanField("prv", default=False)
     DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
     DefaultName = TextField("d-name", allow_none=True)

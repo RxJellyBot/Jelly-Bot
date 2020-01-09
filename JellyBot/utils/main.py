@@ -1,4 +1,4 @@
-from typing import Optional, NamedTuple
+from typing import Optional
 from collections import OrderedDict, namedtuple
 
 from django.apps import apps
@@ -7,7 +7,6 @@ from bson import ObjectId
 
 from extutils import safe_cast
 from flags import Platform
-from models import ChannelModel
 from mongodb.factory import RootUserManager, ChannelManager
 from JellyBot.keys import Session, ParamDictPrefix
 from JellyBot.api.static.param import Common
