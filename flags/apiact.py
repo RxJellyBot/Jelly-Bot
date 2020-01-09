@@ -31,6 +31,10 @@ class APICommand(FlagSingleEnum):
             401: Issue Channel Registration Execode
             402: Change Channel Star
             403: Change Channel Name
+        41x - Profile
+            411: Detach
+            412: Check Name
+            413: Attach
 
     5xx - Special Services
         50x - Short URL
@@ -57,6 +61,10 @@ class APICommand(FlagSingleEnum):
     MG_CHANNEL_ISSUE_REG = 401, _("Management - Issue Channel Registration Execode")
     MG_CHANNEL_STAR_CHANGE = 402, _("Management - Change Channel Star")
     MG_CHANNEL_NAME_CHANGE = 403, _("Management - Change Channel Name")
+
+    MG_PROFILE_DETACH = 411, _("Management - Detach Profile")
+    MG_PROFILE_NAME_CHECK = 412, _("Management - Profile Name Check")
+    MG_PROFILE_ATTACH = 413, _("Management - Attach Profile")
 
     SERV_SHORTEN_URL = 501, _("Services - Shorten URL")
     SERV_UPDATE_TARGET = 502, _("Services - Update Target")

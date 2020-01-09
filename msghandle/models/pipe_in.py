@@ -178,10 +178,11 @@ class MessageEventObjectFactory:
         return ChannelCollectionManager.register(platform, token, child_channel_oid, default_name).model
 
     @staticmethod
-    def from_line(event: MessageEvent) -> MessageEventObject:
+    def from_line(event: MessageEvent, destination: str) -> MessageEventObject:
         from extline import LineApiUtils, LineApiWrapper
 
-        user_model = MessageEventObjectFactory._ensure_user_idt_(Platform.LINE, LineApiUtils.get_user_id(event))
+        user_model = MessageEventObjectFactory._ensure_user_idt_(
+            Platform.LINE, LineApiUtils.get_user_id(event, destination))
         channel_model = MessageEventObjectFactory._ensure_channel_(
             Platform.LINE, LineApiUtils.get_channel_id(event), LineApiUtils.get_channel_id(event))
 

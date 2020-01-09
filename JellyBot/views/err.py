@@ -26,6 +26,8 @@ class WebsiteErrorView:
                 (_("Channel Collection Not Found"), "err/info/chcoll_not_found.html"),
             WebsiteError.BOT_CMD_NOT_FOUND:
                 (_("Bot Command Not Found"), "err/doc/cmd_not_found.html"),
+            WebsiteError.INSUFFICIENT_PERMISSION:
+                (_("Insufficient Permission"), "err/insuf_perm.html"),
             WebsiteError.UNKNOWN:
                 (_("Unknown"), "err/unknown.html")
         }

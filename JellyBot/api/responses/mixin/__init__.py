@@ -1,5 +1,7 @@
 from ._base import BaseMixin
 from .common import (
-    HandleChannelOidMixin, HandleChannelMixin, HandlePlatformMixin, RequireSenderMixin, RequireSenderAutoRegisterMixin
+    HandleChannelRegisterOidMixin, HandleChannelMixin, HandlePlatformMixin,
+    RequireSenderMixin, RequireSenderAutoRegisterMixin, HandleChannelOidMixin
 )
 from .serialize import SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
+from .perm import RequirePermissionMixin

@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Error" %}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row text-center text-danger">
+            <div class="col-lg display-4">
+                {% trans "Insufficient Permission" %}
+            </div>
+        </div>
+        <div class="row text-center text-danger">
+            <div class="col-lg align-self-center">
+                {% trans "Certain permissions is required for this operation." %}
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                    {% trans "To perform the operation, the following permission(s) is required:" %}<br>
+                <ul>
+                    {% for perm in required_permission %}
+                        <li><code>{{ perm.code }}</code>&nbsp;-&nbsp;{{ perm.key }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

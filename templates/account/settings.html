@@ -19,7 +19,7 @@
                         <div class="card-body text-primary">
                             <div class="row">
                                 <label class="col-sm-4 col-form-label text-center"
-                                       for="cfgName">{% trans "Name" context "Profile Name" %}</label>
+                                       for="cfgName">{% trans "Name" context "User Name" %}</label>
                                 <div class="col-sm-8">
                                     {% with current_config.name as current_name %}
                                         <input type="text" class="form-control" id="cfgName" name="x-Name"
@@ -34,7 +34,6 @@
                     <div class="card border-info mb-3">
                         <div class="card-header text-center text-info">{% trans "Preferences" %}</div>
                         <div class="card-body text-info">
-
                             <div class="row mb-3">
                                 <label class="col-sm-4 col-form-label text-center" for="cfgLocale"
                                        data-toggle="tooltip" data-placement="top"

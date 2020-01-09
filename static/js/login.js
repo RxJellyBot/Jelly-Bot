@@ -6,19 +6,15 @@ $(document).ready(function() {
 
 // noinspection JSUnusedGlobalSymbols
 function onSignInHandle(idToken, defaultRedirectUrl) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('POST', window.location.href);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('X-CSRFToken', $("input[name=csrfmiddlewaretoken]").val());
-    xhr.onload = function () {
+    xhrPostRequest(window.location.href, 'idtoken=' + idToken, function (xhr) {
         if (xhr.responseText === "PASS") {
             window.location.replace(getRedirectUrl(defaultRedirectUrl));
         } else {
             generateAlert("danger", xhr.responseText);
         }
-    };
-    // noinspection JSUnresolvedFunction, JSUnresolvedVariable
-    xhr.send('idtoken=' + idToken);
+    }, function (xhr) {
+        xhr.setRequestHeader('X-CSRFToken', $("input[name=csrfmiddlewaretoken]").val());
+    });
 }
 
 function getRedirectUrl(defaultUrl) {

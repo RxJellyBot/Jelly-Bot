@@ -1,4 +1,4 @@
 from .channel import (
     ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, ChannelStarChangeResponse
 )
-from .perm import PermissionQueryResponse
+from .prof import PermissionQueryResponse, ProfileDetachResponse, ProfileNameCheckResponse, ProfileAttachResponse

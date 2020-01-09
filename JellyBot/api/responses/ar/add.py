@@ -4,7 +4,7 @@ from JellyBot import systemconfig
 from JellyBot.api.static import result, info, param
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.responses.mixin import (
-    HandleChannelOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultExtraMixin
+    HandleChannelRegisterOidMixin, SerializeErrorMixin, RequireSenderMixin, SerializeResultExtraMixin
 )
 from extutils import cast_keep_none
 from flags import AutoReplyContentType, Execode
@@ -129,7 +129,7 @@ class AutoReplyAddBaseResponse(
         return self._param_dict
 
 
-class AutoReplyAddResponse(HandleChannelOidMixin, AutoReplyAddBaseResponse):
+class AutoReplyAddResponse(HandleChannelRegisterOidMixin, AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = AutoReplyManager.add_conn_complete(
             self._keyword, self._keyword_type, self._responses, self._sender_oid, self.get_channel_oid(),

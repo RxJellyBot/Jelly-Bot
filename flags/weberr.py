@@ -18,6 +18,9 @@ class WebsiteError(FlagSingleEnum):
 
     200 - Bot
         200 - Command not found
+
+    300 - Permission
+        300 - Insufficient Permission
     """
 
     @classmethod
@@ -35,3 +38,5 @@ class WebsiteError(FlagSingleEnum):
     CHANNEL_COLLECTION_NOT_FOUND = 103, _("Channel Collection Not Found")
 
     BOT_CMD_NOT_FOUND = 200, _("Bot Command Not Found")
+
+    INSUFFICIENT_PERMISSION = 300, _("Insufficient Permission")

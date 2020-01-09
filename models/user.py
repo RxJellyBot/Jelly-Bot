@@ -80,6 +80,11 @@ class OnPlatformUserModel(Model):
 
             if self.platform == Platform.LINE:
                 from extline import LineApiWrapper
+                from models import ChannelCollectionModel
+
+                if isinstance(channel_data, ChannelCollectionModel):
+                    raise ValueError("Finding the user name with `ChannelCollectionModel` currently not yet supported. "
+                                     "Check issue #38.")
 
                 if channel_data:
                     n = LineApiWrapper.get_user_name_safe(self.token, channel_data)

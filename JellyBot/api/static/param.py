@@ -52,6 +52,11 @@ class Manage:
         NEW_NAME = "name"
         STAR = "star"
 
+    class Profile:
+        CHANNEL_OID = Common.CHANNEL_OID
+        PROFILE_OID = "poid"
+        NAME = "name"
+
 
 class Service:
     class ShortUrl:

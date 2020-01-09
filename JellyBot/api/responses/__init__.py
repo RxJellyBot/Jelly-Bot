@@ -5,7 +5,7 @@ from .ar import (
 )
 from .id import (
     ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, PermissionQueryResponse,
-    ChannelStarChangeResponse
+    ChannelStarChangeResponse, ProfileDetachResponse, ProfileNameCheckResponse, ProfileAttachResponse
 )
 from .execode import ExecodeCompleteApiResponse, ExecodeListApiResponse
 from .services import ShortUrlShortenResponse
