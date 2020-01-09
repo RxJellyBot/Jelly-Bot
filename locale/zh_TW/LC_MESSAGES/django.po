@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 07:45+0800\n"
-"PO-Revision-Date: 2020-01-06 07:48+0800\n"
+"POT-Creation-Date: 2020-01-06 14:31+0800\n"
+"PO-Revision-Date: 2020-01-06 14:32+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -504,6 +504,18 @@ msgid ""
 "Eligibility of accessing the pinned auto-reply module, changing the admin/"
 "mod of a channel...etc."
 msgstr "置頂自動回覆組的存取權、更動頻道的管理者、副管...等。"
+
+#: .\extdiscord\core.py:122
+msgid "{} joined the server."
+msgstr "{} 加入了群組。"
+
+#: .\extdiscord\core.py:134
+msgid "{} left the server."
+msgstr "{} 離開了群組。"
+
+#: .\extline\handler\member.py:34
+msgid "{} joined the group."
+msgstr "{} 加入了群組。"
 
 #: .\extutils\dt.py:26
 msgid "{} Days {} H {:02} M {:02} S"
@@ -1175,66 +1187,82 @@ msgstr "貼圖"
 msgid "File"
 msgstr "檔案"
 
-#: .\flags\perm.py:34 .\flags\perm.py:71
+#: .\flags\perm.py:38 .\flags\perm.py:83
 msgid "Normal"
 msgstr "一般"
 
-#: .\flags\perm.py:35
+#: .\flags\perm.py:39
 msgid "User who has this permission can do all normal operations."
 msgstr "擁有此權限的用戶可以使用所有一般功能。"
 
-#: .\flags\perm.py:38
+#: .\flags\perm.py:42
 msgid "Auto-Reply: Access Pinned Module"
 msgstr "自動回覆: 存取置頂回覆組"
 
-#: .\flags\perm.py:39
+#: .\flags\perm.py:43
 msgid ""
 "User who has this permission can access the Pinned property of the Auto-"
 "Reply modules."
 msgstr "擁有此權限的用戶可以存取回覆組的屬性。"
 
-#: .\flags\perm.py:42
+#: .\flags\perm.py:46
 msgid "Members: Change Managers"
 msgstr "成員管理: 更動管理者"
 
-#: .\flags\perm.py:43
+#: .\flags\perm.py:47
 msgid "User who has this permission can change the members of managers."
 msgstr "擁有此權限的用戶可以更改管理員的組成。"
 
-#: .\flags\perm.py:46
+#: .\flags\perm.py:50
 msgid "Channel: Features availability"
 msgstr "頻道: 開關功能"
 
-#: .\flags\perm.py:47
+#: .\flags\perm.py:51
 msgid ""
 "User who has this permission can change the availability of the certain "
 "features."
 msgstr "擁有此權限的用戶可以開關特定功能。"
 
-#: .\flags\perm.py:50
+#: .\flags\perm.py:54
 msgid "Channel: Vote for managers"
 msgstr "頻道: 開關票選管理員功能"
 
-#: .\flags\perm.py:51
+#: .\flags\perm.py:55
 msgid ""
 "User who has this permission can change the availability of voting to "
 "promote members."
 msgstr "擁有此權限的用戶可以開關票選管理員的功能。"
 
-#: .\flags\perm.py:54
+#: .\flags\perm.py:58
 msgid "Channel: Info Privacy"
 msgstr "頻道: 資訊隱私"
 
-#: .\flags\perm.py:55
+#: .\flags\perm.py:59
 msgid ""
 "User who has this permission can change the privacy of the channel info."
 msgstr "擁有此權限的用戶可以更改頻道資訊是否隱藏。"
 
-#: .\flags\perm.py:72 .\templates\info\profile.html:62
+#: .\flags\perm.py:62
+msgid "Profile: Create"
+msgstr "身分組: 建立"
+
+#: .\flags\perm.py:63
+msgid "User who has this permission can create profiles."
+msgstr "擁有此權限的用戶可以建立身分組。"
+
+#: .\flags\perm.py:66
+msgid "Profile: Delete"
+msgstr "身分組: 刪除"
+
+#: .\flags\perm.py:67
+msgid "User who has this permission can delete profiles."
+msgstr "擁有此權限的用戶可以刪除身分組。"
+
+#: .\flags\perm.py:84 .\templates\info\profile.html:62
 msgid "Moderator"
 msgstr "副管"
 
-#: .\flags\perm.py:73 .\templates\info\profile.html:60
+#: .\flags\perm.py:85 .\templates\info\profile.html:60
 msgid "Admin"
 msgstr "管理員"
 
@@ -1317,7 +1345,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:210
+#: .\mongodb\factory\prof.py:211
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2810,15 +2838,25 @@ msgstr "身分組"
 msgid "Check ID"
 msgstr "ID"
 
-#: .\templates\account\channel\list_table.html:58
-msgid "Detach"
-msgstr "解除"
+#: .\templates\account\channel\list_table.html:47
+msgctxt "Profile Controls"
+msgid "Controls"
+msgstr "身分組控制"
 
-#: .\templates\account\channel\list_table.html:66
+#: .\templates\account\channel\list_table.html:52
 msgid "Create"
 msgstr "建立"
 
-#: .\templates\account\channel\list_table.html:74
+#: .\templates\account\channel\list_table.html:58
+#: .\templates\account\channel\manage.html:31
+msgid "Profiles"
+msgstr "身份組"
+
+#: .\templates\account\channel\list_table.html:71
+msgid "Detach"
+msgstr "解除"
+
+#: .\templates\account\channel\list_table.html:82
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\components\info_adv.html:32
@@ -2827,7 +2865,7 @@ msgstr "建立"
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:80
+#: .\templates\account\channel\list_table.html:88
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
 #: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
 #: .\templates\info\components\info_adv.html:46
@@ -2841,10 +2879,6 @@ msgstr "頻道代碼"
 #: .\templates\info\profile.html:15
 msgid "Basic Information"
 msgstr "基本資訊"
-
-#: .\templates\account\channel\manage.html:31
-msgid "Profiles"
-msgstr "身份組"
 
 #: .\templates\account\channel\manage.html:48
 msgid "Permissions and Controls"
@@ -3987,6 +4021,7 @@ msgid "Channel Collection ID: "
 msgstr "頻道組ID: "
 
 #: .\templates\info\components\info_adv.html:82
+msgctxt "Channel Controls"
 msgid "Controls"
 msgstr "頻道控制"
 

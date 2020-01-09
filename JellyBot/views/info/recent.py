@@ -2,9 +2,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from JellyBot.components.mixin import LoginRequiredMixin
+from JellyBot.components.mixin import LoginRequiredMixin, ChannelOidRequiredMixin
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid, get_channel_data, get_limit
+from JellyBot.utils import get_root_oid, get_limit
 from JellyBot.systemconfig import Website
 
 from flags import WebsiteError
@@ -13,15 +13,10 @@ from mongodb.helper import MessageStatsDataProcessor
 from mongodb.factory import ProfileManager
 
 
-class RecentMessagesView(LoginRequiredMixin, TemplateResponseMixin, View):
+class RecentMessagesView(ChannelOidRequiredMixin, LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        channel_data = get_channel_data(kwargs)
-
-        # Check if the channel data exists
-        if not channel_data.ok:
-            return WebsiteErrorView.website_error(
-                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
+        channel_data = self.get_channel_data(*args, **kwargs)
 
         # Check if the user is in the channel
         root_oid = get_root_oid(request)

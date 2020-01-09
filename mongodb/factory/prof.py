@@ -15,8 +15,8 @@ from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfi
 from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
-)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
+    ChannelModel)
 
 from ._base import BaseCollection
 
@@ -36,15 +36,22 @@ class UserProfileManager(BaseCollection):
             name="Profile Connection Identity",
             unique=True)
 
-    def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oid: ObjectId) \
+    def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
+                            profile_oids: Union[ObjectId, List[ObjectId]]) \
             -> ChannelProfileConnectionModel:
         """
         Attach `ChannelPermissionProfileModel` and return the attached data.
         """
         id_ = self.update_one(
-            {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
-             ChannelProfileConnectionModel.UserOid.key: root_uid},
-            {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}}, upsert=True).upserted_id
+            {
+                ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+                ChannelProfileConnectionModel.UserOid.key: root_uid
+            },
+            {"$addToSet": {
+                ChannelProfileConnectionModel.ProfileOids.key:
+                    {"$each": profile_oids} if isinstance(profile_oids, list) else profile_oids
+            }},
+            upsert=True).upserted_id
 
         if id_:
             # noinspection PyTypeChecker
@@ -64,6 +71,11 @@ class UserProfileManager(BaseCollection):
                                  "however no corresponding model found.")
 
         return model
+
+    def user_attch_profiles(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oids: List[ObjectId]):
+        self.update_one({ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+                         ChannelProfileConnectionModel.UserOid.key: root_uid},
+                        {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: {"$each": profile_oids}}})
 
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
@@ -207,6 +219,21 @@ class ProfileDataManager(BaseCollection):
             GetOutcome.O_ADDED if create_result.success else GetOutcome.X_DEFAULT_PROFILE_ERROR,
             create_result.model, ex)
 
+    def get_attachable_profiles(
+            self, channel_oid: ObjectId, existing_permissions: Set[PermissionCategory],
+            highest_perm_lv: PermissionLevel) \
+            -> CursorWithCount:
+        filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
+
+        # noinspection PyTypeChecker
+        limited_permissions = set(PermissionCategory) \
+            .difference(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv)) \
+            .difference(existing_permissions)
+        for perm in limited_permissions:
+            filter_[f"{ChannelProfileModel.Permission.key}.{perm.code}"] = False
+
+        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
+
     def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
         default_profile, outcome, ex = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
@@ -227,6 +254,11 @@ class ProfileDataManager(BaseCollection):
     def _create_profile_(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
+
+    @param_type_ensure
+    def is_name_available(self, channel_oid: ObjectId, name: str):
+        return self.count_documents({ChannelProfileModel.Name.key: name,
+                                     ChannelProfileModel.ChannelOid.key: channel_oid}) == 0
 
 
 class PermissionPromotionRecordHolder(BaseCollection):
@@ -301,9 +333,13 @@ class ProfileManager:
         conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
 
         if conn:
-            return [self._prof.get_profile(poid)
-                    for poid
-                    in conn.profile_oids if not None]
+            ret = []
+            for poid in conn.profile_oids:
+                prof = self._prof.get_profile(poid)
+                if prof:
+                    ret.append(prof)
+
+            return ret
         else:
             return []
 
@@ -320,8 +356,6 @@ class ProfileManager:
     def get_user_channel_profiles(self, root_uid: Optional[ObjectId], inside_only: bool = True,
                                   accessbible_only: bool = True) \
             -> List[ChannelProfileListEntry]:
-        from time import time
-
         if root_uid is None:
             return []
 
@@ -342,7 +376,6 @@ class ProfileManager:
         profile_dict = self._prof.get_profile_dict(profile_oid_list)
 
         for prof_conn in prof_conns:
-            _start_ = time()
             not_found_prof_oids = []
 
             # Get Channel Model
@@ -371,10 +404,15 @@ class ProfileManager:
             elif len(not_found_prof_oids) > 0:
                 not_found_prof_oids_dict[cnl_oid] = not_found_prof_oids
             else:
+                perms = self.get_permissions(prof)
+                can_create_profile = self.can_create_profile(perms)
+                can_delete_profile = self.can_delete_profile(perms)
+
                 ret.append(
                     ChannelProfileListEntry(
                         channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
-                        starred=prof_conn.starred, default_profile_oid=default_profile_oid
+                        starred=prof_conn.starred, default_profile_oid=default_profile_oid,
+                        can_create_profile=can_create_profile, can_delete_profile=can_delete_profile
                     ))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
@@ -400,22 +438,52 @@ class ProfileManager:
         return self._conn.get_users_exist_channel_dict(user_oids)
 
     # noinspection PyMethodMayBeStatic
-    def get_permissions(self, profiles: List[ChannelProfileModel]) -> List[PermissionCategory]:
-        ret = []
+    def get_permissions(self, profiles: List[ChannelProfileModel]) -> Set[PermissionCategory]:
+        ret = set()
 
         for prof in profiles:
-            ret.extend([PermissionCategory.cast(perm_cat)
-                        for perm_cat, perm_grant
-                        in prof.permission.items() if perm_grant])
+            for perm_cat, perm_grant in prof.permission.items():
+                perm = PermissionCategory.cast(perm_cat, silent_fail=True)
+                if perm_grant and perm:
+                    ret.add(perm)
 
             highest_perm_lv = self.highest_permission_level(profiles)
-            ret.extend(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv))
+            ret = ret.union(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv))
 
         return ret
 
-    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False)\
+    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
             -> List[ChannelProfileConnectionModel]:
         return self._conn.get_channel_members(channel_oid, available_only)
+
+    def get_available_connections(self) -> CursorWithCount:
+        return self._conn.get_available_connections()
+
+    def get_attachable_profiles(self, root_uid: ObjectId, channel_oid: ObjectId) -> List[ChannelProfileModel]:
+        profiles = self.get_user_profiles(channel_oid, root_uid)
+        exist_perm = self.get_permissions(profiles)
+        highest_perm = self.highest_permission_level(profiles)
+        attachables = {prof.id: prof
+                       for prof in self._prof.get_attachable_profiles(channel_oid, exist_perm, highest_perm)}
+        attachable_ids = set(attachables.keys())
+
+        prof_conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
+        for poid in prof_conn.profile_oids:
+            if poid in attachable_ids and poid in attachables:
+                del attachables[poid]
+
+        return list(attachables.values())
+
+    def is_name_available(self, channel_oid: ObjectId, name: str):
+        return self._prof.is_name_available(channel_oid, name)
+
+    # noinspection PyMethodMayBeStatic
+    def can_create_profile(self, permissions: Set[PermissionCategory]):
+        return PermissionCategory.PRF_CREATE_ATTACH in permissions
+
+    # noinspection PyMethodMayBeStatic
+    def can_delete_profile(self, permissions: Set[PermissionCategory]):
+        return PermissionCategory.PRF_DELETE in permissions
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
@@ -423,8 +491,9 @@ class ProfileManager:
     def change_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self._conn.change_star(channel_oid, root_oid, star)
 
-    def get_available_connections(self) -> CursorWithCount:
-        return self._conn.get_available_connections()
+    @param_type_ensure
+    def attach_profile(self, user_oid: ObjectId, channel_oid: ObjectId, profile_oid: ObjectId):
+        self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
 
     def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
         return self._conn.detach_profile(user_oid, profile_oid)

@@ -5,10 +5,10 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.utils.timezone import get_current_timezone
 
-from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid, get_channel_data
+from JellyBot.views import render_template
+from JellyBot.utils import get_root_oid
+from JellyBot.components.mixin import ChannelOidRequiredMixin
 from extutils import safe_cast
-from flags import WebsiteError
 from mongodb.factory import MessageRecordStatisticsManager
 from mongodb.helper import MessageStatsDataProcessor
 
@@ -60,14 +60,10 @@ def get_msg_stats_data_package(channel_data, hours_within, tzinfo, incl_unav):
     return ret
 
 
-class ChannelMessageStatsView(TemplateResponseMixin, View):
+class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
-        channel_data = get_channel_data(kwargs)
-
-        if not channel_data.ok:
-            return WebsiteErrorView.website_error(
-                request, WebsiteError.CHANNEL_NOT_FOUND, {"channel_oid": channel_data.oid_org}, nav_param=kwargs)
+        channel_data = self.get_channel_data(*args, **kwargs)
 
         hours_within = safe_cast(request.GET.get("hours_within"), int)
         incl_unav = safe_cast(request.GET.get("incl_unav"), bool)

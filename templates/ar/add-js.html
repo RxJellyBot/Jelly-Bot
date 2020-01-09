@@ -108,10 +108,7 @@
             url = "{% url "api.ar.add_execode" %}"
         }
 
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", url);
-        xhr.responseType = "json";
-        xhr.onload = function () {
+        xhrPostRequest(url, collectData(), function (xhr) {
             hideAllSubmitMsg();
             try {
                 updateArCode(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
@@ -119,8 +116,7 @@
             } catch (error) {
                 onSubmissionFailed(error);
             }
-        };
-        xhr.send(collectData());
+        });
     }
 
     function displayExecode(response) {

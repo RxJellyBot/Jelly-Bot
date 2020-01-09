@@ -1,9 +1,11 @@
+from abc import ABC
+
 from bson import ObjectId
 
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.static import param
 from JellyBot.api.responses.mixin import (
-    RequireSenderMixin,
+    RequireSenderMixin, HandleChannelOidMixin,
     SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin
 )
 from extutils import safe_cast
@@ -11,7 +13,7 @@ from mongodb.factory import ProfileManager
 
 
 class PermissionQueryResponse(
-        RequireSenderMixin,
+        RequireSenderMixin, HandleChannelOidMixin,
         SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin, BaseApiResponse):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
@@ -25,17 +27,8 @@ class PermissionQueryResponse(
         self._channel_oid = self._param_dict[param.Manage.Channel.CHANNEL_OID]
         self._profiles = None
 
-    def _handle_channel_(self):
-        if not self._channel_oid:
-            self._err[param.Manage.Channel.CHANNEL_OID] = self._channel_oid
-
-    def pre_process(self):
-        super().pre_process()
-
-        self._handle_channel_()
-
     def pass_condition(self) -> bool:
-        return super().pass_condition() and self._channel_oid is not None and self._root_oid is not None
+        return super().pass_condition() and self._root_oid is not None
 
     def is_success(self) -> bool:
         return super().is_success() and self._profiles is not None
@@ -47,9 +40,9 @@ class PermissionQueryResponse(
             self._result = ProfileManager.get_permissions(self._profiles)
 
 
-class ProfileDetachResponse(
+class ProfileResponseBase(
         RequireSenderMixin,
-        SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin, BaseApiResponse):
+        SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin, BaseApiResponse, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
@@ -73,6 +66,30 @@ class ProfileDetachResponse(
     def pass_condition(self) -> bool:
         return super().pass_condition() and self._profile_oid is not None and self._sender_oid is not None
 
+
+class ProfileAttachResponse(HandleChannelOidMixin, ProfileResponseBase):
+    def process_pass(self):
+        ProfileManager.attach_profile(self._sender_oid, self._channel_oid, self._profile_oid)
+        self._result = True
+
+
+class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
         ProfileManager.detach_profile(self._sender_oid, self._profile_oid)
         self._result = True
+
+
+class ProfileNameCheckResponse(
+        HandleChannelOidMixin,
+        SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin, BaseApiResponse):
+    def __init__(self, param_dict, sender_oid):
+        super().__init__(param_dict, sender_oid)
+
+        self._param_dict.update(**{
+            param.Manage.Profile.NAME: param_dict.get(param.Manage.Profile.NAME)
+        })
+
+        self._profile_name = self._param_dict[param.Manage.Profile.NAME]
+
+    def process_pass(self):
+        self._result = ProfileManager.is_name_available(self._channel_oid, self._profile_name)

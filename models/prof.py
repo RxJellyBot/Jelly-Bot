@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Set
 
 from bson import ObjectId
 
@@ -11,9 +11,9 @@ from models.field import (
 
 
 class ChannelProfileModel(Model):
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!! Check `ProfileManager.sanitize_profile_kwargs` when changing the variable name of this class. !!!
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # !!! Check `ProfileManager.process_profile_kwargs` when changing the variable name of this class. !!!
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
     Name = TextField("n", default="-", must_have_content=True)
     Color = ColorField("col")
@@ -32,6 +32,20 @@ class ChannelProfileModel(Model):
     def is_admin(self):
         return self.permission_level >= PermissionLevel.ADMIN
 
+    @property
+    def permission_set(self) -> Set[PermissionCategory]:
+        ret = set()
+
+        for cat, permitted in self.permission.items():
+            if permitted:
+                perm = PermissionCategory.cast(cat, silent_fail=True)
+                if perm:
+                    ret.add(perm)
+
+        ret = ret.union(PermissionCategoryDefault.get_overridden_permissions(self.permission_level))
+
+        return ret
+
     def pre_iter(self):
         # Will be used when the data will be passed to MongoDB
         d = [p.code_str for p in PermissionCategoryDefault.get_overridden_permissions(self.permission_level)]
@@ -48,6 +62,8 @@ class ChannelProfileListEntry:
     channel_name: str
     profiles: List[ChannelProfileModel]
     starred: bool
+    can_create_profile: bool
+    can_delete_profile: bool
     default_profile_oid: ObjectId
 
 

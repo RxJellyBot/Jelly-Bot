@@ -70,6 +70,8 @@
 {% endblock %}
 
 {% block ex-script %}
+    <script src="{% static "js/utils/xhr.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/account/channel_list.js" %}" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $("input.channel-name").keyup(onChannelNameKeyup);
@@ -83,16 +85,11 @@
                 let url = `{% url "api.id.channel.name_change" %}`;
                 let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-                let xhr = new XMLHttpRequest();
-                xhr.open("POST", url);
-                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xhr.responseType = "json";
-                xhr.onload = function () {
+                xhrPostRequest(url, params, function (xhr) {
                     let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
 
                     onNameChangeLoad(success, xhr.response, elem);
-                };
-                xhr.send(params);
+                });
             }
         }
 
@@ -108,27 +105,18 @@
             let url = `{% url "api.id.channel.star_change" %}`;
             let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channel_oid}&{{ static_keys_param.Manage.Channel.STAR }}=${new_val}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", url);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.responseType = "json";
-            xhr.send(params);
+            xhrPostRequest(url, params);
         }
 
-        function detachProfile(profile_oid) {
+        function detachProfile(profile_oid, onLoad) {
             let url = `{% url "api.id.profile.detach" %}`;
             let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", url);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.responseType = "json";
-            xhr.send(params);
+            xhrPostRequest(url, params, onLoad);
         }
 
         function detachConfirmMessage(name) {
             return `{% blocktrans trimmed %}Are you sure to detach this profile (${name})?{% endblocktrans %}`;
         }
     </script>
-    <script type="text/javascript" src="{% static "js/account/channel_list.js" %}"></script>
 {% endblock %}
