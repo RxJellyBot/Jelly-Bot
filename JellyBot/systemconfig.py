@@ -131,7 +131,8 @@ class Bot:
 
     class RecentActivity:
         CooldownSeconds = 30
-        DefaultLimitCount = 100
+        DefaultLimitCountLink = 100
+        DefaultLimitCountDirect = 15
 
     class Timer:
         AutoDeletionDays = 7
