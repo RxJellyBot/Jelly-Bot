@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 14:31+0800\n"
-"PO-Revision-Date: 2020-01-06 14:32+0800\n"
+"POT-Creation-Date: 2020-01-10 02:54+0800\n"
+"PO-Revision-Date: 2020-01-10 02:59+0800\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -125,18 +125,23 @@ msgstr "整合: 用戶資訊"
 msgid "Account Home"
 msgstr "帳號首頁"
 
-#: .\JellyBot\views\account\prof.py:29 .\JellyBot\views\nav.py:93
+#: .\JellyBot\views\account\prof.py:32 .\JellyBot\views\nav.py:93
 #: .\templates\account\channel\prof\create.html:8
 msgid "Create Profile"
 msgstr "建立身分組"
 
-#: .\JellyBot\views\account\prof.py:46
+#: .\JellyBot\views\account\prof.py:49
 msgid "Profile successfully created."
 msgstr "身分組創建成功。"
 
-#: .\JellyBot\views\account\prof.py:48
+#: .\JellyBot\views\account\prof.py:51
 msgid "Failed to create the profile."
 msgstr "身分組創建失敗。"
+
+#: .\JellyBot\views\account\prof.py:68 .\JellyBot\views\nav.py:96
+#: .\templates\account\channel\prof\attach.html:8
+msgid "Attach Profile"
+msgstr "附加身分組"
 
 #: .\JellyBot\views\ar\add.py:19
 msgid "Add an Auto-Reply"
@@ -146,20 +151,20 @@ msgstr "新增自動回覆"
 msgid "Auto-Reply Home"
 msgstr "自動回覆 - 首頁"
 
-#: .\JellyBot\views\ar\ranking.py:26
+#: .\JellyBot\views\ar\ranking.py:21
 msgid "Auto-Reply ranking in {}"
 msgstr "{} 中的自動回覆排名"
 
-#: .\JellyBot\views\ar\ranking.py:42
+#: .\JellyBot\views\ar\ranking.py:37
 msgid "Auto-Reply ranking channel list"
 msgstr "自動回覆排名頻道清單"
 
-#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:158
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:161
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:190
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:193
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -175,7 +180,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:186
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:189
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -184,7 +189,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:174
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:177
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -192,7 +197,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:172
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:175
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -200,7 +205,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:176
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:179
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -208,26 +213,26 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:178
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:181
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:161
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:164
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
 
-#: .\JellyBot\views\err.py:16 .\flags\weberr.py:29
+#: .\JellyBot\views\err.py:16 .\flags\weberr.py:32
 #: .\templates\err\exctnt_not_found.html:14
 msgid "Extra Content Not Found"
 msgstr "額外內容不存在"
 
-#: .\JellyBot\views\err.py:18 .\flags\weberr.py:30
+#: .\JellyBot\views\err.py:18 .\flags\weberr.py:33
 #: .\templates\err\not_in_the_channel.html:14
 msgid "Not in the Channel"
 msgstr "不在頻道內"
 
-#: .\JellyBot\views\err.py:20 .\flags\weberr.py:32 .\flags\weberr.py:33
+#: .\JellyBot\views\err.py:20 .\flags\weberr.py:35 .\flags\weberr.py:36
 #: .\templates\err\account\proflink_not_found.html:14
 msgid "Profile Link Not Found"
 msgstr "無對應身份組連結"
@@ -240,17 +245,22 @@ msgstr "頻道資料不存在"
 msgid "Profile Data Not Found"
 msgstr "身份組不存在"
 
-#: .\JellyBot\views\err.py:26 .\flags\weberr.py:35
+#: .\JellyBot\views\err.py:26 .\flags\weberr.py:38
 #: .\templates\err\info\chcoll_not_found.html:14
 msgid "Channel Collection Not Found"
 msgstr "頻道組不存在"
 
-#: .\JellyBot\views\err.py:28 .\flags\weberr.py:37
+#: .\JellyBot\views\err.py:28 .\flags\weberr.py:40
 msgid "Bot Command Not Found"
 msgstr "機器人指令不存在"
 
-#: .\JellyBot\views\err.py:30 .\flags\execode.py:25 .\flags\msgtype.py:11
-#: .\flags\weberr.py:27
+#: .\JellyBot\views\err.py:30 .\flags\weberr.py:42
+#: .\templates\err\insuf_perm.html:14
+msgid "Insufficient Permission"
+msgstr "權限不足"
+
+#: .\JellyBot\views\err.py:32 .\flags\execode.py:25 .\flags\msgtype.py:11
+#: .\flags\weberr.py:30
 msgid "Unknown"
 msgstr "不明行為"
 
@@ -270,31 +280,31 @@ msgstr ""
 msgid "Home Page"
 msgstr "首頁"
 
-#: .\JellyBot\views\info\botstats.py:79 .\JellyBot\views\nav.py:138
+#: .\JellyBot\views\info\botstats.py:74 .\JellyBot\views\nav.py:141
 msgid "Bot Usage Stats - {}"
 msgstr "機器人使用統計 - {}"
 
-#: .\JellyBot\views\info\channel.py:33
+#: .\JellyBot\views\info\channel.py:29
 msgid "Channel Info - {}"
 msgstr "頻道資訊 - {}"
 
-#: .\JellyBot\views\info\channel.py:60 .\templates\info\channel\search.html:9
+#: .\JellyBot\views\info\channel.py:56 .\templates\info\channel\search.html:9
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:147
+#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:150
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:94 .\JellyBot\views\nav.py:135
+#: .\JellyBot\views\info\msgstats.py:90 .\JellyBot\views\nav.py:138
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:144
+#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:147
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
-#: .\JellyBot\views\info\recent.py:47 .\JellyBot\views\nav.py:141
+#: .\JellyBot\views\info\recent.py:42 .\JellyBot\views\nav.py:144
 msgid "Recent Messages - {}"
 msgstr "近期訊息 - {}"
 
@@ -330,72 +340,72 @@ msgstr "頻道登錄"
 msgid "Integrate Account"
 msgstr "整合帳號"
 
-#: .\JellyBot\views\nav.py:101 .\msghandle\botcmd\command\ar.py:25
+#: .\JellyBot\views\nav.py:104 .\msghandle\botcmd\command\ar.py:25
 #: .\templates\index.html:19
 msgid "Auto Reply"
 msgstr "自動回覆"
 
-#: .\JellyBot\views\nav.py:103
+#: .\JellyBot\views\nav.py:106
 msgid "Introduction"
 msgstr "簡介"
 
-#: .\JellyBot\views\nav.py:105
+#: .\JellyBot\views\nav.py:108
 msgid "Main Intro"
 msgstr "主要介紹"
 
-#: .\JellyBot\views\nav.py:109
+#: .\JellyBot\views\nav.py:112
 msgid "Functions"
 msgstr "功能"
 
-#: .\JellyBot\views\nav.py:111
+#: .\JellyBot\views\nav.py:114
 msgid "Add"
 msgstr "新增"
 
-#: .\JellyBot\views\nav.py:113
+#: .\JellyBot\views\nav.py:116
 msgid "Ranking"
 msgstr "排名"
 
-#: .\JellyBot\views\nav.py:117
+#: .\JellyBot\views\nav.py:120
 msgid "Auto-Reply Ranking - {}"
 msgstr "自動回覆排名 - {}"
 
-#: .\JellyBot\views\nav.py:125 .\templates\info\channel\search.html:67
+#: .\JellyBot\views\nav.py:128 .\templates\info\channel\search.html:67
 msgid "Info"
 msgstr "資訊查詢"
 
-#: .\JellyBot\views\nav.py:128
+#: .\JellyBot\views\nav.py:131
 msgid "Channel"
 msgstr "頻道"
 
-#: .\JellyBot\views\nav.py:132
+#: .\JellyBot\views\nav.py:135
 msgid "Channel - {}"
 msgstr "頻道 - {}"
 
-#: .\JellyBot\views\nav.py:155
+#: .\JellyBot\views\nav.py:158
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:165 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:168 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:170
+#: .\JellyBot\views\nav.py:173
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:182
+#: .\JellyBot\views\nav.py:185
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:184
+#: .\JellyBot\views\nav.py:187
 msgid "API Command"
 msgstr "API指令"
 
-#: .\JellyBot\views\nav.py:198
+#: .\JellyBot\views\nav.py:201
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:200 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:203 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
 
@@ -696,63 +706,71 @@ msgstr "(換行)"
 msgid "(Space)"
 msgstr "(空格)"
 
-#: .\flags\apiact.py:46
+#: .\flags\apiact.py:48
 msgid "Unknown Action"
 msgstr "不明指令"
 
-#: .\flags\apiact.py:48
+#: .\flags\apiact.py:50
 msgid "Auto-Reply - Addition"
 msgstr "自動回覆 - 新增"
 
-#: .\flags\apiact.py:49
+#: .\flags\apiact.py:51
 msgid "Auto-Reply - Content Validation"
 msgstr "自動回覆 - 內容驗證"
 
-#: .\flags\apiact.py:50
+#: .\flags\apiact.py:52
 msgid "Auto-Reply - Tag Popularity"
 msgstr "自動回覆 - 熱門標籤"
 
-#: .\flags\apiact.py:52
+#: .\flags\apiact.py:54
 msgid "Execode - Auto-Reply Addition"
 msgstr "執行碼 - 自動回覆 - 新增"
 
-#: .\flags\apiact.py:53
+#: .\flags\apiact.py:55
 msgid "Execode - List All"
 msgstr "執行碼 - 列出全部"
 
-#: .\flags\apiact.py:54
+#: .\flags\apiact.py:56
 msgid "Execode - Complete Action"
 msgstr "執行碼 - 完成"
 
-#: .\flags\apiact.py:56
+#: .\flags\apiact.py:58
 msgid "Data Query - Channel"
 msgstr "資料查詢 - 頻道"
 
-#: .\flags\apiact.py:57
+#: .\flags\apiact.py:59
 msgid "Data Query - Permission"
 msgstr "資料查詢 - 權限"
 
-#: .\flags\apiact.py:59
+#: .\flags\apiact.py:61
 msgid "Management - Issue Channel Registration Execode"
 msgstr "管理 - 發給頻道登錄用執行碼"
 
-#: .\flags\apiact.py:60
+#: .\flags\apiact.py:62
 msgid "Management - Change Channel Star"
 msgstr "管理 - 更改頻道最愛"
 
-#: .\flags\apiact.py:61
+#: .\flags\apiact.py:63
 msgid "Management - Change Channel Name"
 msgstr "管理 - 更改頻道名稱"
 
-#: .\flags\apiact.py:63
+#: .\flags\apiact.py:65
 msgid "Management - Detach Profile"
 msgstr "管理 - 解除身分組"
 
-#: .\flags\apiact.py:65
+#: .\flags\apiact.py:66
+msgid "Management - Profile Name Check"
+msgstr "管理 - 檢查身分組名稱"
+
+#: .\flags\apiact.py:67
+msgid "Management - Attach Profile"
+msgstr "管理 - 附加身分組"
+
+#: .\flags\apiact.py:69
 msgid "Services - Shorten URL"
 msgstr "服務 - 短網址"
 
-#: .\flags\apiact.py:66
+#: .\flags\apiact.py:70
 msgid "Services - Update Target"
 msgstr "服務 - 更新目標網址"
 
@@ -1187,82 +1205,92 @@ msgstr "貼圖"
 msgid "File"
 msgstr "檔案"
 
-#: .\flags\perm.py:38 .\flags\perm.py:83
+#: .\flags\perm.py:39 .\flags\perm.py:88
 msgid "Normal"
 msgstr "一般"
 
-#: .\flags\perm.py:39
+#: .\flags\perm.py:40
 msgid "User who has this permission can do all normal operations."
 msgstr "擁有此權限的用戶可以使用所有一般功能。"
 
-#: .\flags\perm.py:42
+#: .\flags\perm.py:43
 msgid "Auto-Reply: Access Pinned Module"
 msgstr "自動回覆: 存取置頂回覆組"
 
-#: .\flags\perm.py:43
+#: .\flags\perm.py:44
 msgid ""
 "User who has this permission can access the Pinned property of the Auto-"
 "Reply modules."
 msgstr "擁有此權限的用戶可以存取回覆組的屬性。"
 
-#: .\flags\perm.py:46
+#: .\flags\perm.py:47
 msgid "Members: Change Managers"
 msgstr "成員管理: 更動管理者"
 
-#: .\flags\perm.py:47
+#: .\flags\perm.py:48
 msgid "User who has this permission can change the members of managers."
 msgstr "擁有此權限的用戶可以更改管理員的組成。"
 
-#: .\flags\perm.py:50
+#: .\flags\perm.py:51
 msgid "Channel: Features availability"
 msgstr "頻道: 開關功能"
 
-#: .\flags\perm.py:51
+#: .\flags\perm.py:52
 msgid ""
 "User who has this permission can change the availability of the certain "
 "features."
 msgstr "擁有此權限的用戶可以開關特定功能。"
 
-#: .\flags\perm.py:54
+#: .\flags\perm.py:55
 msgid "Channel: Vote for managers"
 msgstr "頻道: 開關票選管理員功能"
 
-#: .\flags\perm.py:55
+#: .\flags\perm.py:56
 msgid ""
 "User who has this permission can change the availability of voting to "
 "promote members."
 msgstr "擁有此權限的用戶可以開關票選管理員的功能。"
 
-#: .\flags\perm.py:58
+#: .\flags\perm.py:59
 msgid "Channel: Info Privacy"
 msgstr "頻道: 資訊隱私"
 
-#: .\flags\perm.py:59
+#: .\flags\perm.py:60
 msgid ""
 "User who has this permission can change the privacy of the channel info."
 msgstr "擁有此權限的用戶可以更改頻道資訊是否隱藏。"
 
-#: .\flags\perm.py:62
-msgid "Profile: Create"
-msgstr "身分組: 建立"
-
 #: .\flags\perm.py:63
-msgid "User who has this permission can create profiles."
-msgstr "擁有此權限的用戶可以建立身分組。"
+msgid "Profile: Create/Attach"
+msgstr "身分組: 建立/附加"
 
-#: .\flags\perm.py:66
+#: .\flags\perm.py:64
+msgid ""
+"User who has this permission can create profiles or attach profiles to "
+"themselves."
+msgstr "擁有此權限的用戶可以自行建立身分組 和 附加身分組到自己身上。"
+
+#: .\flags\perm.py:67
 msgid "Profile: Delete"
 msgstr "身分組: 刪除"
 
-#: .\flags\perm.py:67
+#: .\flags\perm.py:68
 msgid "User who has this permission can delete profiles."
 msgstr "擁有此權限的用戶可以刪除身分組。"
 
-#: .\flags\perm.py:84 .\templates\info\profile.html:62
+#: .\flags\perm.py:71
+msgid "Profile: Attach on Member"
+msgstr "身分組: 附加至成員"
+
+#: .\flags\perm.py:72
+msgid "User who has this permission can attach profiles to the other members."
+msgstr "擁有此權限的用戶可以附加身分組至對應頻道的成員。"
+
+#: .\flags\perm.py:89 .\templates\info\profile.html:62
 msgid "Moderator"
 msgstr "副管"
 
-#: .\flags\perm.py:85 .\templates\info\profile.html:60
+#: .\flags\perm.py:90 .\templates\info\profile.html:60
 msgid "Admin"
 msgstr "管理員"
 
@@ -1325,7 +1353,7 @@ msgstr "X: 未分類"
 msgid "Model is invalid for uncategorized reason."
 msgstr "資料模組因不明原因而無效。"
 
-#: .\flags\weberr.py:34 .\templates\err\info\profile_not_found.html:14
+#: .\flags\weberr.py:37 .\templates\err\info\profile_not_found.html:14
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
@@ -1345,7 +1373,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:211
+#: .\mongodb\factory\prof.py:238
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2805,7 +2833,7 @@ msgstr ""
 "用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
 "者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
-#: .\templates\account\channel\list.html:130
+#: .\templates\account\channel\list.html:119
 msgid "Are you sure to detach this profile (${name})?"
 msgstr "確定要解除這個身分組嗎(${name})？"
 
@@ -2847,16 +2875,21 @@ msgstr "身分組控制"
 msgid "Create"
 msgstr "建立"
 
-#: .\templates\account\channel\list_table.html:58
+#: .\templates\account\channel\list_table.html:56
+#: .\templates\account\channel\prof\attach.html:23
+msgid "Attach"
+msgstr "附加"
+
+#: .\templates\account\channel\list_table.html:62
 #: .\templates\account\channel\manage.html:31
 msgid "Profiles"
 msgstr "身份組"
 
-#: .\templates\account\channel\list_table.html:71
+#: .\templates\account\channel\list_table.html:75
 msgid "Detach"
 msgstr "解除"
 
-#: .\templates\account\channel\list_table.html:82
+#: .\templates\account\channel\list_table.html:86
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
 #: .\templates\info\channel\search.html:78
 #: .\templates\info\components\info_adv.html:32
@@ -2865,7 +2898,7 @@ msgstr "解除"
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:88
+#: .\templates\account\channel\list_table.html:92
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
 #: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
 #: .\templates\info\components\info_adv.html:46
@@ -2880,13 +2913,33 @@ msgstr "頻道代碼"
 msgid "Basic Information"
 msgstr "基本資訊"
 
-#: .\templates\account\channel\manage.html:48
+#: .\templates\account\channel\manage.html:51
 msgid "Permissions and Controls"
 msgstr "權限 / 相關控制"
 
 #: .\templates\account\channel\perm\1.html:2
 msgid "No operations available."
 msgstr "無可用操作。"
+
+#: .\templates\account\channel\prof\attach.html:29
+msgid "Permission Level:"
+msgstr "權限等級:"
+
+#: .\templates\account\channel\prof\attach.html:31
+msgid "Permissions:"
+msgstr "權限:"
+
+#: .\templates\account\channel\prof\attach.html:40
+msgid "Profile Details"
+msgstr "身分組資訊"
+
+#: .\templates\account\channel\prof\attach.html:51
+#, python-format
+msgid ""
+"No attachable profiles. <a href=\"%(create_url)s\">Visit this page</a> to "
+"create a new one!"
+msgstr ""
+"無可附加身分組。<a href=\"%(create_url)s\">瀏覽此頁面</a>以新增身分組！"
 
 #: .\templates\account\channel\prof\create-main.html:4
 #: .\templates\ar\add-main.html:4
@@ -2898,7 +2951,16 @@ msgstr "主設定"
 msgid "Name"
 msgstr "名稱"
 
-#: .\templates\account\channel\prof\create-main.html:13
+#: .\templates\account\channel\prof\create-main.html:12
+#, python-format
+msgid ""
+"Duplicated profile name detected. Visit <a href=\"%(attach_url)s\">this "
+"page</a> to attach the existing profile."
+msgstr ""
+"使用此名稱的身分組已存在。<a href=\"%(attach_url)s\">瀏覽此頁面</a>以附加身分"
+"組。"
+
+#: .\templates\account\channel\prof\create-main.html:19
 msgid "Color"
 msgstr "顏色"
 
@@ -3170,7 +3232,7 @@ msgstr "此設定會影響顯示的語言。"
 msgid "Update"
 msgstr "更新"
 
-#: .\templates\ar\add-js.html:245
+#: .\templates\ar\add-js.html:241
 msgid ""
 "let msg = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: "
 "${valMax} / Current: <b>${valNow})</b>`;"
@@ -3178,15 +3240,15 @@ msgstr ""
 "let msg = `<b>${txtareaFor}</b>的長度內容已超過限制。(最大長度: ${valMax} / "
 "目前長度: <b>${valNow})</b>`;"
 
-#: .\templates\ar\add-js.html:250
+#: .\templates\ar\add-js.html:246
 msgid "let msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;"
 msgstr "let msg = `<b>${txtareaFor}</b>的內容不能為空。`;"
 
-#: .\templates\ar\add-js.html:266
+#: .\templates\ar\add-js.html:262
 msgid "Channel validation failed. Recheck the input channel info."
 msgstr "頻道資訊驗證失敗。請檢查輸入的頻道資訊。"
 
-#: .\templates\ar\add-js.html:274
+#: .\templates\ar\add-js.html:270
 msgid ""
 "Select a channel in Registration > Channel Member or any other method to "
 "register the module."
@@ -3719,7 +3781,8 @@ msgstr "範例"
 #: .\templates\err\info\channel_not_found.html:8
 #: .\templates\err\info\chcoll_not_found.html:8
 #: .\templates\err\info\profile_not_found.html:8
-#: .\templates\err\not_in_the_channel.html:8 .\templates\err\unknown.html:7
+#: .\templates\err\insuf_perm.html:8 .\templates\err\not_in_the_channel.html:8
+#: .\templates\err\unknown.html:7
 msgid "Error"
 msgstr "錯誤"
 
@@ -3824,6 +3887,14 @@ msgstr ""
 "請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
 "%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
 "href=\"%(about_page)s\">聯絡網站開發者。</a>"
+
+#: .\templates\err\insuf_perm.html:19
+msgid "Certain permissions is required for this operation."
+msgstr "執行此動作必須擁有對應的權限。"
+
+#: .\templates\err\insuf_perm.html:24
+msgid "To perform the operation, the following permission(s) is required:"
+msgstr "您必須擁有下列權限以執行此動作:"
 
 #: .\templates\err\not_in_the_channel.html:19
 msgid ""
