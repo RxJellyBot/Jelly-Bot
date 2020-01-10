@@ -147,6 +147,13 @@ class UserProfileManager(BaseCollection):
             {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
             parse_cls=ChannelProfileConnectionModel)
 
+    def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
+        return [mdl.user_oid for mdl
+                in self.find_cursor_with_count(
+                    {ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
+                    parse_cls=ChannelProfileConnectionModel
+        )]
+
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
@@ -473,6 +480,9 @@ class ProfileManager:
                 del attachables[poid]
 
         return list(attachables.values())
+
+    def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
+        return self._conn.get_profile_user_oids(profile_oid)
 
     def is_name_available(self, channel_oid: ObjectId, name: str):
         return self._prof.is_name_available(channel_oid, name)
