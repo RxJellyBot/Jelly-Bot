@@ -53,16 +53,10 @@
             </div>
             <div class="col-lg mb-3">
                 <div class="card border-dark text-center">
-                    <h5 class="card-header text-dark">{% trans "Privilege" %}</h5>
+                    <h5 class="card-header text-dark">{% trans "Permission Level" %}</h5>
                     <div class="card-body">
                         <div class="card-text h2">
-                            {% if profile_data.is_admin %}
-                                <span class="text-danger">{% trans "Admin" %}</span>
-                            {% elif profile_data.is_mod %}
-                                <span class="text-success">{% trans "Moderator" %}</span>
-                            {% else %}
-                                <span class="text-black-50">{% trans "N/A" %}</span>
-                            {% endif %}
+                            <span class="text-success">{{ profile_data.permission_level.code }}&nbsp;({{ profile_data.permission_level.key }})</span>
                         </div>
                     </div>
                 </div>
@@ -82,25 +76,58 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col mb-3">
+        <div class="row mb-3">
+            <div class="col">
                 <span class="h3">{% trans "Permissions" %}</span>
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
             {% for perm_cat in perm_cats %}
                 <div class="col-lg-4 col-6 list-group-item list-group-item-action mb-0">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ perm_cat.key }}</h5>
                         {% if profile_data.permission|get_val:perm_cat.code_str %}
-                        <span class="dot bg-success"></span>
+                            <span class="dot bg-success"></span>
                         {% else %}
-                        <span class="dot bg-danger"></span>
+                            <span class="dot bg-danger"></span>
                         {% endif %}
                     </div>
                     <p class="mb-0">{{ perm_cat.description }}</p>
                 </div>
             {% endfor %}
         </div>
+        <div class="row mb-3">
+            <div class="col">
+                <span class="h3">{% trans "User who also have this profile" %}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive table-freeze-header" style="max-height: 35rem">
+                    <table class="table table-hover table-bordered table-bordered mb-0 datatable">
+                        <thead>
+                        <tr>
+                            <th scope="col">{% trans "Member Name" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for name in names %}
+                            <tr>
+                                <td class="align-middle text-center">{{ name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
+{% endblock %}
+
+{% block ex-style %}
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}
