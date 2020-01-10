@@ -16,7 +16,7 @@ Website: http://rnnx.cc/Website
 
 ### Links
 
-[Features/Issues that has done implementing but not yet uploaded](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Atype-awaiting-pr)
+[Features/Issues that has done implementing but not yet uploaded](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Amark-awaiting-pr)
 
 [Features/Issues that is currently working on](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Amark-working)
 
