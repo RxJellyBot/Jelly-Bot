@@ -210,13 +210,20 @@ class BaseCollection(ControlExtensionMixin, Collection):
         else:
             return cls.model_class
 
+    def on_init(self):
+        ModelFieldChecker.check_async(self)
+
+    def on_init_async(self):
+        pass
+
     def __init__(self):
         self._db = MONGO_CLIENT.get_database(self.get_db_name())
 
         super().__init__(self._db, self.get_col_name(), codec_options=get_codec_options())
         self._data_model = self.get_model_cls()
 
-        ModelFieldChecker.check_async(self)
+        self.on_init()
+        Thread(target=self.on_init_async).start()
 
     def insert_one_data(self, **model_args) -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
         return super().insert_one_data(self.get_model_cls(), **model_args)
