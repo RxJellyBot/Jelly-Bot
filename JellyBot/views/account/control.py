@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from JellyBot import keys
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.utils import get_root_oid, get_post_keys
-from JellyBot.views import render_template, simple_str_response
+from JellyBot.views import render_template, simple_str_response, simple_json_response
 from extutils.locales import locales, languages
 from extutils.dt import now_utc_aware, localtime
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
@@ -51,13 +51,13 @@ class AccountLoginView(View):
         if s != AccountLoginView.PASS_SIGNAL:
             s += s_contact
 
-        response = simple_str_response(request, s)
+        response = simple_json_response(s)
 
         if token is not None:
             response.set_cookie(keys.Cookies.USER_TOKEN, token)
 
         if s == AccountLoginView.PASS_SIGNAL and token is None:
-            return simple_str_response(request, _("User token is null however login succeed. {}").format(s_contact))
+            return simple_json_response(_("User token is null however login succeed. {}").format(s_contact))
         else:
             return response
 

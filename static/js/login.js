@@ -7,10 +7,11 @@ $(document).ready(function() {
 // noinspection JSUnusedGlobalSymbols
 function onSignInHandle(idToken, defaultRedirectUrl) {
     xhrPostRequest(window.location.href, 'idtoken=' + idToken, function (xhr) {
-        if (xhr.responseText === "PASS") {
+        let response = xhr.response["text"];
+        if (response === "PASS") {
             window.location.replace(getRedirectUrl(defaultRedirectUrl));
         } else {
-            generateAlert("danger", xhr.responseText);
+            generateAlert("danger", response);
         }
     }, function (xhr) {
         xhr.setRequestHeader('X-CSRFToken', $("input[name=csrfmiddlewaretoken]").val());
@@ -22,7 +23,7 @@ function getRedirectUrl(defaultUrl) {
     if (url === "") {
         url = defaultUrl;
     }
-    return url
+    return decodeURIComponent(url)
 }
 
 function getUrlVars() {
