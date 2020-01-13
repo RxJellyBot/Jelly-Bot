@@ -5,6 +5,7 @@ import pymongo
 from bson import ObjectId
 
 from django.utils.translation import gettext_lazy as _
+from pymongo import UpdateOne
 
 from extutils.color import ColorFactory
 from extutils.checker import param_type_ensure
@@ -191,6 +192,28 @@ class ProfileDataManager(BaseCollection):
             [(ChannelProfileModel.ChannelOid.key, pymongo.DESCENDING),
              (ChannelProfileModel.Name.key, pymongo.ASCENDING)],
             name="Profile Identity", unique=True)
+
+    def on_init_async(self):
+        super().on_init_async()
+
+        cmds = []
+
+        for perm_cat in PermissionCategory:
+            perm_key = f"{ChannelProfileModel.Permission.key}.{perm_cat.code}"
+
+            for data in self.find_cursor_with_count({perm_key: {"$exists": False}}, parse_cls=ChannelProfileModel):
+                cmds.append(
+                    UpdateOne(
+                        {OID_KEY: data.id},
+                        {"$set": {
+                            perm_key:
+                                perm_cat in PermissionCategoryDefault.get_overridden_permissions(data.permission_level)
+                        }}
+                    )
+                )
+
+        if cmds:
+            self.bulk_write(cmds)
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
