@@ -97,6 +97,13 @@ class OnPlatformUserModel(Model):
 
             if n:
                 set_uname_cache(self.id, n)
+            else:
+                # Mark unavailable
+                from mongodb.factory import ProfileManager, RootUserManager
+
+                root_data_result = RootUserManager.get_root_data_onplat(self.platform, self.token, auto_register=False)
+                if root_data_result.success:
+                    ProfileManager.mark_unavailable_async(channel_data.id, root_data_result.model.id)
 
         return _user_name_cache_.get(self.id)
 

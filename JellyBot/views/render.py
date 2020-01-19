@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import Template, RequestContext
 from django.utils import timezone
@@ -11,6 +11,7 @@ from JellyBot.api.static import result, param
 from JellyBot.utils import get_root_oid
 from extutils import HerokuWrapper
 from extutils.flags import is_flag_class, is_flag_single, is_flag_double
+from extutils.serializer import JellyBotSerializer
 
 
 def render_template(request, title, template_name, context=None, content_type=None, status=None,
@@ -70,3 +71,7 @@ def render_flag_table(request, title: str, table_title: str, flag_enum, context:
 
 def simple_str_response(request, s):
     return HttpResponse(Template("{{ result }}").render(RequestContext(request, {"result": s})))
+
+
+def simple_json_response(text):
+    return JsonResponse({"text": text}, encoder=JellyBotSerializer)

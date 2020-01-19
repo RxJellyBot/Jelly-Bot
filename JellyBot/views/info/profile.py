@@ -6,7 +6,8 @@ from django.views.generic.base import TemplateResponseMixin
 
 from extutils import safe_cast
 from flags import PermissionCategory, WebsiteError
-from mongodb.factory import ProfileManager
+from mongodb.factory import ProfileManager, ChannelManager
+from mongodb.helper import IdentitySearcher
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components.mixin import LoginRequiredMixin
 
@@ -22,9 +23,14 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
             return WebsiteErrorView.website_error(
                 request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid})
 
+        channel_model = ChannelManager.get_channel_oid(profile_data.channel_oid)
+        names = IdentitySearcher.get_batch_user_name(ProfileManager.get_profile_user_oids(profile_oid),
+                                                     channel_model, on_not_found=None)
+
         # noinspection PyTypeChecker
         return render_template(
             self.request, _("Profile Info - {}").format(profile_data.name), "info/profile.html", {
                 "profile_data": profile_data,
-                "perm_cats": list(PermissionCategory)
+                "perm_cats": list(PermissionCategory),
+                "names": filter(lambda n: n is not None, names.values())
             }, nav_param=kwargs)

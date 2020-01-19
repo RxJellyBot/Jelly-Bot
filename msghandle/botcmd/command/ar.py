@@ -83,11 +83,11 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
             e.channel_oid, excde_entry.creator_oid)
     except Exception as ex:
         MailSender.send_email_async(
-            "Failed to construct an Auto-reply module using Execode.\n"
-            f"User ID: {e.user_model.id}\n"
-            f"Channel ID: {e.channel_oid}\n"
-            f"Execode: {excde_entry.execode}\n"
-            f"Exception: {traceback.format_exception(None, ex, ex.__traceback__)}",
+            "Failed to construct an Auto-reply module using Execode.<br>"
+            f"User ID: {e.user_model.id}<br>"
+            f"Channel ID: {e.channel_oid}<br>"
+            f"Execode: {excde_entry.execode}<br>"
+            f"Exception: <pre>{traceback.format_exception(None, ex, ex.__traceback__)}</pre>",
             subject="Failed to construct AR module")
 
         return [HandledMessageEventText(content=_(
