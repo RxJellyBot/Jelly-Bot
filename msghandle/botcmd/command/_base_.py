@@ -403,7 +403,18 @@ class CommandNode:
 
     @staticmethod
     def _sanitize_args_(args_list: List[str]):
-        return [arg.strip() for arg in args_list if arg]
+        ret = []
+        for arg in args_list:
+            # Strip the arg
+            if arg:
+                arg = arg.strip()
+
+            # Replace the escaped newline with the real newline
+            arg = arg.replace("\\n", "\n")
+
+            ret.append(arg)
+
+        return ret
 
     @staticmethod
     def _merge_overlength_args_(args_list: List[str], splitter: str, max_count: int):
