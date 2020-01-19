@@ -49,7 +49,7 @@ class AutoReplyAddBaseResponse(
         self._data[k] = self._keyword
 
     def _handle_keyword_type_(self):
-        self._keyword_type = int(AutoReplyContentType.default() or self._keyword_type)
+        self._keyword_type = int(self._keyword_type or AutoReplyContentType.default())
 
         if self._keyword_type == AutoReplyContentType.IMAGE:
             self._err[result.AutoReplyResponse.KEYWORD] = False
@@ -72,7 +72,7 @@ class AutoReplyAddBaseResponse(
             self._info.append(info.AutoReply.RESPONSE_TYPES_SHORTENED)
 
         self._responses = self._data[k] = \
-            [AutoReplyContentModel(Content=resp, ContentType=int(self._response_types[idx]))
+            [AutoReplyContentModel(Content=resp, ContentType=int(self._response_types[idx] or AutoReplyContentType.default()))
              for idx, resp in enumerate(self._responses)]
 
     def _handle_private_(self):
