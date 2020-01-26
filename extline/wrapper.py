@@ -15,7 +15,7 @@ __all__ = ["line_api", "_inst", "LineApiUtils"]
 
 line_token = os.environ.get("LINE_TOKEN")
 if not line_token:
-    SYSTEM.logger.error("Specify Line webhook access token as LINE_TOKEN in environment variables.")
+    SYSTEM.logger.critical("Specify Line webhook access token as LINE_TOKEN in environment variables.")
     sys.exit(1)
 
 

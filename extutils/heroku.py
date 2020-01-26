@@ -13,7 +13,7 @@ class HerokuWrapper:
             # noinspection PyUnresolvedReferences
             self._core = heroku3.from_key(token)
         else:
-            SYSTEM.logger.error("Specify HEROKU_API_TOKEN in environment variables.")
+            SYSTEM.logger.critical("Specify HEROKU_API_TOKEN in environment variables.")
             sys.exit(1)
 
         self._cache_release_list = {}

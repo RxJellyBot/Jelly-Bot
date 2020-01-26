@@ -69,6 +69,18 @@
     "SERVICE_SHORT_URL": {
       "description": "The URL to test the availability of the short service web app. Including protocol. Excluding slash.",
       "required": true
+    },
+    "DDNS_PASSWORD": {
+      "description": "Password for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false
+    },
+    "DDNS_HOST": {
+      "description": "Host for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false
+    },
+    "DDNS_DOMAIN": {
+      "description": "Domain for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false
     }
   }
 }

@@ -13,7 +13,7 @@ from extutils.logger import SYSTEM
 
 CLIENT_ID = os.environ.get("GI_CLIENT_ID")
 if CLIENT_ID is None:
-    SYSTEM.logger.error("Cannot find GI_CLIENT_ID for Google Identity Service in system variables.")
+    SYSTEM.logger.critical("Cannot find GI_CLIENT_ID for Google Identity Service in system variables.")
     sys.exit(1)
 
 

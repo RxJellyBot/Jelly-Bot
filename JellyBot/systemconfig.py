@@ -10,8 +10,6 @@ if "HTTP_HOST" in os.environ:
 
 
 class System:
-    PingSpamWaitSeconds = 5 * 60  # 5 mins / Heroku sleep on 30 mins
-
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
     HerokuAppName = "newjellybot"
 
@@ -20,6 +18,8 @@ class System:
     MaxSendContentLines = 20
 
     NoUserTokenNotificationSeconds = 72 * 3600  # 12 Hrs
+
+    DDNSUpdateIntervalSeconds = 3600
 
 
 class PlatformConfig(ABC):

@@ -11,7 +11,7 @@ from .responses import ImgurUploadResponse
 
 IMGUR_CLIENT_ID = os.environ.get("IMGUR_CLIENT_ID")
 if not IMGUR_CLIENT_ID:
-    SYSTEM.logger.error("Specify IMGUR_CLIENT_ID as the client ID of imgur client.")
+    SYSTEM.logger.critical("Specify IMGUR_CLIENT_ID as the client ID of imgur client.")
     sys.exit(1)
 
 

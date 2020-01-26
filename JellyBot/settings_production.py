@@ -50,7 +50,7 @@ TEMPLATES = [
 
 LOGGING_ROOT = '../logs/Jelly-Bot/Application'
 LOGGING_FILE_ROOT = os.path.join(LOGGING_ROOT, 'logs')
-LOGGING_FILE_ERROR = os.path.join(LOGGING_ROOT, 'logs-severe')
+LOGGING_FILE_ERROR = os.path.join(LOGGING_FILE_ROOT, 'logs-severe.log')
 
 sys.stdout = open(os.path.join(LOGGING_ROOT, 'app.log'), "w+")
 sys.stderr = open(os.path.join(LOGGING_ROOT, 'app-error.log'), "w+")

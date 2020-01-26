@@ -8,5 +8,3 @@ from .heroku import _inst as HerokuWrapper
 from .github import _inst as GithubWrapper
 # noinspection PyUnresolvedReferences
 from .singleton import Singleton, SingletonABC
-# noinspection PyUnresolvedReferences
-from .spamping import activate_ping_spam

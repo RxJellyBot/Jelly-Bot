@@ -39,8 +39,9 @@ class AccountLoginView(View):
                 s = _("The data cannot be passed into the server.")
             else:
                 s = _(
-                    "An unknown error occurred during the new user data registration. Code: {}.").format(
-                    result.outcome.code)
+                    "An unknown error occurred during the new user data registration. "
+                    "Code: {} / Registration Code: {}.").format(
+                    result.outcome.code, result.idt_reg_result.outcome.code)
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:

@@ -13,7 +13,7 @@ __all__ = ["line_handle_event", "line_parser"]
 
 line_secret = os.environ.get("LINE_SECRET")
 if not line_secret:
-    SYSTEM.logger.error("Specify Line webhook secret as LINE_SECRET in environment variables.")
+    SYSTEM.logger.critical("Specify Line webhook secret as LINE_SECRET in environment variables.")
     sys.exit(1)
 
 line_parser = WebhookParser(line_secret)

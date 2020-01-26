@@ -33,13 +33,15 @@ class LogStreamHandler(logging.StreamHandler):
 
 
 class LogRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.ABC):
-    def __init__(self, root, name):
-        path_folder = os.path.join(root, name)
-        Path(path_folder).mkdir(parents=True, exist_ok=True)
+    def __init__(self, root, name=None):
+        if name:
+            path_folder = os.path.join(root, name)
+            Path(path_folder).mkdir(parents=True, exist_ok=True)
+            path_file = os.path.join(path_folder, "log.log")
+        else:
+            path_file = root
 
-        super().__init__(
-            os.path.join(path_folder, "log.log"),
-            when="midnight", backupCount=10, encoding="utf-8")
+        super().__init__(path_file, when="midnight", backupCount=10, encoding="utf-8")
 
 
 class LogTimedRotatingFileHandler(LogRotatingFileHandlerBase):
@@ -51,11 +53,13 @@ class LogTimedRotatingFileHandler(LogRotatingFileHandlerBase):
 
 
 class LogSevereTimedRotatingFileHandler(LogRotatingFileHandlerBase):
-    def __init__(self, name):
+    def __init__(self):
         if hasattr(settings, "LOGGING_FILE_ERROR"):
-            super().__init__(settings.LOGGING_FILE_ERROR, name)
+            super().__init__(settings.LOGGING_FILE_ERROR)
         else:
-            super().__init__("logs", name)
+            super().__init__("logs-severe.log")
+
+        self.setLevel(logging.WARNING)
 
 
 class LoggerSkeleton:
@@ -77,14 +81,12 @@ class LoggerSkeleton:
             else:
                 level = logging.WARNING
 
-        logging.getLogger("sys.misc").error(f"{name} - {level}")
-
         # Initialize objects
         self._fmt = LogFormatter(fmt if fmt else LoggerSkeleton.DEFAULT_FMT)
         self._handlers = [
             LogStreamHandler(),
             LogTimedRotatingFileHandler(name),
-            LogSevereTimedRotatingFileHandler(name)
+            LogSevereTimedRotatingFileHandler()
         ]
         self._handlers_apply_formatter_(self._fmt)
         self._core = logging.getLogger(name)
