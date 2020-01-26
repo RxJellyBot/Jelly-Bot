@@ -183,9 +183,14 @@ class DiscordClientWrapper:
 
 
 _inst = DiscordClientWrapper()
+_discord_thread = None
 
 
 def run_server():
     # Obtained from https://github.com/Rapptz/discord.py/issues/710#issuecomment-395609297
-    thread = threading.Thread(target=_inst.discord_loop.run_until_complete, args=(_inst.start(discord_token),))
-    thread.start()
+    global _discord_thread
+
+    if not _discord_thread:
+        _discord_thread = threading.Thread(
+            target=_inst.discord_loop.run_until_complete, args=(_inst.start(discord_token),))
+        _discord_thread.start()
