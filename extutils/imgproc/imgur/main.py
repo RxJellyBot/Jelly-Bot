@@ -3,13 +3,15 @@ import sys
 
 import requests
 
+from extutils.logger import SYSTEM
+
 from .endpoints import ImgurEndpoints
 from .responses import ImgurUploadResponse
 
 
 IMGUR_CLIENT_ID = os.environ.get("IMGUR_CLIENT_ID")
 if not IMGUR_CLIENT_ID:
-    print("Specify IMGUR_CLIENT_ID as the client ID of imgur client.")
+    SYSTEM.logger.error("Specify IMGUR_CLIENT_ID as the client ID of imgur client.")
     sys.exit(1)
 
 

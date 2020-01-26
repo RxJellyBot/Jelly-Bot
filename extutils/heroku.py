@@ -3,6 +3,8 @@ import sys
 
 import heroku3
 
+from extutils.logger import SYSTEM
+
 
 class HerokuWrapper:
     def __init__(self):
@@ -11,7 +13,7 @@ class HerokuWrapper:
             # noinspection PyUnresolvedReferences
             self._core = heroku3.from_key(token)
         else:
-            print("Specify HEROKU_API_TOKEN in environment variables.")
+            SYSTEM.logger.error("Specify HEROKU_API_TOKEN in environment variables.")
             sys.exit(1)
 
         self._cache_release_list = {}

@@ -6,6 +6,7 @@ from typing import Optional
 import pymongo
 from bson import ObjectId
 
+from extutils.logger import SYSTEM
 from extutils.checker import param_type_ensure
 from models import ShortUrlRecordModel
 from models.field import UrlField
@@ -31,8 +32,8 @@ class ShortUrlDataManager(BaseCollection):
         service_url = os.environ.get("SERVICE_SHORT_URL")
 
         if not service_url:
-            print("Short URL service URL not found. Specify it as SERVICE_SHORT_URL in env var.")
-            print("Service availablility not checked.")
+            SYSTEM.logger.warning("Short URL service URL not found. Specify it as SERVICE_SHORT_URL in env var.")
+            SYSTEM.logger.warning("Service availability not checked.")
             return False
         else:
             service_url = f"{service_url}/test"

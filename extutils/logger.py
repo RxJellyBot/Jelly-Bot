@@ -1,10 +1,15 @@
+import abc
 import os
 import sys
 import logging
+import logging.handlers
+from pathlib import Path
+
+from django.conf import settings
 
 from extutils import split_fill
 
-__all__ = ["LoggerSkeleton"]
+__all__ = ["LoggerSkeleton", "SYSTEM"]
 
 
 LOGGER_SPLITTER = ","
@@ -18,83 +23,95 @@ if "LOGGER" in os.environ:
         loggers[logger_name] = int(lv) if lv else lv
 
 
-class GlobalLogFormatter(logging.Formatter):
+class LogFormatter(logging.Formatter):
     default_msec_format = "%s.%03d"
 
 
-class GlobalLogHandler(logging.StreamHandler):
+class LogStreamHandler(logging.StreamHandler):
     def __init__(self):
         super().__init__(sys.stdout)
 
 
+class LogRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.ABC):
+    def __init__(self, root, name):
+        path_folder = os.path.join(root, name)
+        Path(path_folder).mkdir(parents=True, exist_ok=True)
+
+        super().__init__(
+            os.path.join(path_folder, "log.log"),
+            when="midnight", backupCount=10, encoding="utf-8")
+
+
+class LogTimedRotatingFileHandler(LogRotatingFileHandlerBase):
+    def __init__(self, name):
+        if hasattr(settings, "LOGGING_FILE_ROOT"):
+            super().__init__(settings.LOGGING_FILE_ROOT, name)
+        else:
+            super().__init__("logs", name)
+
+
+class LogSevereTimedRotatingFileHandler(LogRotatingFileHandlerBase):
+    def __init__(self, name):
+        if hasattr(settings, "LOGGING_FILE_ERROR"):
+            super().__init__(settings.LOGGING_FILE_ERROR, name)
+        else:
+            super().__init__("logs", name)
+
+
 class LoggerSkeleton:
-    DEFAULT_FMT = "%(asctime)s %(name)s[%(levelname)s]: %(message)s"
+    DEFAULT_FMT = "%(asctime)s %(levelname)s [%(name)s] - %(message)s"
 
     def __init__(self, name: str, fmt: str = None, level: int = None, logger_name_env: str = None):
         # https://docs.python.org/3/library/logging.html#logrecord-attributes
 
-        if not logger_name_env:
+        if logger_name_env is None:
             logger_name_env = name
 
-        self._enabled = False
-        self._is_debug = bool(int(os.environ.get("DEBUG", 0)))
-
-        if not level:
-            if logger_name_env in loggers and loggers[logger_name_env]:
+        if level is None:
+            if logger_name_env in loggers:
                 level = loggers[logger_name_env]
-            elif self._is_debug:
+            elif bool(int(os.environ.get("DEBUG", 0))):
                 level = logging.DEBUG
             elif "LOG_LEVEL" in os.environ:
                 level = int(os.environ["LOG_LEVEL"])
             else:
                 level = logging.WARNING
 
-        self._is_debug = self._is_debug or level <= logging.DEBUG
+        logging.getLogger("sys.misc").error(f"{name} - {level}")
 
         # Initialize objects
-        self._fmt = GlobalLogFormatter(fmt if fmt else LoggerSkeleton.DEFAULT_FMT)
-        self._handler = GlobalLogHandler()
+        self._fmt = LogFormatter(fmt if fmt else LoggerSkeleton.DEFAULT_FMT)
+        self._handlers = [
+            LogStreamHandler(),
+            LogTimedRotatingFileHandler(name),
+            LogSevereTimedRotatingFileHandler(name)
+        ]
+        self._handlers_apply_formatter_(self._fmt)
         self._core = logging.getLogger(name)
 
         # Configs
-        self.set_level(level)
-        self._handler.setFormatter(self._fmt)
+        self._core.setLevel(level)
 
         # Activate
-        if logger_name_env in loggers or self.is_debug:
-            self.enable()
-
-    def enable(self):
-        self._core.addHandler(self._handler)
-
-    def disable(self):
-        self._core.removeHandler(self._handler)
-
-    def set_level(self, level):
-        self._core.setLevel(level)
-        self._handler.setLevel(level)
+        for handler in self._handlers:
+            self._core.addHandler(handler)
 
     def temp_apply_format(self, fmt_str, level, msg, *args, **kwargs):
-        self._handler.setFormatter(GlobalLogFormatter(fmt_str))
+        self._handlers_apply_formatter_(LogFormatter(fmt_str))
         self._core.log(level, msg, *args, **kwargs)
-        self._handler.setFormatter(self._fmt)
+        self._handlers_apply_formatter_(self._fmt)
 
-    @property
-    def is_debug(self) -> bool:
-        return self._is_debug
-
-    @property
-    def enabled(self) -> bool:
-        return self._enabled
+    def _handlers_apply_formatter_(self, fmt):
+        for handler in self._handlers:
+            handler.setFormatter(fmt)
 
     @property
     def logger(self):
         return self._core
 
     @property
-    def handler(self):
-        return self._handler
-
-    @property
     def formatter(self):
         return self._fmt
+
+
+SYSTEM = LoggerSkeleton("sys.main", logger_name_env="SYSTEM", level=logging.DEBUG)

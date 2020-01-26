@@ -67,6 +67,11 @@ class AccountLogoutView(View):
     def get(self, request, *args, **kwargs):
         response = render_template(request, _("Logout"), "account/logout.html")
         response.delete_cookie(keys.Cookies.USER_TOKEN)
+        try:
+            del request.session[keys.Session.USER_ROOT_ID]
+            request.session.modified = True
+        except KeyError:
+            pass
 
         return response
 

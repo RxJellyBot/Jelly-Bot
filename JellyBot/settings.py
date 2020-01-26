@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
 import os
 import sys
 
@@ -26,7 +25,7 @@ from django.utils.translation import gettext_lazy as _
 # Run tests                                                                                   #
 ###############################################################################################
 
-# MAIN
+# --- Main
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if SECRET_KEY is None:
@@ -37,29 +36,18 @@ DEBUG = bool(int(os.environ.get('DEBUG', 0)))
 
 PRODUCTION = bool(int(os.environ.get('PRODUCTION', 1)))
 
-# SECURITY
-
-if PRODUCTION:
-    # Cross-site load in frame
-    X_FRAME_OPTIONS = 'DENY'
-
-    # For SecurityMiddleware
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-    # CSRF
-    CSRF_COOKIE_DOMAIN = 'raenonx.cc'
-    CSRF_COOKIE_HTTPONLY = True
-
-# Application definition
+# --- Application definition
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 ALLOWED_HOSTS = [
+    # Local IP addresses
     'testserver',
     'localhost',
     '127.0.0.1',
+    '192.168.50.33',
+    # URL Domain of the bot
     'bot.raenonx.cc',
     # Allowed URLs of Heroku's for LINE Bot webhook
     'newjellybot.herokuapp.com'
@@ -94,50 +82,27 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'JellyBot.urls'
 
-if PRODUCTION:
-    TEMPLATES = [
-        {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': ['templates'],
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.template.context_processors.i18n',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
-                ],
-                'loaders': [
-                    ('django.template.loaders.cached.Loader', [
-                        'django.template.loaders.filesystem.Loader',
-                        'django.template.loaders.app_directories.Loader'
-                    ]),
-                ],
-            },
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
         },
-    ]
-else:
-    TEMPLATES = [
-        {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': ['templates'],
-            'APP_DIRS': True,
-            'OPTIONS': {
-                'context_processors': [
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.request',
-                    'django.template.context_processors.i18n',
-                    'django.contrib.auth.context_processors.auth',
-                    'django.contrib.messages.context_processors.messages',
-                ],
-            },
-        },
-    ]
+    },
+]
 
 WSGI_APPLICATION = 'JellyBot.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+# --- Database
+# --- https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -146,8 +111,8 @@ DATABASES = {
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+# --- Password validation
+# --- https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -164,10 +129,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
+# --- Internationalization
+# --- https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'zh-TW'
+LANGUAGE_CODE = 'zh-tw'
 
 LANGUAGES = (
     ('en-us', _('English')),
@@ -186,32 +151,28 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+# --- Static files (CSS, JavaScript, Images)
+# --- https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
 
 # noinspection PyUnresolvedReferences
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
-
-# Authorization
+# --- Authorization
 
 LOGIN_URL = reverse_lazy("account.login")
 
-# On-Error handling
+# --- On-Error handling
 
 ADMINS = [('RaenonX JELLYCAT', os.environ.get("EMAIL_ACCOUNT"))]
 
-# Email
+# --- Email
 
 if os.environ.get("EMAIL_ACCOUNT") is None:
-    sys.exit("EMAIL_ACCOUNT not set in enviroment variable.")
+    sys.exit("EMAIL_ACCOUNT not set in environment variable.")
 if os.environ.get("EMAIL_PASSWORD") is None:
-    sys.exit("EMAIL_PASSWORD not set in enviroment variable.")
+    sys.exit("EMAIL_PASSWORD not set in environment variable.")
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
@@ -219,7 +180,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get("EMAIL_ACCOUNT")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
-# Sanitizer
+# --- Sanitizer
 
 SANITIZER_ALLOWED_TAGS = ['div', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'p', 'pre', 'code']
 SANITIZER_ALLOWED_ATTRIBUTES = ['class', 'id', 'role', 'data-toggle', 'href', 'aria-labelledby']

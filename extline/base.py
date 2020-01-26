@@ -4,6 +4,8 @@ import sys
 from linebot import WebhookParser
 from linebot.models import MessageEvent
 
+from extutils.logger import SYSTEM
+
 from .handler import handle_main, handle_msg_main
 
 __all__ = ["line_handle_event", "line_parser"]
@@ -11,7 +13,7 @@ __all__ = ["line_handle_event", "line_parser"]
 
 line_secret = os.environ.get("LINE_SECRET")
 if not line_secret:
-    print("Specify Line webhook secret as LINE_SECRET in environment variables.")
+    SYSTEM.logger.error("Specify Line webhook secret as LINE_SECRET in environment variables.")
     sys.exit(1)
 
 line_parser = WebhookParser(line_secret)

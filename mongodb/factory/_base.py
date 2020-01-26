@@ -11,6 +11,7 @@ from pymongo.errors import DuplicateKeyError
 
 from extutils.mongo import get_codec_options
 from extutils.dt import now_utc_aware
+from extutils.logger import SYSTEM
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
@@ -22,8 +23,8 @@ from mongodb.factory.results import WriteOutcome
 
 single_db_name = os.environ.get("MONGO_DB")
 if single_db_name:
-    print("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
-    print(f"MongoDB single database name: {single_db_name}")
+    SYSTEM.logger.info("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
+    SYSTEM.logger.info(f"MongoDB single database name: {single_db_name}")
 
 
 class ControlExtensionMixin(Collection):

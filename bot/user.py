@@ -8,6 +8,7 @@ from mongodb.factory import RootUserManager, ProfileManager, ChannelManager
 from models import ChannelProfileConnectionModel, OnPlatformUserModel, ChannelModel, set_uname_cache
 from extutils.timing import exec_timing_result
 from extutils.emailutils import MailSender
+from extutils.logger import SYSTEM
 
 
 def _perform_existence_check_(set_name_to_cache: bool):
@@ -35,13 +36,13 @@ def _perform_existence_check_(set_name_to_cache: bool):
                 if ret:
                     marked_unavailable += 1
 
-        print(f"Marked {marked_unavailable} connections unavailable.")
+        SYSTEM.logger.info(f"Marked {marked_unavailable} connections unavailable.")
 
-    print(f"Performing user channel existence check on {len(list_prof_conn)} connections...")
+    SYSTEM.logger.info(f"Performing user channel existence check on {len(list_prof_conn)} connections...")
 
     result = exec_timing_result(fn)
 
-    print(f"User channel existence check completed in {result.execution_ms:.2f} ms.")
+    SYSTEM.logger.info(f"User channel existence check completed in {result.execution_ms:.2f} ms.")
 
 
 def _check_on_prof_conn_(

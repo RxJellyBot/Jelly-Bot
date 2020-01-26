@@ -8,10 +8,12 @@ from google.oauth2 import id_token
 # noinspection PyPackageRequirements
 from google.auth.transport import requests
 
+from extutils.logger import SYSTEM
+
 
 CLIENT_ID = os.environ.get("GI_CLIENT_ID")
 if CLIENT_ID is None:
-    print("Cannot find GI_CLIENT_ID for Google Identity Service in system variables.")
+    SYSTEM.logger.error("Cannot find GI_CLIENT_ID for Google Identity Service in system variables.")
     sys.exit(1)
 
 
