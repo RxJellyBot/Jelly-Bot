@@ -2,6 +2,9 @@
 __pycache__/
 archive/
 lib/
+logs/
+web.config
 *.bat
+*.log
 cache.json
 tests/sandbox*.py
