@@ -5,11 +5,9 @@ from django.utils import timezone
 
 from bot.system import get_boot_dt
 from JellyBot import keys
-from JellyBot.systemconfig import System
 from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
 from JellyBot.utils import get_root_oid
-from extutils import HerokuWrapper
 from extutils.flags import is_flag_class, is_flag_single, is_flag_double
 from extutils.serializer import JellyBotSerializer
 
