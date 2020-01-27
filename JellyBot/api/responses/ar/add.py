@@ -72,7 +72,9 @@ class AutoReplyAddBaseResponse(
             self._info.append(info.AutoReply.RESPONSE_TYPES_SHORTENED)
 
         self._responses = self._data[k] = \
-            [AutoReplyContentModel(Content=resp, ContentType=int(self._response_types[idx] or AutoReplyContentType.default()))
+            [AutoReplyContentModel(
+                Content=resp,
+                ContentType=int(self._response_types[idx] or AutoReplyContentType.default()))
              for idx, resp in enumerate(self._responses)]
 
     def _handle_private_(self):

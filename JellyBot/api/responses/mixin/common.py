@@ -108,9 +108,9 @@ class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
 
-        RequireSenderAutoRegisterMixin._handle_sender_oid_(self, param_dict)
+        RequireSenderAutoRegisterMixin._handle_sender_oid_this_(self, param_dict)
 
-    def _handle_sender_oid_(self, param_dict):
+    def _handle_sender_oid_this_(self, param_dict):
         RequireSenderAutoRegisterMixin._handle_api_token_(self, param_dict)
 
         if self._sender_oid is None:

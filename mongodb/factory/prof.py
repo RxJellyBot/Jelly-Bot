@@ -152,8 +152,7 @@ class UserProfileManager(BaseCollection):
         return [mdl.user_oid for mdl
                 in self.find_cursor_with_count(
                     {ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
-                    parse_cls=ChannelProfileConnectionModel
-        )]
+                    parse_cls=ChannelProfileConnectionModel)]
 
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
