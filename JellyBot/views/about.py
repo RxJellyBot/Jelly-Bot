@@ -9,6 +9,7 @@ from extutils import GithubWrapper
 class AboutView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
+        # FIXME: Change this to get latest commit
         github_deploy = GithubWrapper.get_latest_deployment(System.GitHubRepoIDName, System.HerokuAppName)
 
         return render_template(request, _("About"), "about.html", {

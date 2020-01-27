@@ -20,18 +20,16 @@ from mongodb.factory.results import (
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
 from mongodb.utils import (
-    CursorWithCount, case_insensitive_collation,
-    Query, MatchPair, UpdateOperation, Set, Increment, NotEqual
+    CursorWithCount, case_insensitive_collation
 )
 from mongodb.factory import ProfileManager
 
 from ._base import BaseCollection
-from ._mixin import CacheMixin
 
 DB_NAME = "ar"
 
 
-class AutoReplyModuleManager(CacheMixin, BaseCollection):
+class AutoReplyModuleManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "conn"
     model_class = AutoReplyModuleModel
@@ -105,35 +103,35 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         model, outcome, ex = \
-            self.insert_one_data_cache(
+            self.insert_one_data(
                 Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type), Responses=responses,
                 CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
                 ChannelId=channel_oid
             )
 
         if outcome.data_found:
-            q_revive = Query(MatchPair(OID_KEY, model.id))
-            op_revive = UpdateOperation(
-                Set(
-                    {
-                        AutoReplyModuleModel.Active.key: True,
-                        AutoReplyModuleModel.RemovedAt.key: DateTimeField.none_obj(),
-                        AutoReplyModuleModel.RemoverOid.key: None
-                    }
-                )
+            outcome = self.update_many_outcome(
+                {OID_KEY: model.id},
+                {"$set": {
+                    AutoReplyModuleModel.Active.key: True,
+                    AutoReplyModuleModel.RemovedAt.key: DateTimeField.none_obj(),
+                    AutoReplyModuleModel.RemoverOid.key: None
+                }}
             )
-
-            outcome = self.update_cache_db_outcome(q_revive, op_revive)
 
         if outcome.is_success:
             # Set other module with the same keyword to be inactive
-            q = Query(MatchPair(AutoReplyModuleModel.Id.key, NotEqual(model.id)),
-                      MatchPair(AutoReplyModuleModel.KEY_KW_TYPE, kw_type),
-                      MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
-                      MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid),
-                      MatchPair(AutoReplyModuleModel.Active.key, True))
 
-            self.update_cache_db_outcome(q, self._remove_update_ops_(creator_oid))
+            self.update_many_outcome(
+                {
+                    AutoReplyModuleModel.Id.key: {"$ne": model.id},
+                    AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+                    AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
+                    AutoReplyModuleModel.ChannelId.key: channel_oid,
+                    AutoReplyModuleModel.Active.key: True
+                },
+                self._remove_update_ops_(creator_oid)
+            )
             self._delete_recent_module_(keyword)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
@@ -147,7 +145,7 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         if not validate_outcome.is_success:
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
-        outcome, ex = self.insert_one_model_cache(model)
+        outcome, ex = self.insert_one_model(model)
 
         if outcome.is_success:
             self._delete_recent_module_(model.keyword.content)
@@ -155,31 +153,29 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
         return AutoReplyModuleAddResult(outcome, model, ex)
 
     @param_type_ensure
-    def _remove_update_ops_(self, remover_oid: ObjectId) -> UpdateOperation:
-        return UpdateOperation(
-            Set(
-                {
-                    AutoReplyModuleModel.Active.key: False,
-                    AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
-                    AutoReplyModuleModel.RemoverOid.key: remover_oid
-                }
-            )
-        )
+    def _remove_update_ops_(self, remover_oid: ObjectId):
+        return {"$set": {
+            AutoReplyModuleModel.Active.key: False,
+            AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
+            AutoReplyModuleModel.RemoverOid.key: remover_oid
+        }}
 
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
-        q = Query(MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
-                  MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid))
+        q = {
+            AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
+            AutoReplyModuleModel.ChannelId.key: channel_oid
+        }
 
         if not AutoReplyModuleManager.has_access_to_pinned(channel_oid, remover_oid):
-            q.add_element(MatchPair(AutoReplyModuleModel.Pinned.key, False))
+            q[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_cache_db_outcome(q, self._remove_update_ops_(remover_oid))
+        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid))
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
             # then it must because of the insufficient permission. Otherwise, it's really not found
-            q.add_element(MatchPair(AutoReplyModuleModel.Pinned.key, True))
-            if self.count_documents(q.to_mongo()) > 0:
+            q[AutoReplyModuleModel.Pinned.key] = True
+            if self.count_documents(q) > 0:
                 return WriteOutcome.X_INSUFFICIENT_PERMISSION
 
         return ret
@@ -188,26 +184,27 @@ class AutoReplyModuleManager(CacheMixin, BaseCollection):
     def get_conn(self, keyword: str, keyword_type: AutoReplyContentType,
                  channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:
-        q = Query(MatchPair(AutoReplyModuleModel.KEY_KW_CONTENT, keyword),
-                  MatchPair(AutoReplyModuleModel.KEY_KW_TYPE, keyword_type),
-                  MatchPair(AutoReplyModuleModel.ChannelId.key, channel_oid),
-                  MatchPair(AutoReplyModuleModel.Active.key, True))
-
         ret: Optional[AutoReplyModuleModel] = \
-            self.get_cache_one(q,
-                               parse_cls=AutoReplyModuleModel,
-                               collation=case_insensitive_collation if case_insensitive else None)
+            self.find_one_casted(
+                {
+                    AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
+                    AutoReplyModuleModel.KEY_KW_TYPE: keyword_type,
+                    AutoReplyModuleModel.ChannelId.key: channel_oid,
+                    AutoReplyModuleModel.Active.key: True
+                },
+                parse_cls=AutoReplyModuleModel,
+                collation=case_insensitive_collation if case_insensitive else None)
 
         if ret:
             now = now_utc_aware()
             if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
-                q_found = Query(MatchPair(AutoReplyModuleModel.Id.key, ret.id))
-                u_query = UpdateOperation(
-                    Set({AutoReplyModuleModel.LastUsed.key: now}),
-                    Increment([AutoReplyModuleModel.CalledCount.key])
-                )
+                q_found = {AutoReplyModuleModel.Id.key: ret.id}
+                u_query = {
+                    "$set": {AutoReplyModuleModel.LastUsed.key: now},
+                    "$inc": {AutoReplyModuleModel.CalledCount.key: 1}
+                }
 
-                self.update_cache_db_async(q_found, u_query)
+                self.update_one_async(q_found, u_query)
                 return ret
 
         return None
