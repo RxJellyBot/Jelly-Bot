@@ -17,6 +17,12 @@ if CLIENT_ID is None:
     sys.exit(1)
 
 
+CLIENT_ID = os.environ.get("GI_CLIENT_ID")
+if CLIENT_ID is None:
+    print("Cannot find GI_CLIENT_ID for Google Identity Service in system variables.")
+    sys.exit(1)
+
+
 class IDIssuerIncorrect(Exception):
     def __init__(self, issuer):
         super().__init__(f'ID issuer is not accounts.google.com. ({issuer})')
