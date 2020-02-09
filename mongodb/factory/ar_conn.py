@@ -13,7 +13,6 @@ from extutils.dt import now_utc_aware
 from flags import PermissionCategory, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel, UniqueKeywordCountResult
-from models.field import DateTimeField
 from models.utils import AutoReplyValidators
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
@@ -41,25 +40,34 @@ class AutoReplyModuleManager(BaseCollection):
         self.create_index(
             [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
              (AutoReplyModuleModel.KEY_KW_TYPE, 1),
-             (AutoReplyModuleModel.Responses.key, 1),
-             (AutoReplyModuleModel.ChannelId.key, 1)],
-            name="Auto Reply Module Identity", unique=True)
+             (AutoReplyModuleModel.ChannelId.key, 1),
+             (AutoReplyModuleModel.Active.key, 1)],
+            name="Index to get module")
 
     @staticmethod
-    def has_access_to_pinned(channel_oid: ObjectId, user_oid: ObjectId):
+    def _has_access_to_pinned_(channel_oid: ObjectId, user_oid: ObjectId):
         perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
         return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
 
-    @staticmethod
-    def validate_content(
-            keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], online_check) \
+    def _validate_content_(
+            self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
+            channel_oid: ObjectId, online_check) \
             -> WriteOutcome:
-        if not AutoReplyValidators.is_valid_content(kw_type, keyword, online_check):
+        # Check validity of keyword
+        if not AutoReplyValidators.is_valid_content(kw_type, kw_content, online_check):
             return WriteOutcome.X_AR_INVALID_KEYWORD
 
+        # Check validity of responses
         for response in responses:
             if not AutoReplyValidators.is_valid_content(response.content_type, response.content, online_check):
                 return WriteOutcome.X_AR_INVALID_RESPONSE
+
+        # Check module duplication
+        if self.count_documents({AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
+                                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+                                 AutoReplyModuleModel.Responses.key: responses,
+                                 AutoReplyModuleModel.ChannelId.key: channel_oid}) > 0:
+            return WriteOutcome.O_DATA_EXISTS
 
         return WriteOutcome.O_MISC
 
@@ -84,7 +92,7 @@ class AutoReplyModuleManager(BaseCollection):
             keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], creator_oid: ObjectId,
             channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        access_to_pinned = AutoReplyModuleManager.has_access_to_pinned(channel_oid, creator_oid)
+        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned_(channel_oid, creator_oid)
 
         # Terminate if someone without permission wants to create a pinned model
         if pinned and not access_to_pinned:
@@ -97,9 +105,10 @@ class AutoReplyModuleManager(BaseCollection):
                  AutoReplyModuleModel.Pinned.key: True}) > 0:
             return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
 
-        validate_outcome = AutoReplyModuleManager.validate_content(keyword, kw_type, responses, online_check=True)
+        validate_outcome = self._validate_content_(
+            keyword, kw_type, responses, channel_oid, online_check=True)
 
-        if not validate_outcome.is_success:
+        if validate_outcome != WriteOutcome.O_MISC:
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         model, outcome, ex = \
@@ -107,16 +116,6 @@ class AutoReplyModuleManager(BaseCollection):
                 Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type), Responses=responses,
                 CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
                 ChannelId=channel_oid
-            )
-
-        if outcome.data_found:
-            outcome = self.update_many_outcome(
-                {OID_KEY: model.id},
-                {"$set": {
-                    AutoReplyModuleModel.Active.key: True,
-                    AutoReplyModuleModel.RemovedAt.key: DateTimeField.none_obj(),
-                    AutoReplyModuleModel.RemoverOid.key: None
-                }}
             )
 
         if outcome.is_success:
@@ -139,10 +138,10 @@ class AutoReplyModuleManager(BaseCollection):
     def add_conn_by_model(self, model: AutoReplyModuleModel, online_check=True) -> AutoReplyModuleAddResult:
         model.clear_oid()
 
-        validate_outcome = AutoReplyModuleManager.validate_content(
-            model.keyword.content, model.keyword.content_type, model.responses, online_check)
+        validate_outcome = self._validate_content_(
+            model.keyword.content, model.keyword.content_type, model.responses, model.channel_id, online_check)
 
-        if not validate_outcome.is_success:
+        if validate_outcome != WriteOutcome.O_MISC:
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         outcome, ex = self.insert_one_model(model)
@@ -166,7 +165,7 @@ class AutoReplyModuleManager(BaseCollection):
             AutoReplyModuleModel.ChannelId.key: channel_oid
         }
 
-        if not AutoReplyModuleManager.has_access_to_pinned(channel_oid, remover_oid):
+        if not AutoReplyModuleManager._has_access_to_pinned_(channel_oid, remover_oid):
             q[AutoReplyModuleModel.Pinned.key] = False
 
         ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid))
