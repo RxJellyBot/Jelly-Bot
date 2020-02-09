@@ -11,7 +11,7 @@ if "HTTP_HOST" in os.environ:
 
 class System:
     GitHubRepoIDName = "RaenonX/Jelly-Bot"
-    HerokuAppName = "newjellybot"
+    GitHubRepoBranch = "master"
 
     MaxOneTimeResponses = 5
     MaxSendContentLength = 2000

@@ -7,6 +7,7 @@ class GitHubWrapper:
 
     def __init__(self):
         self._cache_deployments = {}
+        self._cache_commit = {}
 
     # noinspection PyMethodMayBeStatic
     def get_latest_deployment(self, repoidname, environment):
@@ -24,6 +25,18 @@ class GitHubWrapper:
                 return None
         else:
             return DotMap(self._cache_deployments[environment][0])
+
+    def get_latest_commit(self, repoidname, branch):
+        if branch not in self._cache_commit:
+            response = requests.get(f"{GitHubWrapper.API_URL}/repos/{repoidname}/commits/{branch}").json()
+
+            if response:
+                self._cache_commit[branch] = response
+                return DotMap(response)
+            else:
+                return None
+        else:
+            return DotMap(self._cache_commit[branch])
 
     @staticmethod
     def get_commit_url(repo_id_name: str, commit_sha: str):

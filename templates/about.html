@@ -22,8 +22,11 @@
                 <div class="card border-info">
                     <h4 class="card-header text-info text-center">{% trans "App-related info" %}</h4>
                     <div class="card-body text-info">
-                        <small>{% trans "Commit: " %}</small><a href="{{ commit_url }}"
-                                                                target="_blank"><code>{{ commit }}</code></a>
+                        <small>{% trans "Current Commit: " %}</small>
+                        <a href="{{ commit_url }}" target="_blank"><code>{{ commit }}</code></a>
+                        {% blocktrans trimmed %}
+                            on&nbsp;<code>{{ commit_branch }}</code>
+                        {% endblocktrans %}
                         <div class="row mt-3">
                             <div class="col-lg-4">
                                 <a class="btn btn-outline-info btn-block" target="_blank"
