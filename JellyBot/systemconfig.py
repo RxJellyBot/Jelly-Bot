@@ -111,7 +111,7 @@ class Bot:
     RandomChoiceSplitter = "  "
     RandomChoiceWeightSplitter = " "
     RandomChoiceOptionLimit = 20
-    RandomChoiceCountLimit = 300
+    RandomChoiceCountLimit = 1000
 
     CaseInsensitive = True
     CaseInsensitivePrefix = True
