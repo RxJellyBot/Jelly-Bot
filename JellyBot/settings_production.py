@@ -46,6 +46,10 @@ TEMPLATES = [
     },
 ]
 
+# --- Static files
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 # --- Logging
 
 LOGGING_ROOT = '../logs/Jelly-Bot/Application'
