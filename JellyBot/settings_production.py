@@ -52,5 +52,21 @@ LOGGING_ROOT = '../logs/Jelly-Bot/Application'
 LOGGING_FILE_ROOT = os.path.join(LOGGING_ROOT, 'logs')
 LOGGING_FILE_ERROR = os.path.join(LOGGING_FILE_ROOT, 'logs-severe.log')
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
+}
+
 sys.stdout = open(os.path.join(LOGGING_ROOT, 'app.log'), "w+")
 sys.stderr = open(os.path.join(LOGGING_ROOT, 'app-error.log'), "w+")

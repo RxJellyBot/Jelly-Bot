@@ -8,22 +8,22 @@ assignees: RaenonX
 ---
 
 ## Description
-(content)
+As title.
 
 ## Expected Behavior
-(content)
+N/A
 
 ## Current Status
-(content)
+Not fixed.
 
 ## How to reproduce
-(steps)
+N/A
 
 ## Origin
-(content, refer an issue or commit if applicable)
+N/A
 
 ## Notes
-(content)
+N/A
 
 ## Solution
-(content, refer the fixing commit if applicable)
+Not yet resolved. Fixing commit to be mentioned after this had been fixed.
