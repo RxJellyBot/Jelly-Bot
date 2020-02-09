@@ -10,11 +10,13 @@ class AboutView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
         # FIXME: Change this to get latest commit
-        github_deploy = GithubWrapper.get_latest_deployment(System.GitHubRepoIDName, System.HerokuAppName)
+        github_commit = GithubWrapper.get_latest_commit(System.GitHubRepoIDName, System.GitHubRepoBranch)
 
         return render_template(request, _("About"), "about.html", {
             "commit":
-                github_deploy.sha,
+                github_commit.sha,
             "commit_url":
-                GithubWrapper.get_commit_url(System.GitHubRepoIDName, github_deploy.sha)
+                GithubWrapper.get_commit_url(System.GitHubRepoIDName, github_commit.sha),
+            "commit_branch":
+                System.GitHubRepoBranch
         })

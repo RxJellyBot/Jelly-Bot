@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-10 02:54+0800\n"
-"PO-Revision-Date: 2020-01-10 02:59+0800\n"
+"POT-Creation-Date: 2020-02-09 02:26-0600\n"
+"PO-Revision-Date: 2020-02-09 02:30-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
-"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.4\n"
+"Language: zh_TW\n"
+"X-Generator: Poedit 2.2.3\n"
 
 #: .\JellyBot\api\static\info.py:16
 msgid "Dummy"
@@ -48,15 +48,15 @@ msgid ""
 "so the system dropped it."
 msgstr "因部分回覆種類找不到對應的回覆，故系統自動無視。"
 
-#: .\JellyBot\settings.py:173
+#: .\JellyBot\settings.py:138
 msgid "English"
 msgstr "英文"
 
-#: .\JellyBot\settings.py:174
+#: .\JellyBot\settings.py:139
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
-#: .\JellyBot\views\about.py:17 .\JellyBot\views\nav.py:25
+#: .\JellyBot\views\about.py:15 .\JellyBot\views\nav.py:25
 msgid "About"
 msgstr "關於"
 
@@ -101,19 +101,20 @@ msgstr "資料無法傳送到伺服器中。"
 
 #: .\JellyBot\views\account\control.py:42
 msgid ""
-"An unknown error occurred during the new user data registration. Code: {}."
-msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {}。"
+"An unknown error occurred during the new user data registration. Code: {} / "
+"Registration Code: {}."
+msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {} / 註冊代碼: {}。"
 
-#: .\JellyBot\views\account\control.py:60
+#: .\JellyBot\views\account\control.py:61
 msgid "User token is null however login succeed. {}"
 msgstr "登入成功，但用戶編碼為空。 ({})"
 
-#: .\JellyBot\views\account\control.py:68 .\JellyBot\views\nav.py:63
+#: .\JellyBot\views\account\control.py:69 .\JellyBot\views\nav.py:63
 #: .\templates\account\main.html:120
 msgid "Logout"
 msgstr "登出"
 
-#: .\JellyBot\views\account\control.py:95 .\templates\account\settings.html:8
+#: .\JellyBot\views\account\control.py:101 .\templates\account\settings.html:8
 msgid "Account Settings"
 msgstr "帳號設定"
 
@@ -300,7 +301,7 @@ msgstr "頻道組資訊 - {}"
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:27 .\JellyBot\views\nav.py:147
+#: .\JellyBot\views\info\profile.py:32 .\JellyBot\views\nav.py:147
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
@@ -1286,11 +1287,11 @@ msgstr "身分組: 附加至成員"
 msgid "User who has this permission can attach profiles to the other members."
 msgstr "擁有此權限的用戶可以附加身分組至對應頻道的成員。"
 
-#: .\flags\perm.py:89 .\templates\info\profile.html:62
+#: .\flags\perm.py:89
 msgid "Moderator"
 msgstr "副管"
 
-#: .\flags\perm.py:90 .\templates\info\profile.html:60
+#: .\flags\perm.py:90
 msgid "Admin"
 msgstr "管理員"
 
@@ -1373,7 +1374,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:238
+#: .\mongodb\factory\prof.py:267
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -1884,11 +1885,11 @@ msgstr "執行失敗。找不到符合條件的資料更新。"
 msgid "No description provided."
 msgstr "沒有敘述。"
 
-#: .\msghandle\botcmd\command\_base_.py:444
+#: .\msghandle\botcmd\command\_base_.py:455
 msgid "Command is in cooldown. Call the command again after {:.2f} secs."
 msgstr "指令冷卻中。請於 {:.2f} 秒後重試。"
 
-#: .\msghandle\botcmd\command\_base_.py:453
+#: .\msghandle\botcmd\command\_base_.py:464
 msgid ""
 "Incorrect type of data: `{}`.\n"
 "Expected type: `{}` / Actual type: `{}`"
@@ -1896,7 +1897,7 @@ msgstr ""
 "`{}` 的資料型態不正確。\n"
 "預期: `{}` / 實際: `{}`"
 
-#: .\msghandle\botcmd\command\_base_.py:474
+#: .\msghandle\botcmd\command\_base_.py:485
 msgid ""
 "Executable command not found.\n"
 "Visit {}{} for more information."
@@ -1904,7 +1905,7 @@ msgstr ""
 "找不到可執行的指令。\n"
 "請瀏覽 {}{} 以獲得更多資訊。"
 
-#: .\msghandle\botcmd\command\_base_.py:497
+#: .\msghandle\botcmd\command\_base_.py:508
 msgid ""
 "Command not allowed to use under this channel type: {}\n"
 "Please use the command under either one of these channel types: {}"
@@ -2287,21 +2288,21 @@ msgstr "所在頻道的訊息量前{}名(7日):"
 msgid "Top {} Message Count in 7 Days in this channel collection:"
 msgstr "所在頻道組的訊息量前{}名(7日):"
 
-#: .\msghandle\botcmd\command\rct.py:12
+#: .\msghandle\botcmd\command\rct.py:14
 msgid "Recent Activity"
 msgstr "近期活動"
 
-#: .\msghandle\botcmd\command\rct.py:13
+#: .\msghandle\botcmd\command\rct.py:15
 msgid "Check various types of recent activities."
 msgstr "查閱各種近期活動紀錄。"
 
-#: .\msghandle\botcmd\command\rct.py:20
+#: .\msghandle\botcmd\command\rct.py:37
+msgid "Visit {}{}?{} to see the most recent {} messages. Login required."
+msgstr "瀏覽 {}{}?{} 以查閱最新 {} 則訊息。此連結必須登入。"
+
+#: .\msghandle\botcmd\command\rct.py:51
 msgid "Maximum count of the recent messages to see."
 msgstr "查閱近期訊息的最大數量。"
-
-#: .\msghandle\botcmd\command\rct.py:28
-msgid "Visit {}{}?{} to see the most recent {} messages."
-msgstr "瀏覽 {}{}?{} 以查閱最新 {} 則訊息。"
 
 #: .\msghandle\botcmd\command\rdm.py:14
 msgid "Random"
@@ -2739,46 +2740,43 @@ msgid "App-related info"
 msgstr "程式相關資訊"
 
 #: .\templates\about.html:25
-msgid "Deployed on "
-msgstr "部署於 "
-
-#: .\templates\about.html:26
-msgid "Heroku Released on "
-msgstr "Heroku部署於 "
+msgid "Current Commit: "
+msgstr "目前Commit: "
 
 #: .\templates\about.html:27
-msgid "Commit: "
-msgstr "Commit: "
+#, python-format
+msgid "on&nbsp;<code>%(commit_branch)s</code>"
+msgstr "<code>(%(commit_branch)s)</code>"
 
-#: .\templates\about.html:36
+#: .\templates\about.html:37
 msgid "Website"
 msgstr "網站"
 
-#: .\templates\about.html:48
+#: .\templates\about.html:49
 msgid "System"
 msgstr "系統"
 
-#: .\templates\about.html:52
+#: .\templates\about.html:53
 msgid "GitHub Repository"
 msgstr "GitHub Repo"
 
-#: .\templates\about.html:54
+#: .\templates\about.html:55
 msgid "Deployed on"
 msgstr "部署於"
 
-#: .\templates\about.html:56 .\templates\account\settings.html:57
+#: .\templates\about.html:57 .\templates\account\settings.html:57
 msgid "Language"
 msgstr "語言"
 
-#: .\templates\about.html:58
+#: .\templates\about.html:59
 msgid "Backend Framework"
 msgstr "後台框架"
 
-#: .\templates\about.html:60 .\templates\about.html:62
+#: .\templates\about.html:61 .\templates\about.html:63
 msgid "Frontend framework"
 msgstr "前台框架"
 
-#: .\templates\about.html:64
+#: .\templates\about.html:65
 msgid "Database"
 msgstr "資料庫"
 
@@ -2965,7 +2963,7 @@ msgid "Color"
 msgstr "顏色"
 
 #: .\templates\account\channel\prof\create-perm.html:4
-#: .\templates\info\profile.html:87
+#: .\templates\info\profile.html:81
 msgid "Permissions"
 msgstr "權限"
 
@@ -2974,6 +2972,7 @@ msgid "Property"
 msgstr "屬性"
 
 #: .\templates\account\channel\prof\create-prop.html:7
+#: .\templates\info\profile.html:56
 msgid "Permission Level"
 msgstr "權限等級"
 
@@ -3651,10 +3650,6 @@ msgid ""
 msgstr "2019年05月18日開始開發；2019年09月11日開始營運。 / 由 醜兔/水母 製作"
 
 #: .\templates\base\footer.html:12
-msgid "updated at"
-msgstr "更新於"
-
-#: .\templates\base\footer.html:15
 #, python-format
 msgid "Booted on %(boot_dt)s."
 msgstr "於 %(boot_dt)s 開機。"
@@ -4080,6 +4075,7 @@ msgstr "使用次數"
 #: .\templates\info\components\bot_table_member.html:7
 #: .\templates\info\components\msg_table_count.html:8
 #: .\templates\info\components\msg_table_user_daily.html:8
+#: .\templates\info\profile.html:110
 msgid "Member Name"
 msgstr "成員名稱"
 
@@ -4185,25 +4181,21 @@ msgstr "頻道身份組資訊"
 msgid "Profile ID"
 msgstr "身分組ID"
 
-#: .\templates\info\profile.html:56
-msgid "Privilege"
-msgstr "特權等級"
-
-#: .\templates\info\profile.html:64
-msgid "N/A"
-msgstr "N/A"
-
-#: .\templates\info\profile.html:72
+#: .\templates\info\profile.html:66
 msgid "Promotion Required"
 msgstr "需要投票"
 
-#: .\templates\info\profile.html:76
+#: .\templates\info\profile.html:70
 msgid "Yes"
 msgstr "是"
 
-#: .\templates\info\profile.html:78
+#: .\templates\info\profile.html:72
 msgid "No"
 msgstr "否"
+
+#: .\templates\info\profile.html:101
+msgid "User who also have this profile"
+msgstr "擁有此身份組的用戶"
 
 #: .\templates\info\recent\message.html:39
 msgid "messages"
@@ -4304,6 +4296,21 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "Deployed on "
+#~ msgstr "部署於 "
+
+#~ msgid "Heroku Released on "
+#~ msgstr "Heroku部署於 "
+
+#~ msgid "updated at"
+#~ msgstr "更新於"
+
+#~ msgid "Privilege"
+#~ msgstr "特權等級"
+
+#~ msgid "N/A"
+#~ msgstr "N/A"
 
 #~ msgctxt "Profile Name"
 #~ msgid "Name"
