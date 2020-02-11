@@ -141,3 +141,8 @@ class Bot:
 
     class RemoteControl:
         IdleDeactivateSeconds = 600  # 10 mins
+
+
+class ExtraService:
+    class Maskfinder:
+        TargetRangeMi = 200
