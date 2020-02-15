@@ -26,17 +26,20 @@
                 </ul>
             </div>
         </div>
-        <div class="row">
-            <div class="col mb-3">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="keyword" value="{{ keyword }}"
-                           placeholder="{% trans "Enter keyword to search" %}" aria-label="URL">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-primary" type="button" id="search">{% trans "Search" %}</button>
+        <form>
+            <div class="row">
+                <div class="col mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="keyword" value="{{ keyword }}"
+                               placeholder="{% trans "Enter keyword to search" %}" aria-label="Keyword">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit"
+                                    id="search">{% trans "Search" %}</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
         <div class="row">
             {% for channel_data in channel_list %}
                 {% with channel_model=channel_data.channel_model channel_name=channel_data.channel_name %}

@@ -39,6 +39,10 @@ class BotFeature(FlagDoubleEnum):
                 1142 - Deactivate
                 1143 - Current Status
 
+        12 - Extra Services
+            120 - Short URL
+                1201 - Create
+
         19 - Functional
                 1901 - User data integration
                 1902 - Calculator
@@ -111,6 +115,9 @@ class BotFeature(FlagDoubleEnum):
         1142, _("Text / Remote / Deactivate"), _("Deactivate the remore control system.")
     TXT_RMC_STATUS = \
         1143, _("Text / Remote / Status"), _("View the current status of the remote control system.")
+
+    TXT_SURL_CREATE = \
+        1201, _("Text / Short URL / Create"), _("Create a shortened URL.")
 
     TXT_FN_UDI_START = \
         1901, _("Text / User Data Integration / Start"), _("Issue an Execode for user data integration.")

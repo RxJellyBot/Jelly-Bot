@@ -114,6 +114,8 @@ def _construct_auto_reply_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Add"), link=reverse("page.ar.add"), parent=auto_reply_parent))
     auto_reply_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Ranking"), link=reverse("page.ar.ranking.list"), parent=auto_reply_parent))
+    auto_reply_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Search"), link=reverse("page.ar.search.list"), parent=auto_reply_parent))
 
     # Hidden Items
     __attach__(auto_reply_parent, NavHidden, current_path,
