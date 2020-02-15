@@ -53,8 +53,10 @@ def backup_collection_thread(
                                          {"$set": {"ts": datetime.utcnow()}}, upsert=True)
         except pymongo.errors.InvalidOperation as e:
             logger.logger.info(f"Backup of `{db_name}.{col_name}` yielded `InvalidOperation`. ({e})")
+        except pymongo.errors.BulkWriteError as e:
+            logger.logger.error(f"Backup of `{db_name}.{col_name}` yielded `BulkWriteError`. ({e.details})")
         except Exception as e:
-            logger.logger.error(f"Backup of `{db_name}.{col_name}` failed. Error: {e}")
+            logger.logger.error(f"Backup of `{db_name}.{col_name}` failed. Error: {e} ({type(e)})")
 
         logger.logger.info(f"Backup of `{db_name}.{col_name}` completed on {datetime.now()}.`")
 
