@@ -9,6 +9,7 @@ from django.conf import settings
 from pymongo.collection import Collection
 from pymongo.errors import DuplicateKeyError
 
+from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
 from extutils.dt import now_utc_aware
 from extutils.logger import SYSTEM
@@ -16,7 +17,7 @@ from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
 from models.utils import ModelFieldChecker
-from mongodb.utils import CursorWithCount
+from mongodb.utils import CursorWithCount, backup_collection
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
 
@@ -213,6 +214,9 @@ class BaseCollection(ControlExtensionMixin, Collection):
 
     def on_init(self):
         ModelFieldChecker.check_async(self)
+        backup_collection(
+            MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
+            single_db_name is not None, Database.BackupIntervalSeconds)
 
     def on_init_async(self):
         pass

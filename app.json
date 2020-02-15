@@ -22,6 +22,10 @@
       "description": "The database name of MongoDB. Set this when single db is needed, e.g. using mLab MongoDB on Heroku.",
       "required": false
     },
+    "MONGO_BACKUP_URL": {
+      "description": "The connection string of MongoDB instance backup target. This cannot be a single db database.",
+      "required": false
+    },
     "PRODUCTION": {
       "description": "Flag indicates that if the app is in production.",
       "required": false
