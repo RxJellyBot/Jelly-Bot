@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load utils %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center mb-3">{% trans "Auto-Reply Module Search" %}</div>
+            <div class="text-center"><code class="h4 font-weight-normal">{{ channel_name }}&nbsp;({{ channel_oid }})</code></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col mb-3">
+                <ul>
+                    <li>
+                        {% blocktrans trimmed %}
+                            Searching <b>without providing the keyword</b> will list all the modules.
+                        {% endblocktrans %}
+                    </li>
+                    <li>
+                        {% blocktrans trimmed %}
+                            Keyword could be a fragment of the <b>module keyword</b>.
+                        {% endblocktrans %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <form>
+            <div class="row">
+                <div class="col mb-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="keyword" value="{{ keyword }}" name="w"
+                               placeholder="{% trans "Enter keyword to search" %}" aria-label="Keyword">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="submit"
+                                    id="search">{% trans "Search" %}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg custom-control custom-checkbox text-center">
+                    <input type="checkbox" class="custom-control-input" name="active_only" id="active-only"
+                           {% if active_only %}checked{% endif %}>
+                    <label class="custom-control-label"
+                           for="active-only">{% trans "Including Unavailable Modules" %}</label>
+                </div>
+            </div>
+        </form>
+
+        <div class="row">
+            {% for module in module_list %}
+                <!-- FIXME: Module Table -->
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

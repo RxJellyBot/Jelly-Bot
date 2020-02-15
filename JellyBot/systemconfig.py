@@ -65,6 +65,8 @@ class Database:
     ExtraContentExpirySeconds = 2073600  # 30 Days
     BulkWriteCount = 300
 
+    BackupIntervalSeconds = 86400  # 24 Hrs
+
     class PopularityConfig:
         TimeDiffIntersectHr = 168
         TimeFunctionCoeff = 40

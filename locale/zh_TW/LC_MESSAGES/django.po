@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-09 02:26-0600\n"
-"PO-Revision-Date: 2020-02-09 02:30-0600\n"
+"POT-Creation-Date: 2020-02-15 03:43-0600\n"
+"PO-Revision-Date: 2020-02-15 03:50-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -145,7 +145,7 @@ msgid "Attach Profile"
 msgstr "附加身分組"
 
 #: .\JellyBot\views\ar\add.py:19
-msgid "Add an Auto-Reply"
+msgid "Add an Auto-Reply module"
 msgstr "新增自動回覆"
 
 #: .\JellyBot\views\ar\main.py:10
@@ -160,12 +160,20 @@ msgstr "{} 中的自動回覆排名"
 msgid "Auto-Reply ranking channel list"
 msgstr "自動回覆排名頻道清單"
 
-#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:161
+#: .\JellyBot\views\ar\search.py:21
+msgid "Auto-Reply search in {}"
+msgstr "搜尋 {} 內的自動回覆組"
+
+#: .\JellyBot\views\ar\search.py:36
+msgid "Auto-Reply search channel list"
+msgstr "自動回覆搜尋頻道清單"
+
+#: .\JellyBot\views\doc\botcmd.py:16 .\JellyBot\views\nav.py:163
 #: .\templates\doc\botcmd_main.html:9
 msgid "Bot Commands List"
 msgstr "機器人指令清單"
 
-#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:193
+#: .\JellyBot\views\doc\botcmd.py:37 .\JellyBot\views\nav.py:195
 msgid "Bot Command - {}"
 msgstr "機器人指令 - {}"
 
@@ -181,7 +189,7 @@ msgstr "API指令"
 msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
-#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:189
+#: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:191
 #: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
 msgid "Execode"
 msgstr "執行碼"
@@ -190,7 +198,7 @@ msgstr "執行碼"
 msgid "Insert Outcome Code"
 msgstr "新增結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:177
+#: .\JellyBot\views\doc\code\outcome.py:12 .\JellyBot\views\nav.py:179
 msgid "Insert Outcome"
 msgstr "新增結果"
 
@@ -198,7 +206,7 @@ msgstr "新增結果"
 msgid "Get Outcome Code"
 msgstr "獲取結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:175
+#: .\JellyBot\views\doc\code\outcome.py:19 .\JellyBot\views\nav.py:177
 msgid "Get Outcome"
 msgstr "獲取結果"
 
@@ -206,7 +214,7 @@ msgstr "獲取結果"
 msgid "Operation Outcome Code"
 msgstr "作業結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:179
+#: .\JellyBot\views\doc\code\outcome.py:26 .\JellyBot\views\nav.py:181
 msgid "Operation Outcome"
 msgstr "作業結果"
 
@@ -214,11 +222,11 @@ msgstr "作業結果"
 msgid "Update Outcome Code"
 msgstr "更新結果代碼"
 
-#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:181
+#: .\JellyBot\views\doc\code\outcome.py:33 .\JellyBot\views\nav.py:183
 msgid "Update Outcome"
 msgstr "更新結果"
 
-#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:164
+#: .\JellyBot\views\doc\terms.py:11 .\JellyBot\views\nav.py:166
 #: .\templates\doc\terms.html:9
 msgid "Terms Explanation"
 msgstr "名詞解釋"
@@ -281,7 +289,7 @@ msgstr ""
 msgid "Home Page"
 msgstr "首頁"
 
-#: .\JellyBot\views\info\botstats.py:74 .\JellyBot\views\nav.py:141
+#: .\JellyBot\views\info\botstats.py:74 .\JellyBot\views\nav.py:143
 msgid "Bot Usage Stats - {}"
 msgstr "機器人使用統計 - {}"
 
@@ -293,19 +301,19 @@ msgstr "頻道資訊 - {}"
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:150
+#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:152
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:90 .\JellyBot\views\nav.py:138
+#: .\JellyBot\views\info\msgstats.py:90 .\JellyBot\views\nav.py:140
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:32 .\JellyBot\views\nav.py:147
+#: .\JellyBot\views\info\profile.py:32 .\JellyBot\views\nav.py:149
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
-#: .\JellyBot\views\info\recent.py:42 .\JellyBot\views\nav.py:144
+#: .\JellyBot\views\info\recent.py:42 .\JellyBot\views\nav.py:146
 msgid "Recent Messages - {}"
 msgstr "近期訊息 - {}"
 
@@ -366,49 +374,61 @@ msgstr "新增"
 msgid "Ranking"
 msgstr "排名"
 
-#: .\JellyBot\views\nav.py:120
+#: .\JellyBot\views\nav.py:118 .\templates\ar\add-props.html:88
+#: .\templates\ar\search-channel.html:38 .\templates\components\navbar.html:18
+#: .\templates\components\navbar.html:19
+#: .\templates\info\channel\search.html:37
+#: .\templates\services\maskfinder\main.html:38
+msgid "Search"
+msgstr "搜尋"
+
+#: .\JellyBot\views\nav.py:122
 msgid "Auto-Reply Ranking - {}"
 msgstr "自動回覆排名 - {}"
 
-#: .\JellyBot\views\nav.py:128 .\templates\info\channel\search.html:67
+#: .\JellyBot\views\nav.py:130 .\templates\info\channel\search.html:70
 msgid "Info"
 msgstr "資訊查詢"
 
-#: .\JellyBot\views\nav.py:131
+#: .\JellyBot\views\nav.py:133
 msgid "Channel"
 msgstr "頻道"
 
-#: .\JellyBot\views\nav.py:135
+#: .\JellyBot\views\nav.py:137
 msgid "Channel - {}"
 msgstr "頻道 - {}"
 
-#: .\JellyBot\views\nav.py:158
+#: .\JellyBot\views\nav.py:160
 msgid "Documentation"
 msgstr "文件/說明"
 
-#: .\JellyBot\views\nav.py:168 .\templates\index.html:26
+#: .\JellyBot\views\nav.py:170 .\templates\index.html:26
 msgid "Bot"
 msgstr "機器人"
 
-#: .\JellyBot\views\nav.py:173
+#: .\JellyBot\views\nav.py:175
 msgid "Outcome Code"
 msgstr "結果代碼"
 
-#: .\JellyBot\views\nav.py:185
+#: .\JellyBot\views\nav.py:187
 msgid "Action Code"
 msgstr "操作代碼"
 
-#: .\JellyBot\views\nav.py:187
+#: .\JellyBot\views\nav.py:189
 msgid "API Command"
 msgstr "API指令"
 
-#: .\JellyBot\views\nav.py:201
+#: .\JellyBot\views\nav.py:203
 msgid "Special Services"
 msgstr "特殊服務"
 
-#: .\JellyBot\views\nav.py:203 .\templates\services\shorturl\main.html:55
+#: .\JellyBot\views\nav.py:205 .\templates\services\shorturl\main.html:55
 msgid "Short URL"
 msgstr "短網址"
+
+#: .\JellyBot\views\nav.py:208 .\JellyBot\views\services\maskfinder.py:23
+msgid "Maskfinder (US Only)"
+msgstr "尋找口罩小工具 (美國)"
 
 #: .\JellyBot\views\services\shorturl.py:16
 msgid "Short URL Service"
@@ -791,230 +811,238 @@ msgstr "LINE貼圖"
 msgid "Custom Signal"
 msgstr "自訂訊號"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Undefined"
 msgstr "未定義"
 
-#: .\flags\botfeature.py:59
+#: .\flags\botfeature.py:63
 msgid "Undefined bot feature flag."
 msgstr "未定義的機器人功能。"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:66
 msgid "Text / Auto Reply / Add"
 msgstr "文字 / 自動回覆 / 新增"
 
-#: .\flags\botfeature.py:62
+#: .\flags\botfeature.py:66
 msgid "Register an auto-reply module."
 msgstr "新增自動回覆組。"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:68
 msgid "Text / Auto Reply / Delete"
 msgstr "文字 / 自動回覆 / 刪除"
 
-#: .\flags\botfeature.py:64
+#: .\flags\botfeature.py:68
 msgid "Delete an auto-reply module."
 msgstr "刪除自動回覆組。"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Text / Auto Reply / Add (Execode)"
 msgstr "文字 / 自動回覆 / 新增 (執行碼)"
 
-#: .\flags\botfeature.py:66
+#: .\flags\botfeature.py:70
 msgid "Register an auto-reply module using Execode."
 msgstr "使用執行碼新增自動回覆組。"
 
-#: .\flags\botfeature.py:68
+#: .\flags\botfeature.py:72
 msgid "Text / Auto Reply / List (Usable)"
 msgstr "文字 / 自動回覆 / 列表 (可用)"
 
-#: .\flags\botfeature.py:68
+#: .\flags\botfeature.py:72
 msgid "List all the usable auto-reply modules."
 msgstr "列出所有可用的自動回覆組。"
 
-#: .\flags\botfeature.py:70
+#: .\flags\botfeature.py:74
 msgid "Text / Auto Reply / List (Keyword)"
 msgstr "文字 / 自動回覆 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:71
+#: .\flags\botfeature.py:75
 msgid ""
 "List all the usable auto-reply modules which keyword includes the provided "
 "keyword."
 msgstr "列出所有含有提供的關鍵字的可用回覆組。"
 
-#: .\flags\botfeature.py:73
+#: .\flags\botfeature.py:77
 msgid "Text / Auto Reply / Ranking"
 msgstr "文字 / 自動回覆 / 排名"
 
-#: .\flags\botfeature.py:74
+#: .\flags\botfeature.py:78
 msgid ""
 "Get the auto-reply module usage ranking and the unique keyword usage ranking."
 msgstr "獲取自動回覆組和回覆組關鍵字排名。"
 
-#: .\flags\botfeature.py:76
+#: .\flags\botfeature.py:80
 msgid "Text / Auto Reply / Respond"
 msgstr "文字 / 自動回覆 / 回覆"
 
-#: .\flags\botfeature.py:76
+#: .\flags\botfeature.py:80
 msgid "Responded to the message origin with the designated response."
 msgstr "根據設定好的關鍵字回覆訊息至訊息來源處。"
 
-#: .\flags\botfeature.py:79
+#: .\flags\botfeature.py:83
 msgid "Text / Timer / Add"
 msgstr "文字 / 計時器 / 新增"
 
-#: .\flags\botfeature.py:79
+#: .\flags\botfeature.py:83
 msgid "Add a timer."
 msgstr "新增一個計時器。"
 
-#: .\flags\botfeature.py:81
+#: .\flags\botfeature.py:85
 msgid "Text / Timer / List (All)"
 msgstr "文字 / 計時器 / 列表 (全部)"
 
-#: .\flags\botfeature.py:81
+#: .\flags\botfeature.py:85
 msgid "List all timers."
 msgstr "列出全部的計時器。"
 
-#: .\flags\botfeature.py:83
+#: .\flags\botfeature.py:87
 msgid "Text / Timer / Delete"
 msgstr "文字 / 計時器 / 刪除"
 
-#: .\flags\botfeature.py:83
+#: .\flags\botfeature.py:87
 msgid "Delete a timer."
 msgstr "刪除一個計時器。"
 
-#: .\flags\botfeature.py:85
+#: .\flags\botfeature.py:89
 msgid "Text / Timer / List (Keyword)"
 msgstr "文字 / 計時器 / 列表 (關鍵字)"
 
-#: .\flags\botfeature.py:85
+#: .\flags\botfeature.py:89
 msgid "Get the timer(s) with the designated keyword."
 msgstr "顯示關鍵字所對應的計時器。"
 
-#: .\flags\botfeature.py:88
+#: .\flags\botfeature.py:92
 msgid "Text / Information / Check IDs"
 msgstr "文字 / 資訊 / 查看ID"
 
-#: .\flags\botfeature.py:88
+#: .\flags\botfeature.py:92
 msgid "Check the ID of current channel and self."
 msgstr "查看自己和所在頻道的ID。"
 
-#: .\flags\botfeature.py:90
+#: .\flags\botfeature.py:94
 msgid "Text / Information / Channel"
 msgstr "文字 / 資訊 / 頻道"
 
-#: .\flags\botfeature.py:90
+#: .\flags\botfeature.py:94
 msgid "Check the channel info."
 msgstr "查閱頻道資訊。"
 
-#: .\flags\botfeature.py:92
+#: .\flags\botfeature.py:96
 msgid "Text / Information / User"
 msgstr "文字 / 資訊 / 用戶"
 
-#: .\flags\botfeature.py:92
+#: .\flags\botfeature.py:96
 msgid "Check the user info of self."
 msgstr "查閱自己的用戶資訊。"
 
-#: .\flags\botfeature.py:94
+#: .\flags\botfeature.py:98
 msgid "Text / Information / Help"
 msgstr "文字 / 資訊 / 幫助"
 
-#: .\flags\botfeature.py:94
+#: .\flags\botfeature.py:98
 msgid "Get help for how to use the bot and the related information."
 msgstr "查看此機器人的使用說明和相關資訊。"
 
-#: .\flags\botfeature.py:97
+#: .\flags\botfeature.py:101
 msgid "Text / Transform / Newline"
 msgstr "文字 / 替換 / 換行字元"
 
-#: .\flags\botfeature.py:97
+#: .\flags\botfeature.py:101
 msgid "Replace the real newline character to be the escaped character \\n."
 msgstr "把實際的換行字元替換為顯示用的換行字元\\n。"
 
-#: .\flags\botfeature.py:100
+#: .\flags\botfeature.py:104
 msgid "Text / Random / Choice (One)"
 msgstr "文字 / 隨機 / 選擇 (單個)"
 
-#: .\flags\botfeature.py:100
+#: .\flags\botfeature.py:104
 msgid "Randomly pick an option among the provided options."
 msgstr "隨機從提供的選項中選出一個選項。"
 
-#: .\flags\botfeature.py:102
+#: .\flags\botfeature.py:106
 msgid "Text / Random / Choice (Multi)"
 msgstr "文字 / 隨機 / 選擇 (多個)"
 
-#: .\flags\botfeature.py:103
+#: .\flags\botfeature.py:107
 msgid "Randomly pick an option among the provided options multiple times."
 msgstr "隨機從提供的選項中，根據指定的次數多次選擇選項。"
 
-#: .\flags\botfeature.py:106
+#: .\flags\botfeature.py:110
 msgid "Text / Recent / Message"
 msgstr "文字 / 近期 / 訊息"
 
-#: .\flags\botfeature.py:106
+#: .\flags\botfeature.py:110
 msgid "Get recent messages including the recalled ones."
 msgstr "獲取近期訊息。這些訊息中包含已經收回的訊息。"
 
-#: .\flags\botfeature.py:109
+#: .\flags\botfeature.py:113
 msgid "Text / Remote / Activate"
 msgstr "文字 / 遙控 / 啟動"
 
-#: .\flags\botfeature.py:109
+#: .\flags\botfeature.py:113
 msgid "Activate the remote control system."
 msgstr "啟動訊息遙控系統。"
 
-#: .\flags\botfeature.py:111
+#: .\flags\botfeature.py:115
 msgid "Text / Remote / Deactivate"
 msgstr "文字 / 遙控 / 停用"
 
-#: .\flags\botfeature.py:111
+#: .\flags\botfeature.py:115
 msgid "Deactivate the remore control system."
 msgstr "停止訊息遙控系統。"
 
-#: .\flags\botfeature.py:113
+#: .\flags\botfeature.py:117
 msgid "Text / Remote / Status"
 msgstr "文字 / 遙控 / 狀態"
 
-#: .\flags\botfeature.py:113
+#: .\flags\botfeature.py:117
 msgid "View the current status of the remote control system."
 msgstr "查閱目前訊息遙控系統的狀態。"
 
-#: .\flags\botfeature.py:116
+#: .\flags\botfeature.py:120
+msgid "Text / Short URL / Create"
+msgstr "文字 / 短網址 / 新增"
+
+#: .\flags\botfeature.py:120
+msgid "Create a shortened URL."
+msgstr "建立一個短網址。"
+
+#: .\flags\botfeature.py:123
 msgid "Text / User Data Integration / Start"
 msgstr "文字 / 整合用戶資料 / 啟動"
 
-#: .\flags\botfeature.py:116
+#: .\flags\botfeature.py:123
 msgid "Issue an Execode for user data integration."
 msgstr "獲取一條執行碼以啟動用戶資訊整合手續。"
 
-#: .\flags\botfeature.py:118
+#: .\flags\botfeature.py:125
 msgid "Text / Calculator"
 msgstr "文字 / 計算機"
 
-#: .\flags\botfeature.py:118
+#: .\flags\botfeature.py:125
 msgid "Auto-detected calculator."
 msgstr "自動偵測並啟動的計算機。"
 
-#: .\flags\botfeature.py:120
+#: .\flags\botfeature.py:127
 msgid "Text / Error Test"
 msgstr "文字 / 錯誤測試"
 
-#: .\flags\botfeature.py:120
+#: .\flags\botfeature.py:127
 msgid "For the purpose of testing the error reporting system."
 msgstr "(測試錯誤回報系統用)"
 
-#: .\flags\botfeature.py:123
+#: .\flags\botfeature.py:130
 msgid "Image / imgur upload"
 msgstr "圖片 / 上傳imgur"
 
-#: .\flags\botfeature.py:123
+#: .\flags\botfeature.py:130
 msgid "Upload image to imgur.com."
 msgstr "將圖片上傳至 imgur.com。"
 
-#: .\flags\botfeature.py:126
+#: .\flags\botfeature.py:133
 msgid "Sticker / LINE / Get Info"
 msgstr "貼圖 / LINE / 資訊"
 
-#: .\flags\botfeature.py:126
+#: .\flags\botfeature.py:133
 msgid "Get the info of the sticker (mostly IDs)."
 msgstr "獲取貼圖的相關資訊(基本上都是ID)。"
 
@@ -1913,11 +1941,11 @@ msgstr ""
 "指令無法在此頻道種類中使用: {}\n"
 "請在下列任一種頻道種類中使用此指令: {}"
 
-#: .\msghandle\botcmd\command\_tree_.py:39
+#: .\msghandle\botcmd\command\_tree_.py:41
 msgid "Dummy command for accomodating new command usage."
 msgstr "用於讓用戶適應新指令用法的假指令。"
 
-#: .\msghandle\botcmd\command\_tree_.py:40
+#: .\msghandle\botcmd\command\_tree_.py:42
 msgid ""
 "Please add 'AR' which means 'Auto-Reply' between JC and the command code.\n"
 "------\n"
@@ -2449,6 +2477,26 @@ msgstr ""
 msgid "Remote control is not activated."
 msgstr "訊息遙控系統未啟動。"
 
+#: .\msghandle\botcmd\command\surl.py:12
+msgid "Shorten URL"
+msgstr "縮短網址"
+
+#: .\msghandle\botcmd\command\surl.py:13
+msgid "Commands related to the Short URL service."
+msgstr "與短網址服務有關的指令。"
+
+#: .\msghandle\botcmd\command\surl.py:18
+msgid "URL to be shortened."
+msgstr "要縮短的網址。"
+
+#: .\msghandle\botcmd\command\surl.py:24
+msgid "URL Shortened."
+msgstr "網址已縮短。"
+
+#: .\msghandle\botcmd\command\surl.py:28
+msgid "Failed to shorten the URL. Code: {}"
+msgstr "網址縮短失敗。代碼: "
+
 #: .\msghandle\botcmd\command\tmr.py:17
 msgid "Timer"
 msgstr "計時器"
@@ -2846,7 +2894,7 @@ msgid "Star"
 msgstr "最愛"
 
 #: .\templates\account\channel\list_table.html:28
-#: .\templates\info\channel\search.html:63
+#: .\templates\info\channel\search.html:66
 #: .\templates\info\components\info_adv.html:89
 msgid "Manage"
 msgstr "管理"
@@ -2860,7 +2908,7 @@ msgid "Check Profiles"
 msgstr "身分組"
 
 #: .\templates\account\channel\list_table.html:40
-#: .\templates\info\channel\search.html:71
+#: .\templates\info\channel\search.html:74
 msgid "Check ID"
 msgstr "ID"
 
@@ -2889,7 +2937,7 @@ msgstr "解除"
 
 #: .\templates\account\channel\list_table.html:86
 #: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
-#: .\templates\info\channel\search.html:78
+#: .\templates\info\channel\search.html:81
 #: .\templates\info\components\info_adv.html:32
 #: .\templates\info\components\info_basic.html:29
 #: .\templates\info\profile.html:44
@@ -2898,7 +2946,7 @@ msgstr "頻道ID"
 
 #: .\templates\account\channel\list_table.html:92
 #: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
-#: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:84
+#: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:87
 #: .\templates\info\components\info_adv.html:46
 msgid "Channel Token"
 msgstr "頻道代碼"
@@ -3440,12 +3488,6 @@ msgid ""
 "'%(tag_splitter)s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splitter)s 並且不是空字串。"
 
-#: .\templates\ar\add-props.html:88 .\templates\components\navbar.html:18
-#: .\templates\components\navbar.html:19
-#: .\templates\info\channel\search.html:35
-msgid "Search"
-msgstr "搜尋"
-
 #: .\templates\ar\add-props.html:100 .\templates\ar\add-props.html:118
 #: .\templates\ar\add-props.html:119
 msgid "Cooldown"
@@ -3629,6 +3671,32 @@ msgstr "使用次數"
 #: .\templates\ar\rk-uniquekw.html:11
 msgid "Module Count"
 msgstr "回覆組數量"
+
+#: .\templates\ar\search-channel.html:9
+msgid "Auto-Reply Module Search"
+msgstr "搜尋自動回覆組"
+
+#: .\templates\ar\search-channel.html:18
+msgid ""
+"Searching <b>without providing the keyword</b> will list all the modules."
+msgstr "<b>不提供關鍵字</b>並搜尋時，會列出所有回覆組。"
+
+#: .\templates\ar\search-channel.html:23
+msgid "Keyword could be a fragment of the <b>module keyword</b>."
+msgstr "搜尋關鍵字可以只是 <b>關鍵字的一部分</b>。"
+
+#: .\templates\ar\search-channel.html:35
+#: .\templates\info\channel\search.html:34
+msgid "Enter keyword to search"
+msgstr "輸入搜尋關鍵字"
+
+#: .\templates\ar\search-channel.html:48
+msgid "Including Unavailable Modules"
+msgstr "包含無法使用的回覆組"
+
+#: .\templates\ar\search-list.html:9
+msgid "Auto-Reply Search Channel List"
+msgstr "自動回覆搜尋頻道清單"
 
 #: .\templates\base\base.html:9
 msgid "Auto reply-based web application."
@@ -4039,11 +4107,7 @@ msgstr "搜尋關鍵字可以是 <b>訊息的其中一部份</b> 或是 <b>頻�
 msgid "Channel which is set to be private will <b>NOT</b> appear."
 msgstr "設為私人的頻道將<b>不會</b>出現在清單中。"
 
-#: .\templates\info\channel\search.html:33
-msgid "Enter keyword to search"
-msgstr "輸入搜尋關鍵字"
-
-#: .\templates\info\channel\search.html:49
+#: .\templates\info\channel\search.html:52
 msgid "Inaccessible for Jelly Bot"
 msgstr "機器人無法存取"
 
@@ -4218,6 +4282,36 @@ msgstr "平均處理耗時"
 #: .\templates\info\recent\message.html:90
 msgid "Unique Sender"
 msgstr "發送者數量"
+
+#: .\templates\services\maskfinder\main.html:9
+msgid "US Mask Finder"
+msgstr "美國口罩尋找工具"
+
+#: .\templates\services\maskfinder\main.html:17
+#, python-format
+msgid ""
+"Currently supports: <ul> <li>Target, within %(target_range_mi)s miles</li> "
+"<li>Walgreens, the closest 32 stores or approx. within 30 miles.</li> </ul>"
+msgstr ""
+"目前支援：<ul> <li>方圓%(target_range_mi)s英里內的Target</li> <li>最近的32間"
+"店面，或是方圓30英里內的Walgreens。</li> </ul>"
+
+#: .\templates\services\maskfinder\main.html:25
+msgid "Double-check the stock by directly calling the store is recommended."
+msgstr "建議另外打電話給商家確認是否在庫。"
+
+#: .\templates\services\maskfinder\main.html:35
+msgid "Enter 5 digit US zip code"
+msgstr "輸入5碼美國郵遞區號"
+
+#: .\templates\services\maskfinder\main.html:54
+#, python-format
+msgid "<code class=\"h2\">%(amt)s</code>&nbsp;left"
+msgstr "剩餘&nbsp;<code class=\"h2\">%(amt)s</code>"
+
+#: .\templates\services\maskfinder\main.html:63
+msgid "mi"
+msgstr "英里"
 
 #: .\templates\services\shorturl\main-js.html:38
 msgid "URL copied to the clipboard"

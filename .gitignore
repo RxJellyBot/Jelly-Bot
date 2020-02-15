@@ -7,3 +7,4 @@ logs/
 web.config
 cache.json
 tests/sandbox*.py
+logs-severe.log*

@@ -16,7 +16,7 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
         root_uid = get_root_oid(request)
 
         return render_template(
-            request, _("Add an Auto-Reply"), "ar/add.html",
+            request, _("Add an Auto-Reply module"), "ar/add.html",
             {
                 "max_responses": AutoReply.MaxResponses,
                 "max_length": AutoReply.MaxContentLength,
