@@ -32,19 +32,26 @@ class LogStreamHandler(logging.StreamHandler):
         super().__init__(sys.stdout)
 
 
+def get_path_file(root, name=None):
+    if name:
+        path_folder = os.path.join(root, name)
+        Path(path_folder).mkdir(parents=True, exist_ok=True)
+        return os.path.join(path_folder, "log.log")
+    else:
+        return root
+
+
+class LogTimedRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.ABC):
+    def __init__(self, root, name=None):
+        super().__init__(get_path_file(root, name), when="midnight", backupCount=10, encoding="utf-8")
+
+
 class LogRotatingFileHandlerBase(logging.handlers.RotatingFileHandler, abc.ABC):
     def __init__(self, root, name=None):
-        if name:
-            path_folder = os.path.join(root, name)
-            Path(path_folder).mkdir(parents=True, exist_ok=True)
-            path_file = os.path.join(path_folder, "log.log")
-        else:
-            path_file = root
-
-        super().__init__(path_file, backupCount=10, encoding="utf-8")
+        super().__init__(get_path_file(root, name), backupCount=10, encoding="utf-8")
 
 
-class LogFileHandler(LogRotatingFileHandlerBase):
+class LogFileHandler(LogTimedRotatingFileHandlerBase):
     def __init__(self, name):
         if hasattr(settings, "LOGGING_FILE_ROOT"):
             super().__init__(settings.LOGGING_FILE_ROOT, name)
