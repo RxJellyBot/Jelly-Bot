@@ -56,6 +56,6 @@ def backup_collection_thread(
         except Exception as e:
             logger.logger.error(f"Backup of `{db_name}.{col_name}` failed. Error: {e}")
 
-        logger.logger.info(f"Backup of `{db_name}.{col_name} completed on {datetime.now()}.`")
+        logger.logger.info(f"Backup of `{db_name}.{col_name}` completed on {datetime.now()}.`")
 
         time.sleep(backup_interval)

@@ -9,7 +9,6 @@ from extutils import GithubWrapper
 class AboutView(View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, *args, **kwargs):
-        # FIXME: Change this to get latest commit
         github_commit = GithubWrapper.get_latest_commit(System.GitHubRepoIDName, System.GitHubRepoBranch)
 
         return render_template(request, _("About"), "about.html", {

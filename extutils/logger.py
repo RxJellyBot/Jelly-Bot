@@ -32,7 +32,7 @@ class LogStreamHandler(logging.StreamHandler):
         super().__init__(sys.stdout)
 
 
-class LogRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.ABC):
+class LogRotatingFileHandlerBase(logging.handlers.RotatingFileHandler, abc.ABC):
     def __init__(self, root, name=None):
         if name:
             path_folder = os.path.join(root, name)
@@ -41,10 +41,10 @@ class LogRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.
         else:
             path_file = root
 
-        super().__init__(path_file, when="midnight", backupCount=10, encoding="utf-8")
+        super().__init__(path_file, backupCount=10, encoding="utf-8")
 
 
-class LogTimedRotatingFileHandler(LogRotatingFileHandlerBase):
+class LogFileHandler(LogRotatingFileHandlerBase):
     def __init__(self, name):
         if hasattr(settings, "LOGGING_FILE_ROOT"):
             super().__init__(settings.LOGGING_FILE_ROOT, name)
@@ -52,7 +52,7 @@ class LogTimedRotatingFileHandler(LogRotatingFileHandlerBase):
             super().__init__("logs", name)
 
 
-class LogSevereTimedRotatingFileHandler(LogRotatingFileHandlerBase):
+class LogSevereFileHandler(LogRotatingFileHandlerBase):
     def __init__(self):
         if hasattr(settings, "LOGGING_FILE_ERROR"):
             super().__init__(settings.LOGGING_FILE_ERROR)
@@ -85,8 +85,8 @@ class LoggerSkeleton:
         self._fmt = LogFormatter(fmt if fmt else LoggerSkeleton.DEFAULT_FMT)
         self._handlers = [
             LogStreamHandler(),
-            LogTimedRotatingFileHandler(name),
-            LogSevereTimedRotatingFileHandler()
+            LogFileHandler(name),
+            LogSevereFileHandler()
         ]
         self._handlers_apply_formatter_(self._fmt)
         self._core = logging.getLogger(name)
