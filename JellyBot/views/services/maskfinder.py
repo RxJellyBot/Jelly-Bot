@@ -3,12 +3,11 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils.maskfinder import get_results
-from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.views import render_template
 from JellyBot.systemconfig import ExtraService
 
 
-class MaskFinderMainView(LoginRequiredMixin, TemplateResponseMixin, View):
+class MaskFinderMainView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         context = {
