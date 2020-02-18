@@ -16,11 +16,12 @@ class AutoReplySearchChannelView(ChannelOidRequiredMixin, TemplateResponseMixin,
         active_only = safe_cast(request.GET.get("active_only"), bool)
 
         channel_data = self.get_channel_data(*args, **kwargs)
+        channel_name = channel_data.model.get_channel_name(get_root_oid(request))
 
         return render_template(
-            request, _("Auto-Reply search in {}").format(channel_data.model.id), "ar/search-channel.html",
+            request, _("Auto-Reply search in {}").format(channel_name), "ar/search-channel.html",
             {
-                "channel_name": channel_data.model.get_channel_name(get_root_oid(request)),
+                "channel_name": channel_name,
                 "channel_oid": channel_data.model.id,
                 "module_list": AutoReplyManager.get_conn_list(channel_data.model.id, keyword, active_only),
                 "active_only": active_only

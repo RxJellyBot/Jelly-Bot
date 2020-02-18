@@ -7,7 +7,8 @@
     <div class="jumbotron">
         <div class="container">
             <div class="display-4 text-center mb-3">{% trans "Auto-Reply Module Search" %}</div>
-            <div class="text-center"><code class="h4 font-weight-normal">{{ channel_name }}&nbsp;({{ channel_oid }})</code></div>
+            <div class="text-center"><code
+                    class="h4 font-weight-normal">{{ channel_name }}&nbsp;({{ channel_oid }})</code></div>
         </div>
     </div>
     <div class="container">
@@ -50,10 +51,37 @@
             </div>
         </form>
 
+        <hr>
+
         <div class="row">
             {% for module in module_list %}
-                <!-- FIXME: Module Table -->
+                <div class="col-lg-4 col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            {{ module.keyword_repr }}
+                        </div>
+                        <div class="card-body">
+                            {% trans "Responses" %}
+                            {% for response in module.responses %}
+                                <div class="mb-2 ar-content">
+                                    {{ response.content_html|safe }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
         </div>
     </div>
+{% endblock %}
+
+{% block ex-style %}
+    <link rel="stylesheet" href="{% static "css/utils/ar-html-content.css" %}">
+    <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}
