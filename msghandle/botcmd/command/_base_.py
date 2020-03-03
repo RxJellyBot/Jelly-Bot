@@ -110,6 +110,7 @@ class CommandFunction:
 
 class CommandNode:
     NO_DESCRIPTION = _("No description provided.")
+    NO_NAME = _("(N/A)")
 
     def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
                  is_root=False, splitters=None, prefix=None, parent=None, case_insensitive=True):
@@ -118,7 +119,7 @@ class CommandNode:
         else:
             if not is_root:
                 raise ValueError(f"`codes` cannot be `None` if the command node is not root. "
-                                 f"(Command Node: {self.__class__.__name__})")
+                                 f"(Command Nrode: {self.__class__.__name__})")
 
         if is_root and (not splitters or not prefix):
             raise ValueError("`splitters` and `prefix` must be specified if the command node is root.")
@@ -126,8 +127,8 @@ class CommandNode:
         if not is_root and (splitters or prefix):
             raise ValueError("Specify `splitters` and `prefix` only when the node is root.")
 
-        self._name = name
-        self._description = description
+        self._name = name or CommandNode.NO_NAME
+        self._description = description or CommandNode.NO_DESCRIPTION
         self._brief_description = brief_description or description
         self._is_root = is_root
         self._splitters = splitters

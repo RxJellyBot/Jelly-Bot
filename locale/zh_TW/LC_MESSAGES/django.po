@@ -6,15 +6,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-15 03:43-0600\n"
-"PO-Revision-Date: 2020-02-15 03:50-0600\n"
+"POT-Creation-Date: 2020-03-03 15:42-0600\n"
+"PO-Revision-Date: 2020-03-03 16:04-0600\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_TW\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 
 #: .\JellyBot\api\static\info.py:16
 msgid "Dummy"
@@ -56,7 +56,7 @@ msgstr "英文"
 msgid "Traditional Chinese"
 msgstr "繁體中文"
 
-#: .\JellyBot\views\about.py:15 .\JellyBot\views\nav.py:25
+#: .\JellyBot\views\about.py:14 .\JellyBot\views\nav.py:25
 msgid "About"
 msgstr "關於"
 
@@ -160,11 +160,11 @@ msgstr "{} 中的自動回覆排名"
 msgid "Auto-Reply ranking channel list"
 msgstr "自動回覆排名頻道清單"
 
-#: .\JellyBot\views\ar\search.py:21
+#: .\JellyBot\views\ar\search.py:22
 msgid "Auto-Reply search in {}"
 msgstr "搜尋 {} 內的自動回覆組"
 
-#: .\JellyBot\views\ar\search.py:36
+#: .\JellyBot\views\ar\search.py:37
 msgid "Auto-Reply search channel list"
 msgstr "自動回覆搜尋頻道清單"
 
@@ -375,7 +375,7 @@ msgid "Ranking"
 msgstr "排名"
 
 #: .\JellyBot\views\nav.py:118 .\templates\ar\add-props.html:88
-#: .\templates\ar\search-channel.html:38 .\templates\components\navbar.html:18
+#: .\templates\ar\search-channel.html:39 .\templates\components\navbar.html:18
 #: .\templates\components\navbar.html:19
 #: .\templates\info\channel\search.html:37
 #: .\templates\services\maskfinder\main.html:38
@@ -426,7 +426,7 @@ msgstr "特殊服務"
 msgid "Short URL"
 msgstr "短網址"
 
-#: .\JellyBot\views\nav.py:208 .\JellyBot\views\services\maskfinder.py:23
+#: .\JellyBot\views\nav.py:208 .\JellyBot\views\services\maskfinder.py:22
 msgid "Maskfinder (US Only)"
 msgstr "尋找口罩小工具 (美國)"
 
@@ -3676,23 +3676,27 @@ msgstr "回覆組數量"
 msgid "Auto-Reply Module Search"
 msgstr "搜尋自動回覆組"
 
-#: .\templates\ar\search-channel.html:18
+#: .\templates\ar\search-channel.html:19
 msgid ""
 "Searching <b>without providing the keyword</b> will list all the modules."
 msgstr "<b>不提供關鍵字</b>並搜尋時，會列出所有回覆組。"
 
-#: .\templates\ar\search-channel.html:23
+#: .\templates\ar\search-channel.html:24
 msgid "Keyword could be a fragment of the <b>module keyword</b>."
 msgstr "搜尋關鍵字可以只是 <b>關鍵字的一部分</b>。"
 
-#: .\templates\ar\search-channel.html:35
+#: .\templates\ar\search-channel.html:36
 #: .\templates\info\channel\search.html:34
 msgid "Enter keyword to search"
 msgstr "輸入搜尋關鍵字"
 
-#: .\templates\ar\search-channel.html:48
+#: .\templates\ar\search-channel.html:49
 msgid "Including Unavailable Modules"
 msgstr "包含無法使用的回覆組"
+
+#: .\templates\ar\search-channel.html:64
+msgid "Responses"
+msgstr "回覆"
 
 #: .\templates\ar\search-list.html:9
 msgid "Auto-Reply Search Channel List"
