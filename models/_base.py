@@ -5,6 +5,7 @@ from bson import ObjectId
 
 from flags import ModelValidityCheckResult
 from extutils.checker import param_type_ensure
+from extutils.dt import localtime
 from models import OID_KEY
 from models.field import BaseField
 from extutils.utils import to_snake_case, to_camel_case
@@ -306,6 +307,10 @@ class Model(MutableMapping, abc.ABC):
                 tmp[fk] = v
 
         return tmp
+
+    @property
+    def created_at(self) -> str:
+        return localtime(self.id.generation_time).strftime("%Y-%m-%d %H:%M:%S")
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self._dict_}>"

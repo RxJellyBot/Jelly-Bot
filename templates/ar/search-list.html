@@ -85,6 +85,10 @@
                                             <a href="{% url "info.channel" channel_oid=module.channel_id %}">{{ module.channel_id }}</a>
                                         </code>
                                     </div>
+                                    <h6>{% trans "Created at" %}</h6>
+                                    <div class="mb-2">
+                                        {{ module.created_at }}
+                                    </div>
                                     <h6>{% trans "Creator" %}</h6>
                                     <div class="mb-2">
                                         {{ username_dict|get_val:module.creator_oid }}
