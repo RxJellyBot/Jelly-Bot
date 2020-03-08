@@ -121,6 +121,9 @@ def _construct_auto_reply_(current_path, parent, nav_param):
     __attach__(auto_reply_parent, NavHidden, current_path,
                _("Auto-Reply Ranking - {}").format(nav_param.get("channel_oid", "N/A")),
                "page.ar.ranking.channel", nav_param, auto_reply_parent)
+    __attach__(auto_reply_parent, NavHidden, current_path,
+               _("Auto-Reply Search - {}").format(nav_param.get("channel_oid", "N/A")),
+               "page.ar.search.channel", nav_param, auto_reply_parent)
 
     return auto_reply_parent
 
