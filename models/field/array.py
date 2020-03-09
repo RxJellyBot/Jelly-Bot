@@ -18,8 +18,15 @@ class ArrayField(BaseField):
                          auto_cast=auto_cast, inst_cls=inst_cls, stores_uid=stores_uid)
 
     def is_value_valid(self, value) -> bool:
+        from models import Model
+
         for v in value:
-            if not isinstance(v, self._elem_type):
+            if issubclass(self._elem_type, Model):
+                try:
+                    self._elem_type.cast_model(v)
+                except Exception:
+                    return False
+            elif not isinstance(v, self._elem_type):
                 return False
 
         if not self._allow_empty and len(value) == 0:
