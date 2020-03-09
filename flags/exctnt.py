@@ -10,3 +10,5 @@ class ExtraContentType(FlagSingleEnum):
 
     PURE_TEXT = 0, _("Pure Text")
     EXTRA_MESSAGE = 1, _("Extra Message")
+
+    AUTO_REPLY_SEARCH = 100, _("Auto Reply Search Result")

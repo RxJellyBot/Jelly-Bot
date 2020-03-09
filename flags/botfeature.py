@@ -76,6 +76,9 @@ class BotFeature(FlagDoubleEnum):
     TXT_AR_RANKING = \
         1006, _("Text / Auto Reply / Ranking"), \
         _("Get the auto-reply module usage ranking and the unique keyword usage ranking.")
+    TXT_AR_INFO = \
+        1007, _("Text / Auto Reply / Info"), \
+        _("Get the detail of the auto-reply modules which keyword includes the provided keyword.")
     TXT_AR_RESPOND = \
         1009, _("Text / Auto Reply / Respond"), _("Responded to the message origin with the designated response.")
 

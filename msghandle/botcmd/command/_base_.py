@@ -429,14 +429,14 @@ class CommandNode:
             return args_list
 
     def parse_args(
-            self, e: TextMessageEventObject, splitter, max_arg_count: int = None,
+            self, e: TextMessageEventObject, command: str, splitter, max_arg_count: int = None,
             args: List[str] = None, is_sub=False) \
             -> List[HandledMessageEventText]:
         if not max_arg_count:
             max_arg_count = self.max_arg_count
 
         if args is None:
-            args = self._split_args_(e.content, splitter, max_arg_count)
+            args = self._split_args_(command, splitter, max_arg_count)
             args = self._sanitize_args_(args)
 
         args = self._merge_overlength_args_(args, splitter, max_arg_count)
@@ -519,20 +519,20 @@ class CommandHandler:
 
     def handle(self, e: TextMessageEventObject) -> List[HandledMessageEventText]:
         # Remove prefix from the string content
-        e.content = e.content[len(self._root.prefix):]
+        command = e.content[len(self._root.prefix):]
 
         # Check what splitter to apply
         splitter = None
         for spltr in self._root.splitters:
-            if e.content.startswith(spltr):
+            if command.startswith(spltr):
                 splitter = spltr
                 break
 
         if splitter:
             # Remove splitter from the string content
-            e.content = e.content[len(splitter):]
+            command = command[len(splitter):]
 
             # Parse the command and return the response
-            return self._root.parse_args(e, splitter)
+            return self._root.parse_args(e, command, splitter)
         else:
             return []

@@ -183,6 +183,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
 
 # --- Sanitizer
 
-SANITIZER_ALLOWED_TAGS = ['div', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'p', 'pre', 'code']
-SANITIZER_ALLOWED_ATTRIBUTES = ['class', 'id', 'role', 'data-toggle', 'href', 'aria-labelledby']
+SANITIZER_ALLOWED_TAGS = ['div', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span',
+                          'p', 'pre', 'code', 'br', 'img', 'ul', 'li']
+SANITIZER_ALLOWED_ATTRIBUTES = ['class', 'id', 'role', 'data-toggle', 'href', 'aria-labelledby', 'src']
 SANITIZER_ALLOWED_STYLES = []

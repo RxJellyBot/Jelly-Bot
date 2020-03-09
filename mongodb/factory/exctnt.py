@@ -27,24 +27,26 @@ class ExtraContentManager(BaseCollection):
         self.create_index(ExtraContentModel.Timestamp.key,
                           expireAfterSeconds=Database.ExtraContentExpirySeconds, name="Timestamp")
 
-    def record_extra_message(self, content_dict: list, title: str = None):
+    def record_extra_message(self, content: list, title: str = None, channel_oid: ObjectId = None):
         """
         :param title: Title of the extra message.
-        :param content_dict: [(<REASON>, <MESSAGE_CONTENT>), (<REASON>, <MESSAGE_CONTENT>)...]
+        :param content: [(<REASON>, <MESSAGE_CONTENT>), (<REASON>, <MESSAGE_CONTENT>)...]
         """
-        return self.record_content(ExtraContentType.EXTRA_MESSAGE, content_dict, title)
+        content = cast_iterable(content, str)
 
-    def record_content(self, type_: ExtraContentType, content: Any, title: str = None) -> RecordExtraContentResult:
+        return self.record_content(ExtraContentType.EXTRA_MESSAGE, content, title, channel_oid)
+
+    def record_content(
+            self, type_: ExtraContentType, content: Any, title: str = None, channel_oid: ObjectId = None) \
+            -> RecordExtraContentResult:
         if not title:
             title = ExtraContentManager.DefaultTitle
 
         if not content:
             return RecordExtraContentResult(WriteOutcome.X_NOT_EXECUTED)
 
-        content = cast_iterable(content, str)
-
         model, outcome, ex = self.insert_one_data(
-            Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow())
+            Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow(), ChannelOid=channel_oid)
 
         return RecordExtraContentResult(outcome, model, ex)
 

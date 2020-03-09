@@ -39,18 +39,18 @@ class HandledEventsHolderPlatform:
 
         if len(self.to_site) > 0:
             rec_result = ExtraContentManager.record_extra_message(
-                self.to_site, datetime.now(tz=timezone.utc).strftime("%m-%d %H:%M:%S UTC%z"))
+                self.to_site,
+                datetime.now(tz=timezone.utc).strftime("%m-%d %H:%M:%S UTC%z"),
+                channel_oid=holder.channel_model.id)
 
             if rec_result.success:
-                url = f'{HostUrl}{reverse("page.extra", kwargs={"page_id": str(rec_result.model_id)})}'
-
                 self.to_send.append(
                     (MessageType.TEXT,
                      _("{} content(s) needs to be viewed on the website because of the following reason(s):{}\nURL: {}")
                      .format(
                          len(self.to_site),
                          "".join([f"\n - {reason}" for reason, content in self.to_site]),
-                         url)
+                         rec_result.url)
                      )
                 )
             else:

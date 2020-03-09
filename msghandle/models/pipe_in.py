@@ -111,10 +111,6 @@ class TextMessageEventObject(MessageEventObject):
     def text(self) -> str:
         return self.content
 
-    @text.setter
-    def text(self, value):
-        self.content = value
-
 
 class ImageMessageEventObject(MessageEventObject):
     def __init__(

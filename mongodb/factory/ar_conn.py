@@ -225,6 +225,11 @@ class AutoReplyModuleManager(BaseCollection):
         return self.find_cursor_with_count(
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
+    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
+        return self\
+            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel)\
+            .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
         ret = self.find_cursor_with_count(
             {AutoReplyModuleModel.ChannelId.key: channel_oid},
@@ -434,6 +439,9 @@ class AutoReplyManager:
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
         return self._mod.get_conn_list(channel_oid, keyword, active_only)
+
+    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
+        return self._mod.get_conn_list_oids(conn_oids)
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> Generator[Tuple[Union[int, str], AutoReplyModuleModel], None, None]:

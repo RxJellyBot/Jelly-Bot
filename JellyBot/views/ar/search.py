@@ -9,7 +9,7 @@ from JellyBot.components.mixin import LoginRequiredMixin, ChannelOidRequiredMixi
 from JellyBot.views.render import render_template
 
 
-class AutoReplySearchChannelView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
+class AutoReplySearchChannelView(LoginRequiredMixin, ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
         root_uid = get_root_oid(request)

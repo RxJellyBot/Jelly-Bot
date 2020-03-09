@@ -56,71 +56,7 @@
         <div class="row">
             {% for module in module_list %}
                 <div class="col-lg-4 col-md-12 mb-3">
-                    <div class="card {% if not module.active %}border-danger{% elif module.pinned %}border-secondary{% endif %}">
-                        <div class="card-header">
-                            {{ module.keyword_repr }}
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-2">{% trans "Responses" %}</div>
-                            <ul class="mb-2 list-group">
-                                {% for response in module.responses %}
-                                    <li class="list-group-item ar-content">
-                                        {{ response.content_html|safe }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                            <div class="mb-2">{% trans "Called Count" %}</div>
-                            <div class="mb-2"><code class="h4">{{ module.called_count }}</code></div>
-                            <div>
-                                <button class="btn btn-primary" data-toggle="collapse"
-                                        data-target="#ARInfo{{ module.id }}">
-                                    {% trans "Other Information" context "Auto Reply Module" %}
-                                </button>
-                            </div>
-                            <div class="collapse" id="ARInfo{{ module.id }}">
-                                <div class="mt-3 card card-body">
-                                    <h6>{% trans "Channel ID" %}</h6>
-                                    <div class="mb-2">
-                                        <code class="h6">
-                                            <a href="{% url "info.channel" channel_oid=module.channel_id %}">{{ module.channel_id }}</a>
-                                        </code>
-                                    </div>
-                                    <h6>{% trans "Created at" %}</h6>
-                                    <div class="mb-2">
-                                        {{ module.created_at }}
-                                    </div>
-                                    <h6>{% trans "Creator" %}</h6>
-                                    <div class="mb-2">
-                                        {{ username_dict|get_val:module.creator_oid }}
-                                    </div>
-                                    {% if not module.active %}
-                                        <h6>{% trans "Remover" %}</h6>
-                                        <div class="mb-2">
-                                            {{ username_dict|get_val:module.remover_oid }}
-                                        </div>
-                                    {% endif %}
-                                    {% if module.removed_at_expr %}
-                                        <h6>{% trans "Removed at" %}</h6>
-                                        <div class="mb-2">
-                                            {{ module.removed_at_expr }}
-                                        </div>
-                                    {% endif %}
-                                    {% if module.last_used_expr %}
-                                        <h6>{% trans "Last used" %}</h6>
-                                        <div class="mb-2">
-                                            {{ module.last_used_expr }}
-                                        </div>
-                                    {% endif %}
-                                    {% if module.cooldown_sec == 0 %}
-                                        <h6>{% trans "Cooldown" %}</h6>
-                                        <div class="mb-2">
-                                            {{ module.cooldown_sec }}&nbsp;<code>{% trans "sec" %}</code>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% include "ar/module-card.html" with module=module username_dict=username_dict %}
                 </div>
             {% endfor %}
         </div>
