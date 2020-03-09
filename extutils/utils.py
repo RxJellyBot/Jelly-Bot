@@ -1,5 +1,6 @@
 import re
 from typing import List, Tuple, Union, Generator, Any
+import html
 
 from django.utils.translation import gettext_lazy as _
 
@@ -79,13 +80,16 @@ def split_fill(s: str, n: int, delim="", fill=None):
     return (s.split(delim) + [fill] * n)[:n]
 
 
-def str_reduce_length(s: str, max_: int):
+def str_reduce_length(s: str, max_: int, escape_html=False):
     suffix = "..."
 
     if len(s) > max_ - len(suffix):
-        return s[:max_ - len(suffix)] + suffix
-    else:
-        return s
+        s = s[:max_ - len(suffix)] + suffix
+
+    if escape_html:
+        s = html.escape(s)
+
+    return s
 
 
 def list_insert_in_between(l: list, insert_obj):

@@ -6,42 +6,56 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <h3 class="text-primary">{% trans "Bot Commands List" %}</h3>
+            <div class="col">
+                <h3 class="text-primary">{% trans "Bot Commands List" %}</h3>
+            </div>
         </div>
         <div class="row mb-3">
-            {% blocktrans trimmed %}
-                The prefix of the commands is&nbsp;<b>{{ cmd_prefix }}</b>.&nbsp;
-            {% endblocktrans %}
-            {% if case_insensitive_prefix %}
-                {% blocktrans trimmed %}This is&nbsp;<b>case-insensitive</b>&nbsp;.{% endblocktrans %}
-            {% else %}
-                {% blocktrans trimmed %}This is&nbsp;<b>case-sensitive</b>&nbsp;.{% endblocktrans %}
-            {% endif %}
+            <div class="col">
+                {% blocktrans trimmed %}
+                    The prefix of the commands is&nbsp;<b>{{ cmd_prefix }}</b>.&nbsp;
+                {% endblocktrans %}
+                {% if case_insensitive_prefix %}
+                    {% blocktrans trimmed %}This is&nbsp;<b>case-insensitive</b>&nbsp;.{% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}This is&nbsp;<b>case-sensitive</b>&nbsp;.{% endblocktrans %}
+                {% endif %}
+            </div>
         </div>
         <div class="row mb-1">
-            {% with splhtml=cmd_splitters_html|safe %}
+            <div class="col">
+                {% with splhtml=cmd_splitters_html|safe %}
+                    {% blocktrans trimmed %}
+                        The splitter(s) between the command code and its arguments is/are&nbsp;{{ splhtml }}.&nbsp;
+                    {% endblocktrans %}
+                {% endwith %}
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
                 {% blocktrans trimmed %}
-                    The splitter(s) between the command code and its arguments is/are&nbsp;{{ splhtml }}.&nbsp;
+                    You should pick a splitter at your convenience and use it through the whole command, or some weird
+                    parsing problems may occur.
                 {% endblocktrans %}
-            {% endwith %}
+            </div>
         </div>
         <div class="row mb-3">
-            {% blocktrans trimmed %}
-                You should pick a splitter at your convenience and use it through the whole command, or some weird
-                parsing problems may occur.
-            {% endblocktrans %}
+            <div class="col">
+                {% if case_insensitive %}
+                    {% blocktrans trimmed %}Command codes are&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
+                {% else %}
+                    {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
+                {% endif %}
+            </div>
         </div>
         <div class="row mb-3">
-            {% if case_insensitive %}
-                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-insensitive</b>.{% endblocktrans %}
-            {% else %}
-                {% blocktrans trimmed %}Command codes are&nbsp;<b>case-sensitive</b>.{% endblocktrans %}
-            {% endif %}
-        </div>
-        <div class="row mb-3">
-            {% blocktrans trimmed %}
-                Use double quotation mark to wrap around a single parameter if it contains any characters that is one of the splitter(s) to prevent parsing error.
-            {% endblocktrans %}
+            <div class="col">
+                {% blocktrans trimmed %}
+                    Use double quotation mark to wrap around a single parameter if it contains any characters that is
+                    one of
+                    the splitter(s) to prevent parsing error.
+                {% endblocktrans %}
+            </div>
         </div>
 
         <div class="row">

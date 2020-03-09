@@ -193,7 +193,7 @@ class RootUserManager(BaseCollection):
 
         # No user data found? Return None
         if not udata:
-            return None
+            return str_not_found if str_not_found else None
 
         UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
 
@@ -221,7 +221,7 @@ class RootUserManager(BaseCollection):
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
                         f"corresponding On-Platform data found.")
 
-        return None
+        return str_not_found if str_not_found else None
 
     def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
         api_u_data = self._mgr_api.get_user_data_token(token)

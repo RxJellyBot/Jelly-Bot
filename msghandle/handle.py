@@ -36,15 +36,15 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
             # Notify users when they attempted to use any features related of the Jelly Bot
             from .spec.no_utoken import handle_no_user_token
 
-            return HandledMessageEventsHolder(handle_no_user_token(e))
+            return HandledMessageEventsHolder(e.channel_model, handle_no_user_token(e))
 
         # Main handle process
         event_type = type(e)
         if event_type in fn_box:
-            ret = HandledMessageEventsHolder(fn_box[event_type](e))
+            ret = HandledMessageEventsHolder(e.channel_model, fn_box[event_type](e))
         else:
             logger.logger.info(f"Message handle object not handled. Raw: {e.raw}")
-            ret = HandledMessageEventsHolder()
+            ret = HandledMessageEventsHolder(e.channel_model)
 
         # Translation deactivation
         deactivate()
@@ -58,4 +58,4 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
     except Exception as ex:
         from .spec.error import handle_error_main
 
-        return HandledMessageEventsHolder(handle_error_main(e, ex))
+        return HandledMessageEventsHolder(e.channel_model, handle_error_main(e, ex))

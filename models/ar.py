@@ -3,6 +3,7 @@ from typing import Optional, Union
 
 from bson import ObjectId
 
+from extutils.dt import localtime
 from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
@@ -122,6 +123,20 @@ class AutoReplyModuleModel(Model):
     @property
     def keyword_repr(self) -> str:
         return f"{str(self.keyword)}"
+
+    @property
+    def last_used_expr(self) -> Optional[str]:
+        if self.last_used != DateTimeField.none_obj():
+            return localtime(self.last_used).strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return None
+
+    @property
+    def removed_at_expr(self) -> Optional[str]:
+        if self.removed_at != DateTimeField.none_obj():
+            return localtime(self.removed_at).strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            return None
 
 
 class AutoReplyModuleExecodeModel(Model):

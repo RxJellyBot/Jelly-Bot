@@ -107,11 +107,12 @@ class HandledMessageCalculateResult(HandledMessageEventText):
 
 
 class HandledMessageEventsHolder:
-    def __init__(self, init_items: List[HandledMessageEvent] = None):
+    def __init__(self, channel_model, init_items: List[HandledMessageEvent] = None):
         if not init_items:
             init_items = []
 
         self._core = init_items
+        self._channel_model = channel_model
 
     def __iter__(self):
         for item in self._core:
@@ -120,6 +121,10 @@ class HandledMessageEventsHolder:
     @property
     def has_item(self) -> bool:
         return len(self._core) > 0
+
+    @property
+    def channel_model(self):
+        return self._channel_model
 
     def to_json(self):
         return [item.to_json() for item in self._core]

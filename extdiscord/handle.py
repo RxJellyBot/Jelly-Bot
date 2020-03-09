@@ -18,10 +18,10 @@ def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
             return handle_message_main(e)
         else:
             DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw}")
-            return HandledMessageEventsHolder()
-    except Exception as e:
-        handle_error(e)
-        return HandledMessageEventsHolder()
+            return HandledMessageEventsHolder(e.channel_model)
+    except Exception as ex:
+        handle_error(ex)
+        return HandledMessageEventsHolder(e.channel_model)
 
 
 def handle_error(e: Exception):

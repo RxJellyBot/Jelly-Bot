@@ -19,8 +19,8 @@ class HomePageView(View):
         if root_oid and now_utc_aware() - root_oid.generation_time < timedelta(days=Website.NewRegisterThresholdDays):
             messages.info(
                 request,
-                _('Newly registered? Visit <a href="{}{}">this page</a> to know '
-                  'how to integrate your LINE / Discord account!').format(
+                _('It seems that you haven\'t integrate your account. '
+                  'Visit <a href="{}{}">this page</a> to know what to do to fully utilize this bot!').format(
                     HostUrl, reverse("page.doc.botcmd.cmd", kwargs={"code": cmd_uintg.main_cmd_code})),
                 extra_tags="safe"
             )

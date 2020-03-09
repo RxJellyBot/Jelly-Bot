@@ -111,10 +111,6 @@ class TextMessageEventObject(MessageEventObject):
     def text(self) -> str:
         return self.content
 
-    @text.setter
-    def text(self, value):
-        self.content = value
-
 
 class ImageMessageEventObject(MessageEventObject):
     def __init__(
@@ -156,7 +152,7 @@ class MessageEventObjectFactory:
         return ret.model
 
     @staticmethod
-    def _ensure_user_idt_(platform: Platform, token: Union[int, str], traceback=None) -> Optional[RootUserModel]:
+    def _ensure_user_idt_(platform: Platform, token: Union[int, str]) -> Optional[RootUserModel]:
         if token:
             result = RootUserManager.register_onplat(platform, token)
             if not result.success:
@@ -164,8 +160,7 @@ class MessageEventObjectFactory:
                     f"Platform: {platform} / Token: {token}<hr>"
                     f"Outcome: {result.outcome}<hr>"
                     f"Conn Outcome: {result.conn_outcome}<hr>"
-                    f"Identity Registration Result: {result.idt_reg_result.serialize()}<hr>"
-                    f"Exception: {traceback.format_exception(None, result.exception, result.exception.__traceback__)}",
+                    f"Identity Registration Result: {result.idt_reg_result.serialize()}",
                     subject="User Registration Failed")
 
             return result.model

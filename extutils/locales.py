@@ -46,10 +46,10 @@ class PytzInfo(tzinfo):
         self._base = tz
 
     def utcoffset(self, dt):
-        return self._base.utcoffset(dt.replace(tzinfo=None))
+        return self._base.utcoffset(dt.replace(tzinfo=None), is_dst=True)
 
     def dst(self, dt):
-        return self._base.dst(dt.replace(tzinfo=None))
+        return self._base.dst(dt.replace(tzinfo=None), is_dst=True)
 
     def tzname(self, dt):
         return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())

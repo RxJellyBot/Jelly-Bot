@@ -65,7 +65,7 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
 
 
 # noinspection PyUnusedLocal
-@cmd_ar_old.command_function(description=_(), arg_count=0)
+@cmd_ar_old.command_function(arg_count=0)
 def old_arg_0(e):
     return [HandledMessageEventText(content=txt)]
 

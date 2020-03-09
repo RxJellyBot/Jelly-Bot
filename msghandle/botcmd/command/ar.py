@@ -6,11 +6,11 @@ from django.utils.translation import gettext_lazy as _
 
 from extutils.emailutils import MailSender
 from extutils.utils import str_reduce_length
-from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType
+from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType, ExtraContentType
 from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
 from models.utils import AutoReplyValidators
 from mongodb.utils import CursorWithCount
-from mongodb.factory import AutoReplyManager, ExecodeManager
+from mongodb.factory import AutoReplyManager, ExecodeManager, ExtraContentManager
 from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl, Bot
@@ -44,6 +44,7 @@ cmd_main = CommandNode(
 cmd_add = cmd_main.new_child_node(codes=["a", "aa", "add"])
 cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
+cmd_info = cmd_main.new_child_node(codes=["i", "info"])
 cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
 
 
@@ -204,8 +205,8 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 
 # ----------------------- List
 
-def get_list_of_keyword(conn_list: CursorWithCount) -> List[str]:
-    return [conn.keyword_repr for conn in conn_list]
+def get_list_of_keyword_html(conn_list: CursorWithCount) -> List[str]:
+    return [f"- {conn.keyword.content_html}<br>" for conn in conn_list]
 
 
 @cmd_list.command_function(
@@ -218,7 +219,9 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
 
     if not conn_list.empty:
-        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) + "\n" + _(", ").join(get_list_of_keyword(conn_list))
+        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
+               + "\n\n" \
+               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
@@ -237,14 +240,47 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
 
     if not conn_list.empty:
-        return [HandledMessageEventText(
-            content=_("Usable Keywords:") + "\n" + _(", ").join(get_list_of_keyword(conn_list)),
-            force_extra=True
-        )]
+        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
+               + "\n\n" \
+               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+
+        return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
         return [HandledMessageEventText(
             content=_("Cannot find any auto-reply module including the substring `{}` in their keyword.")
                 .format(keyword))]
+
+
+@cmd_info.command_function(
+    feature_flag=BotFeature.TXT_AR_INFO,
+    arg_count=1,
+    arg_help=[_("The search keyword to find the Auto-Reply module. "
+                "Auto-Reply module which keyword contains this will be returned.")],
+    scope=CommandScopeCollection.GROUP_ONLY,
+    cooldown_sec=10
+)
+def auto_reply_module_detail(e: TextMessageEventObject, keyword: str):
+    conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
+
+    if not conn_list.empty:
+        result = ExtraContentManager.record_content(
+            ExtraContentType.AUTO_REPLY_SEARCH, [module.id for module in conn_list],
+            _("Auto-Reply module with keyword {} in {}").format(
+                keyword, e.channel_model.get_channel_name(e.user_model.id)),
+            channel_oid=e.channel_oid)
+
+        if result.success:
+            content = _("Visit {} to see the result.").format(result.url)
+        else:
+            content = _("Failed to record the result. ({})").format(result.outcome.code_str)
+    else:
+        content = _("Cannot find any auto-reply module including the substring `{}` in their keyword.").format(keyword)
+
+    content += "\n"
+    content += _("Visit {}{} for more completed module searching functionality. Login required.").format(
+        HostUrl, reverse("page.ar.search.channel", kwargs={"channel_oid": e.channel_oid}))
+
+    return [HandledMessageEventText(content=content)]
 
 
 @cmd_rk.command_function(
