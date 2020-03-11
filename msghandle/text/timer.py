@@ -28,12 +28,12 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
         Bot.Timer.MaxNotifyRangeSeconds
     )
 
-    crs = TimerManager.get_notify(e.channel_oid, within_secs)
-    crs2 = TimerManager.get_time_up(e.channel_oid)
+    crs = list(TimerManager.get_notify(e.channel_oid, within_secs))
+    crs2 = list(TimerManager.get_time_up(e.channel_oid))
 
     ret = []
 
-    if not crs2.empty:
+    if crs2:
         ret.append(_("**{} timer(s) have timed up!**").format(len(crs2)))
         ret.append("")
 
