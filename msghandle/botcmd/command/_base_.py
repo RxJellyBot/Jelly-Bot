@@ -479,7 +479,7 @@ class CommandNode:
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:
-                return cmd_node.parse_args(e, splitter, cmd_node.max_arg_count, args=cmd_args, is_sub=True)
+                return cmd_node.parse_args(e, command, splitter, cmd_node.max_arg_count, args=cmd_args, is_sub=True)
 
         if is_sub:
             return [HandledMessageEventText(
