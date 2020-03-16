@@ -46,7 +46,7 @@ class PytzInfo(tzinfo):
         self._base = tz
 
     def utcoffset(self, dt):
-        return self._base.utcoffset(dt.replace(tzinfo=None), is_dst=True)
+        return self._base.utcoffset(dt.replace(tzinfo=None))
 
     def dst(self, dt):
         return self._base.dst(dt.replace(tzinfo=None), is_dst=True)
