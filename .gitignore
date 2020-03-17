@@ -4,7 +4,7 @@ archive/
 lib/
 logs/
 *.log
-web.config
+*.bat
 cache.json
+web.config
 tests/sandbox*.py
-logs-severe.log*

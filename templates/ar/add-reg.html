@@ -49,10 +49,7 @@
                                                 data-cplat="{{ channel_data.platform.key }}"
                                                 data-cplatcode="{{ channel_data.platform.code }}"
                                                 data-cid="{{ channel_data.id }}">
-                                            {% trans "ID: " %}{{ channel_data.id }}
-                                            {% if channel_name %}
-                                                &nbsp;-&nbsp;{{ channel_name }}
-                                            {% endif %}</option>
+                                            {% trans "ID: " %}{{ channel_data.id }}{% if channel_name %}&nbsp;-&nbsp;{{ channel_name }}{% endif %}</option>
                                     {% endwith %}
                                 {% endwith %}
                             {% endfor %}

@@ -16,8 +16,7 @@ from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfi
 from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel,
-    ChannelModel)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel)
 
 from ._base import BaseCollection
 
@@ -511,11 +510,15 @@ class ProfileManager:
 
     # noinspection PyMethodMayBeStatic
     def can_create_profile(self, permissions: Set[PermissionCategory]):
-        return PermissionCategory.PRF_CREATE_ATTACH in permissions
+        return PermissionCategory.PRF_CONTROL_SELF in permissions
 
     # noinspection PyMethodMayBeStatic
     def can_delete_profile(self, permissions: Set[PermissionCategory]):
         return PermissionCategory.PRF_DELETE in permissions
+
+    # noinspection PyMethodMayBeStatic
+    def can_attach_profile_member(self, permissions: Set[PermissionCategory]):
+        return PermissionCategory.PRF_CONTROL_MEMBER in permissions
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
@@ -524,8 +527,9 @@ class ProfileManager:
         return self._conn.change_star(channel_oid, root_oid, star)
 
     @param_type_ensure
-    def attach_profile(self, user_oid: ObjectId, channel_oid: ObjectId, profile_oid: ObjectId):
-        self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
+    def attach_profile(self, user_oid: ObjectId, channel_oid: ObjectId, profile_oid: ObjectId) \
+            -> ChannelProfileConnectionModel:
+        return self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
 
     def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
         return self._conn.detach_profile(user_oid, profile_oid)

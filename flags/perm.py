@@ -26,9 +26,10 @@ class PermissionCategory(FlagDoubleEnum):
         303 - Adjust Info Privacy
 
     4xx - Profile Control
-        401 - Create Profile
-        402 - Delete Profile
-        403 - Attach on Member
+        401 - Control (self)
+        402 - Control (member)
+        403 - Create
+        404 - Delete
     """
 
     @classmethod
@@ -59,17 +60,21 @@ class PermissionCategory(FlagDoubleEnum):
         303, _("Channel: Info Privacy"), \
         _("User who has this permission can change the privacy of the channel info.")
 
-    PRF_CREATE_ATTACH = \
-        401, _("Profile: Create/Attach"), \
-        _("User who has this permission can create profiles or attach profiles to themselves.")
+    PRF_CONTROL_SELF = \
+        401, _("Profile: Control (self)"), \
+        _("User who has this permission can attach/detach profile to themselves.")
+
+    PRF_CONTROL_MEMBER = \
+        402, _("Profile: Control (member)"), \
+        _("User who has this permission can attach/detach profiles to the other members.")
+
+    PRF_CREATE = \
+        403, _("Profile: Create"), \
+        _("User who has this permission can create profiles.")
 
     PRF_DELETE = \
-        402, _("Profile: Delete"), \
+        404, _("Profile: Delete"), \
         _("User who has this permission can delete profiles.")
-
-    PRF_ATTACH_MEMBER = \
-        403, _("Profile: Attach on Member"), \
-        _("User who has this permission can attach profiles to the other members.")
 
 
 class PermissionLevel(FlagSingleEnum):

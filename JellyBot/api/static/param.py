@@ -56,6 +56,7 @@ class Manage:
         CHANNEL_OID = Common.CHANNEL_OID
         PROFILE_OID = "poid"
         NAME = "name"
+        TARGET = "target"
 
 
 class Service:

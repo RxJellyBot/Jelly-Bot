@@ -1,0 +1,13 @@
+{% load i18n %}
+
+<div class="row">
+    <div class="col-lg">
+        <h3>
+            {% url "account.profile.create" channel_oid=channel_oid as create_url %}
+            {% blocktrans trimmed %}
+                No attachable profiles. <a href="{{ create_url }}">Visit this page</a> to create a new
+                one!
+            {% endblocktrans %}
+        </h3>
+    </div>
+</div>

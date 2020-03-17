@@ -108,9 +108,11 @@
             xhrPostRequest(url, params);
         }
 
-        function detachProfile(profile_oid, onLoad) {
+        function detachProfile(profile_oid, channel_oid, onLoad) {
             let url = `{% url "api.id.profile.detach" %}`;
-            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}&{{ static_keys_param.LOCAL_REFER }}=true`;
+            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}`
+                + `&{{ static_keys_param.Common.CHANNEL_OID }}=${channel_oid}`;
+                + `&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             xhrPostRequest(url, params, onLoad);
         }

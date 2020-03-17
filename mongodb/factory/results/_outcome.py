@@ -285,6 +285,9 @@ class OperationOutcome(BaseOutcome):
         302 - Source user data not found
         303 - Destination user data not found
 
+    4xx - Problems related to Permission Control
+        401 - Insufficient permission
+
     5xx - Problems related to Model
         501 - Construction Error
 
@@ -341,6 +344,9 @@ class OperationOutcome(BaseOutcome):
     X_DEST_DATA_NOT_FOUND = \
         303, _("X: Destination Data Not Found"), \
         _("Destination user data not found.")
+    X_INSUFFICIENT_PERMISSION = \
+        401, _("X: Insufficient Permission"), \
+        _("Insufficient permission to execute this operation.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")
@@ -370,8 +376,6 @@ class UpdateOutcome(BaseOutcome):
 
     1xx - Problems related to Model
         101 - Model not found
-
-    2
 
     9xx - Problems related to execution
         901 - Not executed

@@ -277,10 +277,14 @@ class RootUserManager(BaseCollection):
 
         return ret
 
-    def get_root_to_onplat_dict(self) -> Dict[ObjectId, List[ObjectId]]:
+    def get_root_to_onplat_dict(self, root_oids: Optional[List[ObjectId]] = None) -> Dict[ObjectId, List[ObjectId]]:
         ret = {}
-        for d in self.find_cursor_with_count(
-                {RootUserModel.OnPlatOids.key: {"$exists": True}}, parse_cls=RootUserModel):
+        filter_ = {RootUserModel.OnPlatOids.key: {"$exists": True}}
+
+        if root_oids:
+            filter_[OID_KEY] = {"$in": root_oids}
+
+        for d in self.find_cursor_with_count(filter_, parse_cls=RootUserModel):
             ret[d.id] = d.on_plat_oids
 
         return ret

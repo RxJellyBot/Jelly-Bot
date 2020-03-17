@@ -3,7 +3,11 @@ $(document).ready(function () {
 });
 
 function onAttachClick() {
-    attachProfile($(this).data("poid"), $(this).data("cid"), function () {
-        location.reload();
-    });
+    attachProfile(
+        $(this).data("poid"),
+        $(this).data("cid"),
+        $("select#target option:selected").data("oid"),
+        function () {
+            location.reload();
+        });
 }

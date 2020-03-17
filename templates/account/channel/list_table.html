@@ -71,7 +71,9 @@
                                         </a>
                                         {% if profile_data.id != channel_conn.default_profile_oid %}
                                             <button class="btn btn-outline-danger detach-profile"
-                                               data-poid="{{ profile_data.id }}" data-pname="{{ profile_data.name }}">
+                                                    data-poid="{{ profile_data.id }}"
+                                                    data-coid="{{ channel_conn.channel_data.id }}"
+                                                    data-pname="{{ profile_data.name }}">
                                                 {% trans "Detach" %}
                                             </button>
                                         {% endif %}
