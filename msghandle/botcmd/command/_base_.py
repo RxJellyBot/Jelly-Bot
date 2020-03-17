@@ -428,6 +428,42 @@ class CommandNode:
         else:
             return args_list
 
+    # noinspection PyMethodMayBeStatic
+    def _handle_fn_(self, e: TextMessageEventObject, cmd_fn: callable, args: List[str] = None):
+        ret: List[HandledMessageEventText]
+
+        if not e.remote_activated and not cmd_fn.scope.is_in_scope(e.channel_type):
+            # Out of scope
+
+            ret = [
+                HandledMessageEventText(
+                    content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
+        elif not cmd_fn.can_be_called(e.channel_oid):
+            # On cooldown
+
+            ret = [
+                HandledMessageEventText(
+                    content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
+                        cmd_fn.cd_sec_left(e.channel_oid)))]
+        else:
+            BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
+            try:
+                ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
+                cmd_fn.record_called(e.channel_oid)
+            except TypeCastingFailed as e:
+                ret = [HandledMessageEventText(
+                    content=_("Incorrect type of data: `{}`.\n"
+                              "Expected type: `{}` / Actual type: `{}`").format(
+                        e.data, type_translation(e.expected_type), type_translation(e.actual_type)
+                    ))]
+
+        if isinstance(ret, str):
+            ret = [HandledMessageEventText(content=ret)]
+        elif isinstance(ret, list):
+            ret = [HandledMessageEventText(content=txt) if isinstance(txt, str) else txt for txt in ret]
+
+        return ret
+
     def parse_args(
             self, e: TextMessageEventObject, command: str, splitter, max_arg_count: int = None,
             args: List[str] = None, is_sub=False) \
@@ -443,36 +479,7 @@ class CommandNode:
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
-            ret: List[HandledMessageEventText]
-
-            # checks
-            if not e.remote_activated and not cmd_fn.scope.is_in_scope(e.channel_type):
-                ret = [
-                    HandledMessageEventText(
-                        content=CommandSpecialResponse.out_of_scope(e.channel_type, cmd_fn.scope.available_ctypes))]
-            elif not cmd_fn.can_be_called(e.channel_oid):
-                ret = [
-                    HandledMessageEventText(
-                        content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
-                            cmd_fn.cd_sec_left(e.channel_oid)))]
-            else:
-                BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
-                try:
-                    ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
-                    cmd_fn.record_called(e.channel_oid)
-                except TypeCastingFailed as e:
-                    ret = [HandledMessageEventText(
-                        content=_("Incorrect type of data: `{}`.\n"
-                                  "Expected type: `{}` / Actual type: `{}`").format(
-                            e.data, type_translation(e.expected_type), type_translation(e.actual_type)
-                        ))]
-
-            if isinstance(ret, str):
-                ret = [HandledMessageEventText(content=ret)]
-            elif isinstance(ret, list):
-                ret = [HandledMessageEventText(content=txt) if isinstance(txt, str) else txt for txt in ret]
-
-            return ret
+            return self._handle_fn_(e, cmd_fn, args)
 
         if args:
             cmd_code, cmd_args = args[0], args[1:]

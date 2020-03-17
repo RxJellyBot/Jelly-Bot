@@ -63,4 +63,3 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
         return [HandledMessageEventText(content="\n".join(ret))]
     else:
         return []
-

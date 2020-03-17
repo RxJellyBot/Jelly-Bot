@@ -12,7 +12,6 @@ from JellyBot.views.render import render_template
 class AutoReplySearchChannelView(LoginRequiredMixin, ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        root_uid = get_root_oid(request)
         keyword = request.GET.get("w")
         include_inactive = safe_cast(request.GET.get("include_inactive"), bool)
 

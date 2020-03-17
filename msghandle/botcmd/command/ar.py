@@ -166,10 +166,10 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
             bypass_multiline_check=True))
     else:
         ret.append(HandledMessageEventText(
-                content=_("Failed to register the Auto-Reply module.\n"
-                          "Code: `{}`\n"
-                          "Visit {} to see the code explanation.").format(
-                    add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
+            content=_("Failed to register the Auto-Reply module.\n"
+                      "Code: `{}`\n"
+                      "Visit {} to see the code explanation.").format(
+                add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
 
     return ret
 
@@ -219,9 +219,9 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
 
     if not conn_list.empty:
-        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
-               + "\n\n" \
-               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) + \
+            "\n\n" + \
+            "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
@@ -241,8 +241,8 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
 
     if not conn_list.empty:
         ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
-               + "\n\n" \
-               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+            + "\n\n" \
+            + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:

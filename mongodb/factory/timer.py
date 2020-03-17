@@ -72,9 +72,10 @@ class TimerManager(BaseCollection):
 
         filter_ = {
             TimerModel.ChannelOid.key: channel_oid,
-            TimerModel.TargetTime.key: {"$lt": now + timedelta(
-                seconds=within_secs if within_secs else Bot.Timer.MaxNotifyRangeSeconds),
-                                        "$gt": now},
+            TimerModel.TargetTime.key: {
+                "$lt": now + timedelta(seconds=within_secs if within_secs else Bot.Timer.MaxNotifyRangeSeconds),
+                "$gt": now
+            },
             TimerModel.Notified.key: False
         }
 

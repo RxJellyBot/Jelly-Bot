@@ -22,8 +22,8 @@ class RemoteControlEntry:
         self.refresh_expiry()
 
     def refresh_expiry(self):
-        self.expiry = localtime(now_utc_aware(), self.tzinfo) \
-                      + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds)
+        self.expiry = \
+            localtime(now_utc_aware(), self.tzinfo) + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds)
 
     @property
     def expiry_str(self) -> str:

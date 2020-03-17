@@ -11,8 +11,6 @@ from JellyBot.views.render import render_template
 class AutoReplyRankingChannelView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic, PyTypeChecker
     def get(self, request, *args, **kwargs):
-        root_uid = get_root_oid(request)
-
         channel_data = self.get_channel_data(*args, **kwargs)
 
         limit = get_limit(request.GET, Website.AutoReply.RankingMaxCount)
