@@ -115,10 +115,22 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for name in names %}
+                        {% for entry in profile_controls %}
                             <tr>
-                                <td class="align-middle text-center">{{ name }}</td>
-                                <td class="align-middle text-center">{{ name }}</td>
+                                <td class="align-middle text-center">{{ entry.name }}</td>
+                                <td class="align-middle text-center">
+                                    {% if entry.removable %}
+                                        <form class="profile-control" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ entry.root_oid }}" name="uid">
+                                            <input type="hidden" value="remove" name="action">
+                                            <button class="btn btn-outline-primary" type="submit"
+                                                    data-uname="{{ entry.name }}">
+                                                {% trans "Detach" %}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -135,4 +147,17 @@
 
 {% block ex-script %}
     {% include "components/interactive-table-js.html" %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("form.profile-control").submit(function(e) {
+                let profileName = "{{ profile_data.name }}";
+                let userName = $(this).find("button").data("uname");
+                let confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}?{% endblocktrans %}`;
+
+                if (!confirm(confirmMsg)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 {% endblock %}

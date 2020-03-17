@@ -16,11 +16,6 @@ class Session:
         COLLECT = "x-stats-collect"
 
 
-# Frontend CSS Class
-class Css:
-    LOGGED_IN_ENABLE = "enable-login"
-
-
 # Param Dict Prefix
 class ParamDictPrefix:
     PostKey = "x-"  # Used in http POST params from HTML forms

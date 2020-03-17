@@ -95,8 +95,7 @@ class ProfileAttachResponse(ProfileResponseBase):
 
 class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
-        ProfileManager.detach_profile(self._sender_oid, self._profile_oid)
-        self._result = OperationOutcome.O_COMPLETED
+        self._result = ProfileManager.detach_profile(self._sender_oid, self._profile_oid)
 
 
 class ProfileNameCheckResponse(

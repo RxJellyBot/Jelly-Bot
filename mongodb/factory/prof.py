@@ -160,8 +160,8 @@ class UserProfileManager(BaseCollection):
             {"$set": {
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
-    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
-        self.update_many_async(
+    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId) -> WriteOutcome:
+        return self.update_many_outcome(
             {ChannelProfileConnectionModel.UserOid.key: user_oid,
              ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
             {"$pull": {
@@ -529,7 +529,7 @@ class ProfileManager:
             -> ChannelProfileConnectionModel:
         return self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
 
-    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId):
+    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId) -> WriteOutcome:
         return self._conn.detach_profile(user_oid, profile_oid)
 
 

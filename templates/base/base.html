@@ -62,14 +62,6 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
-<script type="text/javascript">
-    $(document).ready(function () {
-        {% for cls in unlock_classes %}
-            $(".{{ cls }}").removeClass("disabled d-none").removeAttr("disabled").removeClass("{{ cls }}");
-        {% endfor %}
-    });
-</script>
-
 {% block ex-script %}{% endblock %}
 
 {% block footer %}
