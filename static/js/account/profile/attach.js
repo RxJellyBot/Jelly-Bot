@@ -6,8 +6,5 @@ function onAttachClick() {
     attachProfile(
         $(this).data("poid"),
         $(this).data("cid"),
-        $("select#target option:selected").data("oid"),
-        function () {
-            location.reload();
-        });
+        $("select#target option:selected").data("oid"));
 }

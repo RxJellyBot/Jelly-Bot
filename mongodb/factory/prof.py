@@ -496,12 +496,10 @@ class ProfileManager:
         highest_perm = self.highest_permission_level(profiles)
         attachables = {prof.id: prof
                        for prof in self._prof.get_attachable_profiles(channel_oid, exist_perm, highest_perm)}
-        attachable_ids = set(attachables.keys())
 
-        prof_conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
-        for poid in prof_conn.profile_oids:
-            if poid in attachable_ids and poid in attachables:
-                del attachables[poid]
+        # Remove default profile
+        channel_data = ChannelManager.get_channel_oid(channel_oid)
+        del attachables[channel_data.config.default_profile_oid]
 
         return list(attachables.values())
 

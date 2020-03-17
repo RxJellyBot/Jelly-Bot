@@ -9,7 +9,6 @@ from flags import PermissionCategory, WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.helper import IdentitySearcher
 from JellyBot.views import render_template, WebsiteErrorView
-from JellyBot.utils import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
 
 
