@@ -23,13 +23,20 @@ class InfoPageActionControl(Enum):
     UNKNOWN = -1
 
     DETACH = 0
+    DELETE = 1
 
     @staticmethod
     def parse(s: str):
-        if s == "remove":
+        if s == "detach":
             return InfoPageActionControl.DETACH
+        if s == "delete":
+            return InfoPageActionControl.DELETE
         else:
             return InfoPageActionControl.UNKNOWN
+
+    @staticmethod
+    def action_detach():
+        pass
 
 
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
@@ -100,4 +107,8 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
             else:
                 messages.warning(request, _("Failed to detach the profile. ({})").format(detach_outcome))
 
-        return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+            return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+        elif action == InfoPageActionControl.DELETE:
+            pass
+        else:
+            return HttpResponse(status=501)

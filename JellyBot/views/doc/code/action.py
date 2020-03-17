@@ -1,4 +1,4 @@
-from django.views.generic.base import View
+from django.views import View
 from django.utils.translation import gettext_lazy as _
 
 from flags import APICommand, Execode
