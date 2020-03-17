@@ -10,6 +10,13 @@
                 config["order"] = [[parseInt($(this).data("sortidx")), $(this).data("sortorder")]]
             }
 
+            if ($(this).hasClass("datatable-noorder")) {
+                config["columnDefs"] = [{
+                    "targets": $(this).data("nordcol"),
+                    "orderable": false
+                }]
+            }
+
             $(this).DataTable(config);
         })
     });

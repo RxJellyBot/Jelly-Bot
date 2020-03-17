@@ -58,8 +58,7 @@ class ProfileResponseBase(
         self._target_oid = self._param_dict[param.Manage.Profile.TARGET] or self._sender_oid
         self._target_self = self._sender_oid == self._target_oid
 
-        self._permissions = \
-            ProfileManager.get_permissions(ProfileManager.get_user_profiles(self._channel_oid, self._sender_oid))
+        self._permissions = ProfileManager.get_user_permissions(self._channel_oid, self._sender_oid)
 
     def _handle_profile_oid_(self):
         self._profile_oid = safe_cast(self._profile_oid, ObjectId)

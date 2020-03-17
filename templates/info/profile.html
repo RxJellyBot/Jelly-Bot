@@ -12,15 +12,15 @@
     <div class="container">
         <div class="row">
             <div class="col mb-3">
-                <span class="h3">{% trans "Basic Information" %}</span>
+                <span class="h4">{% trans "Basic Information" %}</span>
             </div>
         </div>
         <div class="row">
             <div class="col-lg mb-3">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Name" %}</h4>
+                    <div class="card-header text-dark">{% trans "Name" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2 font-weight-normal">
+                        <div class="card-text h4 font-weight-normal">
                             <span class="dot" style="background-color: {{ profile_data.color.color_hex }}"></span>
                             {{ profile_data.name }}
                         </div>
@@ -29,9 +29,9 @@
             </div>
             <div class="col-lg">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Profile ID" %}</h4>
+                    <div class="card-header text-dark">{% trans "Profile ID" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <code>{{ profile_data.id }}</code>
                         </div>
                     </div>
@@ -41,9 +41,9 @@
         <div class="row">
             <div class="col-lg-6 mb-3">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
+                    <div class="card-header text-dark">{% trans "Channel ID" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <code><a href="{% url "info.channel" channel_oid=profile_data.channel_oid %}">
                                 {{ profile_data.channel_oid }}
                             </a></code>
@@ -53,9 +53,9 @@
             </div>
             <div class="col-lg mb-3">
                 <div class="card border-dark text-center">
-                    <h5 class="card-header text-dark">{% trans "Permission Level" %}</h5>
+                    <div class="card-header text-dark">{% trans "Permission Level" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <span class="text-success">{{ profile_data.permission_level.code }}&nbsp;({{ profile_data.permission_level.key }})</span>
                         </div>
                     </div>
@@ -63,9 +63,9 @@
             </div>
             <div class="col-lg">
                 <div class="card border-dark text-center mb-3">
-                    <h5 class="card-header text-dark">{% trans "Promotion Required" %}</h5>
+                    <div class="card-header text-dark">{% trans "Promotion Required" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             {% if profile_data.promo_vote > 0 %}
                                 <span class="text-danger">{% trans "Yes" %}</span>
                             {% else %}
@@ -76,9 +76,10 @@
                 </div>
             </div>
         </div>
+        <hr>
         <div class="row mb-3">
             <div class="col">
-                <span class="h3">{% trans "Permissions" %}</span>
+                <span class="h4">{% trans "Permissions" %}</span>
             </div>
         </div>
         <div class="row mb-3">
@@ -96,23 +97,27 @@
                 </div>
             {% endfor %}
         </div>
+        <hr>
         <div class="row mb-3">
             <div class="col">
-                <span class="h3">{% trans "User who also have this profile" %}</span>
+                <span class="h4">{% trans "User who also have this profile" %}</span>
             </div>
         </div>
         <div class="row">
             <div class="col">
                 <div class="table-responsive table-freeze-header" style="max-height: 35rem">
-                    <table class="table table-hover table-bordered table-bordered mb-0 datatable">
+                    <table class="table table-hover table-bordered table-bordered mb-0 datatable datatable-noorder"
+                           data-nordcol="1">
                         <thead>
                         <tr>
                             <th scope="col">{% trans "Member Name" %}</th>
+                            <th scope="col">{% trans "Control" %}</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for name in names %}
                             <tr>
+                                <td class="align-middle text-center">{{ name }}</td>
                                 <td class="align-middle text-center">{{ name }}</td>
                             </tr>
                         {% endfor %}

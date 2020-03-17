@@ -28,8 +28,7 @@ class PermissionCategory(FlagDoubleEnum):
     4xx - Profile Control
         401 - Control (self)
         402 - Control (member)
-        403 - Create
-        404 - Delete
+        403 - Create / Edit / Delete
     """
 
     @classmethod
@@ -68,13 +67,9 @@ class PermissionCategory(FlagDoubleEnum):
         402, _("Profile: Control (member)"), \
         _("User who has this permission can attach/detach profiles to the other members.")
 
-    PRF_CREATE = \
-        403, _("Profile: Create"), \
-        _("User who has this permission can create profiles.")
-
-    PRF_DELETE = \
-        404, _("Profile: Delete"), \
-        _("User who has this permission can delete profiles.")
+    PRF_CED = \
+        403, _("Profile: CED"), \
+        _("User who has this permission can create / edit / delete (CED) profiles.")
 
 
 class PermissionLevel(FlagSingleEnum):

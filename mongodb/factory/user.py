@@ -150,7 +150,7 @@ class RootUserManager(BaseCollection):
                     if on_exist:
                         on_exist()
         else:
-            overall_outcome = oc_onreg_failed  # FIXME: Maylay register failed
+            overall_outcome = oc_onreg_failed
 
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)

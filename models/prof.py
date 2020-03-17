@@ -62,8 +62,7 @@ class ChannelProfileListEntry:
     channel_name: str
     profiles: List[ChannelProfileModel]
     starred: bool
-    can_create_profile: bool
-    can_delete_profile: bool
+    can_ced_profile: bool
     default_profile_oid: ObjectId
 
 

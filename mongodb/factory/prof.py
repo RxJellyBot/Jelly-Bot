@@ -433,14 +433,13 @@ class ProfileManager:
                 not_found_prof_oids_dict[cnl_oid] = not_found_prof_oids
             else:
                 perms = self.get_permissions(prof)
-                can_create_profile = self.can_create_profile(perms)
-                can_delete_profile = self.can_delete_profile(perms)
+                can_ced_profile = self.can_ced_profile(perms)
 
                 ret.append(
                     ChannelProfileListEntry(
                         channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
                         starred=prof_conn.starred, default_profile_oid=default_profile_oid,
-                        can_create_profile=can_create_profile, can_delete_profile=can_delete_profile
+                        can_ced_profile=can_ced_profile
                     ))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
@@ -480,6 +479,10 @@ class ProfileManager:
 
         return ret
 
+    # noinspection PyMethodMayBeStatic
+    def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[PermissionCategory]:
+        return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
+
     def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
             -> List[ChannelProfileConnectionModel]:
         return self._conn.get_channel_members(channel_oid, available_only)
@@ -487,7 +490,7 @@ class ProfileManager:
     def get_available_connections(self) -> CursorWithCount:
         return self._conn.get_available_connections()
 
-    def get_attachable_profiles(self, root_uid: ObjectId, channel_oid: ObjectId) -> List[ChannelProfileModel]:
+    def get_attachable_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         profiles = self.get_user_profiles(channel_oid, root_uid)
         exist_perm = self.get_permissions(profiles)
         highest_perm = self.highest_permission_level(profiles)
@@ -509,15 +512,12 @@ class ProfileManager:
         return self._prof.is_name_available(channel_oid, name)
 
     # noinspection PyMethodMayBeStatic
-    def can_create_profile(self, permissions: Set[PermissionCategory]):
-        return PermissionCategory.PRF_CONTROL_SELF in permissions
+    def can_ced_profile(self, permissions: Set[PermissionCategory]):
+        """CED Stands for Create / Edit / Delete."""
+        return PermissionCategory.PRF_CED in permissions
 
     # noinspection PyMethodMayBeStatic
-    def can_delete_profile(self, permissions: Set[PermissionCategory]):
-        return PermissionCategory.PRF_DELETE in permissions
-
-    # noinspection PyMethodMayBeStatic
-    def can_attach_profile_member(self, permissions: Set[PermissionCategory]):
+    def can_control_profile_member(self, permissions: Set[PermissionCategory]):
         return PermissionCategory.PRF_CONTROL_MEMBER in permissions
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):

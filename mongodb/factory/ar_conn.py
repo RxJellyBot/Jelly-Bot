@@ -46,7 +46,7 @@ class AutoReplyModuleManager(BaseCollection):
 
     @staticmethod
     def _has_access_to_pinned_(channel_oid: ObjectId, user_oid: ObjectId):
-        perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
+        perms = ProfileManager.get_user_permissions(channel_oid, user_oid)
         return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
 
     def _validate_content_(

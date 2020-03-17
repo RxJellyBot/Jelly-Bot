@@ -16,9 +16,8 @@ class RequirePermissionMixin(RequireSenderMixin, HandleChannelOidMixin, ABC):
         super().__init__(param_dict, sender_oid)
 
     def _permission_check_(self):
-        permission_pass = ProfileManager.get_permissions(
-            ProfileManager.get_user_profiles(self._channel_oid, self._sender_oid)
-        ).issuperset(self.required_permission())
+        permission_pass = ProfileManager.get_user_permissions(self._channel_oid, self._sender_oid)\
+            .issuperset(self.required_permission())
 
         if not permission_pass:
             self._err[result.SenderIdentity.PERMISSION] = False

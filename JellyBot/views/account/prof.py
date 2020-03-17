@@ -19,7 +19,7 @@ from mongodb.helper import IdentitySearcher
 class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
     @staticmethod
     def required_permission() -> Set[PermissionCategory]:
-        return {PermissionCategory.PRF_CONTROL_SELF}
+        return {PermissionCategory.PRF_CED}
 
     # noinspection PyUnusedLocal,PyTypeChecker
     def get(self, request, *args, **kwargs):
@@ -65,9 +65,8 @@ class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
         channel_data = self.get_channel_data(*args, **kwargs)
         channel_oid = channel_data.model.id
 
-        attach_member = ProfileManager.can_attach_profile_member(
-            ProfileManager.get_permissions(
-                ProfileManager.get_user_profiles(channel_oid, root_oid)))
+        attach_member = ProfileManager.can_control_profile_member(
+            ProfileManager.get_user_permissions(channel_oid, root_oid))
 
         member_list = {}
         if attach_member:
@@ -80,6 +79,6 @@ class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
             {
                 "channel_oid": channel_oid,
                 "attachable_profiles": ProfileManager.get_attachable_profiles(
-                    root_oid, channel_data.model.get_oid()),
+                    channel_data.model.get_oid(), root_oid),
                 "member_list": member_list
             }, nav_param=kwargs)
