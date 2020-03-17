@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-09 02:59-0500\n"
-"PO-Revision-Date: 2020-03-09 03:04-0500\n"
+"POT-Creation-Date: 2020-03-17 07:21-0500\n"
+"PO-Revision-Date: 2020-03-17 07:24-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -139,7 +139,7 @@ msgstr "身分組創建成功。"
 msgid "Failed to create the profile."
 msgstr "身分組創建失敗。"
 
-#: .\JellyBot\views\account\prof.py:68 .\JellyBot\views\nav.py:96
+#: .\JellyBot\views\account\prof.py:78 .\JellyBot\views\nav.py:96
 #: .\templates\account\channel\prof\attach.html:8
 msgid "Attach Profile"
 msgstr "附加身分組"
@@ -190,7 +190,7 @@ msgid "Execode Type Code"
 msgstr "執行碼種類代碼"
 
 #: .\JellyBot\views\doc\code\action.py:17 .\JellyBot\views\nav.py:194
-#: .\doc\terms.py:39 .\templates\ar\add-reg.html:111
+#: .\doc\terms.py:39 .\templates\ar\add-reg.html:108
 msgid "Execode"
 msgstr "執行碼"
 
@@ -231,44 +231,44 @@ msgstr "更新結果"
 msgid "Terms Explanation"
 msgstr "名詞解釋"
 
-#: .\JellyBot\views\err.py:16 .\flags\weberr.py:32
+#: .\JellyBot\views\err.py:8 .\flags\weberr.py:32
 #: .\templates\err\exctnt_not_found.html:14
 msgid "Extra Content Not Found"
 msgstr "額外內容不存在"
 
-#: .\JellyBot\views\err.py:18 .\flags\weberr.py:33
+#: .\JellyBot\views\err.py:10 .\flags\weberr.py:33
 #: .\templates\err\not_in_the_channel.html:14
 msgid "Not in the Channel"
 msgstr "不在頻道內"
 
-#: .\JellyBot\views\err.py:20 .\flags\weberr.py:35 .\flags\weberr.py:36
+#: .\JellyBot\views\err.py:12 .\flags\weberr.py:35 .\flags\weberr.py:36
 #: .\templates\err\account\proflink_not_found.html:14
 msgid "Profile Link Not Found"
 msgstr "無對應身份組連結"
 
-#: .\JellyBot\views\err.py:22
+#: .\JellyBot\views\err.py:14
 msgid "Channel Data Not Found"
 msgstr "頻道資料不存在"
 
-#: .\JellyBot\views\err.py:24
+#: .\JellyBot\views\err.py:16
 msgid "Profile Data Not Found"
 msgstr "身份組不存在"
 
-#: .\JellyBot\views\err.py:26 .\flags\weberr.py:38
+#: .\JellyBot\views\err.py:18 .\flags\weberr.py:38
 #: .\templates\err\info\chcoll_not_found.html:14
 msgid "Channel Collection Not Found"
 msgstr "頻道組不存在"
 
-#: .\JellyBot\views\err.py:28 .\flags\weberr.py:40
+#: .\JellyBot\views\err.py:20 .\flags\weberr.py:40
 msgid "Bot Command Not Found"
 msgstr "機器人指令不存在"
 
-#: .\JellyBot\views\err.py:30 .\flags\weberr.py:42
+#: .\JellyBot\views\err.py:22 .\flags\weberr.py:42
 #: .\templates\err\insuf_perm.html:14
 msgid "Insufficient Permission"
 msgstr "權限不足"
 
-#: .\JellyBot\views\err.py:32 .\flags\execode.py:25 .\flags\msgtype.py:11
+#: .\JellyBot\views\err.py:24 .\flags\execode.py:25 .\flags\msgtype.py:11
 #: .\flags\weberr.py:30
 msgid "Unknown"
 msgstr "不明行為"
@@ -308,7 +308,27 @@ msgstr "頻道組資訊 - {}"
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:32 .\JellyBot\views\nav.py:152
+#: .\JellyBot\views\info\profile.py:64
+msgid "Profile detached."
+msgstr "已解除身分組。"
+
+#: .\JellyBot\views\info\profile.py:66
+msgid "Failed to detach the profile. ({})"
+msgstr "身分組解除失敗。({})"
+
+#: .\JellyBot\views\info\profile.py:74
+msgid "Attempted to delete the default profile which is not allowed."
+msgstr "嘗試刪除預設身分組。此行為無效。"
+
+#: .\JellyBot\views\info\profile.py:85
+msgid "Profile deleted."
+msgstr "身分組已刪除。"
+
+#: .\JellyBot\views\info\profile.py:88
+msgid "Failed to delete the profile."
+msgstr "身分組刪除失敗。"
+
+#: .\JellyBot\views\info\profile.py:108 .\JellyBot\views\nav.py:152
 msgid "Profile Info - {}"
 msgstr "身份組資訊 - {}"
 
@@ -700,7 +720,7 @@ msgid "Permission Category"
 msgstr "權限分類"
 
 #: .\extutils\strtrans\type_trans.py:22 .\templates\account\main.html:73
-#: .\templates\ar\add-reg.html:68 .\templates\ar\add-reg.html:134
+#: .\templates\ar\add-reg.html:65 .\templates\ar\add-reg.html:131
 #: .\templates\info\chcoll\main.html:47
 #: .\templates\info\components\info_adv.html:62
 msgid "Platform"
@@ -1219,7 +1239,7 @@ msgstr "無法整合用戶資訊。"
 msgid "X: Model - Construction"
 msgstr "X: 資料模組 - 建構"
 
-#: .\flags\execode.py:112 .\mongodb\factory\results\_outcome.py:346
+#: .\flags\execode.py:112 .\mongodb\factory\results\_outcome.py:352
 msgid "An error occurred during model construction."
 msgstr "於建構資料模組時發生錯誤。"
 
@@ -1307,30 +1327,29 @@ msgid ""
 msgstr "擁有此權限的用戶可以更改頻道資訊是否隱藏。"
 
 #: .\flags\perm.py:63
-msgid "Profile: Create/Attach"
-msgstr "身分組: 建立/附加"
+msgid "Profile: Control (self)"
+msgstr "身分組: 控制(對自己)"
 
 #: .\flags\perm.py:64
-msgid ""
-"User who has this permission can create profiles or attach profiles to "
-"themselves."
-msgstr "擁有此權限的用戶可以自行建立身分組 和 附加身分組到自己身上。"
+msgid "User who has this permission can attach/detach profile to themselves."
+msgstr "擁有此權限的用戶可以對自己附加/解除身分組。"
 
 #: .\flags\perm.py:67
-msgid "Profile: Delete"
-msgstr "身分組: 刪除"
+msgid "Profile: Control (member)"
+msgstr "身分組: 控制(隊成員)"
 
 #: .\flags\perm.py:68
-msgid "User who has this permission can delete profiles."
-msgstr "擁有此權限的用戶可以刪除身分組。"
+msgid ""
+"User who has this permission can attach/detach profiles to the other members."
+msgstr "擁有此權限的用戶可以對成員附加/解除身分組。"
 
 #: .\flags\perm.py:71
-msgid "Profile: Attach on Member"
-msgstr "身分組: 附加至成員"
+msgid "Profile: CED"
+msgstr "身分組: CED"
 
 #: .\flags\perm.py:72
-msgid "User who has this permission can attach profiles to the other members."
-msgstr "擁有此權限的用戶可以附加身分組至對應頻道的成員。"
+msgid "User who has this permission can create / edit / delete (CED) profiles."
+msgstr "擁有此權限的用戶可以創建/編輯/刪除(CED)身分組。"
 
 #: .\flags\perm.py:89
 msgid "Moderator"
@@ -1419,7 +1438,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:267
+#: .\mongodb\factory\prof.py:268
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -1457,6 +1476,7 @@ msgid "The system returned OK with uncategorized reason."
 msgstr "執行成功。原因未分類。"
 
 #: .\mongodb\factory\results\_outcome.py:94
+#: .\mongodb\factory\results\_outcome.py:348
 msgid "X: Insufficient Permission"
 msgstr "X: 權限不足"
 
@@ -1677,8 +1697,8 @@ msgstr "執行失敗。於新增資料的過程中發生不明的錯誤。"
 
 #: .\mongodb\factory\results\_outcome.py:170
 #: .\mongodb\factory\results\_outcome.py:256
-#: .\mongodb\factory\results\_outcome.py:348
-#: .\mongodb\factory\results\_outcome.py:394
+#: .\mongodb\factory\results\_outcome.py:354
+#: .\mongodb\factory\results\_outcome.py:398
 msgid "X: Not Executed"
 msgstr "X: 未執行"
 
@@ -1739,7 +1759,7 @@ msgid "The content in the parameter is empty."
 msgstr "參數的內容為空。"
 
 #: .\mongodb\factory\results\_outcome.py:244
-#: .\mongodb\factory\results\_outcome.py:333
+#: .\mongodb\factory\results\_outcome.py:336
 msgid "X: Channel Not Found"
 msgstr "X: 頻道不存在"
 
@@ -1777,152 +1797,156 @@ msgstr "執行碼種類與預期的不符。"
 msgid "The acquiring process had not been executed."
 msgstr "資料獲取程序未執行。"
 
-#: .\mongodb\factory\results\_outcome.py:306
+#: .\mongodb\factory\results\_outcome.py:309
 msgid "O: Completed"
 msgstr "O: 已完成"
 
-#: .\mongodb\factory\results\_outcome.py:307
+#: .\mongodb\factory\results\_outcome.py:310
 msgid "The operation was successfully completed."
 msgstr "程序執行完成。"
 
-#: .\mongodb\factory\results\_outcome.py:309
+#: .\mongodb\factory\results\_outcome.py:312
 msgid "X: Execode Not Found"
 msgstr "X: 執行碼不存在"
 
-#: .\mongodb\factory\results\_outcome.py:310
+#: .\mongodb\factory\results\_outcome.py:313
 msgid "No enqueued Execode found."
 msgstr "沒有找到已登記的執行碼。"
 
-#: .\mongodb\factory\results\_outcome.py:312
+#: .\mongodb\factory\results\_outcome.py:315
 msgid "X: Keys Lacking"
 msgstr "X: 參數短少"
 
-#: .\mongodb\factory\results\_outcome.py:313
+#: .\mongodb\factory\results\_outcome.py:316
 msgid "There are keys lacking so that the Execode cannot be completed."
 msgstr "因完成執行碼所需要的參數有缺，故完成手續失敗。"
 
-#: .\mongodb\factory\results\_outcome.py:315
+#: .\mongodb\factory\results\_outcome.py:318
 msgid "X: Completion Failed"
 msgstr "X: 完成手續失敗"
 
-#: .\mongodb\factory\results\_outcome.py:316
+#: .\mongodb\factory\results\_outcome.py:319
 msgid "The action completion was failed."
 msgstr "完成手續執行失敗。"
 
-#: .\mongodb\factory\results\_outcome.py:318
+#: .\mongodb\factory\results\_outcome.py:321
 msgid "X: No Complete Action"
 msgstr "X: 無對應完成手續"
 
-#: .\mongodb\factory\results\_outcome.py:319
+#: .\mongodb\factory\results\_outcome.py:322
 msgid "No complete action implemented yet for the provided action type."
 msgstr "對應的完成手續尚未實作完成。"
 
-#: .\mongodb\factory\results\_outcome.py:321
+#: .\mongodb\factory\results\_outcome.py:324
 msgid "X: Completion Error"
 msgstr "X: 完成手續錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:322
+#: .\mongodb\factory\results\_outcome.py:325
 msgid "An error occurred during action completion process."
 msgstr "執行完成手續時發生了不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:324
+#: .\mongodb\factory\results\_outcome.py:327
 msgid "X: Empty Execode"
 msgstr "X: 空執行碼"
 
-#: .\mongodb\factory\results\_outcome.py:325
+#: .\mongodb\factory\results\_outcome.py:328
 msgid "The Execode is empty."
 msgstr "執行碼為空。"
 
-#: .\mongodb\factory\results\_outcome.py:327
+#: .\mongodb\factory\results\_outcome.py:330
 msgid "X: Collation Error"
 msgstr "X: 校勘錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:328
+#: .\mongodb\factory\results\_outcome.py:331
 msgid "An error occurred during parameter collation process."
 msgstr "於參數校勘的過程中發生了不明的錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:330
+#: .\mongodb\factory\results\_outcome.py:333
 msgid "X: Execode type Mismatch"
 msgstr "X: 執行碼種類不符"
 
-#: .\mongodb\factory\results\_outcome.py:331
+#: .\mongodb\factory\results\_outcome.py:334
 msgid "The type of the Execode doesn't match the desired one."
 msgstr "執行碼種類與預期不符。"
 
-#: .\mongodb\factory\results\_outcome.py:334
+#: .\mongodb\factory\results\_outcome.py:337
 msgid "Channel was not found using the given Channel ID."
 msgstr "頻道ID沒有對應的頻道資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:336
+#: .\mongodb\factory\results\_outcome.py:339
 msgid "X: Source = Destination"
 msgstr "X: 來源和目標相同"
 
-#: .\mongodb\factory\results\_outcome.py:337
+#: .\mongodb\factory\results\_outcome.py:340
 msgid "Source user data is equal to the destination user data."
 msgstr "來源用戶資訊和目標用戶資訊相同。"
 
-#: .\mongodb\factory\results\_outcome.py:339
+#: .\mongodb\factory\results\_outcome.py:342
 msgid "X: Source Data Not Found"
 msgstr "X: 找不到來源用戶資訊"
 
-#: .\mongodb\factory\results\_outcome.py:340
+#: .\mongodb\factory\results\_outcome.py:343
 msgid "Source user data not found."
 msgstr "找不到來源用戶資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:342
+#: .\mongodb\factory\results\_outcome.py:345
 msgid "X: Destination Data Not Found"
 msgstr "X: 找不到目標用戶資訊"
 
-#: .\mongodb\factory\results\_outcome.py:343
+#: .\mongodb\factory\results\_outcome.py:346
 msgid "Destination user data not found."
 msgstr "找不到目標用戶資訊。"
 
-#: .\mongodb\factory\results\_outcome.py:345
+#: .\mongodb\factory\results\_outcome.py:349
+msgid "Insufficient permission to execute this operation."
+msgstr "因權限不足，無法執行。"
+
+#: .\mongodb\factory\results\_outcome.py:351
 msgid "X: Construction Error"
 msgstr "X: 建構錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:349
-#: .\mongodb\factory\results\_outcome.py:395
+#: .\mongodb\factory\results\_outcome.py:355
+#: .\mongodb\factory\results\_outcome.py:399
 msgid "The operation had not been executed."
 msgstr "程序未執行。"
 
-#: .\mongodb\factory\results\_outcome.py:351
+#: .\mongodb\factory\results\_outcome.py:357
 msgid "X: Not Updated"
 msgstr "X: 未更新"
 
-#: .\mongodb\factory\results\_outcome.py:352
+#: .\mongodb\factory\results\_outcome.py:358
 msgid "Update operation not performed."
 msgstr "更新處理未完成。"
 
-#: .\mongodb\factory\results\_outcome.py:354
+#: .\mongodb\factory\results\_outcome.py:360
 msgid "X: Not Deleted"
 msgstr "X: 未刪除"
 
-#: .\mongodb\factory\results\_outcome.py:355
+#: .\mongodb\factory\results\_outcome.py:361
 msgid "Delete operation not performed."
 msgstr "刪除處理未完成。"
 
-#: .\mongodb\factory\results\_outcome.py:357
+#: .\mongodb\factory\results\_outcome.py:363
 msgid "X: Error"
 msgstr "X: 錯誤"
 
-#: .\mongodb\factory\results\_outcome.py:358
+#: .\mongodb\factory\results\_outcome.py:364
 msgid "An error has occurred during the process execution."
 msgstr "於程序執行中發生錯誤。"
 
-#: .\mongodb\factory\results\_outcome.py:388
+#: .\mongodb\factory\results\_outcome.py:392
 msgid "O: Success"
 msgstr "O: 成功"
 
-#: .\mongodb\factory\results\_outcome.py:389
+#: .\mongodb\factory\results\_outcome.py:393
 msgid "The updating operation succeed."
 msgstr "更新手續執行成功。"
 
-#: .\mongodb\factory\results\_outcome.py:391
+#: .\mongodb\factory\results\_outcome.py:395
 msgid "X: Not found"
 msgstr "X: 不存在"
 
-#: .\mongodb\factory\results\_outcome.py:392
+#: .\mongodb\factory\results\_outcome.py:396
 msgid "The data for updating is not found."
 msgstr "執行失敗。找不到符合條件的資料更新。"
 
@@ -2909,9 +2933,9 @@ msgstr ""
 "用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
 "者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
-#: .\templates\account\channel\list.html:119
-msgid "Are you sure to detach this profile (${name})?"
-msgstr "確定要解除這個身分組嗎(${name})？"
+#: .\templates\account\channel\list.html:121
+msgid "Are you sure to detach ${name}?"
+msgstr "確定要解除身份組: ${name}嗎？"
 
 #: .\templates\account\channel\list_table.html:16
 #: .\templates\info\components\info_adv.html:12
@@ -2952,31 +2976,33 @@ msgid "Create"
 msgstr "建立"
 
 #: .\templates\account\channel\list_table.html:56
-#: .\templates\account\channel\prof\attach.html:23
+#: .\templates\account\channel\prof\attach-list.html:17
 msgid "Attach"
 msgstr "附加"
 
 #: .\templates\account\channel\list_table.html:62
 #: .\templates\account\channel\manage.html:31
+#: .\templates\account\channel\prof\attach-list.html:7
 msgid "Profiles"
 msgstr "身份組"
 
-#: .\templates\account\channel\list_table.html:75
+#: .\templates\account\channel\list_table.html:77
+#: .\templates\info\profile.html:143
 msgid "Detach"
 msgstr "解除"
 
-#: .\templates\account\channel\list_table.html:86
-#: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:97
+#: .\templates\account\channel\list_table.html:88
+#: .\templates\account\channel\manage.html:21 .\templates\ar\add-reg.html:94
 #: .\templates\ar\module-card.html:27 .\templates\info\channel\search.html:81
 #: .\templates\info\components\info_adv.html:32
 #: .\templates\info\components\info_basic.html:29
-#: .\templates\info\profile.html:44
+#: .\templates\info\profile.html:21
 msgid "Channel ID"
 msgstr "頻道ID"
 
-#: .\templates\account\channel\list_table.html:92
-#: .\templates\ar\add-reg.html:84 .\templates\ar\add-reg.html:125
-#: .\templates\ar\add-reg.html:149 .\templates\info\channel\search.html:87
+#: .\templates\account\channel\list_table.html:94
+#: .\templates\ar\add-reg.html:81 .\templates\ar\add-reg.html:122
+#: .\templates\ar\add-reg.html:146 .\templates\info\channel\search.html:87
 #: .\templates\info\components\info_adv.html:46
 msgid "Channel Token"
 msgstr "頻道代碼"
@@ -2997,19 +3023,7 @@ msgstr "權限 / 相關控制"
 msgid "No operations available."
 msgstr "無可用操作。"
 
-#: .\templates\account\channel\prof\attach.html:29
-msgid "Permission Level:"
-msgstr "權限等級:"
-
-#: .\templates\account\channel\prof\attach.html:31
-msgid "Permissions:"
-msgstr "權限:"
-
-#: .\templates\account\channel\prof\attach.html:40
-msgid "Profile Details"
-msgstr "身分組資訊"
-
-#: .\templates\account\channel\prof\attach.html:51
+#: .\templates\account\channel\prof\attach-empty.html:7
 #, python-format
 msgid ""
 "No attachable profiles. <a href=\"%(create_url)s\">Visit this page</a> to "
@@ -3017,13 +3031,46 @@ msgid ""
 msgstr ""
 "無可附加身分組。<a href=\"%(create_url)s\">瀏覽此頁面</a>以新增身分組！"
 
+#: .\templates\account\channel\prof\attach-list.html:23
+msgid "Permission Level:"
+msgstr "權限等級:"
+
+#: .\templates\account\channel\prof\attach-list.html:25
+msgid "Permissions:"
+msgstr "權限:"
+
+#: .\templates\account\channel\prof\attach-list.html:34
+msgid "Profile Details"
+msgstr "身分組資訊"
+
+#: .\templates\account\channel\prof\attach-list.html:44
+#: .\templates\services\shorturl\main.html:58
+msgid "Target"
+msgstr "目標"
+
+#: .\templates\account\channel\prof\attach-list.html:49
+msgid "Select a target member"
+msgstr "選擇目標成員"
+
+#: .\templates\account\channel\prof\attach-list.html:51
+msgid "(Self)"
+msgstr "(自己)"
+
+#: .\templates\account\channel\prof\attach.html:38
+msgid "Profile attached."
+msgstr "身分組已附加。"
+
+#: .\templates\account\channel\prof\attach.html:40
+msgid "Profile failed to attach."
+msgstr "身分組附加失敗。"
+
 #: .\templates\account\channel\prof\create-main.html:4
 #: .\templates\ar\add-main.html:4
 msgid "Main Settings"
 msgstr "主設定"
 
 #: .\templates\account\channel\prof\create-main.html:7
-#: .\templates\ar\add-reg.html:65 .\templates\info\profile.html:21
+#: .\templates\ar\add-reg.html:62 .\templates\info\profile.html:45
 msgid "Name"
 msgstr "名稱"
 
@@ -3041,7 +3088,7 @@ msgid "Color"
 msgstr "顏色"
 
 #: .\templates\account\channel\prof\create-perm.html:4
-#: .\templates\info\profile.html:81
+#: .\templates\info\profile.html:96
 msgid "Permissions"
 msgstr "權限"
 
@@ -3054,7 +3101,26 @@ msgstr "屬性"
 msgid "Permission Level"
 msgstr "權限等級"
 
-#: .\templates\account\channel\prof\create.html:28
+#: .\templates\account\channel\prof\create.html:16
+msgid ""
+"Availability of enabling the permissions is decided by the permission level."
+msgstr "可勾選的權限由自己最高的權限等級決定。"
+
+#: .\templates\account\channel\prof\create.html:17
+msgid "Newly created profile will be automatically attached to self."
+msgstr "新創建的身分組會自動附加到自己身上。"
+
+#: .\templates\account\channel\prof\create.html:19
+msgid ""
+"Individually checked permission will be overridden by the permissions of the "
+"permission level. For example, if the permission level is Normal(0), "
+"regardless if the permission \"Normal\" is checked, the permission will "
+"always grant to the user."
+msgstr ""
+"權限等級中含有的權限會直接覆寫可勾選的權限。舉例來說，無論權限「一般」是否有"
+"勾選，只要權限等級是「一般(等級0)」，這個身分組就具有權限「一般」。"
+
+#: .\templates\account\channel\prof\create.html:42
 #: .\templates\account\integrate.html:37 .\templates\ar\add.html:45
 msgid "Submit"
 msgstr "提交"
@@ -3573,27 +3639,27 @@ msgstr "選擇一個頻道"
 msgid "ID: "
 msgstr "ID: "
 
-#: .\templates\ar\add-reg.html:113
+#: .\templates\ar\add-reg.html:110
 msgid ""
 "The Execode for registering the module will appear below once the task is "
 "enqueued."
 msgstr "成功登記後，登錄回覆組用的執行碼將會在下方出現。"
 
-#: .\templates\ar\add-reg.html:127
+#: .\templates\ar\add-reg.html:124
 msgid "Input the channel token to directly register the module."
 msgstr "輸入頻道ID以直接新增回覆組。"
 
-#: .\templates\ar\add-reg.html:129
+#: .\templates\ar\add-reg.html:126
 msgid ""
 "This method will be unusable if the channel had not been registered in the "
 "bot."
 msgstr "若頻道尚未註冊，則無法使用此方法。"
 
-#: .\templates\ar\add-reg.html:148
+#: .\templates\ar\add-reg.html:145
 msgid "Input the Channel Token"
 msgstr "輸入頻道代碼"
 
-#: .\templates\ar\add-reg.html:155
+#: .\templates\ar\add-reg.html:152
 msgid "Check"
 msgstr "檢查"
 
@@ -3764,16 +3830,16 @@ msgstr "輸入搜尋關鍵字"
 msgid "Including Unavailable Modules"
 msgstr "包含無法使用的回覆組"
 
-#: .\templates\base\base.html:9
+#: .\templates\base\base.html:9 .\templates\garbage\418.html:9
 msgid "Auto reply-based web application."
 msgstr "以自動回覆為基礎的線上應用程式。"
 
-#: .\templates\base\base.html:10
+#: .\templates\base\base.html:10 .\templates\garbage\418.html:10
 msgid "RaenonX"
 msgstr "水母 / 醜兔"
 
 #: .\templates\base\base.html:16 .\templates\components\navbar.html:7
-#: .\templates\index.html:7
+#: .\templates\garbage\418.html:16 .\templates\index.html:7
 msgid "Jelly Bot"
 msgstr "小水母"
 
@@ -3923,19 +3989,18 @@ msgstr "沒有找到連結到頻道的身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(channel_oid)s</code> "
-"is 24 characters. (Current: %(channel_oid|length)s)</li> <li><code>"
-"%(channel_oid)s</code> is the Channel ID, <b>NOT the channel token</b>.</li> "
-"<li>Channel ID - <b><code>%(channel_oid)s</code></b> appears on <a href="
-"\"%(channel_list)s\">this page</a>. <li>Channel info has not been set to be "
-"private.</li> </ul> If all the conditions match, but the error still occurs, "
-"please <a href=\"%(about_page)s\">contact the website developer.</a>"
+"is 24 characters.</li> <li><code>%(channel_oid)s</code> is the Channel ID, "
+"<b>NOT the channel token</b>.</li> <li>Channel ID - <b><code>"
+"%(channel_oid)s</code></b> appears on <a href=\"%(channel_list)s\">this "
+"page</a>. <li>Channel info has not been set to be private.</li> </ul> If all "
+"the conditions match, but the error still occurs, please <a href="
+"\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
-"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。(目前: "
-"%(channel_oid|length)s)</li> <li><code>%(channel_oid)s</code>是頻道ID，而<b>"
-"不是</b>頻道代碼。</li> <li>頻道ID - <b><code>%(channel_oid)s</code></b>有出"
-"現在<a href=\"%(channel_list)s\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</"
-"li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">"
-"聯絡網站開發者。</a>"
+"請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。</li> "
+"<li><code>%(channel_oid)s</code>是頻道ID，而<b>不是</b>頻道代碼。</li> <li>頻"
+"道ID - <b><code>%(channel_oid)s</code></b>有出現在<a href=\"%(channel_list)s"
+"\">此頁面</a>。<li>頻道資訊沒有被設定為隱藏。</li> </ul>如果所有條件已符合，"
+"但是還是發生錯誤，請<a href=\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\doc\cmd_not_found.html:14
 msgid "Command Not Found"
@@ -4009,13 +4074,13 @@ msgstr "沒有找到對應的使用者身份組。"
 #, python-format
 msgid ""
 "Please check that:<br> <ul> <li>The length of <code>%(profile_oid)s</code> "
-"is 24 characters. (Current: %(profile_oid|length)s)</li> </ul> If all the "
-"conditions match, but the error still occurs, please <a href=\"%(about_page)s"
-"\">contact the website developer.</a>"
+"is 24 characters.</li> </ul> If all the conditions match, but the error "
+"still occurs, please <a href=\"%(about_page)s\">contact the website "
+"developer.</a>"
 msgstr ""
-"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。(目前: "
-"%(profile_oid|length)s)</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a "
-"href=\"%(about_page)s\">聯絡網站開發者。</a>"
+"請確認<br> <ul> <li><code>%(profile_oid)s</code>的長度是24字元。</li> </ul>如"
+"果所有條件已符合，但是還是發生錯誤，請<a href=\"%(about_page)s\">聯絡網站開發"
+"者。</a>"
 
 #: .\templates\err\insuf_perm.html:19
 msgid "Certain permissions is required for this operation."
@@ -4052,6 +4117,18 @@ msgstr "不明的網站錯誤。代碼 %(err_code)s。"
 #: .\templates\exctnt.html:12
 msgid "These will be deleted from the database after: "
 msgstr "這些內容將會於下列時間後刪除: "
+
+#: .\templates\garbage\418.html:16
+msgid "Teapot"
+msgstr "茶壺"
+
+#: .\templates\garbage\418.html:70
+msgid "Some knowledge: "
+msgstr "小知識: "
+
+#: .\templates\garbage\418.html:70
+msgid "About server code 4xx"
+msgstr "有關伺服器代碼4xx"
 
 #: .\templates\index.html:9
 msgid "An auto-reply based bot with extended features."
@@ -4205,7 +4282,7 @@ msgstr "使用次數"
 #: .\templates\info\components\bot_table_member.html:7
 #: .\templates\info\components\msg_table_count.html:8
 #: .\templates\info\components\msg_table_user_daily.html:8
-#: .\templates\info\profile.html:110
+#: .\templates\info\profile.html:127
 msgid "Member Name"
 msgstr "成員名稱"
 
@@ -4307,7 +4384,7 @@ msgstr "成員每日訊息量"
 msgid "Channel Profile Info"
 msgstr "頻道身份組資訊"
 
-#: .\templates\info\profile.html:32
+#: .\templates\info\profile.html:33
 msgid "Profile ID"
 msgstr "身分組ID"
 
@@ -4323,9 +4400,26 @@ msgstr "是"
 msgid "No"
 msgstr "否"
 
-#: .\templates\info\profile.html:101
+#: .\templates\info\profile.html:87 .\templates\services\shorturl\main.html:74
+msgid "Delete"
+msgstr "刪除"
+
+#: .\templates\info\profile.html:117
 msgid "User who also have this profile"
 msgstr "擁有此身份組的用戶"
+
+#: .\templates\info\profile.html:128
+msgctxt "Profile Control"
+msgid "Control"
+msgstr "相關控制"
+
+#: .\templates\info\profile.html:169
+msgid "Are you sure to detach ${profileName} from ${userName} ?"
+msgstr "確定要將身分組 ${profileName} 從 ${userName} 身上移除嗎？"
+
+#: .\templates\info\profile.html:177
+msgid "Are you sure to delete this profile?"
+msgstr "確定要刪除這個身分組嗎？"
 
 #: .\templates\info\recent\message.html:39
 msgid "messages"
@@ -4441,14 +4535,6 @@ msgstr "使用次數"
 msgid "Actions"
 msgstr "操作"
 
-#: .\templates\services\shorturl\main.html:58
-msgid "Target"
-msgstr "目標"
-
-#: .\templates\services\shorturl\main.html:74
-msgid "Delete"
-msgstr "刪除"
-
 #: .\templates\services\shorturl\main.html:97
 msgid "Not Implemented"
 msgstr "未完成"
@@ -4456,6 +4542,18 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid ""
+#~ "Individually checked permission will be overridden by the permissions of "
+#~ "the permission level."
+#~ msgstr ""
+#~ "權限等級中含有的權限會直接覆寫可勾選的權限。舉例來說，無論權限「一般」是否"
+#~ "有勾選，只要權限等級是「一般(等級0)」，這個身分組就具有權限「一般」。"
+
+#~ msgid ""
+#~ "User who has this permission can create profiles or attach profiles to "
+#~ "themselves."
+#~ msgstr "擁有此權限的用戶可以自行建立身分組 和 附加身分組到自己身上。"
 
 #~ msgid ""
 #~ "Newly registered? Visit <a href=\"{}{}\">this page</a> to know how to "

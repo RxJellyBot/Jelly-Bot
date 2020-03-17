@@ -15,7 +15,12 @@
                 <ul>
                     <li>{% trans "Availability of enabling the permissions is decided by the permission level." %}</li>
                     <li>{% trans "Newly created profile will be automatically attached to self." %}</li>
-                    <li>{% trans "Individually checked permission will be overridden by the permissions of the permission level." %}</li>
+                    <li>
+                        {% blocktrans trimmed %}
+                            Individually checked permission will be overridden by the permissions of the permission level.
+                            For example, if the permission level is Normal(0), regardless if the permission "Normal" is checked, the permission will always grant to the user.
+                        {% endblocktrans %}
+                    </li>
                 </ul>
             </div>
         </div>
