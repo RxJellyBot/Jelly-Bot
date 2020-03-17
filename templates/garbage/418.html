@@ -1,0 +1,96 @@
+{% load i18n %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="{% trans "Auto reply-based web application." %}">
+    <meta name="author" content="{% trans "RaenonX" %}">
+    {% block ex-meta %}{% endblock %}
+
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}">
+    <link rel="icon" href="{% static "favicon.ico" %}">
+
+    <title>{% trans "Teapot" %} | {% trans "Jelly Bot" %}</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css"
+          integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous"/>
+</head>
+<body>
+<div class="container">
+    <div class="row mt-3">
+        <div class="col-6">
+            <p>歡迎來到小水母的茶壺！</p>
+            <p>Welcome to Jellybot's teapot!</p>
+            <p>Jellybotの薬缶へようこそ！</p>
+            <p>제 찻주전자 오신 것을 환영합니다!</p>
+        </div>
+        <div class="col-6">
+            Credit:<br>
+            <ul>
+                <li>C.K.</li>
+                <li>Meng Meng</li>
+                <li>Woofan</li>
+                <li>Capoo</li>
+                <li>AAAAA</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div id="carouselImage" class="carousel slide" data-ride="carousel" data-interval="3000" data-pause="false">
+                <div class="carousel-inner d-block">
+                    <div class="carousel-item text-center active">
+                        <img src="{% static "img/garbage/418/1.jpg" %}" class="w-50" alt="C.K.'s Artwork">
+                    </div>
+                    <div class="carousel-item text-center">
+                        <img src="{% static "img/garbage/418/2.jpg" %}" class="w-50" alt="Meng Meng's Artwork">
+                    </div>
+                    <div class="carousel-item text-center">
+                        <img src="{% static "img/garbage/418/3.jpg" %}" class="w-50" alt="Woofan's Artwork">
+                    </div>
+                    <div class="carousel-item text-center">
+                        <img src="{% static "img/garbage/418/4.png" %}" class="w-50" alt="Capoo's Artwork">
+                    </div>
+                    <div class="carousel-item text-center">
+                        <img src="{% static "img/garbage/418/5.jpg" %}" class="w-50" alt="AAAAA's Artwork">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% trans "Some knowledge: " %}<a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#4xx_Client_errors">{% trans "About server code 4xx" %}</a>
+        </div>
+    </div>
+</div>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-98311727-3"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+    gtag("config", "UA-98311727-3");
+</script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>

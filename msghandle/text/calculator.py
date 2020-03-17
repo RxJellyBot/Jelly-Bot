@@ -1,6 +1,6 @@
 from typing import List
 
-from sympy import sympify, latex, Rational
+from sympy import sympify
 from sympy.core.compatibility import exec_
 from sympy.core.sympify import SympifyError
 # noinspection PyProtectedMember
@@ -34,6 +34,10 @@ def process_calculator(e: TextMessageEventObject) -> List[HandledMessageEvent]:
         except SympifyError as e:
             logger.logger.debug(
                 f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")
+            return []
+        except NameError as e:
+            logger.logger.debug(
+                f"Exception occurred for text message calculator. Message: {e.args}")
             return []
         except SyntaxError:
             return []
