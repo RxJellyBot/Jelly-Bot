@@ -78,14 +78,16 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <form class="profile-delete" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" value="{{ entry.root_oid }}" name="uid">
-                    <input type="hidden" value="delete" name="action">
-                    <button class="btn btn-outline-danger" type="submit">
-                        {% trans "Delete" %}
-                    </button>
-                </form>
+                {% if not is_default %}
+                    <form class="profile-delete" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ entry.root_oid }}" name="uid">
+                        <input type="hidden" value="delete" name="action">
+                        <button class="btn btn-outline-danger" type="submit">
+                            {% trans "Delete" %}
+                        </button>
+                    </form>
+                {% endif %}
             </div>
         </div>
         <hr>
@@ -164,7 +166,8 @@
             $("form.profile-detach").submit(function (e) {
                 let profileName = "{{ profile_data.name }}";
                 let userName = $(this).find("button").data("uname");
-                let confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}?{% endblocktrans %}`;
+                let confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}
+                    ?{% endblocktrans %}`;
 
                 if (!confirm(confirmMsg)) {
                     e.preventDefault();

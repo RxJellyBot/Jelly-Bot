@@ -25,6 +25,16 @@ class InfoPageActionControl(Enum):
     DETACH = 0
     DELETE = 1
 
+    def is_argument_valid(self, target_uid):
+        if self == InfoPageActionControl.UNKNOWN:
+            return False
+        elif self == InfoPageActionControl.DETACH:
+            return target_uid is not None
+        elif self == InfoPageActionControl.DELETE:
+            return True
+
+        raise NotImplementedError()
+
     @staticmethod
     def parse(s: str):
         if s == "detach":
@@ -35,8 +45,48 @@ class InfoPageActionControl(Enum):
             return InfoPageActionControl.UNKNOWN
 
     @staticmethod
-    def action_detach():
-        pass
+    def action_detach(request, sender_oid, target_uid, permissions, profile_oid):
+        target_self = sender_oid == target_uid
+
+        # Permission Check
+        if target_self and PermissionCategory.PRF_CONTROL_SELF in permissions:
+            pass
+        elif PermissionCategory.PRF_CONTROL_MEMBER in permissions:
+            pass
+        else:
+            return HttpResponse(status=403)
+
+        # Main Action
+        detach_outcome = ProfileManager.detach_profile(profile_oid, target_uid)
+
+        # Alert messages
+        if detach_outcome.is_success:
+            messages.info(request, _("Profile detached."))
+        else:
+            messages.warning(request, _("Failed to detach the profile. ({})").format(detach_outcome))
+
+        return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+
+    @staticmethod
+    def action_delete(request, channel_model, profile_oid):
+        # Terminate if the profile to be deleted is the default profile
+        if channel_model.config.default_profile_oid == profile_oid:
+            messages.warning(request, _("Attempted to delete the default profile which is not allowed."))
+            return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+
+        # Detach profile from all users
+        ProfileManager.detach_profile(profile_oid)
+
+        # Delete the profile from the database
+        deleted = ProfileManager.delete_profile(profile_oid)
+
+        # Alert messages
+        if deleted:
+            messages.info(request, _("Profile deleted."))
+            return redirect(reverse("account.channel.list"))
+        else:
+            messages.warning(request, _("Failed to delete the profile."))
+            return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
 
 
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
@@ -49,7 +99,7 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         if not profile_data:
             return WebsiteErrorView.website_error(
-                request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid})
+                request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid_str})
 
         channel_model = ChannelManager.get_channel_oid(profile_data.channel_oid)
 
@@ -60,6 +110,7 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "profile_controls":
                     ProfileHelper.get_user_profile_controls(channel_model, profile_oid, get_root_oid(request)),
                 "perm_cats": list(PermissionCategory),
+                "is_default": profile_oid == channel_model.config.default_profile_oid
             }, nav_param=kwargs)
 
     # noinspection PyMethodMayBeStatic
@@ -79,36 +130,20 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
         # --- Get form data
 
         action = InfoPageActionControl.parse(request.POST.get("action"))
-        uid = safe_cast(request.POST.get("uid"), ObjectId)
+        target_uid = safe_cast(request.POST.get("uid"), ObjectId)
 
-        if action == InfoPageActionControl.UNKNOWN or not uid:
+        if not action.is_argument_valid(target_uid):
             return HttpResponse(status=400)
 
         # --- Check permission
-
-        target_self = sender_oid == uid
 
         permissions = ProfileManager.get_user_permissions(channel_model.id, sender_oid)
 
         # --- Execute corresponding action
 
         if action == InfoPageActionControl.DETACH:
-            if target_self and PermissionCategory.PRF_CONTROL_SELF in permissions:
-                pass
-            elif PermissionCategory.PRF_CONTROL_MEMBER in permissions:
-                pass
-            else:
-                return HttpResponse(status=403)
-
-            detach_outcome = ProfileManager.detach_profile(uid, profile_oid)
-
-            if detach_outcome.is_success:
-                messages.info(request, _("Profile detached."))
-            else:
-                messages.warning(request, _("Failed to detach the profile. ({})").format(detach_outcome))
-
-            return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+            return InfoPageActionControl.action_detach(request, sender_oid, target_uid, permissions, profile_oid)
         elif action == InfoPageActionControl.DELETE:
-            pass
+            return InfoPageActionControl.action_delete(request, channel_model, profile_oid)
         else:
             return HttpResponse(status=501)

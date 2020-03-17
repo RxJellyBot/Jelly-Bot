@@ -160,12 +160,14 @@ class UserProfileManager(BaseCollection):
             {"$set": {
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
-    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId) -> WriteOutcome:
+    def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> WriteOutcome:
+        filter_ = {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}
+
+        if user_oid:
+            filter_[ChannelProfileConnectionModel.UserOid.key] = user_oid
+
         return self.update_many_outcome(
-            {ChannelProfileConnectionModel.UserOid.key: user_oid,
-             ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
-            {"$pull": {
-                ChannelProfileConnectionModel.ProfileOids.key: profile_oid}})
+            filter_, {"$pull": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}})
 
     def change_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self.update_one(
@@ -278,6 +280,9 @@ class ProfileDataManager(BaseCollection):
         model, outcome, ex = self.insert_one_data(**kwargs)
 
         return CreatePermissionProfileResult(outcome, model, ex)
+
+    def delete_profile(self, profile_oid: ObjectId):
+        return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
     def _create_profile_(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
@@ -529,8 +534,13 @@ class ProfileManager:
             -> ChannelProfileConnectionModel:
         return self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
 
-    def detach_profile(self, user_oid: ObjectId, profile_oid: ObjectId) -> WriteOutcome:
-        return self._conn.detach_profile(user_oid, profile_oid)
+    def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> WriteOutcome:
+        """Detach the profile from all users if `user_oid` is `None`."""
+        return self._conn.detach_profile(profile_oid, user_oid)
+
+    def delete_profile(self, profile_oid: ObjectId) -> bool:
+        """Returns if there's an item deleted."""
+        return self._prof.delete_profile(profile_oid)
 
 
 _inst = ProfileManager()
