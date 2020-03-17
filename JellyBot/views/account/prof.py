@@ -50,7 +50,7 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
         else:
             messages.warning(request, _("Failed to create the profile."))
 
-        return redirect(reverse("account.profile.create", kwargs={"channel_oid": model.channel_oid}))
+        return redirect(reverse("info.profile", kwargs={"profile_oid": model.id}))
 
 
 # noinspection PyUnusedLocal

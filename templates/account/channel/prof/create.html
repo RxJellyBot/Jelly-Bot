@@ -10,6 +10,15 @@
     </div>
 
     <div class="container">
+        <div class="row">
+            <div class="col">
+                <ul>
+                    <li>{% trans "Availability of enabling the permissions is decided by the permission level." %}</li>
+                    <li>{% trans "Newly created profile will be automatically attached to self." %}</li>
+                    <li>{% trans "Individually checked permission will be overridden by the permissions of the permission level." %}</li>
+                </ul>
+            </div>
+        </div>
         <form id="createProfile" method="post">
             {% csrf_token %}
             <div class="row">
