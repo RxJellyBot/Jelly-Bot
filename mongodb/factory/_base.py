@@ -214,9 +214,10 @@ class BaseCollection(ControlExtensionMixin, Collection):
 
     def on_init(self):
         ModelFieldChecker.check_async(self)
-        backup_collection(
-            MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
-            single_db_name is not None, Database.BackupIntervalSeconds)
+        if settings.PRODUCTION:
+            backup_collection(
+                MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
+                single_db_name is not None, Database.BackupIntervalSeconds)
 
     def on_init_async(self):
         pass
