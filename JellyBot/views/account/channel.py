@@ -58,7 +58,7 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             return render_template(
                 self.request, _("Channel Management - {}").format(channel_oid), "account/channel/manage.html", {
                     "user_profiles": u_profs,
-                    "perm_sum": ProfileManager.get_permissions(u_profs),
+                    "perm_sum": sorted(ProfileManager.get_permissions(u_profs), key=lambda x: x.code),
                     "channel_oid": channel_oid
                 }, nav_param=kwargs)
         else:
