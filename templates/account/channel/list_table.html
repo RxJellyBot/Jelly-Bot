@@ -56,6 +56,10 @@
                                         {% trans "Attach" %}
                                     </a>
                                 {% endif %}
+                                <a class="btn btn-outline-success mb-2"
+                                   href="{% url "account.profile.list" channel_oid=channel_conn.channel_data.id %}">
+                                    {% trans "List" %}
+                                </a>
                             </div>
                         </div>
                         <div class="row mt-1">

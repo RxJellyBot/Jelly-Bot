@@ -1,6 +1,5 @@
 from typing import Set
 
-from bson import ObjectId
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -9,14 +8,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from extutils import safe_cast
 from extutils.color import ColorFactory
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.utils import get_post_keys, get_root_oid, get_profile_data
-from JellyBot.components.mixin import PermissionRequiredMixin
+from JellyBot.components.mixin import PermissionRequiredMixin, LoginRequiredMixin, ChannelOidRequiredMixin
 from flags import PermissionCategoryDefault, PermissionCategory, WebsiteError
 from mongodb.factory import ProfileManager
-from mongodb.helper import IdentitySearcher
+from mongodb.helper import IdentitySearcher, ProfileHelper
 
 
 class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
@@ -24,7 +22,7 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
     def required_permission() -> Set[PermissionCategory]:
         return {PermissionCategory.PRF_CED}
 
-    # noinspection PyUnusedLocal,PyTypeChecker
+    # noinspection PyTypeChecker
     def get(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
         channel_data = self.get_channel_data(*args, **kwargs)
@@ -41,7 +39,7 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
                 "value_color": ColorFactory.BLACK.color_hex
             }, nav_param=kwargs)
 
-    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic
     def post(self, request, *args, **kwargs):
         data = get_post_keys(request.POST)
         root_uid = get_root_oid(request)
@@ -56,13 +54,11 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
         return redirect(reverse("info.profile", kwargs={"profile_oid": model.id}))
 
 
-# noinspection PyUnusedLocal
 class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
     @staticmethod
     def required_permission() -> Set[PermissionCategory]:
         return {PermissionCategory.PRF_CONTROL_SELF}
 
-    # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
         channel_data = self.get_channel_data(*args, **kwargs)
@@ -92,7 +88,6 @@ class ProfileEditView(PermissionRequiredMixin, TemplateResponseMixin, View):
     def required_permission() -> Set[PermissionCategory]:
         return {PermissionCategory.PRF_CED}
 
-    # noinspection PyUnusedLocal,PyTypeChecker
     def get(self, request, *args, **kwargs):
         profile_result = get_profile_data(kwargs)
 
@@ -109,7 +104,7 @@ class ProfileEditView(PermissionRequiredMixin, TemplateResponseMixin, View):
                 "value_name": profile_model.name
             }, nav_param=kwargs)
 
-    # noinspection PyUnusedLocal,PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic
     def post(self, request, *args, **kwargs):
         profile_result = get_profile_data(kwargs)
 
@@ -130,3 +125,16 @@ class ProfileEditView(PermissionRequiredMixin, TemplateResponseMixin, View):
             messages.warning(request, _("Failed to update the profile."))
             return redirect(reverse("account.profile.edit",
                                     kwargs={"channel_oid": channel_oid, "profile_oid": profile_oid}))
+
+
+class ProfileListView(LoginRequiredMixin, ChannelOidRequiredMixin, TemplateResponseMixin, View):
+    # noinspection PyTypeChecker
+    def get(self, request, *args, **kwargs):
+        channel_result = self.get_channel_data(*args, **kwargs)
+
+        return render_template(
+            self.request, _("List Profile"), "account/channel/prof/list.html",
+            {
+                "prof_entry": ProfileHelper.get_channel_profiles(channel_result.model.id),
+                "perm_cats": list(PermissionCategory)
+            }, nav_param=kwargs)

@@ -29,7 +29,7 @@ class AutoReplySearchChannelView(LoginRequiredMixin, ChannelOidRequiredMixin, Te
         username_dict = IdentitySearcher.get_batch_user_name(uids, channel_data.model, on_not_found="")
 
         return render_template(
-            request, _("Auto-Reply search in {}").format(channel_name), "ar/search-list.html",
+            request, _("Auto-Reply search in {}").format(channel_name), "ar/search-main.html",
             {
                 "channel_name": channel_name,
                 "channel_oid": channel_data.model.id,
@@ -46,7 +46,7 @@ class AutoReplySearchChannelListView(LoginRequiredMixin, TemplateResponseMixin, 
         root_uid = get_root_oid(request)
 
         return render_template(
-            request, _("Auto-Reply search channel list"), "ar/search-channel.html",
+            request, _("Auto-Reply search channel list"), "ar/search-chlist.html",
             {
                 "channel_list": ProfileManager.get_user_channel_profiles(
                     root_uid, inside_only=True, accessbible_only=True)

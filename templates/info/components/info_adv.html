@@ -82,14 +82,18 @@
             <h5 class="card-header text-primary">{% trans "Controls" context "Channel Controls" %}</h5>
             <div class="card-body">
                 <div class="card-text h4">
-                    {% if manageable %}
-                        <div class="col-lg-auto">
+                    <div class="col-lg-auto">
+                        {% if manageable %}
                             <a class="btn btn-outline-primary"
                                href="{% url "account.channel.manage" channel_oid=channel_data.id %}">
                                 {% trans "Manage" %}
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                        <a class="btn btn-outline-primary"
+                           href="{% url "account.profile.list" channel_oid=channel_data.id %}">
+                            {% trans "List" %}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

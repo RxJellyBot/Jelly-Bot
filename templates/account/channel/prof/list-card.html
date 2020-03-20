@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load utils %}
+
+{% with entry.profile as profile %}
+    <div class="card {% if profile.is_admin %}border-danger{% elif profile.is_mod %}border-secondary{% endif %}">
+        <div class="card-header ar-content">
+            <span class="sm-dot" style="background-color: {{ profile.color.color_hex }}"></span>
+            <a href="{% url "info.profile" profile_oid=profile.id %}" target="_blank">
+                {{ profile.name }}
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="mb-2">{% trans "Permission Level" %}</div>
+            <div class="mb-2"><code class="h4">{{ profile.permission_level.code }}</code></div>
+            <div class="mb-2">{% trans "Permissions" %}</div>
+            <ul class="mb-3 list-group">
+                {% for perm_cat in perm_cats %}
+                    {% if perm_cat in profile.permission_set %}
+                        <li class="list-group-item">
+                            {{ perm_cat.key }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <div>
+                <a class="btn btn-outline-dark" data-toggle="collapse" href="#Profile{{ profile.id }}">
+                    {% trans "List of user who have this profile" %}
+                </a>
+            </div>
+            <div class="collapse" id="Profile{{ profile.id }}">
+                <ul class="mt-3 list-group">
+                    {% for name in entry.owner_names %}
+                        <li class="list-group-item">{{ name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endwith %}

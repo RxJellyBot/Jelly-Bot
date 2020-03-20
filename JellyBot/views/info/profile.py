@@ -111,7 +111,6 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "profile_controls":
                     ProfileHelper.get_user_profile_controls(channel_model, profile_model.id, root_oid, permissions),
                 "perm_cats": list(PermissionCategory),
-                "perm_cats_green": permissions,
                 "is_default": profile_model.id == channel_model.config.default_profile_oid
             }, nav_param=kwargs)
 

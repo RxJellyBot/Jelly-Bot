@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, List, Dict, Set, Union
+from typing import Optional, List, Dict, Set, Union, Iterable
 
 import pymongo
 from bson import ObjectId
@@ -77,6 +77,7 @@ class UserProfileManager(BaseCollection):
                          ChannelProfileConnectionModel.UserOid.key: root_uid},
                         {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: {"$each": profile_oids}}})
 
+    @param_type_ensure
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
@@ -148,10 +149,23 @@ class UserProfileManager(BaseCollection):
             parse_cls=ChannelProfileConnectionModel)
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
-        return [mdl.user_oid for mdl
-                in self.find_cursor_with_count(
-                    {ChannelProfileConnectionModel.ProfileOids.key: profile_oid},
-                    parse_cls=ChannelProfileConnectionModel)]
+        filter_ = {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}
+        return [mdl.user_oid for mdl in self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel)]
+
+    def get_profiles_user_oids(self, profile_oids: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
+        ret = {}
+        filter_ = {ChannelProfileConnectionModel.ProfileOids.key: {"$in": profile_oids}}
+
+        for conn in self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel):
+            user_oid = conn.user_oid
+
+            for prof_oid in conn.profile_oids:
+                if prof_oid in ret:
+                    ret[prof_oid].append(user_oid)
+                else:
+                    ret[prof_oid] = [user_oid]
+
+        return ret
 
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
@@ -222,6 +236,10 @@ class ProfileDataManager(BaseCollection):
         return {model.id: model for model
                 in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
 
+    def get_channel_profiles(self, channel_oid: ObjectId):
+        return self.find_cursor_with_count(
+            {ChannelProfileModel.ChannelOid.key: channel_oid}, parse_cls=ChannelProfileModel)
+
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
         Automatically creates a default profile for `channel_oid` if not exists.
@@ -288,6 +306,7 @@ class ProfileDataManager(BaseCollection):
 
         return CreateProfileResult(outcome, model, ex)
 
+    @param_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         """
         Update a profile using the data in `update_dict`.
@@ -321,7 +340,6 @@ class ProfileManager:
         self._prof = ProfileDataManager()
         self._promo = PermissionPromotionRecordHolder()
 
-    @param_type_ensure
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
         Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
 
@@ -404,14 +422,12 @@ class ProfileManager:
 
         return ret
 
-    @param_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         return self._prof.update_profile(profile_oid, update_dict)
 
     def update_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self._conn.change_star(channel_oid, root_oid, star)
 
-    @param_type_ensure
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
         Get the `list` of `ChannelProfileModel` of the specified user.
@@ -430,6 +446,11 @@ class ProfileManager:
             return ret
         else:
             return []
+
+    @param_type_ensure
+    def get_channel_profiles(self, channel_oid: ObjectId):
+        """Get the existing profiles of a channel."""
+        return self._prof.get_channel_profiles(channel_oid)
 
     # noinspection PyMethodMayBeStatic
     def get_highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:
@@ -524,7 +545,6 @@ class ProfileManager:
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         return self._conn.get_users_exist_channel_dict(user_oids)
 
-    # noinspection PyMethodMayBeStatic
     def get_permissions(self, profiles: List[ChannelProfileModel]) -> Set[PermissionCategory]:
         ret = set()
 
@@ -539,7 +559,6 @@ class ProfileManager:
 
         return ret
 
-    # noinspection PyMethodMayBeStatic
     def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[PermissionCategory]:
         return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
 
@@ -564,7 +583,12 @@ class ProfileManager:
         return list(attachables.values())
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
+        """Get a list containing the user OID who have the profile."""
         return self._conn.get_profile_user_oids(profile_oid)
+
+    def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
+        """Get a `dict` which key is the profile OID and value is the user OID who have the corresponding profile."""
+        return self._conn.get_profiles_user_oids(profile_oid)
 
     def is_name_available(self, channel_oid: ObjectId, name: str):
         return self._prof.is_name_available(channel_oid, name)

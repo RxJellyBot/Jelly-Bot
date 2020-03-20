@@ -16,7 +16,7 @@ class AutoReplyRankingChannelView(ChannelOidRequiredMixin, TemplateResponseMixin
         limit = get_limit(request.GET, Website.AutoReply.RankingMaxCount)
 
         return render_template(
-            request, _("Auto-Reply ranking in {}").format(channel_data.model.id), "ar/rk-channel.html",
+            request, _("Auto-Reply ranking in {}").format(channel_data.model.id), "ar/rk-main.html",
             {
                 "rk_module": AutoReplyManager.get_module_count_stats(channel_data.model.id, limit),
                 "rk_ukw": AutoReplyManager.get_unique_keyword_count_stats(channel_data.model.id, limit),
@@ -32,7 +32,7 @@ class AutoReplyRankingChannelListView(LoginRequiredMixin, TemplateResponseMixin,
         root_uid = get_root_oid(request)
 
         return render_template(
-            request, _("Auto-Reply ranking channel list"), "ar/rk-list.html",
+            request, _("Auto-Reply ranking channel list"), "ar/rk-chlist.html",
             {
                 "channel_list": ProfileManager.get_user_channel_profiles(
                     root_uid, inside_only=True, accessbible_only=True)
