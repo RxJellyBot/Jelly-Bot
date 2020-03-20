@@ -24,17 +24,16 @@
                 </ul>
             </div>
         </div>
-        <form id="createProfile" method="post">
+        <form method="post">
+            <input type="hidden" name="x-ChannelOid" id="channelOid" value="{{ channel_oid }}">
             {% csrf_token %}
             <div class="row">
                 <div class="col-lg-6">
-                    <input type="hidden" name="x-ChannelOid" id="channelOid" value="{{ channel_oid }}">
-
-                    {% include "account/channel/prof/create-main.html" %}
-                    {% include "account/channel/prof/create-prop.html" %}
+                    {% include "account/channel/prof/ce-main.html" %}
+                    {% include "account/channel/prof/ce-prop.html" %}
                 </div>
                 <div class="col-lg-6">
-                    {% include "account/channel/prof/create-perm.html" %}
+                    {% include "account/channel/prof/ce-perm.html" %}
                 </div>
             </div>
             <div class="row text-right">
@@ -46,7 +45,7 @@
     </div>
 {% endblock %}
 {% block ex-script %}
-    {% include "account/channel/prof/create-js.html" %}
+    {% include "account/channel/prof/ce-js.html" %}
     <script src="{% static "js/utils/generator.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/account/profile/create.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/account/profile/ce.js" %}" type="text/javascript"></script>
 {% endblock %}

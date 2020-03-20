@@ -16,7 +16,7 @@ class GetPermissionProfileResult(ModelResult):
 
 
 @dataclass
-class CreatePermissionProfileResult(ModelResult):
+class CreateProfileResult(ModelResult):
     def __init__(self, outcome, model, exception=None):
         """
         :type outcome: WriteOutcome

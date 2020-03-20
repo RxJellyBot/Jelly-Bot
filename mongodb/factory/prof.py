@@ -12,7 +12,7 @@ from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
 from flags import PermissionCategory, PermissionCategoryDefault, PermissionLevel
 from mongodb.factory import ChannelManager
-from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreatePermissionProfileResult
+from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreateProfileResult
 from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
@@ -264,7 +264,7 @@ class ProfileDataManager(BaseCollection):
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
-    def create_default_profile(self, channel_oid: ObjectId) -> CreatePermissionProfileResult:
+    def create_default_profile(self, channel_oid: ObjectId) -> CreateProfileResult:
         default_profile, outcome, ex = self._create_profile_(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_inserted:
@@ -274,12 +274,27 @@ class ProfileDataManager(BaseCollection):
             if not set_success:
                 outcome = WriteOutcome.X_ON_SET_CONFIG
 
-        return CreatePermissionProfileResult(outcome, default_profile, ex)
+        return CreateProfileResult(outcome, default_profile, ex)
 
-    def create_profile(self, kwargs) -> CreatePermissionProfileResult:
+    def create_profile(self, kwargs) -> CreateProfileResult:
+        """
+        Create a profile.
+
+        Uses `kwargs` to construct a `ChannelProfileModel` then insert the model into the database.
+
+        :param kwargs: `dict` to construct a `ChannelProfileModel`.
+        """
         model, outcome, ex = self.insert_one_data(**kwargs)
 
-        return CreatePermissionProfileResult(outcome, model, ex)
+        return CreateProfileResult(outcome, model, ex)
+
+    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
+        """
+        Update a profile using the data in `update_dict`.
+
+        :param update_dict: `dict` of data to be updated. Key is the field key of `ChannelProfileModel`.
+        """
+        return self.update_many_outcome({OID_KEY: profile_oid}, {"$set": update_dict})
 
     def delete_profile(self, profile_oid: ObjectId):
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
@@ -316,9 +331,32 @@ class ProfileManager:
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    # Used for sanitizing webpage form data
+    # noinspection PyTypeChecker
+    @param_type_ensure
+    def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
+        """
+        Register a new profile with the user's oid and the other args with py key for the model.
+
+        :param root_uid: User's OID.
+        :param profile_kwargs: A `dict` with py keys for creating `ChannelProfileModel`.
+        :return: Newly constructed model.
+        """
+        create_result = self._prof.create_profile(profile_kwargs)
+        if create_result.success:
+            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+
+        return create_result.model
+
     # noinspection PyMethodMayBeStatic
-    def process_profile_kwargs(self, profile_kwargs: dict):
+    def process_create_profile_kwargs(self, profile_kwargs: dict):
+        """
+        Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
+
+        After processing, it returns a `dict` with field keys which can be used to create a `ChannelProfileModel`.
+
+        :param profile_kwargs: A `dict` to be processed.
+        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`.
+        """
         # --- Collate `PermissionLevel`
         perm_lv = PermissionLevel.cast(profile_kwargs["PermissionLevel"])
         profile_kwargs["PermissionLevel"] = perm_lv
@@ -347,14 +385,31 @@ class ProfileManager:
 
         return profile_kwargs
 
-    # noinspection PyTypeChecker
-    @param_type_ensure
-    def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
-        create_result = self._prof.create_profile(profile_kwargs)
-        if create_result.success:
-            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+    # noinspection PyMethodMayBeStatic
+    def process_edit_profile_kwargs(self, profile_kwargs: dict):
+        """
+        Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
-        return create_result.model
+        After processing, it returns a `dict` with json keys which can be used as the operand of `$set` for updating.
+
+        :param profile_kwargs: A `dict` to be processed.
+        :return: a `dict` with py keys which can be used as the operand of `$set` for updating.
+        """
+        ret = {}
+
+        for k, v in profile_kwargs.items():
+            jk = ChannelProfileModel.field_to_json_key(k)
+            if jk:
+                ret[jk] = ChannelProfileModel.get_field_class(k).cast_to_desired_type(v)
+
+        return ret
+
+    @param_type_ensure
+    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
+        return self._prof.update_profile(profile_oid, update_dict)
+
+    def update_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
+        return self._conn.change_star(channel_oid, root_oid, star)
 
     @param_type_ensure
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
@@ -377,7 +432,7 @@ class ProfileManager:
             return []
 
     # noinspection PyMethodMayBeStatic
-    def highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:
+    def get_highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:
         current_max = PermissionLevel.lowest()
 
         for profile in profiles:
@@ -479,7 +534,7 @@ class ProfileManager:
                 if perm_grant and perm:
                     ret.add(perm)
 
-            highest_perm_lv = self.highest_permission_level(profiles)
+            highest_perm_lv = self.get_highest_permission_level(profiles)
             ret = ret.union(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv))
 
         return ret
@@ -498,7 +553,7 @@ class ProfileManager:
     def get_attachable_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         profiles = self.get_user_profiles(channel_oid, root_uid)
         exist_perm = self.get_permissions(profiles)
-        highest_perm = self.highest_permission_level(profiles)
+        highest_perm = self.get_highest_permission_level(profiles)
         attachables = {prof.id: prof
                        for prof in self._prof.get_attachable_profiles(channel_oid, exist_perm, highest_perm)}
 
@@ -525,9 +580,6 @@ class ProfileManager:
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
-
-    def change_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
-        return self._conn.change_star(channel_oid, root_oid, star)
 
     @param_type_ensure
     def attach_profile(self, user_oid: ObjectId, channel_oid: ObjectId, profile_oid: ObjectId) \

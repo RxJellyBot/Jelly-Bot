@@ -17,3 +17,9 @@ class ColorField(BaseField):
     @classmethod
     def none_obj(cls):
         return ColorFactory.BLACK
+
+    def cast_to_desired_type(self, value):
+        if isinstance(value, str):
+            value = ColorFactory.from_hex(value).color_int
+
+        return super().cast_to_desired_type(value)

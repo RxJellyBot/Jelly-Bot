@@ -1,5 +1,5 @@
 import abc
-from typing import MutableMapping
+from typing import MutableMapping, Optional
 
 from bson import ObjectId
 
@@ -234,49 +234,28 @@ class Model(MutableMapping, abc.ABC):
         return d
 
     @classmethod
-    def model_fields(cls) -> set:
-        if not hasattr(cls, "_CacheField") or cls.__qualname__ not in cls._CacheField:
-            s = {k for k, v in cls.__dict__.items() if cls._valid_model_key_(k)}
-            if cls.WITH_OID:
-                s.add("Id")
+    def _init_cache_to_field_(cls):
+        d = {v.key: fk for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
+        if cls.WITH_OID:
+            d[OID_KEY] = "Id"
 
-            cls._CacheField = {cls.__qualname__: s}
-
-        return cls._CacheField[cls.__qualname__]
+        cls._CacheToField = {cls.__qualname__: d}
 
     @classmethod
-    def model_json(cls) -> set:
-        if not hasattr(cls, "_CacheJson") or cls.__qualname__ not in cls._CacheJson:
-            s = {v.key for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
-            if cls.WITH_OID:
-                s.add(cls.Id.key)
+    def _init_cache_field_(cls):
+        s = {k for k, v in cls.__dict__.items() if cls._valid_model_key_(k)}
+        if cls.WITH_OID:
+            s.add("Id")
 
-            cls._CacheJson = {cls.__qualname__: s}
-
-        return cls._CacheJson[cls.__qualname__]
+        cls._CacheField = {cls.__qualname__: s}
 
     @classmethod
-    def cast_model(cls, obj):
-        """Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`."""
-        if obj is not None and not isinstance(obj, cls):
-            return cls(**obj, from_db=True)
+    def _init_cache_json_(cls):
+        s = {v.key for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
+        if cls.WITH_OID:
+            s.add(cls.Id.key)
 
-        return obj
-
-    @classmethod
-    def json_key_to_field(cls, json_key) -> str:
-        if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
-            d = {v.key: fk for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
-            if cls.WITH_OID:
-                d[OID_KEY] = "Id"
-
-            cls._CacheToField = {cls.__qualname__: d}
-
-        return cls._CacheToField[cls.__qualname__].get(json_key)
-
-    @classmethod
-    def generate_default(cls, **kwargs):
-        return cls(**kwargs)
+        cls._CacheJson = {cls.__qualname__: s}
 
     @classmethod
     def _valid_model_key_(cls, fk):
@@ -308,9 +287,62 @@ class Model(MutableMapping, abc.ABC):
 
         return tmp
 
+    @classmethod
+    def model_fields(cls) -> set:
+        """Get the set of all available field keys."""
+        if not hasattr(cls, "_CacheField") or cls.__qualname__ not in cls._CacheField:
+            cls._init_cache_field_()
+
+        return cls._CacheField[cls.__qualname__]
+
+    @classmethod
+    def model_json(cls) -> set:
+        """Get the set of all available json keys."""
+        if not hasattr(cls, "_CacheJson") or cls.__qualname__ not in cls._CacheJson:
+            cls._init_cache_json_()
+
+        return cls._CacheJson[cls.__qualname__]
+
+    @classmethod
+    def json_key_to_field(cls, json_key) -> Optional[str]:
+        """Get the corresponding field key using the provided json key. Return `None` if not found."""
+        if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
+            cls._init_cache_to_field_()
+
+        return cls._CacheToField[cls.__qualname__].get(json_key)
+
+    @classmethod
+    def field_to_json_key(cls, field_key) -> Optional[str]:
+        """Get the corresponding json key using the provided field key. Return `None` if not found."""
+        if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
+            cls._init_cache_to_field_()
+
+        d = cls._CacheToField[cls.__qualname__]
+        for jk, fk in d.items():
+            if fk == field_key:
+                return jk
+
+        return None
+
+    @classmethod
+    def get_field_class(cls, field_key) -> BaseField:
+        return getattr(cls, field_key)
+
+    @classmethod
+    def generate_default(cls, **kwargs):
+        return cls(**kwargs)
+
     @property
     def created_at(self) -> str:
         return localtime(self.id.generation_time).strftime("%Y-%m-%d %H:%M:%S")
+
+    @classmethod
+    def cast_model(cls, obj):
+        """Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`."""
+        if obj is not None and not isinstance(obj, cls):
+            return cls(**obj, from_db=True)
+
+        return obj
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self._dict_}>"

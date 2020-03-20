@@ -79,7 +79,7 @@
         <div class="row">
             <div class="col-lg-12">
                 {% if not is_default %}
-                    <form class="profile-delete" method="POST">
+                    <form class="profile-delete d-inline mr-2" method="POST">
                         {% csrf_token %}
                         <input type="hidden" value="{{ entry.root_oid }}" name="uid">
                         <input type="hidden" value="delete" name="action">
@@ -88,6 +88,9 @@
                         </button>
                     </form>
                 {% endif %}
+                <a class="btn btn-outline-success" href="{% url "account.profile.edit" channel_oid=profile_data.channel_oid profile_oid=profile_data.id %}">
+                    {% trans "Edit" %}
+                </a>
             </div>
         </div>
         <hr>

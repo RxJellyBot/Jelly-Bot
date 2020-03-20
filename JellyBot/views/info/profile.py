@@ -14,7 +14,7 @@ from extutils import safe_cast
 from flags import PermissionCategory, WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.helper import ProfileHelper
-from JellyBot.utils import get_root_oid
+from JellyBot.utils import get_root_oid, get_profile_data
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.components.mixin import LoginRequiredMixin
 
@@ -92,44 +92,39 @@ class InfoPageActionControl(Enum):
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyMethodMayBeStatic
     def get(self, request, **kwargs):
-        profile_oid_str = kwargs.get("profile_oid", "")
-        profile_oid = safe_cast(profile_oid_str, ObjectId)
+        profile_result = get_profile_data(kwargs)
 
-        profile_data = ProfileManager.get_profile(profile_oid)
-
-        if not profile_data:
+        if not profile_result.ok:
             return WebsiteErrorView.website_error(
-                request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid_str})
+                request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_result.oid_org})
 
         root_oid = get_root_oid(request)
+        profile_model = profile_result.model
 
-        channel_model = ChannelManager.get_channel_oid(profile_data.channel_oid)
+        channel_model = ChannelManager.get_channel_oid(profile_model.channel_oid)
         permissions = ProfileManager.get_user_permissions(channel_model.id, root_oid)
 
         # noinspection PyTypeChecker
         return render_template(
-            request, _("Profile Info - {}").format(profile_data.name), "info/profile.html", {
-                "profile_data": profile_data,
+            request, _("Profile Info - {}").format(profile_model.name), "info/profile.html", {
+                "profile_data": profile_model,
                 "profile_controls":
-                    ProfileHelper.get_user_profile_controls(channel_model, profile_oid, root_oid, permissions),
+                    ProfileHelper.get_user_profile_controls(channel_model, profile_model.id, root_oid, permissions),
                 "perm_cats": list(PermissionCategory),
                 "perm_cats_green": permissions,
-                "is_default": profile_oid == channel_model.config.default_profile_oid
+                "is_default": profile_model.id == channel_model.config.default_profile_oid
             }, nav_param=kwargs)
 
     # noinspection PyMethodMayBeStatic
     def post(self, request, **kwargs):
         sender_oid = get_root_oid(request)
 
-        profile_oid_str = kwargs.get("profile_oid", "")
-        profile_oid = safe_cast(profile_oid_str, ObjectId)
+        profile_result = get_profile_data(kwargs)
 
-        profile_data = ProfileManager.get_profile(profile_oid)
-
-        if not profile_data:
+        if not profile_result.ok:
             return HttpResponse(status=404)
 
-        channel_model = ChannelManager.get_channel_oid(profile_data.channel_oid)
+        channel_model = ChannelManager.get_channel_oid(profile_result.model.channel_oid)
 
         # --- Get form data
 
@@ -144,6 +139,8 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
         permissions = ProfileManager.get_user_permissions(channel_model.id, sender_oid)
 
         # --- Execute corresponding action
+
+        profile_oid = profile_result.model.id
 
         if action == InfoPageActionControl.DETACH:
             return InfoPageActionControl.action_detach(request, sender_oid, target_uid, permissions, profile_oid)
