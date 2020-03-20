@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Set
 
 from bson import ObjectId
 
@@ -17,14 +17,14 @@ class ProfileControlEntry:
 
 class ProfileHelper:
     @staticmethod
-    def get_user_profile_controls(channel_model, profile_oid: ObjectId, requester_oid: ObjectId) \
+    def get_user_profile_controls(
+            channel_model, profile_oid: ObjectId, requester_oid: ObjectId, permissions: Set[PermissionCategory]) \
             -> List[ProfileControlEntry]:
         ret = []
 
         names = IdentitySearcher.get_batch_user_name(
             ProfileManager.get_profile_user_oids(profile_oid), channel_model, on_not_found=None)
 
-        permissions = ProfileManager.get_user_permissions(channel_model.id, requester_oid)
         remove_self = PermissionCategory.PRF_CONTROL_SELF in permissions
         remove_member = PermissionCategory.PRF_CONTROL_MEMBER in permissions
         is_default = channel_model.config.default_profile_oid == profile_oid

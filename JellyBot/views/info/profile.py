@@ -101,15 +101,19 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
             return WebsiteErrorView.website_error(
                 request, WebsiteError.PROFILE_NOT_FOUND, {"profile_oid": profile_oid_str})
 
+        root_oid = get_root_oid(request)
+
         channel_model = ChannelManager.get_channel_oid(profile_data.channel_oid)
+        permissions = ProfileManager.get_user_permissions(channel_model.id, root_oid)
 
         # noinspection PyTypeChecker
         return render_template(
             request, _("Profile Info - {}").format(profile_data.name), "info/profile.html", {
                 "profile_data": profile_data,
                 "profile_controls":
-                    ProfileHelper.get_user_profile_controls(channel_model, profile_oid, get_root_oid(request)),
+                    ProfileHelper.get_user_profile_controls(channel_model, profile_oid, root_oid, permissions),
                 "perm_cats": list(PermissionCategory),
+                "perm_cats_green": permissions,
                 "is_default": profile_oid == channel_model.config.default_profile_oid
             }, nav_param=kwargs)
 
