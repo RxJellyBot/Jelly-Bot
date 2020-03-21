@@ -1,0 +1,197 @@
+from dataclasses import dataclass, field
+from typing import List, Union
+
+from bson import ObjectId
+from django.utils.translation import gettext_lazy as _
+
+from extutils.color import ColorFactory, Color
+from flags import CommandScopeCollection, BotFeature, ProfilePermission, PermissionLevel, ProfilePermissionDefault
+from msghandle.models import TextMessageEventObject, HandledMessageEventText
+from models import ChannelProfileModel
+from mongodb.factory import ProfileManager
+
+from ._base_ import CommandNode
+
+cmd = CommandNode(
+    codes=["pf", "prof", "profile"], order_idx=250, name=_("Profile Management"),
+    description=_("Controls related to profile management."))
+
+cmd_add = cmd.new_child_node(
+    codes=["cr", "c", "n", "new"], name=_("Create"),
+    description=_(
+        "Create a profile and attach it to self.\n\n"
+        "## Create\n\n"
+        "Parameter will be applied if not specified:\n\n"
+        "- Color: `{}`"
+        "- Permission: `{}`\n\n"
+        "- Permission Level: `{}`").format(
+        ColorFactory.DEFAULT, ProfilePermission.NORMAL, PermissionLevel.NORMAL))
+
+
+@dataclass
+class PermissionParseResult:
+    valid: List[ProfilePermission] = field(default_factory=list)  # Able to be set on the profile
+    invalid: List[ProfilePermission] = field(default_factory=list)  # Unable to be set on the profile
+    skipped: List[str] = field(default_factory=list)  # Unparsable strings
+
+    @property
+    def has_valid(self) -> bool:
+        return len(self.valid) > 0
+
+    @property
+    def has_invalid(self) -> bool:
+        return len(self.invalid) > 0
+
+    @property
+    def has_skipped(self) -> bool:
+        return len(self.skipped) > 0
+
+
+def _parse_name_(channel_oid: ObjectId, name: str):
+    if ProfileManager.is_name_available(channel_oid, name):
+        return name
+    else:
+        return None
+
+
+def _parse_color_(color: Union[str, Color]):
+    if isinstance(color, str):
+        try:
+            return ColorFactory.from_hex(color)
+        except ValueError:
+            return None
+    elif isinstance(color, Color):
+        return color
+    else:
+        raise TypeError()
+
+
+def _parse_permission_(permission: str, max_perm_lv: PermissionLevel) -> PermissionParseResult:
+    result = PermissionParseResult()
+
+    permission = permission.split(",")
+    controllable_permissions = ProfilePermissionDefault.get_overridden_permissions(max_perm_lv)
+
+    for perm in permission:
+        perm = perm.strip()
+
+        try:
+            perm = ProfilePermission.cast(perm)
+        except Exception:
+            result.skipped.append(perm)
+            continue
+
+        if perm in controllable_permissions:
+            result.valid.append(perm)
+        else:
+            result.invalid.append(perm)
+
+    return result
+
+
+def _parse_permission_level_(perm_lv: Union[str, PermissionLevel]):
+    return PermissionLevel.cast(perm_lv, silent_fail=True)
+
+
+_help_name_ = _("Name of the profile.")
+_help_color_ = _("HEX color code for the profile.<br>Example: `81D8D0`")
+_help_permission_ = _("Permission to be granted for the profile.<br>"
+                      "If multiple, use comma to separate them.<br>"
+                      "Check documentation for the permission code.<br>"
+                      "Example: `1,401,403`")
+_help_permission_lv_ = _("Permission level of the profile.<br>"
+                         "Check documentation for the permission level.<br>"
+                         "Example: `0`")
+
+
+@cmd_add.command_function(
+    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=1,
+    arg_help=[_help_name_, _help_color_]
+)
+def profile_create_name(
+        e: TextMessageEventObject, name: str):
+    return profile_create_internal(e, name, ColorFactory.DEFAULT, [ProfilePermission.NORMAL], PermissionLevel.NORMAL)
+
+
+@cmd_add.command_function(
+    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=2,
+    arg_help=[_help_name_, _help_color_]
+)
+def profile_create_name_color(
+        e: TextMessageEventObject, name: str, color: str):
+    return profile_create_internal(e, name, color, [ProfilePermission.NORMAL], PermissionLevel.NORMAL)
+
+
+@cmd_add.command_function(
+    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=4,
+    arg_help=[_help_name_, _help_color_, _help_permission_, _help_permission_lv_]
+)
+def profile_create_spec_all(
+        e: TextMessageEventObject, name: str, color: str, permission: str, perm_lv: str):
+    return profile_create_internal(e, name, color, permission, perm_lv)
+
+
+# noinspection PyTypeChecker
+def profile_create_internal(
+        e: TextMessageEventObject, name: str, color: Union[str, Color],
+        permission: Union[str, List[ProfilePermission]], perm_lv: Union[str, PermissionLevel]):
+    # --- Parse name
+
+    prof_name = _parse_name_(e.channel_oid, name)
+    if not prof_name:
+        return [HandledMessageEventText(content=_("The profile name `{}` is unavailable in this channel. "
+                                                  "Please choose a different one.").format(name))]
+
+    # --- Parse color
+
+    color = _parse_color_(color)
+    if not color:
+        return [HandledMessageEventText(
+            content=_("Failed to parse color. Make sure it is in the format of `81D8D0`."))]
+
+    # --- Parse permission level
+
+    perm_lv = _parse_permission_level_(perm_lv)
+    if not perm_lv:
+        return [HandledMessageEventText(
+            content=_("Failed to parse permission level. Make sure it is a valid level or check the documentation."))]
+
+    # --- Parse permission
+
+    msg_on_hold = []
+    if isinstance(permission, str):
+        profiles = ProfileManager.get_user_profiles(e.channel_model.id, e.user_model.id)
+        max_perm_lv = ProfileManager.get_highest_permission_level(profiles)
+
+        parsed_perm = _parse_permission_(permission, max_perm_lv)
+        if parsed_perm.has_skipped:
+            msg_on_hold.append(HandledMessageEventText(
+                content=_("Strings below were skipped because it cannot be understood as permission:\n{}").format(
+                    "\n".join(parsed_perm.skipped))))
+        if parsed_perm.has_invalid:
+            msg_on_hold.append(HandledMessageEventText(
+                content=_("Permissions below were not be able to set on the profile "
+                          "because your permission level is insufficient:\n{}").format(
+                    "\n".join([str(p) for p in parsed_perm.invalid]))))
+        if not parsed_perm.has_valid:
+            return [HandledMessageEventText(content=_("Profile permission parsing failed."))] + msg_on_hold
+
+        permission = parsed_perm.valid
+
+    # --- Process permission
+
+    perm_dict = {perm.code_str: perm in permission for perm in list(ProfilePermission)}
+
+    # --- Create Model
+
+    mdl = ChannelProfileModel(
+        ChannelOid=e.channel_model.id, Name=prof_name, Color=color, Permission=perm_dict, PermissionLevel=perm_lv)
+    mdl = ProfileManager.register_new_model(e.user_model.id, mdl)
+
+    if mdl:
+        return [HandledMessageEventText(content=_("Profile created and attached."))] + msg_on_hold
+    else:
+        return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold

@@ -20,6 +20,13 @@ class BotFeature(FlagDoubleEnum):
                 1012 - List (All)
                 1013 - Delete
                 1019 - List (Keyword)
+            102 - Profile
+                1021 - Create
+                1022 - Query
+                1023 - List
+                1024 - Attach
+                1025 - Detach
+                1026 - Delete
 
         11 - Sub
             110 - Information
@@ -92,6 +99,19 @@ class BotFeature(FlagDoubleEnum):
         1013, _("Text / Timer / Delete"), _("Delete a timer.")
     TXT_TMR_GET = \
         1019, _("Text / Timer / List (Keyword)"), _("Get the timer(s) with the designated keyword.")
+
+    TXT_PF_CREATE = \
+        1021, _("Text / Profile / Create"), _("Add a timer.")
+    TXT_PF_QUERY = \
+        1022, _("Text / Profile / Query"), _("List all timers.")
+    TXT_PF_LIST = \
+        1023, _("Text / Profile / List"), _("List all timers.")
+    TXT_PF_ATTACH = \
+        1024, _("Text / Profile / Attach"), _("Delete a timer.")
+    TXT_PF_DETACH = \
+        1025, _("Text / Profile / Detach"), _("Get the timer(s) with the designated keyword.")
+    TXT_PF_DELETE = \
+        1026, _("Text / Profile / Delete"), _("Get the timer(s) with the designated keyword.")
 
     TXT_INFO_ID = \
         1101, _("Text / Information / Check IDs"), _("Check the ID of current channel and self.")

@@ -1,7 +1,7 @@
 # noinspection PyUnresolvedReferences
 from .artype import AutoReplyContentType
 # noinspection PyUnresolvedReferences
-from .perm import PermissionCategory, PermissionCategoryDefault, PermissionLevel
+from .perm import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 # noinspection PyUnresolvedReferences
 from .platforms import Platform
 # noinspection PyUnresolvedReferences

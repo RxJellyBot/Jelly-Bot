@@ -11,7 +11,6 @@ from models.field import (
 )
 
 from ._base import Model, ModelDefaultValueExt
-from .ar import AutoReplyModuleModel
 
 
 class ExtraContentModel(Model):

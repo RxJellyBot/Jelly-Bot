@@ -3,7 +3,7 @@ from typing import List, Set
 
 from bson import ObjectId
 
-from flags import PermissionCategory
+from flags import ProfilePermission
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.helper import IdentitySearcher
 from models import ChannelProfileModel
@@ -21,19 +21,22 @@ class ChannelProfileEntry:
     profile: ChannelProfileModel
     owner_names: List[str]
 
+    def __post_init__(self):
+        self.owner_names = sorted(self.owner_names)
+
 
 class ProfileHelper:
     @staticmethod
     def get_user_profile_controls(
-            channel_model, profile_oid: ObjectId, requester_oid: ObjectId, permissions: Set[PermissionCategory]) \
+            channel_model, profile_oid: ObjectId, requester_oid: ObjectId, permissions: Set[ProfilePermission]) \
             -> List[ProfileControlEntry]:
         ret = []
 
         names = IdentitySearcher.get_batch_user_name(
             ProfileManager.get_profile_user_oids(profile_oid), channel_model, on_not_found=None)
 
-        remove_self = PermissionCategory.PRF_CONTROL_SELF in permissions
-        remove_member = PermissionCategory.PRF_CONTROL_MEMBER in permissions
+        remove_self = ProfilePermission.PRF_CONTROL_SELF in permissions
+        remove_member = ProfilePermission.PRF_CONTROL_MEMBER in permissions
         is_default = channel_model.config.default_profile_oid == profile_oid
 
         for uid, name in sorted(names.items(), key=lambda item: item[1]):

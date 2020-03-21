@@ -198,6 +198,10 @@ def _construct_docs_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("API Command"), link=reverse("page.doc.code.api"), parent=docs_parent))
     docs_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("Execode"), link=reverse("page.doc.code.excde"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavHeader, label=_("Profile"), parent=docs_parent))
+    docs_parent.add_item(nav_items_factory(
+        NavEntry, current_path, label=_("Permission"), link=reverse("page.doc.prof.perm"), parent=docs_parent))
 
     # Hidden Items
     __attach__(

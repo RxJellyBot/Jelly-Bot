@@ -16,7 +16,7 @@ class ColorField(BaseField):
 
     @classmethod
     def none_obj(cls):
-        return ColorFactory.BLACK
+        return ColorFactory.DEFAULT
 
     def cast_to_desired_type(self, value):
         if isinstance(value, str):

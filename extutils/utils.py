@@ -92,8 +92,8 @@ def str_reduce_length(s: str, max_: int, escape_html=False):
     return s
 
 
-def list_insert_in_between(l: list, insert_obj):
-    ret = l.copy()
+def list_insert_in_between(lst: list, insert_obj):
+    ret = lst.copy()
 
     for i in range(1, len(ret) * 2 - 2, 2):
         ret[i:i] = [insert_obj]
@@ -101,10 +101,10 @@ def list_insert_in_between(l: list, insert_obj):
     return ret
 
 
-def rotate_list(l: List, n: int):
+def rotate_list(lst: List, n: int):
     """`n` means elements to rotate from left to right"""
     n = int(n)
-    return l[n:] + l[:n]
+    return lst[n:] + lst[:n]
 
 
 def char_description(c: str):

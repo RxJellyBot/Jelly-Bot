@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils import safe_cast
-from flags import PermissionCategory, WebsiteError
+from flags import ProfilePermission, WebsiteError
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.helper import ProfileHelper
 from JellyBot.utils import get_root_oid, get_profile_data
@@ -49,9 +49,9 @@ class InfoPageActionControl(Enum):
         target_self = sender_oid == target_uid
 
         # Permission Check
-        if target_self and PermissionCategory.PRF_CONTROL_SELF in permissions:
+        if target_self and ProfilePermission.PRF_CONTROL_SELF in permissions:
             pass
-        elif PermissionCategory.PRF_CONTROL_MEMBER in permissions:
+        elif ProfilePermission.PRF_CONTROL_MEMBER in permissions:
             pass
         else:
             return HttpResponse(status=403)
@@ -110,7 +110,7 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "profile_data": profile_model,
                 "profile_controls":
                     ProfileHelper.get_user_profile_controls(channel_model, profile_model.id, root_oid, permissions),
-                "perm_cats": list(PermissionCategory),
+                "perm_cats": list(ProfilePermission),
                 "is_default": profile_model.id == channel_model.config.default_profile_oid
             }, nav_param=kwargs)
 

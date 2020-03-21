@@ -2,7 +2,7 @@ from abc import ABC
 
 from bson import ObjectId
 
-from flags import PermissionCategory
+from flags import ProfilePermission
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.static import param
 from JellyBot.api.responses.mixin import (
@@ -79,9 +79,9 @@ class ProfileResponseBase(
     @property
     def permitted(self):
         if self._target_self:
-            return PermissionCategory.PRF_CONTROL_SELF in self._permissions
+            return ProfilePermission.PRF_CONTROL_SELF in self._permissions
         else:
-            return PermissionCategory.PRF_CONTROL_MEMBER in self._permissions
+            return ProfilePermission.PRF_CONTROL_MEMBER in self._permissions
 
 
 class ProfileAttachResponse(ProfileResponseBase):

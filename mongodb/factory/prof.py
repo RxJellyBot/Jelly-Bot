@@ -10,7 +10,7 @@ from pymongo import UpdateOne
 from extutils.color import ColorFactory
 from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
-from flags import PermissionCategory, PermissionCategoryDefault, PermissionLevel
+from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreateProfileResult
 from mongodb.utils import CursorWithCount
@@ -212,7 +212,7 @@ class ProfileDataManager(BaseCollection):
 
         cmds = []
 
-        for perm_cat in PermissionCategory:
+        for perm_cat in ProfilePermission:
             perm_key = f"{ChannelProfileModel.Permission.key}.{perm_cat.code}"
 
             for data in self.find_cursor_with_count({perm_key: {"$exists": False}}, parse_cls=ChannelProfileModel):
@@ -221,7 +221,7 @@ class ProfileDataManager(BaseCollection):
                         {OID_KEY: data.id},
                         {"$set": {
                             perm_key:
-                                perm_cat in PermissionCategoryDefault.get_overridden_permissions(data.permission_level)
+                                perm_cat in ProfilePermissionDefault.get_overridden_permissions(data.permission_level)
                         }}
                     )
                 )
@@ -268,14 +268,14 @@ class ProfileDataManager(BaseCollection):
             create_result.model, ex)
 
     def get_attachable_profiles(
-            self, channel_oid: ObjectId, existing_permissions: Set[PermissionCategory],
+            self, channel_oid: ObjectId, existing_permissions: Set[ProfilePermission],
             highest_perm_lv: PermissionLevel) \
             -> CursorWithCount:
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
 
         # noinspection PyTypeChecker
-        limited_permissions = set(PermissionCategory) \
-            .difference(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv)) \
+        limited_permissions = set(ProfilePermission) \
+            .difference(ProfilePermissionDefault.get_overridden_permissions(highest_perm_lv)) \
             .difference(existing_permissions)
         for perm in limited_permissions:
             filter_[f"{ChannelProfileModel.Permission.key}.{perm.code}"] = False
@@ -303,6 +303,18 @@ class ProfileDataManager(BaseCollection):
         :param kwargs: `dict` to construct a `ChannelProfileModel`.
         """
         model, outcome, ex = self.insert_one_data(**kwargs)
+
+        return CreateProfileResult(outcome, model, ex)
+
+    def create_profile_model(self, model: ChannelProfileModel) -> CreateProfileResult:
+        """
+        Create a profile.
+
+        Insert the passed-in `model` into the database.
+
+        :param model: `ChannelProfileModel` to be inserted.
+        """
+        outcome, ex = self.insert_one_model(model)
 
         return CreateProfileResult(outcome, model, ex)
 
@@ -365,6 +377,22 @@ class ProfileManager:
 
         return create_result.model
 
+    # noinspection PyTypeChecker
+    @param_type_ensure
+    def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
+        """
+        Register a new profile with the user's oid and the constructed `ChannelProfileModel`.
+
+        :param root_uid: User's OID.
+        :param model: Constructed `ChannelProfileModel` to be inserted.
+        :return: Newly constructed model.
+        """
+        create_result = self._prof.create_profile_model(model)
+        if create_result.success:
+            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+
+        return create_result.model
+
     # noinspection PyMethodMayBeStatic
     def process_create_profile_kwargs(self, profile_kwargs: dict):
         """
@@ -388,11 +416,11 @@ class ProfileManager:
                 del profile_kwargs[k]
 
         # Fill default overriden permissions by permission level
-        for perm in PermissionCategoryDefault.get_overridden_permissions(perm_lv):
+        for perm in ProfilePermissionDefault.get_overridden_permissions(perm_lv):
             perm_dict[perm.code_str] = True
 
         # Fill the rest of the permissions
-        for perm_cat in PermissionCategory:
+        for perm_cat in ProfilePermission:
             if perm_cat.code_str not in perm_dict:
                 perm_dict[perm_cat.code_str] = False
 
@@ -545,21 +573,21 @@ class ProfileManager:
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         return self._conn.get_users_exist_channel_dict(user_oids)
 
-    def get_permissions(self, profiles: List[ChannelProfileModel]) -> Set[PermissionCategory]:
+    def get_permissions(self, profiles: List[ChannelProfileModel]) -> Set[ProfilePermission]:
         ret = set()
 
         for prof in profiles:
             for perm_cat, perm_grant in prof.permission.items():
-                perm = PermissionCategory.cast(perm_cat, silent_fail=True)
+                perm = ProfilePermission.cast(perm_cat, silent_fail=True)
                 if perm_grant and perm:
                     ret.add(perm)
 
             highest_perm_lv = self.get_highest_permission_level(profiles)
-            ret = ret.union(PermissionCategoryDefault.get_overridden_permissions(highest_perm_lv))
+            ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(highest_perm_lv))
 
         return ret
 
-    def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[PermissionCategory]:
+    def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[ProfilePermission]:
         return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
 
     def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
@@ -594,13 +622,13 @@ class ProfileManager:
         return self._prof.is_name_available(channel_oid, name)
 
     # noinspection PyMethodMayBeStatic
-    def can_ced_profile(self, permissions: Set[PermissionCategory]):
+    def can_ced_profile(self, permissions: Set[ProfilePermission]):
         """CED Stands for Create / Edit / Delete."""
-        return PermissionCategory.PRF_CED in permissions
+        return ProfilePermission.PRF_CED in permissions
 
     # noinspection PyMethodMayBeStatic
-    def can_control_profile_member(self, permissions: Set[PermissionCategory]):
-        return PermissionCategory.PRF_CONTROL_MEMBER in permissions
+    def can_control_profile_member(self, permissions: Set[ProfilePermission]):
+        return ProfilePermission.PRF_CONTROL_MEMBER in permissions
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()

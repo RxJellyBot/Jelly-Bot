@@ -12,15 +12,15 @@ from extutils.color import ColorFactory
 from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.utils import get_post_keys, get_root_oid, get_profile_data
 from JellyBot.components.mixin import PermissionRequiredMixin, LoginRequiredMixin, ChannelOidRequiredMixin
-from flags import PermissionCategoryDefault, PermissionCategory, WebsiteError
+from flags import ProfilePermissionDefault, ProfilePermission, WebsiteError
 from mongodb.factory import ProfileManager
 from mongodb.helper import IdentitySearcher, ProfileHelper
 
 
 class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
     @staticmethod
-    def required_permission() -> Set[PermissionCategory]:
-        return {PermissionCategory.PRF_CED}
+    def required_permission() -> Set[ProfilePermission]:
+        return {ProfilePermission.PRF_CED}
 
     # noinspection PyTypeChecker
     def get(self, request, *args, **kwargs):
@@ -34,9 +34,9 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
             {
                 "channel_oid": channel_data.model.id,
                 "max_perm_lv": max_perm_lv,
-                "perm_cats_controllable": PermissionCategoryDefault.get_overridden_permissions(max_perm_lv),
-                "perm_cats": list(PermissionCategory),
-                "value_color": ColorFactory.BLACK.color_hex
+                "perm_cats_controllable": ProfilePermissionDefault.get_overridden_permissions(max_perm_lv),
+                "perm_cats": list(ProfilePermission),
+                "value_color": ColorFactory.DEFAULT.color_hex
             }, nav_param=kwargs)
 
     # noinspection PyMethodMayBeStatic
@@ -56,8 +56,8 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
 
 class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
     @staticmethod
-    def required_permission() -> Set[PermissionCategory]:
-        return {PermissionCategory.PRF_CONTROL_SELF}
+    def required_permission() -> Set[ProfilePermission]:
+        return {ProfilePermission.PRF_CONTROL_SELF}
 
     def get(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
@@ -85,8 +85,8 @@ class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
 
 class ProfileEditView(PermissionRequiredMixin, TemplateResponseMixin, View):
     @staticmethod
-    def required_permission() -> Set[PermissionCategory]:
-        return {PermissionCategory.PRF_CED}
+    def required_permission() -> Set[ProfilePermission]:
+        return {ProfilePermission.PRF_CED}
 
     def get(self, request, *args, **kwargs):
         profile_result = get_profile_data(kwargs)
@@ -136,5 +136,5 @@ class ProfileListView(LoginRequiredMixin, ChannelOidRequiredMixin, TemplateRespo
             self.request, _("List Profile"), "account/channel/prof/list.html",
             {
                 "prof_entry": ProfileHelper.get_channel_profiles(channel_result.model.id),
-                "perm_cats": list(PermissionCategory)
+                "perm_cats": list(ProfilePermission)
             }, nav_param=kwargs)

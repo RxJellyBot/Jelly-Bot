@@ -2,7 +2,7 @@ from django.urls import path
 
 from .code import (
     InsertOutcomeCodeView, GetOutcomeCodeView, OperationOutcomeCodeView, UpdateOutcomeCodeView,
-    APIActionCodeView, ExecodeCodeView
+    APIActionCodeView, ExecodeCodeView, ProfilePermissionCodeView
 )
 from .terms import TermsExplanationView
 from .botcmd import BotCommandMainView, BotCommandHelpView
@@ -16,5 +16,6 @@ urlpatterns = [
     path('action/api/', APIActionCodeView.as_view(), name="page.doc.code.api"),
     path('action/execode/', ExecodeCodeView.as_view(), name="page.doc.code.excde"),
     path('botcmd/', BotCommandMainView.as_view(), name="page.doc.botcmd.main"),
-    path('botcmd/<str:code>/', BotCommandHelpView.as_view(), name="page.doc.botcmd.cmd")
+    path('botcmd/<str:code>/', BotCommandHelpView.as_view(), name="page.doc.botcmd.cmd"),
+    path('profile/permission/', ProfilePermissionCodeView.as_view(), name="page.doc.prof.perm")
 ]

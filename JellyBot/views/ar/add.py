@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from models import OID_KEY
 from mongodb.factory import ProfileManager
-from flags import Platform, AutoReplyContentType, PermissionCategory
+from flags import Platform, AutoReplyContentType, ProfilePermission
 from JellyBot.systemconfig import AutoReply
 from JellyBot.utils import get_root_oid
 from JellyBot.components.mixin import LoginRequiredMixin
@@ -27,6 +27,6 @@ class AutoReplyAddView(LoginRequiredMixin, TemplateResponseMixin, View):
                 "user_ch_list": ProfileManager.get_user_channel_profiles(
                     root_uid, inside_only=True, accessbible_only=True),
                 "root_uid_str": str(root_uid),
-                "perm_pin_access": PermissionCategory.AR_ACCESS_PINNED_MODULE.code,
+                "perm_pin_access": ProfilePermission.AR_ACCESS_PINNED_MODULE.code,
                 "oid_key": OID_KEY
             })
