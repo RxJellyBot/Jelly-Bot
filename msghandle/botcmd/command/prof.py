@@ -200,6 +200,24 @@ def profile_create_internal(
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold
 
 
+def _output_profile_txt_(result_entries):
+    entries = []
+    for entry in result_entries:
+        profile = entry.profile
+
+        str_ = [f"`{profile.id}` / {profile.name} ({profile.color.color_hex})",
+                f"{_('Detail Link')}: {HostUrl}{reverse('info.profile', kwargs={'profile_oid': profile.id})}"]
+
+        if entry.owner_names:
+            str_.append(f"Owner: {_(', ').join(entry.owner_names)}")
+        else:
+            str_.append(f"{_('Nobody has this profile for now.')}")
+
+        entries.append("\n".join(str_))
+
+    return "\n\n".join(entries)
+
+
 cmd_query = cmd.new_child_node(
     codes=["q", "query"], name=_("Query"),
     description=_("Find profiles which name includes the provided keyword."))
@@ -216,11 +234,21 @@ def profile_query(e: TextMessageEventObject, keyword: str):
     if not result:
         return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
 
-    ret = []
-    for entry in result:
-        profile = entry.profile
-        ret.append(f"`{profile.id}` / {profile.name} ({profile.color.color_hex})\n"
-                   f"{_('Detail Link')}: {HostUrl}{reverse('info.profile', kwargs={'profile_oid': profile.id})}\n"
-                   f"Owner: {_(', ').join(entry.owner_names)}")
+    return [HandledMessageEventText(content=_output_profile_txt_(result))]
 
-    return [HandledMessageEventText(content="\n\n".join(ret))]
+
+cmd_list = cmd.new_child_node(
+    codes=["l", "lst", "list"], name=_("List"),
+    description=_("List all profiles in the channel."))
+
+
+@cmd_list.command_function(
+    feature_flag=BotFeature.TXT_PF_LIST, scope=CommandScopeCollection.GROUP_ONLY
+)
+def profile_list(e: TextMessageEventObject):
+    result = ProfileHelper.get_channel_profiles(e.channel_oid)
+
+    if not result:
+        return [HandledMessageEventText(content=_("No profile in this channel."))]
+
+    return [HandledMessageEventText(content=_output_profile_txt_(result))]
