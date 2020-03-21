@@ -74,11 +74,8 @@ class InfoPageActionControl(Enum):
             messages.warning(request, _("Attempted to delete the default profile which is not allowed."))
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
 
-        # Detach profile from all users
-        ProfileManager.detach_profile(channel_model.id, profile_oid)
-
-        # Delete the profile from the database
-        deleted = ProfileManager.delete_profile(profile_oid)
+        # Detach profile from all users and delete the profile from the database
+        deleted = ProfileManager.delete_profile(channel_model.id, profile_oid)
 
         # Alert messages
         if deleted:

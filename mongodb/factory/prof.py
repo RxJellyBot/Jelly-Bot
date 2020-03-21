@@ -579,6 +579,9 @@ class ProfileManager:
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self._prof.get_profile(profile_oid)
 
+    def get_profile_name(self, name: str) -> Optional[ChannelProfileModel]:
+        return self._prof.get_profile_name(name)
+
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         return self._conn.get_users_exist_channel_dict(user_oids)
 
@@ -654,7 +657,7 @@ class ProfileManager:
     def attach_profile_name(
             self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str, target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
-        prof = self._prof.get_profile_name(profile_name)
+        prof = self.get_profile_name(profile_name)
         if not prof:
             return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
 
@@ -700,7 +703,7 @@ class ProfileManager:
             self, channel_oid: ObjectId, profile_name: str,
             user_oid: Optional[ObjectId] = None, target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
-        prof = self._prof.get_profile_name(profile_name)
+        prof = self.get_profile_name(profile_name)
         if not prof:
             return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
 
@@ -731,8 +734,10 @@ class ProfileManager:
         else:
             return OperationOutcome.X_DETACH_FAILED
 
-    def delete_profile(self, profile_oid: ObjectId) -> bool:
-        """Returns if there's an item deleted."""
+    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId) -> bool:
+        """Returns if the profile is deleted."""
+        self.detach_profile(channel_oid, profile_oid)
+
         return self._prof.delete_profile(profile_oid)
 
 

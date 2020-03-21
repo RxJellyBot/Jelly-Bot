@@ -20,6 +20,7 @@ cmd = CommandNode(
     codes=["pf", "prof", "profile"], order_idx=250, name=_("Profile Management"),
     description=_("Controls related to profile management."))
 
+# region Create
 cmd_create = cmd.new_child_node(
     codes=["cr", "c", "n", "new"], name=_("Create"),
     description=_(
@@ -224,8 +225,10 @@ def _output_profile_txt_(result_entries):
         entries.append("\n".join(str_))
 
     return "\n\n".join(entries)
+# endregion
 
 
+# region Query
 cmd_query = cmd.new_child_node(
     codes=["q", "query"], name=_("Query"),
     description=_("Find profiles which name includes the provided keyword."))
@@ -243,8 +246,10 @@ def profile_query(e: TextMessageEventObject, keyword: str):
         return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
 
     return [HandledMessageEventText(content=_output_profile_txt_(result))]
+# endregion
 
 
+# region List
 cmd_list = cmd.new_child_node(
     codes=["l", "lst", "list"], name=_("List"),
     description=_("List all profiles in the channel."))
@@ -260,8 +265,10 @@ def profile_list(e: TextMessageEventObject):
         return [HandledMessageEventText(content=_("No profile in this channel."))]
 
     return [HandledMessageEventText(content=_output_profile_txt_(result))]
+# endregion
 
 
+# region Attach
 cmd_attach = cmd.new_child_node(
     codes=["a", "attach"], name=_("Attach"),
     description=_("Attach profile to either self or a member."))
@@ -291,10 +298,12 @@ def profile_attach_self(e: TextMessageEventObject, name: str):
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
     return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
+# endregion
 
 
+# region Detach
 cmd_detach = cmd.new_child_node(
-    codes=["d", "detach"], name=_("Detach"),
+    codes=["d", "dt", "detach"], name=_("Detach"),
     description=_("Detach profile from either self or a member."))
 
 
@@ -322,3 +331,37 @@ def profile_detach_self(e: TextMessageEventObject, name: str):
 )
 def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
     return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))
+# endregion
+
+
+# region Delete
+cmd_delete = cmd.new_child_node(
+    codes=["del", "detach"], name=_("Delete"),
+    description=_("Delete profile."))
+
+
+@cmd_delete.command_function(
+    feature_flag=BotFeature.TXT_PF_DELETE, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=1,
+    arg_help=[_help_name_]
+)
+def profile_delete(e: TextMessageEventObject, name: str):
+    # --- Check profile name
+    prof = ProfileManager.get_profile_name(name)
+    if not prof:
+        return [HandledMessageEventText(content=_("Profile with the name `{}` not found.").format(name))]
+
+    # --- Check permission
+
+    profiles = ProfileManager.get_user_profiles(e.channel_model.id, e.user_model.id)
+    user_permissions = ProfileManager.get_permissions(profiles)
+
+    if ProfilePermission.PRF_CED not in user_permissions:
+        return [HandledMessageEventText(content=_("Insufficient permission to delete profile."))]
+
+    deleted = ProfileManager.delete_profile(e.channel_oid, prof.id)
+    if deleted:
+        return [HandledMessageEventText(content=_("Profile deleted."))]
+    else:
+        return [HandledMessageEventText(content=_("Failed to delete the profile."))]
+# endregion
