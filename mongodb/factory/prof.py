@@ -12,7 +12,9 @@ from extutils.checker import param_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mongodb.factory import ChannelManager
-from mongodb.factory.results import WriteOutcome, GetOutcome, GetPermissionProfileResult, CreateProfileResult
+from mongodb.factory.results import (
+    WriteOutcome, GetOutcome, OperationOutcome, GetPermissionProfileResult, CreateProfileResult
+)
 from mongodb.utils import CursorWithCount
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
@@ -37,10 +39,9 @@ class UserProfileManager(BaseCollection):
             unique=True)
 
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
-                            profile_oids: Union[ObjectId, List[ObjectId]]) \
-            -> ChannelProfileConnectionModel:
+                            profile_oids: Union[ObjectId, List[ObjectId]]) -> OperationOutcome:
         """
-        Attach `ChannelPermissionProfileModel` and return the attached data.
+        Attach `ChannelPermissionProfileModel` and return the update result.
         """
         id_ = self.update_one(
             {
@@ -70,12 +71,7 @@ class UserProfileManager(BaseCollection):
                 raise ValueError("`Model` should exists because `upserted_id` not exists, "
                                  "however no corresponding model found.")
 
-        return model
-
-    def user_attch_profiles(self, channel_oid: ObjectId, root_uid: ObjectId, profile_oids: List[ObjectId]):
-        self.update_one({ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
-                         ChannelProfileConnectionModel.UserOid.key: root_uid},
-                        {"$addToSet": {ChannelProfileConnectionModel.ProfileOids.key: {"$each": profile_oids}}})
+        return OperationOutcome.O_COMPLETED
 
     @param_type_ensure
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
@@ -167,6 +163,12 @@ class UserProfileManager(BaseCollection):
 
         return ret
 
+    def is_user_in_channel(self, channel_oid: ObjectId, root_oid: ObjectId) -> bool:
+        return self.count_documents(
+            {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
+             ChannelProfileConnectionModel.UserOid.key: root_oid,
+             ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}}) > 0
+
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
         self.update_one(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
@@ -235,6 +237,9 @@ class ProfileDataManager(BaseCollection):
     def get_profile_dict(self, profile_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelProfileModel]:
         return {model.id: model for model
                 in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
+
+    def get_profile_name(self, name: str) -> Optional[ChannelProfileModel]:
+        return self.find_one_casted({ChannelProfileModel.Name.key: name}, parse_cls=ChannelProfileModel)
 
     def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
@@ -637,10 +642,54 @@ class ProfileManager:
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
+    def _attach_detach_permission_check_(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
+        permissions = self.get_user_permissions(channel_oid, user_oid)
+
+        if target_oid and user_oid != target_oid:
+            return ProfilePermission.PRF_CONTROL_MEMBER in permissions
+        else:
+            return ProfilePermission.PRF_CONTROL_SELF in permissions
+
     @param_type_ensure
-    def attach_profile(self, user_oid: ObjectId, channel_oid: ObjectId, profile_oid: ObjectId) \
-            -> ChannelProfileConnectionModel:
-        return self._conn.user_attach_profile(channel_oid, user_oid, profile_oid)
+    def attach_profile_name(
+            self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str, target_oid: Optional[ObjectId] = None) \
+            -> OperationOutcome:
+        prof = self._prof.get_profile_name(profile_name)
+        if not prof:
+            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
+
+        return self.attach_profile(channel_oid, user_oid, prof.id, target_oid)
+
+    @param_type_ensure
+    def attach_profile(
+            self, channel_oid: ObjectId, user_oid: ObjectId, profile_oid: ObjectId,
+            target_oid: Optional[ObjectId] = None) -> OperationOutcome:
+        """
+        Attach profile to the target.
+
+        If `target_oid` is `None`, then the profile will be attached to self.
+        """
+        if not target_oid:
+            target_oid = user_oid
+        else:
+            if not self._conn.is_user_in_channel(channel_oid, target_oid):
+                return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
+
+        # --- Check permissions
+
+        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+            return OperationOutcome.X_INSUFFICIENT_PERMISSION
+
+        # --- Check profile attachable
+
+        attachable_profiles = self.get_attachable_profiles(channel_oid, target_oid)
+        if not attachable_profiles:
+            return OperationOutcome.X_NO_ATTACHABLE_PROFILES
+
+        if profile_oid not in [prof.id for prof in attachable_profiles]:
+            return OperationOutcome.X_UNATTACHABLE
+
+        return self._conn.user_attach_profile(channel_oid, target_oid, profile_oid)
 
     def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> WriteOutcome:
         """Detach the profile from all users if `user_oid` is `None`."""

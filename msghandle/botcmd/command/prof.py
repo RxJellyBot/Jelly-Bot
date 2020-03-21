@@ -141,6 +141,14 @@ def profile_create_spec_all(
 def profile_create_internal(
         e: TextMessageEventObject, name: str, color: Union[str, Color],
         permission: Union[str, List[ProfilePermission]], perm_lv: Union[str, PermissionLevel]):
+    # --- Check permission
+
+    profiles = ProfileManager.get_user_profiles(e.channel_model.id, e.user_model.id)
+    user_permissions = ProfileManager.get_permissions(profiles)
+
+    if ProfilePermission.PRF_CED not in user_permissions:
+        return [HandledMessageEventText(content=_("Insufficient permission to create profile."))]
+
     # --- Parse name
 
     prof_name = _parse_name_(e.channel_oid, name)
@@ -166,7 +174,6 @@ def profile_create_internal(
 
     msg_on_hold = []
     if isinstance(permission, str):
-        profiles = ProfileManager.get_user_profiles(e.channel_model.id, e.user_model.id)
         max_perm_lv = ProfileManager.get_highest_permission_level(profiles)
 
         parsed_perm = _parse_permission_(permission, max_perm_lv)
@@ -252,3 +259,37 @@ def profile_list(e: TextMessageEventObject):
         return [HandledMessageEventText(content=_("No profile in this channel."))]
 
     return [HandledMessageEventText(content=_output_profile_txt_(result))]
+
+
+cmd_attach = cmd.new_child_node(
+    codes=["a", "attach"], name=_("Attach"),
+    description=_("Attach profile to either self or a member."))
+
+
+@cmd_attach.command_function(
+    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=1,
+    arg_help=[_help_name_]
+)
+def profile_attach_self(e: TextMessageEventObject, name: str):
+    result = ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name)
+
+    if result.is_success:
+        return [HandledMessageEventText(content=_("Profile attached."))]
+    else:
+        return [HandledMessageEventText(content=_("Failed to attach the profile.\nError: {}").format(result))]
+
+
+@cmd_attach.command_function(
+    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=2,
+    arg_help=[_help_name_, _("The OID of the target user to be attached the profile.")]
+)
+def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
+    result = ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid)
+
+    if result.is_success:
+        return [HandledMessageEventText(content=_("Profile attached."))]
+    else:
+        return [HandledMessageEventText(
+            content=_("Failed to attach the profile.\nError: `{}` - {}").format(result.code_str, result.description))]

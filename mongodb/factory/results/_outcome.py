@@ -287,6 +287,10 @@ class OperationOutcome(BaseOutcome):
 
     4xx - Problems related to Permission Control
         401 - Insufficient permission
+        402 - Cannot be attached
+        403 - Profile not found with the name
+        404 - No attachable profiles
+        405 - Target not in channel
 
     5xx - Problems related to Model
         501 - Construction Error
@@ -347,6 +351,18 @@ class OperationOutcome(BaseOutcome):
     X_INSUFFICIENT_PERMISSION = \
         401, _("X: Insufficient Permission"), \
         _("Insufficient permission to execute this operation.")
+    X_UNATTACHABLE = \
+        402, _("X: Unattachable"), \
+        _("This profile cannot be attached to the target.")
+    X_PROFILE_NOT_FOUND_NAME = \
+        403, _("X: Not found (name)"), \
+        _("Profile not found with the given name.")
+    X_NO_ATTACHABLE_PROFILES = \
+        404, _("X: No attachable profiles"), \
+        _("No attachable profiles for the target.")
+    X_TARGET_NOT_IN_CHANNEL = \
+        405, _("X: Target not in channel"), \
+        _("The target to be attached the profile is not in the channel.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")

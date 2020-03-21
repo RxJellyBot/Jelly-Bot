@@ -56,9 +56,6 @@ class ProfileResponseBase(
 
         self._profile_oid = self._param_dict[param.Manage.Profile.PROFILE_OID]
         self._target_oid = self._param_dict[param.Manage.Profile.TARGET] or self._sender_oid
-        self._target_self = self._sender_oid == self._target_oid
-
-        self._permissions = ProfileManager.get_user_permissions(self._channel_oid, self._sender_oid)
 
     def _handle_profile_oid_(self):
         self._profile_oid = safe_cast(self._profile_oid, ObjectId)
@@ -76,29 +73,16 @@ class ProfileResponseBase(
     def is_success(self) -> bool:
         return super().is_success() and self._result.is_success
 
-    @property
-    def permitted(self):
-        if self._target_self:
-            return ProfilePermission.PRF_CONTROL_SELF in self._permissions
-        else:
-            return ProfilePermission.PRF_CONTROL_MEMBER in self._permissions
-
 
 class ProfileAttachResponse(ProfileResponseBase):
     def process_pass(self):
-        if self.permitted:
-            model_result = ProfileManager.attach_profile(self._target_oid, self._channel_oid, self._profile_oid)
-            self._result = OperationOutcome.O_COMPLETED if model_result is not None else OperationOutcome.X_ERROR
-        else:
-            self._result = OperationOutcome.X_INSUFFICIENT_PERMISSION
+        self._result = ProfileManager.attach_profile(
+            self._channel_oid, self._sender_oid, self._profile_oid, self._target_oid)
 
 
 class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
-        if self.permitted:
-            self._result = ProfileManager.detach_profile(self._profile_oid, self._target_oid)
-        else:
-            self._result = WriteOutcome.X_INSUFFICIENT_PERMISSION
+        self._result = ProfileManager.detach_profile(self._profile_oid, self._target_oid)
 
 
 class ProfileNameCheckResponse(
