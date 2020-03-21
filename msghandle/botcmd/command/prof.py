@@ -3,12 +3,15 @@ from typing import List, Union
 
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from extutils.color import ColorFactory, Color
 from flags import CommandScopeCollection, BotFeature, ProfilePermission, PermissionLevel, ProfilePermissionDefault
+from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from models import ChannelProfileModel
 from mongodb.factory import ProfileManager
+from mongodb.helper import ProfileHelper
 
 from ._base_ import CommandNode
 
@@ -16,7 +19,7 @@ cmd = CommandNode(
     codes=["pf", "prof", "profile"], order_idx=250, name=_("Profile Management"),
     description=_("Controls related to profile management."))
 
-cmd_add = cmd.new_child_node(
+cmd_create = cmd.new_child_node(
     codes=["cr", "c", "n", "new"], name=_("Create"),
     description=_(
         "Create a profile and attach it to self.\n\n"
@@ -104,17 +107,17 @@ _help_permission_lv_ = _("Permission level of the profile.<br>"
                          "Example: `0`")
 
 
-@cmd_add.command_function(
+@cmd_create.command_function(
     feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
-    arg_help=[_help_name_, _help_color_]
+    arg_help=[_help_name_]
 )
 def profile_create_name(
         e: TextMessageEventObject, name: str):
     return profile_create_internal(e, name, ColorFactory.DEFAULT, [ProfilePermission.NORMAL], PermissionLevel.NORMAL)
 
 
-@cmd_add.command_function(
+@cmd_create.command_function(
     feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=2,
     arg_help=[_help_name_, _help_color_]
@@ -124,7 +127,7 @@ def profile_create_name_color(
     return profile_create_internal(e, name, color, [ProfilePermission.NORMAL], PermissionLevel.NORMAL)
 
 
-@cmd_add.command_function(
+@cmd_create.command_function(
     feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=4,
     arg_help=[_help_name_, _help_color_, _help_permission_, _help_permission_lv_]
@@ -195,3 +198,29 @@ def profile_create_internal(
         return [HandledMessageEventText(content=_("Profile created and attached."))] + msg_on_hold
     else:
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold
+
+
+cmd_query = cmd.new_child_node(
+    codes=["q", "query"], name=_("Query"),
+    description=_("Find profiles which name includes the provided keyword."))
+
+
+@cmd_query.command_function(
+    feature_flag=BotFeature.TXT_PF_QUERY, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=1,
+    arg_help=[_("Keyword to be used to find the profile. Can be a part of the profile name.")]
+)
+def profile_query(e: TextMessageEventObject, keyword: str):
+    result = ProfileHelper.get_channel_profiles(e.channel_oid, keyword)
+
+    if not result:
+        return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
+
+    ret = []
+    for entry in result:
+        profile = entry.profile
+        ret.append(f"`{profile.id}` / {profile.name} ({profile.color.color_hex})\n"
+                   f"{_('Detail Link')}: {HostUrl}{reverse('info.profile', kwargs={'profile_oid': profile.id})}\n"
+                   f"Owner: {_(', ').join(entry.owner_names)}")
+
+    return [HandledMessageEventText(content="\n\n".join(ret))]

@@ -236,9 +236,13 @@ class ProfileDataManager(BaseCollection):
         return {model.id: model for model
                 in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
 
-    def get_channel_profiles(self, channel_oid: ObjectId):
-        return self.find_cursor_with_count(
-            {ChannelProfileModel.ChannelOid.key: channel_oid}, parse_cls=ChannelProfileModel)
+    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
+        filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
+
+        if partial_keyword:
+            filter_[ChannelProfileModel.Name.key] = {"$regex": partial_keyword, "$options": "i"}
+
+        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
@@ -476,9 +480,9 @@ class ProfileManager:
             return []
 
     @param_type_ensure
-    def get_channel_profiles(self, channel_oid: ObjectId):
+    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
         """Get the existing profiles of a channel."""
-        return self._prof.get_channel_profiles(channel_oid)
+        return self._prof.get_channel_profiles(channel_oid, partial_keyword)
 
     # noinspection PyMethodMayBeStatic
     def get_highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:

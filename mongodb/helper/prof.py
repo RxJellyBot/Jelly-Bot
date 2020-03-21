@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set
+from typing import List, Set, Optional
 
 from bson import ObjectId
 
@@ -55,11 +55,11 @@ class ProfileHelper:
         return ret
 
     @staticmethod
-    def get_channel_profiles(channel_oid: ObjectId) -> List[ChannelProfileEntry]:
+    def get_channel_profiles(channel_oid: ObjectId, partial_name: Optional[str] = None) -> List[ChannelProfileEntry]:
         ret = []
 
         # Get channel profiles. Terminate if no available profiles
-        profs = list(ProfileManager.get_channel_profiles(channel_oid))
+        profs = list(ProfileManager.get_channel_profiles(channel_oid, partial_name))
         if not profs:
             return ret
 
