@@ -18,6 +18,7 @@ from .search import IdentitySearcher
 
 @dataclass
 class UserMessageStatsEntry:
+    user_oid: ObjectId
     user_name: str
     available: bool
     total_count: int
@@ -182,7 +183,7 @@ class MessageStatsDataProcessor:
 
                 entries.append(
                     UserMessageStatsEntry(
-                        user_name=name, category_count=cat_count, available=available_dict[uid],
+                        user_oid=uid, user_name=name, category_count=cat_count, available=available_dict[uid],
                         total_count=sum_, total_count_ratio=sum_ / max_individual_msg if max_individual_msg > 0 else 0)
                 )
 

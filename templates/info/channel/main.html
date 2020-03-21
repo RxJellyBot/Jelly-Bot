@@ -58,6 +58,19 @@
         <hr>
 
         <div class="row">
+            <div class="col mb-3 h3">
+                {% trans "Member list" %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col mb-3">
+                {% include "info/components/ch_member_table.html" with member_list=user_message_data1d.member_stats only %}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
             <div class="col mb-3">
                 <a class="h3 text-info" href="{% url "info.channel.msgstats" channel_oid=channel_data.id %}">
                     {% trans "Message Statistics" %}
@@ -119,4 +132,10 @@
 
 {% block ex-style %}
     <link rel="stylesheet" href="{% static "css/utils/table.css" %}">
+
+    {% include "components/interactive-table-css.html" %}
+{% endblock %}
+
+{% block ex-script %}
+    {% include "components/interactive-table-js.html" %}
 {% endblock %}

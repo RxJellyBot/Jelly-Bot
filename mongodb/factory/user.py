@@ -195,11 +195,11 @@ class RootUserManager(BaseCollection):
         if not udata:
             return str_not_found if str_not_found else None
 
-        UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
+        UserNameEntry = namedtuple("UserNameEntry", ["user_id", "user_name"])
 
         # Name has been set?
         if udata.config.name:
-            return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
+            return UserNameEntry(user_id=root_oid, user_name=udata.config.name)
 
         # On Platform Identity found?
         if udata.has_onplat_data:
@@ -214,8 +214,7 @@ class RootUserManager(BaseCollection):
                         else:
                             uname = onplat_data.get_name_str(channel_data)
 
-                    return UserNameQuery(
-                        user_id=root_oid, user_name=uname)
+                    return UserNameEntry(user_id=root_oid, user_name=uname)
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
