@@ -95,6 +95,12 @@ def _construct_my_account_(current_path, parent, nav_param):
     __attach__(
         my_account_parent, NavHidden, current_path, _("Attach Profile"),
         "account.profile.attach", nav_param, my_account_parent)
+    __attach__(
+        my_account_parent, NavHidden, current_path, _("Edit Profile"),
+        "account.profile.edit", nav_param, my_account_parent)
+    __attach__(
+        my_account_parent, NavHidden, current_path, _("List Profile"),
+        "account.profile.list", nav_param, my_account_parent)
 
     return my_account_parent
 
