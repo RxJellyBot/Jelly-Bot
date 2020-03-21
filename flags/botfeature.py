@@ -33,6 +33,7 @@ class BotFeature(FlagDoubleEnum):
                 1101 - Check channel/self ID
                 1102 - Check channel info
                 1103 - Check user info
+                1104 - Check channel member's info
                 1109 - Bot Help
             111 - Transform/Replace
                 1111 - Replace newline character
@@ -119,6 +120,8 @@ class BotFeature(FlagDoubleEnum):
         1102, _("Text / Information / Channel"), _("Check the channel info.")
     TXT_INFO_USER = \
         1103, _("Text / Information / User"), _("Check the user info of self.")
+    TXT_INFO_CHANNEL_MEMBER = \
+        1104, _("Text / Information / Channel Member"), _("Check the info of the channel members.")
     TXT_BOT_HELP = \
         1109, _("Text / Information / Help"), _("Get help for how to use the bot and the related information.")
 

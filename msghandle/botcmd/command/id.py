@@ -1,9 +1,10 @@
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from flags import BotFeature
-from mongodb.helper import MessageStatsDataProcessor
-from msghandle.models import TextMessageEventObject
+from flags import BotFeature, CommandScopeCollection
+from mongodb.factory import ProfileManager
+from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
+from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl
 
 from ._base_ import CommandNode
@@ -146,3 +147,26 @@ def check_sender_identity(e: TextMessageEventObject):
     ret.extend(_user_ranking_section_(e))
 
     return "\n".join(ret)
+
+
+cmd_ch_mem = cmd_ch.new_child_node(
+    codes=["m", "mem", "members"], name=_("Check channel members' info"),
+    description=_("Check the info of all channel members.")
+)
+
+
+@cmd_ch_mem.command_function(
+    feature_flag=BotFeature.TXT_INFO_CHANNEL_MEMBER,
+    scope=CommandScopeCollection.GROUP_ONLY
+)
+def check_channel_member(e: TextMessageEventObject):
+    ret = []
+
+    user_oids = [conn.user_oid for conn in ProfileManager.get_channel_members(e.channel_oid, available_only=True)]
+    user_name_dict = IdentitySearcher.get_batch_user_name(user_oids, e.channel_model, on_not_found="(N/A)")
+
+    for user_oid, user_name in sorted(user_name_dict.items(), key=lambda x: x[1]):
+        ret.append(f"<li>`{user_oid}` - {user_name}</li>")
+
+    ret = '\n'.join(ret)
+    return [HandledMessageEventText(content=f"<ul>{ret}</ul>", force_extra=True)]

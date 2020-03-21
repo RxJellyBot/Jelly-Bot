@@ -2,6 +2,7 @@ import os
 import sys
 from typing import List, Union, Optional
 
+import requests
 from linebot import LineBotApi
 from linebot.exceptions import LineBotApiError
 from linebot.models import TextSendMessage, SendMessage, Profile, ImageMessage
@@ -67,6 +68,8 @@ class LineApiWrapper:
                 return None
             else:
                 raise ex
+        except requests.exceptions.ConnectionError:
+            return self.get_profile(uid, channel_data)
 
     def get_user_name_safe(self, uid, channel_data: Optional[ChannelModel] = None) -> Optional[str]:
         prof = self.get_profile(uid, channel_data)
