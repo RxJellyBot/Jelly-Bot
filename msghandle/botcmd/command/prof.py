@@ -10,6 +10,7 @@ from flags import CommandScopeCollection, BotFeature, ProfilePermission, Permiss
 from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from models import ChannelProfileModel
+from mongodb.factory.results import OperationOutcome
 from mongodb.factory import ProfileManager
 from mongodb.helper import ProfileHelper
 
@@ -266,30 +267,58 @@ cmd_attach = cmd.new_child_node(
     description=_("Attach profile to either self or a member."))
 
 
+def _output_attach_outcome_(outcome: OperationOutcome):
+    if outcome.is_success:
+        return [HandledMessageEventText(content=_("Profile attached."))]
+    else:
+        return [HandledMessageEventText(
+            content=_("Failed to attach the profile.\nError: `{}` - {}").format(outcome.code_str, outcome.description))]
+
+
 @cmd_attach.command_function(
     feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_help_name_]
 )
 def profile_attach_self(e: TextMessageEventObject, name: str):
-    result = ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name)
-
-    if result.is_success:
-        return [HandledMessageEventText(content=_("Profile attached."))]
-    else:
-        return [HandledMessageEventText(content=_("Failed to attach the profile.\nError: {}").format(result))]
+    return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
 
 
 @cmd_attach.command_function(
     feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=2,
-    arg_help=[_help_name_, _("The OID of the target user to be attached the profile.")]
+    arg_help=[_help_name_, _("The OID of the target user to be attached to the profile.")]
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    result = ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid)
+    return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
 
-    if result.is_success:
-        return [HandledMessageEventText(content=_("Profile attached."))]
+
+cmd_detach = cmd.new_child_node(
+    codes=["d", "detach"], name=_("Detach"),
+    description=_("Detach profile from either self or a member."))
+
+
+def _output_detach_outcome_(outcome: OperationOutcome):
+    if outcome.is_success:
+        return [HandledMessageEventText(content=_("Profile detached."))]
     else:
         return [HandledMessageEventText(
-            content=_("Failed to attach the profile.\nError: `{}` - {}").format(result.code_str, result.description))]
+            content=_("Failed to detach the profile.\nError: `{}` - {}").format(outcome.code_str, outcome.description))]
+
+
+@cmd_detach.command_function(
+    feature_flag=BotFeature.TXT_PF_DETACH, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=1,
+    arg_help=[_help_name_]
+)
+def profile_detach_self(e: TextMessageEventObject, name: str):
+    return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id))
+
+
+@cmd_detach.command_function(
+    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    arg_count=2,
+    arg_help=[_help_name_, _("The OID of the target user to be detached from the profile.")]
+)
+def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
+    return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))

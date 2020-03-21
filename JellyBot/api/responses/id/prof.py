@@ -82,7 +82,7 @@ class ProfileAttachResponse(ProfileResponseBase):
 
 class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
-        self._result = ProfileManager.detach_profile(self._profile_oid, self._target_oid)
+        self._result = ProfileManager.detach_profile(self._channel_oid, self._profile_oid, self._target_oid)
 
 
 class ProfileNameCheckResponse(

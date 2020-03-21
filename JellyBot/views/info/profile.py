@@ -45,7 +45,7 @@ class InfoPageActionControl(Enum):
             return InfoPageActionControl.UNKNOWN
 
     @staticmethod
-    def action_detach(request, sender_oid, target_uid, permissions, profile_oid):
+    def action_detach(request, channel_oid, sender_oid, target_uid, permissions, profile_oid):
         target_self = sender_oid == target_uid
 
         # Permission Check
@@ -57,7 +57,7 @@ class InfoPageActionControl(Enum):
             return HttpResponse(status=403)
 
         # Main Action
-        detach_outcome = ProfileManager.detach_profile(profile_oid, target_uid)
+        detach_outcome = ProfileManager.detach_profile(channel_oid, profile_oid, target_uid)
 
         # Alert messages
         if detach_outcome.is_success:
@@ -75,7 +75,7 @@ class InfoPageActionControl(Enum):
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
 
         # Detach profile from all users
-        ProfileManager.detach_profile(profile_oid)
+        ProfileManager.detach_profile(channel_model.id, profile_oid)
 
         # Delete the profile from the database
         deleted = ProfileManager.delete_profile(profile_oid)
@@ -142,8 +142,10 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
         profile_oid = profile_result.model.id
 
         if action == InfoPageActionControl.DETACH:
-            return InfoPageActionControl.action_detach(request, sender_oid, target_uid, permissions, profile_oid)
+            return InfoPageActionControl.action_detach(
+                request, channel_model.id, sender_oid, target_uid, permissions, profile_oid)
         elif action == InfoPageActionControl.DELETE:
-            return InfoPageActionControl.action_delete(request, channel_model, profile_oid)
+            return InfoPageActionControl.action_delete(
+                request, channel_model, profile_oid)
         else:
             return HttpResponse(status=501)

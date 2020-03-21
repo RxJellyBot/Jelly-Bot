@@ -669,6 +669,8 @@ class ProfileManager:
 
         If `target_oid` is `None`, then the profile will be attached to self.
         """
+        # --- Check target
+
         if not target_oid:
             target_oid = user_oid
         else:
@@ -689,11 +691,45 @@ class ProfileManager:
         if profile_oid not in [prof.id for prof in attachable_profiles]:
             return OperationOutcome.X_UNATTACHABLE
 
+        # --- Attach profile
+
         return self._conn.user_attach_profile(channel_oid, target_oid, profile_oid)
 
-    def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> WriteOutcome:
+    @param_type_ensure
+    def detach_profile_name(
+            self, channel_oid: ObjectId, profile_name: str,
+            user_oid: Optional[ObjectId] = None, target_oid: Optional[ObjectId] = None) \
+            -> OperationOutcome:
+        prof = self._prof.get_profile_name(profile_name)
+        if not prof:
+            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
+
+        return self.detach_profile(channel_oid, prof.id, user_oid, target_oid)
+
+    def detach_profile(
+            self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None,
+            target_oid: Optional[ObjectId] = None) -> OperationOutcome:
         """Detach the profile from all users if `user_oid` is `None`."""
-        return self._conn.detach_profile(profile_oid, user_oid)
+        # --- Check target
+
+        if not target_oid:
+            target_oid = user_oid
+        else:
+            if not self._conn.is_user_in_channel(channel_oid, target_oid):
+                return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
+
+        # --- Check permissions
+
+        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+            return OperationOutcome.X_INSUFFICIENT_PERMISSION
+
+        # --- Detach profile
+
+        detach_outcome = self._conn.detach_profile(profile_oid, target_oid)
+        if detach_outcome.is_success:
+            return OperationOutcome.O_COMPLETED
+        else:
+            return OperationOutcome.X_DETACH_FAILED
 
     def delete_profile(self, profile_oid: ObjectId) -> bool:
         """Returns if there's an item deleted."""

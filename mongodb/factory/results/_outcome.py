@@ -291,6 +291,7 @@ class OperationOutcome(BaseOutcome):
         403 - Profile not found with the name
         404 - No attachable profiles
         405 - Target not in channel
+        406 - Detach failed
 
     5xx - Problems related to Model
         501 - Construction Error
@@ -363,6 +364,9 @@ class OperationOutcome(BaseOutcome):
     X_TARGET_NOT_IN_CHANNEL = \
         405, _("X: Target not in channel"), \
         _("The target to be attached the profile is not in the channel.")
+    X_DETACH_FAILED = \
+        406, _("X: Detach failed"), \
+        _("Failed to detach the profile from the target.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction Error"), \
         _("An error occurred during model construction.")
