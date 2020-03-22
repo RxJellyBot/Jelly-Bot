@@ -27,7 +27,7 @@ cmd_create = cmd.new_child_node(
         "Create a profile and attach it to self.\n\n"
         "## Create\n\n"
         "Parameter will be applied if not specified:\n\n"
-        "- Color: `{}`"
+        "- Color: `{}`\n\n"
         "- Permission: `{}`\n\n"
         "- Permission Level: `{}`").format(
         ColorFactory.DEFAULT, ProfilePermission.NORMAL, PermissionLevel.NORMAL))
