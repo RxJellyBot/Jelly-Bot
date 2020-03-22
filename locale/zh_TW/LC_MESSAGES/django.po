@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-03-22 08:14-0500\n"
-"PO-Revision-Date: 2020-03-22 08:27-0500\n"
+"PO-Revision-Date: 2020-03-22 08:59-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2446,7 +2446,7 @@ msgstr "無可用排行資訊。"
 
 #: .\msghandle\botcmd\command\calc.py:11
 msgid "Calculator"
-msgstr "文字 / 計算機"
+msgstr "計算機"
 
 #: .\msghandle\botcmd\command\calc.py:12
 msgid "Execute the sympy calculator."
