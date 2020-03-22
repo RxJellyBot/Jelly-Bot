@@ -1,24 +1,60 @@
 {% load i18n %}
+{% load utils %}
 
 <canvas id="msgstats-daily"></canvas>
 
 <!--suppress JSUnresolvedFunction -->
 <script type="text/javascript">
+    {% call_method msg_mean_data "generate_result" 3 as mean_3d %}
+    {% call_method msg_mean_data "generate_result" 7 as mean_7d %}
+    {% call_method msg_mean_data "generate_result" 14 as mean_14d %}
     new Chart(document.getElementById("msgstats-daily").getContext("2d"), {
         type: "line",
 
         data: {
             labels: {{ msg_daily_data.label_date|safe }},
-            datasets: [{
-                label: "{% trans "Message Count" %}",
-                borderColor: "rgb(50, 50, 50)",
-                pointBackgroundColor: "rgb(50, 50, 50)",
-                pointBorderColor: "rgb(50, 50, 50)",
-                pointRadius: 4,
-                pointHoverRadius: 8,
-                fill: false,
-                data: {{ msg_daily_data.data_sum }}
-            }]
+            datasets: [
+                {
+                    label: "{% trans "Message Count" %}",
+                    borderColor: "rgb(50, 50, 50)",
+                    pointBackgroundColor: "rgb(50, 50, 50)",
+                    pointBorderColor: "rgb(50, 50, 50)",
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    data: {{ msg_daily_data.data_sum }}
+                },
+                {
+                    label: "{{ mean_3d.label }}",
+                    borderColor: "rgb(0, 166, 83)",
+                    pointBackgroundColor: "rgb(0, 166, 83)",
+                    pointBorderColor: "rgb(0, 166, 83)",
+                    pointRadius: 1,
+                    pointHoverRadius: 4,
+                    fill: false,
+                    data: {{ mean_3d.data_list }}
+                },
+                {
+                    label: "{{ mean_7d.label }}",
+                    borderColor: "rgb(166, 137, 5)",
+                    pointBackgroundColor: "rgb(166, 137, 5)",
+                    pointBorderColor: "rgb(166, 137, 5)",
+                    pointRadius: 1,
+                    pointHoverRadius: 4,
+                    fill: false,
+                    data: {{ mean_7d.data_list }}
+                },
+                {
+                    label: "{{ mean_14d.label }}",
+                    borderColor: "rgb(166, 33, 33)",
+                    pointBackgroundColor: "rgb(166, 33, 33)",
+                    pointBorderColor: "rgb(166, 33, 33)",
+                    pointRadius: 1,
+                    pointHoverRadius: 4,
+                    fill: false,
+                    data: {{ mean_14d.data_list }}
+                },
+            ]
         },
 
         options: {

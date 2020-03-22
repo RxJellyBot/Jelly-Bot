@@ -18,7 +18,7 @@ from .stats import (
     APIStatisticModel, MessageRecordModel, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
-    MemberMessageCountResult
+    MemberMessageCountResult, MeanMessageResultGenerator
 )
 # noinspection PyUnresolvedReferences
 from .execode import ExecodeEntryModel

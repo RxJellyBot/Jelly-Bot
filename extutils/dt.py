@@ -116,6 +116,11 @@ class TimeRange:
 
         return ret
 
+    def set_start_day_offset(self, offset_days: int):
+        """Offset `start` by `offset_days` days. Overwrites `start_org` to be the `start` before offsetting."""
+        self.start_org = self.start
+        self.start = self.start + timedelta(days=offset_days)
+
     @property
     def is_inf(self):
         return math.isinf(self.hr_length)

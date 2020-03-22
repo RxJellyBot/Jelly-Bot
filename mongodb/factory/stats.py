@@ -1,4 +1,3 @@
-import struct
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List
@@ -17,7 +16,7 @@ from models import (
     APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
-    MemberMessageCountResult
+    MemberMessageCountResult, MeanMessageResultGenerator
 )
 
 from JellyBot.systemconfig import Database
@@ -144,7 +143,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                 if not start_id:
                     continue
                 end_id = dt_to_objectid(range_.end)
-                if end_id:
+                if not end_id:
                     continue
 
                 switch_branches.append(
@@ -248,6 +247,41 @@ class MessageRecordStatisticsManager(BaseCollection):
             HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=start, end=end),
             tzinfo_,
             start=start, end=end)
+
+    def mean_message_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: tzinfo = UTC.to_tzinfo(),
+            max_mean_days: int = 5) -> \
+            MeanMessageResultGenerator:
+        match_d = self._channel_oids_filter_(channel_oids)
+
+        trange = parse_time_range(hr_range=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        trange.set_start_day_offset(-max_mean_days)
+
+        self._attach_time_range_(match_d, trange=trange)
+
+        pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                "_id": {
+                    MeanMessageResultGenerator.KEY_DATE: {
+                        "$dateToString": {
+                            "date": "$_id",
+                            "format": "%Y-%m-%d",
+                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                        }
+                    }
+                },
+                MeanMessageResultGenerator.KEY_COUNT: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        return MeanMessageResultGenerator(
+            list(self.aggregate(pipeline)),
+            HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=trange.start_org, end=end),
+            tzinfo_,
+            trange=trange, max_mean_days=max_mean_days)
 
     def member_daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,
