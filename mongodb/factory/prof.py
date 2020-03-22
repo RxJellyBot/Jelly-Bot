@@ -545,20 +545,19 @@ class ProfileManager:
                 else:
                     not_found_prof_oids.append(p)
 
-            if len(prof) == 0:
-                not_found_prof_oids_dict[cnl_oid] = []
-            elif len(not_found_prof_oids) > 0:
+            if len(not_found_prof_oids) > 0:
+                # There's some profile not found in the database while ID is registered
                 not_found_prof_oids_dict[cnl_oid] = not_found_prof_oids
-            else:
-                perms = self.get_permissions(prof)
-                can_ced_profile = self.can_ced_profile(perms)
 
-                ret.append(
-                    ChannelProfileListEntry(
-                        channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
-                        starred=prof_conn.starred, default_profile_oid=default_profile_oid,
-                        can_ced_profile=can_ced_profile
-                    ))
+            perms = self.get_permissions(prof)
+            can_ced_profile = self.can_ced_profile(perms)
+
+            ret.append(
+                ChannelProfileListEntry(
+                    channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
+                    starred=prof_conn.starred, default_profile_oid=default_profile_oid,
+                    can_ced_profile=can_ced_profile
+                ))
 
         if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
             not_found_prof_oids_txt = "\n".join(
@@ -714,7 +713,7 @@ class ProfileManager:
         return self.detach_profile(channel_oid, prof.id, user_oid, target_oid)
 
     def detach_profile(
-            self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None,
+            self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId],
             target_oid: Optional[ObjectId] = None) -> OperationOutcome:
         """Detach the profile from all users if `user_oid` is `None`."""
         # --- Check target
@@ -738,9 +737,10 @@ class ProfileManager:
         else:
             return OperationOutcome.X_DETACH_FAILED
 
-    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId) -> bool:
+    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId]) -> bool:
         """Returns if the profile is deleted."""
-        self.detach_profile(channel_oid, profile_oid)
+        if not self.detach_profile(channel_oid, profile_oid, user_oid):
+            return False
 
         return self._prof.delete_profile(profile_oid)
 
