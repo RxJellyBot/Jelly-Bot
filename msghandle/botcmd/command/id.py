@@ -56,20 +56,24 @@ def _chcoll_info_url_(e: TextMessageEventObject):
 def _user_ranking_section_(e: TextMessageEventObject):
     ret = []
 
-    rk_ch_1d = MessageStatsDataProcessor.get_user_channel_ranking(e.channel_model, e.user_model.id, 24)
+    rk_ch_1d = MessageStatsDataProcessor.get_user_channel_ranking(
+        e.channel_model, e.user_model.id, hours_within=24)
     if rk_ch_1d.available:
         ret.append(_("Current Channel Message Count Ranking in 1 Day - {}").format(str(rk_ch_1d)))
 
-    rk_ch_7d = MessageStatsDataProcessor.get_user_channel_ranking(e.channel_model, e.user_model.id, 168)
+    rk_ch_7d = MessageStatsDataProcessor.get_user_channel_ranking(
+        e.channel_model, e.user_model.id, hours_within=168)
     if rk_ch_7d.available:
         ret.append(_("Current Channel Message Count Ranking in 7 Days - {}").format(str(rk_ch_7d)))
 
     if e.chcoll_model:
-        rk_ccoll_1d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 24)
+        rk_ccoll_1d = MessageStatsDataProcessor.get_user_chcoll_ranking(
+            e.chcoll_model, e.user_model.id, hours_within=24)
         if rk_ccoll_1d.available:
             ret.append(_("Channel Collection Message Count Ranking in 1 Day - {}").format(str(rk_ccoll_1d)))
 
-        rk_ccoll_7d = MessageStatsDataProcessor.get_user_chcoll_ranking(e.chcoll_model, e.user_model.id, 168)
+        rk_ccoll_7d = MessageStatsDataProcessor.get_user_chcoll_ranking(
+            e.chcoll_model, e.user_model.id, hours_within=168)
         if rk_ccoll_7d.available:
             ret.append(_("Channel Collection Message Count Ranking in 7 Days - {}").format(str(rk_ccoll_7d)))
 

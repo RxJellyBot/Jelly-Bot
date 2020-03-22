@@ -1,7 +1,7 @@
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from typing import List, Optional, Union, NamedTuple, Dict
-from datetime import tzinfo
+from datetime import tzinfo, datetime
 
 from bson import ObjectId
 
@@ -195,9 +195,12 @@ class MessageStatsDataProcessor:
 
     @staticmethod
     def _get_user_msg_ranking_(
-            channel_oids: Union[List[ObjectId], ObjectId], root_oid: ObjectId, hours_within: Optional[int] = None):
-        data = sorted(MessageRecordStatisticsManager.get_user_messages(channel_oids, hours_within).data.items(),
-                      key=lambda _: _[1].total, reverse=True)
+            channel_oids: Union[List[ObjectId], ObjectId], root_oid: ObjectId, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None):
+        data = sorted(
+            MessageRecordStatisticsManager.get_user_messages(
+                channel_oids, hours_within=hours_within, start=start, end=end).data.items(),
+            key=lambda _: _[1].total, reverse=True)
         for idx, item in enumerate(data, start=1):
             oid, entry = item
             if oid == root_oid:
@@ -206,15 +209,18 @@ class MessageStatsDataProcessor:
         return UserMessageRanking(rank=-1, total=len(data))
 
     @staticmethod
-    def get_user_daily_message(channel_data: ChannelModel, hours_within: Optional[int] = None,
-                               tz: Optional[tzinfo] = None, available_only: Optional[bool] = True) \
+    def get_user_daily_message(
+            channel_data: ChannelModel, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
+            tz: Optional[tzinfo] = None, available_only: Optional[bool] = True) \
             -> UserDailyMessageResult:
         available_dict = {d.user_oid: d.available
                           for d in ProfileManager.get_channel_members(channel_data.id, available_only=available_only)}
         uname_dict = IdentitySearcher.get_batch_user_name(
             list(available_dict.keys()),
             channel_data, on_not_found="(N/A)")
-        result = MessageRecordStatisticsManager.member_daily_message_count(channel_data.id, hours_within, tz)
+        result = MessageRecordStatisticsManager.member_daily_message_count(
+            channel_data.id, hours_within=hours_within, start=start, end=end, tzinfo_=tz)
 
         count_proc = {oid: [] for oid in uname_dict.keys()}
         for date in result.dates:
@@ -229,33 +235,43 @@ class MessageStatsDataProcessor:
 
     @staticmethod
     def get_user_channel_messages(
-            channel_data: ChannelModel, hours_within: Optional[int] = None, available_only: bool = True) \
+            channel_data: ChannelModel, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
+            available_only: bool = True) \
             -> UserMessageStats:
         return MessageStatsDataProcessor._get_user_msg_stats_(
-            MessageRecordStatisticsManager.get_user_messages(channel_data.id, hours_within),
+            MessageRecordStatisticsManager.get_user_messages(
+                channel_data.id, hours_within=hours_within, start=start, end=end),
             channel_data, available_only
         )
 
     @staticmethod
     def get_user_chcoll_messages(
-            chcoll_data: ChannelCollectionModel, hours_within: Optional[int] = None, available_only: bool = True) \
+            chcoll_data: ChannelCollectionModel, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
+            available_only: bool = True) \
             -> UserMessageStats:
         return MessageStatsDataProcessor._get_user_msg_stats_(
-            MessageRecordStatisticsManager.get_user_messages(chcoll_data.child_channel_oids, hours_within),
+            MessageRecordStatisticsManager.get_user_messages(
+                chcoll_data.child_channel_oids, hours_within=hours_within, start=start, end=end),
             chcoll_data, available_only=available_only
         )
 
     @staticmethod
     def get_user_channel_ranking(
-            channel_data: ChannelModel, root_oid: ObjectId, hours_within: Optional[int] = None) \
+            channel_data: ChannelModel, root_oid: ObjectId, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> UserMessageRanking:
-        return MessageStatsDataProcessor._get_user_msg_ranking_(channel_data.id, root_oid, hours_within)
+        return MessageStatsDataProcessor._get_user_msg_ranking_(
+            channel_data.id, root_oid, hours_within=hours_within, start=start, end=end)
 
     @staticmethod
     def get_user_chcoll_ranking(
-            chcoll_data: ChannelCollectionModel, root_oid: ObjectId, hours_within: Optional[int] = None) \
+            chcoll_data: ChannelCollectionModel, root_oid: ObjectId, *,
+            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> UserMessageRanking:
-        return MessageStatsDataProcessor._get_user_msg_ranking_(chcoll_data.child_channel_oids, root_oid, hours_within)
+        return MessageStatsDataProcessor._get_user_msg_ranking_(
+            chcoll_data.child_channel_oids, root_oid, hours_within=hours_within, start=start, end=end)
 
     @staticmethod
     def get_recent_messages(
@@ -288,7 +304,7 @@ class PerMemberStats:
 class BotUsageStatsDataProcessor:
     @staticmethod
     def get_per_user_bot_usage(
-            channel_data: ChannelModel, hours_within: Optional[int] = None) \
+            channel_data: ChannelModel, *, hours_within: Optional[int] = None) \
             -> PerMemberStats:
         data = []
         features = [f for f in BotFeature]
@@ -296,7 +312,7 @@ class BotUsageStatsDataProcessor:
         members = ProfileManager.get_channel_members(channel_data.id, available_only=True)
 
         usage_data = BotFeatureUsageDataManager.get_channel_per_user_usage(
-            channel_data.id, hours_within, [d.user_oid for d in members]).data
+            channel_data.id, hours_within=hours_within, member_oid_list=[d.user_oid for d in members]).data
         uid_handled = IdentitySearcher.get_batch_user_name(usage_data.keys(), channel_data)
 
         for uid, name in uid_handled.items():

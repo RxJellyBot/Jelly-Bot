@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 from threading import Thread
 from typing import Type, Optional, Tuple
 
@@ -156,8 +156,9 @@ class ControlExtensionMixin(Collection):
             target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
 
     def find_cursor_with_count(
-            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None, **kwargs) -> CursorWithCount:
-        self._attach_hours_within_(filter_, hours_within)
+            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> CursorWithCount:
+        self._attach_time_range_(filter_, hours_within=hours_within, start=start, end=end)
 
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
@@ -166,18 +167,24 @@ class ControlExtensionMixin(Collection):
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod
-    def _attach_hours_within_(filter_: dict, hours_within: Optional[int] = None):
-        fltr = {}
+    def _attach_time_range_(filter_: dict, *, hours_within: Optional[int] = None,
+                            start: Optional[datetime] = None, end: Optional[datetime] = None):
+        id_filter = {}
 
-        if hours_within:
-            fltr["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+        if start:
+            id_filter["$gt"] = ObjectId.from_datetime(start)
+        if end:
+            id_filter["$lt"] = ObjectId.from_datetime(end)
 
-        if fltr:
+        if not id_filter and hours_within:
+            id_filter["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+
+        if id_filter:
             if OID_KEY in filter_:
                 filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
-                filter_[OID_KEY].update(fltr)
+                filter_[OID_KEY].update(id_filter)
             else:
-                filter_[OID_KEY] = fltr
+                filter_[OID_KEY] = id_filter
 
 
 class BaseCollection(ControlExtensionMixin, Collection):

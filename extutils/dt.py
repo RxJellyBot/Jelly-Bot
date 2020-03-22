@@ -1,4 +1,7 @@
-from datetime import datetime, timedelta
+from typing import Optional
+
+from dateutil import parser
+from datetime import datetime, timedelta, tzinfo
 
 import pytz
 from django.utils import timezone
@@ -27,3 +30,20 @@ def t_delta_str(t_delta: timedelta):
     else:
         h += t_delta.days * 24
         return _("{} H {:02} M {:02} S").format(h, m, s)
+
+
+def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None):
+    if not dt_str:
+        return None
+
+    # Parse datetime string
+    try:
+        dt = parser.parse(dt_str, ignoretz=False)
+    except (ValueError, OverflowError):
+        return None
+
+    # Attach timezone if needed
+    if is_tz_naive(dt):
+        dt = dt.replace(tzinfo=tzinfo_ or pytz.utc)
+
+    return dt

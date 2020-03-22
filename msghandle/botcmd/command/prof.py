@@ -336,7 +336,7 @@ def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: Obje
 
 # region Delete
 cmd_delete = cmd.new_child_node(
-    codes=["del", "detach"], name=_("Delete"),
+    codes=["del", "delete"], name=_("Delete"),
     description=_("Delete profile."))
 
 

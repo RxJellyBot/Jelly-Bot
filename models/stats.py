@@ -70,7 +70,14 @@ class HourlyResult(abc.ABC):
                 self.denom[hr % 24] += 1
 
     @staticmethod
-    def data_days_collected(collection, filter_, hr_range):
+    def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
+                            start: Optional[datetime] = None, end: Optional[datetime] = None):
+        if start:
+            if end:
+                return (end - start).total_seconds() / 86400
+            else:
+                return (now_utc_aware() - start).total_seconds() / 86400
+
         if hr_range:
             return hr_range / 24
         else:
@@ -87,13 +94,20 @@ class DailyResult(abc.ABC):
     KEY_DATE = "dt"
 
     @staticmethod
-    def date_list(days_collected, tzinfo):
+    def date_list(days_collected, tzinfo, *, start: Optional[datetime] = None, end: Optional[datetime] = None):
         ret = []
 
-        _end_ = localtime(now_utc_aware(), tz=tzinfo)
-        _start_ = (_end_ - timedelta(days=days_collected)).date()
+        if end:
+            _end_ = localtime(end, tz=tzinfo).date()
+        else:
+            _end_ = localtime(now_utc_aware(), tz=tzinfo).date()
 
-        for i in range((_end_.date() - _start_).days + 1):
+        if start:
+            _start_ = start.date()
+        else:
+            _start_ = _end_ - timedelta(days=days_collected)
+
+        for i in range((_end_ - _start_).days + 1):
             ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
 
         return ret
@@ -155,12 +169,13 @@ class DailyMessageResult(DailyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected, tzinfo):
+    def __init__(self, cursor, days_collected, tzinfo, *,
+                 start: Optional[datetime] = None, end: Optional[datetime] = None):
         ResultEntry = namedtuple("ResultEntry", ["date", "data"])
         DataPoint = namedtuple("DataPoint", ["count", "percentage", "is_max"])
 
         self.label_hr = [h for h in range(24)]
-        self.label_date = self.date_list(days_collected, tzinfo)
+        self.label_date = self.date_list(days_collected, tzinfo, start=start, end=end)
 
         data_sum = {dt: 0 for dt in self.label_date}
         data = {dt: [0] * 24 for dt in self.label_date}
@@ -194,8 +209,9 @@ class MemberDailyMessageResult(DailyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected, tzinfo):
-        self.dates = self.date_list(days_collected, tzinfo)
+    def __init__(self, cursor, days_collected, tzinfo, *,
+                 start: Optional[datetime] = None, end: Optional[datetime] = None):
+        self.dates = self.date_list(days_collected, tzinfo, start=start, end=end)
         self.data = {date: {} for date in self.dates}
         for d in cursor:
             _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]

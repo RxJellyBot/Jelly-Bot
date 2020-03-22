@@ -20,8 +20,8 @@ class ChannelInfoView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
         chcoll_data: Optional[ChannelCollectionModel] = \
             ChannelCollectionManager.get_chcoll_child_channel(channel_data.model.id)
 
-        msgdata_1d = MessageStatsDataProcessor.get_user_channel_messages(channel_data.model, 24)
-        msgdata_7d = MessageStatsDataProcessor.get_user_channel_messages(channel_data.model, 168)
+        msgdata_1d = MessageStatsDataProcessor.get_user_channel_messages(channel_data.model, hours_within=24)
+        msgdata_7d = MessageStatsDataProcessor.get_user_channel_messages(channel_data.model, hours_within=168)
 
         channel_name = channel_data.model.get_channel_name(get_root_oid(request))
 
@@ -37,7 +37,7 @@ class ChannelInfoView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
                 "msg_count7d": msgdata_7d.msg_count,
                 "manageable": bool(
                     ProfileManager.get_user_profiles(channel_data.model.id, get_root_oid(request))),
-                "bot_usage_7d": BotFeatureUsageDataManager.get_channel_usage(channel_data.model.id, 168),
+                "bot_usage_7d": BotFeatureUsageDataManager.get_channel_usage(channel_data.model.id, hours_within=168),
                 "bot_usage_all": BotFeatureUsageDataManager.get_channel_usage(channel_data.model.id)
             },
             nav_param=kwargs)

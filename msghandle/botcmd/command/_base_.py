@@ -287,7 +287,8 @@ class CommandNode:
         """
         for code in cmd_node.command_codes:
             if code in self._child_nodes and id(self._child_nodes[code]) != id(cmd_node):
-                logger.logger.warning(f"Code {code} has a corresponding command node ({repr(self._child_nodes[code])}) "
+                logger.logger.warning(f"Code `{code}` has a corresponding command node "
+                                      f"({repr(self._child_nodes[code])}) "
                                       f"registered. This will be replaced by {repr(cmd_node)}")
 
             if self._case_insensitive:
