@@ -163,6 +163,7 @@ class UserProfileManager(BaseCollection):
 
         return ret
 
+    @param_type_ensure
     def is_user_in_channel(self, channel_oid: ObjectId, root_oid: ObjectId) -> bool:
         return self.count_documents(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
@@ -247,7 +248,7 @@ class ProfileDataManager(BaseCollection):
         if partial_keyword:
             filter_[ChannelProfileModel.Name.key] = {"$regex": partial_keyword, "$options": "i"}
 
-        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
+        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel).sort([(OID_KEY, pymongo.ASCENDING)])
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """

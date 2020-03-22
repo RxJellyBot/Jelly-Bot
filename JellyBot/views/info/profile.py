@@ -57,7 +57,7 @@ class InfoPageActionControl(Enum):
             return HttpResponse(status=403)
 
         # Main Action
-        detach_outcome = ProfileManager.detach_profile(channel_oid, profile_oid, sender_oid)
+        detach_outcome = ProfileManager.detach_profile(channel_oid, profile_oid, sender_oid, target_uid)
 
         # Alert messages
         if detach_outcome.is_success:
