@@ -449,5 +449,5 @@ class BotFeatureHourlyAvgResult(HourlyResult):
             for diff_ in diff:
                 self.data.append(UsageEntry(feature=diff_, data=[0] * 24, color="#9C0000", hidden="true"))
 
-        self.data = [UsageEntry(feature=_("(Total)"), data=hr_sum, color="#323232", hidden="false")] \
-                    + list(sorted(self.data, key=lambda i: i.feature.code))
+        entry = UsageEntry(feature=_("(Total)"), data=hr_sum, color="#323232", hidden="false")
+        self.data = [entry] + list(sorted(self.data, key=lambda i: i.feature.code))

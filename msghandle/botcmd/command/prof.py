@@ -359,7 +359,7 @@ def profile_delete(e: TextMessageEventObject, name: str):
     if ProfilePermission.PRF_CED not in user_permissions:
         return [HandledMessageEventText(content=_("Insufficient permission to delete profile."))]
 
-    deleted = ProfileManager.delete_profile(e.channel_oid, prof.id)
+    deleted = ProfileManager.delete_profile(e.channel_oid, prof.id, e.user_model.id)
     if deleted:
         return [HandledMessageEventText(content=_("Profile deleted."))]
     else:

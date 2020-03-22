@@ -2,7 +2,6 @@ from abc import ABC
 
 from bson import ObjectId
 
-from flags import ProfilePermission
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.static import param
 from JellyBot.api.responses.mixin import (
@@ -11,7 +10,6 @@ from JellyBot.api.responses.mixin import (
 )
 from extutils import safe_cast
 from mongodb.factory import ProfileManager
-from mongodb.factory.results import OperationOutcome, WriteOutcome
 
 
 class PermissionQueryResponse(
@@ -82,7 +80,8 @@ class ProfileAttachResponse(ProfileResponseBase):
 
 class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
-        self._result = ProfileManager.detach_profile(self._channel_oid, self._profile_oid, self._target_oid)
+        self._result = ProfileManager.detach_profile(
+            self._channel_oid, self._profile_oid, self._sender_oid, self._target_oid)
 
 
 class ProfileNameCheckResponse(

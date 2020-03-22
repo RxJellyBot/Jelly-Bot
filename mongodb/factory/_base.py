@@ -1,6 +1,6 @@
 import os
 import struct
-from datetime import timedelta, datetime
+from datetime import datetime
 from threading import Thread
 from typing import Type, Optional, Tuple, Union
 

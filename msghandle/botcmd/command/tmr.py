@@ -3,7 +3,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from extutils.boolext import str_to_bool, true_word, false_word, StrBoolResult
-from extutils.dt import is_tz_naive, parse_to_dt
+from extutils.dt import parse_to_dt
 from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import TimerManager

@@ -31,8 +31,8 @@ class ChannelCollectionInfoView(TemplateResponseMixin, View):
             return WebsiteErrorView.website_error(
                 request, WebsiteError.CHANNEL_COLLECTION_NOT_FOUND, {"chcoll_oid": chcoll_oid_str}, nav_param=kwargs)
 
-        msgdata_1d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 24)
-        msgdata_7d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, 168)
+        msgdata_1d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, hours_within=24)
+        msgdata_7d = MessageStatsDataProcessor.get_user_chcoll_messages(chcoll_data, hours_within=168)
 
         return render_template(
             self.request, _("Channel Collection Info - {}").format(chcoll_oid), "info/chcoll/main.html",

@@ -57,7 +57,7 @@ class InfoPageActionControl(Enum):
             return HttpResponse(status=403)
 
         # Main Action
-        detach_outcome = ProfileManager.detach_profile(channel_oid, profile_oid, target_uid)
+        detach_outcome = ProfileManager.detach_profile(channel_oid, profile_oid, sender_oid)
 
         # Alert messages
         if detach_outcome.is_success:
@@ -75,7 +75,7 @@ class InfoPageActionControl(Enum):
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
 
         # Detach profile from all users and delete the profile from the database
-        deleted = ProfileManager.delete_profile(channel_model.id, profile_oid)
+        deleted = ProfileManager.delete_profile(channel_model.id, profile_oid, get_root_oid(request))
 
         # Alert messages
         if deleted:
