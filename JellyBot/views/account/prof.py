@@ -132,9 +132,14 @@ class ProfileListView(LoginRequiredMixin, ChannelOidRequiredMixin, TemplateRespo
     def get(self, request, *args, **kwargs):
         channel_result = self.get_channel_data(*args, **kwargs)
 
+        permissions = ProfileManager.get_user_permissions(channel_result.model.id, get_root_oid(request))
+        can_ced_profile = ProfilePermission.PRF_CED  in permissions
+
         return render_template(
             self.request, _("List Profile"), "account/channel/prof/list.html",
             {
                 "prof_entry": ProfileHelper.get_channel_profiles(channel_result.model.id),
-                "perm_cats": list(ProfilePermission)
+                "perm_cats": list(ProfilePermission),
+                "can_ced_profile": can_ced_profile,
+                "channel_oid": channel_result.model.id
             }, nav_param=kwargs)

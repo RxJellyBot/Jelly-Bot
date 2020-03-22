@@ -10,6 +10,36 @@
     </div>
 
     <div class="container">
+        <div class="row mb-3">
+            <div class="col">
+                <h4>{% trans "Controls" %}</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if can_ced_profile %}
+                    <a class="btn btn-outline-dark mr-1"
+                       href="{% url "account.profile.create" channel_oid=channel_oid %}">
+                        {% trans "Create" %}
+                    </a>
+                    <a class="btn btn-outline-dark mr-1"
+                       href="{% url "account.profile.attach" channel_oid=channel_oid %}">
+                        {% trans "Attach" %}
+                    </a>
+                {% endif %}
+                <a class="btn btn-outline-dark mr-1"
+                   href="{% url "account.profile.list" channel_oid=channel_oid %}">
+                    {% trans "List" %}
+                </a>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row mb-3">
+            <div class="col">
+                <h4>{% trans "Profiles" %}</h4>
+            </div>
+        </div>
         <div class="row">
             {% for entry in prof_entry %}
                 <div class="col-lg-4 col-md-12 mb-3">
