@@ -17,7 +17,8 @@ from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 from .stats import (
     APIStatisticModel, MessageRecordModel, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
-    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult, MemberDailyMessageResult
+    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
+    MemberMessageCountResult
 )
 # noinspection PyUnresolvedReferences
 from .execode import ExecodeEntryModel

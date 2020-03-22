@@ -10,7 +10,7 @@ from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from extutils.utils import enumerate_ranking
-from extutils.dt import now_utc_aware, localtime
+from extutils.dt import now_utc_aware, parse_time_range, TimeRange
 from flags import BotFeature, MessageType
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
@@ -72,15 +72,9 @@ class HourlyResult(abc.ABC):
     @staticmethod
     def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
                             start: Optional[datetime] = None, end: Optional[datetime] = None):
-        if start:
-            if end:
-                return (end - start).total_seconds() / 86400
-            else:
-                return (now_utc_aware() - start).total_seconds() / 86400
+        trange = parse_time_range(hr_range=hr_range, start=start, end=end)
 
-        if hr_range:
-            return hr_range / 24
-        else:
+        if trange.is_inf:
             oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
 
             if oldest:
@@ -88,6 +82,8 @@ class HourlyResult(abc.ABC):
                 return (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
             else:
                 return HourlyResult.DAYS_NONE
+        else:
+            return trange.hr_length / 24
 
 
 class DailyResult(abc.ABC):
@@ -97,18 +93,10 @@ class DailyResult(abc.ABC):
     def date_list(days_collected, tzinfo, *, start: Optional[datetime] = None, end: Optional[datetime] = None):
         ret = []
 
-        if end:
-            _end_ = localtime(end, tz=tzinfo).date()
-        else:
-            _end_ = localtime(now_utc_aware(), tz=tzinfo).date()
+        trange = parse_time_range(hr_range=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
 
-        if start:
-            _start_ = start.date()
-        else:
-            _start_ = _end_ - timedelta(days=days_collected)
-
-        for i in range((_end_ - _start_).days + 1):
-            ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
+        for i in range((trange.end.date() - trange.start.date()).days + 1):
+            ret.append((trange.start.date() + timedelta(days=i)).strftime("%Y-%m-%d"))
 
         return ret
 
@@ -221,7 +209,43 @@ class MemberDailyMessageResult(DailyResult):
 
 
 @dataclass
-class MemeberMessageEntry:
+class MemberMessageCountEntry:
+    intervals: InitVar[int]
+    count: List[int] = field(init=False)
+
+    def __post_init__(self, intervals: int):
+        self.count = [0] * intervals
+
+    @property
+    def total(self) -> int:
+        return sum(self.count)
+
+
+class MemberMessageCountResult:
+    KEY_MEMBER_ID = "uid"
+    KEY_INTERVAL_IDX = "idx"
+
+    KEY_COUNT = "ct"
+
+    def __init__(self, cursor, interval: int, trange: TimeRange):
+        self.trange = trange
+
+        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
+
+        for d in cursor:
+            uid = d[OID_KEY][MemberMessageCountResult.KEY_MEMBER_ID]
+            idx = int(d[OID_KEY].get(MemberMessageCountResult.KEY_INTERVAL_IDX, interval - 1))
+
+            if uid not in self.data:
+                self.data[uid] = MemberMessageCountEntry(interval)
+
+            count = d[MemberMessageByCategoryResult.KEY_COUNT]
+
+            self.data[uid].count[idx] = count
+
+
+@dataclass
+class MemberMessageByCategoryEntry:
     label_category: InitVar[List[MessageType]]
     data: Optional[Dict[MessageType, int]] = None
     total: int = field(init=False)
@@ -243,7 +267,7 @@ class MemeberMessageEntry:
         return self.data.get(category, 0)
 
 
-class MemberMessageResult:
+class MemberMessageByCategoryResult:
     KEY_MEMBER_ID = "uid"
     KEY_CATEGORY = "cat"
 
@@ -256,21 +280,21 @@ class MemberMessageResult:
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
         ]
 
-        self.data = {}
+        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
-            uid = d[OID_KEY][MemberMessageResult.KEY_MEMBER_ID]
-            cat = MessageType.cast(d[OID_KEY][MemberMessageResult.KEY_CATEGORY])
+            uid = d[OID_KEY][MemberMessageByCategoryResult.KEY_MEMBER_ID]
+            cat = MessageType.cast(d[OID_KEY][MemberMessageByCategoryResult.KEY_CATEGORY])
 
             if uid not in self.data:
                 self.data[uid] = self.get_default_data_entry()
 
-            count = d[MemberMessageResult.KEY_COUNT]
+            count = d[MemberMessageByCategoryResult.KEY_COUNT]
 
             self.data[uid].add(cat, count)
 
     def get_default_data_entry(self):
-        return MemeberMessageEntry(self.label_category)
+        return MemberMessageByCategoryEntry(self.label_category)
 
 
 class BotFeatureUsageResult:

@@ -1,3 +1,4 @@
+import struct
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List
@@ -5,15 +6,20 @@ from typing import Any, Optional, Union, List
 import pymongo
 from bson import ObjectId
 
+from extutils import dt_to_objectid
 from extutils.locales import UTC
-from extutils.dt import now_utc_aware
+from extutils.dt import now_utc_aware, parse_time_range
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from mongodb.utils import CursorWithCount
-from models import APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel, \
-    HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult, \
-    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageResult, MemberDailyMessageResult
+from models import (
+    APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel,
+    HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
+    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
+    MemberMessageCountResult
+)
+
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -115,10 +121,56 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         return [e["cid"] for e in aggr]
 
-    def get_user_messages(
+    def get_user_messages_total_count(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, period_count: int = 3,
+            tzinfo_: Optional[tzinfo] = None) \
+            -> MemberMessageCountResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+        trange = parse_time_range(
+            hr_range=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
+
+        self._attach_time_range_(match_d, trange=trange)
+
+        # $switch expression for time range
+        switch_branches = []
+
+        # Check for full range (inf)
+        # `start` and `end` cannot be `None` for generating `ObjectId`,
+        # however `start` and `end` for full range are `None`.
+        if not trange.is_inf:
+            for idx, range_ in enumerate(trange.get_periods()):
+                start_id = dt_to_objectid(range_.start)
+                if not start_id:
+                    continue
+                end_id = dt_to_objectid(range_.end)
+                if end_id:
+                    continue
+
+                switch_branches.append(
+                    {"case": {"$and": [{"$gte": ["$" + OID_KEY, start_id]},
+                                       {"$lt": ["$" + OID_KEY, end_id]}]},
+                     "then": str(idx)}
+                )
+
+        group_key = {MemberMessageCountResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key}
+        if switch_branches:
+            group_key[MemberMessageCountResult.KEY_INTERVAL_IDX] = {"$switch": {"branches": switch_branches}}
+
+        aggr_pipeline = [
+            {"$match": match_d},
+            {"$group": {
+                OID_KEY: group_key,
+                MemberMessageCountResult.KEY_COUNT: {"$sum": 1}
+            }}
+        ]
+
+        return MemberMessageCountResult(list(self.aggregate(aggr_pipeline)), period_count, trange)
+
+    def get_user_messages_by_category(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None) \
-            -> MemberMessageResult:
+            -> MemberMessageByCategoryResult:
         match_d = self._channel_oids_filter_(channel_oids)
         self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
 
@@ -126,14 +178,14 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$match": match_d},
             {"$group": {
                 OID_KEY: {
-                    MemberMessageResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key,
-                    MemberMessageResult.KEY_CATEGORY: "$" + MessageRecordModel.MessageType.key
+                    MemberMessageByCategoryResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key,
+                    MemberMessageByCategoryResult.KEY_CATEGORY: "$" + MessageRecordModel.MessageType.key
                 },
-                MemberMessageResult.KEY_COUNT: {"$sum": 1}
+                MemberMessageByCategoryResult.KEY_COUNT: {"$sum": 1}
             }}
         ]
 
-        return MemberMessageResult(list(self.aggregate(aggr_pipeline)))
+        return MemberMessageByCategoryResult(list(self.aggregate(aggr_pipeline)))
 
     def hourly_interval_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,

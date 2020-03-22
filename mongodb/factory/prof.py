@@ -602,9 +602,13 @@ class ProfileManager:
     def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[ProfilePermission]:
         return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
 
-    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
+    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
             -> List[ChannelProfileConnectionModel]:
         return self._conn.get_channel_members(channel_oid, available_only)
+
+    def get_channel_member_oids(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
+            -> List[ObjectId]:
+        return [mdl.user_oid for mdl in self.get_channel_members(channel_oid, available_only=available_only)]
 
     def get_available_connections(self) -> CursorWithCount:
         return self._conn.get_available_connections()

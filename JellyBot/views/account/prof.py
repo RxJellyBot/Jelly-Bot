@@ -70,7 +70,7 @@ class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
         member_list = {}
         if attach_member:
             member_list = IdentitySearcher.get_batch_user_name(
-                [mdl.user_oid for mdl in ProfileManager.get_channel_members(channel_oid, True)], channel_data.model)
+                ProfileManager.get_channel_member_oids(channel_oid, available_only=True), channel_data.model)
             member_list = sorted(member_list.items(), key=lambda item: item[1])
 
         return render_template(

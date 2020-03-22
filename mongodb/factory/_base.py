@@ -1,7 +1,8 @@
 import os
+import struct
 from datetime import timedelta, datetime
 from threading import Thread
-from typing import Type, Optional, Tuple
+from typing import Type, Optional, Tuple, Union
 
 from bson import ObjectId
 from bson.errors import InvalidDocument
@@ -11,7 +12,7 @@ from pymongo.errors import DuplicateKeyError
 
 from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
-from extutils.dt import now_utc_aware
+from extutils.dt import parse_time_range, TimeRange
 from extutils.logger import SYSTEM
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
@@ -168,16 +169,37 @@ class ControlExtensionMixin(Collection):
 
     @staticmethod
     def _attach_time_range_(filter_: dict, *, hours_within: Optional[int] = None,
-                            start: Optional[datetime] = None, end: Optional[datetime] = None):
+                            start: Optional[datetime] = None, end: Optional[datetime] = None,
+                            range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
+        """
+        Attach parsed time range to the filter.
+
+        Data which creation time (generation time of `_id`) is out of the given time range will be filtered out.
+
+        If `trange` is specified, `hours_within`, `start`, `end`, `range_mult` will be ignored.
+        """
         id_filter = {}
 
-        if start:
-            id_filter["$gt"] = ObjectId.from_datetime(start)
-        if end:
-            id_filter["$lt"] = ObjectId.from_datetime(end)
+        # Get the time range
 
-        if not id_filter and hours_within:
-            id_filter["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+        if not trange:
+            trange = parse_time_range(hr_range=hours_within, start=start, end=end, range_mult=range_mult)
+
+        if trange.start:
+            try:
+                id_filter["$gt"] = ObjectId.from_datetime(trange.start)
+            except struct.error:
+                # start time out of range
+                pass
+
+        if trange.end:
+            try:
+                id_filter["$lt"] = ObjectId.from_datetime(trange.end)
+            except struct.error:
+                # end time out of range
+                pass
+
+        # Modifying filter
 
         if id_filter:
             if OID_KEY in filter_:

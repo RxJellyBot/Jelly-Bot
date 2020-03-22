@@ -166,7 +166,7 @@ cmd_ch_mem = cmd_ch.new_child_node(
 def check_channel_member(e: TextMessageEventObject):
     ret = []
 
-    user_oids = [conn.user_oid for conn in ProfileManager.get_channel_members(e.channel_oid, available_only=True)]
+    user_oids = ProfileManager.get_channel_member_oids(e.channel_oid, available_only=True)
     user_name_dict = IdentitySearcher.get_batch_user_name(user_oids, e.channel_model, on_not_found="(N/A)")
 
     for user_oid, user_name in sorted(user_name_dict.items(), key=lambda x: x[1]):

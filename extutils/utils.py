@@ -1,7 +1,10 @@
 import re
+import struct
+from datetime import datetime
 from typing import List, Tuple, Union, Generator, Any
 import html
 
+from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 
@@ -147,3 +150,10 @@ def enumerate_ranking(iterable, start=1, t_prefix=True, is_equal: callable = lam
         prev = curr
 
         temp = []
+
+
+def dt_to_objectid(dt: datetime):
+    try:
+        return ObjectId.from_datetime(dt)
+    except struct.error:
+        return None
