@@ -20,12 +20,20 @@ class BotFeature(FlagDoubleEnum):
                 1012 - List (All)
                 1013 - Delete
                 1019 - List (Keyword)
+            102 - Profile
+                1021 - Create
+                1022 - Query
+                1023 - List
+                1024 - Attach
+                1025 - Detach
+                1026 - Delete
 
         11 - Sub
             110 - Information
                 1101 - Check channel/self ID
                 1102 - Check channel info
                 1103 - Check user info
+                1104 - Check channel member's info
                 1109 - Bot Help
             111 - Transform/Replace
                 1111 - Replace newline character
@@ -38,6 +46,8 @@ class BotFeature(FlagDoubleEnum):
                 1141 - Activate
                 1142 - Deactivate
                 1143 - Current Status
+            115 - Calculator
+                1151 - Calculate
 
         12 - Extra Services
             120 - Short URL
@@ -91,12 +101,27 @@ class BotFeature(FlagDoubleEnum):
     TXT_TMR_GET = \
         1019, _("Text / Timer / List (Keyword)"), _("Get the timer(s) with the designated keyword.")
 
+    TXT_PF_CREATE = \
+        1021, _("Text / Profile / Create"), _("Add a timer.")
+    TXT_PF_QUERY = \
+        1022, _("Text / Profile / Query"), _("List all timers.")
+    TXT_PF_LIST = \
+        1023, _("Text / Profile / List"), _("List all timers.")
+    TXT_PF_ATTACH = \
+        1024, _("Text / Profile / Attach"), _("Delete a timer.")
+    TXT_PF_DETACH = \
+        1025, _("Text / Profile / Detach"), _("Get the timer(s) with the designated keyword.")
+    TXT_PF_DELETE = \
+        1026, _("Text / Profile / Delete"), _("Get the timer(s) with the designated keyword.")
+
     TXT_INFO_ID = \
         1101, _("Text / Information / Check IDs"), _("Check the ID of current channel and self.")
     TXT_INFO_CHANNEL = \
         1102, _("Text / Information / Channel"), _("Check the channel info.")
     TXT_INFO_USER = \
         1103, _("Text / Information / User"), _("Check the user info of self.")
+    TXT_INFO_CHANNEL_MEMBER = \
+        1104, _("Text / Information / Channel Member"), _("Check the info of the channel members.")
     TXT_BOT_HELP = \
         1109, _("Text / Information / Help"), _("Get help for how to use the bot and the related information.")
 
@@ -118,6 +143,9 @@ class BotFeature(FlagDoubleEnum):
         1142, _("Text / Remote / Deactivate"), _("Deactivate the remore control system.")
     TXT_RMC_STATUS = \
         1143, _("Text / Remote / Status"), _("View the current status of the remote control system.")
+
+    TXT_CALCULATOR = \
+        1151, _("Text / Calculator"), _("Calculate the given expression string.")
 
     TXT_SURL_CREATE = \
         1201, _("Text / Short URL / Create"), _("Create a shortened URL.")

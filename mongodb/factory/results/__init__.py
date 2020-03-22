@@ -14,6 +14,6 @@ from .channel import (
 )
 from .statistics import RecordAPIStatisticsResult, MessageRecordResult
 from .execode import EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult
-from .perm import GetPermissionProfileResult, CreatePermissionProfileResult
+from .perm import GetPermissionProfileResult, CreateProfileResult
 from .exctnt import RecordExtraContentResult
 from .shorturl import UrlShortenResult

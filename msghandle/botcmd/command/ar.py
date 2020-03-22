@@ -19,8 +19,7 @@ from ._base_ import CommandNode
 
 __all__ = ["cmd_main"]
 
-# ----------------------- Command Nodes
-
+# region Command Nodes
 cmd_main = CommandNode(
     codes=["ar", "auto"], order_idx=0, name=_("Auto Reply"),
     brief_description=_("Perform operations related to the auto-reply feature."),
@@ -46,11 +45,10 @@ cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
 cmd_info = cmd_main.new_child_node(codes=["i", "info"])
 cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
+# endregion
 
 
-# ----------------------- Add
-
-
+# region Add
 @cmd_add.command_function(
     feature_flag=BotFeature.TXT_AR_ADD_EXECODE,
     arg_count=1,
@@ -166,17 +164,16 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
             bypass_multiline_check=True))
     else:
         ret.append(HandledMessageEventText(
-                content=_("Failed to register the Auto-Reply module.\n"
-                          "Code: `{}`\n"
-                          "Visit {} to see the code explanation.").format(
-                    add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
+            content=_("Failed to register the Auto-Reply module.\n"
+                      "Code: `{}`\n"
+                      "Visit {} to see the code explanation.").format(
+                add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
 
     return ret
+# endregion
 
 
-# ----------------------- Delete
-
-
+# region Delete
 @cmd_del.command_function(
     feature_flag=BotFeature.TXT_AR_DEL,
     arg_count=1,
@@ -201,10 +198,10 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
                           "Code: {}\n"
                           "Visit {} to see the code explanation.").format(
                     outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+# endregion
 
 
-# ----------------------- List
-
+# region List / Query / Info / Ranking
 def get_list_of_keyword_html(conn_list: CursorWithCount) -> List[str]:
     return [f"- {conn.keyword.content_html}<br>" for conn in conn_list]
 
@@ -219,9 +216,9 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
 
     if not conn_list.empty:
-        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
-               + "\n\n" \
-               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+        ctnt = _("Usable Keywords ({}):").format(len(conn_list)) + \
+            "\n\n" + \
+            "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
@@ -241,8 +238,8 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
 
     if not conn_list.empty:
         ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
-               + "\n\n" \
-               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+            + "\n\n" \
+            + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
@@ -327,3 +324,4 @@ def auto_reply_ranking(e: TextMessageEventObject):
         return [HandledMessageEventText(content="\n".join([str(s) for s in ret]))]
     else:
         return [HandledMessageEventText(content=_("No ranking data available for now."))]
+# endregion

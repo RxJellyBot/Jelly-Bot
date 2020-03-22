@@ -6,11 +6,11 @@
         <div class="row mb-3">
             <label class="col-sm-4 col-form-label text-center" for="name">{% trans "Name" %}</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" id="name" name="x-Name" required>
+                <input type="text" class="form-control" id="name" name="x-Name" value="{{ value_name }}" required>
                 <div class="invalid-feedback">
                 {% url "account.profile.attach" channel_oid=channel_oid as attach_url %}
                     {% blocktrans trimmed %}
-                        Duplicated profile name detected. Visit <a href="{{ attach_url }}">this page</a> to attach the existing profile.
+                        Duplicated profile name detected. Visit <a href="{{ attach_url }}">this page</a> to attach the existing profile or choose a different name.
                     {% endblocktrans %}
                 </div>
             </div>
@@ -18,7 +18,7 @@
         <div class="row">
             <label class="col-sm-4 col-form-label text-center" for="color">{% trans "Color" %}</label>
             <div class="col-sm-8 input-group">
-                <input type="text" class="form-control" id="color" name="x-Color" value="{{ default_color }}"
+                <input type="text" class="form-control" id="color" name="x-Color" value="{{ value_color }}"
                        pattern="#[0-9a-fA-F]{6}" required>
                 <div class="input-group-append">
                     <span class="input-group-text" id="colorSample">&nbsp;&nbsp;</span>

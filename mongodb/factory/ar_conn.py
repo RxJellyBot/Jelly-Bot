@@ -10,7 +10,7 @@ from extutils.utils import enumerate_ranking
 from extutils.checker import param_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
-from flags import PermissionCategory, AutoReplyContentType
+from flags import ProfilePermission, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel, UniqueKeywordCountResult
 from models.utils import AutoReplyValidators
@@ -46,8 +46,8 @@ class AutoReplyModuleManager(BaseCollection):
 
     @staticmethod
     def _has_access_to_pinned_(channel_oid: ObjectId, user_oid: ObjectId):
-        perms = ProfileManager.get_permissions(ProfileManager.get_user_profiles(channel_oid, user_oid))
-        return PermissionCategory.AR_ACCESS_PINNED_MODULE in perms
+        perms = ProfileManager.get_user_permissions(channel_oid, user_oid)
+        return ProfilePermission.AR_ACCESS_PINNED_MODULE in perms
 
     def _validate_content_(
             self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
@@ -271,7 +271,7 @@ class AutoReplyModuleTagManager(BaseCollection):
         super().__init__()
         self.create_index(AutoReplyModuleTagModel.Name.key, name="Auto Reply Tag Identity", unique=True)
 
-    def get_insert(self, name, color=ColorFactory.BLACK) -> AutoReplyModuleTagGetResult:
+    def get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
         ex = None
         tag_data = self.find_one_casted(
             {AutoReplyModuleTagModel.Name.key: name},
@@ -433,7 +433,7 @@ class AutoReplyManager:
 
         return ret
 
-    def tag_get_insert(self, name, color=ColorFactory.BLACK) -> AutoReplyModuleTagGetResult:
+    def tag_get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
         return self._tag.get_insert(name, color)
 
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \

@@ -1,10 +1,9 @@
-from dateutil import parser
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
 from extutils.boolext import str_to_bool, true_word, false_word, StrBoolResult
-from extutils.dt import is_tz_naive
+from extutils.dt import is_tz_naive, parse_to_dt
 from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import TimerManager
@@ -48,14 +47,9 @@ continue_help = _("A word that can indicate if the timer should keep counting up
 def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, countup: str) \
         -> List[HandledMessageEventText]:
     # Parse datetime string
-    try:
-        dt = parser.parse(dt, ignoretz=False)
-    except (ValueError, OverflowError):
+    dt = parse_to_dt(dt)
+    if not dt:
         return [HandledMessageEventText(content=_("Failed to parse the string of datetime. (`{}`)").format(dt))]
-
-    # Attach timezone if needed
-    if is_tz_naive(dt):
-        dt = dt.replace(tzinfo=e.user_model.config.tzinfo)
 
     # Check `countup` flag
     ctup = str_to_bool(countup)

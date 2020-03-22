@@ -14,6 +14,8 @@ from .rmc import cmd as cmd_rmc
 from .tmr import cmd as cmd_tmr
 from .rct import cmd as cmd_rct
 from .surl import cmd as cmd_surl
+from .calc import cmd as cmd_calc
+from .prof import cmd as cmd_prof
 
 # List all main command nodes for some pages to get the command data
 __all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr"]
@@ -31,6 +33,8 @@ cmd_root.attach_child_node(cmd_tmr)
 cmd_root.attach_child_node(cmd_rct)
 cmd_root.attach_child_node(cmd_rmc)
 cmd_root.attach_child_node(cmd_surl)
+cmd_root.attach_child_node(cmd_calc)
+cmd_root.attach_child_node(cmd_prof)
 
 # DEPRECATE: Old command
 

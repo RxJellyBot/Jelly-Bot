@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from JellyBot.systemconfig import System
 from bot.user import perform_existence_check
 from bot.system import record_boot_dt
@@ -32,6 +34,8 @@ def _check_all_ready_():
 def on_system_fully_ready():
     """Code to execute on system fully prepared."""
     load_handling_functions()
-    perform_existence_check(set_name_to_cache=True)
     record_boot_dt()
-    activate_ddns_update(System.DDNSUpdateIntervalSeconds)
+
+    if settings.PRODUCTION:
+        perform_existence_check(set_name_to_cache=True)
+        activate_ddns_update(System.DDNSUpdateIntervalSeconds)

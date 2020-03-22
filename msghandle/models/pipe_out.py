@@ -72,10 +72,13 @@ class HandledMessageEventLineSticker(HandledMessageEvent):
 
 
 class HandledMessageCalculateResult(HandledMessageEventText):
-    def __init__(self, expr_before: str, expr_after):
+    def __init__(self, expr_before: str, expr_after=None):
         content = str(_("**AUTO CALCULATOR**\n"
                         "Expression: `{}`\n"
                         "Result: `{}`").format(expr_before, expr_after))
+
+        if not expr_after:
+            expr_after = expr_before
 
         if isinstance(expr_after, Rational):
             content += "\n" + str(_("Evaluated: `{}`").format(float(expr_after)))

@@ -49,6 +49,9 @@ class Website:
     class RecentActivity:
         MaxMessageCount = 1000
 
+    class Message:
+        DefaultPeriodCount = 3
+
 
 class AutoReply:
     MaxResponses = 5

@@ -1,7 +1,8 @@
 import os
-from datetime import timedelta
+import struct
+from datetime import timedelta, datetime
 from threading import Thread
-from typing import Type, Optional, Tuple
+from typing import Type, Optional, Tuple, Union
 
 from bson import ObjectId
 from bson.errors import InvalidDocument
@@ -11,7 +12,7 @@ from pymongo.errors import DuplicateKeyError
 
 from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
-from extutils.dt import now_utc_aware
+from extutils.dt import parse_time_range, TimeRange
 from extutils.logger import SYSTEM
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
@@ -156,8 +157,9 @@ class ControlExtensionMixin(Collection):
             target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
 
     def find_cursor_with_count(
-            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None, **kwargs) -> CursorWithCount:
-        self._attach_hours_within_(filter_, hours_within)
+            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> CursorWithCount:
+        self._attach_time_range_(filter_, hours_within=hours_within, start=start, end=end)
 
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
@@ -166,18 +168,45 @@ class ControlExtensionMixin(Collection):
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod
-    def _attach_hours_within_(filter_: dict, hours_within: Optional[int] = None):
-        fltr = {}
+    def _attach_time_range_(filter_: dict, *, hours_within: Optional[int] = None,
+                            start: Optional[datetime] = None, end: Optional[datetime] = None,
+                            range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
+        """
+        Attach parsed time range to the filter.
 
-        if hours_within:
-            fltr["$gt"] = ObjectId.from_datetime(now_utc_aware() - timedelta(hours=hours_within))
+        Data which creation time (generation time of `_id`) is out of the given time range will be filtered out.
 
-        if fltr:
+        If `trange` is specified, `hours_within`, `start`, `end`, `range_mult` will be ignored.
+        """
+        id_filter = {}
+
+        # Get the time range
+
+        if not trange:
+            trange = parse_time_range(hr_range=hours_within, start=start, end=end, range_mult=range_mult)
+
+        if trange.start:
+            try:
+                id_filter["$gt"] = ObjectId.from_datetime(trange.start)
+            except struct.error:
+                # start time out of range
+                pass
+
+        if trange.end:
+            try:
+                id_filter["$lt"] = ObjectId.from_datetime(trange.end)
+            except struct.error:
+                # end time out of range
+                pass
+
+        # Modifying filter
+
+        if id_filter:
             if OID_KEY in filter_:
                 filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
-                filter_[OID_KEY].update(fltr)
+                filter_[OID_KEY].update(id_filter)
             else:
-                filter_[OID_KEY] = fltr
+                filter_[OID_KEY] = id_filter
 
 
 class BaseCollection(ControlExtensionMixin, Collection):
@@ -214,9 +243,10 @@ class BaseCollection(ControlExtensionMixin, Collection):
 
     def on_init(self):
         ModelFieldChecker.check_async(self)
-        backup_collection(
-            MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
-            single_db_name is not None, Database.BackupIntervalSeconds)
+        if settings.PRODUCTION:
+            backup_collection(
+                MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
+                single_db_name is not None, Database.BackupIntervalSeconds)
 
     def on_init_async(self):
         pass

@@ -3,7 +3,7 @@ from typing import List, Set
 
 from bson import ObjectId
 
-from flags import PermissionCategory, PermissionCategoryDefault, PermissionLevel
+from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from models import Model, ChannelModel, ModelDefaultValueExt
 from models.field import (
     ObjectIDField, TextField, ColorField, DictionaryField, BooleanField, ArrayField, IntegerField, PermissionLevelField
@@ -19,7 +19,7 @@ class ChannelProfileModel(Model):
     Color = ColorField("col")
     PromoVote = IntegerField("promo")
     Permission = DictionaryField("perm",
-                                 default=PermissionCategoryDefault.get_default_code_str_dict(), allow_none=False)
+                                 default=ProfilePermissionDefault.get_default_code_str_dict(), allow_none=False)
     PermissionLevel = PermissionLevelField("plv")
 
     EmailKeyword = ArrayField("e-kw", str)
@@ -33,24 +33,24 @@ class ChannelProfileModel(Model):
         return self.permission_level >= PermissionLevel.ADMIN
 
     @property
-    def permission_set(self) -> Set[PermissionCategory]:
+    def permission_set(self) -> Set[ProfilePermission]:
         ret = set()
 
         for cat, permitted in self.permission.items():
             if permitted:
-                perm = PermissionCategory.cast(cat, silent_fail=True)
+                perm = ProfilePermission.cast(cat, silent_fail=True)
                 if perm:
                     ret.add(perm)
 
-        ret = ret.union(PermissionCategoryDefault.get_overridden_permissions(self.permission_level))
+        ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
         return ret
 
     def pre_iter(self):
         # Will be used when the data will be passed to MongoDB
-        d = [p.code_str for p in PermissionCategoryDefault.get_overridden_permissions(self.permission_level)]
+        d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
 
-        for perm_cat in PermissionCategory:
+        for perm_cat in ProfilePermission:
             k = perm_cat.code_str
             if k not in self.permission:
                 self.permission[k] = k in d
@@ -62,8 +62,7 @@ class ChannelProfileListEntry:
     channel_name: str
     profiles: List[ChannelProfileModel]
     starred: bool
-    can_create_profile: bool
-    can_delete_profile: bool
+    can_ced_profile: bool
     default_profile_oid: ObjectId
 
 

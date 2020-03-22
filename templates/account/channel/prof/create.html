@@ -10,17 +10,30 @@
     </div>
 
     <div class="container">
-        <form class="enable-login d-none" id="createProfile" method="post">
+        <div class="row">
+            <div class="col">
+                <ul>
+                    <li>{% trans "Availability of enabling the permissions is decided by the permission level." %}</li>
+                    <li>{% trans "Newly created profile will be automatically attached to self." %}</li>
+                    <li>
+                        {% blocktrans trimmed %}
+                            Individually checked permission will be overridden by the permissions of the permission level.
+                            For example, if the permission level is Normal(0), regardless if the permission "Normal" is checked, the permission will always grant to the user.
+                        {% endblocktrans %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <form method="post">
+            <input type="hidden" name="x-ChannelOid" id="channelOid" value="{{ channel_oid }}">
             {% csrf_token %}
             <div class="row">
                 <div class="col-lg-6">
-                    <input type="hidden" name="x-ChannelOid" id="channelOid" value="{{ channel_oid }}">
-
-                    {% include "account/channel/prof/create-main.html" %}
-                    {% include "account/channel/prof/create-prop.html" %}
+                    {% include "account/channel/prof/ce-main.html" %}
+                    {% include "account/channel/prof/ce-prop.html" %}
                 </div>
                 <div class="col-lg-6">
-                    {% include "account/channel/prof/create-perm.html" %}
+                    {% include "account/channel/prof/ce-perm.html" %}
                 </div>
             </div>
             <div class="row text-right">
@@ -32,7 +45,7 @@
     </div>
 {% endblock %}
 {% block ex-script %}
-    {% include "account/channel/prof/create-js.html" %}
+    {% include "account/channel/prof/ce-js.html" %}
     <script src="{% static "js/utils/generator.js" %}" type="text/javascript"></script>
-    <script src="{% static "js/account/profile/create.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/account/profile/ce.js" %}" type="text/javascript"></script>
 {% endblock %}

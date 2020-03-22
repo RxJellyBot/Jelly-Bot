@@ -32,7 +32,6 @@ pre {
     height: 0.7rem;
     min-width: 0.7rem;
     width: 0.7rem;
-    border: 0.01rem solid #BBBBBB;
     border-radius: 50%;
     display: inline-block;
 }
@@ -41,7 +40,6 @@ pre {
     height: 1.5rem;
     min-width: 1.5rem;
     width: 1.5rem;
-    border: 0.01rem solid #BBBBBB;
     border-radius: 50%;
     display: inline-block;
 }

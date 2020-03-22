@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagDoubleEnum, FlagSingleEnum
 
 
-class PermissionCategory(FlagDoubleEnum):
+class ProfilePermission(FlagDoubleEnum):
     """
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !! Add corresponding HTML file under `templates/account/channel/perm` with code as the name of the file. !!
@@ -26,14 +26,14 @@ class PermissionCategory(FlagDoubleEnum):
         303 - Adjust Info Privacy
 
     4xx - Profile Control
-        401 - Create Profile
-        402 - Delete Profile
-        403 - Attach on Member
+        401 - Control (self)
+        402 - Control (member)
+        403 - Create / Edit / Delete
     """
 
     @classmethod
     def default(cls):
-        raise PermissionCategory.NORMAL
+        raise ProfilePermission.NORMAL
 
     NORMAL = \
         1, _("Normal"), \
@@ -59,17 +59,17 @@ class PermissionCategory(FlagDoubleEnum):
         303, _("Channel: Info Privacy"), \
         _("User who has this permission can change the privacy of the channel info.")
 
-    PRF_CREATE_ATTACH = \
-        401, _("Profile: Create/Attach"), \
-        _("User who has this permission can create profiles or attach profiles to themselves.")
+    PRF_CONTROL_SELF = \
+        401, _("Profile: Control (self)"), \
+        _("User who has this permission can attach/detach profile to themselves.")
 
-    PRF_DELETE = \
-        402, _("Profile: Delete"), \
-        _("User who has this permission can delete profiles.")
+    PRF_CONTROL_MEMBER = \
+        402, _("Profile: Control (member)"), \
+        _("User who has this permission can attach/detach profiles to the other members.")
 
-    PRF_ATTACH_MEMBER = \
-        403, _("Profile: Attach on Member"), \
-        _("User who has this permission can attach profiles to the other members.")
+    PRF_CED = \
+        403, _("Profile: CED"), \
+        _("User who has this permission can create / edit / delete (CED) profiles.")
 
 
 class PermissionLevel(FlagSingleEnum):
@@ -98,36 +98,36 @@ class PermissionLevel(FlagSingleEnum):
                 return
 
 
-class PermissionCategoryDefault:
+class ProfilePermissionDefault:
     _Cache = {}
 
     _Default = {
-        PermissionCategory.NORMAL
+        ProfilePermission.NORMAL
     }
 
     # noinspection PyTypeChecker
     _Override = {
         PermissionLevel.MOD: {
-            PermissionCategory.AR_ACCESS_PINNED_MODULE
+            ProfilePermission.AR_ACCESS_PINNED_MODULE
         },
-        PermissionLevel.highest(): set(PermissionCategory)
+        PermissionLevel.highest(): set(ProfilePermission)
     }
 
     @staticmethod
-    def get_overridden_permissions(highest_perm_lv: PermissionLevel) -> Set[PermissionCategory]:
-        if highest_perm_lv not in PermissionCategoryDefault._Cache:
-            perms = PermissionCategoryDefault._Default
+    def get_overridden_permissions(highest_perm_lv: PermissionLevel) -> Set[ProfilePermission]:
+        if highest_perm_lv not in ProfilePermissionDefault._Cache:
+            perms = ProfilePermissionDefault._Default
             for perm_lv in highest_perm_lv.iter_to_max:
-                perms = perms.union(PermissionCategoryDefault._Override.get(perm_lv, set()))
+                perms = perms.union(ProfilePermissionDefault._Override.get(perm_lv, set()))
 
-            PermissionCategoryDefault._Cache[highest_perm_lv] = perms
+            ProfilePermissionDefault._Cache[highest_perm_lv] = perms
 
-        return PermissionCategoryDefault._Cache[highest_perm_lv]
+        return ProfilePermissionDefault._Cache[highest_perm_lv]
 
     @staticmethod
-    def get_default_dict() -> Dict[PermissionCategory, bool]:
-        return {perm_cat: perm_cat in PermissionCategoryDefault._Default for perm_cat in PermissionCategory}
+    def get_default_dict() -> Dict[ProfilePermission, bool]:
+        return {perm_cat: perm_cat in ProfilePermissionDefault._Default for perm_cat in ProfilePermission}
 
     @staticmethod
     def get_default_code_str_dict() -> Dict[str, bool]:
-        return {k.code_str: v for k, v in PermissionCategoryDefault.get_default_dict().items()}
+        return {k.code_str: v for k, v in ProfilePermissionDefault.get_default_dict().items()}

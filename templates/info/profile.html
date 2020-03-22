@@ -12,26 +12,27 @@
     <div class="container">
         <div class="row">
             <div class="col mb-3">
-                <span class="h3">{% trans "Basic Information" %}</span>
+                <span class="h4">{% trans "Basic Information" %}</span>
             </div>
         </div>
         <div class="row">
-            <div class="col-lg mb-3">
+            <div class="col-lg-6 mb-3">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Name" %}</h4>
+                    <div class="card-header text-dark">{% trans "Channel ID" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2 font-weight-normal">
-                            <span class="dot" style="background-color: {{ profile_data.color.color_hex }}"></span>
-                            {{ profile_data.name }}
+                        <div class="card-text h4">
+                            <code><a href="{% url "info.channel" channel_oid=profile_data.channel_oid %}">
+                                {{ profile_data.channel_oid }}
+                            </a></code>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg">
+            <div class="col-lg-6 mb-3">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Profile ID" %}</h4>
+                    <div class="card-header text-dark">{% trans "Profile ID" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <code>{{ profile_data.id }}</code>
                         </div>
                     </div>
@@ -41,31 +42,30 @@
         <div class="row">
             <div class="col-lg-6 mb-3">
                 <div class="card border-dark text-center">
-                    <h4 class="card-header text-dark">{% trans "Channel ID" %}</h4>
+                    <div class="card-header text-dark">{% trans "Name" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
-                            <code><a href="{% url "info.channel" channel_oid=profile_data.channel_oid %}">
-                                {{ profile_data.channel_oid }}
-                            </a></code>
+                        <div class="card-text h4 font-weight-normal">
+                            <span class="dot" style="background-color: {{ profile_data.color.color_hex }}"></span>
+                            {{ profile_data.name }}
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg mb-3">
+            <div class="col-lg-3 mb-3">
                 <div class="card border-dark text-center">
-                    <h5 class="card-header text-dark">{% trans "Permission Level" %}</h5>
+                    <div class="card-header text-dark">{% trans "Permission Level" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <span class="text-success">{{ profile_data.permission_level.code }}&nbsp;({{ profile_data.permission_level.key }})</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg">
-                <div class="card border-dark text-center mb-3">
-                    <h5 class="card-header text-dark">{% trans "Promotion Required" %}</h5>
+            <div class="col-lg-3 mb-3">
+                <div class="card border-dark text-center">
+                    <div class="card-header text-dark">{% trans "Promotion Required" %}</div>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             {% if profile_data.promo_vote > 0 %}
                                 <span class="text-danger">{% trans "Yes" %}</span>
                             {% else %}
@@ -76,9 +76,27 @@
                 </div>
             </div>
         </div>
-        <div class="row mb-3">
-            <div class="col">
-                <span class="h3">{% trans "Permissions" %}</span>
+        <div class="row">
+            <div class="col-lg-12">
+                {% if not is_default %}
+                    <form class="profile-delete d-inline mr-2" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ entry.root_oid }}" name="uid">
+                        <input type="hidden" value="delete" name="action">
+                        <button class="btn btn-outline-danger" type="submit">
+                            {% trans "Delete" %}
+                        </button>
+                    </form>
+                {% endif %}
+                <a class="btn btn-outline-success" href="{% url "account.profile.edit" channel_oid=profile_data.channel_oid profile_oid=profile_data.id %}">
+                    {% trans "Edit" %}
+                </a>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col mb-3">
+                <span class="h4">{% trans "Permissions" %}</span>
             </div>
         </div>
         <div class="row mb-3">
@@ -86,7 +104,7 @@
                 <div class="col-lg-4 col-6 list-group-item list-group-item-action mb-0">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ perm_cat.key }}</h5>
-                        {% if profile_data.permission|get_val:perm_cat.code_str %}
+                        {% if perm_cat in profile_data.permission_set %}
                             <span class="dot bg-success"></span>
                         {% else %}
                             <span class="dot bg-danger"></span>
@@ -96,24 +114,40 @@
                 </div>
             {% endfor %}
         </div>
+        <hr>
         <div class="row mb-3">
             <div class="col">
-                <span class="h3">{% trans "User who also have this profile" %}</span>
+                <span class="h4">{% trans "User who also have this profile" %}</span>
             </div>
         </div>
         <div class="row">
             <div class="col">
                 <div class="table-responsive table-freeze-header" style="max-height: 35rem">
-                    <table class="table table-hover table-bordered table-bordered mb-0 datatable">
+                    <table class="table table-hover table-bordered table-bordered mb-0 datatable datatable-noorder"
+                           data-nordcol="1">
                         <thead>
                         <tr>
                             <th scope="col">{% trans "Member Name" %}</th>
+                            <th scope="col">{% trans "Control" context "Profile Control" %}</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for name in names %}
+                        {% for entry in profile_controls %}
                             <tr>
-                                <td class="align-middle text-center">{{ name }}</td>
+                                <td class="align-middle text-center">{{ entry.name }}</td>
+                                <td class="align-middle text-center">
+                                    {% if entry.removable %}
+                                        <form class="profile-detach" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ entry.root_oid }}" name="uid">
+                                            <input type="hidden" value="detach" name="action">
+                                            <button class="btn btn-outline-danger" type="submit"
+                                                    data-uname="{{ entry.name }}">
+                                                {% trans "Detach" %}
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -130,4 +164,25 @@
 
 {% block ex-script %}
     {% include "components/interactive-table-js.html" %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("form.profile-detach").submit(function (e) {
+                let profileName = "{{ profile_data.name }}";
+                let userName = $(this).find("button").data("uname");
+                let confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}
+                    ?{% endblocktrans %}`;
+
+                if (!confirm(confirmMsg)) {
+                    e.preventDefault();
+                }
+            });
+            $("form.profile-delete").submit(function (e) {
+                let confirmMsg = `{% blocktrans trimmed %}Are you sure to delete this profile?{% endblocktrans %}`;
+
+                if (!confirm(confirmMsg)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 {% endblock %}

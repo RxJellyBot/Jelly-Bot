@@ -42,7 +42,7 @@ class _BaseValidators:
                 return False
         else:
             try:
-                return content.startswith("http") and (content[len(content)-4:] in (".png", ".jpg"))
+                return content.startswith("http") and (content[len(content) - 4:] in (".png", ".jpg"))
             except Exception:
                 return False
 

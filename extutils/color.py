@@ -45,6 +45,8 @@ class Color:
 class ColorFactory:
     BLACK = Color(0)
 
+    DEFAULT = BLACK
+
     @staticmethod
     def from_rgb(red: int, green: int, blue: int):
         def _val_check_(val, name):
@@ -63,7 +65,7 @@ class ColorFactory:
         :param hex_str: Allowed formats are: #FFFFFF or FFFFFF.
         """
         if not re.match(r"#?[0-9A-Fa-f]{6}", hex_str):
-            raise ValueError(f"Invalid color string. Should be like #FFFFFF or FFFFFF. ({hex_str})")
+            raise ValueError(f"Invalid color string. Should be in the format of #FFFFFF or FFFFFF. ({hex_str})")
 
         hex_str = hex_str.replace("#", "")
 

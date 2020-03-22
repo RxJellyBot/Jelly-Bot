@@ -1,0 +1,26 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center">{% trans "Profile List" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            {% for entry in prof_entry %}
+                <div class="col-lg-4 col-md-12 mb-3">
+                    {% include "account/channel/prof/list-card.html" with entry=entry %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block ex-script %}
+    <script type="text/javascript">
+    </script>
+{% endblock %}

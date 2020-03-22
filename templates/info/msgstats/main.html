@@ -27,28 +27,61 @@
         </div>
 
         <form>
-            <div class="row">
-                <div class="col-lg mb-3">
-                    <div class="form-row mb-3">
-                        <label class="col-2 col-form-label text-right" for="range">{% trans "Range" %}</label>
-                        <div class="col-4">
-                            <div class="input-group">
-                                <input type="number" class="form-control border-dark" value="{{ hr_range }}"
-                                       name="hours_within" id="range">
-                                <div class="input-group-append"><span
-                                        class="input-group-text">{% trans "Hours" %}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-form-label text-lg-right">
-                            <small>{% trans "Leave this blank and refresh to get all-time record." %}</small>
+            <div class="row mb-3 mx-1">
+                <div class="row col-lg-8">
+                    <label class="col-4 col-form-label text-right" for="range">{% trans "Range" %}</label>
+                    <div class="col-8 input-group px-0">
+                        <input type="number" class="form-control border-dark" value="{{ hr_range }}"
+                               name="hours_within" id="range">
+                        <div class="input-group-append"><span class="input-group-text">{% trans "Hours" %}</span>
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-4 col-form-label text-right">
+                    <small>{% trans "Leave this blank and refresh to get all-time record." %}</small>
+                </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-3 mx-1">
+                <div class="col text-right mx-3">
+                    <small>{% trans "Above will be ignored if both the starting time and the endtime are provided." %}</small>
+                </div>
+            </div>
+            <hr>
+            <div class="row mb-3 mx-1">
+                <div class="row col-lg-8">
+                    <label class="col-4 col-form-label text-right"
+                           for="startingTime">{% trans "Starting Time" %}</label>
+                    <input class="col-8 form-control border-dark" type="datetime-local" id="startingTime" name="start"
+                           value="{{ dt_start }}">
+                </div>
+                <div class="col-lg-4 col-form-label text-right">
+                    <small>{% trans "Starting time of the data." %}</small>
+                </div>
+            </div>
+            <div class="row mb-3 mx-1">
+                <div class="row col-lg-8">
+                    <label class="col-4 col-form-label text-right" for="endingTime">{% trans "Ending Time" %}</label>
+                    <input class="col-8 form-control border-dark" type="datetime-local" id="endingTime"
+                           name="end" value="{{ dt_end }}">
+                </div>
+                <div class="col-lg-4 col-form-label text-right">
+                    <small>{% trans "Ending time of the data." %}</small>
+                </div>
+            </div>
+            <div class="row mb-3 mx-1">
+                <div class="row col-lg-8">
+                    <label class="col-4 col-form-label text-right" for="period">{% trans "Period" %}</label>
+                    <input class="col-8 form-control border-dark" type="number" id="period"
+                           name="period" value="{{ period_count }}">
+                </div>
+                <div class="col-lg-4 col-form-label text-right">
+                    <small>{% trans "Count of periods to view the message count comparison." %}</small>
+                </div>
+            </div>
+            <div class="row mb-3 mx-1">
                 <div class="col-lg custom-control custom-checkbox text-center">
-                    <input type="checkbox" class="custom-control-input" name="incl_unav" id="incl-unav" {% if incl_unav %}checked{% endif %}>
+                    <input type="checkbox" class="custom-control-input" name="incl_unav" id="incl-unav"
+                           {% if incl_unav %}checked{% endif %}>
                     <label class="custom-control-label"
                            for="incl-unav">{% trans "Including Unavailable Members" %}</label>
                 </div>
@@ -125,7 +158,7 @@
         </div>
         <div class="row">
             <div class="col-lg mb-3">
-                {% include "info/components/msg_chart_daily.html" with msg_daily_data=msg_daily_data only %}
+                {% include "info/components/msg_chart_daily.html" with msg_daily_data=msg_daily_data msg_mean_data=msg_mean_data only %}
             </div>
         </div>
         <div class="row">
@@ -144,6 +177,18 @@
                 {% include "info/components/msg_table_count.html" with message_data=channel_user_msg simplified=False only %}
             </div>
         </div>
+        {% if not msg_intvcount_data.is_inf %}
+            <div class="row">
+                <div class="col-lg mb-3">
+                    <h5>#&nbsp;{% trans "Member Message Count in Different Time Ranges" %}</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg mb-3">
+                    {% include "info/components/msg_table_count_trange.html" with message_data=msg_intvcount_data only %}
+                </div>
+            </div>
+        {% endif %}
         <div class="row">
             <div class="col-lg mb-3">
                 <h5>#&nbsp;{% trans "Member Daily Message Count" %}</h5>

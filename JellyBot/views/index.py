@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.views.generic.base import View
+from django.views import View
 from django.urls import reverse
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _

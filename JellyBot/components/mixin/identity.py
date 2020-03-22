@@ -6,7 +6,7 @@ from django.views import View
 from JellyBot import keys
 from JellyBot.utils import get_root_oid, get_channel_data
 from JellyBot.views import WebsiteErrorView
-from flags import PermissionCategory, WebsiteError
+from flags import ProfilePermission, WebsiteError
 from mongodb.factory import ProfileManager
 
 
@@ -42,15 +42,14 @@ class ChannelOidRequiredMixin(View):
 
 class PermissionRequiredMixin(ChannelOidRequiredMixin, LoginRequiredMixin, View):
     @staticmethod
-    def required_permission() -> Set[PermissionCategory]:
+    def required_permission() -> Set[ProfilePermission]:
         raise NotImplementedError()
 
     def dispatch(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
 
-        pass_ = ProfileManager.get_permissions(
-            ProfileManager.get_user_profiles(self.get_channel_data(*args, **kwargs).model.id, root_oid)
-        ).issuperset(self.required_permission())
+        pass_ = ProfileManager.get_user_permissions(self.get_channel_data(*args, **kwargs).model.id, root_oid)\
+            .issuperset(self.required_permission())
 
         if not pass_:
             return WebsiteErrorView.website_error(

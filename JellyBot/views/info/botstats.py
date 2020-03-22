@@ -19,17 +19,17 @@ KEY_MEMBER_USAGE = "member_usage"
 
 def _hr_flow_(channel_oid, hours_within, tzinfo):
     return KEY_HR_FLOW, BotFeatureUsageDataManager.get_channel_hourly_avg(
-        channel_oid, hours_within, True, tzinfo)
+        channel_oid, hours_within=hours_within, incl_not_used=True, tzinfo_=tzinfo)
 
 
 def _total_usage_(channel_oid, hours_within):
     return KEY_TOTAL_USAGE, BotFeatureUsageDataManager.get_channel_usage(
-        channel_oid, hours_within, False)
+        channel_oid, hours_within=hours_within, incl_not_used=False)
 
 
 def _member_usage_(channel_oid, hours_within):
     return KEY_MEMBER_USAGE, BotUsageStatsDataProcessor.get_per_user_bot_usage(
-        channel_oid, hours_within)
+        channel_oid, hours_within=hours_within)
 
 
 def get_bot_stats_data_package(channel_data, hours_within, tzinfo):

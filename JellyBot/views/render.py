@@ -36,14 +36,6 @@ def render_template(request, title, template_name, context=None, content_type=No
     # Append version numbers for footer
     context["boot_dt"] = timezone.localtime(get_boot_dt()).strftime("%m/%d %H:%M (UTC%z)")
 
-    # Append backend vars
-    unlock_classes = []
-
-    if get_root_oid(request):
-        unlock_classes.append(keys.Css.LOGGED_IN_ENABLE)
-
-    context["unlock_classes"] = unlock_classes
-
     return render(request, template_name, context, content_type, status, using)
 
 

@@ -4,7 +4,7 @@ from typing import Iterable
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-from flags import AutoReplyContentType, PermissionCategory, Platform
+from flags import AutoReplyContentType, ProfilePermission, Platform
 
 
 def type_translation(type_: type):
@@ -16,7 +16,7 @@ def type_translation(type_: type):
         return _("Integer")
     elif issubclass(type_, AutoReplyContentType):
         return _("Auto Reply Content Type")
-    elif issubclass(type_, PermissionCategory):
+    elif issubclass(type_, ProfilePermission):
         return _("Permission Category")
     elif issubclass(type_, Platform):
         return _("Platform")

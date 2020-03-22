@@ -2,6 +2,7 @@ from abc import ABC
 
 from bson import ObjectId
 
+from flags import ProfilePermission
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.static import param
 from JellyBot.api.responses.mixin import (
@@ -10,6 +11,7 @@ from JellyBot.api.responses.mixin import (
 )
 from extutils import safe_cast
 from mongodb.factory import ProfileManager
+from mongodb.factory.results import OperationOutcome, WriteOutcome
 
 
 class PermissionQueryResponse(
@@ -41,7 +43,7 @@ class PermissionQueryResponse(
 
 
 class ProfileResponseBase(
-        RequireSenderMixin,
+        RequireSenderMixin, HandleChannelOidMixin,
         SerializeErrorMixin, SerializeResultOnSuccessMixin, SerializeResultExtraMixin, BaseApiResponse, ABC):
     def __init__(self, param_dict, sender_oid):
         super().__init__(param_dict, sender_oid)
@@ -49,9 +51,11 @@ class ProfileResponseBase(
         self._param_dict.update(**{
             param.Manage.USER_OID: sender_oid,
             param.Manage.Profile.PROFILE_OID: param_dict.get(param.Manage.Profile.PROFILE_OID),
+            param.Manage.Profile.TARGET: param_dict.get(param.Manage.Profile.TARGET),
         })
 
         self._profile_oid = self._param_dict[param.Manage.Profile.PROFILE_OID]
+        self._target_oid = self._param_dict[param.Manage.Profile.TARGET] or self._sender_oid
 
     def _handle_profile_oid_(self):
         self._profile_oid = safe_cast(self._profile_oid, ObjectId)
@@ -66,17 +70,19 @@ class ProfileResponseBase(
     def pass_condition(self) -> bool:
         return super().pass_condition() and self._profile_oid is not None and self._sender_oid is not None
 
+    def is_success(self) -> bool:
+        return super().is_success() and self._result.is_success
 
-class ProfileAttachResponse(HandleChannelOidMixin, ProfileResponseBase):
+
+class ProfileAttachResponse(ProfileResponseBase):
     def process_pass(self):
-        ProfileManager.attach_profile(self._sender_oid, self._channel_oid, self._profile_oid)
-        self._result = True
+        self._result = ProfileManager.attach_profile(
+            self._channel_oid, self._sender_oid, self._profile_oid, self._target_oid)
 
 
 class ProfileDetachResponse(ProfileResponseBase):
     def process_pass(self):
-        ProfileManager.detach_profile(self._sender_oid, self._profile_oid)
-        self._result = True
+        self._result = ProfileManager.detach_profile(self._channel_oid, self._profile_oid, self._target_oid)
 
 
 class ProfileNameCheckResponse(

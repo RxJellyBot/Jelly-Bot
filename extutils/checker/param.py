@@ -55,6 +55,10 @@ class BaseDataTypeConverter(ABC):
 
     @classmethod
     def _cast_union_(cls, data: Any, type_annt):
+        # Early termination if the data type is in Union
+        if type(data) in type_annt.__args__:
+            return data
+
         last_e = None
 
         for allowed_type in type_annt.__args__:

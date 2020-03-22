@@ -78,6 +78,16 @@ class AccountLogoutView(View):
 
 
 class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
+    # noinspection PyUnusedLocal
+    def get(self, request, *args, **kwargs):
+        config = RootUserManager.get_config_root_oid(get_root_oid(request))
+
+        return render_template(
+            self.request, _("Account Settings"), "account/settings.html",
+            {"locale_list": sorted(locales, key=lambda item: item.description),
+             "lang_list": sorted(languages, key=lambda item: item.code),
+             "current_config": config})
+
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post(self, request, *args, **kwargs):
         update_result = RootUserManager.update_config(get_root_oid(request), **get_post_keys(request.POST))
@@ -92,13 +102,3 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
                 request,
                 f"danger/{localtime(now_utc_aware()):%m-%d %H:%M:%S (%Z)} - "
                 f"{_('Account settings failed to update.')}")
-
-    # noinspection PyUnusedLocal
-    def get(self, request, *args, **kwargs):
-        config = RootUserManager.get_config_root_oid(get_root_oid(request))
-
-        return render_template(
-            self.request, _("Account Settings"), "account/settings.html",
-            {"locale_list": sorted(locales, key=lambda item: item.description),
-             "lang_list": sorted(languages, key=lambda item: item.code),
-             "current_config": config})

@@ -2,7 +2,6 @@ from django.urls import reverse
 from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
 
-from extutils.dt import localtime
 from flags import BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.helper import MessageStatsDataProcessor

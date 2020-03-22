@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from extutils import safe_cast
 from flags import Platform
-from mongodb.factory import RootUserManager, ChannelManager
+from mongodb.factory import RootUserManager, ChannelManager, ProfileManager
 from JellyBot.keys import Session, ParamDictPrefix
 from JellyBot.api.static.param import Common
 
@@ -40,7 +40,7 @@ def get_post_keys(qd):
             if k.startswith(ParamDictPrefix.PostKey)}
 
 
-ChannelDataGetResult = namedtuple("ResultTemplate", ["ok", "model", "oid_org"])
+ChannelDataGetResult = namedtuple("ChannelGetData", ["ok", "model", "oid_org"])
 
 
 def get_channel_data(kwargs) -> ChannelDataGetResult:
@@ -50,6 +50,18 @@ def get_channel_data(kwargs) -> ChannelDataGetResult:
     model = ChannelManager.get_channel_oid(channel_oid)
 
     return ChannelDataGetResult(ok=model is not None, model=model, oid_org=channel_oid_str)
+
+
+ProfileDataGetResult = namedtuple("ProfileGetData", ["ok", "model", "oid_org"])
+
+
+def get_profile_data(kwargs) -> ProfileDataGetResult:
+    profile_oid_str = kwargs.get("profile_oid", "")
+    profile_oid = safe_cast(profile_oid_str, ObjectId)
+
+    model = ProfileManager.get_profile(profile_oid)
+
+    return ProfileDataGetResult(ok=model is not None, model=model, oid_org=profile_oid_str)
 
 
 def get_limit(param_dict, max_: Optional[int] = None):

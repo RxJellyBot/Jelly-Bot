@@ -39,6 +39,10 @@
                                href="#info{{ channel_conn.channel_data.id }}">
                                 {% trans "Check ID" %}
                             </a>
+                            <a class="btn btn-outline-warning"
+                               href="{% url "info.channel.msgstats" channel_oid=channel_conn.channel_data.id %}">
+                                {% trans "Message Stats" %}
+                            </a>
                         </div>
                     </div>
 
@@ -46,7 +50,7 @@
                         <div class="row mt-3">
                             <label class="col-3 col-form-label text-right">{% trans "Controls" context "Profile Controls" %}</label>
                             <div class="col-9">
-                                {% if channel_conn.can_create_profile %}
+                                {% if channel_conn.can_ced_profile %}
                                     <a class="btn btn-outline-success mb-2"
                                        href="{% url "account.profile.create" channel_oid=channel_conn.channel_data.id %}">
                                         {% trans "Create" %}
@@ -56,6 +60,10 @@
                                         {% trans "Attach" %}
                                     </a>
                                 {% endif %}
+                                <a class="btn btn-outline-success mb-2"
+                                   href="{% url "account.profile.list" channel_oid=channel_conn.channel_data.id %}">
+                                    {% trans "List" %}
+                                </a>
                             </div>
                         </div>
                         <div class="row mt-1">
@@ -71,7 +79,9 @@
                                         </a>
                                         {% if profile_data.id != channel_conn.default_profile_oid %}
                                             <button class="btn btn-outline-danger detach-profile"
-                                               data-poid="{{ profile_data.id }}" data-pname="{{ profile_data.name }}">
+                                                    data-poid="{{ profile_data.id }}"
+                                                    data-coid="{{ channel_conn.channel_data.id }}"
+                                                    data-pname="{{ profile_data.name }}">
                                                 {% trans "Detach" %}
                                             </button>
                                         {% endif %}

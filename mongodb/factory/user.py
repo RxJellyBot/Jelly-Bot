@@ -150,7 +150,7 @@ class RootUserManager(BaseCollection):
                     if on_exist:
                         on_exist()
         else:
-            overall_outcome = oc_onreg_failed  # FIXME: Maylay register failed
+            overall_outcome = oc_onreg_failed
 
         return RootUserRegistrationResult(overall_outcome,
                                           build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
@@ -195,11 +195,11 @@ class RootUserManager(BaseCollection):
         if not udata:
             return str_not_found if str_not_found else None
 
-        UserNameQuery = namedtuple("UserNameQuery", ["user_id", "user_name"])
+        UserNameEntry = namedtuple("UserNameEntry", ["user_id", "user_name"])
 
         # Name has been set?
         if udata.config.name:
-            return UserNameQuery(user_id=root_oid, user_name=udata.config.name)
+            return UserNameEntry(user_id=root_oid, user_name=udata.config.name)
 
         # On Platform Identity found?
         if udata.has_onplat_data:
@@ -214,8 +214,7 @@ class RootUserManager(BaseCollection):
                         else:
                             uname = onplat_data.get_name_str(channel_data)
 
-                    return UserNameQuery(
-                        user_id=root_oid, user_name=uname)
+                    return UserNameEntry(user_id=root_oid, user_name=uname)
                 else:
                     MailSender.send_email(
                         f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
@@ -277,10 +276,14 @@ class RootUserManager(BaseCollection):
 
         return ret
 
-    def get_root_to_onplat_dict(self) -> Dict[ObjectId, List[ObjectId]]:
+    def get_root_to_onplat_dict(self, root_oids: Optional[List[ObjectId]] = None) -> Dict[ObjectId, List[ObjectId]]:
         ret = {}
-        for d in self.find_cursor_with_count(
-                {RootUserModel.OnPlatOids.key: {"$exists": True}}, parse_cls=RootUserModel):
+        filter_ = {RootUserModel.OnPlatOids.key: {"$exists": True}}
+
+        if root_oids:
+            filter_[OID_KEY] = {"$in": root_oids}
+
+        for d in self.find_cursor_with_count(filter_, parse_cls=RootUserModel):
             ret[d.id] = d.on_plat_oids
 
         return ret

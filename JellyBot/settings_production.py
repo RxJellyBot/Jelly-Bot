@@ -57,6 +57,7 @@ LOGGING_ROOT = '../logs/Jelly-Bot/Application'
 LOGGING_FILE_ROOT = os.path.join(LOGGING_ROOT, 'logs')
 LOGGING_FILE_ERROR = os.path.join(LOGGING_FILE_ROOT, 'logs-severe.log')
 
+# To see the log which level is < 30 (WARNING), `DEBUG` must set to 1.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

@@ -16,7 +16,9 @@ class AutoReplyContentType(FlagSingleEnum):
     @staticmethod
     def determine(content: str):
         # LINE API requires image to be sent in HTTPS protocol
-        if content.endswith(".jpg") and content.startswith("https://"):
+        image_ext_ok = (content.endswith(".jpg") or content.endswith(".png") or content.endswith(".jpeg"))
+
+        if image_ext_ok and content.startswith("https://"):
             return AutoReplyContentType.IMAGE
         elif content.isnumeric():
             return AutoReplyContentType.LINE_STICKER

@@ -2,7 +2,7 @@ import abc
 import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Dict, Optional, List
 
 import pymongo
@@ -10,7 +10,7 @@ from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
 from extutils.utils import enumerate_ranking
-from extutils.dt import now_utc_aware, localtime
+from extutils.dt import now_utc_aware, parse_time_range, TimeRange
 from flags import BotFeature, MessageType
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
@@ -70,10 +70,11 @@ class HourlyResult(abc.ABC):
                 self.denom[hr % 24] += 1
 
     @staticmethod
-    def data_days_collected(collection, filter_, hr_range):
-        if hr_range:
-            return hr_range / 24
-        else:
+    def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
+                            start: Optional[datetime] = None, end: Optional[datetime] = None):
+        trange = parse_time_range(hr_range=hr_range, start=start, end=end)
+
+        if trange.is_inf:
             oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
 
             if oldest:
@@ -81,22 +82,38 @@ class HourlyResult(abc.ABC):
                 return (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
             else:
                 return HourlyResult.DAYS_NONE
+        else:
+            return trange.hr_length / 24
 
 
 class DailyResult(abc.ABC):
     KEY_DATE = "dt"
 
     @staticmethod
-    def date_list(days_collected, tzinfo):
+    def date_list(days_collected, tzinfo, *,
+                  start: Optional[datetime] = None, end: Optional[datetime] = None,
+                  trange: Optional[TimeRange] = None) -> List[date]:
+        """Returns the date list within the time range. Disregard `start` and `end` if `trange` is specified."""
         ret = []
 
-        _end_ = localtime(now_utc_aware(), tz=tzinfo)
-        _start_ = (_end_ - timedelta(days=days_collected)).date()
+        if not trange:
+            trange = parse_time_range(hr_range=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
 
-        for i in range((_end_.date() - _start_).days + 1):
-            ret.append((_start_ + timedelta(days=i)).strftime("%Y-%m-%d"))
+        if trange.is_inf:
+            raise ValueError("TimeRange is infinity.")
+
+        for i in range((trange.end.date() - trange.start.date()).days + 1):
+            ret.append(trange.start.date() + timedelta(days=i))
 
         return ret
+
+    @staticmethod
+    def date_list_str(days_collected, tzinfo, *,
+                      start: Optional[datetime] = None, end: Optional[datetime] = None,
+                      trange: Optional[TimeRange] = None) -> List[str]:
+        """Returns the date list within the time range. Disregard `start` and `end` if `trange` is specified."""
+        return [dt.strftime("%Y-%m-%d") for dt
+                in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
 
 
 class HourlyIntervalAverageMessageResult(HourlyResult):
@@ -155,24 +172,25 @@ class DailyMessageResult(DailyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected, tzinfo):
+    def __init__(self, cursor, days_collected, tzinfo, *,
+                 start: Optional[datetime] = None, end: Optional[datetime] = None):
         ResultEntry = namedtuple("ResultEntry", ["date", "data"])
         DataPoint = namedtuple("DataPoint", ["count", "percentage", "is_max"])
 
         self.label_hr = [h for h in range(24)]
-        self.label_date = self.date_list(days_collected, tzinfo)
+        self.label_date = self.date_list_str(days_collected, tzinfo, start=start, end=end)
 
         data_sum = {dt: 0 for dt in self.label_date}
         data = {dt: [0] * 24 for dt in self.label_date}
 
         for d in cursor:
-            date = d[OID_KEY][DailyMessageResult.KEY_DATE]
+            date_ = d[OID_KEY][DailyMessageResult.KEY_DATE]
             hr = d[OID_KEY][DailyMessageResult.KEY_HOUR]
 
             count = d[DailyMessageResult.KEY_COUNT]
 
-            data[date][hr] += count
-            data_sum[date] += count
+            data[date_][hr] += count
+            data_sum[date_] += count
 
         for dt, pts in data.items():
             sum_ = sum(pts)
@@ -185,8 +203,52 @@ class DailyMessageResult(DailyResult):
 
         self.data_sum = [data_sum[k] for k in
                          sorted(data_sum.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
-        self.data = [ResultEntry(date=date, data=data[date])
-                     for date in sorted(data.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
+        self.data = [ResultEntry(date=date_, data=data[date_])
+                     for date_ in sorted(data.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
+
+
+class MeanMessageResult:
+    def __init__(self, date_list: List[date], data_list: List[float], mean_days: int):
+        self.date_list = date_list
+        self.data_list = data_list
+        self.label = _("{} days mean").format(mean_days)
+
+
+class MeanMessageResultGenerator(DailyResult):
+    KEY_COUNT = "ct"
+
+    def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange, max_mean_days: int):
+        self.max_madays = max_mean_days
+        self.trange = trange
+        self.dates = self.date_list(days_collected, tzinfo, start=trange.start, end=trange.end)
+        self.data = {date_: 0 for date_ in self.dates}
+
+        for d in cursor:
+            date_ = datetime.strptime(d[OID_KEY][MeanMessageResultGenerator.KEY_DATE], "%Y-%m-%d").date()
+            count = d[MeanMessageResultGenerator.KEY_COUNT]
+
+            self.data[date_] += count
+
+    def generate_result(self, mean_days: int) -> MeanMessageResult:
+        if mean_days > self.max_madays:
+            raise ValueError("Max mean average calculation range reached.")
+
+        date_list = []
+        data_list = []
+
+        current_date = self.trange.start_org.date()
+        end_date = self.trange.end.date()
+        while current_date <= end_date:
+            total = 0
+            for i in range(mean_days):
+                total += self.data.get(current_date - timedelta(days=i), 0)
+
+            date_list.append(current_date)
+            data_list.append(total / mean_days)
+
+            current_date += timedelta(days=1)
+
+        return MeanMessageResult(date_list, data_list, mean_days)
 
 
 class MemberDailyMessageResult(DailyResult):
@@ -194,8 +256,9 @@ class MemberDailyMessageResult(DailyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected, tzinfo):
-        self.dates = self.date_list(days_collected, tzinfo)
+    def __init__(self, cursor, days_collected, tzinfo, *,
+                 start: Optional[datetime] = None, end: Optional[datetime] = None):
+        self.dates = self.date_list_str(days_collected, tzinfo, start=start, end=end)
         self.data = {date: {} for date in self.dates}
         for d in cursor:
             _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]
@@ -205,7 +268,43 @@ class MemberDailyMessageResult(DailyResult):
 
 
 @dataclass
-class MemeberMessageEntry:
+class MemberMessageCountEntry:
+    intervals: InitVar[int]
+    count: List[int] = field(init=False)
+
+    def __post_init__(self, intervals: int):
+        self.count = [0] * intervals
+
+    @property
+    def total(self) -> int:
+        return sum(self.count)
+
+
+class MemberMessageCountResult:
+    KEY_MEMBER_ID = "uid"
+    KEY_INTERVAL_IDX = "idx"
+
+    KEY_COUNT = "ct"
+
+    def __init__(self, cursor, interval: int, trange: TimeRange):
+        self.trange = trange
+
+        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
+
+        for d in cursor:
+            uid = d[OID_KEY][MemberMessageCountResult.KEY_MEMBER_ID]
+            idx = int(d[OID_KEY].get(MemberMessageCountResult.KEY_INTERVAL_IDX, interval - 1))
+
+            if uid not in self.data:
+                self.data[uid] = MemberMessageCountEntry(interval)
+
+            count = d[MemberMessageByCategoryResult.KEY_COUNT]
+
+            self.data[uid].count[idx] = count
+
+
+@dataclass
+class MemberMessageByCategoryEntry:
     label_category: InitVar[List[MessageType]]
     data: Optional[Dict[MessageType, int]] = None
     total: int = field(init=False)
@@ -227,7 +326,7 @@ class MemeberMessageEntry:
         return self.data.get(category, 0)
 
 
-class MemberMessageResult:
+class MemberMessageByCategoryResult:
     KEY_MEMBER_ID = "uid"
     KEY_CATEGORY = "cat"
 
@@ -240,21 +339,21 @@ class MemberMessageResult:
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
         ]
 
-        self.data = {}
+        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
-            uid = d[OID_KEY][MemberMessageResult.KEY_MEMBER_ID]
-            cat = MessageType.cast(d[OID_KEY][MemberMessageResult.KEY_CATEGORY])
+            uid = d[OID_KEY][MemberMessageByCategoryResult.KEY_MEMBER_ID]
+            cat = MessageType.cast(d[OID_KEY][MemberMessageByCategoryResult.KEY_CATEGORY])
 
             if uid not in self.data:
                 self.data[uid] = self.get_default_data_entry()
 
-            count = d[MemberMessageResult.KEY_COUNT]
+            count = d[MemberMessageByCategoryResult.KEY_COUNT]
 
             self.data[uid].add(cat, count)
 
     def get_default_data_entry(self):
-        return MemeberMessageEntry(self.label_category)
+        return MemberMessageByCategoryEntry(self.label_category)
 
 
 class BotFeatureUsageResult:
@@ -347,4 +446,4 @@ class BotFeatureHourlyAvgResult(HourlyResult):
                 self.data.append(UsageEntry(feature=diff_, data=[0] * 24, color="#9C0000", hidden="true"))
 
         self.data = [UsageEntry(feature=_("(Total)"), data=hr_sum, color="#323232", hidden="false")] \
-            + list(sorted(self.data, key=lambda i: i.feature.code))
+                    + list(sorted(self.data, key=lambda i: i.feature.code))

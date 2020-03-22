@@ -3,6 +3,27 @@ from django.utils.translation import gettext_lazy as _
 from flags import WebsiteError
 from JellyBot.views.render import render_template
 
+template_dict = {
+    WebsiteError.EXTRA_CONTENT_NOT_FOUND:
+        (_("Extra Content Not Found"), "err/exctnt_not_found.html"),
+    WebsiteError.NOT_IN_THE_CHANNEL:
+        (_("Not in the Channel"), "err/not_in_the_channel.html"),
+    WebsiteError.PROFILE_LINK_NOT_FOUND:
+        (_("Profile Link Not Found"), "err/account/proflink_not_found.html"),
+    WebsiteError.CHANNEL_NOT_FOUND:
+        (_("Channel Data Not Found"), "err/info/channel_not_found.html"),
+    WebsiteError.PROFILE_NOT_FOUND:
+        (_("Profile Data Not Found"), "err/info/profile_not_found.html"),
+    WebsiteError.CHANNEL_COLLECTION_NOT_FOUND:
+        (_("Channel Collection Not Found"), "err/info/chcoll_not_found.html"),
+    WebsiteError.BOT_CMD_NOT_FOUND:
+        (_("Bot Command Not Found"), "err/doc/cmd_not_found.html"),
+    WebsiteError.INSUFFICIENT_PERMISSION:
+        (_("Insufficient Permission"), "err/insuf_perm.html"),
+    WebsiteError.UNKNOWN:
+        (_("Unknown"), "err/unknown.html")
+}
+
 
 class WebsiteErrorView:
     # noinspection PyArgumentList
@@ -11,27 +32,6 @@ class WebsiteErrorView:
         if not nav_param:
             nav_param = {}
 
-        d = {
-            WebsiteError.EXTRA_CONTENT_NOT_FOUND:
-                (_("Extra Content Not Found"), "err/exctnt_not_found.html"),
-            WebsiteError.NOT_IN_THE_CHANNEL:
-                (_("Not in the Channel"), "err/not_in_the_channel.html"),
-            WebsiteError.PROFILE_LINK_NOT_FOUND:
-                (_("Profile Link Not Found"), "err/account/proflink_not_found.html"),
-            WebsiteError.CHANNEL_NOT_FOUND:
-                (_("Channel Data Not Found"), "err/info/channel_not_found.html"),
-            WebsiteError.PROFILE_NOT_FOUND:
-                (_("Profile Data Not Found"), "err/info/profile_not_found.html"),
-            WebsiteError.CHANNEL_COLLECTION_NOT_FOUND:
-                (_("Channel Collection Not Found"), "err/info/chcoll_not_found.html"),
-            WebsiteError.BOT_CMD_NOT_FOUND:
-                (_("Bot Command Not Found"), "err/doc/cmd_not_found.html"),
-            WebsiteError.INSUFFICIENT_PERMISSION:
-                (_("Insufficient Permission"), "err/insuf_perm.html"),
-            WebsiteError.UNKNOWN:
-                (_("Unknown"), "err/unknown.html")
-        }
-
-        label, template = d.get(WebsiteError(code), WebsiteError.UNKNOWN)
+        label, template = template_dict.get(WebsiteError(code), WebsiteError.UNKNOWN)
 
         return render_template(request, label, template, ctxt, nav_param=nav_param)

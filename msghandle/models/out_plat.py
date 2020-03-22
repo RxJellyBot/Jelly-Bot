@@ -3,7 +3,6 @@ from typing import List, Tuple, Type
 import traceback
 
 from discord import Embed
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from linebot.models import TextSendMessage, ImageSendMessage
 
@@ -11,7 +10,7 @@ from flags import MessageType
 from extutils.utils import list_insert_in_between
 from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
-from JellyBot.systemconfig import PlatformConfig, HostUrl
+from JellyBot.systemconfig import PlatformConfig
 from mongodb.factory import ExtraContentManager
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder, HandledMessageEvent, \

@@ -95,7 +95,7 @@ class ChannelStarChangeResponse(
         self._star = str_to_bool(self._star).to_bool()
 
     def process_pass(self):
-        self._result = ProfileManager.change_channel_star(self._channel_oid, self._root_oid, self._star)
+        self._result = ProfileManager.update_channel_star(self._channel_oid, self._root_oid, self._star)
 
     def is_success(self) -> bool:
         return super().is_success() and self._result

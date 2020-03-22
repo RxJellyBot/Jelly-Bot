@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-lg mb-3">
         <div class="card border-primary text-center">
-            <h4 class="card-header text-primary">{% trans "Channel Name" %}</h4>
+            <h5 class="card-header text-primary">{% trans "Channel Name" %}</h5>
             <div class="card-body">
                 <div class="card-text h2">
                     <div class="row justify-content-lg-center">
@@ -29,9 +29,9 @@
 <div class="row">
     <div class="col-lg mb-3">
         <div class="card border-primary text-center">
-            <h4 class="card-header text-primary">{% trans "Channel ID" %}</h4>
+            <h5 class="card-header text-primary">{% trans "Channel ID" %}</h5>
             <div class="card-body">
-                <div class="card-text h2">
+                <div class="card-text h4">
                     <div class="row justify-content-lg-center">
                         <div class="col-lg-auto">
                             <code>{{ channel_data.id }}</code>
@@ -43,9 +43,9 @@
     </div>
     <div class="col-lg mb-3">
         <div class="card border-primary text-center">
-            <h4 class="card-header text-primary">{% trans "Channel Token" %}</h4>
+            <h5 class="card-header text-primary">{% trans "Channel Token" %}</h5>
             <div class="card-body">
-                <div class="card-text h2">
+                <div class="card-text h4">
                     <div class="row justify-content-lg-center">
                         <div class="col-lg-auto">
                             <code>{{ channel_data.token }}</code>
@@ -59,7 +59,7 @@
 <div class="row">
     <div class="col-lg mb-3">
         <div class="card border-primary text-center">
-            <h4 class="card-header text-primary">{% trans "Platform" %}</h4>
+            <h5 class="card-header text-primary">{% trans "Platform" %}</h5>
             <div class="card-body">
                 <div class="card-text h4">
                     <div class="row justify-content-lg-center">
@@ -79,17 +79,21 @@
     </div>
     <div class="col-lg mb-3">
         <div class="card border-primary text-center">
-            <h4 class="card-header text-primary">{% trans "Controls" context "Channel Controls" %}</h4>
+            <h5 class="card-header text-primary">{% trans "Controls" context "Channel Controls" %}</h5>
             <div class="card-body">
-                <div class="card-text h5">
-                    {% if manageable %}
-                        <div class="col-lg-auto">
+                <div class="card-text h4">
+                    <div class="col-lg-auto">
+                        {% if manageable %}
                             <a class="btn btn-outline-primary"
                                href="{% url "account.channel.manage" channel_oid=channel_data.id %}">
                                 {% trans "Manage" %}
                             </a>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                        <a class="btn btn-outline-primary"
+                           href="{% url "account.profile.list" channel_oid=channel_data.id %}">
+                            {% trans "List" %}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

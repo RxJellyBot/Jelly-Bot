@@ -115,7 +115,7 @@ class DiscordClient(Client):
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
         if udata_result.success and cdata:
-            ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
+            ProfileManager.register_new_default_async(cdata.id, udata_result.model.id)
 
         sys_channel = member.guild.system_channel
         if sys_channel:
@@ -127,7 +127,7 @@ class DiscordClient(Client):
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
         if udata_result.success and cdata:
-            ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
+            ProfileManager.mark_unavailable_async(cdata.id, udata_result.model.id)
 
         sys_channel = member.guild.system_channel
         if sys_channel:

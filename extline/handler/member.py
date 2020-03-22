@@ -22,7 +22,7 @@ def handle_member_join(request, event, destination):
         udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
 
         if udata_result.success and cdata:
-            ProfileManager.register_new_default_async(udata_result.model.id, cdata.id)
+            ProfileManager.register_new_default_async(cdata.id, udata_result.model.id)
 
             uname = RootUserManager.get_root_data_uname(udata_result.model.get_oid(), cdata).user_name
             if uname:
@@ -43,7 +43,7 @@ def handle_member_left(request, event, destination):
         cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 
         if udata_result.success and cdata:
-            ProfileManager.mark_unavailable_async(udata_result.model.id, cdata.id)
+            ProfileManager.mark_unavailable_async(cdata.id, udata_result.model.id)
 
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Left Group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
