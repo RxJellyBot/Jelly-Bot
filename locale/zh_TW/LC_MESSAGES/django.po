@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 08:14-0500\n"
-"PO-Revision-Date: 2020-03-22 08:59-0500\n"
+"POT-Creation-Date: 2020-03-22 10:02-0500\n"
+"PO-Revision-Date: 2020-03-22 10:02-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -86,6 +86,10 @@ msgstr "登入"
 #: .\JellyBot\views\account\control.py:25
 msgid "An unknown error occurred."
 msgstr "發生未知的錯誤。"
+
+#: .\JellyBot\views\account\control.py:26
+msgid "Contact the administrator of the website."
+msgstr "聯繫網站管理員。"
 
 #: .\JellyBot\views\account\control.py:35
 msgid "Registration process not performed."
@@ -1536,7 +1540,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:158 .\models\stats.py:448
+#: .\models\stats.py:158 .\models\stats.py:452
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -2661,6 +2665,22 @@ msgstr "身份組創立成功並附加至自身。"
 msgid "Profile registration failed."
 msgstr "身份組登錄失敗。"
 
+#: .\msghandle\botcmd\command\prof.py:218
+msgid "Detail Link: {}{}"
+msgstr "詳細連結: {}{}"
+
+#: .\msghandle\botcmd\command\prof.py:221
+msgid "Owner: {}"
+msgstr "擁有者: {}"
+
+#: .\msghandle\botcmd\command\prof.py:221
+msgid ", "
+msgstr "、"
+
+#: .\msghandle\botcmd\command\prof.py:223
+msgid "Nobody has this profile for now."
+msgstr "目前沒有人有這個身份組。"
+
 #: .\msghandle\botcmd\command\prof.py:233
 msgid "Query"
 msgstr "查詢"
@@ -2937,7 +2957,7 @@ msgstr "網址已縮短。"
 
 #: .\msghandle\botcmd\command\surl.py:28
 msgid "Failed to shorten the URL. Code: {}"
-msgstr "網址縮短失敗。代碼: "
+msgstr "網址縮短失敗。代碼: {}"
 
 #: .\msghandle\botcmd\command\tmr.py:16
 msgid "Timer"
@@ -5006,9 +5026,6 @@ msgstr "更新目標網址 及 刪除 的功能尚未實作。"
 #~ msgstr ""
 #~ "剛註冊帳號？瀏覽<a href=\"{}{}\">這個頁面</a>就可以知道如何整合LINE/"
 #~ "Discord帳號囉！"
-
-#~ msgid ", "
-#~ msgstr "、"
 
 #~ msgid "Usable Keywords:"
 #~ msgstr "可用關鍵字:"
