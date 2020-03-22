@@ -10,12 +10,14 @@
             </a>
         </div>
         <div class="card-body">
+            <div class="mb-2">{% trans "Owners count" %}</div>
+            <div class="mb-2"><code class="h4">{{ entry.owner_names|length }}</code></div>
             <div class="mb-2">{% trans "Permission Level" %}</div>
             <div class="mb-2"><code class="h4">{{ profile.permission_level.code }}</code></div>
             <div class="mb-2">{% trans "Permissions" %}</div>
             <ul class="mb-3 list-group">
                 {% for perm_cat in perm_cats %}
-                    {% if perm_cat in profile.permission_set %}
+                    {% if perm_cat in profile.permission_list %}
                         <li class="list-group-item">
                             {{ perm_cat.key }}
                         </li>

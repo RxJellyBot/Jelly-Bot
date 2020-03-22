@@ -24,8 +24,9 @@
                         </p>
                         {% trans "Permissions:" %}
                         <ul>
-                            {% for perm_cat in profile.permission_set %}
-                                <li><code>{{ perm_cat.code }}</code>:&nbsp;{{ perm_cat.key }}
+                            {% for perm_cat in profile.permission_list %}
+                                <li>
+                                    <code>{{ perm_cat.code }}</code>:&nbsp;{{ perm_cat.key }}
                                 </li>
                             {% endfor %}
                         </ul>

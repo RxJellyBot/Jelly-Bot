@@ -77,8 +77,7 @@ class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
             self.request, _("Attach Profile"), "account/channel/prof/attach.html",
             {
                 "channel_oid": channel_oid,
-                "attachable_profiles": ProfileManager.get_attachable_profiles(
-                    channel_data.model.get_oid(), root_oid),
+                "attachable_profiles": ProfileManager.get_attachable_profiles(channel_data.model.get_oid(), root_oid),
                 "member_list": member_list
             }, nav_param=kwargs)
 

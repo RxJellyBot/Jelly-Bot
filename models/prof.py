@@ -33,7 +33,7 @@ class ChannelProfileModel(Model):
         return self.permission_level >= PermissionLevel.ADMIN
 
     @property
-    def permission_set(self) -> Set[ProfilePermission]:
+    def permission_list(self) -> List[ProfilePermission]:
         ret = set()
 
         for cat, permitted in self.permission.items():
@@ -44,7 +44,7 @@ class ChannelProfileModel(Model):
 
         ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
-        return ret
+        return sorted(ret, key=lambda x: x.code)
 
     def pre_iter(self):
         # Will be used when the data will be passed to MongoDB
