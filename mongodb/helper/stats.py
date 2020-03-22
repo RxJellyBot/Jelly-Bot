@@ -1,3 +1,4 @@
+import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from typing import List, Optional, Union, NamedTuple, Dict, Tuple, Iterator
@@ -149,17 +150,41 @@ class UserMessageCountIntervalEntry:
     user_name: str
     total: int
     count: InitVar[List[int]]
-    count_data: Iterator[Tuple[int, int]] = field(init=False)
+    count_data: Iterator[Tuple[int, int, float]] = field(init=False)
+    increases: int = 0
+    decreases: int = 0
+    avg_diff: float = field(init=False)
+    avg_diff_pct: float = field(init=False)
 
     def __post_init__(self, count: List[int]):
         # Reverse to put the most recent at the front
         difference = []
+        difference_pct = []
         count = list(reversed(count))
 
         for idx in range(len(count)):
-            difference.append(count[0] - count[idx])
+            base = count[0]
+            data = count[idx]
 
-        self.count_data = zip(count, difference)
+            diff = base - data
+            difference.append(diff)
+            difference_pct.append(diff / data * 100 if data != 0 else (math.inf if diff != 0 else 0))
+
+            if diff > 0:
+                self.increases += 1
+            elif diff < 0:
+                self.decreases += 1
+
+        self.count_data = zip(count, difference, difference_pct)
+        if len(difference) == 1:
+            self.avg_diff = sum(difference)
+            self.avg_diff_pct = sum(filter(lambda x: not math.isinf(x), difference_pct))
+        else:
+            self.avg_diff = sum(difference) / (len(difference) - 1)
+            self.avg_diff_pct = sum(filter(lambda x: not math.isinf(x), difference_pct)) / (len(difference_pct) - 1)
+
+        if self.avg_diff_pct == 0 and self.avg_diff > 0:
+            self.avg_diff_pct = math.inf
 
 
 @dataclass
@@ -181,12 +206,18 @@ class UserMessageCountIntervalResult:
 
         self.data = []
         for uid, entry in original_result.data.items():
-            uname = uname_dict.get(uid)
+            uname = uname_dict.pop(uid, None)
 
             if not uname and available_only:
                 continue
 
             self.data.append(UserMessageCountIntervalEntry(user_name=uname, total=entry.total, count=entry.count))
+
+        # Fill 0
+        if uname_dict:
+            for uid, name in uname_dict.items():
+                self.data.append(UserMessageCountIntervalEntry(
+                    user_name=name, total=0, count=[0] * original_result.interval))
 
 
 class MessageStatsDataProcessor:

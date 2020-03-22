@@ -6,10 +6,13 @@
         <thead>
         <tr>
             <th class="align-middle text-center">{% trans "Member Name" %}</th>
-            <th class="align-middle text-center ">{% trans "Total Count" %}</th>
+            <th class="align-middle text-center">{% trans "Total Count" %}</th>
+            <th class="align-middle text-center">{% trans "Avg +/-" %}</th>
+            <th class="align-middle text-center">{% trans "Avg +/- %" %}</th>
             {% for range_name in message_data.time_ranges %}
                 <th class="align-middle text-center">{{ range_name }}</th>
                 <th class="align-middle text-center">+/-</th>
+                <th class="align-middle text-center">+/- (%)</th>
             {% endfor %}
         </tr>
         </thead>
@@ -18,16 +21,19 @@
             <tr>
                 <th class="align-middle text-center">{{ entry.user_name }}</th>
                 <td class="align-middle text-center h4"><code>{{ entry.total }}</code></td>
-                {% for count, difference in entry.count_data %}
+                <td class="align-middle text-center h5 font-weight-normal">
+                    {% include "components/num.html" with num=entry.avg_diff fmt=".1f" only %}
+                </td>
+                <td class="align-middle text-center h5 font-weight-normal">
+                    {% include "components/num.html" with num=entry.avg_diff_pct fmt=".2f" suffix="%" only %}
+                </td>
+                {% for count, diff, diff_pct in entry.count_data %}
                     <td class="align-middle text-center h5 font-weight-normal">{{ count }}</td>
                     <td class="align-middle text-center h5 font-weight-normal">
-                        {% if difference > 0 %}
-                            <span class="text-success">+{{ difference }}</span>
-                        {% elif difference < 0 %}
-                            <span class="text-danger">{{ difference }}</span>
-                        {% else %}
-                            {{ difference }}
-                        {% endif %}
+                        {% include "components/num.html" with num=diff fmt="s" only %}
+                    </td>
+                    <td class="align-middle text-center h5 font-weight-normal">
+                        {% include "components/num.html" with num=diff_pct fmt=".2f" suffix="%" only %}
                     </td>
                 {% endfor %}
             </tr>

@@ -1,0 +1,7 @@
+{% if num > 0 %}
+    <span class="text-success">+{{ num|stringformat:fmt }}{{ suffix }}</span>
+{% elif num < 0 %}
+    <span class="text-danger">{{ num|stringformat:fmt }}{{ suffix }}</span>
+{% else %}
+    {{ num|stringformat:fmt }}{{ suffix }}
+{% endif %}
