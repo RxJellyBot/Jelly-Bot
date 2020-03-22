@@ -215,12 +215,12 @@ def _output_profile_txt_(result_entries):
         profile = entry.profile
 
         str_ = [f"`{profile.id}` / {profile.name} ({profile.color.color_hex})",
-                f"{_('Detail Link')}: {HostUrl}{reverse('info.profile', kwargs={'profile_oid': profile.id})}"]
+                _('Detail Link: {}{}').format(HostUrl, reverse('info.profile', kwargs={'profile_oid': profile.id}))]
 
         if entry.owner_names:
-            str_.append(f"Owner: {_(', ').join(entry.owner_names)}")
+            str_.append(_("Owner: {}").format(_(', ').join(entry.owner_names)))
         else:
-            str_.append(f"{_('Nobody has this profile for now.')}")
+            str_.append(_('Nobody has this profile for now.'))
 
         entries.append("\n".join(str_))
 
