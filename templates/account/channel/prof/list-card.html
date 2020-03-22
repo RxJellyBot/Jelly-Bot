@@ -15,7 +15,7 @@
             <div class="mb-2">{% trans "Permissions" %}</div>
             <ul class="mb-3 list-group">
                 {% for perm_cat in perm_cats %}
-                    {% if perm_cat in profile.permission_set %}
+                    {% if perm_cat in profile.permission_list %}
                         <li class="list-group-item">
                             {{ perm_cat.key }}
                         </li>

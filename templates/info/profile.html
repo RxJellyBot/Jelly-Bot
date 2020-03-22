@@ -104,7 +104,7 @@
                 <div class="col-lg-4 col-6 list-group-item list-group-item-action mb-0">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">{{ perm_cat.key }}</h5>
-                        {% if perm_cat in profile_data.permission_set %}
+                        {% if perm_cat in profile_data.permission_list %}
                             <span class="dot bg-success"></span>
                         {% else %}
                             <span class="dot bg-danger"></span>
