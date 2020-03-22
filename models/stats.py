@@ -219,7 +219,11 @@ class MeanMessageResultGenerator(DailyResult):
 
     def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange, max_mean_days: int):
         self.max_madays = max_mean_days
-        self.trange = trange
+        if trange.is_inf:
+            self.trange = parse_time_range(
+                hr_range=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
+        else:
+            self.trange = trange
         self.dates = self.date_list(days_collected, tzinfo, start=trange.start, end=trange.end)
         self.data = {date_: 0 for date_ in self.dates}
 
@@ -259,7 +263,7 @@ class MemberDailyMessageResult(DailyResult):
     def __init__(self, cursor, days_collected, tzinfo, *,
                  start: Optional[datetime] = None, end: Optional[datetime] = None):
         self.dates = self.date_list_str(days_collected, tzinfo, start=start, end=end)
-        self.data = {date: {} for date in self.dates}
+        self.data = {date_: {} for date_ in self.dates}
         for d in cursor:
             _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]
             _member_ = d[OID_KEY][MemberDailyMessageResult.KEY_MEMBER]
