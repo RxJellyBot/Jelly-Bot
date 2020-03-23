@@ -94,6 +94,9 @@ class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, Vi
         hours_within = safe_cast(request.GET.get("hours_within"), int)
         incl_unav = safe_cast(request.GET.get("incl_unav"), bool)
         period_count = safe_cast(request.GET.get("period"), int) or Website.Message.DefaultPeriodCount
+        if period_count <= 0:
+            messages.warning(request, _("Period count cannot be less than or equal to 0."))
+            period_count = Website.Message.DefaultPeriodCount
 
         # Get starting timestamp
         dt_start_str = request.GET.get("start")

@@ -222,7 +222,8 @@ def _output_profile_txt_(result_entries):
         else:
             str_.append(_('Nobody has this profile for now.'))
 
-        entries.append("\n".join(str_))
+        # Force `__proxy__` to `str`
+        entries.append("\n".join([str(s) for s in str_]))
 
     return "\n\n".join(entries)
 # endregion

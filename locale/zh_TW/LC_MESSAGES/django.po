@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 10:02-0500\n"
-"PO-Revision-Date: 2020-03-22 10:02-0500\n"
+"POT-Creation-Date: 2020-03-22 13:23-0500\n"
+"PO-Revision-Date: 2020-03-22 13:24-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -148,20 +148,20 @@ msgstr "身份組創建失敗。"
 msgid "Attach Profile"
 msgstr "附加身份組"
 
-#: .\JellyBot\views\account\prof.py:101 .\JellyBot\views\nav.py:99
+#: .\JellyBot\views\account\prof.py:100 .\JellyBot\views\nav.py:99
 #: .\templates\account\channel\prof\edit.html:8
 msgid "Edit Profile"
 msgstr "編輯身份組"
 
-#: .\JellyBot\views\account\prof.py:120
+#: .\JellyBot\views\account\prof.py:119
 msgid "Profile successfully updated."
 msgstr "身份組更新成功。"
 
-#: .\JellyBot\views\account\prof.py:125
+#: .\JellyBot\views\account\prof.py:124
 msgid "Failed to update the profile."
 msgstr "身份組創建失敗。"
 
-#: .\JellyBot\views\account\prof.py:136 .\JellyBot\views\nav.py:102
+#: .\JellyBot\views\account\prof.py:138 .\JellyBot\views\nav.py:102
 msgid "List Profile"
 msgstr "身份組列表"
 
@@ -333,27 +333,31 @@ msgstr "頻道資訊搜尋"
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:105
+#: .\JellyBot\views\info\msgstats.py:98
+msgid "Period count cannot be less than or equal to 0."
+msgstr "週期數量必須大於0。"
+
+#: .\JellyBot\views\info\msgstats.py:108
 msgid "Failed to parse the starting timestamp. Received: {}"
 msgstr "起始時間點剖析失敗。內容: {}"
 
-#: .\JellyBot\views\info\msgstats.py:108
+#: .\JellyBot\views\info\msgstats.py:111
 msgid "Start time out of range."
 msgstr "起始時間點不在可用範圍內。"
 
-#: .\JellyBot\views\info\msgstats.py:117
+#: .\JellyBot\views\info\msgstats.py:120
 msgid "Failed to parse the ending timestamp. Received: {}"
 msgstr "終止時間點剖析失敗。內容: {}"
 
-#: .\JellyBot\views\info\msgstats.py:120
+#: .\JellyBot\views\info\msgstats.py:123
 msgid "End time out of range."
 msgstr "終止時間點不在可用範圍內。"
 
-#: .\JellyBot\views\info\msgstats.py:127
+#: .\JellyBot\views\info\msgstats.py:130
 msgid "Invalid timestamp: Ending time is before the starting time."
 msgstr "無效的時間點: 終止時間點先於起始時間點。"
 
-#: .\JellyBot\views\info\msgstats.py:151 .\JellyBot\views\nav.py:149
+#: .\JellyBot\views\info\msgstats.py:154 .\JellyBot\views\nav.py:149
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -1540,7 +1544,7 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:158 .\models\stats.py:452
+#: .\models\stats.py:158 .\models\stats.py:453
 msgid "(Total)"
 msgstr "(總計)"
 
@@ -1560,7 +1564,7 @@ msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
-#: .\mongodb\factory\prof.py:295
+#: .\mongodb\factory\prof.py:296
 msgid "Default Profile"
 msgstr "預設身份組"
 
@@ -2564,6 +2568,7 @@ msgstr "與身份組管理有關的指令。"
 
 #: .\msghandle\botcmd\command\prof.py:25
 #: .\templates\account\channel\list_table.html:56
+#: .\templates\account\channel\prof\list.html:23
 msgid "Create"
 msgstr "建立"
 
@@ -2700,7 +2705,7 @@ msgstr "沒有找到名稱含有 {} 的身份組。"
 
 #: .\msghandle\botcmd\command\prof.py:254
 #: .\templates\account\channel\list_table.html:65
-#: .\templates\info\components\info_adv.html:94
+#: .\templates\account\channel\prof\list.html:32
 msgid "List"
 msgstr "列表"
 
@@ -2715,6 +2720,7 @@ msgstr "此頻道內沒有身份組。"
 #: .\msghandle\botcmd\command\prof.py:273
 #: .\templates\account\channel\list_table.html:60
 #: .\templates\account\channel\prof\attach-list.html:17
+#: .\templates\account\channel\prof\list.html:27
 msgid "Attach"
 msgstr "附加"
 
@@ -3379,6 +3385,7 @@ msgid "Message Stats"
 msgstr "訊息統計"
 
 #: .\templates\account\channel\list_table.html:51
+#: .\templates\account\channel\prof\list.html:15
 msgctxt "Profile Controls"
 msgid "Controls"
 msgstr "身份組控制"
@@ -3386,6 +3393,7 @@ msgstr "身份組控制"
 #: .\templates\account\channel\list_table.html:70
 #: .\templates\account\channel\manage.html:31
 #: .\templates\account\channel\prof\attach-list.html:7
+#: .\templates\account\channel\prof\list.html:40
 msgid "Profiles"
 msgstr "身份組"
 
@@ -3445,20 +3453,20 @@ msgstr "權限等級:"
 msgid "Permissions:"
 msgstr "權限:"
 
-#: .\templates\account\channel\prof\attach-list.html:34
+#: .\templates\account\channel\prof\attach-list.html:35
 msgid "Profile Details"
 msgstr "身份組資訊"
 
-#: .\templates\account\channel\prof\attach-list.html:44
+#: .\templates\account\channel\prof\attach-list.html:45
 #: .\templates\services\shorturl\main.html:58
 msgid "Target"
 msgstr "目標"
 
-#: .\templates\account\channel\prof\attach-list.html:49
+#: .\templates\account\channel\prof\attach-list.html:50
 msgid "Select a target member"
 msgstr "選擇目標成員"
 
-#: .\templates\account\channel\prof\attach-list.html:51
+#: .\templates\account\channel\prof\attach-list.html:52
 msgid "(Self)"
 msgstr "(自己)"
 
@@ -3490,7 +3498,7 @@ msgid "Color"
 msgstr "顏色"
 
 #: .\templates\account\channel\prof\ce-perm.html:4
-#: .\templates\account\channel\prof\list-card.html:15
+#: .\templates\account\channel\prof\list-card.html:17
 #: .\templates\info\profile.html:99
 msgid "Permissions"
 msgstr "權限"
@@ -3500,7 +3508,7 @@ msgid "Property"
 msgstr "屬性"
 
 #: .\templates\account\channel\prof\ce-prop.html:8
-#: .\templates\account\channel\prof\list-card.html:13
+#: .\templates\account\channel\prof\list-card.html:15
 #: .\templates\info\profile.html:56
 msgid "Permission Level"
 msgstr "權限等級"
@@ -3530,7 +3538,11 @@ msgstr ""
 msgid "Submit"
 msgstr "提交"
 
-#: .\templates\account\channel\prof\list-card.html:27
+#: .\templates\account\channel\prof\list-card.html:13
+msgid "Owners count"
+msgstr "擁有者數量"
+
+#: .\templates\account\channel\prof\list-card.html:29
 msgid "List of user who have this profile"
 msgstr "擁有此身份組的用戶"
 
@@ -4724,6 +4736,10 @@ msgctxt "Channel Controls"
 msgid "Controls"
 msgstr "頻道控制"
 
+#: .\templates\info\components\info_adv.html:94
+msgid "Profiles (List)"
+msgstr "身份組列表"
+
 #: .\templates\info\components\msg_chart_daily.html:18
 msgid "Message Count"
 msgstr "訊息量"
@@ -4741,6 +4757,15 @@ msgstr "總計比例 %%"
 #: .\templates\info\components\msg_table_user_daily.html:9
 msgid "Total Count"
 msgstr "訊息總數"
+
+#: .\templates\info\components\msg_table_count_trange.html:10
+msgid "Avg +/-"
+msgstr "平均差異"
+
+#: .\templates\info\components\msg_table_count_trange.html:11
+#, python-format
+msgid "Avg +/- %%"
+msgstr "平均差異%%"
 
 #: .\templates\info\components\msg_table_daily.html:7
 msgid "Date"
@@ -4870,7 +4895,7 @@ msgstr "擁有此身份組的用戶"
 #: .\templates\info\profile.html:131
 msgctxt "Profile Control"
 msgid "Control"
-msgstr "相關控制"
+msgstr "身份組控制"
 
 #: .\templates\info\profile.html:172
 msgid "Are you sure to detach ${profileName} from ${userName} ?"
@@ -5001,6 +5026,12 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#, fuzzy
+#~| msgctxt "Profile Controls"
+#~| msgid "Controls"
+#~ msgid "Controls"
+#~ msgstr "身份組控制"
 
 #~ msgid "Create a profile and attach it to self."
 #~ msgstr "創立一個身份組，並附加到自己身上。"

@@ -293,6 +293,7 @@ class MemberMessageCountResult:
     def __init__(self, cursor, interval: int, trange: TimeRange):
         self.trange = trange
 
+        self.interval = interval
         self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
