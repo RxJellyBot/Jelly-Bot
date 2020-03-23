@@ -6,16 +6,20 @@
                 paging: false
             };
 
-            if ($(this).hasClass("datatable-sort")) {
+            if ($(this).hasClass("datatable-presort")) {
                 config["order"] = [[parseInt($(this).data("sortidx")), $(this).data("sortorder")]]
             }
 
-            if ($(this).hasClass("datatable-noorder")) {
-                config["columnDefs"] = [{
-                    "targets": $(this).data("nordcol"),
+            config["columnDefs"] = [
+                {
+                    "targets": "htmlnumfmt",
+                    "type": "html-num-fmt",
+                },
+                {
+                    "targets": "nosort",
                     "orderable": false
-                }]
-            }
+                }
+            ];
 
             $(this).DataTable(config);
         })
