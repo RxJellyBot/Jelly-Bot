@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-22 13:23-0500\n"
-"PO-Revision-Date: 2020-03-22 13:24-0500\n"
+"POT-Creation-Date: 2020-03-24 07:59-0500\n"
+"PO-Revision-Date: 2020-03-24 07:59-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -361,7 +361,7 @@ msgstr "無效的時間點: 終止時間點先於起始時間點。"
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
-#: .\JellyBot\views\info\profile.py:64 .\msghandle\botcmd\command\prof.py:312
+#: .\JellyBot\views\info\profile.py:64 .\msghandle\botcmd\command\prof.py:313
 msgid "Profile detached."
 msgstr "已解除身份組。"
 
@@ -373,11 +373,11 @@ msgstr "身份組解除失敗。({})"
 msgid "Attempted to delete the default profile which is not allowed."
 msgstr "嘗試刪除預設身份組。此行為無效。"
 
-#: .\JellyBot\views\info\profile.py:82 .\msghandle\botcmd\command\prof.py:364
+#: .\JellyBot\views\info\profile.py:82 .\msghandle\botcmd\command\prof.py:365
 msgid "Profile deleted."
 msgstr "身份組已刪除。"
 
-#: .\JellyBot\views\info\profile.py:85 .\msghandle\botcmd\command\prof.py:366
+#: .\JellyBot\views\info\profile.py:85 .\msghandle\botcmd\command\prof.py:367
 msgid "Failed to delete the profile."
 msgstr "身份組刪除失敗。"
 
@@ -2686,54 +2686,54 @@ msgstr "、"
 msgid "Nobody has this profile for now."
 msgstr "目前沒有人有這個身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:233
+#: .\msghandle\botcmd\command\prof.py:234
 msgid "Query"
 msgstr "查詢"
 
-#: .\msghandle\botcmd\command\prof.py:234
+#: .\msghandle\botcmd\command\prof.py:235
 msgid "Find profiles which name includes the provided keyword."
 msgstr "列出所有名稱含有提供的字串的身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:240
+#: .\msghandle\botcmd\command\prof.py:241
 msgid ""
 "Keyword to be used to find the profile. Can be a part of the profile name."
 msgstr "查詢身份組用的關鍵字。可以是身份組名稱的一部份。"
 
-#: .\msghandle\botcmd\command\prof.py:246
+#: .\msghandle\botcmd\command\prof.py:247
 msgid "No profile with the keyword `{}` was found."
 msgstr "沒有找到名稱含有 {} 的身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:254
+#: .\msghandle\botcmd\command\prof.py:255
 #: .\templates\account\channel\list_table.html:65
 #: .\templates\account\channel\prof\list.html:32
 msgid "List"
 msgstr "列表"
 
-#: .\msghandle\botcmd\command\prof.py:255
+#: .\msghandle\botcmd\command\prof.py:256
 msgid "List all profiles in the channel."
 msgstr "列出所有頻道內的身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:265
+#: .\msghandle\botcmd\command\prof.py:266
 msgid "No profile in this channel."
 msgstr "此頻道內沒有身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:273
+#: .\msghandle\botcmd\command\prof.py:274
 #: .\templates\account\channel\list_table.html:60
 #: .\templates\account\channel\prof\attach-list.html:17
 #: .\templates\account\channel\prof\list.html:27
 msgid "Attach"
 msgstr "附加"
 
-#: .\msghandle\botcmd\command\prof.py:274
+#: .\msghandle\botcmd\command\prof.py:275
 msgid "Attach profile to either self or a member."
 msgstr "附加身份組至自己或成員。"
 
-#: .\msghandle\botcmd\command\prof.py:279
+#: .\msghandle\botcmd\command\prof.py:280
 #: .\templates\account\channel\prof\attach.html:38
 msgid "Profile attached."
 msgstr "身份組已附加。"
 
-#: .\msghandle\botcmd\command\prof.py:282
+#: .\msghandle\botcmd\command\prof.py:283
 msgid ""
 "Failed to attach the profile.\n"
 "Error: `{}` - {}"
@@ -2741,21 +2741,21 @@ msgstr ""
 "身份組附加失敗。\n"
 "錯誤: `{}` - {}"
 
-#: .\msghandle\botcmd\command\prof.py:297
+#: .\msghandle\botcmd\command\prof.py:298
 msgid "The OID of the target user to be attached to the profile."
 msgstr "附加身份組的目標對象使用者ID。"
 
-#: .\msghandle\botcmd\command\prof.py:306
+#: .\msghandle\botcmd\command\prof.py:307
 #: .\templates\account\channel\list_table.html:85
-#: .\templates\info\profile.html:146
+#: .\templates\info\profile.html:145
 msgid "Detach"
 msgstr "解除"
 
-#: .\msghandle\botcmd\command\prof.py:307
+#: .\msghandle\botcmd\command\prof.py:308
 msgid "Detach profile from either self or a member."
 msgstr "解除自己或成員的身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:315
+#: .\msghandle\botcmd\command\prof.py:316
 msgid ""
 "Failed to detach the profile.\n"
 "Error: `{}` - {}"
@@ -2763,24 +2763,24 @@ msgstr ""
 "身份組解除失敗。\n"
 "錯誤: `{}` - {}"
 
-#: .\msghandle\botcmd\command\prof.py:330
+#: .\msghandle\botcmd\command\prof.py:331
 msgid "The OID of the target user to be detached from the profile."
 msgstr "解除身份組的目標對象使用者ID。"
 
-#: .\msghandle\botcmd\command\prof.py:339 .\templates\info\profile.html:87
+#: .\msghandle\botcmd\command\prof.py:340 .\templates\info\profile.html:87
 #: .\templates\services\shorturl\main.html:74
 msgid "Delete"
 msgstr "刪除"
 
-#: .\msghandle\botcmd\command\prof.py:340
+#: .\msghandle\botcmd\command\prof.py:341
 msgid "Delete profile."
 msgstr "刪除身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:352
+#: .\msghandle\botcmd\command\prof.py:353
 msgid "Profile with the name `{}` not found."
 msgstr "沒有找到名稱為 `{}` 的身份組。"
 
-#: .\msghandle\botcmd\command\prof.py:360
+#: .\msghandle\botcmd\command\prof.py:361
 msgid "Insufficient permission to delete profile."
 msgstr "因權限不足，無法刪除身份組。"
 
@@ -4548,11 +4548,11 @@ msgstr "這些內容將會於下列時間後刪除: "
 msgid "Teapot"
 msgstr "茶壺"
 
-#: .\templates\garbage\418.html:70
+#: .\templates\garbage\418.html:49
 msgid "Some knowledge: "
 msgstr "小知識: "
 
-#: .\templates\garbage\418.html:70
+#: .\templates\garbage\418.html:49
 msgid "About server code 4xx"
 msgstr "有關伺服器代碼4xx"
 
@@ -4715,7 +4715,7 @@ msgstr "使用次數"
 #: .\templates\info\components\msg_table_count.html:8
 #: .\templates\info\components\msg_table_count_trange.html:8
 #: .\templates\info\components\msg_table_user_daily.html:8
-#: .\templates\info\profile.html:130
+#: .\templates\info\profile.html:129
 msgid "Member Name"
 msgstr "成員名稱"
 
@@ -4766,6 +4766,10 @@ msgstr "平均差異"
 #, python-format
 msgid "Avg +/- %%"
 msgstr "平均差異%%"
+
+#: .\templates\info\components\msg_table_count_trange.html:12
+msgid "Avg +/- NRM"
+msgstr "平均差異 (標準化)"
 
 #: .\templates\info\components\msg_table_daily.html:7
 msgid "Date"
@@ -4892,16 +4896,16 @@ msgstr "編輯"
 msgid "User who also have this profile"
 msgstr "擁有此身份組的用戶"
 
-#: .\templates\info\profile.html:131
+#: .\templates\info\profile.html:130
 msgctxt "Profile Control"
 msgid "Control"
 msgstr "身份組控制"
 
-#: .\templates\info\profile.html:172
+#: .\templates\info\profile.html:171
 msgid "Are you sure to detach ${profileName} from ${userName} ?"
 msgstr "確定要將身份組 ${profileName} 從 ${userName} 身上移除嗎？"
 
-#: .\templates\info\profile.html:180
+#: .\templates\info\profile.html:179
 msgid "Are you sure to delete this profile?"
 msgstr "確定要刪除這個身份組嗎？"
 
