@@ -9,6 +9,7 @@
             <th scope="col" class="align-middle text-center">{% trans "Total Count" %}</th>
             <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/-" %}</th>
             <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/- %" %}</th>
+            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/- NRM" %}</th>
             {% for range_name in message_data.time_ranges %}
                 <th scope="col" class="align-middle text-center">{{ range_name }}</th>
                 <th scope="col" class="align-middle text-center htmlnumfmt">+/-</th>
@@ -26,6 +27,9 @@
                 </td>
                 <td class="align-middle text-center h5 font-weight-normal">
                     {% include "components/num.html" with num=entry.avg_diff_pct fmt=".2f" suffix="%" only %}
+                </td>
+                <td class="align-middle text-center h5 font-weight-normal">
+                    {% include "components/num.html" with num=entry.avg_diff_nrm fmt=".2f" only %}
                 </td>
                 {% for count, diff, diff_pct in entry.count_data %}
                     <td class="align-middle text-center h5 font-weight-normal">{{ count }}</td>

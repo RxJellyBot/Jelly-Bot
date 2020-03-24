@@ -154,6 +154,7 @@ class UserMessageCountIntervalEntry:
     increases: int = 0
     decreases: int = 0
     avg_diff: float = field(init=False)
+    avg_diff_nrm: float = field(init=False)
     avg_diff_pct: float = field(init=False)
 
     def __post_init__(self, count: List[int]):
@@ -185,6 +186,11 @@ class UserMessageCountIntervalEntry:
 
         if self.avg_diff_pct == 0 and self.avg_diff > 0:
             self.avg_diff_pct = math.inf
+            self.avg_diff_nrm = self.avg_diff
+        elif self.avg_diff_pct != 0:
+            self.avg_diff_nrm = self.avg_diff / abs(self.avg_diff_pct / 100)
+        else:
+            self.avg_diff_nrm = 0
 
 
 @dataclass
