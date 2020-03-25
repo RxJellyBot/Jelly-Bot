@@ -1,7 +1,7 @@
-import unittest
-
 import pymongo
 from bson import ObjectId
+
+from django.test import TestCase
 
 from JellyBot.systemconfig import ChannelConfig
 from flags import Platform
@@ -14,7 +14,7 @@ from extutils.mongo import get_codec_options
 MONGO = pymongo.MongoClient("localhost", 27017)
 
 
-class TestModel(unittest.TestCase):
+class TestModel(TestCase):
     def test_parse(self):
         json = {ChannelConfigModel.VotePromoMod.key: 5,
                 ChannelConfigModel.VotePromoAdmin.key: 5,
@@ -78,7 +78,7 @@ class TestModel(unittest.TestCase):
             inserted[AutoReplyModuleTagModel.Color.key], AutoReplyModuleTagModel.Color.default_value)
 
 
-class TestFieldFilter(unittest.TestCase):
+class TestFieldFilter(TestCase):
     def test_intfield_autocast(self):
         field = IntegerField("n").new()
 
@@ -126,7 +126,3 @@ class TestFieldFilter(unittest.TestCase):
         self.assertEqual(field.value, None)
         field.value = None
         self.assertEqual(field.value, None)
-
-
-if __name__ == '__main__':
-    unittest.main()

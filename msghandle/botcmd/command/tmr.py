@@ -47,7 +47,7 @@ continue_help = _("A word that can indicate if the timer should keep counting up
 def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, countup: str) \
         -> List[HandledMessageEventText]:
     # Parse datetime string
-    dt = parse_to_dt(dt)
+    dt = parse_to_dt(dt, tzinfo_=e.user_model.config.tzinfo)
     if not dt:
         return [HandledMessageEventText(content=_("Failed to parse the string of datetime. (`{}`)").format(dt))]
 
