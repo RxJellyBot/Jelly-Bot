@@ -22,8 +22,8 @@ class AccountLoginView(View):
 
     # noinspection PyMethodMayBeStatic, PyUnusedLocal, PyBroadException
     def post(self, request, *args, **kwargs):
-        s = _("An unknown error occurred.")
-        s_contact = " " + _("Contact the administrator of the website.")
+        s = str(_("An unknown error occurred."))
+        s_contact = " " + str(_("Contact the administrator of the website."))
         token = None
 
         try:
