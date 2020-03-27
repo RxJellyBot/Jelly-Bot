@@ -48,14 +48,16 @@ class AccountLoginView(View):
                 MailSender.send_email_async(
                     f"Result: {result.serialize()}<br>"
                     f"Outcome: {result.outcome}<br>"
-                    f"Registration: {result.idt_reg_result.outcome}",
+                    f"Exception: {result.exception}<br>"
+                    f"Registration: {result.idt_reg_result.outcome}<br>"
+                    f"Registration Exception: {result.idt_reg_result.exception}<br>",
                     subject="New user data registration failed"
                 )
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:
             # EXNOTE: Insert `raise ex2` when any error occurred during login
-            # raise ex2
+            raise ex2
             s += f" ({ex2})"
 
         if s != AccountLoginView.PASS_SIGNAL:
