@@ -57,7 +57,7 @@ class AccountLoginView(View):
             s = str(ex1)
         except Exception as ex2:
             # EXNOTE: Insert `raise ex2` when any error occurred during login
-            raise ex2
+            # raise ex2
             s += f" ({ex2})"
 
         if s != AccountLoginView.PASS_SIGNAL:
