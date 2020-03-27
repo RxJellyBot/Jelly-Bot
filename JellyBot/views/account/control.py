@@ -9,6 +9,7 @@ from JellyBot.views import render_template, simple_str_response, simple_json_res
 from extutils.locales import locales, languages
 from extutils.dt import now_utc_aware, localtime
 from extutils.gidentity import get_identity_data, IDIssuerIncorrect
+from extutils.emailutils import MailSender
 from mongodb.factory import RootUserManager
 from mongodb.factory.results import WriteOutcome
 
@@ -42,6 +43,14 @@ class AccountLoginView(View):
                     "An unknown error occurred during the new user data registration. "
                     "Code: {} / Registration Code: {}.").format(
                     result.outcome.code, result.idt_reg_result.outcome.code)
+
+            if not result.outcome.is_success:
+                MailSender.send_email_async(
+                    f"Result: {result.serialize()}<br>"
+                    f"Outcome: {result.outcome}<br>"
+                    f"Registration: {result.idt_reg_result.outcome}",
+                    subject="New user data registration failed"
+                )
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:
