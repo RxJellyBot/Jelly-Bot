@@ -55,7 +55,7 @@ class RootUserModel(Model):
 class APIUserModel(Model):
     API_TOKEN_LENGTH = 32
 
-    Email = TextField("e", default=ModelDefaultValueExt.Required, regex=r"^\w+@\w+",
+    Email = TextField("e", default=ModelDefaultValueExt.Required, regex=r"^.+@.+",
                       allow_none=False, must_have_content=True)
     GoogleUid = TextField("goo_id", default=ModelDefaultValueExt.Required, regex=r"\w+",
                           allow_none=False, must_have_content=True)
