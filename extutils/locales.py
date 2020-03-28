@@ -54,6 +54,10 @@ class PytzInfo(tzinfo):
     def tzname(self, dt):
         return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())
 
+    @property
+    def tzidentifier(self):
+        return self._base.zone
+
 
 HKG = LocaleInfo(_("Asia: Hong Kong"), "Asia/Hong_Kong")
 MYS = LocaleInfo(_("Asia: Kuala Lumpur, Malaysia"), "Asia/Kuala_Lumpur")

@@ -6,7 +6,7 @@ import pymongo
 from bson import ObjectId
 
 from extutils import dt_to_objectid
-from extutils.locales import UTC
+from extutils.locales import UTC, PytzInfo
 from extutils.dt import now_utc_aware, parse_time_range
 from extutils.checker import param_type_ensure
 from flags import APICommand, MessageType, BotFeature
@@ -188,7 +188,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def hourly_interval_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,
-            tzinfo_: tzinfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
+            tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
@@ -199,7 +199,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$group": {
                 "_id": {
                     HourlyIntervalAverageMessageResult.KEY_HR:
-                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}},
+                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzidentifier}},
                     HourlyIntervalAverageMessageResult.KEY_CATEGORY:
                         "$" + MessageRecordModel.MessageType.key
                 },
@@ -214,7 +214,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
+            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             DailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
         self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
@@ -227,13 +227,13 @@ class MessageRecordStatisticsManager(BaseCollection):
                         "$dateToString": {
                             "date": "$_id",
                             "format": "%Y-%m-%d",
-                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                            "timezone": tzinfo_.tzidentifier
                         }
                     },
                     DailyMessageResult.KEY_HOUR: {
                         "$hour": {
                             "date": "$_id",
-                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                            "timezone": tzinfo_.tzidentifier
                         }
                     }
                 },
@@ -250,7 +250,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def mean_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: tzinfo = UTC.to_tzinfo(),
+            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo(),
             max_mean_days: int = 5) -> \
             MeanMessageResultGenerator:
         match_d = self._channel_oids_filter_(channel_oids)
@@ -268,7 +268,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                         "$dateToString": {
                             "date": "$_id",
                             "format": "%Y-%m-%d",
-                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                            "timezone": tzinfo_.tzidentifier
                         }
                     }
                 },
@@ -286,7 +286,7 @@ class MessageRecordStatisticsManager(BaseCollection):
     def member_daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
-            tzinfo_: tzinfo = UTC.to_tzinfo()) -> \
+            tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             MemberDailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
         self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
@@ -299,7 +299,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                         "$dateToString": {
                             "date": "$_id",
                             "format": "%Y-%m-%d",
-                            "timezone": tzinfo_.tzname(datetime.utcnow())
+                            "timezone": tzinfo_.tzidentifier
                         }
                     },
                     MemberDailyMessageResult.KEY_MEMBER: "$" + MessageRecordModel.UserRootOid.key
@@ -354,7 +354,7 @@ class BotFeatureUsageDataManager(BaseCollection):
     @param_type_ensure
     def get_channel_hourly_avg(
             self, channel_oid: ObjectId, *, hours_within: int = None, incl_not_used: bool = False,
-            tzinfo_: tzinfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
+            tzinfo_: PytzInfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
         filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
 
         self._attach_time_range_(filter_, hours_within=hours_within)
@@ -366,7 +366,7 @@ class BotFeatureUsageDataManager(BaseCollection):
                     BotFeatureHourlyAvgResult.KEY_FEATURE:
                         "$" + BotFeatureUsageModel.Feature.key,
                     BotFeatureHourlyAvgResult.KEY_HR:
-                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzname(datetime.utcnow())}}
+                        {"$hour": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}
                 },
                 BotFeatureHourlyAvgResult.KEY_COUNT: {"$sum": 1}
             }}
