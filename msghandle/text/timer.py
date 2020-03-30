@@ -28,29 +28,29 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
         Bot.Timer.MaxNotifyRangeSeconds
     )
 
-    crs = list(TimerManager.get_notify(e.channel_oid, within_secs))
-    crs2 = list(TimerManager.get_time_up(e.channel_oid))
+    tmr_ntf = TimerManager.get_notify(e.channel_oid, within_secs)
+    tmr_up = TimerManager.get_time_up(e.channel_oid)
 
     ret = []
 
-    if crs2:
-        ret.append(_("**{} timer(s) have timed up!**").format(len(crs2)))
+    if tmr_up:
+        ret.append(_("**{} timer(s) have timed up!**").format(len(tmr_up)))
         ret.append("")
 
-        for tmr in crs2:
+        for tmr in tmr_up:
             ret.append(_("- {event} has timed up! (at {time})").format(
                 event=tmr.title, time=localtime(tmr.target_time, e.user_model.config.tzinfo)
             ))
 
-    if crs:
+    if tmr_ntf:
         if ret:
             ret.append("-------------")
 
         now = now_utc_aware()
-        ret.append(_("**{} timer(s) will time up in less than {:.0f} minutes!**").format(len(crs), within_secs / 60))
+        ret.append(_("**{} timer(s) will time up in less than {:.0f} minutes!**").format(len(tmr_ntf), within_secs / 60))
         ret.append("")
 
-        for tmr in crs:
+        for tmr in tmr_ntf:
             ret.append(_("- {event} will time up after [{diff}]! (at {time})").format(
                 event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                 time=localtime(tmr.target_time, e.user_model.config.tzinfo)
