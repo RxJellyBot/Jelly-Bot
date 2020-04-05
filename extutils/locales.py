@@ -1,4 +1,4 @@
-from datetime import tzinfo
+from datetime import tzinfo, timedelta
 
 from django.utils.translation import gettext_lazy as _
 
@@ -46,10 +46,10 @@ class PytzInfo(tzinfo):
         self._base = tz
 
     def utcoffset(self, dt):
-        return self._base.utcoffset(dt.replace(tzinfo=None))
+        return self._base.utcoffset(dt.replace(tzinfo=None), is_dst=is_now_dst(self._base))
 
     def dst(self, dt):
-        return self._base.dst(dt.replace(tzinfo=None), is_dst=True)
+        return self._base.dst(dt.replace(tzinfo=None), is_dst=is_now_dst(self._base))
 
     def tzname(self, dt):
         return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())
@@ -57,6 +57,11 @@ class PytzInfo(tzinfo):
     @property
     def tzidentifier(self):
         return self._base.zone
+
+
+def is_now_dst(tz):
+    now = pytz.utc.localize(datetime.utcnow())
+    return now.astimezone(tz).dst() != timedelta(0)
 
 
 HKG = LocaleInfo(_("Asia: Hong Kong"), "Asia/Hong_Kong")
