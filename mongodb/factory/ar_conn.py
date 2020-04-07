@@ -37,6 +37,8 @@ class AutoReplyModuleManager(BaseCollection):
 
     def __init__(self):
         super().__init__()
+
+        # Using `_validate_content_` to track the uniqueness of the modules instead of creating a index
         self.create_index(
             [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
              (AutoReplyModuleModel.KEY_KW_TYPE, 1),
