@@ -24,5 +24,24 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=15 --max-line-length=120 --ignore=F401,F403,F405 --statistics
     - name: Run Django Tests
+      env:
+        SECRET_KEY: ${{ secrets.DjangoSecretKey }}
+        DJANGO_SETTINGS_MODULE: JellyBot.settings
+        MONGO_URL: ${{ secrets.MongoDBURL }}
+        MONGO_DB: GitHubActionTest
+        LINE_SECRET: ${{ secrets.LINESecret }}
+        LINE_TOKEN: ${{ secrets.LINEToken }}
+        DISCORD_TOKEN: ${{ secrets.DiscordToken }}
+        PRODUCTION: 0
+        DEBUG: 1
+        LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
+        NO_FIELD_CHECK: 1
+        GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}
+        EMAIL_ACCOUNT: ${{ secrets.EmailAccount }}
+        EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
+        SERVICE_SHORT_URL: http://rnnx.cc
+        DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
+        DDNS_HOST: bot
+        DDNS_DOMAIN: raenonx.cc
       run: |
         python3 manage.py test
