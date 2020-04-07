@@ -186,11 +186,14 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
     outcome = AutoReplyManager.del_conn(keyword, e.channel_oid, e.user_model.id)
 
     if outcome.is_success:
-        return [HandledMessageEventText(content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
+        return [HandledMessageEventText(
+            content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
     elif outcome == WriteOutcome.X_INSUFFICIENT_PERMISSION:
-        return [HandledMessageEventText(content=_("Insufficient Permission to delete the auto-reply module."))]
+        return [HandledMessageEventText(
+            content=_("Insufficient Permission to delete the auto-reply module."))]
     elif outcome == WriteOutcome.X_NOT_FOUND:
-        return [HandledMessageEventText(content=_("Auto-reply module of the keyword {} not found.").format(keyword))]
+        return [HandledMessageEventText(
+            content=_("Active auto-reply module of the keyword `{}` not found.").format(keyword))]
     else:
         return [
             HandledMessageEventText(

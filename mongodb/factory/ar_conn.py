@@ -162,7 +162,8 @@ class AutoReplyModuleManager(BaseCollection):
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         q = {
             AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
-            AutoReplyModuleModel.ChannelId.key: channel_oid
+            AutoReplyModuleModel.ChannelId.key: channel_oid,
+            AutoReplyModuleModel.Active.key: True
         }
 
         if not AutoReplyModuleManager._has_access_to_pinned_(channel_oid, remover_oid):
