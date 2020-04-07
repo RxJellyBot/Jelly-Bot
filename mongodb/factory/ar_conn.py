@@ -195,7 +195,7 @@ class AutoReplyModuleManager(BaseCollection):
         if not AutoReplyModuleManager._has_access_to_pinned_(channel_oid, remover_oid):
             q[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid))
+        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid), collation=case_insensitive_collation)
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
