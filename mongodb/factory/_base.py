@@ -136,7 +136,7 @@ class ControlExtensionMixin(Collection):
         return model, outcome, ex
 
     def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
-        update_result = self.update_many(filter_, update, upsert, collation)
+        update_result = self.update_many(filter_, update, upsert=upsert, collation=collation)
 
         if update_result.matched_count > 0:
             if update_result.modified_count > 0:

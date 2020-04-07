@@ -74,10 +74,14 @@ class AutoReplyModuleManager(BaseCollection):
                 return WriteOutcome.X_AR_INVALID_RESPONSE
 
         # Check module duplication
-        if self.count_documents({AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
-                                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
-                                 AutoReplyModuleModel.Responses.key: responses,
-                                 AutoReplyModuleModel.ChannelId.key: channel_oid}) > 0:
+        if self.count_documents(
+                {
+                    AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
+                    AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+                    AutoReplyModuleModel.Responses.key: responses,
+                    AutoReplyModuleModel.ChannelId.key: channel_oid
+                },
+                collation=case_insensitive_collation) > 0:
             return WriteOutcome.O_DATA_EXISTS
 
         return WriteOutcome.O_MISC
@@ -150,7 +154,8 @@ class AutoReplyModuleManager(BaseCollection):
                     AutoReplyModuleModel.ChannelId.key: channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
-                self._remove_update_ops_(creator_oid)
+                self._remove_update_ops_(creator_oid),
+                collation=case_insensitive_collation
             )
             self._delete_recent_module_(keyword)
 
@@ -248,8 +253,8 @@ class AutoReplyModuleManager(BaseCollection):
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
-        return self\
-            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel)\
+        return self \
+            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel) \
             .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
