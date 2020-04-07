@@ -1,98 +1,119 @@
 {
   "name": "Jelly Bot",
   "repository": "https://github.com/RaenonX/Jelly-Bot",
+  "description": "Multi-platform chatting bot.",
+  "website": "https://bot.raenonx.com/",
   "env": {
-    "GI_CLIENT_ID": {
-      "description": "Google Identity service client id. Format should be 000000000000-ffffffffffffffffffffffffffffffff.apps.googleusercontent.com.",
-      "required": true
-    },
     "SECRET_KEY": {
       "description": "The secret key for Django app.",
-      "required": true
+      "required": true,
+      "tag": ["django"]
     },
     "DJANGO_SETTINGS_MODULE": {
       "description": "Module of Django settings.",
-      "value": "JellyBot.settings"
+      "required": false,
+      "value": "JellyBot.settings",
+      "tag": ["django"]
     },
     "MONGO_URL": {
       "description": "Connection string for pymongo to connect to mongoDB.",
-      "required": true
+      "required": true,
+      "tag": ["mongodb"]
     },
     "MONGO_DB": {
       "description": "The database name of MongoDB. Set this when single db is needed, e.g. using mLab MongoDB on Heroku.",
-      "required": false
+      "required": false,
+      "tag": ["mongodb"]
     },
     "MONGO_BACKUP_URL": {
       "description": "The connection string of MongoDB instance backup target. This cannot be a single db database.",
-      "required": false
-    },
-    "PRODUCTION": {
-      "description": "Flag indicates that if the app is in production.",
-      "required": false
-    },
-    "DEBUG": {
-      "description": "Flag indicates that if the app should display debug message / in debug mode.",
-      "required": false
-    },
-    "EMAIL_ACCOUNT": {
-      "description": "Email address/account for sending error report.",
-      "required": true
-    },
-    "EMAIL_PASSWORD": {
-      "description": "Email password for sending error report. Recommended using alternate password for app access.",
-      "required": true
-    },
-    "HEROKU_API_TOKEN": {
-      "description": "Heroku API token for displaying status of the heroku app.",
-      "required": true
+      "required": false,
+      "tag": ["mongodb"]
     },
     "LINE_SECRET": {
       "description": "LINE Business Bot secret.",
-      "required": true
+      "required": true,
+      "tag": ["key/line"]
     },
     "LINE_TOKEN": {
       "description": "LINE Business Bot access token.",
-      "required": true
-    },
-    "LOGGER": {
-      "description": "Logger(s) configuration. See `note.md` for more details.",
-      "required": false
-    },
-    "LOG_LEVEL": {
-      "description": "Logger(s) configuration, specifically log level. See `note.md` for more details.",
-      "required": false
+      "required": true,
+      "tag": ["key/line"]
     },
     "DISCORD_TOKEN": {
       "description": "Token for Discord bot.",
-      "required": true
+      "required": true,
+      "tag": ["key/discord"]
+    },
+    "PRODUCTION": {
+      "description": "Flag indicates that if the app is in production.",
+      "required": false,
+      "tag": ["system"]
+    },
+    "DEBUG": {
+      "description": "Flag indicates that if the app should display debug message / in debug mode.",
+      "required": false,
+      "tag": ["system"]
+    },
+    "LOGGER": {
+      "description": "Logger(s) configuration. See `note.md` for more details.",
+      "required": false,
+      "tag": ["system"]
+    },
+    "LOG_LEVEL": {
+      "description": "Logger(s) configuration, specifically log level. See `note.md` for more details.",
+      "required": false,
+      "tag": ["system"]
     },
     "DISCORD_START": {
       "description": "Start the Discord bot when the app is ready. The bot will be started if the value is given regardless what value it is.",
-      "required": false
-    },
-    "HTTP_HOST": {
-      "description": "The domain of the app excluding protocol and the ending slash. For example, bot.raenonx.cc",
-      "required": true
-    },
-    "SERVICE_SHORT_URL": {
-      "description": "The URL to test the availability of the short service web app. Including protocol. Excluding slash.",
-      "required": true
-    },
-    "DDNS_PASSWORD": {
-      "description": "Password for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
-      "required": false
-    },
-    "DDNS_HOST": {
-      "description": "Host for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
-      "required": false
-    },
-    "DDNS_DOMAIN": {
-      "description": "Domain for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
-      "required": false
+      "required": false,
+      "tag": ["system"]
     },
     "NO_FIELD_CHECK":{
       "description": "Set any value to this variable if the app should not perform model field check.",
-      "required": false
+      "required": false,
+      "tag": ["system"]
+    },
+    "GI_CLIENT_ID": {
+      "description": "Google Identity service client id. Format should be 000000000000-ffffffffffffffffffffffffffffffff.apps.googleusercontent.com.",
+      "required": true,
+      "tag": ["app/google-identity"]
+    },
+    "EMAIL_ACCOUNT": {
+      "description": "Email address/account for sending error report.",
+      "required": true,
+      "tag": ["app/email"]
+    },
+    "EMAIL_PASSWORD": {
+      "description": "Email password for sending error report. Recommended using alternate password for app access.",
+      "required": true,
+      "tag": ["app/email"]
+    },
+    "HTTP_HOST": {
+      "description": "The domain of the app excluding protocol and the ending slash. For example, bot.raenonx.cc",
+      "required": true,
+      "tag": ["app/url"]
+    },
+    "SERVICE_SHORT_URL": {
+      "description": "The URL to test the availability of the short service web app. Including protocol. Excluding slash.",
+      "required": true,
+      "tag": ["app/url"]
+    },
+    "DDNS_PASSWORD": {
+      "description": "Password for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false,
+      "tag": ["app/ddns"]
+    },
+    "DDNS_HOST": {
+      "description": "Host for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false,
+      "tag": ["app/ddns"]
+    },
+    "DDNS_DOMAIN": {
+      "description": "Domain for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false,
+      "tag": ["app/ddns"]
     }
   }
 }
