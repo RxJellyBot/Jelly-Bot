@@ -53,6 +53,17 @@ class AutoReplyModuleManager(BaseCollection):
             self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
             channel_oid: ObjectId, online_check) \
             -> WriteOutcome:
+        """
+        Perform the following checks and return the corresponding result:
+        - Validity of the keyword
+            - `WriteOutcome.X_AR_INVALID_KEYWORD` if invalid
+        - Validity of the responses
+            - `WriteOutcome.X_AR_INVALID_RESPONSE` if invalid
+        - Module duplicated
+            - `WriteOutcome.O_DATA_EXISTS` if duplicated
+
+        Returns `WriteOutcome.O_MISC` if all checks passed.
+        """
         # Check validity of keyword
         if not AutoReplyValidators.is_valid_content(kw_type, kw_content, online_check):
             return WriteOutcome.X_AR_INVALID_KEYWORD
@@ -63,10 +74,14 @@ class AutoReplyModuleManager(BaseCollection):
                 return WriteOutcome.X_AR_INVALID_RESPONSE
 
         # Check module duplication
-        if self.count_documents({AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
-                                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
-                                 AutoReplyModuleModel.Responses.key: responses,
-                                 AutoReplyModuleModel.ChannelId.key: channel_oid}) > 0:
+        if self.count_documents(
+                {
+                    AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
+                    AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+                    AutoReplyModuleModel.Responses.key: responses,
+                    AutoReplyModuleModel.ChannelId.key: channel_oid
+                },
+                collation=case_insensitive_collation) > 0:
             return WriteOutcome.O_DATA_EXISTS
 
         return WriteOutcome.O_MISC
@@ -108,7 +123,7 @@ class AutoReplyModuleManager(BaseCollection):
         validate_outcome = self._validate_content_(
             keyword, kw_type, responses, channel_oid, online_check=True)
 
-        if validate_outcome != WriteOutcome.O_MISC:
+        if not validate_outcome.is_success:
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         model, outcome, ex = \
@@ -117,6 +132,16 @@ class AutoReplyModuleManager(BaseCollection):
                 CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
                 ChannelId=channel_oid
             )
+
+        # Duplication was already checked when validating the content
+        # However, the module ID is not acquired during check, so the module insertion still performed
+        if outcome == WriteOutcome.O_DATA_EXISTS:
+            # Re-enables the module if exactly same module found
+            # Check unique indexes of what "same" means
+
+            self.update_many_outcome(
+                {AutoReplyModuleModel.Id.key: model.id},
+                {"$set": {AutoReplyModuleModel.Active.key: True}})
 
         if outcome.is_success:
             # Set other module with the same keyword to be inactive
@@ -129,7 +154,8 @@ class AutoReplyModuleManager(BaseCollection):
                     AutoReplyModuleModel.ChannelId.key: channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
-                self._remove_update_ops_(creator_oid)
+                self._remove_update_ops_(creator_oid),
+                collation=case_insensitive_collation
             )
             self._delete_recent_module_(keyword)
 
@@ -162,13 +188,14 @@ class AutoReplyModuleManager(BaseCollection):
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         q = {
             AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
-            AutoReplyModuleModel.ChannelId.key: channel_oid
+            AutoReplyModuleModel.ChannelId.key: channel_oid,
+            AutoReplyModuleModel.Active.key: True
         }
 
         if not AutoReplyModuleManager._has_access_to_pinned_(channel_oid, remover_oid):
             q[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid))
+        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid), collation=case_insensitive_collation)
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
@@ -226,8 +253,8 @@ class AutoReplyModuleManager(BaseCollection):
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
-        return self\
-            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel)\
+        return self \
+            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel) \
             .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
