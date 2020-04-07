@@ -25,11 +25,11 @@ jobs:
     steps:
       - name: Print SHA
         run: |
-          echo %GITHUB_SHA%
+          echo $GITHUB_SHA
 
       - name: Print REF
         run: |
-          echo %GITHUB_REF%
+          echo $GITHUB_REF
 
   style-check:
     runs-on: windows-latest
@@ -75,4 +75,4 @@ jobs:
     steps:
       - name: Run Django Tests
         run: |
-          python3 manage.py tests
+          python manage.py tests
