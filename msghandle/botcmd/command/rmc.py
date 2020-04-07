@@ -76,6 +76,6 @@ def remote_control_status(e: TextMessageEventObject):
                               "Will be deactivated at `{}`.").format(
                         cnl.id, cnl.platform.key,
                         cnl.get_channel_name(e.user_model.id), current.expiry_str))
-        ]
+            ]
     else:
         return [HandledMessageEventText(content=_("Remote control is not activated."))]
