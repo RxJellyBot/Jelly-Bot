@@ -53,6 +53,17 @@ class AutoReplyModuleManager(BaseCollection):
             self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
             channel_oid: ObjectId, online_check) \
             -> WriteOutcome:
+        """
+        Perform the following checks and return the corresponding result:
+        - Validity of the keyword
+            - `WriteOutcome.X_AR_INVALID_KEYWORD` if invalid
+        - Validity of the responses
+            - `WriteOutcome.X_AR_INVALID_RESPONSE` if invalid
+        - Module duplicated
+            - `WriteOutcome.O_DATA_EXISTS` if duplicated
+
+        Returns `WriteOutcome.O_MISC` if all checks passed.
+        """
         # Check validity of keyword
         if not AutoReplyValidators.is_valid_content(kw_type, kw_content, online_check):
             return WriteOutcome.X_AR_INVALID_KEYWORD
@@ -108,7 +119,7 @@ class AutoReplyModuleManager(BaseCollection):
         validate_outcome = self._validate_content_(
             keyword, kw_type, responses, channel_oid, online_check=True)
 
-        if validate_outcome != WriteOutcome.O_MISC:
+        if not validate_outcome.is_success:
             return AutoReplyModuleAddResult(validate_outcome, None, None)
 
         model, outcome, ex = \
@@ -117,6 +128,16 @@ class AutoReplyModuleManager(BaseCollection):
                 CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
                 ChannelId=channel_oid
             )
+
+        # Duplication was already checked when validating the content
+        # However, the module ID is not acquired during check, so the module insertion still performed
+        if outcome == WriteOutcome.O_DATA_EXISTS:
+            # Re-enables the module if exactly same module found
+            # Check unique indexes of what "same" means
+
+            self.update_many_outcome(
+                {AutoReplyModuleModel.Id.key: model.id},
+                {"$set": {AutoReplyModuleModel.Active.key: True}})
 
         if outcome.is_success:
             # Set other module with the same keyword to be inactive
