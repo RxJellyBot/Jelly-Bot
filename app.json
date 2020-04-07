@@ -63,8 +63,12 @@
       "required": false
     },
     "DISCORD_TOKEN": {
-      "description": "Token for discord bot.",
+      "description": "Token for Discord bot.",
       "required": true
+    },
+    "DISCORD_START": {
+      "description": "Start the Discord bot when the app is ready. The bot will be started if the value is given regardless what value it is.",
+      "required": false
     },
     "HTTP_HOST": {
       "description": "The domain of the app excluding protocol and the ending slash. For example, bot.raenonx.cc",
@@ -84,6 +88,10 @@
     },
     "DDNS_DOMAIN": {
       "description": "Domain for ddns update. Details in https://www.namecheap.com/support/knowledgebase/article.aspx/29/11/how-do-i-use-a-browser-to-dynamically-update-the-hosts-ip.",
+      "required": false
+    },
+    "NO_FIELD_CHECK":{
+      "description": "Set any value to this variable if the app should not perform model field check.",
       "required": false
     }
   }

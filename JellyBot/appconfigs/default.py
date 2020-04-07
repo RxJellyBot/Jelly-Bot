@@ -1,12 +1,14 @@
+import os
 from django.apps import AppConfig
-
-from bot.event import signal_django_ready
-from extdiscord import run_server
 
 
 class JellyBotAppConfig(AppConfig):
     name = "JellyBot"
 
     def ready(self):
+        from bot.event import signal_django_ready
+        from extdiscord import run_server
+
         signal_django_ready()
-        run_server()
+        if os.environ.get("DISCORD_START"):
+            run_server()

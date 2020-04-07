@@ -29,19 +29,23 @@ def calculate_expression(expr: str, output_error: bool = False) -> List[HandledM
 
         if output_error:
             return [HandledMessageCalculateResult(
-                expr_before=_("I have difficulty understanding you.\n{} ({})").format(e.expr, e.base_exc))]
+                expr_before=expr,
+                expr_after=_("I have difficulty understanding you.\n{} ({})").format(e.expr, e.base_exc))]
         else:
             return []
     except NameError as e:
         logger.logger.debug(f"Exception occurred for text message calculator. Message: {e.args}")
 
         if output_error:
-            return [HandledMessageCalculateResult(expr_before=_("WTF are you talking about?\n{}").format(e.args))]
+            return [HandledMessageCalculateResult(
+                expr_before=expr,
+                expr_after=_("WTF are you talking about?\n{}").format(e.args))]
         else:
             return []
     except SyntaxError as e:
         if output_error:
             return [HandledMessageCalculateResult(
-                expr_before=_("I can't understand.\n{} ({})").format(e.args, e.text))]
+                expr_before=expr,
+                expr_after=_("I can't understand.\n{} ({})").format(e.args, e.text))]
         else:
             return []

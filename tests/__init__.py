@@ -1,2 +1,1 @@
-from .api import *
-from .components import *
+from .bot import *  # NOQA
