@@ -2,7 +2,7 @@ from abc import ABC
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from sympy import latex, Rational
+from sympy import latex, Float, Rational, Integer
 
 from extutils import safe_cast
 from extutils.emailutils import MailSender
@@ -80,12 +80,21 @@ class HandledMessageCalculateResult(HandledMessageEventText):
         if not expr_after:
             expr_after = expr_before
 
-        if isinstance(expr_after, Rational):
-            content += "\n" + str(_("Evaluated: `{}`").format(float(expr_after)))
+        self.evaluated = None
+        if isinstance(expr_after, Rational) and not isinstance(expr_after, Integer):
+            self.evaluated = float(expr_after)
+
+        if self.evaluated:
+            content += "\n" + str(_("Evaluated: `{}`").format(self.evaluated))
 
         super().__init__(content)
+
+        # Type casting float to eliminate the unnecessary floating points
+        if isinstance(expr_after, Float):
+            self.calc_result = str(float(expr_after))
+        else:
+            self.calc_result = str(expr_after)
         self.latex = latex(expr_after)
-        self.calc_result = str(expr_after)
         self.calc_expr = expr_before
 
     @property
@@ -104,6 +113,10 @@ class HandledMessageCalculateResult(HandledMessageEventText):
     @property
     def latex_for_html(self):
         return f"$${self.latex}$$"
+
+    @property
+    def has_evaluated(self):
+        return self.evaluated is not None
 
     def to_json(self):
         return super().to_json().update({"latex": self.latex})

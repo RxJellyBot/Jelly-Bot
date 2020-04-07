@@ -242,7 +242,9 @@ class BaseCollection(ControlExtensionMixin, Collection):
             return cls.model_class
 
     def on_init(self):
-        ModelFieldChecker.check_async(self)
+        if not os.environ.get("NO_FIELD_CHECK"):
+            ModelFieldChecker.check_async(self)
+
         if settings.PRODUCTION:
             backup_collection(
                 MONGO_CLIENT, self.get_db_name(), self.get_col_name(),
