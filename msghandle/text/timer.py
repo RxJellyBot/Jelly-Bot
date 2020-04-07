@@ -47,7 +47,8 @@ def process_timer_notification(e: TextMessageEventObject) -> List[HandledMessage
             ret.append("-------------")
 
         now = now_utc_aware()
-        ret.append(_("**{} timer(s) will time up in less than {:.0f} minutes!**").format(len(tmr_ntf), within_secs / 60))
+        ret.append(_("**{} timer(s) will time up in less than {:.0f} minutes!**").format(
+            len(tmr_ntf), within_secs / 60))
         ret.append("")
 
         for tmr in tmr_ntf:
