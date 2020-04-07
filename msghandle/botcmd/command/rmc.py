@@ -34,11 +34,13 @@ cmd_status = cmd.new_child_node(codes=["s", "cur", "status", "current"])
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId):
-    activated = RemoteControl.activate(e.user_model, e.channel_model_source.id, target_channel)
+    entry = RemoteControl.activate(
+        e.user_model.id, e.channel_model_source.id, target_channel, e.user_model.config.tzinfo)
 
-    if activated:
+    if entry.target_channel:
         return [HandledMessageEventText(content=_("Remote control activated."))]
     else:
+        RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
         return [HandledMessageEventText(content=_("Target channel not found. Failed to activate remote control."))]
 
 
@@ -56,17 +58,24 @@ def remote_control_deactivate(e: TextMessageEventObject):
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_status(e: TextMessageEventObject):
-    current = RemoteControl.get_current(e.user_model.id, e.channel_model_source.id)
+    current = RemoteControl.get_current(e.user_model.id, e.channel_model_source.id, update_expiry=False)
 
     if current:
-        return [
-            HandledMessageEventText(
-                content=_("Remote control is activated.\n"
-                          "Target Channel ID: `{}`\n"
-                          "Target Channel Platform & Name: *{} / {}*\n"
-                          "Will be deactivated at `{}`.").format(
-                    current.target_channel.id, current.target_channel.platform.key,
-                    current.target_channel.get_channel_name(e.user_model.id), current.expiry_str))
+        cnl = current.target_channel
+        if not cnl:
+            RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
+            return [HandledMessageEventText(
+                content=_("Target channel data not found. Terminating remote control.\n"
+                          "Target Channel ID: `{]`").format(current.target_channel_oid))]
+        else:
+            return [
+                HandledMessageEventText(
+                    content=_("Remote control is activated.\n"
+                              "Target Channel ID: `{}`\n"
+                              "Target Channel Platform & Name: *{} / {}*\n"
+                              "Will be deactivated at `{}`.").format(
+                        cnl.id, cnl.platform.key,
+                        cnl.get_channel_name(e.user_model.id), current.expiry_str))
         ]
     else:
         return [HandledMessageEventText(content=_("Remote control is not activated."))]
