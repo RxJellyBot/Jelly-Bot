@@ -24,12 +24,14 @@ jobs:
 
     steps:
       - name: Print SHA
+        shell: cmd
         run: |
-          echo $GITHUB_SHA
+          echo %GITHUB_SHA%
 
       - name: Print REF
+        shell: cmd
         run: |
-          echo $GITHUB_REF
+          echo %GITHUB_REF%
 
   style-check:
     runs-on: windows-latest
@@ -37,6 +39,8 @@ jobs:
     needs: [build]
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: flake8
         run: |
           pip install flake8
@@ -73,6 +77,8 @@ jobs:
       DDNS_DOMAIN: raenonx.cc
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Run Django Tests
         run: |
           python manage.py tests
