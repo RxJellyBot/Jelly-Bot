@@ -62,6 +62,7 @@ jobs:
       DISCORD_TOKEN: ${{ secrets.DiscordToken }}
       PRODUCTION: 0
       DEBUG: 1
+      TEST: 1
       LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
       NO_FIELD_CHECK: 1
       GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}

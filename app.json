@@ -48,11 +48,19 @@
     "PRODUCTION": {
       "description": "Flag indicates that if the app is in production.",
       "required": false,
+      "valid": ["0", "1"],
       "tag": ["system"]
     },
     "DEBUG": {
       "description": "Flag indicates that if the app should display debug message / in debug mode.",
       "required": false,
+      "valid": ["0", "1"],
+      "tag": ["system"]
+    },
+    "TEST": {
+      "description": "Flag indicates that if the app is testing.",
+      "required": false,
+      "valid": ["0", "1"],
       "tag": ["system"]
     },
     "LOGGER": {
