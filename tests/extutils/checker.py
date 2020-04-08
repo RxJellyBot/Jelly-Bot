@@ -157,6 +157,32 @@ class TestArgTypeEnsure(TestCase):
         self.assertEquals(MessageType.TEXT, a1_out)
         self.assertEquals(MessageType.LOCATION, a2_out)
         self.assertEquals("1", a3_out)
+
+    def test_list(self):
+        l_out = 1
+
+        @arg_type_ensure
+        def fn(l: List[int]):
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertListEqual([1], l_out)
+
+    def test_list_union_element(self):
+        l_out = [5, True, 3.7, "A"]
+
+        @arg_type_ensure
+        def fn(l: List[Union[int, bool]]):
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertListEqual([5, True, 3, True], l_out)
         
     def test_normal_nested_union(self):
         a1_out = "1"

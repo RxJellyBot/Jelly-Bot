@@ -49,8 +49,8 @@ class TestRemoteControlHolder(TestCase):
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
         self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
-        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 5, f"Expiry time not match.")
-        self.assertNotAlmostEquals(expiry_unexpected.timestamp(), entry.expiry.timestamp(), 5, f"Unexpected expiry.")
+        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 2, f"Expiry time not match.")
+        self.assertNotAlmostEquals(expiry_unexpected.timestamp(), entry.expiry.timestamp(), 2, f"Unexpected expiry.")
 
     def test_get_current_not_update_expiry(self):
         self.rmc.activate(UID, CID_SRC, CID_DEST)
@@ -62,8 +62,8 @@ class TestRemoteControlHolder(TestCase):
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
         self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
-        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 5, f"Expiry time not match.")
-        self.assertNotAlmostEquals(expiry_unexpected.timestamp(), entry.expiry.timestamp(), 5, f"Unexpected expiry.")
+        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 2, f"Expiry time not match.")
+        self.assertNotAlmostEquals(expiry_unexpected.timestamp(), entry.expiry.timestamp(), 2, f"Unexpected expiry.")
 
     def test_auto_deactivate(self):
         self.set_temp_expiry()
@@ -82,4 +82,4 @@ class TestRemoteControlHolder(TestCase):
 
         self.assertIsNotNone(entry, "Activation returned `None`")
         self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
-        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 5, f"Expiry time not match.")
+        self.assertAlmostEquals(expiry_expected.timestamp(), entry.expiry.timestamp(), 2, f"Expiry time not match.")
