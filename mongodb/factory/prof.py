@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from pymongo import UpdateOne
 
 from extutils.color import ColorFactory
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mongodb.factory import ChannelManager
@@ -73,7 +73,7 @@ class UserProfileManager(BaseCollection):
 
         return OperationOutcome.O_COMPLETED
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
@@ -163,7 +163,7 @@ class UserProfileManager(BaseCollection):
 
         return ret
 
-    @param_type_ensure
+    @arg_type_ensure
     def is_user_in_channel(self, channel_oid: ObjectId, root_oid: ObjectId) -> bool:
         return self.count_documents(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
@@ -328,7 +328,7 @@ class ProfileDataManager(BaseCollection):
 
         return CreateProfileResult(outcome, model, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         """
         Update a profile using the data in `update_dict`.
@@ -344,7 +344,7 @@ class ProfileDataManager(BaseCollection):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
 
-    @param_type_ensure
+    @arg_type_ensure
     def is_name_available(self, channel_oid: ObjectId, name: str):
         return self.count_documents({ChannelProfileModel.Name.key: name,
                                      ChannelProfileModel.ChannelOid.key: channel_oid}) == 0
@@ -365,14 +365,14 @@ class ProfileManager:
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
         Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
 
-    @param_type_ensure
+    @arg_type_ensure
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
         default_prof = self._prof.get_default_profile(channel_oid)
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
     # noinspection PyTypeChecker
-    @param_type_ensure
+    @arg_type_ensure
     def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
         """
         Register a new profile with the user's oid and the other args with py key for the model.
@@ -388,7 +388,7 @@ class ProfileManager:
         return create_result.model
 
     # noinspection PyTypeChecker
-    @param_type_ensure
+    @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
         """
         Register a new profile with the user's oid and the constructed `ChannelProfileModel`.
@@ -485,7 +485,7 @@ class ProfileManager:
         else:
             return []
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
         """Get the existing profiles of a channel."""
         return self._prof.get_channel_profiles(channel_oid, partial_keyword)
@@ -657,7 +657,7 @@ class ProfileManager:
         else:
             return ProfilePermission.PRF_CONTROL_SELF in permissions
 
-    @param_type_ensure
+    @arg_type_ensure
     def attach_profile_name(
             self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str, target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
@@ -667,7 +667,7 @@ class ProfileManager:
 
         return self.attach_profile(channel_oid, user_oid, prof.id, target_oid)
 
-    @param_type_ensure
+    @arg_type_ensure
     def attach_profile(
             self, channel_oid: ObjectId, user_oid: ObjectId, profile_oid: ObjectId,
             target_oid: Optional[ObjectId] = None) -> OperationOutcome:
@@ -702,7 +702,7 @@ class ProfileManager:
 
         return self._conn.user_attach_profile(channel_oid, target_oid, profile_oid)
 
-    @param_type_ensure
+    @arg_type_ensure
     def detach_profile_name(
             self, channel_oid: ObjectId, profile_name: str,
             user_oid: Optional[ObjectId] = None, target_oid: Optional[ObjectId] = None) \

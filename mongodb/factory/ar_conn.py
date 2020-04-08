@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from JellyBot.systemconfig import AutoReply, Database, DataQuery, Bot
 from extutils.utils import enumerate_ranking
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import ProfilePermission, AutoReplyContentType
@@ -179,7 +179,7 @@ class AutoReplyModuleManager(BaseCollection):
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def _remove_update_ops_(self, remover_oid: ObjectId):
         return {"$set": {
             AutoReplyModuleModel.Active.key: False,
@@ -208,7 +208,7 @@ class AutoReplyModuleManager(BaseCollection):
 
         return ret
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_conn(self, keyword: str, keyword_type: AutoReplyContentType,
                  channel_oid: ObjectId, case_insensitive: bool = True) -> \
             Optional[AutoReplyModuleModel]:

@@ -9,7 +9,7 @@ from .logger import logger
 
 
 __all__ = [
-    "param_type_ensure", "TypeCastingFailed",
+    "arg_type_ensure", "TypeCastingFailed",
     "BaseDataTypeConverter", "NonSafeDataTypeConverter"
 ]
 
@@ -38,7 +38,7 @@ class BaseDataTypeConverter(ABC):
             return data
 
         if type_annt is not Parameter.empty \
-                and type_annt not in cls.valid_data_types + cls._ignore\
+                and type_annt not in cls.valid_data_types + cls._ignore \
                 and not (hasattr(type_annt, "__origin__") and type_annt.__origin__ is Union):
             return cls.on_type_invalid(data, type_annt)
 
@@ -96,7 +96,7 @@ class BaseDataTypeConverter(ABC):
 
 
 class GeneralDataTypeConverter(BaseDataTypeConverter):
-    valid_data_types = [int, str, bool, type, dict, ObjectId]
+    valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):
@@ -119,7 +119,7 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
 
 class NonSafeDataTypeConverter(GeneralDataTypeConverter):
     """Raises `TypeCastingFailed` on exception occurred during casting."""
-    valid_data_types = [int, str, bool, type, dict, ObjectId]
+    valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):
@@ -140,7 +140,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
         raise TypeCastingFailed(data, dtype, e)
 
 
-def param_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
+def arg_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
     if fn:
         def wrapper_in(*args_cast, **kwargs_cast):
             return _type_ensure_(fn, converter, *args_cast, **kwargs_cast)

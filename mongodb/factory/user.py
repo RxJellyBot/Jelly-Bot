@@ -9,7 +9,7 @@ from pymongo import ReturnDocument
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.emailutils import MailSender
 from extutils.locales import default_locale
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from flags import Platform
 from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel, \
     ChannelCollectionModel
@@ -78,17 +78,17 @@ class OnPlatformIdentityManager(BaseCollection):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
         return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
         return self.find_one_casted(
             {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
             parse_cls=OnPlatformUserModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def register(self, platform: Platform, user_token) -> OnPlatformUserRegistrationResult:
         entry, outcome, ex = \
             self.insert_one_data(Token=user_token, Platform=platform)
@@ -173,11 +173,11 @@ class RootUserManager(BaseCollection):
                                "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
                                (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({OID_KEY: root_oid}, parse_cls=RootUserModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_root_data_uname(
             self, root_oid: ObjectId, channel_data: Union[ChannelModel, ChannelCollectionModel, None] = None,
             str_not_found: Optional[str] = None) -> Optional[namedtuple]:
@@ -256,7 +256,7 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
         return self._mgr_onplat.get_onplat(platform, user_token)
 
@@ -288,7 +288,7 @@ class RootUserManager(BaseCollection):
 
         return ret
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
 
@@ -323,11 +323,11 @@ class RootUserManager(BaseCollection):
 
         return GetRootUserDataResult(outcome, rt_user_data)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid}, parse_cls=RootUserModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -335,7 +335,7 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config.tzinfo
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -343,7 +343,7 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config.language
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
@@ -351,7 +351,7 @@ class RootUserManager(BaseCollection):
         else:
             return u_data.config
 
-    @param_type_ensure
+    @arg_type_ensure
     def merge_onplat_to_api(self, src_root_oid: ObjectId, dest_root_oid: ObjectId) -> OperationOutcome:
         """
         Merge 2 root user data to be the same. Only the data of `dest_root_oid` will be kept.
@@ -381,7 +381,7 @@ class RootUserManager(BaseCollection):
         else:
             return OperationOutcome.X_NOT_DELETED
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:
         updated = self.find_one_and_update(
             {OID_KEY: root_oid},

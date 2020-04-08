@@ -3,7 +3,7 @@ from typing import Optional, Dict, List
 from bson import ObjectId
 from pymongo import ReturnDocument
 
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel, OID_KEY
 from mongodb.utils import CursorWithCount
@@ -27,7 +27,7 @@ class ChannelManager(BaseCollection):
         self.create_index(
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
-    @param_type_ensure
+    @arg_type_ensure
     def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
         entry, outcome, ex = self.insert_one_data(
             Platform=platform, Token=token,
@@ -38,25 +38,25 @@ class ChannelManager(BaseCollection):
 
         return ChannelRegistrationResult(outcome, entry, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def deregister(self, platform: Platform, token: str) -> WriteOutcome:
         return self.mark_accessibility(platform, token, False)
 
-    @param_type_ensure
+    @arg_type_ensure
     def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
         return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
         return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
             -> ChannelChangeNameResult:
         """
@@ -86,7 +86,7 @@ class ChannelManager(BaseCollection):
 
         return ChannelChangeNameResult(outcome, ret, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_token(self, platform: Platform, token: str, auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = self.find_one_casted(
@@ -103,7 +103,7 @@ class ChannelManager(BaseCollection):
 
         return ret
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_oid(self, channel_oid: ObjectId, hide_private: bool = False) -> Optional[ChannelModel]:
         filter_ = {ChannelModel.Id.key: channel_oid}
 
@@ -122,7 +122,7 @@ class ChannelManager(BaseCollection):
         return {model.id: model for model
                 in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
         filter_ = \
             {
@@ -136,7 +136,7 @@ class ChannelManager(BaseCollection):
         return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
 
     # noinspection PyArgumentList
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         if not isinstance(platform, Platform):
             platform = Platform(platform)
@@ -171,7 +171,7 @@ class ChannelCollectionManager(BaseCollection):
             name="Channel Collection Identity", unique=True)
         self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
 
-    @param_type_ensure
+    @arg_type_ensure
     def register(
             self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
             -> ChannelCollectionRegistrationResult:
@@ -187,33 +187,33 @@ class ChannelCollectionManager(BaseCollection):
 
         return ChannelCollectionRegistrationResult(outcome, entry, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
         return self.find_one_casted(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             parse_cls=ChannelCollectionModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_chcoll_oid(self, chcoll_oid: ObjectId) -> Optional[ChannelCollectionModel]:
         return self.find_one_casted(
             {ChannelCollectionModel.Id.key: chcoll_oid},
             parse_cls=ChannelCollectionModel
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_chcoll_child_channel(self, child_channel_oid: ObjectId):
         return self.find_one_casted(
             {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid},
             parse_cls=ChannelCollectionModel
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
         return self.update_many_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_default_name(self, platform: Platform, token: str, new_default_name: str):
         return self.update_many_outcome(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},

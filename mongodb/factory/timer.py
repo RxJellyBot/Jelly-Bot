@@ -7,7 +7,7 @@ from bson import ObjectId
 from models import TimerModel, TimerListResult, OID_KEY
 from mongodb.factory.results import WriteOutcome
 from mongodb.utils import CursorWithCount
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.locales import UTC
 from extutils.dt import is_tz_naive, now_utc_aware
 from JellyBot.systemconfig import Bot
@@ -27,7 +27,7 @@ class TimerManager(BaseCollection):
         self.create_index(TimerModel.Keyword.key)
         self.create_index(TimerModel.DeletionTime.key, expireAfterSeconds=0)
 
-    @param_type_ensure
+    @arg_type_ensure
     def add_new_timer(
             self, ch_oid: ObjectId, keyword: str, title: str, target_time: datetime,
             countup: bool = False, period_sec: int = 0) -> WriteOutcome:
@@ -48,17 +48,17 @@ class TimerManager(BaseCollection):
 
         return outcome
 
-    @param_type_ensure
+    @arg_type_ensure
     def del_timer(self, timer_oid: ObjectId) -> bool:
         return self.delete_one({OID_KEY: timer_oid}).deleted_count > 0
 
-    @param_type_ensure
+    @arg_type_ensure
     def list_all_timer(self, channel_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_timers(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
         return TimerListResult(
             self.find_cursor_with_count({TimerModel.Keyword.key: keyword,
@@ -66,7 +66,7 @@ class TimerManager(BaseCollection):
                 .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> List[TimerModel]:
         now = now_utc_aware()
 
@@ -90,7 +90,7 @@ class TimerManager(BaseCollection):
 
         return ret
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_time_up(self, channel_oid: ObjectId) -> List[TimerModel]:
         now = now_utc_aware()
 

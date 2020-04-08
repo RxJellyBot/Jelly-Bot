@@ -4,7 +4,7 @@ from typing import MutableMapping, Optional
 from bson import ObjectId
 
 from flags import ModelValidityCheckResult
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.dt import localtime
 from models import OID_KEY
 from models.field import BaseField
@@ -214,7 +214,7 @@ class Model(MutableMapping, abc.ABC):
             else:
                 return True
 
-    @param_type_ensure
+    @arg_type_ensure
     def set_oid(self, oid: ObjectId):
         self._inner_dict_update_("Id", oid)
 

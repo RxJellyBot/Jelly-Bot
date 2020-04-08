@@ -11,7 +11,7 @@ from discord import (
 
 from bot.event import signal_discord_ready
 from extdiscord.utils import channel_full_repr
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import Platform
 from extdiscord import handle_discord_main
@@ -157,7 +157,7 @@ class DiscordClientWrapper:
     async def start(self, token):
         await self._core.start(token)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_user_name_safe(self, uid: int) -> Optional[str]:
         udata = self._core.get_user(uid)
 
@@ -166,7 +166,7 @@ class DiscordClientWrapper:
         else:
             return None
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_guild(self, gid: int) -> Optional[Guild]:
         return self._core.get_guild(gid)
 

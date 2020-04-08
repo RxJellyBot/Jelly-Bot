@@ -7,7 +7,7 @@ import pymongo
 from bson import ObjectId
 
 from extutils.logger import SYSTEM
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from models import ShortUrlRecordModel
 from models.field import UrlField
 from mongodb.factory.results import WriteOutcome, UrlShortenResult
@@ -72,7 +72,7 @@ class ShortUrlDataManager(BaseCollection):
 
         return code
 
-    @param_type_ensure
+    @arg_type_ensure
     def create_record(self, target: str, creator_oid: ObjectId) -> UrlShortenResult:
         if not ShortUrlDataManager.is_valid_url(target):
             return UrlShortenResult(WriteOutcome.X_INVALID_URL, None)
@@ -80,7 +80,7 @@ class ShortUrlDataManager(BaseCollection):
         model, outcome, ex = self.insert_one_data(Code=self.generate_code(), Target=target, CreatorOid=creator_oid)
         return UrlShortenResult(outcome, model, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_target(self, code: str) -> Optional[str]:
         ret = self.get_record(code)
 
@@ -89,17 +89,17 @@ class ShortUrlDataManager(BaseCollection):
         else:
             return None
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_record(self, code: str) -> Optional[ShortUrlRecordModel]:
         return self.find_one_casted({ShortUrlRecordModel.Code.key: code}, parse_cls=ShortUrlRecordModel)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_user_record(self, creator_oid: ObjectId) -> CursorWithCount:
         filter_ = {ShortUrlRecordModel.CreatorOid.key: creator_oid}
         crs = CursorWithCount(self.find(filter_), self.count_documents(filter_), parse_cls=ShortUrlRecordModel)
         return crs.sort([(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 
-    @param_type_ensure
+    @arg_type_ensure
     def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:
         if not ShortUrlDataManager.is_valid_url(new_target):
             return False
