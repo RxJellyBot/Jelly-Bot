@@ -21,17 +21,11 @@ CID_DEST = ObjectId.from_datetime(_now_ + timedelta(days=1))
 class TestRemoteControlHolder(TestCase):
     _expiry_ = Bot.RemoteControl.IdleDeactivateSeconds
 
-    @classmethod
-    def setUpClass(cls):
-        cls.rmc = RemoteControl()
+    def setUp(self) -> None:
+        self.rmc = RemoteControl()
 
-    @classmethod
-    def tearDown(cls):
-        cls.restore_temp_expiry()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.restore_temp_expiry()
+    def tearDown(self) -> None:
+        self.restore_temp_expiry()
 
     @staticmethod
     def set_temp_expiry():
