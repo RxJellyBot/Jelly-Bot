@@ -87,4 +87,4 @@ jobs:
 
       - name: Run Django tests
         run: |
-          python manage.py tests
+          python manage.py test tests
