@@ -38,7 +38,7 @@ class ChannelModel(Model):
         if oid_str in self.name:
             return self.name[oid_str]
         else:
-            return self.config.default_name or ""
+            return self.config.default_name or self.token
 
 
 class ChannelCollectionModel(Model):
