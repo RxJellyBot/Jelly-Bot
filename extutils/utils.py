@@ -119,11 +119,11 @@ def char_description(c: str):
         return c
 
 
-def enumerate_ranking(iterable, start=1, t_prefix=True, is_equal: callable = lambda cur, prv: cur == prv) -> \
+def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_equal: callable = lambda cur, prv: cur == prv) -> \
         Generator[Tuple[Union[int, str], Any], None, None]:
     _null_ = object()
 
-    iterator = iter(iterable)
+    iterator = iter(iterable_sorted)
 
     prev = next(iterator, _null_)
     rank = start
@@ -132,12 +132,14 @@ def enumerate_ranking(iterable, start=1, t_prefix=True, is_equal: callable = lam
     while prev != _null_:
         curr = next(iterator, _null_)
 
+        # Check tied
         while curr != _null_ and is_equal(curr, prev):
             temp.append(prev)
 
             prev = curr
             curr = next(iterator, _null_)
 
+        # Add prefix if any is tied
         for d in temp:
             yield f"T{rank}" if t_prefix else rank, d
 

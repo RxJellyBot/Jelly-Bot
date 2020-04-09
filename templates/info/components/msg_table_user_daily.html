@@ -8,6 +8,7 @@
             <th scope="col">{% trans "Member Name" %}</th>
             <th scope="col" class="text-center no-line-break">{% trans "Total Count" %}</th>
             {% for date in message_data.label_dates %}
+                <th scope="col" class="text-center no-line-break nosort">#</th>
                 <th scope="col" class="text-center no-line-break">{{ date }}</th>
             {% endfor %}
         </tr>
@@ -17,7 +18,8 @@
             <tr {% if not entry.available %}class="table-danger" {% endif %}>
                 <th class="align-middle text-center no-line-break">{{ entry.member_name }}</th>
                 <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_total }}</code></td>
-                {% for ct in entry.count_list %}
+                {% for rk, ct in entry.rank_count_zip %}
+                    <td class="align-middle text-center h5 font-weight-normal no-line-break"><code>{{ rk }}</code></td>
                     <td class="align-middle text-center h5 font-weight-normal">{{ ct }}</td>
                 {% endfor %}
             </tr>

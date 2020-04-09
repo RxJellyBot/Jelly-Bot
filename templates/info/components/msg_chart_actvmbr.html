@@ -1,0 +1,47 @@
+{% load i18n %}
+
+<canvas id="msgstats-actvmbr"></canvas>
+
+<!--suppress JSUnresolvedFunction -->
+<script type="text/javascript">
+    new Chart(document.getElementById("msgstats-actvmbr").getContext("2d"), {
+        type: "line",
+
+        data: {
+            labels: {{ msg_daily_data.label_dates|safe }},
+            datasets: [
+                {
+                    label: "{% trans "Active Member Count" %}",
+                    borderColor: "rgb(50, 50, 50)",
+                    pointBackgroundColor: "rgb(50, 50, 50)",
+                    pointBorderColor: "rgb(50, 50, 50)",
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    data: {{ msg_daily_data.active_members }},
+                },
+            ]
+        },
+
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            elements: {
+                line: {
+                    tension: 0 // disables bezier curves
+                }
+            },
+            legend: {
+                labels: {
+                    fontFamily: defaults.labels.fontFamily,
+                    fontSize: defaults.labels.fontSize
+                }
+            }
+        }
+    });
+</script>

@@ -169,6 +169,17 @@
 
         <div class="row">
             <div class="col-lg mb-3">
+                <h5>#&nbsp;{% trans "Daily Active Member Count" %}</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg mb-3">
+                {% include "info/components/msg_chart_actvmbr.html" with msg_daily_data=msg_daily_user only %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg mb-3">
                 <h5>#&nbsp;{% trans "Member Message Count Ranking" %}</h5>
             </div>
         </div>
