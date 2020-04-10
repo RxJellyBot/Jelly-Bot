@@ -3,13 +3,13 @@ from typing import List
 from bson import ObjectId
 
 from extutils.emailutils import MailSender
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from models.field import BaseField
 
 
 class UserDataIntegrationHelper:
     @staticmethod
-    @param_type_ensure
+    @arg_type_ensure
     def integrate(src_root_oid: ObjectId, dest_root_oid: ObjectId) -> bool:
         """
         :return: Integration succeed or not.

@@ -8,7 +8,7 @@ from bson import ObjectId
 from extutils import dt_to_objectid
 from extutils.locales import UTC, PytzInfo
 from extutils.dt import now_utc_aware, parse_time_range
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from flags import APICommand, MessageType, BotFeature
 from mongodb.factory.results import RecordAPIStatisticsResult
 from mongodb.utils import CursorWithCount
@@ -36,7 +36,7 @@ class APIStatisticsManager(BaseCollection):
         self.create_index(APIStatisticModel.Timestamp.key,
                           expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 
-    @param_type_ensure
+    @arg_type_ensure
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
                      org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
         entry, outcome, ex = self.insert_one_data(
@@ -56,7 +56,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         self.create_index(MessageRecordModel.Timestamp.key,
                           expireAfterSeconds=Database.MessageStats.MessageRecordExpirySeconds, name="Timestamp")
 
-    @param_type_ensure
+    @arg_type_ensure
     def record_message_async(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
             message_type: MessageType, message_content: Any, proc_time_secs: float):
@@ -64,7 +64,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             target=self.record_message,
             args=(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)).start()
 
-    @param_type_ensure
+    @arg_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
             message_type: MessageType, message_content: Any, proc_time_secs: float):
@@ -74,13 +74,13 @@ class MessageRecordStatisticsManager(BaseCollection):
             ProcessTimeSecs=proc_time_secs, Timestamp=now_utc_aware()
         )
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
         return self.find_cursor_with_count(
             {MessageRecordModel.ChannelOid.key: channel_oid}, parse_cls=MessageRecordModel
         ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_message_frequency(self, channel_oid: ObjectId, within_mins: Union[float, int] = 720) -> float:
         """Get message frequency in terms of seconds per message."""
         rct_msg_count = self.count_documents(
@@ -321,18 +321,18 @@ class BotFeatureUsageDataManager(BaseCollection):
     collection_name = "bot"
     model_class = BotFeatureUsageModel
 
-    @param_type_ensure
+    @arg_type_ensure
     def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()
 
-    @param_type_ensure
+    @arg_type_ensure
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
         if feature_used != BotFeature.UNDEFINED:
             self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
 
     # Statistics
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_usage(
             self, channel_oid: ObjectId, *, hours_within: int = None, incl_not_used: bool = False) \
             -> BotFeatureUsageResult:
@@ -351,7 +351,7 @@ class BotFeatureUsageDataManager(BaseCollection):
 
         return BotFeatureUsageResult(list(self.aggregate(pipeline)), incl_not_used)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_hourly_avg(
             self, channel_oid: ObjectId, *, hours_within: int = None, incl_not_used: bool = False,
             tzinfo_: PytzInfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
@@ -377,7 +377,7 @@ class BotFeatureUsageDataManager(BaseCollection):
             incl_not_used,
             HourlyResult.data_days_collected(self, filter_, hr_range=hours_within))
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_channel_per_user_usage(
             self, channel_oid: ObjectId, *, hours_within: int = None,
             member_oid_list: Optional[List[ObjectId]] = None) \

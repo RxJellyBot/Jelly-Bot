@@ -263,12 +263,12 @@ class MemberDailyMessageResult(DailyResult):
     def __init__(self, cursor, days_collected, tzinfo, *,
                  start: Optional[datetime] = None, end: Optional[datetime] = None):
         self.dates = self.date_list_str(days_collected, tzinfo, start=start, end=end)
-        self.data = {date_: {} for date_ in self.dates}
+        self.data_count = {date_: {} for date_ in self.dates}
         for d in cursor:
             _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]
             _member_ = d[OID_KEY][MemberDailyMessageResult.KEY_MEMBER]
             _count_ = d[MemberDailyMessageResult.KEY_COUNT]
-            self.data[_date_][_member_] = _count_
+            self.data_count[_date_][_member_] = _count_
 
 
 @dataclass

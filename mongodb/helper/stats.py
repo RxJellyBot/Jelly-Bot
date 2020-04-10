@@ -133,16 +133,26 @@ class UserDailyMessageEntry:
     member_name: str
     available: bool
     count_list: List[int]
+    rank_list: List[str]
     count_total: int = field(init=False)
 
     def __post_init__(self):
         self.count_total = sum(self.count_list)
 
+    @property
+    def rank_count_zip(self):
+        return zip(self.rank_list, self.count_list)
+
 
 @dataclass
 class UserDailyMessageResult:
     label_dates: List[str]
+    active_members: List[int]
     entries: List[UserDailyMessageEntry]
+
+    @property
+    def label_dates_jsarr(self):
+        return f"[{self.label_dates}]"
 
 
 @dataclass
@@ -307,16 +317,41 @@ class MessageStatsDataProcessor:
         result = MessageRecordStatisticsManager.member_daily_message_count(
             channel_data.id, hours_within=hours_within, start=start, end=end, tzinfo_=tz)
 
-        count_proc = {oid: [] for oid in uname_dict.keys()}
+        # Array for storing active member count
+        actv_mbr = []
+
+        # Create empty arrays for the result
+        # Each entry corresponds to daily message count in a specific date
+        # Ordered by the date
+        proc_count = {}
+        proc_rank = {}
+        for oid in uname_dict.keys():
+            proc_count[oid] = []
+            proc_rank[oid] = []
+
         for date in result.dates:
-            data_of_date = result.data[date]
-            for oid in count_proc.keys():
-                count_proc[oid].append(data_of_date.get(oid, 0))
+            # Get the data of the corresponding date
+            data_of_date = result.data_count[date]
 
-        entries = [UserDailyMessageEntry(member_name=name, count_list=count_proc[oid], available=available_dict[oid])
-                   for oid, name in uname_dict.items()]
+            # Storing active member count
+            actv_mbr.append(len(data_of_date))
 
-        return UserDailyMessageResult(label_dates=result.dates, entries=entries)
+            # Get and sort the daily message count
+            collated_count = {oid: data_of_date.get(oid, 0) for oid in proc_count.keys()}
+            sorted_count = list(sorted(collated_count.items(), key=lambda x: x[1], reverse=True))
+
+            # Insert daily count and rank
+            for rank, entry in enumerate_ranking(sorted_count, is_equal=lambda cur, prv: cur[1] == prv[1]):
+                uid, count = entry
+                proc_count[uid].append(count)
+                proc_rank[uid].append(rank)
+
+        entries = [
+            UserDailyMessageEntry(
+                member_name=name, count_list=proc_count[oid], rank_list=proc_rank[oid], available=available_dict[oid])
+            for oid, name in uname_dict.items()]
+
+        return UserDailyMessageResult(label_dates=result.dates, entries=entries, active_members=actv_mbr)
 
     @staticmethod
     def get_user_channel_messages(

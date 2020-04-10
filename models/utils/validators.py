@@ -16,7 +16,7 @@ class AutoReplyValidators:
             type_ = flags.AutoReplyContentType(type_)
 
         if type_ == flags.AutoReplyContentType.TEXT:
-            return len(content) <= AutoReply.MaxContentLength
+            return 0 < len(content.strip()) <= AutoReply.MaxContentLength
 
         if type_ == flags.AutoReplyContentType.IMAGE:
             return _BaseValidators.is_content_image(content, online_check)

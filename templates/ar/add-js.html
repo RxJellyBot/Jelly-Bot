@@ -181,10 +181,11 @@
     function formSubmissionChecks() {
         let errmsgs = [];
 
-        formValidateContentDisplayMarker();
-
         // Check Content Length and related actions on components
         errmsgs = errmsgs.concat(formValidateContentLength());
+
+        // Check the content's validity and also refresh the validity marker
+        errmsgs = errmsgs.concat(formValidateContentRefreshMarker());
 
         // Channel check
         if (regId === "arChannel") {
@@ -209,12 +210,24 @@
         return msgAvailable;
     }
 
-    function formValidateContentDisplayMarker() {
+    // Refresh the validity markers of the textareas and return corresponding error message if any
+    function formValidateContentRefreshMarker() {
+        let errMsg = [];
+
         $("div.txtarea-count").each(function () {
             if (!$(this).parent().hasClass("d-none")) {
-                validateTextArea($(this), $(this).find("textarea"));
+                let valid = validateTextArea($(this), $(this).find("textarea"));
+                if (!valid) {
+                    let name = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+                    {% blocktrans trimmed %}
+                        let msg = `The content of <b>${name}</b> is invalid.</b>`;
+                    {% endblocktrans %}
+                    errMsg.push(msg);
+                }
             }
         });
+
+        return errMsg;
     }
 
     function formValidateContentLength() {

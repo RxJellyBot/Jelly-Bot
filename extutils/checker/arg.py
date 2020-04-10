@@ -9,7 +9,7 @@ from .logger import logger
 
 
 __all__ = [
-    "param_type_ensure", "TypeCastingFailed",
+    "arg_type_ensure", "TypeCastingFailed",
     "BaseDataTypeConverter", "NonSafeDataTypeConverter"
 ]
 
@@ -30,6 +30,10 @@ class BaseDataTypeConverter(ABC):
     _ignore = [Any]
     valid_data_types: List[type] = []
 
+    @staticmethod
+    def _typing_alias_origin_(dtype: Any) -> Optional[Any]:
+        return getattr(dtype, "__origin__", None)
+
     @classmethod
     @abstractmethod
     def _convert_(cls, data: Any, type_annt):
@@ -37,15 +41,20 @@ class BaseDataTypeConverter(ABC):
         if type(data) == type_annt:
             return data
 
+        alias_origin_union = cls._typing_alias_origin_(type_annt) is Union
+        alias_origin_list = cls._typing_alias_origin_(type_annt) is list
+
         if type_annt is not Parameter.empty \
-                and type_annt not in cls.valid_data_types + cls._ignore\
-                and not (hasattr(type_annt, "__origin__") and type_annt.__origin__ is Union):
+                and type_annt not in cls.valid_data_types + cls._ignore \
+                and not any([alias_origin_union, alias_origin_list]):
             return cls.on_type_invalid(data, type_annt)
 
         try:
             # [origin is Union] before [not in _ignore] so if type_annt is Union, then it won't go to `type_annt(data)`
-            if hasattr(type_annt, "__origin__") and type_annt.__origin__ is Union:
+            if alias_origin_union:
                 return cls._cast_union_(data, type_annt)
+            if alias_origin_list:
+                return cls._cast_list_(data, type_annt)
             elif type_annt not in cls._ignore:
                 return type_annt(data)
             else:
@@ -75,9 +84,30 @@ class BaseDataTypeConverter(ABC):
         return cls.on_cast_fail(data, type_annt, last_e)
 
     @classmethod
+    def _cast_list_(cls, data: Any, type_annt):
+        ret = []
+        cast_type = type_annt.__args__[0]
+        annt_union = cls._typing_alias_origin_(cast_type) is Union
+
+        try:
+            iterator = iter(data)
+        except TypeError:
+            iterator = iter([1])
+
+        for obj in iterator:
+            if annt_union:
+                ret.append(cls._cast_union_(obj, cast_type))
+            elif isinstance(data, cast_type):
+                ret.append(obj)
+            else:
+                ret.append(cast_type(obj))
+
+        return ret
+
+    @classmethod
     def _data_is_allowed_type_(cls, data, allowed_type):
         t = type(data)
-        return t == allowed_type or (hasattr(allowed_type, "__origin__") and allowed_type.__origin__ is t)
+        return t == allowed_type or cls._typing_alias_origin_(allowed_type) is t
 
     @classmethod
     def convert(cls, data: Any, type_annt):
@@ -86,9 +116,13 @@ class BaseDataTypeConverter(ABC):
         else:
             return cls._convert_(data, type_annt)
 
-    @staticmethod
-    def on_type_invalid(data: Any, dtype: type):
-        raise NotImplementedError()
+    @classmethod
+    @abstractmethod
+    def on_type_invalid(cls, data: Any, dtype: type):
+        if is_flag_class(dtype):
+            return dtype(int(data))
+        else:
+            return data
 
     @staticmethod
     def on_cast_fail(data: Any, dtype: type, e: Exception):
@@ -96,19 +130,15 @@ class BaseDataTypeConverter(ABC):
 
 
 class GeneralDataTypeConverter(BaseDataTypeConverter):
-    valid_data_types = [int, str, bool, type, dict, ObjectId]
+    valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):
-        ret = super()._convert_(data, type_annt)
-        return ret
+        return super()._convert_(data, type_annt)
 
-    @staticmethod
-    def on_type_invalid(data: Any, dtype: type) -> Any:
-        if is_flag_class(dtype):
-            return dtype(int(data))
-        else:
-            return data
+    @classmethod
+    def on_type_invalid(cls, data: Any, dtype: type) -> Any:
+        return super().on_type_invalid(data, dtype)
 
     @staticmethod
     def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
@@ -119,19 +149,15 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
 
 class NonSafeDataTypeConverter(GeneralDataTypeConverter):
     """Raises `TypeCastingFailed` on exception occurred during casting."""
-    valid_data_types = [int, str, bool, type, dict, ObjectId]
+    valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
     def _convert_(cls, data: Any, type_annt):
-        ret = super()._convert_(data, type_annt)
-        return ret
+        return super()._convert_(data, type_annt)
 
-    @staticmethod
-    def on_type_invalid(data: Any, dtype: type) -> Any:
-        if is_flag_class(dtype):
-            return dtype(int(data))
-        else:
-            return data
+    @classmethod
+    def on_type_invalid(cls, data: Any, dtype: type) -> Any:
+        return super().on_type_invalid(data, dtype)
 
     @staticmethod
     def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
@@ -140,7 +166,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
         raise TypeCastingFailed(data, dtype, e)
 
 
-def param_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
+def arg_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
     if fn:
         def wrapper_in(*args_cast, **kwargs_cast):
             return _type_ensure_(fn, converter, *args_cast, **kwargs_cast)

@@ -113,17 +113,19 @@ function updateTextAreaPercentBar(area_base, txtArea, id) {
     }
 }
 
+// Return if the given text area is valid
 function validateTextArea(parent, txtArea) {
     validateContent(parent.find("select.ar-type option:selected").val(), txtArea.val(), function (success, result) {
         hideAllValidClasses(txtArea);
-        let valid = success && result;
 
-        if (valid) {
+        if (success && result) {
             txtArea.addClass("is-valid");
         } else {
             txtArea.addClass("is-invalid");
         }
-    })
+    });
+
+    return txtArea.hasClass("is-valid");
 }
 
 function initRegSelection() {

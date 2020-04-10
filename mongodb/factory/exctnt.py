@@ -7,7 +7,7 @@ from JellyBot.systemconfig import Database
 from flags import ExtraContentType
 from models import ExtraContentModel, OID_KEY
 from mongodb.factory.results import RecordExtraContentResult, WriteOutcome
-from extutils.checker import param_type_ensure
+from extutils.checker import arg_type_ensure
 from extutils.utils import cast_iterable
 
 from ._base import BaseCollection
@@ -50,7 +50,7 @@ class ExtraContentManager(BaseCollection):
 
         return RecordExtraContentResult(outcome, model, ex)
 
-    @param_type_ensure
+    @arg_type_ensure
     def get_content(self, content_id: ObjectId) -> Optional[ExtraContentModel]:
         return self.find_one_casted({OID_KEY: content_id}, parse_cls=ExtraContentModel)
 

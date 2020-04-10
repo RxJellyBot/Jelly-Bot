@@ -12,7 +12,7 @@ from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import BotFeatureUsageDataManager
 from JellyBot.systemconfig import HostUrl
-from extutils.checker import param_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
+from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
 from extutils.logger import LoggerSkeleton
 from extutils.strtrans import type_translation
 
@@ -449,7 +449,7 @@ class CommandNode:
         else:
             BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
             try:
-                ret = param_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
+                ret = arg_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
                 cmd_fn.record_called(e.channel_oid)
             except TypeCastingFailed as e:
                 ret = [HandledMessageEventText(
