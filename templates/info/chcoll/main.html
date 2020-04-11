@@ -18,9 +18,9 @@
         <div class="row">
             <div class="col-lg mb-3">
                 <div class="card border-primary text-center mb-3">
-                    <h4 class="card-header text-primary">{% trans "Channel Collection ID" %}</h4>
+                    <h5 class="card-header text-primary">{% trans "Channel Collection ID" %}</h5>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <div class="row justify-content-lg-center">
                                 <div class="col-lg-auto">
                                     <code>{{ chcoll_data.id }}</code>
@@ -30,9 +30,9 @@
                     </div>
                 </div>
                 <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Channel Collection Token" %}</h4>
+                    <h5 class="card-header text-primary">{% trans "Channel Collection Token" %}</h5>
                     <div class="card-body">
-                        <div class="card-text h2">
+                        <div class="card-text h4">
                             <div class="row justify-content-lg-center">
                                 <div class="col-lg-auto">
                                     <code>{{ chcoll_data.token }}</code>
@@ -44,9 +44,9 @@
             </div>
             <div class="col-lg mb-3">
                 <div class="card border-primary text-center mb-3">
-                    <h4 class="card-header text-primary">{% trans "Platform" %}</h4>
+                    <h5 class="card-header text-primary">{% trans "Platform" %}</h5>
                     <div class="card-body">
-                        <div class="card-text h5">
+                        <div class="card-text h4">
                             <div class="row justify-content-lg-center">
                                 <div class="col-lg-auto">
                                     {{ chcoll_data.platform.key }}
@@ -56,14 +56,14 @@
                     </div>
                 </div>
                 <div class="card border-primary text-center">
-                    <h4 class="card-header text-primary">{% trans "Child Channels" %}</h4>
+                    <h5 class="card-header text-primary">{% trans "Child Channels" %}</h5>
                     <div class="card-body">
                         <div class="list-group overflow-auto" style="max-height: 20rem">
                             {% for cch_data in chcoll_cch_data %}
                                 <a href="{% url "info.channel" channel_oid=cch_data.channel_data.id %}" target="_blank"
                                    class="list-group-item list-group-item-action{% if not cch_data.channel_data.bot_accessible %} list-group-item-danger{% endif %}">
-                                    <span class="h5 font-weight-normal">{{ cch_data.channel_name }}</span><br>
-                                    <code class="h6">{{ cch_data.channel_data.id }}</code>
+                                    <span class="h6 font-weight-normal">{{ cch_data.channel_name }}</span><br>
+                                    <code>{{ cch_data.channel_data.id }}</code>
                                 </a>
                             {% endfor %}
                         </div>

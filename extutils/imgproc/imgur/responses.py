@@ -20,6 +20,13 @@ class ImgurUploadResponse(ImgurResponse):
         super().__init__(response)
 
     @property
+    def delete_hash(self) -> Optional[str]:
+        if self.success:
+            return self._dict["data"]["deletehash"]
+        else:
+            return None
+
+    @property
     def link(self) -> Optional[str]:
         if self.success:
             return self._dict["data"]["link"]
