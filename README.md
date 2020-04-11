@@ -16,17 +16,13 @@ Website: http://rnnx.cc/Website
 
 ### Links
 
-[Features/Issues that has done implementing but not yet uploaded](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Amark-awaiting-pr)
+[Features/Issues that has done implementing but not yet deployed](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+Awaiting+PR%22)
 
-[Features/Issues that is currently working on](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Amark-working)
+[Features/Issues that is currently working on](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+In+Progress%22)
 
-[Features/Issues that should be started soon](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Apriority-9)
+[Features/Issues that should be started soon](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Priority%3A+9%22)
 
-[Known Bugs](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3Atype-bug)
-
-[Brief view of the current project progress](https://github.com/RaenonX/Jelly-Bot/labels)
-
-[Categorized project progresses](https://github.com/RaenonX/Jelly-Bot/projects)
+[Known Bugs](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Type%3A+Bug%22)
 
 <hr>
 
