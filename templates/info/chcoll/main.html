@@ -82,7 +82,8 @@
                 <div class="card border-success text-center">
                     <h4 class="card-header text-success">{% trans "Message Count in 1 Day" %}</h4>
                     <div class="card-body">
-                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count1d }}</code></p>
+                        <p class="mb-3">{% trans "Total Messages: " %}<code
+                                class="h5">{{ user_message_data1d.msg_count }}</code></p>
                         {% include "info/components/msg_table_count.html" with message_data=user_message_data1d simplified=True only %}
                     </div>
                 </div>
@@ -91,7 +92,8 @@
                 <div class="card border-success text-center">
                     <h4 class="card-header text-success">{% trans "Message Count in 7 Days" %}</h4>
                     <div class="card-body">
-                        <p class="mb-3">{% trans "Total Messages: " %}<code class="h5">{{ msg_count7d }}</code></p>
+                        <p class="mb-3">{% trans "Total Messages: " %}<code
+                                class="h5">{{ user_message_data7d.msg_count }}</code></p>
                         {% include "info/components/msg_table_count.html" with message_data=user_message_data7d simplified=True only %}
                     </div>
                 </div>

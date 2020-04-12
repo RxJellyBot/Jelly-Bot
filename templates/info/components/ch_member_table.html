@@ -6,13 +6,17 @@
         <tr>
             <th scope="col">{% trans "Member Name" %}</th>
             <th scope="col">{% trans "Member ID" %}</th>
+            <th scope="col">{% trans "Last Message Timestamp" %}</th>
+            <th scope="col">{% trans "First Join Timestamp" %}</th>
         </tr>
         </thead>
         <tbody>
-        {% for member in member_list %}
+        {% for member in member_info %}
             <tr>
                 <th class="align-middle text-center no-line-break">{{ member.user_name }}</th>
                 <td class="align-middle text-center no-line-break"><code class="h6">{{ member.user_oid }}</code></td>
+                <td class="align-middle text-center no-line-break">{{ member.last_message_at_str }}</td>
+                <td class="align-middle text-center no-line-break">{{ member.first_joined_str }}</td>
             </tr>
         {% endfor %}
         </tbody>

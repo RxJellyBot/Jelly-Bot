@@ -1,26 +1,24 @@
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
-from typing import Any, Optional, Union, List
+from typing import Any, Optional, Union, List, Dict
 
 import pymongo
 from bson import ObjectId
 
+from JellyBot.systemconfig import Database
 from extutils import dt_to_objectid
-from extutils.locales import UTC, PytzInfo
-from extutils.dt import now_utc_aware, parse_time_range
 from extutils.checker import arg_type_ensure
+from extutils.dt import now_utc_aware, parse_time_range, localtime
+from extutils.locales import UTC, PytzInfo
 from flags import APICommand, MessageType, BotFeature
-from mongodb.factory.results import RecordAPIStatisticsResult
-from mongodb.utils import CursorWithCount
 from models import (
     APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
     MemberMessageCountResult, MeanMessageResultGenerator
 )
-
-from JellyBot.systemconfig import Database
-
+from mongodb.factory.results import RecordAPIStatisticsResult
+from mongodb.utils import CursorWithCount
 from ._base import BaseCollection
 
 DB_NAME = "stats"
@@ -91,6 +89,29 @@ class MessageRecordStatisticsManager(BaseCollection):
             return (within_mins * 60) / rct_msg_count
         else:
             return 0.0
+
+    def get_user_last_message_ts(
+            self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) -> Dict[ObjectId, datetime]:
+        ret = {}
+        KEY_TS = "msgts"
+
+        pipeline = [
+            {"$match": {
+                MessageRecordModel.ChannelOid.key: channel_oid,
+                MessageRecordModel.UserRootOid.key: {"$in": user_oids}
+            }},
+            {"$sort": {
+                "_id": pymongo.DESCENDING
+            }},
+            {"$group": {
+                "_id": "$" + MessageRecordModel.UserRootOid.key,
+                KEY_TS: {"$first": "$" + OID_KEY}
+            }}
+        ]
+        for data in self.aggregate(pipeline):
+            ret[data[OID_KEY]] = localtime(data[KEY_TS].generation_time, tzinfo_)
+
+        return ret
 
     # Statistics
 

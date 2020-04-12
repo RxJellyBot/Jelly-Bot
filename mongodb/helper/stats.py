@@ -1,8 +1,8 @@
 import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
-from typing import List, Optional, Union, NamedTuple, Dict, Tuple, Iterator
 from datetime import tzinfo, datetime
+from typing import List, Optional, Union, NamedTuple, Dict, Tuple, Iterator
 
 from bson import ObjectId
 
@@ -16,10 +16,10 @@ from models import (
 from mongodb.factory import (
     MessageRecordStatisticsManager, ProfileManager, BotFeatureUsageDataManager
 )
-
 from .search import IdentitySearcher
 
 
+# region Dataclasses for `MessageStatsDataProcessor`
 @dataclass
 class UserMessageStatsEntry:
     user_oid: ObjectId
@@ -236,6 +236,9 @@ class UserMessageCountIntervalResult:
                     user_name=name, total=0, count=[0] * original_result.interval))
 
 
+# endregion
+
+
 class MessageStatsDataProcessor:
     @staticmethod
     def _get_user_msg_stats_(msg_result: MemberMessageByCategoryResult,
@@ -423,6 +426,7 @@ class MessageStatsDataProcessor:
             original_result=data, uname_dict=uname_dict, available_only=available_only)
 
 
+# region Dataclasses for `BotUsageStatsDataProcessor`
 @dataclass
 class PerMemberStatsEntry:
     user_name: str
@@ -434,6 +438,9 @@ class PerMemberStatsEntry:
 class PerMemberStats:
     data: List[PerMemberStatsEntry]
     features: List[BotFeature]
+
+
+# endregion
 
 
 class BotUsageStatsDataProcessor:

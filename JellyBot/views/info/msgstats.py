@@ -1,15 +1,15 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 
 from django.contrib import messages
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
-from django.utils.timezone import get_current_timezone
 
-from JellyBot.views import render_template
-from JellyBot.utils import get_root_oid
 from JellyBot.components.mixin import ChannelOidRequiredMixin
 from JellyBot.systemconfig import Website
+from JellyBot.utils import get_root_oid
+from JellyBot.views import render_template
 from extutils import safe_cast, dt_to_objectid
 from extutils.dt import parse_to_dt
 from mongodb.factory import MessageRecordStatisticsManager
@@ -87,6 +87,21 @@ def get_msg_stats_data_package(
 
 
 class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
+    @staticmethod
+    def get_timestamp(request, get_dict_key, *, msg_parse_failed=None, msg_out_of_range=None):
+        dt_str = request.GET.get(get_dict_key)
+        dt_parsed = None
+        if dt_str:
+            dt_parsed = parse_to_dt(dt_str, tzinfo_=get_current_timezone())
+            if not dt_parsed:
+                msg_parse_failed = msg_parse_failed or _("Failed to parse the timestamp. ({})")
+                messages.warning(request, msg_parse_failed.format(dt_str))
+            elif not dt_to_objectid(dt_parsed):
+                dt_parsed = None
+                messages.warning(request, msg_out_of_range or _("Timestamp out of range."))
+
+        return dt_parsed
+
     # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
         channel_data = self.get_channel_data(*args, **kwargs)
@@ -99,28 +114,18 @@ class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, Vi
             period_count = Website.Message.DefaultPeriodCount
 
         # Get starting timestamp
-        dt_start_str = request.GET.get("start")
-        dt_start = None
-        if dt_start_str:
-            dt_start = parse_to_dt(dt_start_str, tzinfo_=get_current_timezone())
-            if not dt_start:
-                messages.warning(
-                    request, _("Failed to parse the starting timestamp. Received: {}").format(dt_start_str))
-            elif not dt_to_objectid(dt_start):
-                dt_start = None
-                messages.warning(request, _("Start time out of range."))
+        dt_start = self.get_timestamp(
+            request, "start",
+            msg_parse_failed=_("Failed to parse the starting timestamp. Received: {}"),
+            msg_out_of_range=_("Start time out of range.")
+        )
 
         # Get ending timestamp
-        dt_end_str = request.GET.get("end")
-        dt_end = None
-        if dt_end_str:
-            dt_end = parse_to_dt(dt_end_str, tzinfo_=get_current_timezone())
-            if not dt_end:
-                messages.warning(
-                    request, _("Failed to parse the ending timestamp. Received: {}").format(dt_end_str))
-            elif not dt_to_objectid(dt_end):
-                dt_end = None
-                messages.warning(request, _("End time out of range."))
+        dt_end = self.get_timestamp(
+            request, "end",
+            msg_parse_failed=_("Failed to parse the ending timestamp. Received: {}"),
+            msg_out_of_range=_("End time out of range.")
+        )
 
         # Check starting and ending timestamp
         if dt_start and dt_end and dt_start > dt_end:
