@@ -45,7 +45,7 @@ class MailSender:
 
             MailSender._cache_[content_html] = None
 
-            if bool(int(os.environ.get("TEST"))):
+            if bool(int(os.environ.get("TEST", 0))):
                 print()
                 print("--- SENDING EMAIL ---")
                 print()
@@ -57,7 +57,7 @@ class MailSender:
     def send_email_async(
             content_html: str, recipients: List[str] = None,
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
-        if bool(int(os.environ.get("TEST"))):
+        if bool(int(os.environ.get("TEST", 0))):
             MailSender.send_email_to_fake_server(*MailSender.collate_info(content_html, recipients, subject, prefix))
         else:
             Thread(
