@@ -6,3 +6,4 @@ from .flags import (
 from .imgproc import TestImgurClient
 from .linesticker import TestLineStickerUtils
 from .boolext import TestBooleanExtension
+from .color import TestColor, TestColorFactory
