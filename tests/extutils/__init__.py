@@ -4,3 +4,4 @@ from .flags import (
     TestFlagCodeEnum, TestFlagSingleCodeEnum, TestFlagDoubleCodeEnum, TestFlagPrefixedDoubleCodeEnum, TestFlagMisc
 )
 from .imgproc import TestImgurClient
+from .linesticker import TestLineStickerUtils
