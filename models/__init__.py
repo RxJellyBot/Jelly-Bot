@@ -1,4 +1,5 @@
 # noinspection PyUnresolvedReferences
+from .field import OID_KEY
 # noinspection PyUnresolvedReferences
 from ._base import Model, ModelDefaultValueExt
 # noinspection PyUnresolvedReferences
@@ -12,8 +13,6 @@ from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel
 from .exctnt import ExtraContentModel
 # noinspection PyUnresolvedReferences
 from .execode import ExecodeEntryModel
-# noinspection PyUnresolvedReferences
-from .field import OID_KEY
 # noinspection PyUnresolvedReferences
 from .prof import (
     ChannelProfileModel, ChannelProfileConnectionModel,
