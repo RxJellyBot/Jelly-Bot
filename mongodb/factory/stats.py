@@ -319,9 +319,9 @@ class MessageRecordStatisticsManager(BaseCollection):
             {"$project": {
                 CountBeforeTimeResult.KEY_SEC_OF_DAY: {
                     "$add": [
-                        {"$multiply": [{"$hour": "$_id"}, 3600]},
-                        {"$multiply": [{"$minute": "$_id"}, 60]},
-                        {"$second": "$_id"}
+                        {"$multiply": [{"$hour": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}, 3600]},
+                        {"$multiply": [{"$minute": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}, 60]},
+                        {"$second": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}
                     ]
                 }
             }},

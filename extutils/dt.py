@@ -155,7 +155,7 @@ class TimeRange:
         else:
             t = localtime(now_utc_aware(), tz=self.tzinfo_).time()
 
-        return t.hour * 3600 + t.minute + 60 + t.second + t.microsecond * 10E-7
+        return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond * 10E-7
 
 
 def parse_time_range(
