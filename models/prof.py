@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Set
+from typing import List
 
 from bson import ObjectId
 

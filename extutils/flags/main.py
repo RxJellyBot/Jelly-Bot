@@ -60,10 +60,15 @@ class FlagCodeMixin(FlagMixin):
     def __eq__(self, other):
         if isinstance(other, int):
             return self.code == other
-        elif isinstance(other, str) and other.isnumeric():
-            return self.code == int(other)
-        else:
-            return super().__eq__(other)
+        elif isinstance(other, str):
+            if other.isnumeric():
+                return self.code == int(other)
+            elif hasattr(self, "name"):
+                return self.name == other
+            else:
+                return self.code_str == other
+
+        return super().__eq__(other)
 
     def __hash__(self):
         return hash((self.__class__, self._code))
@@ -160,12 +165,22 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 
 class FlagEnumMixin:
     @classmethod
-    def cast(cls, item: Union[str, int], silent_fail=False):
+    def cast(cls, item: Union[str, int], *, silent_fail=False):
+        """
+        Cast `item` to be the enum.
+        `item` can only be either `str` or `int`.
+
+        :param item: The item to be casted. Can be the name or the code of the enum.
+        :param silent_fail: Indicate if this function should throw an error if casting failed.
+        :return: Casted enum.
+        :exception TypeError: The type of the `item` does not match the type which can be casted.
+        :exception ValueError: The value does not match any of the element in the enum.
+        """
         if isinstance(item, cls):
             return item
 
-        if not isinstance(item, (str, int)):
-            raise ValueError(f"Source type ({type(item)}) for casting not handled.")
+        if not type(item) in (str, int):
+            raise TypeError(f"Source type ({type(item)}) for casting not handled.")
 
         # noinspection PyTypeChecker
         for i in list(cls):
@@ -175,34 +190,19 @@ class FlagEnumMixin:
         if silent_fail:
             return None
         else:
-            raise TypeError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
+            raise ValueError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
 
     @classmethod
     def contains(cls, item):
-        if isinstance(item, str) and not issubclass(cls, FlagSingleMixin):
-            return False
-
-        if isinstance(item, int):
-            det_fn = FlagEnumMixin._match_int_
-        elif isinstance(item, str):
-            det_fn = FlagEnumMixin._match_str_
-        else:
+        if not type(item) in (str, int, cls):
             return False
 
         # noinspection PyTypeChecker
         for i in list(cls):
-            if det_fn(i, item):
+            if i == item:
                 return True
 
         return False
-
-    @staticmethod
-    def _match_int_(enum, item):
-        return enum.code == item
-
-    @staticmethod
-    def _match_str_(enum, item):
-        return enum.key == item or enum.name == item or enum.code_str == item
 
 
 class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):

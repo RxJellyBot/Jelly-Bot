@@ -183,7 +183,7 @@ class TestArgTypeEnsure(TestCase):
         fn(l_out)
 
         self.assertListEqual([5, True, 3, True], l_out)
-        
+
     def test_normal_nested_union(self):
         a1_out = "1"
         a2_out = [1]

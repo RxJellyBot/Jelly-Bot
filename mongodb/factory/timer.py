@@ -6,7 +6,6 @@ from bson import ObjectId
 
 from models import TimerModel, TimerListResult, OID_KEY
 from mongodb.factory.results import WriteOutcome
-from mongodb.utils import CursorWithCount
 from extutils.checker import arg_type_ensure
 from extutils.locales import UTC
 from extutils.dt import is_tz_naive, now_utc_aware
