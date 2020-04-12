@@ -70,6 +70,7 @@ jobs:
       EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
       SERVICE_SHORT_URL: http://rnnx.cc
       DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
+      IMGUR_CLIENT_ID: ${{ secrets.ImgurClientID }}
       DDNS_HOST: bot
       DDNS_DOMAIN: raenonx.cc
 
