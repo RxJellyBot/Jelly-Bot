@@ -3,22 +3,24 @@ import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta, date
+from time import gmtime, strftime
 from typing import Dict, Optional, List
 
 import pymongo
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-from extutils.utils import enumerate_ranking
 from extutils.dt import now_utc_aware, parse_time_range, TimeRange
+from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
+from models import Model, ModelDefaultValueExt, OID_KEY
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
-from models import Model, ModelDefaultValueExt, OID_KEY
 
 
+# region Models
 class APIStatisticModel(Model):
     Timestamp = DateTimeField("t", default=ModelDefaultValueExt.Required, allow_none=False)
     SenderOid = ObjectIDField("sd", default=ModelDefaultValueExt.Optional, allow_none=True, stores_uid=True)
@@ -46,9 +48,10 @@ class BotFeatureUsageModel(Model):
     SenderRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
 
 
-# --- Results
+# endregion
 
 
+# region Results - Base
 class HourlyResult(abc.ABC):
     DAYS_NONE = 0
 
@@ -87,7 +90,17 @@ class HourlyResult(abc.ABC):
 
 
 class DailyResult(abc.ABC):
+    FMT_DATE = "%Y-%m-%d"
+
     KEY_DATE = "dt"
+
+    @staticmethod
+    def trange_ensure_not_inf(days_collected, trange, tzinfo):
+        """Ensure that time range are not `inf` length."""
+        if trange.is_inf:
+            return parse_time_range(hr_range=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
+        else:
+            return trange
 
     @staticmethod
     def date_list(days_collected, tzinfo, *,
@@ -112,8 +125,11 @@ class DailyResult(abc.ABC):
                       start: Optional[datetime] = None, end: Optional[datetime] = None,
                       trange: Optional[TimeRange] = None) -> List[str]:
         """Returns the date list within the time range. Disregard `start` and `end` if `trange` is specified."""
-        return [dt.strftime("%Y-%m-%d") for dt
+        return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
+
+
+# endregion
 
 
 class HourlyIntervalAverageMessageResult(HourlyResult):
@@ -202,9 +218,9 @@ class DailyMessageResult(DailyResult):
                 data[dt] = [DataPoint(count=dp, percentage=0.0, is_max=False) for dp in pts]
 
         self.data_sum = [data_sum[k] for k in
-                         sorted(data_sum.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
+                         sorted(data_sum.keys(), key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
         self.data = [ResultEntry(date=date_, data=data[date_])
-                     for date_ in sorted(data.keys(), key=lambda x: datetime.strptime(x, "%Y-%m-%d"))]
+                     for date_ in sorted(data.keys(), key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
 
 
 class MeanMessageResult:
@@ -219,16 +235,12 @@ class MeanMessageResultGenerator(DailyResult):
 
     def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange, max_mean_days: int):
         self.max_madays = max_mean_days
-        if trange.is_inf:
-            self.trange = parse_time_range(
-                hr_range=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
-        else:
-            self.trange = trange
-        self.dates = self.date_list(days_collected, tzinfo, start=trange.start, end=trange.end)
+        self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+        self.dates = self.date_list(days_collected, tzinfo, start=self.trange.start, end=self.trange.end)
         self.data = {date_: 0 for date_ in self.dates}
 
         for d in cursor:
-            date_ = datetime.strptime(d[OID_KEY][MeanMessageResultGenerator.KEY_DATE], "%Y-%m-%d").date()
+            date_ = datetime.strptime(d[OID_KEY][MeanMessageResultGenerator.KEY_DATE], DailyResult.FMT_DATE).date()
             count = d[MeanMessageResultGenerator.KEY_COUNT]
 
             self.data[date_] += count
@@ -260,9 +272,9 @@ class MemberDailyMessageResult(DailyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected, tzinfo, *,
-                 start: Optional[datetime] = None, end: Optional[datetime] = None):
-        self.dates = self.date_list_str(days_collected, tzinfo, start=start, end=end)
+    def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange):
+        self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+        self.dates = self.date_list_str(days_collected, tzinfo, start=self.trange.start, end=self.trange.end)
         self.data_count = {date_: {} for date_ in self.dates}
         for d in cursor:
             _date_ = d[OID_KEY][MemberDailyMessageResult.KEY_DATE]
@@ -271,6 +283,29 @@ class MemberDailyMessageResult(DailyResult):
             self.data_count[_date_][_member_] = _count_
 
 
+class CountBeforeTimeResult(DailyResult):
+    KEY_SEC_OF_DAY = "sd"
+
+    KEY_COUNT = "ct"
+
+    def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange):
+        self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+        self.dates = self.date_list_str(days_collected, tzinfo, start=self.trange.start, end=self.trange.end)
+
+        self.data_count = {date_: 0 for date_ in self.dates}
+        for d in cursor:
+            _date_ = d[OID_KEY][CountBeforeTimeResult.KEY_DATE]
+            _count_ = d[CountBeforeTimeResult.KEY_COUNT]
+            self.data_count[_date_] = _count_
+
+        self.data_count = [ct for dt, ct in self.data_count.items()]
+
+    @property
+    def title(self):
+        return _("Message Count Before {}").format(strftime("%I:%M:%S %p", gmtime(self.trange.end_time_seconds)))
+
+
+# region MemberMessageCountResult
 @dataclass
 class MemberMessageCountEntry:
     intervals: InitVar[int]
@@ -308,6 +343,10 @@ class MemberMessageCountResult:
             self.data[uid].count[idx] = count
 
 
+# endregion
+
+
+# region MemberMessageByCategoryResult
 @dataclass
 class MemberMessageByCategoryEntry:
     label_category: InitVar[List[MessageType]]
@@ -359,6 +398,9 @@ class MemberMessageByCategoryResult:
 
     def get_default_data_entry(self):
         return MemberMessageByCategoryEntry(self.label_category)
+
+
+# endregion
 
 
 class BotFeatureUsageResult:

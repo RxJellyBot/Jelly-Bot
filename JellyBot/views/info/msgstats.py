@@ -18,6 +18,7 @@ from mongodb.helper import MessageStatsDataProcessor
 KEY_MSG_INTV_FLOW = "msg_intvflow_data"
 KEY_MSG_INTV_COUNT = "msg_intvcount_data"
 KEY_MSG_DAILY = "msg_daily_data"
+KEY_MSG_BEFORE_TIME = "msg_before_time"
 KEY_MSG_MEAN = "msg_mean_data"
 KEY_MSG_DAILY_USER = "msg_daily_user"
 KEY_MSG_USER_CHANNEL = "channel_user_msg"
@@ -45,6 +46,11 @@ def _msg_mean_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
         channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end, max_mean_days=14)
 
 
+def _msg_before_time_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
+    return KEY_MSG_BEFORE_TIME, MessageRecordStatisticsManager.message_count_before_time(
+        channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end)
+
+
 def _msg_user_daily_(channel_data, tzinfo, available_only, *, hours_within=None, start=None, end=None):
     return KEY_MSG_DAILY_USER, MessageStatsDataProcessor.get_user_daily_message(
         channel_data, tz=tzinfo, hours_within=hours_within, start=start, end=end, available_only=available_only)
@@ -67,6 +73,8 @@ def get_msg_stats_data_package(
                    executor.submit(_msg_intv_count_, channel_data, tzinfo, available_only,
                                    hours_within=hours_within, start=start, end=end, period_count=period_count),
                    executor.submit(_msg_daily_, channel_data.id, tzinfo,
+                                   hours_within=hours_within, start=start, end=end),
+                   executor.submit(_msg_before_time_, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),
                    executor.submit(_msg_mean_, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),

@@ -1,11 +1,10 @@
 import math
 from dataclasses import dataclass, field, InitVar
+from datetime import datetime, timedelta, tzinfo
 from typing import Optional, Union, List
 
-from dateutil import parser
-from datetime import datetime, timedelta, tzinfo
-
 import pytz
+from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -139,6 +138,24 @@ class TimeRange:
             end_str = "-"
 
         return f"{start_str} ~ {end_str}"
+
+    @property
+    def end_time_seconds(self):
+        """
+        Get the timeseconds of the ending timestamp.
+
+        If `end` does not exist, use the current time with `tzinfo`.
+
+        Example:
+            17:00:00 -> 61200
+            06:54:27 -> 24867
+        """
+        if self.end:
+            t = self.end.time()
+        else:
+            t = localtime(now_utc_aware(), tz=self.tzinfo_).time()
+
+        return t.hour * 3600 + t.minute + 60 + t.second + t.microsecond * 10E-7
 
 
 def parse_time_range(
