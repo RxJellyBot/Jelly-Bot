@@ -50,7 +50,7 @@ class UserMessageStats:
         # Disabling T-prefix for datatable sorting in the webpage
         for rank, data in enumerate_ranking(
                 list(sorted(org_stats, key=lambda x: x.total_count, reverse=True)),
-                is_equal=lambda cur, prv: cur.total_count == prv.total_count,
+                is_tie=lambda cur, prv: cur.total_count == prv.total_count,
                 t_prefix=False):
             data.set_rank(rank)
             self.member_stats.append(data)
@@ -344,7 +344,7 @@ class MessageStatsDataProcessor:
             sorted_count = list(sorted(collated_count.items(), key=lambda x: x[1], reverse=True))
 
             # Insert daily count and rank
-            for rank, entry in enumerate_ranking(sorted_count, is_equal=lambda cur, prv: cur[1] == prv[1]):
+            for rank, entry in enumerate_ranking(sorted_count, is_tie=lambda cur, prv: cur[1] == prv[1]):
                 uid, count = entry
                 proc_count[uid].append(count)
                 proc_rank[uid].append(rank)

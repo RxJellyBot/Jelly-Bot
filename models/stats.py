@@ -411,7 +411,7 @@ class BotFeatureUsageResult:
 
         self.data = []
         for rank, d in enumerate_ranking(
-                cursor, is_equal=lambda cur, prv: cur[BotFeatureUsageResult.KEY] == prv[BotFeatureUsageResult.KEY]):
+                cursor, is_tie=lambda cur, prv: cur[BotFeatureUsageResult.KEY] == prv[BotFeatureUsageResult.KEY]):
             try:
                 feature = BotFeature.cast(d[OID_KEY]).key
 

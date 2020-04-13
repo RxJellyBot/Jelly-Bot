@@ -19,7 +19,7 @@ LOGGER_LVSPLIT = "|"
 loggers = {}
 if "LOGGER" in os.environ:
     for lgr in os.environ["LOGGER"].split(LOGGER_SPLITTER):
-        logger_name, lv = split_fill(lgr.strip(), 2, LOGGER_LVSPLIT)
+        logger_name, lv = split_fill(lgr.strip(), 2, delim=LOGGER_LVSPLIT)
         loggers[logger_name] = int(lv) if lv else lv
 
 
