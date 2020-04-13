@@ -10,7 +10,7 @@ import pymongo
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-from extutils.dt import now_utc_aware, parse_time_range, TimeRange
+from extutils.dt import now_utc_aware, TimeRange
 from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
@@ -75,7 +75,7 @@ class HourlyResult(abc.ABC):
     @staticmethod
     def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
                             start: Optional[datetime] = None, end: Optional[datetime] = None):
-        trange = parse_time_range(hr_range=hr_range, start=start, end=end)
+        trange = TimeRange(range_hr=hr_range, start=start, end=end)
 
         if trange.is_inf:
             oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
@@ -98,7 +98,7 @@ class DailyResult(abc.ABC):
     def trange_ensure_not_inf(days_collected, trange, tzinfo):
         """Ensure that time range are not `inf` length."""
         if trange.is_inf:
-            return parse_time_range(hr_range=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
+            return TimeRange(range_hr=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
         else:
             return trange
 
@@ -110,7 +110,7 @@ class DailyResult(abc.ABC):
         ret = []
 
         if not trange:
-            trange = parse_time_range(hr_range=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
+            trange = TimeRange(range_hr=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
 
         if trange.is_inf:
             raise ValueError("TimeRange is infinity.")

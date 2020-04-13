@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, field, InitVar
-from datetime import datetime, timedelta, tzinfo
+from datetime import datetime, timedelta, tzinfo, time
 from typing import Optional, Union, List
 
 import pytz
@@ -33,7 +33,14 @@ def t_delta_str(t_delta: timedelta):
         return _("{} H {:02} M {:02} S").format(h, m, s)
 
 
-def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None):
+def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:
+    """
+    Parse `dt_str` to a tz-aware `datetime`.
+
+    :param dt_str: `str` to be parsed.
+    :param tzinfo_: tzinfo to be applied to the datetime. Uses UTC if not provided.
+    :return: `None` if the parsing failed. Otherwise, timezone-aware `datetime`.
+    """
     if not dt_str:
         return None
 
@@ -50,36 +57,88 @@ def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None):
     return dt
 
 
+def time_to_seconds(t: time) -> float:
+    """Convert `t` to second past in a day."""
+    return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond * 1E-6
+
+
 class TimeRangeEndBeforeStart(Exception):
     pass
 
 
 @dataclass
 class TimeRange:
-    start: Optional[datetime]
+    """
+    Represents a time range.
+
+    If `start` and `end` specified
+        > Ignore `range_hr`
+
+    If `range_hr` specified
+        > If `start` specified
+            - `end` will be `start` + `range_hr` hrs
+        > If `end` specified
+            - `start` will be `end` - `range_hr` hrs
+        > If both not specified
+            - `start` will be the current time - `range_hr` hrs
+
+    `start` and `end` must be tz-aware if specified.
+    """
+    start: Optional[datetime] = None
     start_org: Optional[datetime] = field(init=False)
-    end: Optional[datetime]
+    end: Optional[datetime] = None
+    range_hr: InitVar[Optional[int]] = None
     range_mult: InitVar[Union[int, float]] = field(default=1.0)
     tzinfo_: Optional[tzinfo] = None
-    expandable: bool = False
-    expanded: bool = False
-    end_autofill_now: bool = True
+    end_autofill_now: InitVar[bool] = True
 
-    def __post_init__(self, range_mult: Union[int, float]):
+    def _localize_(self, dt: Optional[datetime]):
+        if dt:
+            return localtime(dt, self.tzinfo_)
+        else:
+            return None
+
+    def _fill_start_end_(self, now: datetime, range_hr: int, end_autofill_now: bool):
+        if self.start and self.end:
+            return
+
+        if range_hr:
+            if self.start:
+                self.end = self.start + timedelta(hours=range_hr)
+            elif self.end:
+                self.start = self.end - timedelta(hours=range_hr)
+            else:
+                self.start = now - timedelta(hours=range_hr)
+
+        if not self.end and end_autofill_now:
+            self.end = now
+
+    def __post_init__(self, range_hr: Optional[int], range_mult: Union[int, float], end_autofill_now: bool):
+        now = localtime(now_utc_aware(), self.tzinfo_)
+
+        # Localize start and end timestamp if exists
+        self.start = self._localize_(self.start)
+        self.end = self._localize_(self.end)
+
+        # Auto fill
+        self._fill_start_end_(now, range_hr, end_autofill_now)
+
+        # Time order check
+        if self.start and self.end and self.start > self.end:
+            raise TimeRangeEndBeforeStart()
+
         self.start_org = self.start
-        if self.start:
-            if not self.end and self.end_autofill_now:
-                self.end = localtime(now_utc_aware(), self.tzinfo_)
 
-            if self.end and self.start > self.end:
-                raise TimeRangeEndBeforeStart()
-
+        if self.expandable:
             self.start = self.start - timedelta(hours=self.hr_length * (range_mult - 1))
-            self.expandable = True
-            self.expanded = self.start != self.start_org
 
     @property
     def hr_length_org(self) -> float:
+        """
+        Time range length BEFORE applying range multiplier(`range_mult`).
+
+        If `end` not set, uses now as the `end`.
+        """
         if self.start_org and self.end:
             return (self.end - self.start_org).total_seconds() / 3600
         elif self.start_org:
@@ -89,12 +148,25 @@ class TimeRange:
 
     @property
     def hr_length(self) -> float:
+        """
+        Time range length AFTER applying range multiplier(`range_mult`).
+
+        If `end` not set, uses now as the `end`.
+        """
         if self.start and self.end:
             return (self.end - self.start).total_seconds() / 3600
         elif self.start:
             return (now_utc_aware() - self.start).total_seconds() / 3600
         else:
             return math.inf
+
+    @property
+    def expandable(self) -> bool:
+        return self.start is not None and self.end is not None
+
+    @property
+    def expanded(self) -> bool:
+        return self.expandable and self.start != self.start_org
 
     def get_periods(self) -> List['TimeRange']:
         if self.hr_length_org <= 0 or self.is_inf:
@@ -123,10 +195,23 @@ class TimeRange:
 
     @property
     def is_inf(self):
-        return math.isinf(self.hr_length)
+        """Indicate if this time range is infinity (either one side of the range or both are not set)."""
+        return self.start is None or self.end is None
 
     @property
     def expr_period_short(self):
+        """
+        Returns the short expression of the time period.
+
+        Start = 01-01 and End = 01-07:
+            01-01 ~ 01-07
+        Start = 01-01 and End = None:
+            01-01 ~ -
+        Start = None and End = 01-07:
+            - ~ 01-07
+        Start = 01-01 and End = 01-07:
+            - ~ -
+        """
         if self.start:
             start_str = self.start.strftime('%m-%d')
         else:
@@ -155,62 +240,4 @@ class TimeRange:
         else:
             t = localtime(now_utc_aware(), tz=self.tzinfo_).time()
 
-        return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond * 10E-7
-
-
-def parse_time_range(
-        *, hr_range: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
-        range_mult: Union[int, float] = 1.0, tzinfo_: Optional[tzinfo] = None) \
-        -> TimeRange:
-    """
-    Parse the time range with the given parameters.
-
-    Parameters all unspecified
-    > `start` and `end` will be `None`.
-
-    `hr_range` specified
-    > `start` will be `hr_range` hours before counting from now.
-
-    `start` and `hr_range` are specified
-    > `end` will be `start` after `hr_range` hours.
-
-    `end` and `hr_range` are specfied
-    > `start` will be `end` before `hr_range` hours.
-
-    Either `start` or `end` is specified but not `hr_range`
-    > the other side of the time range will be `None`.
-
-    `start` and `end` are specified
-    > `hr_range` will be ignored.
-
-    Given time range will be expanded `range_mult` times if expandable.
-
-    :param hr_range: hour range
-    :param start: starting timestamp
-    :param end: ending timestamp
-    :return: a `TimeRange` object
-    """
-    if not hr_range and not start and not end:
-        return TimeRange(start=None, end=None, range_mult=range_mult, tzinfo_=tzinfo_)
-
-    now = localtime(now_utc_aware(), tzinfo_)
-    if start:
-        start = localtime(start, tzinfo_)
-    if end:
-        end = localtime(end, tzinfo_)
-
-    if start and end:
-        return TimeRange(start=start, end=end, range_mult=range_mult, tzinfo_=tzinfo_)
-
-    if hr_range:
-        if start:
-            return TimeRange(start=start, end=start + timedelta(hours=hr_range), range_mult=range_mult, tzinfo_=tzinfo_)
-        elif end:
-            return TimeRange(start=end - timedelta(hours=hr_range), end=end, range_mult=range_mult, tzinfo_=tzinfo_)
-        else:
-            return TimeRange(start=now - timedelta(hours=hr_range), end=now, range_mult=range_mult, tzinfo_=tzinfo_)
-    else:
-        if start:
-            return TimeRange(start=start, end=now, range_mult=range_mult, tzinfo_=tzinfo_)
-        elif end:
-            return TimeRange(start=None, end=end, range_mult=range_mult, tzinfo_=tzinfo_)
+        return time_to_seconds(t)

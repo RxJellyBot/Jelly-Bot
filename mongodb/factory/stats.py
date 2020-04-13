@@ -8,7 +8,7 @@ from bson import ObjectId
 from JellyBot.systemconfig import Database
 from extutils import dt_to_objectid
 from extutils.checker import arg_type_ensure
-from extutils.dt import now_utc_aware, parse_time_range, localtime
+from extutils.dt import now_utc_aware, localtime, TimeRange
 from extutils.locales import UTC, PytzInfo
 from flags import APICommand, MessageType, BotFeature
 from models import (
@@ -147,8 +147,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: Optional[tzinfo] = None) \
             -> MemberMessageCountResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        trange = parse_time_range(
-            hr_range=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
+        trange = TimeRange(
+            range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
 
         self._attach_time_range_(match_d, trange=trange)
 
@@ -276,7 +276,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             MeanMessageResultGenerator:
         match_d = self._channel_oids_filter_(channel_oids)
 
-        trange = parse_time_range(hr_range=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
         trange.set_start_day_offset(-max_mean_days)
 
         self._attach_time_range_(match_d, trange=trange)
@@ -310,7 +310,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             CountBeforeTimeResult:
         match_d = self._channel_oids_filter_(channel_oids)
 
-        trange = parse_time_range(hr_range=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
         self._attach_time_range_(match_d, trange=trange)
 
@@ -356,7 +356,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             MemberDailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
 
-        trange = parse_time_range(hr_range=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
         self._attach_time_range_(match_d, trange=trange)
 

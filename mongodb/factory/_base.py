@@ -12,7 +12,7 @@ from pymongo.errors import DuplicateKeyError
 
 from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
-from extutils.dt import parse_time_range, TimeRange
+from extutils.dt import TimeRange
 from extutils.logger import SYSTEM
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
@@ -183,7 +183,7 @@ class ControlExtensionMixin(Collection):
         # Get the time range
 
         if not trange:
-            trange = parse_time_range(hr_range=hours_within, start=start, end=end, range_mult=range_mult)
+            trange = TimeRange(range_hr=hours_within, start=start, end=end, range_mult=range_mult)
 
         if trange.start:
             try:
