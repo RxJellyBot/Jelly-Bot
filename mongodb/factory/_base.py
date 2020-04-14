@@ -1,10 +1,8 @@
 import os
-import struct
 from datetime import datetime
 from threading import Thread
 from typing import Type, Optional, Tuple, Union
 
-from bson import ObjectId
 from bson.errors import InvalidDocument
 from django.conf import settings
 from pymongo.collection import Collection
@@ -14,6 +12,7 @@ from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
 from extutils.dt import TimeRange
 from extutils.logger import SYSTEM
+from extutils.utils import dt_to_objectid
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
 from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
@@ -167,6 +166,7 @@ class ControlExtensionMixin(Collection):
     def find_one_casted(self, filter_, *args, parse_cls: Type[Model] = None, **kwargs) -> Optional[Model]:
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
+    # noinspection PyUnboundLocalVariable
     @staticmethod
     def _attach_time_range_(filter_: dict, *, hours_within: Optional[int] = None,
                             start: Optional[datetime] = None, end: Optional[datetime] = None,
@@ -183,21 +183,16 @@ class ControlExtensionMixin(Collection):
         # Get the time range
 
         if not trange:
-            trange = TimeRange(range_hr=hours_within, start=start, end=end, range_mult=range_mult)
+            trange = TimeRange(
+                range_hr=hours_within, start=start, end=end, range_mult=range_mult, end_autofill_now=False)
 
-        if trange.start:
-            try:
-                id_filter["$gt"] = ObjectId.from_datetime(trange.start)
-            except struct.error:
-                # start time out of range
-                pass
+        gt_oid = dt_to_objectid(trange.start)
+        if trange.start and gt_oid:
+            id_filter["$gt"] = gt_oid
 
-        if trange.end:
-            try:
-                id_filter["$lt"] = ObjectId.from_datetime(trange.end)
-            except struct.error:
-                # end time out of range
-                pass
+        lt_oid = dt_to_objectid(trange.end)
+        if trange.end and lt_oid:
+            id_filter["$lt"] = lt_oid
 
         # Modifying filter
 
