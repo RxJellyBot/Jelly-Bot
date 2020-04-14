@@ -39,7 +39,7 @@ class AccountChannelListView(LoginRequiredMixin, TemplateResponseMixin, View):
                 access_no.append(channel_conn)
 
         return render_template(
-            self.request, _("Channel Management"), "account/channel/list.html", {
+            self.request, _("Channel List"), "account/channel/list.html", {
                 "conn_access_ok": access_ok,
                 "conn_access_no": access_no,
                 "bot_cmd_info_code": cmd_id.main_cmd_code

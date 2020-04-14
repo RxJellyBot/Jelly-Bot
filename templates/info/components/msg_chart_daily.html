@@ -25,6 +25,16 @@
                     data: {{ msg_daily_data.data_sum }}
                 },
                 {
+                    label: "{{ msg_before_time.title }}",
+                    borderColor: "rgb(111, 111, 111)",
+                    pointBackgroundColor: "rgb(111, 111, 111)",
+                    pointBorderColor: "rgb(111, 111, 111)",
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    fill: false,
+                    data: {{ msg_before_time.data_count }}
+                },
+                {
                     label: "{{ mean_3d.label }}",
                     borderColor: "rgb(0, 166, 83)",
                     pointBackgroundColor: "rgb(0, 166, 83)",

@@ -1,14 +1,14 @@
 from enum import Enum, auto
 
 
-# =========== USER CONFIG ===========
+# region Configurations
 
 case_insensitive = True
 
 true_word = ("true", "t", "yes", "y")
 false_word = ("false", "f", "no", "n")
 
-# =========== USER CONFIG ===========
+# endregion
 
 if case_insensitive:
     true_word = tuple(map(str.lower, true_word))
@@ -20,7 +20,12 @@ class StrBoolResult(Enum):
     FALSE = auto()
     UNKNOWN = auto()
 
-    def to_bool(self):
+    def to_bool(self) -> bool:
+        """
+        Cast this enum to `bool`.
+
+        :exception ValueError: the value is unknown.
+        """
         if self == self.TRUE:
             return True
         elif self == self.FALSE:
@@ -29,7 +34,7 @@ class StrBoolResult(Enum):
             raise ValueError("The result is `UNKNOWN`.")
 
 
-def str_to_bool(s: str):
+def str_to_bool(s: str) -> StrBoolResult:
     if case_insensitive:
         s = s.lower()
 

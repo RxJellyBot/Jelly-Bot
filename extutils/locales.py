@@ -28,10 +28,10 @@ class LocaleInfo:
         return f"UTC{self.to_tzinfo().tzname(datetime.utcnow())}"
 
     def to_tzinfo(self):
-        return PytzInfo(pytz.timezone(self.pytz_code))
+        return LocaleInfo.get_tzinfo(self.pytz_code)
 
     @staticmethod
-    def get_tzinfo(tzname: str):
+    def get_tzinfo(tzname: str) -> 'PytzInfo':
         return PytzInfo(pytz.timezone(tzname))
 
 
@@ -49,7 +49,11 @@ class PytzInfo(tzinfo):
         return self._base.utcoffset(dt.replace(tzinfo=None))
 
     def dst(self, dt):
-        return self._base.dst(dt.replace(tzinfo=None), is_dst=is_now_dst(self._base))
+        if self._base is pytz.UTC:
+            # UTC does not accept `is_dst`
+            return self._base.dst(dt.replace(tzinfo=None))
+        else:
+            return self._base.dst(dt.replace(tzinfo=None), is_dst=is_now_dst(self._base))
 
     def tzname(self, dt):
         return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())

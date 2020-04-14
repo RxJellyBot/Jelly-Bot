@@ -196,7 +196,7 @@ class UniqueKeywordCountResult:
 
         usage_key = UniqueKeywordCountResult.KEY_COUNT_USAGE
 
-        for rank, d in enumerate_ranking(crs, is_equal=lambda cur, prv: cur[usage_key] == prv[usage_key]):
+        for rank, d in enumerate_ranking(crs, is_tie=lambda cur, prv: cur[usage_key] == prv[usage_key]):
             self.data.append(
                 UniqueKeywordCountEntry(
                     word=d[OID_KEY][UniqueKeywordCountResult.KEY_WORD],

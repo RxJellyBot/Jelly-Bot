@@ -1,26 +1,24 @@
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
-from typing import Any, Optional, Union, List
+from typing import Any, Optional, Union, List, Dict
 
 import pymongo
 from bson import ObjectId
 
+from JellyBot.systemconfig import Database
 from extutils import dt_to_objectid
-from extutils.locales import UTC, PytzInfo
-from extutils.dt import now_utc_aware, parse_time_range
 from extutils.checker import arg_type_ensure
+from extutils.dt import now_utc_aware, localtime, TimeRange
+from extutils.locales import UTC, PytzInfo
 from flags import APICommand, MessageType, BotFeature
-from mongodb.factory.results import RecordAPIStatisticsResult
-from mongodb.utils import CursorWithCount
 from models import (
     APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
-    MemberMessageCountResult, MeanMessageResultGenerator
+    MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult
 )
-
-from JellyBot.systemconfig import Database
-
+from mongodb.factory.results import RecordAPIStatisticsResult
+from mongodb.utils import CursorWithCount
 from ._base import BaseCollection
 
 DB_NAME = "stats"
@@ -92,6 +90,29 @@ class MessageRecordStatisticsManager(BaseCollection):
         else:
             return 0.0
 
+    def get_user_last_message_ts(
+            self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) -> Dict[ObjectId, datetime]:
+        ret = {}
+        KEY_TS = "msgts"
+
+        pipeline = [
+            {"$match": {
+                MessageRecordModel.ChannelOid.key: channel_oid,
+                MessageRecordModel.UserRootOid.key: {"$in": user_oids}
+            }},
+            {"$sort": {
+                "_id": pymongo.DESCENDING
+            }},
+            {"$group": {
+                "_id": "$" + MessageRecordModel.UserRootOid.key,
+                KEY_TS: {"$first": "$" + OID_KEY}
+            }}
+        ]
+        for data in self.aggregate(pipeline):
+            ret[data[OID_KEY]] = localtime(data[KEY_TS].generation_time, tzinfo_)
+
+        return ret
+
     # Statistics
 
     @staticmethod
@@ -126,8 +147,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: Optional[tzinfo] = None) \
             -> MemberMessageCountResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        trange = parse_time_range(
-            hr_range=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
+        trange = TimeRange(
+            range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
 
         self._attach_time_range_(match_d, trange=trange)
 
@@ -226,7 +247,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                     DailyMessageResult.KEY_DATE: {
                         "$dateToString": {
                             "date": "$_id",
-                            "format": "%Y-%m-%d",
+                            "format": DailyMessageResult.FMT_DATE,
                             "timezone": tzinfo_.tzidentifier
                         }
                     },
@@ -255,7 +276,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             MeanMessageResultGenerator:
         match_d = self._channel_oids_filter_(channel_oids)
 
-        trange = parse_time_range(hr_range=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
         trange.set_start_day_offset(-max_mean_days)
 
         self._attach_time_range_(match_d, trange=trange)
@@ -267,7 +288,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                     MeanMessageResultGenerator.KEY_DATE: {
                         "$dateToString": {
                             "date": "$_id",
-                            "format": "%Y-%m-%d",
+                            "format": MeanMessageResultGenerator.FMT_DATE,
                             "timezone": tzinfo_.tzidentifier
                         }
                     }
@@ -283,13 +304,61 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_,
             trange=trange, max_mean_days=max_mean_days)
 
+    def message_count_before_time(
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
+            CountBeforeTimeResult:
+        match_d = self._channel_oids_filter_(channel_oids)
+
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+
+        self._attach_time_range_(match_d, trange=trange)
+
+        pipeline = [
+            {"$match": match_d},
+            {"$project": {
+                CountBeforeTimeResult.KEY_SEC_OF_DAY: {
+                    "$add": [
+                        {"$multiply": [{"$hour": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}, 3600]},
+                        {"$multiply": [{"$minute": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}, 60]},
+                        {"$second": {"date": "$_id", "timezone": tzinfo_.tzidentifier}}
+                    ]
+                }
+            }},
+            {"$match": {
+                CountBeforeTimeResult.KEY_SEC_OF_DAY: {"$lt": trange.end_time_seconds}
+            }},
+            {"$group": {
+                "_id": {
+                    CountBeforeTimeResult.KEY_DATE: {
+                        "$dateToString": {
+                            "date": "$_id",
+                            "format": CountBeforeTimeResult.FMT_DATE,
+                            "timezone": tzinfo_.tzidentifier
+                        }
+                    }
+                },
+                CountBeforeTimeResult.KEY_COUNT: {"$sum": 1}
+            }},
+            {"$sort": {"_id": pymongo.ASCENDING}}
+        ]
+
+        return CountBeforeTimeResult(
+            list(self.aggregate(pipeline)),
+            HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=trange.start_org, end=end),
+            tzinfo_,
+            trange=trange)
+
     def member_daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
             tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             MemberDailyMessageResult:
         match_d = self._channel_oids_filter_(channel_oids)
-        self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
+
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+
+        self._attach_time_range_(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -298,7 +367,7 @@ class MessageRecordStatisticsManager(BaseCollection):
                     MemberDailyMessageResult.KEY_DATE: {
                         "$dateToString": {
                             "date": "$_id",
-                            "format": "%Y-%m-%d",
+                            "format": MemberDailyMessageResult.FMT_DATE,
                             "timezone": tzinfo_.tzidentifier
                         }
                     },
@@ -312,8 +381,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             list(self.aggregate(pipeline)),
             HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=start, end=end),
             tzinfo_,
-            start=start, end=end
-        )
+            trange=trange)
 
 
 class BotFeatureUsageDataManager(BaseCollection):

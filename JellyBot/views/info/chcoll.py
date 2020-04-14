@@ -1,18 +1,17 @@
 from typing import Optional
 
 from bson import ObjectId
-
+from django.utils.translation import gettext as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
-from django.utils.translation import gettext as _
 
-from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.utils import get_root_oid
+from JellyBot.views import render_template, WebsiteErrorView
 from extutils import safe_cast
 from flags import WebsiteError
 from models import ChannelCollectionModel
-from mongodb.helper import MessageStatsDataProcessor, InfoProcessor
 from mongodb.factory import ChannelCollectionManager
+from mongodb.helper import MessageStatsDataProcessor, InfoProcessor
 
 
 class ChannelCollectionInfoView(TemplateResponseMixin, View):
@@ -41,8 +40,6 @@ class ChannelCollectionInfoView(TemplateResponseMixin, View):
                 "chcoll_cch_data":
                     InfoProcessor.collate_child_channel_data(get_root_oid(request), chcoll_data.child_channel_oids),
                 "user_message_data1d": msgdata_1d,
-                "msg_count1d": msgdata_1d.msg_count,
-                "user_message_data7d": msgdata_7d,
-                "msg_count7d": msgdata_7d.msg_count
+                "user_message_data7d": msgdata_7d
             },
             nav_param=kwargs)

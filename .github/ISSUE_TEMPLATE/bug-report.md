@@ -2,7 +2,7 @@
 name: Bug report
 about: A bug report.
 title: ''
-labels: "Type: Bug", "Priority: 9"
+labels: 'Type: Bug, Priority: 9'
 assignees: RaenonX
 ---
 

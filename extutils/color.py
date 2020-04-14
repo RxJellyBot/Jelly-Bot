@@ -5,6 +5,9 @@ from bson.codec_options import TypeEncoder
 
 class Color:
     def __init__(self, color_sum: int):
+        """
+        :exception ValueError: `color_sum` is invalid.
+        """
         if 0 <= color_sum <= 16777215:
             self._col_code = color_sum
         else:
@@ -28,6 +31,7 @@ class Color:
 
     @property
     def color_hex(self) -> str:
+        """Return the color in the format of #FFFFFF."""
         return f"#{self.color_int // 65536:02x}{(self.color_int // 256) % 256:02x}{self.color_int % 256:02x}"
 
     def __repr__(self):
@@ -38,6 +42,8 @@ class Color:
             return other.color_int == self.color_int
         elif isinstance(other, int):
             return other == self.color_int
+        elif isinstance(other, str):
+            return other.replace("#", "") == self.color_hex.replace("#", "")
         else:
             return False
 
@@ -49,6 +55,10 @@ class ColorFactory:
 
     @staticmethod
     def from_rgb(red: int, green: int, blue: int):
+        """
+        :exception ValueError: if any or `red`, `green` or `blue` is invalid.
+        """
+
         def _val_check_(val, name):
             if val < 0 or val > 255:
                 raise ValueError(f"Invalid {name} value. Should be 0~255. ({val})")
@@ -63,6 +73,7 @@ class ColorFactory:
     def from_hex(hex_str: str):
         """
         :param hex_str: Allowed formats are: #FFFFFF or FFFFFF.
+        :exception ValueError: if the hex string is in a invalid format.
         """
         if not re.match(r"#?[0-9A-Fa-f]{6}", hex_str):
             raise ValueError(f"Invalid color string. Should be in the format of #FFFFFF or FFFFFF. ({hex_str})")

@@ -475,7 +475,7 @@ class AutoReplyManager:
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> Generator[Tuple[Union[int, str], AutoReplyModuleModel], None, None]:
         return enumerate_ranking(self._mod.get_module_count_stats(channel_oid, limit),
-                                 is_equal=lambda cur, prv: cur.called_count == prv.called_count)
+                                 is_tie=lambda cur, prv: cur.called_count == prv.called_count)
 
     def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> UniqueKeywordCountResult:
