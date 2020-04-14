@@ -4,7 +4,6 @@ archive/
 lib/
 logs/
 *.log
-*.bat
 cache.json
 web.config
 tests/sandbox*.py
