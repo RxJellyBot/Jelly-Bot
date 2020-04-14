@@ -37,7 +37,7 @@ jobs:
 
       - name: Install flake8
         run: |
-          pip install --force-reinstall git+https://github.com/pycqa/pyflakes
+          pip install flake8
 
       - name: Perform syntax check
         run: |
