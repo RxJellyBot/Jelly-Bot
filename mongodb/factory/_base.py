@@ -186,10 +186,12 @@ class ControlExtensionMixin(Collection):
             trange = TimeRange(
                 range_hr=hours_within, start=start, end=end, range_mult=range_mult, end_autofill_now=False)
 
-        if trange.start and (gt_oid := dt_to_objectid(trange.start)):
+        gt_oid = dt_to_objectid(trange.start)
+        if trange.start and gt_oid:
             id_filter["$gt"] = gt_oid
 
-        if trange.end and (lt_oid := dt_to_objectid(trange.end)):
+        lt_oid = dt_to_objectid(trange.end)
+        if trange.end and lt_oid:
             id_filter["$lt"] = lt_oid
 
         # Modifying filter
