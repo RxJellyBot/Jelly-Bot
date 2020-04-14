@@ -9,16 +9,17 @@ from django.conf import settings
 
 from extutils import split_fill
 
-__all__ = ["LoggerSkeleton", "SYSTEM"]
-
+__all__ = ["LoggerSkeleton", "SYSTEM", "ENV_VAR_NAME_LOGGER", "ENV_VAR_NAME_LOG_LEVEL"]
 
 LOGGER_SPLITTER = ","
 LOGGER_LVSPLIT = "|"
 
+ENV_VAR_NAME_LOGGER = "LOGGER"
+ENV_VAR_NAME_LOG_LEVEL = "LOG_LEVEL"
 
 loggers = {}
-if "LOGGER" in os.environ:
-    for lgr in os.environ["LOGGER"].split(LOGGER_SPLITTER):
+if ENV_VAR_NAME_LOGGER in os.environ:
+    for lgr in os.environ[ENV_VAR_NAME_LOGGER].split(LOGGER_SPLITTER):
         logger_name, lv = split_fill(lgr.strip(), 2, delim=LOGGER_LVSPLIT)
         loggers[logger_name] = int(lv) if lv else lv
 
@@ -70,6 +71,18 @@ class LogSevereFileHandler(LogRotatingFileHandlerBase):
 
 
 class LoggerSkeleton:
+    """
+    A logger skeleton class to manage a logger.
+
+    The logger's level is determined in the following order:
+        > Level specified in env var (`LOGGER`)
+            - see `note.md`
+        > `DEBUG` env var
+            - `logging.DEBUG` if set to 1
+        > Log level specified in env var (`LOG_LEVEL`)
+            - see `note.md`
+    If none of the above matches. then the default level will be set to `logging.WARNING`.
+    """
     DEFAULT_FMT = "%(asctime)s %(levelname)s [%(name)s] - %(message)s"
 
     def __init__(self, name: str, fmt: str = None, level: int = None, logger_name_env: str = None):
@@ -81,10 +94,10 @@ class LoggerSkeleton:
         if level is None:
             if logger_name_env in loggers:
                 level = loggers[logger_name_env]
-            elif bool(int(os.environ.get("DEBUG", 0))):
+            elif settings.DEBUG:
                 level = logging.DEBUG
-            elif "LOG_LEVEL" in os.environ:
-                level = int(os.environ["LOG_LEVEL"])
+            elif ENV_VAR_NAME_LOG_LEVEL in os.environ:
+                level = int(os.environ[ENV_VAR_NAME_LOG_LEVEL])
             else:
                 level = logging.WARNING
 
