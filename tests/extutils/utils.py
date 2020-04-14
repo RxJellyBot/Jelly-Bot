@@ -235,5 +235,9 @@ class TestFunctions(TestCase):
 
         self.assertIsNotNone(dt_to_objectid(low_bound))
         self.assertIsNotNone(dt_to_objectid(high_bound))
+        self.assertIsNone(dt_to_objectid(None))
+        self.assertIsNone(dt_to_objectid(1))
+        self.assertIsNone(dt_to_objectid("7"))
+        self.assertIsNone(dt_to_objectid([8]))
         self.assertIsNone(dt_to_objectid(low_bound - timedelta(days=5)))
         self.assertIsNone(dt_to_objectid(high_bound + timedelta(days=5)))

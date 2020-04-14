@@ -1,5 +1,4 @@
 import re
-import struct
 from datetime import datetime
 from typing import List, Tuple, Union, Generator, Any, Optional
 import html
@@ -208,11 +207,8 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
 
 
 def dt_to_objectid(dt: Optional[datetime]):
-    """Parse `dt` to `ObjectId`. `None` if out of bound or `dt` is `None`."""
-    if dt is None:
-        return None
-
+    """Parse `dt` to `ObjectId`. `None` if failed to convert."""
     try:
         return ObjectId.from_datetime(dt)
-    except struct.error:
+    except Exception:
         return None
