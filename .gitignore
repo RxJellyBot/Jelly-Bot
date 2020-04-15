@@ -1,7 +1,7 @@
 .idea
 __pycache__/
 archive/
-lib/
+/lib/
 logs/
 *.log
 cache.json

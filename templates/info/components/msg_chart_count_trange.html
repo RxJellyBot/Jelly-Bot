@@ -1,0 +1,9 @@
+<canvas id="{{ canvas_id }}" style="height: 2rem; width: 7rem;"></canvas>
+<script>
+    new Graph({
+        data: {{ data }},
+        target: document.getElementById("{{ canvas_id }}"),
+        background: "rgba(255, 255, 255, 0)",
+        lineColor: "#888888",
+    })
+</script>

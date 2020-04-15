@@ -7,13 +7,11 @@
         <tr>
             <th scope="col" class="align-middle text-center">{% trans "Member Name" %}</th>
             <th scope="col" class="align-middle text-center">{% trans "Total Count" %}</th>
+            <th scope="col" class="align-middle text-center nosort">{% trans "Chart" %}</th>
             <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/-" %}</th>
-            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/- %" %}</th>
-            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/- NRM" %}</th>
+            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Bounce" %}</th>
             {% for range_name in message_data.time_ranges %}
                 <th scope="col" class="align-middle text-center">{{ range_name }}</th>
-                <th scope="col" class="align-middle text-center htmlnumfmt">+/-</th>
-                <th scope="col" class="align-middle text-center htmlnumfmt">+/- (%)</th>
             {% endfor %}
         </tr>
         </thead>
@@ -22,23 +20,15 @@
             <tr>
                 <th class="align-middle text-center">{{ entry.user_name }}</th>
                 <td class="align-middle text-center h4"><code>{{ entry.total }}</code></td>
+                <td class="align-middle text-center">{% include "info/components/msg_chart_count_trange.html" with data=entry.count canvas_id=entry.id %}</td>
                 <td class="align-middle text-center h5 font-weight-normal">
-                    {% include "components/num.html" with num=entry.avg_diff fmt=".1f" only %}
+                    {% include "components/num.html" with num=entry.avg_diff fmt=".2f" only %}
                 </td>
                 <td class="align-middle text-center h5 font-weight-normal">
-                    {% include "components/num.html" with num=entry.avg_diff_pct fmt=".2f" suffix="%" only %}
+                    {{ entry.bounce|stringformat:".2f" }}
                 </td>
-                <td class="align-middle text-center h5 font-weight-normal">
-                    {% include "components/num.html" with num=entry.avg_diff_nrm fmt=".2f" only %}
-                </td>
-                {% for count, diff, diff_pct in entry.count_data %}
+                {% for count in entry.count_new_front %}
                     <td class="align-middle text-center h5 font-weight-normal">{{ count }}</td>
-                    <td class="align-middle text-center h5 font-weight-normal">
-                        {% include "components/num.html" with num=diff fmt="s" only %}
-                    </td>
-                    <td class="align-middle text-center h5 font-weight-normal">
-                        {% include "components/num.html" with num=diff_pct fmt=".2f" suffix="%" only %}
-                    </td>
                 {% endfor %}
             </tr>
         {% endfor %}

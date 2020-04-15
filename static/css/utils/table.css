@@ -12,14 +12,16 @@ div.table-freeze-header th {
     background-color: #eeeeee;
 }
 
-div.table-freeze-first-col thead th:first-child {
-    left: 0;
-    z-index: 1;
-}
+@media (min-width: 1200px) {
+    div.table-freeze-first-col thead th:first-child {
+        left: 0;
+        z-index: 1;
+    }
 
-div.table-freeze-first-col tbody th {
-    position: -webkit-sticky; /* for Safari */
-    position: sticky;
-    left: 0;
-    border-right: 1px solid #CCC;
+    div.table-freeze-first-col tbody th {
+        position: -webkit-sticky; /* for Safari */
+        position: sticky;
+        left: 0;
+        border-right: 1px solid #CCC;
+    }
 }
