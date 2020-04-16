@@ -17,8 +17,12 @@ def localtime(dt=None, tz=None):
     return timezone.localtime(dt, tz)
 
 
+def make_tz_aware(dt, tz=None):
+    return timezone.make_aware(dt, tz)
+
+
 def is_tz_naive(dt) -> bool:
-    return dt.tzinfo is None or dt.tzinfo.utcoffset(datetime.now()) is None
+    return timezone.is_naive(dt)
 
 
 def t_delta_str(t_delta: timedelta):
@@ -94,6 +98,9 @@ class TimeRange:
 
     def _localize_(self, dt: Optional[datetime]):
         if dt:
+            if is_tz_naive(dt):
+                dt = make_tz_aware(dt, self.tzinfo_)
+
             return localtime(dt, self.tzinfo_)
         else:
             return None
