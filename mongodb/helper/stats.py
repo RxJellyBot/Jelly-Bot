@@ -183,14 +183,8 @@ class UserMessageCountIntervalEntry:
             if idx > 0:
                 bounce.append(abs(data - self.count_new_front[idx - 1]))
 
-        if len(difference) == 1:
-            self.avg_diff = sum(difference)
-            self.bounce = sum(bounce)
-        else:
-            self.avg_diff = sum(difference) / (len(difference) - 1)
-            self.bounce = sum(bounce) / (len(bounce) - 1)
-
-        self.bounce = abs(self.bounce)
+        self.avg_diff = sum(difference) / len(difference)
+        self.bounce = abs(sum(bounce) / len(bounce))
 
 
 @dataclass
