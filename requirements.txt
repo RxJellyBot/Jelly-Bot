@@ -4,7 +4,6 @@ markdown2
 requests
 dnspython
 pymongo
-bson
 Django
 webencodings
 django-html_sanitizer

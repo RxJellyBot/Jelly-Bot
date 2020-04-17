@@ -1,3 +1,4 @@
+import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from datetime import tzinfo, datetime
@@ -162,7 +163,8 @@ class UserMessageCountIntervalEntry:
     total: int
     count: List[int]
     count_new_front: List[int] = field(init=False)
-    avg_diff: float = field(init=False)
+    diff_index: float = 0.0
+    diff_index_nrm: float = 0.0
     bounce: float = field(init=False)
 
     def __post_init__(self):
@@ -172,19 +174,23 @@ class UserMessageCountIntervalEntry:
         # Reverse to put the most recent at the front
         self.count_new_front = list(reversed(self.count))
 
-        difference = []
         bounce = []
+        difference = []
 
-        for idx in range(len(self.count_new_front)):
-            base = self.count_new_front[0]
-            data = self.count_new_front[idx]
+        item_count = len(self.count)
 
-            difference.append(base - data)
-            if idx > 0:
-                bounce.append(abs(data - self.count_new_front[idx - 1]))
+        for idx in range(1, item_count):
+            base = self.count[idx - 1]
+            data = self.count[idx]
 
-        self.avg_diff = sum(difference) / len(difference)
-        self.bounce = abs(sum(bounce) / len(bounce))
+            diff = data - base
+
+            difference.append(diff)
+            bounce.append(abs(diff))
+            self.diff_index += diff * math.pow(idx / item_count, 1 / 4)
+
+        self.diff_index_nrm = self.diff_index / (abs(max(bounce)) or 1) * 1000
+        self.bounce = sum(bounce) / (len(bounce) or 1)
 
 
 @dataclass

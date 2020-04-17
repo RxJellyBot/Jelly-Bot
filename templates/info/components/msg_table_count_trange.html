@@ -8,7 +8,8 @@
             <th scope="col" class="align-middle text-center">{% trans "Member Name" %}</th>
             <th scope="col" class="align-middle text-center">{% trans "Total Count" %}</th>
             <th scope="col" class="align-middle text-center nosort">{% trans "Chart" %}</th>
-            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Avg +/-" %}</th>
+            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "DI" %}</th>
+            <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "DIN" %}</th>
             <th scope="col" class="align-middle text-center htmlnumfmt">{% trans "Bounce" %}</th>
             {% for range_name in message_data.time_ranges %}
                 <th scope="col" class="align-middle text-center">{{ range_name }}</th>
@@ -22,7 +23,10 @@
                 <td class="align-middle text-center h4"><code>{{ entry.total }}</code></td>
                 <td class="align-middle text-center">{% include "info/components/msg_chart_count_trange.html" with data=entry.count canvas_id=entry.id %}</td>
                 <td class="align-middle text-center h5 font-weight-normal">
-                    {% include "components/num.html" with num=entry.avg_diff fmt=".2f" only %}
+                    {% include "components/num.html" with num=entry.diff_index fmt=".2f" only %}
+                </td>
+                <td class="align-middle text-center h5 font-weight-normal">
+                    {% include "components/num.html" with num=entry.diff_index_nrm fmt=".2f" only %}
                 </td>
                 <td class="align-middle text-center h5 font-weight-normal">
                     {{ entry.bounce|stringformat:".2f" }}
