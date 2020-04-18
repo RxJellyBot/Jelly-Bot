@@ -6,7 +6,8 @@ from django.test import TestCase
 import pytz
 
 from extutils.dt import (
-    is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds, TimeRange, TimeRangeEndBeforeStart
+    is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds,
+    TimeRange, TimeRangeEndBeforeStart
 )
 
 
@@ -28,8 +29,6 @@ class TestDatetime(TestCase):
         dt_parsed = parse_to_dt("2020-04-04 16:00+0200")
         tz_expected = timezone(timedelta(hours=2))
         dt_expected = datetime(2020, 4, 4, 16, 0, 0, 0, tzinfo=tz_expected)
-
-        now = now_utc_aware()
 
         self.assertFalse(is_tz_naive(dt_parsed))
         self.assertEquals(dt_expected, dt_parsed)
@@ -290,6 +289,16 @@ class TestParseTimeRange(TestCase):
         tr.set_start_day_offset(-5)
         self.assertEquals(start_dt, tr.start_org)
         self.assertEquals(start_dt - timedelta(days=5), tr.start)
+
+    def test_set_day_tz_naive(self):
+        start_dt = datetime(2020, 2, 14, 1, 1, 1)
+        end_dt = datetime(2020, 2, 17, 1, 1, 1)
+
+        tr = TimeRange(start=start_dt, end=end_dt, tzinfo_=pytz.UTC)
+        self.assertFalse(is_tz_naive(tr.start))
+        self.assertEquals(pytz.UTC.localize(start_dt), tr.start)
+        self.assertFalse(is_tz_naive(tr.end))
+        self.assertEquals(pytz.UTC.localize(end_dt), tr.end)
 
     def test_set_day_offset_none(self):
         tr = TimeRange()

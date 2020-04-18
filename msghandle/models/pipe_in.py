@@ -222,7 +222,7 @@ class MessageEventObjectFactory:
             # Attachment has height and width means it's an image
             if attachment.height and attachment.width:
                 return ImageMessageEventObject(
-                    message, ImageContent(message.attachments[0].url, ImageContentType.URL, message.content),
+                    message, ImageContent(attachment.url, ImageContentType.URL, message.content),
                     channel_model, user_model, SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
                 )
         else:

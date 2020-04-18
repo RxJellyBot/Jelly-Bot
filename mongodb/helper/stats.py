@@ -2,7 +2,7 @@ import math
 from collections import namedtuple
 from dataclasses import dataclass, field, InitVar
 from datetime import tzinfo, datetime
-from typing import List, Optional, Union, NamedTuple, Dict, Tuple, Iterator
+from typing import List, Optional, Union, NamedTuple, Dict
 
 from bson import ObjectId
 
@@ -157,50 +157,40 @@ class UserDailyMessageResult:
 
 @dataclass
 class UserMessageCountIntervalEntry:
+    # Unique identifier used for identifying individual result graph in `msg_chart_count_trange.html`
+    id: int = field(init=False)
     user_name: str
     total: int
-    count: InitVar[List[int]]
-    count_data: Iterator[Tuple[int, int, float]] = field(init=False)
-    increases: int = 0
-    decreases: int = 0
-    avg_diff: float = field(init=False)
-    avg_diff_nrm: float = field(init=False)
-    avg_diff_pct: float = field(init=False)
+    count: List[int]
+    count_new_front: List[int] = field(init=False)
+    diff_index: float = 0.0
+    diff_index_nrm: float = 0.0
+    bounce: float = field(init=False)
 
-    def __post_init__(self, count: List[int]):
+    def __post_init__(self):
+        # Put ID
+        self.id = id(self)
+
         # Reverse to put the most recent at the front
+        self.count_new_front = list(reversed(self.count))
+
+        bounce = []
         difference = []
-        difference_pct = []
-        count = list(reversed(count))
 
-        for idx in range(len(count)):
-            base = count[0]
-            data = count[idx]
+        item_count = len(self.count)
 
-            diff = base - data
+        for idx in range(1, item_count):
+            base = self.count[idx - 1]
+            data = self.count[idx]
+
+            diff = data - base
+
             difference.append(diff)
-            difference_pct.append(diff / data * 100 if data != 0 else (math.inf if diff != 0 else 0))
+            bounce.append(abs(diff))
+            self.diff_index += diff * math.pow(idx / item_count, 1 / 4)
 
-            if diff > 0:
-                self.increases += 1
-            elif diff < 0:
-                self.decreases += 1
-
-        self.count_data = zip(count, difference, difference_pct)
-        if len(difference) == 1:
-            self.avg_diff = sum(difference)
-            self.avg_diff_pct = sum(filter(lambda x: not math.isinf(x), difference_pct))
-        else:
-            self.avg_diff = sum(difference) / (len(difference) - 1)
-            self.avg_diff_pct = sum(filter(lambda x: not math.isinf(x), difference_pct)) / (len(difference_pct) - 1)
-
-        if self.avg_diff_pct == 0 and self.avg_diff > 0:
-            self.avg_diff_pct = math.inf
-            self.avg_diff_nrm = self.avg_diff
-        elif self.avg_diff_pct != 0:
-            self.avg_diff_nrm = self.avg_diff / abs(self.avg_diff_pct / 100)
-        else:
-            self.avg_diff_nrm = 0
+        self.diff_index_nrm = self.diff_index / (abs(max(bounce)) or 1) * 1000
+        self.bounce = sum(bounce) / (len(bounce) or 1)
 
 
 @dataclass

@@ -46,7 +46,11 @@ class PytzInfo(tzinfo):
         self._base = tz
 
     def utcoffset(self, dt):
-        return self._base.utcoffset(dt.replace(tzinfo=None))
+        if self._base is pytz.UTC:
+            # UTC does not accept `is_dst`
+            return self._base.utcoffset(dt.replace(tzinfo=None))
+        else:
+            return self._base.utcoffset(dt.replace(tzinfo=None), is_dst=is_now_dst(self._base))
 
     def dst(self, dt):
         if self._base is pytz.UTC:
