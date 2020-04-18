@@ -11,7 +11,7 @@ from models.field import BaseField
 from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, KeyNotExistedError
-from .field import ObjectIDField, ModelField
+from .field import ObjectIDField, ModelField, ModelDefaultValueExt
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
 
 
@@ -207,7 +207,7 @@ class Model(MutableMapping, abc.ABC):
 
     def is_field_none(self, fk, raise_on_not_exists=True):
         try:
-            return self._inner_dict_get_(fk).is_none()
+            return self._inner_dict_get_(fk).is_empty()
         except KeyError:
             if raise_on_not_exists:
                 raise KeyNotExistedError(fk, self.__class__.__qualname__)
@@ -346,16 +346,3 @@ class Model(MutableMapping, abc.ABC):
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self._dict_}>"
-
-
-class ModelDefaultValueExtItem:
-    def __init__(self, s):
-        self._name = s
-
-    def __repr__(self):
-        return f"<Default: {self._name}>"
-
-
-class ModelDefaultValueExt:
-    Required = ModelDefaultValueExtItem("Required")
-    Optional = ModelDefaultValueExtItem("Optional")
