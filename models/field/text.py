@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 
 from ._base import BaseField
+from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMatch, FieldEmptyValueNotAllowed
 
 
 class TextField(BaseField):
@@ -13,13 +14,18 @@ class TextField(BaseField):
         self._must_have_content = must_have_content
         super().__init__(key, default, allow_none, auto_cast=auto_cast)
 
-    def is_value_valid(self, value) -> bool:
-        content_valid = (self.allow_none and value is None)\
-            or ((self._regex is None or re.match(self._regex, value)) and len(value) < self._maxlen)\
-            or self.is_none(value)
-        content_check = (not self._must_have_content or (self._must_have_content and len(value) > 0))
+    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+        # Length check
+        if len(value) > self._maxlen:
+            raise FieldMaxLengthReached(self.key, len(value), self._maxlen)
 
-        return self.is_type_matched(value) and content_valid and content_check
+        # Regex check
+        if self._regex is not None and not re.match(self._regex, value):
+            raise FieldRegexNotMatch(self.key, value, self._regex)
+
+        # Empty Value
+        if self._must_have_content and len(value) == 0:
+            raise FieldEmptyValueNotAllowed(self.key)
 
     @classmethod
     def none_obj(cls):
@@ -38,8 +44,9 @@ class UrlField(BaseField):
     def expected_types(self):
         return str
 
-    def is_value_valid(self, value) -> bool:
-        return UrlField.is_valid_url(value)
+    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+        if not UrlField.is_valid_url(value):
+            raise FieldInvalidUrl(self.key, value)
 
     @staticmethod
     def is_valid_url(url) -> bool:

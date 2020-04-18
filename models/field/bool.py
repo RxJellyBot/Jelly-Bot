@@ -9,9 +9,6 @@ class BooleanField(BaseField):
     def none_obj(cls):
         return False
 
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value)
-
     @property
     def expected_types(self):
         return bool, int

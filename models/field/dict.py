@@ -9,9 +9,6 @@ class DictionaryField(BaseField):
     def none_obj(cls):
         return {}
 
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value)
-
     @property
     def expected_types(self):
         return dict

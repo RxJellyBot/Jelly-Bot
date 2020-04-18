@@ -1,7 +1,7 @@
 # noinspection PyUnresolvedReferences
-from .field import OID_KEY
+from .field import OID_KEY, ModelDefaultValueExt
 # noinspection PyUnresolvedReferences
-from ._base import Model, ModelDefaultValueExt
+from ._base import Model
 # noinspection PyUnresolvedReferences
 from .ar import (
     AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleExecodeModel,
