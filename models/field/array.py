@@ -1,8 +1,12 @@
+import math
+
 from bson import ObjectId
 from pymongo.collection import Collection
 
 from ._base import BaseField, FieldInstance
-from .exceptions import FieldReadOnly, FieldTypeMismatch, MaxLengthReachedError
+from .exceptions import (
+    FieldReadOnly, FieldValueTypeMismatch, FieldMaxLengthReached, FieldCastingFailed, FieldEmptyValueNotAllowed
+)
 
 
 class ArrayField(BaseField):
@@ -11,28 +15,47 @@ class ArrayField(BaseField):
         if not inst_cls:
             inst_cls = ArrayFieldInstance
 
+        # Check max length
+        if max_len < 0:
+            raise ValueError("Max length of the array field must > 0.")
+        if type(max_len) != int:
+            raise TypeError("Max length of the array must be `int`.")
+
         self._elem_type = elem_type
         self._max_len = max_len
         self._allow_empty = allow_empty
         super().__init__(key, default, allow_none=allow_none, readonly=readonly,
                          auto_cast=auto_cast, inst_cls=inst_cls, stores_uid=stores_uid)
 
-    def is_value_valid(self, value) -> bool:
+    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+        # Check emptiness
+        if not self._allow_empty and len(value) == 0:
+            raise FieldEmptyValueNotAllowed(self.key)
+
+        # Check length
+        if len(value) > self.max_len:
+            raise FieldMaxLengthReached(self.key, len(value), self.max_len)
+
+    def _check_type_matched_not_none_(self, value, *, pass_on_castable=False):
         from models import Model
 
+        cast_type = None
+        if issubclass(self._elem_type, Model):
+            cast_type = self._elem_type
+
         for v in value:
-            if issubclass(self._elem_type, Model):
+            value_type = type(v)
+
+            if cast_type:
+                cast_type.cast_model(v)
+            elif not value_type == self._elem_type:
+                if not pass_on_castable:
+                    raise FieldValueTypeMismatch(self.key, value_type, self.elem_type)
+
                 try:
-                    self._elem_type.cast_model(v)
-                except Exception:
-                    return False
-            elif not isinstance(v, self._elem_type):
-                return False
-
-        if not self._allow_empty and len(value) == 0:
-            return False
-
-        return self.is_type_matched(value)
+                    self._elem_type(v)
+                except Exception as e:
+                    raise FieldCastingFailed(self.key, v, self.elem_type, exc=e)
 
     @classmethod
     def none_obj(cls):
@@ -41,6 +64,28 @@ class ArrayField(BaseField):
     @property
     def expected_types(self):
         return list, tuple, set
+
+    @property
+    def elem_type(self):
+        return self._elem_type
+
+    @property
+    def max_len(self):
+        return self._max_len or math.inf
+
+    def cast_to_desired_type(self, value):
+        self.check_value_valid(value, skip_type_check=False, pass_on_castable=self.auto_cast)
+
+        v_new = []
+        for v in value:
+            value_type = type(v)
+
+            if not value_type == self.elem_type:
+                v = self.elem_type(v)
+
+            v_new.append(v)
+
+        return v_new
 
     @property
     def replace_uid_implemented(self) -> bool:
@@ -59,35 +104,13 @@ class ModelArrayField(ArrayField):
                          inst_cls=ModelArrayFieldInstanceFactory.generate(model_type))
         self._model_type = model_type
 
-    def is_value_valid(self, value) -> bool:
-        for v in value:
-            if not isinstance(v, self._elem_type):
-                try:
-                    self._model_type.cast_model(v)
-                except Exception:
-                    return False
-
-        if not self._allow_empty and len(value) == 0:
-            return False
-
-        return self.is_type_matched(value)
-
 
 class ArrayFieldInstance(FieldInstance):
-    def add_item(self, item):
-        if self.base.read_only:
-            raise FieldReadOnly(self.__class__.__qualname__)
+    def __init__(self, base, value=None):
+        if not isinstance(base, ArrayField):
+            raise ValueError(f"`ArrayFieldInstance` can only be used when the base class is {ArrayField}. ({base})")
 
-        if not isinstance(item, self.base.elem_type):
-            raise FieldTypeMismatch(type(item), type(self.base.expected_types), self.base.key)
-
-        if self.value is not None:
-            if 0 < self.base.max_len < len(self.value):
-                raise MaxLengthReachedError(self.base.max_len)
-            else:
-                self.value.append(item)
-        else:
-            self.value = [item]
+        super().__init__(base, value)
 
 
 class ModelArrayFieldInstanceFactory:

@@ -10,7 +10,8 @@ from models.field import (
     ExtraContentTypeField, TextField, DateTimeField, GeneralField, ObjectIDField
 )
 
-from ._base import Model, ModelDefaultValueExt
+from ._base import Model
+from .field import ModelDefaultValueExt
 
 
 class ExtraContentModel(Model):

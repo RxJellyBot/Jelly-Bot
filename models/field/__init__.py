@@ -1,5 +1,6 @@
 from .array import ArrayField, ModelArrayField
 from ._base import BaseField
+from ._default import ModelDefaultValueExt
 from .bool import BooleanField
 from .datetime import DateTimeField
 from .float import FloatField

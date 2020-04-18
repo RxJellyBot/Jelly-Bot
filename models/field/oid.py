@@ -2,6 +2,7 @@ from bson import ObjectId
 from pymongo.collection import Collection
 
 from ._base import BaseField
+from .exceptions import FieldValueInvalid
 
 OID_KEY = "_id"
 
@@ -11,8 +12,9 @@ class ObjectIDField(BaseField):
         super().__init__(name or OID_KEY, default, allow_none, readonly=readonly,
                          auto_cast=auto_cast, stores_uid=stores_uid)
 
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value) and (self.allow_none or ObjectId.is_valid(value))
+    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+        if not self.allow_none and not ObjectId.is_valid(value):
+            raise FieldValueInvalid(self.key, value)
 
     @classmethod
     def none_obj(cls):

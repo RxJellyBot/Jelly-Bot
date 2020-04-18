@@ -14,17 +14,14 @@ class DateTimeField(BaseField):
     def none_obj(cls):
         return datetime.min.replace(tzinfo=timezone.utc)
 
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value)
-
     @property
     def expected_types(self):
         return datetime
 
 
 class DateTimeFieldInstance(FieldInstance):
-    def force_set(self, value: datetime):
+    def force_set(self, value: datetime, skip_type_check=False):
         if is_tz_naive(value):
             value = value.replace(tzinfo=timezone.utc)
 
-        super().force_set(value)
+        super().force_set(value, skip_type_check=skip_type_check)
