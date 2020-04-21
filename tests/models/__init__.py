@@ -1,2 +1,2 @@
 from .base import TestModel
-from .fields import TestArrayField
+from .fields import TestArrayField, TestBoolField

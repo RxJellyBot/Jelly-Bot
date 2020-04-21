@@ -44,9 +44,9 @@ class FieldInstance:
         """Setting the value while passing the readonly check."""
         self.base.check_value_valid(value, skip_type_check=skip_type_check, pass_on_castable=self.base.auto_cast)
 
-        # Cast if `auto_cast` is `True` OR if the value is `None` and ot os allowed.
+        # Cast if `auto_cast` is `True` OR if the value is not `None`.
         # If it's not allowed, it should be yielded from the above checks
-        if self.base.auto_cast and value is not None:
+        if self.base.auto_cast and value is not None and not self.base.is_type_matched(value):
             try:
                 value = self.base.cast_to_desired_type(value)
             except (TypeError, ValueError) as e:
@@ -54,7 +54,7 @@ class FieldInstance:
 
         self._value = value
 
-    def is_none(self) -> bool:
+    def is_empty(self) -> bool:
         return self.base.is_empty(self.value)
 
     def __repr__(self):

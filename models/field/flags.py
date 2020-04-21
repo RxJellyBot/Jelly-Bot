@@ -1,3 +1,5 @@
+from abc import ABC
+
 from extutils.flags import FlagCodeEnum
 from flags import APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType, MessageType, BotFeature, \
     PermissionLevel
@@ -6,7 +8,7 @@ from .int import IntegerField
 from .exceptions import FieldFlagNotFound
 
 
-class FlagField(IntegerField):
+class FlagField(IntegerField, ABC):
     FLAG_TYPE: FlagCodeEnum = None
 
     def __init__(self, key, default=None, allow_none=False, auto_cast=True):
@@ -25,14 +27,14 @@ class FlagField(IntegerField):
 
     @property
     def expected_types(self):
-        return int, self._type
+        return self._type
 
     @property
     def desired_type(self):
         return self._type
 
     def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
-        if isinstance(value, int) and value not in self._type:
+        if isinstance(value, int) and self._type.cast(value) not in self._type:
             raise FieldFlagNotFound(self.key, value, self._type)
 
 
