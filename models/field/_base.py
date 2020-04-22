@@ -44,9 +44,8 @@ class FieldInstance:
         """Setting the value while passing the readonly check."""
         self.base.check_value_valid(value, skip_type_check=skip_type_check, pass_on_castable=self.base.auto_cast)
 
-        # Cast if `auto_cast` is `True` OR if the value is not `None`.
-        # If it's not allowed, it should be yielded from the above checks
-        if self.base.auto_cast and value is not None and not self.base.is_type_matched(value):
+        # Perform cast whenever auto cast is set to `True`.
+        if self.base.auto_cast:
             try:
                 value = self.base.cast_to_desired_type(value)
             except (TypeError, ValueError) as e:
@@ -203,6 +202,23 @@ class BaseField(abc.ABC):
             return True
 
     def cast_to_desired_type(self, value):
+        """
+        Cast the value to the desired type.
+
+        Does not perform type cast if the value type is already the desired type.
+        """
+        if type(value) == self.desired_type:
+            return value
+        elif self.allow_none and value is None:
+            return None
+        else:
+            return self.desired_type(value)
+
+    def _cast_to_desired_type_(self, value):
+        """
+        Method hook to be called if `cast_to_desired_type()` is called
+        and the given value type is not the desired type.
+        """
         return self.desired_type(value)
 
     def new(self, val=None):
