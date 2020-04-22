@@ -76,6 +76,9 @@ class ArrayField(BaseField):
     def cast_to_desired_type(self, value):
         self.check_value_valid(value, skip_type_check=False, pass_on_castable=self.auto_cast)
 
+        if self.allow_none and value is None:
+            return None
+
         v_new = []
         for v in value:
             value_type = type(v)

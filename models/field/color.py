@@ -15,7 +15,7 @@ class ColorField(BaseField):
     def none_obj(cls):
         return ColorFactory.DEFAULT
 
-    def cast_to_desired_type(self, value):
+    def _cast_to_desired_type_(self, value):
         # Data store in the database is int
         if isinstance(value, int):
             return Color(value)

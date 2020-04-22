@@ -22,5 +22,5 @@ class ModelField(BaseField):
     def expected_types(self):
         return self.model_cls
 
-    def cast_to_desired_type(self, value):
+    def _cast_to_desired_type_(self, value):
         return self.desired_type(**value, from_db=True)
