@@ -1,5 +1,7 @@
 # Jelly Bot
 
+![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)
+
 Supported on Discord and LINE. Feel free to add it to your group!
 
 LINE Bot: http://rnnx.cc/Line
