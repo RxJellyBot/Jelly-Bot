@@ -174,7 +174,7 @@ class BaseField(abc.ABC):
     def is_type_matched(self, value, *, pass_on_castable=False) -> bool:
         try:
             self.check_type_matched(value, pass_on_castable=pass_on_castable)
-        except Exception as _:
+        except Exception:
             return False
         else:
             return True
@@ -196,7 +196,7 @@ class BaseField(abc.ABC):
     def is_value_valid(self, value, *, skip_type_check=False, pass_on_castable=False) -> bool:
         try:
             self.check_value_valid(value, skip_type_check=skip_type_check, pass_on_castable=pass_on_castable)
-        except Exception as _:
+        except Exception:
             return False
         else:
             return True
