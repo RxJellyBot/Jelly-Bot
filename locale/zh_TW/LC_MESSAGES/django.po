@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-24 07:59-0500\n"
-"PO-Revision-Date: 2020-03-24 07:59-0500\n"
+"POT-Creation-Date: 2020-05-07 06:35-0500\n"
+"PO-Revision-Date: 2020-05-07 06:37-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -64,10 +64,10 @@ msgstr "關於"
 msgid "Channel Register"
 msgstr "登錄頻道"
 
-#: .\JellyBot\views\account\channel.py:42 .\JellyBot\views\nav.py:87
-#: .\doc\terms.py:53 .\templates\account\channel\manage.html:9
-msgid "Channel Management"
-msgstr "頻道管理"
+#: .\JellyBot\views\account\channel.py:42 .\JellyBot\views\nav.py:77
+#: .\templates\account\channel\list.html:8
+msgid "Channel List"
+msgstr "頻道列表"
 
 #: .\JellyBot\views\account\channel.py:59
 msgid "Channel Management - {}"
@@ -79,46 +79,46 @@ msgid ""
 "connections linked to the channel."
 msgstr "找不到你與該頻道的連結，故已將你重新導向至頻道資訊頁面。"
 
-#: .\JellyBot\views\account\control.py:21 .\JellyBot\views\nav.py:21
+#: .\JellyBot\views\account\control.py:22 .\JellyBot\views\nav.py:21
 msgid "Login"
 msgstr "登入"
 
-#: .\JellyBot\views\account\control.py:25
+#: .\JellyBot\views\account\control.py:26
 msgid "An unknown error occurred."
 msgstr "發生未知的錯誤。"
 
-#: .\JellyBot\views\account\control.py:26
+#: .\JellyBot\views\account\control.py:27
 msgid "Contact the administrator of the website."
 msgstr "聯繫網站管理員。"
 
-#: .\JellyBot\views\account\control.py:35
+#: .\JellyBot\views\account\control.py:36
 msgid "Registration process not performed."
 msgstr "登錄程序未執行。"
 
-#: .\JellyBot\views\account\control.py:37
+#: .\JellyBot\views\account\control.py:38
 msgid "New user data creation failed."
 msgstr "新用戶資料創建失敗。"
 
-#: .\JellyBot\views\account\control.py:39
+#: .\JellyBot\views\account\control.py:40
 msgid "The data cannot be passed into the server."
 msgstr "資料無法傳送到伺服器中。"
 
-#: .\JellyBot\views\account\control.py:42
+#: .\JellyBot\views\account\control.py:43
 msgid ""
 "An unknown error occurred during the new user data registration. Code: {} / "
 "Registration Code: {}."
 msgstr "於新用戶資料登錄的過程中發生了不明的錯誤。代碼: {} / 註冊代碼: {}。"
 
-#: .\JellyBot\views\account\control.py:61
+#: .\JellyBot\views\account\control.py:72
 msgid "User token is null however login succeed. {}"
 msgstr "登入成功，但用戶編碼為空。 ({})"
 
-#: .\JellyBot\views\account\control.py:69 .\JellyBot\views\nav.py:63
+#: .\JellyBot\views\account\control.py:80 .\JellyBot\views\nav.py:63
 #: .\templates\account\main.html:120
 msgid "Logout"
 msgstr "登出"
 
-#: .\JellyBot\views\account\control.py:86 .\templates\account\settings.html:8
+#: .\JellyBot\views\account\control.py:97 .\templates\account\settings.html:8
 msgid "Account Settings"
 msgstr "帳號設定"
 
@@ -321,43 +321,51 @@ msgstr "首頁"
 msgid "Bot Usage Stats - {}"
 msgstr "機器人使用統計 - {}"
 
-#: .\JellyBot\views\info\channel.py:29
+#: .\JellyBot\views\info\channel.py:33
 msgid "Channel Info - {}"
 msgstr "頻道資訊 - {}"
 
-#: .\JellyBot\views\info\channel.py:56 .\templates\info\channel\search.html:9
+#: .\JellyBot\views\info\channel.py:58 .\templates\info\channel\search.html:9
 msgid "Channel Info Search"
 msgstr "頻道資訊搜尋"
 
-#: .\JellyBot\views\info\chcoll.py:38 .\JellyBot\views\nav.py:161
+#: .\JellyBot\views\info\chcoll.py:37 .\JellyBot\views\nav.py:161
 msgid "Channel Collection Info - {}"
 msgstr "頻道組資訊 - {}"
 
-#: .\JellyBot\views\info\msgstats.py:98
+#: .\JellyBot\views\info\msgstats.py:105
+msgid "Failed to parse the timestamp. ({})"
+msgstr "時間戳記剖析失敗。({})"
+
+#: .\JellyBot\views\info\msgstats.py:109
+msgid "Timestamp out of range."
+msgstr "時間戳記不在可用範圍內。"
+
+#: .\JellyBot\views\info\msgstats.py:121
 msgid "Period count cannot be less than or equal to 0."
 msgstr "週期數量必須大於0。"
 
-#: .\JellyBot\views\info\msgstats.py:108
+#: .\JellyBot\views\info\msgstats.py:127
 msgid "Failed to parse the starting timestamp. Received: {}"
 msgstr "起始時間點剖析失敗。內容: {}"
 
-#: .\JellyBot\views\info\msgstats.py:111
+#: .\JellyBot\views\info\msgstats.py:128
 msgid "Start time out of range."
 msgstr "起始時間點不在可用範圍內。"
 
-#: .\JellyBot\views\info\msgstats.py:120
+#: .\JellyBot\views\info\msgstats.py:134
 msgid "Failed to parse the ending timestamp. Received: {}"
 msgstr "終止時間點剖析失敗。內容: {}"
 
-#: .\JellyBot\views\info\msgstats.py:123
+#: .\JellyBot\views\info\msgstats.py:135
 msgid "End time out of range."
 msgstr "終止時間點不在可用範圍內。"
 
-#: .\JellyBot\views\info\msgstats.py:130
+#: .\JellyBot\views\info\msgstats.py:143
 msgid "Invalid timestamp: Ending time is before the starting time."
 msgstr "無效的時間點: 終止時間點先於起始時間點。"
 
-#: .\JellyBot\views\info\msgstats.py:154 .\JellyBot\views\nav.py:149
+#: .\JellyBot\views\info\msgstats.py:167 .\JellyBot\views\nav.py:149
 msgid "Channel Message Stats - {}"
 msgstr "頻道訊息統計 - {}"
 
@@ -405,10 +413,6 @@ msgstr "總覽"
 msgid "Shortcut"
 msgstr "捷徑"
 
-#: .\JellyBot\views\nav.py:77 .\templates\account\channel\list.html:8
-msgid "Channel List"
-msgstr "頻道列表"
-
 #: .\JellyBot\views\nav.py:80 .\templates\account\main.html:117
 msgid "Settings"
 msgstr "設定"
@@ -416,6 +420,11 @@ msgstr "設定"
 #: .\JellyBot\views\nav.py:84
 msgid "Channel Registration"
 msgstr "頻道登錄"
+
+#: .\JellyBot\views\nav.py:87 .\doc\terms.py:53
+#: .\templates\account\channel\manage.html:9
+msgid "Channel Management"
+msgstr "頻道管理"
 
 #: .\JellyBot\views\nav.py:90
 msgid "Integrate Account"
@@ -518,7 +527,7 @@ msgstr "尋找口罩小工具 (美國)"
 msgid "Short URL Service"
 msgstr "短網址服務"
 
-#: .\bot\utils\calculator.py:32
+#: .\bot\utils\calculator.py:33
 msgid ""
 "I have difficulty understanding you.\n"
 "{} ({})"
@@ -526,7 +535,7 @@ msgstr ""
 "我不清楚不了解。\n"
 "{} ({})"
 
-#: .\bot\utils\calculator.py:39
+#: .\bot\utils\calculator.py:42
 msgid ""
 "WTF are you talking about?\n"
 "{}"
@@ -534,7 +543,7 @@ msgstr ""
 "りしれ供さ小？\n"
 "{}"
 
-#: .\bot\utils\calculator.py:45
+#: .\bot\utils\calculator.py:49
 msgid ""
 "I can't understand.\n"
 "{} ({})"
@@ -656,11 +665,11 @@ msgstr "{} 離開了群組。"
 msgid "{} joined the group."
 msgstr "{} 加入了群組。"
 
-#: .\extutils\dt.py:31
+#: .\extutils\dt.py:34
 msgid "{} Days {} H {:02} M {:02} S"
 msgstr "{} 日 {} 時 {:02} 分 {:02} 秒"
 
-#: .\extutils\dt.py:34
+#: .\extutils\dt.py:37
 msgid "{} H {:02} M {:02} S"
 msgstr "{} 時 {:02} 分 {:02} 秒"
 
@@ -676,111 +685,111 @@ msgstr "有聲貼圖"
 msgid "Static Sticker"
 msgstr "靜態貼圖"
 
-#: .\extutils\locales.py:58
+#: .\extutils\locales.py:75
 msgid "Asia: Hong Kong"
 msgstr "亞洲: 香港"
 
-#: .\extutils\locales.py:59
+#: .\extutils\locales.py:76
 msgid "Asia: Kuala Lumpur, Malaysia"
 msgstr "亞洲: 馬來西亞 - 吉隆坡"
 
-#: .\extutils\locales.py:60
+#: .\extutils\locales.py:77
 msgid "Asia: Macau"
 msgstr "亞洲: 澳門"
 
-#: .\extutils\locales.py:61
+#: .\extutils\locales.py:78
 msgid "Asia: Seoul, South Korea"
 msgstr "亞洲: 南韓 - 首爾"
 
-#: .\extutils\locales.py:62
+#: .\extutils\locales.py:79
 msgid "Asia: Singapore"
 msgstr "亞洲: 新加坡"
 
-#: .\extutils\locales.py:63
+#: .\extutils\locales.py:80
 msgid "Asia: Taipei, Taiwan"
 msgstr "亞洲: 台灣 - 台北"
 
-#: .\extutils\locales.py:64
+#: .\extutils\locales.py:81
 msgid "Asia: Tokyo, Japan"
 msgstr "亞洲: 日本 - 東京"
 
-#: .\extutils\locales.py:65
+#: .\extutils\locales.py:82
 msgid "Europe: London, UK"
 msgstr "歐洲: 英國 - 倫敦"
 
-#: .\extutils\locales.py:66
+#: .\extutils\locales.py:83
 msgid "North America: Central Timezone, USA"
 msgstr "北美: 美國 - 中部時區"
 
-#: .\extutils\locales.py:67
+#: .\extutils\locales.py:84
 msgid "North America: Eastern Timezone, Canada"
 msgstr "北美: 加拿大 - 東部時區"
 
-#: .\extutils\locales.py:68
+#: .\extutils\locales.py:85
 msgid "North America: Eastern Timezone, USA"
 msgstr "北美: 美國 - 東部時區"
 
-#: .\extutils\locales.py:69
+#: .\extutils\locales.py:86
 msgid "North America: Los Angeles, USA"
 msgstr "北美: 美國 - 洛杉磯"
 
-#: .\extutils\locales.py:70
+#: .\extutils\locales.py:87
 msgid "North America: Mountain Timezone, USA"
 msgstr "北美: 美國 - 山地時區"
 
-#: .\extutils\locales.py:71
+#: .\extutils\locales.py:88
 msgid "North America: New York, USA"
 msgstr "北美: 美國 - 紐約"
 
-#: .\extutils\locales.py:72
+#: .\extutils\locales.py:89
 msgid "North America: Pacific Timezone, Canada"
 msgstr "北美: 加拿大 - 太平洋時區"
 
-#: .\extutils\locales.py:73
+#: .\extutils\locales.py:90
 msgid "North America: Pacific Timezone, USA"
 msgstr "北美: 美國 - 太平洋時區"
 
-#: .\extutils\locales.py:74
+#: .\extutils\locales.py:91
 msgid "North America: Toronto, Canada"
 msgstr "北美: 加拿大 - 多倫多"
 
-#: .\extutils\locales.py:75
+#: .\extutils\locales.py:92
 msgid "North America: Vancouver, Canada"
 msgstr "北美: 加拿大 - 溫哥華"
 
-#: .\extutils\locales.py:76
+#: .\extutils\locales.py:93
 msgid "Oceania: Adelaide, Australia"
 msgstr "大洋洲: 澳洲 - 阿德萊德"
 
-#: .\extutils\locales.py:77
+#: .\extutils\locales.py:94
 msgid "Oceania: Auckland, New Zealand"
 msgstr "大洋洲: 紐西蘭 - 奧克蘭"
 
-#: .\extutils\locales.py:78
+#: .\extutils\locales.py:95
 msgid "Oceania: Brisbane, Australia"
 msgstr "大洋洲: 澳洲 - 布里斯本"
 
-#: .\extutils\locales.py:79
+#: .\extutils\locales.py:96
 msgid "Oceania: Melbourne, Australia"
 msgstr "大洋洲: 澳洲 - 墨爾本"
 
-#: .\extutils\locales.py:80
+#: .\extutils\locales.py:97
 msgid "Oceania: Perth, Australia"
 msgstr "大洋洲: 澳洲 - 伯斯"
 
-#: .\extutils\locales.py:81
+#: .\extutils\locales.py:98
 msgid "Oceania: Sydney, Australia"
 msgstr "大洋洲: 澳洲 - 雪梨"
 
-#: .\extutils\locales.py:82
+#: .\extutils\locales.py:99
 msgid "Universal Time Coordinated"
 msgstr "世界標準時間"
 
-#: .\extutils\locales.py:94
+#: .\extutils\locales.py:111
 msgid "English (United States)"
 msgstr "英文 (美國)"
 
-#: .\extutils\locales.py:95
+#: .\extutils\locales.py:112
 msgid "Chinese (Taiwan)"
 msgstr "中文 (台灣)"
 
@@ -827,11 +836,11 @@ msgstr "可循環/迭代物件(陣列、清單...等)"
 msgid "(Null)"
 msgstr "(空)"
 
-#: .\extutils\utils.py:115
+#: .\extutils\utils.py:144
 msgid "(Newline)"
 msgstr "(換行)"
 
-#: .\extutils\utils.py:117
+#: .\extutils\utils.py:146
 msgid "(Space)"
 msgstr "(空格)"
 
@@ -1544,13 +1553,17 @@ msgstr "資料模組因不明原因而無效。"
 msgid "Profile Not Found"
 msgstr "身份組不存在"
 
-#: .\models\stats.py:158 .\models\stats.py:453
+#: .\models\stats.py:174 .\models\stats.py:495
 msgid "(Total)"
 msgstr "(總計)"
 
-#: .\models\stats.py:214
+#: .\models\stats.py:230
 msgid "{} days mean"
 msgstr "{}日平均"
+
+#: .\models\stats.py:305
+msgid "Message Count Before {}"
+msgstr "{} 前的訊息量"
 
 #: .\models\timer.py:80
 msgid "- [{diff}] to {event} (at {time})"
@@ -2369,7 +2382,7 @@ msgstr ""
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
 "100(貼圖)。如果這個參數是\"100\"的話，以上這兩組自動回覆組都會被刪除。"
 
-#: .\msghandle\botcmd\command\ar.py:189
+#: .\msghandle\botcmd\command\ar.py:190
 msgid ""
 "Auto-Reply Module deleted.\n"
 "Keyword: {}"
@@ -2377,15 +2390,15 @@ msgstr ""
 "自動回覆組已刪除。\n"
 "關鍵字: {}"
 
-#: .\msghandle\botcmd\command\ar.py:191
+#: .\msghandle\botcmd\command\ar.py:193
 msgid "Insufficient Permission to delete the auto-reply module."
 msgstr "權限不足，故無法刪除回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:193
-msgid "Auto-reply module of the keyword {} not found."
-msgstr "沒有找到關鍵字為 {} 的自動回覆組。"
+#: .\msghandle\botcmd\command\ar.py:196
+msgid "Active auto-reply module of the keyword `{}` not found."
+msgstr "沒有找到關鍵字為 {} 的可用自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:197
+#: .\msghandle\botcmd\command\ar.py:200
 msgid ""
 "Failed to delete the Auto-Reply module.\n"
 "Code: {}\n"
@@ -2395,60 +2408,60 @@ msgstr ""
 "代碼: `{}`\n"
 "瀏覽 {} 以了解代碼的意思。"
 
-#: .\msghandle\botcmd\command\ar.py:219 .\msghandle\botcmd\command\ar.py:240
+#: .\msghandle\botcmd\command\ar.py:222 .\msghandle\botcmd\command\ar.py:243
 msgid "Usable Keywords ({}):"
 msgstr "可用關鍵字 ({}):"
 
-#: .\msghandle\botcmd\command\ar.py:225
+#: .\msghandle\botcmd\command\ar.py:228
 msgid "No usable auto-reply module in this channel."
 msgstr "此頻道沒有可用的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:231 .\msghandle\botcmd\command\ar.py:254
+#: .\msghandle\botcmd\command\ar.py:234 .\msghandle\botcmd\command\ar.py:257
 msgid ""
 "The search keyword to find the Auto-Reply module. Auto-Reply module which "
 "keyword contains this will be returned."
 msgstr "搜尋自動回覆組的關鍵字。結果中只會有包含此關鍵字的回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:247 .\msghandle\botcmd\command\ar.py:274
+#: .\msghandle\botcmd\command\ar.py:250 .\msghandle\botcmd\command\ar.py:277
 msgid ""
 "Cannot find any auto-reply module including the substring `{}` in their "
 "keyword."
 msgstr "沒有找到任何關鍵字含有 `{}` 的自動回覆組。"
 
-#: .\msghandle\botcmd\command\ar.py:265
+#: .\msghandle\botcmd\command\ar.py:268
 msgid "Auto-Reply module with keyword {} in {}"
 msgstr "關鍵字中含有{}的自動回覆組 ({})"
 
-#: .\msghandle\botcmd\command\ar.py:270
+#: .\msghandle\botcmd\command\ar.py:273
 msgid "Visit {} to see the result."
 msgstr "瀏覽 {} 以查看結果。"
 
-#: .\msghandle\botcmd\command\ar.py:272
+#: .\msghandle\botcmd\command\ar.py:275
 msgid "Failed to record the result. ({})"
 msgstr "結果登錄失敗。(`{}`)"
 
-#: .\msghandle\botcmd\command\ar.py:277
+#: .\msghandle\botcmd\command\ar.py:280
 msgid ""
 "Visit {}{} for more completed module searching functionality. Login required."
 msgstr "瀏覽 {}{} 以使用更完整的搜尋功能。此連結必須登入。"
 
-#: .\msghandle\botcmd\command\ar.py:289
+#: .\msghandle\botcmd\command\ar.py:292
 msgid "Auto-Reply TOP{} ranking"
 msgstr "自動回覆 前{} 排名"
 
-#: .\msghandle\botcmd\command\ar.py:295
+#: .\msghandle\botcmd\command\ar.py:298
 msgid "# Module usage ranking"
 msgstr "# 自動回覆組使用排行"
 
-#: .\msghandle\botcmd\command\ar.py:312
+#: .\msghandle\botcmd\command\ar.py:315
 msgid "# Unique keyword ranking"
 msgstr "# 回覆組關鍵字排行"
 
-#: .\msghandle\botcmd\command\ar.py:319
+#: .\msghandle\botcmd\command\ar.py:322
 msgid "For more ranking data, please visit {}{}."
 msgstr "瀏覽 {}{} 以獲取詳細資訊。"
 
-#: .\msghandle\botcmd\command\ar.py:326
+#: .\msghandle\botcmd\command\ar.py:329
 msgid "No ranking data available for now."
 msgstr "無可用排行資訊。"
 
@@ -2917,19 +2930,27 @@ msgstr "如果此系統已經啟動，則重複啟動時，目標頻道將會被
 msgid "The ID of the remote control target channel."
 msgstr "遙控目標頻道的頻道ID。"
 
-#: .\msghandle\botcmd\command\rmc.py:40
+#: .\msghandle\botcmd\command\rmc.py:41
 msgid "Remote control activated."
 msgstr "訊息遙控系統已啟動。"
 
-#: .\msghandle\botcmd\command\rmc.py:42
+#: .\msghandle\botcmd\command\rmc.py:44
 msgid "Target channel not found. Failed to activate remote control."
 msgstr "沒有找到目標頻道。無法啟動訊息遙控系統。"
 
-#: .\msghandle\botcmd\command\rmc.py:51
+#: .\msghandle\botcmd\command\rmc.py:53
 msgid "Remote control deactivated."
 msgstr "訊息遙控系統已停用。"
 
-#: .\msghandle\botcmd\command\rmc.py:64
+#: .\msghandle\botcmd\command\rmc.py:68
+msgid ""
+"Target channel data not found. Terminating remote control.\n"
+"Target Channel ID: `{}`"
+msgstr ""
+"沒有找到目標頻道。無法啟動訊息遙控系統。\n"
+"目標頻道ID: `{}`"
+
+#: .\msghandle\botcmd\command\rmc.py:73
 msgid ""
 "Remote control is activated.\n"
 "Target Channel ID: `{}`\n"
@@ -2941,7 +2962,7 @@ msgstr ""
 "目標頻道平台 & 名稱: *{} / {}*\n"
 "系統將於 `{}` 後自動停用。"
 
-#: .\msghandle\botcmd\command\rmc.py:72
+#: .\msghandle\botcmd\command\rmc.py:81
 msgid "Remote control is not activated."
 msgstr "訊息遙控系統未啟動。"
 
@@ -3192,7 +3213,7 @@ msgstr ""
 "表達式: `{}`\n"
 "結果: `{}`"
 
-#: .\msghandle\models\pipe_out.py:84
+#: .\msghandle\models\pipe_out.py:88
 msgid "Evaluated: `{}`"
 msgstr "運算: `{}`"
 
@@ -3239,7 +3260,7 @@ msgstr "- {event} 結束於 {time}！"
 msgid "**{} timer(s) will time up in less than {:.0f} minutes!**"
 msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 
-#: .\msghandle\text\timer.py:54
+#: .\msghandle\text\timer.py:55
 msgid "- {event} will time up after [{diff}]! (at {time})"
 msgstr "- {event} 將於 [{diff}] 後時間到！(於 {time})"
 
@@ -3800,7 +3821,11 @@ msgstr "此設定會影響顯示的語言。"
 msgid "Update"
 msgstr "更新"
 
-#: .\templates\ar\add-js.html:241
+#: .\templates\ar\add-js.html:222
+msgid "let msg = `The content of <b>${name}</b> is invalid.</b>`;"
+msgstr "let msg = `<b>${name}</b>的內容無效。`;"
+
+#: .\templates\ar\add-js.html:254
 msgid ""
 "let msg = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: "
 "${valMax} / Current: <b>${valNow})</b>`;"
@@ -3808,15 +3833,15 @@ msgstr ""
 "let msg = `<b>${txtareaFor}</b>的長度內容已超過限制。(最大長度: ${valMax} / "
 "目前長度: <b>${valNow})</b>`;"
 
-#: .\templates\ar\add-js.html:246
+#: .\templates\ar\add-js.html:259
 msgid "let msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;"
 msgstr "let msg = `<b>${txtareaFor}</b>的內容不能為空。`;"
 
-#: .\templates\ar\add-js.html:262
+#: .\templates\ar\add-js.html:275
 msgid "Channel validation failed. Recheck the input channel info."
 msgstr "頻道資訊驗證失敗。請檢查輸入的頻道資訊。"
 
-#: .\templates\ar\add-js.html:270
+#: .\templates\ar\add-js.html:283
 msgid ""
 "Select a channel in Registration > Channel Member or any other method to "
 "register the module."
@@ -4587,7 +4612,7 @@ msgid "More Details"
 msgstr "詳細"
 
 #: .\templates\info\botstats\main.html:10
-#: .\templates\info\channel\main.html:107
+#: .\templates\info\channel\main.html:109
 msgid "Bot Feature Usage Statistics"
 msgstr "機器人使用統計"
 
@@ -4654,20 +4679,20 @@ msgstr "成員列表"
 msgid "Message Count in 1 Day"
 msgstr "訊息量(1日)"
 
-#: .\templates\info\channel\main.html:86 .\templates\info\channel\main.html:95
-#: .\templates\info\chcoll\main.html:85 .\templates\info\chcoll\main.html:94
+#: .\templates\info\channel\main.html:86 .\templates\info\channel\main.html:96
+#: .\templates\info\chcoll\main.html:85 .\templates\info\chcoll\main.html:95
 msgid "Total Messages: "
 msgstr "總訊息量: "
 
-#: .\templates\info\channel\main.html:93 .\templates\info\chcoll\main.html:92
+#: .\templates\info\channel\main.html:94 .\templates\info\chcoll\main.html:93
 msgid "Message Count in 7 Days"
 msgstr "訊息量(7日)"
 
-#: .\templates\info\channel\main.html:115
+#: .\templates\info\channel\main.html:117
 msgid "Usage in 7 Days"
 msgstr "7日內統計"
 
-#: .\templates\info\channel\main.html:123
+#: .\templates\info\channel\main.html:125
 msgid "All time usage"
 msgstr "全時統計"
 
@@ -4727,6 +4752,14 @@ msgstr "總計使用次數"
 msgid "Member ID"
 msgstr "成員使用者ID"
 
+#: .\templates\info\components\ch_member_table.html:9
+msgid "Last Message Timestamp"
+msgstr "最後訊息時間"
+
+#: .\templates\info\components\ch_member_table.html:10
+msgid "First Join Timestamp"
+msgstr "初次加入時間"
+
 #: .\templates\info\components\info_adv.html:74
 msgid "Channel Collection ID: "
 msgstr "頻道組ID: "
@@ -4739,6 +4772,10 @@ msgstr "頻道控制"
 #: .\templates\info\components\info_adv.html:94
 msgid "Profiles (List)"
 msgstr "身份組列表"
+
+#: .\templates\info\components\msg_chart_actvmbr.html:14
+msgid "Active Member Count"
+msgstr "活躍成員數"
 
 #: .\templates\info\components\msg_chart_daily.html:18
 msgid "Message Count"
@@ -4759,17 +4796,20 @@ msgid "Total Count"
 msgstr "訊息總數"
 
 #: .\templates\info\components\msg_table_count_trange.html:10
-msgid "Avg +/-"
-msgstr "平均差異"
+msgid "Chart"
+msgstr "圖表"
 
 #: .\templates\info\components\msg_table_count_trange.html:11
-#, python-format
-msgid "Avg +/- %%"
-msgstr "平均差異%%"
+msgid "DI"
+msgstr "差異指數"
 
 #: .\templates\info\components\msg_table_count_trange.html:12
-msgid "Avg +/- NRM"
-msgstr "平均差異 (標準化)"
+msgid "DIN"
+msgstr "差異指數(正常化)"
+
+#: .\templates\info\components\msg_table_count_trange.html:13
+msgid "Bounce"
+msgstr "彈跳"
 
 #: .\templates\info\components\msg_table_daily.html:7
 msgid "Date"
@@ -4857,14 +4897,18 @@ msgid "Daily Message Flow"
 msgstr "每日訊息量"
 
 #: .\templates\info\msgstats\main.html:172
+msgid "Daily Active Member Count"
+msgstr "每日活躍成員數"
+
+#: .\templates\info\msgstats\main.html:183
 msgid "Member Message Count Ranking"
 msgstr "成員訊息量排行"
 
-#: .\templates\info\msgstats\main.html:183
+#: .\templates\info\msgstats\main.html:194
 msgid "Member Message Count in Different Time Ranges"
 msgstr "成員週期訊息量"
 
-#: .\templates\info\msgstats\main.html:194
+#: .\templates\info\msgstats\main.html:205
 msgid "Member Daily Message Count"
 msgstr "成員每日訊息量"
 
@@ -5030,6 +5074,15 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid "Avg +/-"
+#~ msgstr "平均差異"
+
+#~ msgid "Avg +/- %%"
+#~ msgstr "平均差異%%"
+
+#~ msgid "Avg +/- NRM"
+#~ msgstr "平均差異 (標準化)"
 
 #, fuzzy
 #~| msgctxt "Profile Controls"

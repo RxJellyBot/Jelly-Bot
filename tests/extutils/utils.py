@@ -10,7 +10,7 @@ from extutils.utils import (
 
 
 # noinspection PyTypeChecker
-class TestFunctions(TestCase):
+class TestUtilFunctions(TestCase):
     def test_cast_keep_none(self):
         self.assertEquals(7, cast_keep_none("7", int))
         self.assertIsNone(cast_keep_none(None, int))

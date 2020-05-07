@@ -4,7 +4,7 @@ from extutils.dt import now_utc_aware
 from extutils.locales import sec_diff_to_utc_offset, locales
 
 
-class TestFunctions(TestCase):
+class TestLocaleFunctions(TestCase):
     def test_sec_diff_to_utc_offset(self):
         self.assertEquals("-0200", sec_diff_to_utc_offset(-7200))
         self.assertEquals("+0000", sec_diff_to_utc_offset(0))
