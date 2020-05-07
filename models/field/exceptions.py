@@ -45,7 +45,7 @@ class FieldValueTypeMismatch(FieldException):
 
 
 class FieldValueInvalid(FieldException):
-    def __init__(self, key: str, value: str):
+    def __init__(self, key: str, value: Any):
         super().__init__(key, error_msg=f"Invalid value: {value}")
 
 

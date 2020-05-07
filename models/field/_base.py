@@ -209,10 +209,13 @@ class BaseField(abc.ABC):
         """
         if type(value) == self.desired_type:
             return value
-        elif self.allow_none and value is None:
-            return None
+        elif value is None:
+            if self.allow_none:
+                return None
+            else:
+                raise FieldNoneNotAllowed(self.key)
         else:
-            return self.desired_type(value)
+            return self._cast_to_desired_type_(value)
 
     def _cast_to_desired_type_(self, value):
         """
