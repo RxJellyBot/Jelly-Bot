@@ -66,7 +66,7 @@ def remote_control_status(e: TextMessageEventObject):
             RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
             return [HandledMessageEventText(
                 content=_("Target channel data not found. Terminating remote control.\n"
-                          "Target Channel ID: `{]`").format(current.target_channel_oid))]
+                          "Target Channel ID: `{}`").format(current.target_channel_oid))]
         else:
             return [
                 HandledMessageEventText(
