@@ -2,8 +2,6 @@
 
 Supported on Discord and LINE. Feel free to add it to your group!
 
-
-
 LINE Bot: http://rnnx.cc/Line
 
 Discord Bot: http://rnnx.cc/Discord

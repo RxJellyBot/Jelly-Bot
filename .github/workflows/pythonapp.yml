@@ -1,4 +1,4 @@
-name: Jelly Bot - Test on push
+name: Jelly Bot - CI Test
 
 on: [push]
 
