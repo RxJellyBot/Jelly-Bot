@@ -44,6 +44,10 @@ class TestArrayField(TestCase):
         f = ArrayField("af", int, readonly=True)
         self.assertTrue(f.read_only)
 
+        fi = f.new()
+        with self.assertRaises(FieldReadOnly):
+            fi.value = [5]
+
     def test_properties_default(self):
         f = ArrayField("af", int, default=[7, 9])
         fi = f.new()
