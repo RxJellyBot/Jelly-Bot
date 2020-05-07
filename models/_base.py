@@ -338,7 +338,11 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def cast_model(cls, obj):
-        """Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`."""
+        """
+        Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`.
+
+        `obj` can be a `dict` returned directly from `PyMongo`.
+        """
         if obj is not None and not isinstance(obj, cls):
             return cls(**obj, from_db=True)
 

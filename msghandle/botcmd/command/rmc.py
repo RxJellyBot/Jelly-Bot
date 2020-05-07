@@ -1,8 +1,8 @@
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-from bot.rmc import RemoteControl
 from flags import BotFeature, CommandScopeCollection
+from mongodb.factory import RemoteControlManager
 from JellyBot.systemconfig import Bot
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 
@@ -34,13 +34,13 @@ cmd_status = cmd.new_child_node(codes=["s", "cur", "status", "current"])
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId):
-    entry = RemoteControl.activate(
-        e.user_model.id, e.channel_model_source.id, target_channel, e.user_model.config.tzinfo)
+    entry = RemoteControlManager.activate(
+        e.user_model.id, e.channel_model_source.id, target_channel, e.user_model.config.locale)
 
     if entry.target_channel:
         return [HandledMessageEventText(content=_("Remote control activated."))]
     else:
-        RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
+        RemoteControlManager.deactivate(e.user_model.id, e.channel_model_source.id)
         return [HandledMessageEventText(content=_("Target channel not found. Failed to activate remote control."))]
 
 
@@ -49,7 +49,7 @@ def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId)
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_deactivate(e: TextMessageEventObject):
-    RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
+    RemoteControlManager.deactivate(e.user_model.id, e.channel_model_source.id)
     return [HandledMessageEventText(content=_("Remote control deactivated."))]
 
 
@@ -58,12 +58,12 @@ def remote_control_deactivate(e: TextMessageEventObject):
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_status(e: TextMessageEventObject):
-    current = RemoteControl.get_current(e.user_model.id, e.channel_model_source.id, update_expiry=False)
+    current = RemoteControlManager.get_current(e.user_model.id, e.channel_model_source.id, update_expiry=False)
 
     if current:
         cnl = current.target_channel
         if not cnl:
-            RemoteControl.deactivate(e.user_model.id, e.channel_model_source.id)
+            RemoteControlManager.deactivate(e.user_model.id, e.channel_model_source.id)
             return [HandledMessageEventText(
                 content=_("Target channel data not found. Terminating remote control.\n"
                           "Target Channel ID: `{}`").format(current.target_channel_oid))]
