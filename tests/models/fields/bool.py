@@ -42,7 +42,8 @@ class TestBoolField(TestCase):
         f = BooleanField("b")
         self.assertTrue(f.cast_to_desired_type("G"))
         self.assertFalse(f.cast_to_desired_type(0))
-        self.assertFalse(f.cast_to_desired_type(None))
+        with self.assertRaises(FieldNoneNotAllowed):
+            f.cast_to_desired_type(None)
         self.assertTrue(f.cast_to_desired_type(True))
         self.assertTrue(f.cast_to_desired_type(7))
 
