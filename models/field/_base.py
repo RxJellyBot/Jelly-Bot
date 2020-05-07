@@ -142,11 +142,11 @@ class BaseField(abc.ABC):
         raise ValueError(f"None object not implemented for {cls}.")
 
     def _check_type_matched_not_none_(self, value, *, pass_on_castable=False):
-        """Hook of value type checking when the value is not `None`."""
+        """Hook of value type checking when the value is not `None` and not a extended default value."""
         pass
 
     def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
-        """Hook of value validity checking when the value is not `None`."""
+        """Hook of value validity checking when the value is not `None` and not a extended default value."""
         pass
 
     def check_type_matched(self, value, *, pass_on_castable=False):
@@ -168,7 +168,7 @@ class BaseField(abc.ABC):
         if not type(value) in expected_types:
             raise FieldTypeMismatch(self.key, type(value), expected_types)
 
-        if value is not None:
+        if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
             self._check_type_matched_not_none_(value, pass_on_castable=pass_on_castable or self.auto_cast)
 
     def is_type_matched(self, value, *, pass_on_castable=False) -> bool:
@@ -189,7 +189,7 @@ class BaseField(abc.ABC):
         if not skip_type_check:
             self.check_type_matched(value, pass_on_castable=pass_on_castable)
 
-        if value is not None:
+        if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
             self._check_value_valid_not_none_(
                 value, skip_type_check=skip_type_check, pass_on_castable=pass_on_castable or self.auto_cast)
 

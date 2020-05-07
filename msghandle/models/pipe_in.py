@@ -7,9 +7,8 @@ from bson import ObjectId
 from linebot.models import TextMessage, ImageMessage, StickerMessage, MessageEvent
 from discord import Message, ChannelType
 
-from bot.rmc import RemoteControl
 from models import ChannelModel, RootUserModel, ChannelCollectionModel
-from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager
+from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager, RemoteControlManager
 from extutils.emailutils import MailSender
 from msghandle import logger
 from msghandle.models import ImageContent, LineStickerContent
@@ -68,7 +67,7 @@ class MessageEventObject(Event, ABC):
 
         rmc = None
         if user_model:
-            rmc = RemoteControl.get_current(user_model.id, channel_model.id)
+            rmc = RemoteControlManager.get_current(user_model.id, channel_model.id)
 
         if rmc:
             src_ch = channel_model

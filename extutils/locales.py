@@ -1,4 +1,5 @@
 from datetime import tzinfo, timedelta
+from typing import Optional
 
 from django.utils.translation import gettext_lazy as _
 
@@ -31,7 +32,11 @@ class LocaleInfo:
         return LocaleInfo.get_tzinfo(self.pytz_code)
 
     @staticmethod
-    def get_tzinfo(tzname: str) -> 'PytzInfo':
+    def get_tzinfo(tzname: Optional[str]) -> Optional['PytzInfo']:
+        """Get the corresponding `pytz` tzinfo. If `tzname` is `None`. Returns `None`."""
+        if tzname is None:
+            return None
+
         return PytzInfo(pytz.timezone(tzname))
 
 

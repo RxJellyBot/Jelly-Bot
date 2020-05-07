@@ -23,6 +23,9 @@ from .exctnt import _inst as ExtraContentManager
 from .shorturl import _inst as ShortUrlDataManager
 # noinspection PyPep8Naming
 from .timer import _inst as TimerManager
+# noinspection PyPep8Naming
+from .rmc import _inst as RemoteControlManager
+
 from ._base import BaseCollection
 
 

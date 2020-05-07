@@ -33,3 +33,5 @@ from .stats import (
 from .timer import TimerModel, TimerListResult
 # noinspection PyUnresolvedReferences
 from .user import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, set_uname_cache
+# noinspection PyUnresolvedReferences
+from .rmc import RemoteControlEntryModel
