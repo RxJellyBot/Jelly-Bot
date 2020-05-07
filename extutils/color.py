@@ -4,11 +4,15 @@ from bson.codec_options import TypeEncoder
 
 
 class Color:
+    @staticmethod
+    def color_num_valid(num: int):
+        return 0 <= num <= 16777215
+
     def __init__(self, color_sum: int):
         """
         :exception ValueError: `color_sum` is invalid.
         """
-        if 0 <= color_sum <= 16777215:
+        if Color.color_num_valid(color_sum):
             self._col_code = color_sum
         else:
             raise ValueError(f"Invalid `color_sum`. Should be 0~16777215. ({color_sum})")
@@ -50,6 +54,7 @@ class Color:
 
 class ColorFactory:
     BLACK = Color(0)
+    WHITE = Color(16777215)
 
     DEFAULT = BLACK
 

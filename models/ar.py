@@ -12,10 +12,10 @@ from models.exceptions import KeyNotExistedError
 from models.utils import AutoReplyValidators
 from extutils.utils import enumerate_ranking
 
-from ._base import Model, ModelDefaultValueExt
+from ._base import Model
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, ModelDefaultValueExt
 )
 
 

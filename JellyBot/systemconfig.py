@@ -62,7 +62,6 @@ class AutoReply:
 
 
 class Database:
-    StatisticsExpirySeconds = 15811200  # 183 Days
     ExecodeExpirySeconds = 86400  # 24 Hrs
     CacheExpirySeconds = 172800  # 2 Days
     ExtraContentExpirySeconds = 2073600  # 30 Days
@@ -83,8 +82,7 @@ class Database:
         AppearanceCoeffA = 1 / math.pow(AppearanceIntersect, AppearanceFunctionCoeff - 1)
 
     class MessageStats:
-        MaxContentCharacter = 500
-        MessageRecordExpirySeconds = 86400 * 365  # 365 Days
+        MaxContentCharacter = 3000
 
 
 class DataQuery:

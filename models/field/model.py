@@ -22,8 +22,5 @@ class ModelField(BaseField):
     def expected_types(self):
         return self.model_cls
 
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value)
-
-    def cast_to_desired_type(self, value):
+    def _cast_to_desired_type_(self, value):
         return self.desired_type(**value, from_db=True)

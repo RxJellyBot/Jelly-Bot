@@ -1,6 +1,7 @@
 from extutils.color import Color, ColorFactory
 
 from ._base import BaseField
+from .exceptions import FieldValueInvalid, FieldTypeMismatch
 
 
 class ColorField(BaseField):
@@ -9,17 +10,28 @@ class ColorField(BaseField):
 
     @property
     def expected_types(self):
-        return Color
-
-    def is_value_valid(self, value) -> bool:
-        return self.is_type_matched(value)
+        return Color, int, str
 
     @classmethod
     def none_obj(cls):
         return ColorFactory.DEFAULT
 
-    def cast_to_desired_type(self, value):
-        if isinstance(value, str):
-            value = ColorFactory.from_hex(value).color_int
+    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+        if isinstance(value, int):
+            if Color.color_num_valid(value):
+                return
+            else:
+                raise FieldValueInvalid(self.key, value)
+        elif isinstance(value, str):
+            ColorFactory.from_hex(value)
+        elif isinstance(value, Color):
+            pass
+        else:
+            raise FieldTypeMismatch(self.key, type(value), self.expected_types)
 
-        return super().cast_to_desired_type(value)
+    def _cast_to_desired_type_(self, value):
+        # Data store in the database is int
+        if isinstance(value, int):
+            return Color(value)
+        else:
+            return ColorFactory.from_hex(value)

@@ -31,8 +31,6 @@ class APIStatisticsManager(BaseCollection):
 
     def __init__(self):
         super().__init__()
-        self.create_index(APIStatisticModel.Timestamp.key,
-                          expireAfterSeconds=Database.StatisticsExpirySeconds, name="Timestamp")
 
     @arg_type_ensure
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
@@ -51,8 +49,6 @@ class MessageRecordStatisticsManager(BaseCollection):
 
     def __init__(self):
         super().__init__()
-        self.create_index(MessageRecordModel.Timestamp.key,
-                          expireAfterSeconds=Database.MessageStats.MessageRecordExpirySeconds, name="Timestamp")
 
     @arg_type_ensure
     def record_message_async(

@@ -1,62 +1,97 @@
-from typing import Union, Tuple
+from abc import ABC
+from typing import Union, Tuple, Any, Iterable
 
 
-class FieldReadOnly(Exception):
-    def __init__(self, field_name):
-        super().__init__(f"This field ({field_name}) is readonly.")
+class FieldException(ABC, Exception):
+    def __init__(self, key: str, *, error_msg: str = None):
+        super().__init__(f"Field (Key: {key}) - {error_msg}")
 
 
-class FieldTypeMismatch(Exception):
-    def __init__(self, key: str, got: type, expected: Union[type, Tuple[type]] = None, field_name: str = None):
-        self._got_type = got
-        self._expected_types = expected
-        self._field_name = field_name
+class FieldReadOnly(FieldException):
+    def __init__(self, key: str):
+        super().__init__(key, error_msg="Readonly.")
 
+
+class FieldTypeMismatch(FieldException):
+    def __init__(self, key: str, actual: type, expected: Union[type, Iterable[type]] = None, *,
+                 extra_message: str = None):
         if expected is None:
-            self._expected_name = "(Unknown)"
+            expected_name = "(Unknown)"
         elif isinstance(expected, type):
-            self._expected_name = expected.__name__
+            expected_name = expected.__name__
         else:
-            self._expected_name = " or ".join([t.__name__ for t in expected])
+            expected_name = " or ".join([t.__name__ for t in expected])
 
-        super().__init__(f"Field (Key: {key}) type mismatch. "
-                         f"Expected: {self._expected_name}, Got: {got.__name__}")
-
-    @property
-    def field_name(self) -> str:
-        return self._field_name
-
-    @property
-    def got_type(self) -> type:
-        return self._got_type
-
-    @property
-    def expected_types(self) -> Union[type, Tuple[type]]:
-        return self._expected_types
-
-
-class FieldValueInvalid(Exception):
-    def __init__(self, key, value):
-        self._value = value
-        super().__init__(f"Invalid Field (Key: {key}) Value: {value}")
-
-    @property
-    def value(self) -> type:
-        return self._value
-
-
-class FieldCastingFailed(Exception):
-    def __init__(self, key, value, value_type, desired_type: type, ex_message):
         super().__init__(
-            f"Field auto-type casting failed. Key: {key}; Value ({value_type}): {value}; Desired Type: {desired_type}; "
-            f"Exception: {ex_message}")
+            key,
+            error_msg=f"Type mismatch. {extra_message or ''} "
+                      f"Expected: {expected_name}, Actual: {actual.__name__}")
 
 
-class MaxLengthReachedError(Exception):
-    def __init__(self, max_len: int):
-        super().__init__(f"Max length ({max_len}) reached.")
+class FieldValueTypeMismatch(FieldException):
+    def __init__(self, key: str, actual: type, expected: Union[type, Tuple[type]] = None, *,
+                 extra_message: str = None):
+        if expected is None:
+            expected_name = "(Unknown)"
+        elif isinstance(expected, type):
+            expected_name = expected.__name__
+        else:
+            expected_name = " or ".join([t.__name__ for t in expected])
+
+        super().__init__(
+            key,
+            error_msg=f"Type mismatch. {extra_message or ''} "
+                      f"Expected: {expected_name}, Actual: {actual.__name__}")
 
 
-class InvalidFieldInstanceClassError(Exception):
-    def __init__(self, inst_cls):
-        super().__init__(f"Invalid field instance class type. ({inst_cls})")
+class FieldValueInvalid(FieldException):
+    def __init__(self, key: str, value: Any):
+        super().__init__(key, error_msg=f"Invalid value: {value}")
+
+
+class FieldCastingFailed(FieldException):
+    def __init__(self, key: str, value: str, desired_type: type, *, exc: Exception = None):
+        super().__init__(
+            key,
+            error_msg=f"Auto casting failed. Value: ({value}) <{type(value)}> / Desired type: {desired_type} / "
+                      f"Exception: {exc}")
+
+
+class FieldNoneNotAllowed(FieldException):
+    def __init__(self, key: str):
+        super().__init__(key, error_msg=f"`None` not allowed.")
+
+
+class FieldEmptyValueNotAllowed(FieldException):
+    def __init__(self, key: str):
+        super().__init__(key, error_msg=f"Empty value not allowed.")
+
+
+class FieldMaxLengthReached(FieldException):
+    def __init__(self, key: str, cur_len: int, max_len: int):
+        super().__init__(key, error_msg=f"Max length reached. {cur_len}/{max_len}")
+
+
+class FieldInvalidUrl(FieldException):
+    def __init__(self, key: str, url: str):
+        super().__init__(key, error_msg=f"Invalid URL: {url}")
+
+
+class FieldFlagNotFound(FieldException):
+    def __init__(self, key: str, obj: Any, flag):
+        super().__init__(key, error_msg=f"Object ({obj}) not found in the flag ({flag}).")
+
+
+class FieldRegexNotMatch(FieldException):
+    def __init__(self, key: str, value: str, regex: str):
+        super().__init__(key, error_msg=f"Regex ({regex}) not match with ({value}).")
+
+
+class FieldInstanceClassInvalid(FieldException):
+    def __init__(self, key: str, inst_cls):
+        super().__init__(key, error_msg=f"Invalid field instance class type: {inst_cls}")
+
+
+class FieldInvalidDefaultValue(FieldException):
+    def __init__(self, key: str, default_value: Any, *, exc: Exception = None):
+        super().__init__(key, error_msg=f"Invalid default value. {default_value} - <{exc}>")

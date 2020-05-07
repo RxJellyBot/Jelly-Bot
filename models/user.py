@@ -8,8 +8,8 @@ from extutils.locales import default_locale, default_language, LocaleInfo
 from JellyBot.systemconfig import DataQuery
 from flags import ModelValidityCheckResult, Platform
 
-from ._base import Model, ModelDefaultValueExt
-from .field import PlatformField, TextField, ArrayField, ObjectIDField, ModelField
+from ._base import Model
+from .field import PlatformField, TextField, ArrayField, ObjectIDField, ModelField, ModelDefaultValueExt
 
 
 class RootUserConfigModel(Model):

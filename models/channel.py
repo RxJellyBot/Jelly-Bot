@@ -5,8 +5,8 @@ from models.field import (
     PlatformField, TextField, ModelField, IntegerField, BooleanField, ObjectIDField, DictionaryField, ArrayField
 )
 
-
-from ._base import Model, ModelDefaultValueExt
+from ._base import Model
+from .field import ModelDefaultValueExt
 
 
 class ChannelConfigModel(Model):

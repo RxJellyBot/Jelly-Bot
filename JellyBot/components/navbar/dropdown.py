@@ -47,6 +47,7 @@ class NavDropdown(NavFirstLevelItem):
             elif isinstance(item, NavEntry):
                 s += item.to_html(True)
             elif hasattr(item, "to_html"):
+                # noinspection PyCallingNonCallable
                 s += item.to_html()
         s += '</div></li>'
 
