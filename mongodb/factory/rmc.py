@@ -76,6 +76,8 @@ class RemoteControlManager(BaseCollection):
             return None
 
         if update_expiry:
+            # Update the object to be returned and the object in the database
+            ret.last_used = now
             self.update_one_async(filter_, {"$set": {RemoteControlEntryModel.LastUsed.key: now}})
 
         # Ensure TTL - for tests, TTL not working in millisecond scale
