@@ -92,5 +92,6 @@ jobs:
           python manage.py test tests
 
       - name: Drop database
+        shell: cmd
         run: |
           python mongodb/cli/drop_db.py %MONGO_DB%
