@@ -349,6 +349,6 @@ class TestArrayFieldExtra(TestCase):
             ArrayField("af", int, max_len=7.5)
 
 
-# For single file testing, or these abstract classes will be instantiated, causing error
+# These abstract classes will be instantiated (causing error) if not deleted
 del TestFieldValue
 del TestFieldProperty

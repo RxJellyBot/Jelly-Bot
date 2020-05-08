@@ -82,15 +82,6 @@ class TestFieldProperty(TestCase, ABC):
 
     # endregion
 
-    # region Store UID
-    def test_properties_stores_uid(self):
-        f = self.get_initialized_field(stores_uid=True)
-        self.assertTrue(f.stores_uid)
-        f = self.get_initialized_field(stores_uid=False)
-        self.assertFalse(f.stores_uid)
-
-    # endregion
-
     # region Default value validity
     @abstractmethod
     def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
