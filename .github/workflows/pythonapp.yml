@@ -89,7 +89,7 @@ jobs:
 
       - name: Install pymongo
         run: |
-          pip install pymongo
+          pip install pymongo dnspython
 
       - name: Drop MongoDB database
         shell: cmd
