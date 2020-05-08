@@ -81,6 +81,7 @@ jobs:
     needs: [prepare, application-tests]
 
     env:
+      MONGO_URL: ${{ secrets.MongoDBURL }}
       DB_DROP: 'GitHubActionTest#${{ github.run_number }}'
 
     steps:
