@@ -5,7 +5,7 @@ class ModelField(BaseField):
     # noinspection PyUnresolvedReferences
     def __init__(self, key, model_cls, **kwargs):
         if model_cls is None:
-            raise ValueError(f"`model_cls` needs to be specified for parsing.")
+            raise ValueError("`model_cls` needs to be specified for parsing.")
         else:
             self._model_cls = model_cls
 

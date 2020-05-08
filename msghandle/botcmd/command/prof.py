@@ -226,6 +226,8 @@ def _output_profile_txt_(result_entries):
         entries.append("\n".join([str(s) for s in str_]))
 
     return "\n\n".join(entries)
+
+
 # endregion
 
 
@@ -247,6 +249,8 @@ def profile_query(e: TextMessageEventObject, keyword: str):
         return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
 
     return [HandledMessageEventText(content=_output_profile_txt_(result))]
+
+
 # endregion
 
 
@@ -266,6 +270,8 @@ def profile_list(e: TextMessageEventObject):
         return [HandledMessageEventText(content=_("No profile in this channel."))]
 
     return [HandledMessageEventText(content=_output_profile_txt_(result))]
+
+
 # endregion
 
 
@@ -279,8 +285,10 @@ def _output_attach_outcome_(outcome: OperationOutcome):
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Profile attached."))]
     else:
-        return [HandledMessageEventText(
-            content=_("Failed to attach the profile.\nError: `{}` - {}").format(outcome.code_str, outcome.description))]
+        return [
+            HandledMessageEventText(
+                content=_("Failed to attach the profile.\nError: `{}` - {}").format(
+                    outcome.code_str, outcome.description))]
 
 
 @cmd_attach.command_function(
@@ -298,7 +306,10 @@ def profile_attach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be attached to the profile.")]
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
+    return _output_attach_outcome_(
+        ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
+
+
 # endregion
 
 
@@ -313,7 +324,8 @@ def _output_detach_outcome_(outcome: OperationOutcome):
         return [HandledMessageEventText(content=_("Profile detached."))]
     else:
         return [HandledMessageEventText(
-            content=_("Failed to detach the profile.\nError: `{}` - {}").format(outcome.code_str, outcome.description))]
+            content=_("Failed to detach the profile.\nError: `{}` - {}").format(outcome.code_str,
+                                                                                outcome.description))]
 
 
 @cmd_detach.command_function(
@@ -331,7 +343,10 @@ def profile_detach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be detached from the profile.")]
 )
 def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))
+    return _output_detach_outcome_(
+        ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))
+
+
 # endregion
 
 

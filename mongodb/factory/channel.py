@@ -87,7 +87,8 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ret, ex)
 
     @arg_type_ensure
-    def get_channel_token(self, platform: Platform, token: str, auto_register: bool = False, default_name: str = None) \
+    def get_channel_token(self, platform: Platform, token: str,
+                          auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)

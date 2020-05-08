@@ -3,7 +3,7 @@ name: Jelly Bot - CI Test
 on: [push]
 
 jobs:
-  print-info:
+  prepare:
     runs-on: windows-latest
 
     steps:
@@ -17,38 +17,10 @@ jobs:
         run: |
           echo %GITHUB_REF%
 
-  style-check:
+  application-tests:
     runs-on: windows-latest
 
-    timeout-minutes: 3
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Install flake8
-        run: |
-          pip install flake8
-
-      - name: Perform syntax check
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
-      - name: Perform style check
-        run: |
-          flake8 . --count --exit-zero --max-complexity=15 --max-line-length=120 --ignore=F401,F403,F405 --statistics
-
-  test:
-    runs-on: windows-latest
+    needs: [prepare]
 
     timeout-minutes: 10
 
@@ -87,19 +59,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django tests
+      - name: Install flake8
+        run: |
+          pip install flake8
+
+      - name: flake8 - error check
+        run: |
+          flake8 . --count --select=E9,F60,F62,F7,F82,F83 --max-complexity=15 --max-line-length=119 --show-source --statistics --benchmark
+
+      - name: flake8 - style check
+        run: |
+          flake8 . --count --ignore=F401 --max-complexity=15 --max-line-length=119 --statistics --benchmark --exit-zero
+
+      - name: Django tests
         run: |
           python manage.py test tests
-
-      - name: Drop database
-        shell: cmd
-        run: |
-          python mongodb/cli/drop_db.py %MONGO_DB%
 
   cleanup:
     runs-on: windows-latest
 
-    needs: [print-info, style-check, test]
+    needs: [prepare, application-tests]
 
     env:
       DB_DROP: 'GitHubActionTest#${{ github.run_number }}'

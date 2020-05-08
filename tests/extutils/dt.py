@@ -244,7 +244,8 @@ class TestParseTimeRange(TestCase):
         self.assertFalse(tr.is_inf)
         self.assertAlmostEquals(48, tr.hr_length_org, 0)
         self.assertAlmostEquals(96, tr.hr_length, 0)
-        self.assertEquals(f"{start_mult_expected.strftime('%m-%d')} ~ {end_dt.strftime('%m-%d')}", tr.expr_period_short)
+        self.assertEquals(f"{start_mult_expected.strftime('%m-%d')} ~ {end_dt.strftime('%m-%d')}",
+                          tr.expr_period_short)
         self.assertAlmostEquals(tr.end_time_seconds, time_to_seconds(end_dt.time()), 0)
         prd = tr.get_periods()
         tr2 = TimeRange(start=start_mult_expected, end=start_dt)

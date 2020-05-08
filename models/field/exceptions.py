@@ -59,12 +59,12 @@ class FieldCastingFailed(FieldException):
 
 class FieldNoneNotAllowed(FieldException):
     def __init__(self, key: str):
-        super().__init__(key, error_msg=f"`None` not allowed.")
+        super().__init__(key, error_msg="`None` not allowed.")
 
 
 class FieldEmptyValueNotAllowed(FieldException):
     def __init__(self, key: str):
-        super().__init__(key, error_msg=f"Empty value not allowed.")
+        super().__init__(key, error_msg="Empty value not allowed.")
 
 
 class FieldMaxLengthReached(FieldException):

@@ -25,7 +25,8 @@ cmd_del = cmd.new_child_node(codes=["d", "del", "delete"])
 # ------------------------- Add -------------------------
 
 add_kw_help = _("Keyword to get the timer. "
-                "The bot will reply the timer status whenever the keyword has been detected in the designated channel.")
+                "The bot will reply the timer status "
+                "whenever the keyword has been detected in the designated channel.")
 title_help = _("Title of the timer.")
 datetime_help = _("String of the target datetime of the timer.\n\n"
                   "- Timezone will be the user's configurated timezone if not specified.\n\n"

@@ -35,7 +35,8 @@ class MemberInfoEntry:
 
 class InfoProcessor:
     @staticmethod
-    def collate_child_channel_data(root_oid: ObjectId, child_channel_oids: List[ObjectId]) -> List[CollatedChannelData]:
+    def collate_child_channel_data(root_oid: ObjectId, child_channel_oids: List[ObjectId]) \
+            -> List[CollatedChannelData]:
         accessible: List[CollatedChannelData] = []
         inaccessible: List[CollatedChannelData] = []
 

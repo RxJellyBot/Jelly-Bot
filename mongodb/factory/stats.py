@@ -33,8 +33,8 @@ class APIStatisticsManager(BaseCollection):
         super().__init__()
 
     @arg_type_ensure
-    def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict, success: bool,
-                     org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
+    def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict,
+                     success: bool, org_param: dict, path_info: str, path_info_full: str) -> RecordAPIStatisticsResult:
         entry, outcome, ex = self.insert_one_data(
             ApiAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
             Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
@@ -86,8 +86,8 @@ class MessageRecordStatisticsManager(BaseCollection):
         else:
             return 0.0
 
-    def get_user_last_message_ts(
-            self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) -> Dict[ObjectId, datetime]:
+    def get_user_last_message_ts(self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) \
+            -> Dict[ObjectId, datetime]:
         ret = {}
         KEY_TS = "msgts"
 

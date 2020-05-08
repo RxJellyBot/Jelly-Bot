@@ -101,7 +101,8 @@ class TestFieldProperty(TestCase, ABC):
     def test_properties_default_valid(self):
         for default_val, expected_autocast in self.get_valid_default_values():
             with self.subTest(default_val=default_val):
-                # Default value could be invalid if `auto_cast` set to `False` while the value does not considered valid
+                # Default value could be invalid if `auto_cast` set to `False`
+                # while the value does not considered valid
                 try:
                     f = self.get_initialized_field(auto_cast=False, default=default_val)
                     fi = f.new()

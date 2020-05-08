@@ -37,7 +37,8 @@ def exec_timing(fn):
 
         caller = inspect.stack()[1]
 
-        exec_logger.logger.info(f"{_duration_ * 1000} ms - Line {caller.lineno} {caller.function} in {caller.filename}")
+        exec_logger.logger.info(f"{_duration_ * 1000} ms - "
+                                f"Line {caller.lineno} {caller.function} in {caller.filename}")
 
         return ret
     return inner

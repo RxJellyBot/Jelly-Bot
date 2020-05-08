@@ -153,7 +153,8 @@ def _repair_fields_(model_cls, data, changed, missing):
                     data[json_key] = default_val
                     changed[0] = True if not changed[0] else changed[0]
             except KeyError:
-                raise ValueError(f"Default value rule not set for json key `{json_key}` in `{model_cls.__qualname__}`.")
+                raise ValueError(f"Default value rule not set "
+                                 f"for json key `{json_key}` in `{model_cls.__qualname__}`.")
 
 
 def _print_scanning_result_(counter):
