@@ -9,7 +9,7 @@ from models.field.exceptions import (
 )
 
 
-class TestFieldPropertyMixin(TestCase, ABC):
+class TestFieldProperty(TestCase, ABC):
     """
     Class to test the property of a field.
 

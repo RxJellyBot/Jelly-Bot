@@ -7,7 +7,7 @@ from models.field import BaseField
 from models.field.exceptions import FieldException
 
 
-class TestFieldValueMixin(TestCase, ABC):
+class TestFieldValue(TestCase, ABC):
     """
     Class to test the value setting and getting of a field.
 

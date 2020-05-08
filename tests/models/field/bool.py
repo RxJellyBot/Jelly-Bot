@@ -1,95 +1,213 @@
-from django.test import TestCase
+from typing import Type, Any, Tuple
 
+from field import BaseField
+from field.exceptions import FieldException
 from models.field import BooleanField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldInvalidDefaultValue, FieldNoneNotAllowed
+    FieldNoneNotAllowed, FieldCastingFailed, FieldValueTypeMismatch
 )
 
+from ._test_val import TestFieldValue
+from ._test_prop import TestFieldProperty
 
-class TestBoolField(TestCase):
-    def test_properties(self):
-        f = BooleanField("b")
-        self.assertFalse(f.allow_none)
-        self.assertFalse(f.read_only)
-        self.assertTrue(f.auto_cast)
-        self.assertEquals("b", f.key)
-        self.assertTupleEqual((bool, int), f.expected_types)
-        self.assertEquals(bool, f.desired_type)
-        self.assertFalse(f.default_value)
-        self.assertFalse(f.stores_uid)
+__all__ = ["TestBoolFieldProperty", "TestBoolFieldValueDefault",
+           "TestBoolFieldValueNoAutoCast", "TestBoolFieldValueNotAllowNone"]
 
-    def test_functions(self):
-        f = BooleanField("b")
-        self.assertFalse(f.is_type_matched(None))
-        self.assertFalse(f.is_type_matched("G"))
-        self.assertTrue(f.is_type_matched(True))
-        self.assertTrue(f.is_type_matched(7))
-        self.assertTrue(f.is_empty(None))
-        self.assertFalse(f.is_empty(True))
-        self.assertFalse(f.is_empty(7))
-        self.assertFalse(f.is_empty("G"))
 
-    def test_checks(self):
-        f = BooleanField("b")
-        with self.assertRaises(FieldNoneNotAllowed):
-            f.check_value_valid(None)
-        f.check_value_valid(True)
-        f.check_value_valid(7)
-        with self.assertRaises(FieldTypeMismatch):
-            f.check_value_valid("G")
+class TestBoolFieldProperty(TestFieldProperty):
+    def get_field_class(self) -> Type[BaseField]:
+        return BooleanField
 
-    def test_cast(self):
-        f = BooleanField("b")
-        self.assertTrue(f.cast_to_desired_type("G"))
-        self.assertFalse(f.cast_to_desired_type(0))
-        with self.assertRaises(FieldNoneNotAllowed):
-            f.cast_to_desired_type(None)
-        self.assertTrue(f.cast_to_desired_type(True))
-        self.assertTrue(f.cast_to_desired_type(7))
+    def valid_not_none_value(self) -> Any:
+        return True
 
-        f = BooleanField("b", allow_none=True, auto_cast=False)
-        self.assertTrue(f.cast_to_desired_type(7))
-        self.assertFalse(f.cast_to_desired_type(0))
-        self.assertTrue(f.cast_to_desired_type("G"))
-        self.assertTrue(f.cast_to_desired_type(True))
-        self.assertFalse(f.cast_to_desired_type(None))
+    def expected_none_object(self) -> Any:
+        return False
 
-    def test_field_instance(self):
-        f = BooleanField("b", default=True)
-        fi = f.new()
-        self.assertTrue(fi.value)
+    def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (1, True),
+            (0, False)
+        )
 
-        fi = f.new(True)
-        self.assertTrue(fi.value)
+    def get_invalid_default_values(self) -> Tuple[Any, ...]:
+        return object(),
 
-        fi.value = 7
-        self.assertTrue(fi.value)
+    def get_expected_types(self) -> Tuple[Type[Any], ...]:
+        return bool, int
 
-        fi.value = True
-        self.assertTrue(fi.value)
+    def get_desired_type(self) -> Type[Any]:
+        return bool
 
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = "G"
 
-        with self.assertRaises(FieldNoneNotAllowed):
-            fi.value = None
+class TestBoolFieldValueDefault(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return BooleanField("k")
 
-        f = BooleanField("b", allow_none=True, auto_cast=False)
-        fi = f.new()
-        self.assertFalse(fi.value)
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
 
-        fi.value = 7
-        self.assertEquals(7, fi.value)
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
 
-        fi.value = True
-        self.assertTrue(fi.value)
+    def is_auto_cast(self) -> bool:
+        return True
 
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = "G"
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
 
-        fi.value = None
-        self.assertFalse(fi.value)
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
 
-    def test_field_invalid_default(self):
-        with self.assertRaises(FieldInvalidDefaultValue):
-            BooleanField("b", default="G")
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (object, FieldCastingFailed),
+            ("X", FieldValueTypeMismatch)
+        )
+
+
+class TestBoolFieldValueNoAutoCast(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return BooleanField("k")
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (object, FieldCastingFailed),
+            ("X", FieldValueTypeMismatch)
+        )
+
+
+class TestBoolFieldValueNotAllowNone(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return BooleanField("k")
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (True, True),
+            (False, True),
+            (7, True),
+            (1, True),
+            (0, True),
+            ("X", False),
+            (object(), False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (True, True),
+            (False, False),
+            (7, True),
+            (1, True),
+            (0, False)
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (object, FieldCastingFailed),
+            (None, FieldNoneNotAllowed),
+            ("X", FieldValueTypeMismatch)
+        )

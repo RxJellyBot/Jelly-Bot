@@ -8,11 +8,14 @@ from models.field.exceptions import (
     FieldMaxLengthReached, FieldInvalidDefaultValue, FieldNoneNotAllowed
 )
 
-from ._test_val import TestFieldValueMixin
-from ._test_prop import TestFieldPropertyMixin
+from ._test_val import TestFieldValue
+from ._test_prop import TestFieldProperty
+
+__all__ = ["TestArrayFieldValueDefault", "TestArrayFieldValueAllowNone", "TestArrayFieldValueNoAutoCast",
+           "TestArrayFieldValueLengthLimited", "TestArrayFieldProperty", "TestArrayFieldExtra"]
 
 
-class TestArrayFieldValueDefault(TestFieldValueMixin):
+class TestArrayFieldValueDefault(TestFieldValue):
     def get_field(self) -> BaseField:
         return ArrayField("k", int)
 
@@ -92,7 +95,7 @@ class TestArrayFieldValueDefault(TestFieldValueMixin):
         )
 
 
-class TestArrayFieldValueAllowNone(TestFieldValueMixin):
+class TestArrayFieldValueAllowNone(TestFieldValue):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, allow_none=True)
 
@@ -173,7 +176,7 @@ class TestArrayFieldValueAllowNone(TestFieldValueMixin):
         )
 
 
-class TestArrayFieldValueNoAutoCast(TestFieldValueMixin):
+class TestArrayFieldValueNoAutoCast(TestFieldValue):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, auto_cast=False)
 
@@ -251,7 +254,7 @@ class TestArrayFieldValueNoAutoCast(TestFieldValueMixin):
         )
 
 
-class TestArrayFieldValueLengthLimited(TestFieldValueMixin):
+class TestArrayFieldValueLengthLimited(TestFieldValue):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, max_len=3)
 
@@ -293,7 +296,7 @@ class TestArrayFieldValueLengthLimited(TestFieldValueMixin):
         )
 
 
-class TestArrayFieldProperty(TestFieldPropertyMixin):
+class TestArrayFieldProperty(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:
         return ArrayField
 
@@ -347,5 +350,5 @@ class TestArrayFieldExtra(TestCase):
 
 
 # For single file testing, or these abstract classes will be instantiated, causing error
-del TestFieldValueMixin
-del TestFieldPropertyMixin
+del TestFieldValue
+del TestFieldProperty
