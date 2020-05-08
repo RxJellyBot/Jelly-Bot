@@ -84,6 +84,8 @@ jobs:
       DB_DROP: 'GitHubActionTest#${{ github.run_number }}'
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Drop database
         shell: cmd
         run: |
