@@ -53,7 +53,7 @@ class FieldCastingFailed(FieldException):
     def __init__(self, key: str, value: str, desired_type: type, *, exc: Exception = None):
         super().__init__(
             key,
-            error_msg=f"Auto casting failed. Value: ({value}) <{type(value)}> / Desired type: {desired_type} / "
+            error_msg=f"Auto casting failed. Value: ({value}) {type(value)} / Desired type: {desired_type} / "
                       f"Exception: {exc}")
 
 
@@ -80,6 +80,11 @@ class FieldInvalidUrl(FieldException):
 class FieldFlagNotFound(FieldException):
     def __init__(self, key: str, obj: Any, flag):
         super().__init__(key, error_msg=f"Object ({obj}) not found in the flag ({flag}).")
+
+
+class FieldFlagDefaultUndefined(FieldException):
+    def __init__(self, key: str, flag):
+        super().__init__(key, error_msg=f"Default value of the flag ({flag}) undefined.")
 
 
 class FieldRegexNotMatch(FieldException):

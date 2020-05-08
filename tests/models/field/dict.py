@@ -8,6 +8,9 @@ from models.field.exceptions import (
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
+__all__ = ["TestDictFieldProperty", "TestDictFieldValueAllowNone",
+           "TestDictFieldValueDefault", "TestDictFieldValueNoAutocast"]
+
 
 class TestDictFieldProperty(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:

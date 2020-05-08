@@ -29,6 +29,9 @@ def is_flag_double(cls):
 class FlagMixin:
     @classmethod
     def default(cls):
+        """
+        :raises ValueError: if not defined
+        """
         raise ValueError(f"Default in {cls.__qualname__} not implemented.")
 
 

@@ -20,6 +20,10 @@ class CodeDoubleEnum(FlagDoubleEnum):
     A = 1, "C", "E"
     B = 2, "D", "F"
 
+    @classmethod
+    def default(cls):
+        return CodeDoubleEnum.A
+
 
 class CodePrefixedDoubleEnum(FlagPrefixedDoubleEnum):
     @property
@@ -129,6 +133,10 @@ class TestFlagCodeEnum(TestCase):
         self.assertFalse(CodeEnum.contains("C"))
         self.assertFalse(CodeEnum.contains(False))
 
+    def test_enum_default(self):
+        with self.assertRaises(ValueError):
+            CodeEnum.default()
+
 
 class TestFlagSingleCodeEnum(TestCase):
     def test_enum_equals(self):
@@ -177,6 +185,10 @@ class TestFlagSingleCodeEnum(TestCase):
         self.assertFalse(CodeSingleEnum.contains(3))
         self.assertFalse(CodeSingleEnum.contains("C"))
         self.assertFalse(CodeSingleEnum.contains(False))
+
+    def test_enum_default(self):
+        with self.assertRaises(ValueError):
+            CodeSingleEnum.default()
 
 
 class TestFlagDoubleCodeEnum(TestCase):
@@ -228,6 +240,9 @@ class TestFlagDoubleCodeEnum(TestCase):
         self.assertFalse(CodeDoubleEnum.contains(3))
         self.assertFalse(CodeDoubleEnum.contains("C"))
         self.assertFalse(CodeDoubleEnum.contains(False))
+
+    def test_enum_default(self):
+        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.default())
 
 
 class TestFlagPrefixedDoubleCodeEnum(TestCase):
@@ -282,3 +297,7 @@ class TestFlagPrefixedDoubleCodeEnum(TestCase):
         self.assertFalse(CodePrefixedDoubleEnum.contains(3))
         self.assertFalse(CodePrefixedDoubleEnum.contains("C"))
         self.assertFalse(CodePrefixedDoubleEnum.contains(False))
+
+    def test_enum_default(self):
+        with self.assertRaises(ValueError):
+            CodePrefixedDoubleEnum.default()

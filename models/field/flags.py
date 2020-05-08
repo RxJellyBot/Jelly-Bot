@@ -1,14 +1,22 @@
 from abc import ABC
 
 from extutils.flags import FlagCodeEnum
-from flags import APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType, MessageType, BotFeature, \
-    PermissionLevel
+from flags import (
+    APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType,
+    MessageType, BotFeature, PermissionLevel
+)
 
 from .int import IntegerField
-from .exceptions import FieldFlagNotFound
+from .exceptions import FieldFlagNotFound, FieldFlagDefaultUndefined, FieldValueInvalid, FieldCastingFailed
 
 
 class FlagField(IntegerField, ABC):
+    """
+    Base class of the ``Flag`` field.
+
+    To use, create a new class using this class as the base class
+    and specify the class variable ``FLAG_TYPE``.
+    """
     FLAG_TYPE: FlagCodeEnum = None
 
     def __init__(self, key, **kwargs):
@@ -16,8 +24,12 @@ class FlagField(IntegerField, ABC):
         if self._type is None:
             raise ValueError("Need to specify the FLAG_TYPE class var.")
 
-        if "default" not in kwargs:
-            kwargs["default"] = self._type.default()
+        try:
+            if "default" not in kwargs:
+                kwargs["default"] = self._type.default()
+        except ValueError:
+            raise FieldFlagDefaultUndefined(key, self._type)
+
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
 
@@ -29,11 +41,21 @@ class FlagField(IntegerField, ABC):
 
     @property
     def expected_types(self):
-        return self._type
+        return self._type, int, str
 
     def _check_value_valid_not_none_(self, value):
-        if isinstance(value, int) and self._type.cast(value) not in self._type:
+        try:
+            self._type.cast(value)
+        except TypeError:
+            raise FieldValueInvalid(self.key, value)
+        except ValueError:
             raise FieldFlagNotFound(self.key, value, self._type)
+
+    def _cast_to_desired_type_(self, value):
+        try:
+            return self._type.cast(value)
+        except (TypeError, ValueError) as e:
+            raise FieldCastingFailed(self.key, value, self.desired_type, exc=e)
 
 
 class APICommandField(FlagField):

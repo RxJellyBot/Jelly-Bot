@@ -14,5 +14,5 @@ from .model import ModelField
 from .flags import (
     APICommandField, AutoReplyContentTypeField, MessageTypeField,
     PlatformField, ExecodeField, ExtraContentTypeField, BotFeatureField,
-    PermissionLevelField
+    PermissionLevelField, FlagField
 )

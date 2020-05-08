@@ -184,7 +184,7 @@ class BaseField(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def none_obj(cls):
+    def none_obj(cls) -> Any:
         raise ValueError(f"None object not implemented for {cls}.")
 
     def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
@@ -244,7 +244,7 @@ class BaseField(abc.ABC):
         else:
             return True
 
-    def cast_to_desired_type(self, value):
+    def cast_to_desired_type(self, value) -> Any:
         """
         Cast the value to the desired type.
 
@@ -260,7 +260,7 @@ class BaseField(abc.ABC):
         else:
             return self._cast_to_desired_type_(value)
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type_(self, value) -> Any:
         """
         Method hook to be called if `cast_to_desired_type()` is called
         and the given value type is not the desired type.
@@ -268,7 +268,7 @@ class BaseField(abc.ABC):
         return self.desired_type(value)
 
     @final
-    def new(self, val=None):
+    def new(self, val=None) -> FieldInstance:
         return self.instance_class(self, val or self.default_value)
 
     @final
