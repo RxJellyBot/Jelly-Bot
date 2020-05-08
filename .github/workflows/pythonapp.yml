@@ -95,3 +95,17 @@ jobs:
         shell: cmd
         run: |
           python mongodb/cli/drop_db.py %MONGO_DB%
+
+  cleanup:
+    runs-on: windows-latest
+
+    needs: [print-info, style-check, test]
+
+    env:
+      DB_DROP: 'GitHubActionTest#${{ github.run_number }}'
+
+    steps:
+      - name: Drop database
+        shell: cmd
+        run: |
+          python mongodb/cli/drop_db.py %DB_DROP%
