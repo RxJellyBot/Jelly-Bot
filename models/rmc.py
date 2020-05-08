@@ -1,6 +1,3 @@
-from datetime import timedelta
-
-from JellyBot.systemconfig import Bot
 from extutils.locales import LocaleInfo
 from extutils.dt import localtime
 from models import Model, ModelDefaultValueExt
@@ -12,13 +9,13 @@ class RemoteControlEntryModel(Model):
     LocaleCode = TextField("loc", allow_none=True)
     SourceChannelOid = ObjectIDField("src", default=ModelDefaultValueExt.Required)
     TargetChannelOid = ObjectIDField("dst", default=ModelDefaultValueExt.Required)
-    LastUsed = DateTimeField("exp", default=ModelDefaultValueExt.Required)
+    ExpiryUtc = DateTimeField("exp", default=ModelDefaultValueExt.Required)
 
     @property
     def expiry(self):
         tzinfo = LocaleInfo.get_tzinfo(self.locale_code)
 
-        return localtime(self.last_used, tzinfo) + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds)
+        return localtime(self.expiry_utc, tzinfo)
 
     @property
     def target_channel(self):

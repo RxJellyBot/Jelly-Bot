@@ -1,44 +1,41 @@
 import os
+import sys
 from abc import ABC
-from datetime import datetime
 
+import pymongo
 from django.test import TestCase
 
+from extutils import exec_timing_result
+from mongodb.factory import single_db_name
 
-class DatabaseTestMixin(TestCase, ABC):
-    _org_os_ = None
+mongo_url = os.environ["MONGO_URL"]
+if not mongo_url:
+    print("`MONGO_URL` not specified in environment variables while some test cases seem to need that.")
+    sys.exit(1)
+mongo_client = pymongo.MongoClient(mongo_url)
 
-    @classmethod
-    def setUpClass(cls):
-        cls._org_os_ = os.environ.get("MONGO_DB")
-        os.environ["MONGO_DB"] = f"Test @ {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')}"
 
-        cls.setUpDataClass()
+class TestDatabaseMixin(TestCase, ABC):
+    """
+    This class should be used if the test case will make use of database.
 
-    @classmethod
-    def tearDownClass(cls):
-        del os.environ["MONGO_DB"]
-        if cls._org_os_:
-            os.environ["MONGO_DB"] = cls._org_os_
+    This class sets a single database at the beginning of the test case and destroy them after each test case.
 
-        cls.tearDownDataClass()
+    This class also provided functionality to get the database ping.
+    """
+    # Original env var `MONGO_DB`
+    _os_mongo_db_ = None
 
     def setUp(self) -> None:
-        self.setUpData()
+        # Ensure the database is clear
+        if single_db_name:
+            mongo_client.drop_database(single_db_name)
 
     def tearDown(self) -> None:
-        self.tearDownData()
-
-    def setUpData(self):
-        pass
-
-    def tearDownData(self):
-        pass
+        # Drop the used database
+        if single_db_name:
+            mongo_client.drop_database(single_db_name)
 
     @classmethod
-    def setUpDataClass(cls):
-        pass
-
-    @classmethod
-    def tearDownDataClass(cls):
-        pass
+    def db_ping_ms(cls) -> float:
+        return exec_timing_result(mongo_client.get_database(single_db_name or "admin").command, "ping").execution_ms

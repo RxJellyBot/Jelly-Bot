@@ -7,12 +7,15 @@ import time
 from extutils import exec_timing_result
 from JellyBot.systemconfig import Bot
 from mongodb.factory import RemoteControlManager
-
-from tests.base import TestTimeComparisonMixin
+from tests.base import TestTimeComparisonMixin, TestDatabaseMixin
 
 EXPIRY_SEC_ORG = Bot.RemoteControl.IdleDeactivateSeconds
-EXPIRY_SEC = 1  # Recommended not to be < 1 because of the communication lag between the app and the database
-SLEEP_SEC = 0.01  # Must be shorter than `EXPIRY_SEC` or the entry will disappear before testing it
+
+# Get the database ping to count in the database communication lag while reducing the test speed
+# Cannot be too short because the actual code execution may not be completed before the expiry
+EXPIRY_SEC = max(0.3, TestDatabaseMixin.db_ping_ms() / 1000 * 1.5)
+# Must be shorter than `EXPIRY_SEC` or the entry will disappear before testing it
+SLEEP_SEC = EXPIRY_SEC * 0.1
 
 # region Test identifiers
 _now_ = datetime.now()
@@ -24,7 +27,7 @@ CID_DEST = ObjectId.from_datetime(_now_ + timedelta(days=1))
 # endregion
 
 
-class TestRemoteControlHolder(TestTimeComparisonMixin, TestCase):
+class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCase):
     @classmethod
     def setUpClass(cls):
         Bot.RemoteControl.IdleDeactivateSeconds = EXPIRY_SEC

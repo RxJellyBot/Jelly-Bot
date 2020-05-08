@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 from threading import Thread
 from typing import Type, Optional, Tuple, Union
@@ -25,6 +26,10 @@ from mongodb.factory.results import WriteOutcome
 single_db_name = os.environ.get("MONGO_DB")
 if single_db_name:
     SYSTEM.logger.info("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
+    SYSTEM.logger.info(f"MongoDB single database name: {single_db_name}")
+elif bool(int(os.environ.get("TEST", 0))):
+    single_db_name = f"Test-{time.time_ns() // 1000000}"
+    SYSTEM.logger.info("MongoDB single database activated because `TEST` has been set to true.")
     SYSTEM.logger.info(f"MongoDB single database name: {single_db_name}")
 
 
