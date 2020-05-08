@@ -1,11 +1,9 @@
 from typing import Type, Any, Tuple
 
 from extutils.color import Color, ColorFactory
-from field import BaseField
-from field.exceptions import FieldException
-from models.field import ColorField
+from models.field import ColorField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid
+    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid, FieldException
 )
 
 from ._test_val import TestFieldValue

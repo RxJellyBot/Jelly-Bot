@@ -1,10 +1,8 @@
 from typing import Type, Any, Tuple
 
-from field import BaseField
-from field.exceptions import FieldException
-from models.field import BooleanField
+from models.field import BooleanField, BaseField
 from models.field.exceptions import (
-    FieldNoneNotAllowed, FieldTypeMismatch
+    FieldException, FieldNoneNotAllowed, FieldTypeMismatch
 )
 
 from ._test_val import TestFieldValue
