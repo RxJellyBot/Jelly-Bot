@@ -9,6 +9,9 @@ from models.field.exceptions import (
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
+__all__ = ["TestColorFieldProperty", "TestColorFieldValueAllowNone",
+           "TestColorFieldValueDefault", "TestColorFieldValueNoAutoCast"]
+
 
 class TestColorFieldProperty(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:

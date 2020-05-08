@@ -86,7 +86,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Drop database
+      - name: Install pymongo
+        run: |
+          pip install pymongo
+
+      - name: Drop MongoDB database
         shell: cmd
         run: |
           python mongodb/cli/drop_db.py %DB_DROP%
