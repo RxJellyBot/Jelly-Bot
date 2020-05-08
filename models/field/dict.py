@@ -14,4 +14,4 @@ class DictionaryField(BaseField):
 
     @property
     def expected_types(self):
-        return dict
+        return dict,
