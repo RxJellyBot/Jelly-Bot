@@ -11,15 +11,17 @@ from .exceptions import FieldFlagNotFound
 class FlagField(IntegerField, ABC):
     FLAG_TYPE: FlagCodeEnum = None
 
-    def __init__(self, key, default=None, allow_none=False, auto_cast=True):
+    def __init__(self, key, **kwargs):
         self._type = self.__class__.FLAG_TYPE
         if self._type is None:
             raise ValueError("Need to specify the FLAG_TYPE class var.")
 
-        if default is None:
-            default = self._type.default()
+        if "default" not in kwargs:
+            kwargs["default"] = self._type.default()
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
 
-        super().__init__(key, default, allow_none, auto_cast=auto_cast)
+        super().__init__(key, **kwargs)
 
     @classmethod
     def none_obj(cls):

@@ -10,10 +10,11 @@ from .exceptions import (
 
 
 class ArrayField(BaseField):
-    def __init__(self, key, elem_type: type, default=None, allow_none=False, max_len=0,
-                 readonly=False, auto_cast=True, allow_empty=True, stores_uid=False, inst_cls=None):
-        if not inst_cls:
-            inst_cls = ArrayFieldInstance
+    def __init__(self, key, elem_type: type, *, max_len=0, allow_empty=True, **kwargs):
+        if "inst_cls" not in kwargs:
+            kwargs["inst_cls"] = ArrayFieldInstance
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
 
         # Check max length
         if max_len < 0:
@@ -24,8 +25,7 @@ class ArrayField(BaseField):
         self._elem_type = elem_type
         self._max_len = max_len
         self._allow_empty = allow_empty
-        super().__init__(key, default, allow_none=allow_none, readonly=readonly,
-                         auto_cast=auto_cast, inst_cls=inst_cls, stores_uid=stores_uid)
+        super().__init__(key, **kwargs)
 
     def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
         # Check emptiness
@@ -101,10 +101,11 @@ class ArrayField(BaseField):
 
 
 class ModelArrayField(ArrayField):
-    def __init__(self, key, model_type, default=None, allow_none=False, max_len=0,
-                 readonly=False, auto_cast=True, allow_empty=True, stores_uid=False):
-        super().__init__(key, model_type, default, allow_none, max_len, readonly, auto_cast, allow_empty, stores_uid,
-                         inst_cls=ModelArrayFieldInstanceFactory.generate(model_type))
+    def __init__(self, key, model_type, **kwargs):
+        if "inst_cls" not in kwargs:
+            kwargs["inst_cls"] = ModelArrayFieldInstanceFactory.generate(model_type)
+
+        super().__init__(key, model_type, **kwargs)
         self._model_type = model_type
 
 

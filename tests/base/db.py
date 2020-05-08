@@ -1,17 +1,17 @@
 import os
-from abc import ABC, abstractmethod
+from abc import ABC
 from datetime import datetime
 
 from django.test import TestCase
 
 
-class TestWithDatabase(TestCase, ABC):
+class DatabaseTestMixin(TestCase, ABC):
     _org_os_ = None
 
     @classmethod
     def setUpClass(cls):
         cls._org_os_ = os.environ.get("MONGO_DB")
-        os.environ["MONGO_DB"] = f"Test{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        os.environ["MONGO_DB"] = f"Test @ {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')}"
 
         cls.setUpDataClass()
 
@@ -29,20 +29,16 @@ class TestWithDatabase(TestCase, ABC):
     def tearDown(self) -> None:
         self.tearDownData()
 
-    @abstractmethod
     def setUpData(self):
-        raise NotImplementedError()
+        pass
 
-    @abstractmethod
     def tearDownData(self):
-        raise NotImplementedError()
+        pass
 
     @classmethod
-    @abstractmethod
     def setUpDataClass(cls):
-        raise NotImplementedError()
+        pass
 
     @classmethod
-    @abstractmethod
     def tearDownDataClass(cls):
-        raise NotImplementedError()
+        pass

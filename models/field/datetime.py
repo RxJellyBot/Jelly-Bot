@@ -9,9 +9,13 @@ from .exceptions import FieldValueInvalid
 
 
 class DateTimeField(BaseField):
-    def __init__(self, key, default=None, allow_none=False, readonly=False):
-        super().__init__(key, default, allow_none, readonly=readonly,
-                         inst_cls=DateTimeFieldInstance)
+    def __init__(self, key, **kwargs):
+        if "inst_cls" not in kwargs:
+            kwargs["inst_cls"] = DateTimeFieldInstance
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+
+        super().__init__(key, **kwargs)
 
     @classmethod
     def none_obj(cls):

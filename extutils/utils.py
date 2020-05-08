@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def cast_keep_none(obj, dest_type: type):
-    """Cast `obj` to `dest_type`. If `obj` is `None`, let it be `None`."""
+    """Cast ``obj`` to ``dest_type``. If ``obj`` is ``None``, let it be ``None``."""
     if obj is not None:
         if issubclass(dest_type, bool):
             return dest_type(int(obj))
@@ -20,11 +20,11 @@ def cast_keep_none(obj, dest_type: type):
 
 def cast_iterable(iterable: Union[List, Tuple], dest_type):
     """
-    Cast `iterable` to List[`dest_type`].
+    Cast ``iterable`` to ``List[dest_type]``.
 
     Can be performed on a nested list.
 
-    If `iterable` is not `list` or `tuple`, then directly cast `iterable` to `dest_type`.
+    If ``iterable`` is not :class:`list` or :class:`tuple`, then directly cast ``iterable`` to ``dest_type``.
     """
     if isinstance(iterable, (list, tuple)):
         ret = []
@@ -56,19 +56,19 @@ def safe_cast(obj, dest_type: type):
 
 def all_lower(o: [str, tuple, list, set, dict]):
     """
-    Will NOT modify the `o` itself.
+    Will NOT modify the ``o`` itself.
 
     Do the following corresponding to its type:
 
-    `str`
-        > return the lower case of `str`.
-    `tuple`, `list`, `set`
+    :class:`str`
+        > return the lower case of :class:`str`.
+    :class:`tuple`, :class:`list`, :class:`set`
         > return the corresponding data structure
-        which every element with a `str` content will be lowered.
-    `dict`
+        which every element with a :class:`str` content will be lowered.
+    :class:`dict`
         > return lowered case of data which is the value of a pair.
     (Not matching the above)
-        > return the original `o`
+        > return the original ``o``
     """
     if isinstance(o, str):
         return o.lower()
@@ -100,19 +100,19 @@ def to_camel_case(s: str):
 
 def split_fill(s: str, n: int, *, delim="", fill=None):
     """
-    Split the string `s` with delimeter `delim` into pieces which minimum is `n`.
+    Split the string ``s`` with delimeter ``delim`` into pieces which minimum is ``n``.
 
-    If splitted element count is < `n`.
-        > Fill the rest of the count with `fill`
-    If splitted element count is > `n`.
-        > Truncate the splitted element list to `n` elements.
+    If splitted element count is < ``n``.
+        > Fill the rest of the count with ``fill``
+    If splitted element count is > ``n``.
+        > Truncate the splitted element list to ``n`` elements.
     """
     return ((s.split(delim) if s else []) + [fill] * n)[:n]
 
 
 def str_reduce_length(s: str, max_: int, *, escape_html=False, suffix: str = "..."):
     """
-    Reduce the length of `s` to `max_` including the length of `suffix`.
+    Reduce the length of ``s`` to ``max_`` including the length of ``suffix``.
 
     HTML escape performed after the length reduction.
     :exception ValueError: suffix length > max content length
@@ -130,7 +130,7 @@ def str_reduce_length(s: str, max_: int, *, escape_html=False, suffix: str = "..
 
 
 def list_insert_in_between(lst: list, insert_obj):
-    """Insert `insert_obj` as an element between every elements of the `lst`."""
+    """Insert ``insert_obj`` as an element between every elements of the ``lst``."""
     ret = lst.copy()
 
     for i in range(1, len(ret) * 2 - 2, 2):
@@ -152,9 +152,9 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
         Generator[Tuple[Union[int, str], Any], None, None]:
     # noinspection PyUnresolvedReferences
     """
-    Generates the ranking and the corresponding data in `iterable_sorted`.
+    Generates the ranking and the corresponding data in ``iterable_sorted``.
 
-    If `t_prefix` is `True`, the ranking
+    If ``t_prefix`` is ``True``, the ranking
 
     Example:
 
@@ -207,7 +207,7 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
 
 
 def dt_to_objectid(dt: Optional[datetime]):
-    """Parse `dt` to `ObjectId`. `None` if failed to convert."""
+    """Parse ``dt`` to :class:`ObjectId`. ``None`` if failed to convert."""
     try:
         return ObjectId.from_datetime(dt)
     except Exception:

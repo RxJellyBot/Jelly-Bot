@@ -75,7 +75,7 @@ class AutoReplyModuleModel(Model):
     key_kw = "kw"
 
     # Main
-    Keyword = ModelField(key_kw, default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
+    Keyword = ModelField(key_kw, AutoReplyContentModel, default=ModelDefaultValueExt.Required)
     Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
                                 max_len=systemconfig.AutoReply.MaxResponses)
 
@@ -140,8 +140,8 @@ class AutoReplyModuleModel(Model):
 
 
 class AutoReplyModuleExecodeModel(Model):
-    Keyword = ModelField(AutoReplyModuleModel.key_kw,
-                         default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
+    Keyword = ModelField(AutoReplyModuleModel.key_kw, AutoReplyContentModel,
+                         default=ModelDefaultValueExt.Required)
     Responses = ArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
                            max_len=systemconfig.AutoReply.MaxResponses)
     Pinned = BooleanField("p", readonly=True)

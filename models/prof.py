@@ -12,7 +12,7 @@ from models.field import (
 
 class ChannelProfileModel(Model):
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # !!! Check `ProfileManager.process_profile_kwargs` when changing the variable name of this class. !!!
+    # !!! Check `ProfileManager.process_create_profile_kwargs` when changing the variable name of this class. !!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
     Name = TextField("n", default="-", must_have_content=True)

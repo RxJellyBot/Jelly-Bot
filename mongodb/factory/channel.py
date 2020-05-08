@@ -60,7 +60,7 @@ class ChannelManager(BaseCollection):
     def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
             -> ChannelChangeNameResult:
         """
-        Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
+        Update the channel name for the user. If ``new_name`` is falsy, then the user-specific name will be removed.
         """
         ex = None
         if new_name:

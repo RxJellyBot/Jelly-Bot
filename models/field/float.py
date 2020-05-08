@@ -2,8 +2,11 @@ from ._base import BaseField
 
 
 class FloatField(BaseField):
-    def __init__(self, key, default=None, allow_none=False, readonly=False, auto_cast=True):
-        super().__init__(key, default, allow_none, readonly=readonly, auto_cast=auto_cast)
+    def __init__(self, key, **kwargs):
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+
+        super().__init__(key, **kwargs)
 
     @classmethod
     def none_obj(cls):

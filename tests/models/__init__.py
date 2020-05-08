@@ -1,2 +1,2 @@
 from .base import TestModel
-from .fields import *  # NOQA
+from .field import *  # NOQA

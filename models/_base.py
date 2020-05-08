@@ -28,10 +28,16 @@ class Model(MutableMapping, abc.ABC):
 
     def __init__(self, from_db=False, **kwargs):
         """
-        :param from_db: If the data of `kwargs` comes from the database.
-        :param kwargs: Example:
-                        Field Keys: Model(FieldKey1=Thing, FieldKey2=Thing...)
-                        Json Keys: Model(json_key1=Thing, json_key2=Thing...)
+        Field Keys
+
+        >>> Model(FieldKey1="Thing", FieldKey2="Thing"...)
+
+        Json keys:
+
+        >>> Model(json_key1="Thing", json_key2="Thing"...)
+
+        :param from_db: If the data of `kwargs` comes from the database
+        :param kwargs: keyword arguments to initialize
         """
         self.__dict__["_dict_"] = {}
 
@@ -305,7 +311,7 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def json_key_to_field(cls, json_key) -> Optional[str]:
-        """Get the corresponding field key using the provided json key. Return `None` if not found."""
+        """Get the corresponding field key using the provided json key. Return ``None`` if not found."""
         if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
             cls._init_cache_to_field_()
 
@@ -313,7 +319,7 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def field_to_json_key(cls, field_key) -> Optional[str]:
-        """Get the corresponding json key using the provided field key. Return `None` if not found."""
+        """Get the corresponding json key using the provided field key. Return ``None`` if not found."""
         if not hasattr(cls, "_CacheToField") or cls.__qualname__ not in cls._CacheToField:
             cls._init_cache_to_field_()
 
@@ -339,9 +345,9 @@ class Model(MutableMapping, abc.ABC):
     @classmethod
     def cast_model(cls, obj):
         """
-        Cast `obj` if it is not `None` and not the instance of `cls`. Otherwise, directly return `obj`.
+        Cast ``obj`` if it is not ``None`` and not the instance of ``cls``. Otherwise, directly return ``obj``.
 
-        `obj` can be a `dict` returned directly from `PyMongo`.
+        ``obj`` can be a :class:`dict` returned directly from any ``PyMongo`` data acquiring operations.
         """
         if obj is not None and not isinstance(obj, cls):
             return cls(**obj, from_db=True)

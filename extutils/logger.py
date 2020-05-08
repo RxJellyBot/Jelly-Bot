@@ -75,11 +75,11 @@ class LoggerSkeleton:
     A logger skeleton class to manage a logger.
 
     The logger's level is determined in the following order:
-        > Level specified in env var (`LOGGER`)
+        > Level specified in env var ``LOGGER``
             - see `note.md`
-        > `DEBUG` env var
+        > ``DEBUG`` env var
             - `logging.DEBUG` if set to 1
-        > Log level specified in env var (`LOG_LEVEL`)
+        > Log level specified in env var ``LOG_LEVEL``
             - see `note.md`
     If none of the above matches. then the default level will be set to `logging.WARNING`.
     """

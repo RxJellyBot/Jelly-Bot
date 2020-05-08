@@ -5,8 +5,11 @@ from .exceptions import FieldValueInvalid, FieldTypeMismatch
 
 
 class ColorField(BaseField):
-    def __init__(self, key, allow_none=False):
-        super().__init__(key, allow_none=allow_none)
+    def __init__(self, key, **kwargs):
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+
+        super().__init__(key, **kwargs)
 
     @property
     def expected_types(self):

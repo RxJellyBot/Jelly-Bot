@@ -148,7 +148,7 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
 
 
 class NonSafeDataTypeConverter(GeneralDataTypeConverter):
-    """Raises `TypeCastingFailed` on exception occurred during casting."""
+    """Raises :class:`TypeCastingFailed` on exception occurred during casting."""
     valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod

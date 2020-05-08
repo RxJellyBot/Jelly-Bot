@@ -1,6 +1,6 @@
 import abc
 from collections.abc import Iterable
-from typing import Tuple
+from typing import Tuple, Type, Any
 
 from bson import ObjectId
 from pymongo.collection import Collection
@@ -14,6 +14,7 @@ from ._default import ModelDefaultValueExt
 
 
 class FieldInstance:
+    """Field instance class. This class actually stores the value."""
     def __init__(self, base, value=None, skip_type_check=True):
         self._base = base
         self._value = None  # Initialize an empty field
@@ -63,35 +64,76 @@ class FieldInstance:
 
 
 class BaseField(abc.ABC):
-    def __init__(self, key, default=None, allow_none=True, readonly=False, auto_cast=True, inst_cls=FieldInstance,
-                 stores_uid=False):
-        if not issubclass(inst_cls, FieldInstance):
-            raise FieldInstanceClassInvalid(key, inst_cls)
+    """
+    Field class. This class acts as a template of each field for a :class:`models.Model`.
+
+    Default properties if not specified on construction
+        - ``default`` - ``None``
+        - ``allow_none`` - ``True``
+        - ``readonly`` - ``False``
+        - ``auto_cast`` - ``True``
+        - ``inst_cls`` - :class:`FieldInstance`
+        - ``stores_uid`` - ``False``
+    """
+
+    def __init__(self, key: str, *, default: Any = None, allow_none: bool = True, readonly: bool = False,
+                 auto_cast: bool = True, inst_cls: Type[FieldInstance] = FieldInstance, stores_uid: bool = False):
+        """
+        Initialize a field.
+
+        Default values
+            - ``default`` - ``None``
+            - ``allow_none`` - ``True``
+            - ``readonly`` - ``False``
+            - ``auto_cast`` - ``True``
+            - ``inst_cls`` - :class:`FieldInstance`
+            - ``stores_uid`` - ``False``
+
+        :param key: key of the field (will be used in database)
+        :param default: default value of the field
+        :param allow_none: if the field is allowed to store `None`
+        :param readonly: if the field is readonly
+        :param auto_cast: if the field will autocast the value to be stored
+        :param inst_cls: `FieldInstance` class to be used
+        :param stores_uid: if the field will store UID
+        """
+        # region Setting field properties
+        self._allow_none = allow_none
+        self._read_only = readonly
+        self._key = key
+        self._auto_cast = auto_cast
+        # endregion
+
+        # region Setting stores UID
+        self._stores_uid = stores_uid
+        if stores_uid and not self.replace_uid_implemented:
+            raise RuntimeError(f"replace_uid function not implemented while this field stores user id. "
+                               f"Please implement the function. ({self.__class__.__qualname__})\n"
+                               f"Override the property `replace_uid_implemented` if the function is implemented.")
+        # endregion
+
+        # region Setting default value
+        if default is not None and not ModelDefaultValueExt.is_default_val_ext(default):
+            try:
+                self.check_value_valid(default)
+            except Exception as e:
+                raise FieldInvalidDefaultValue(self.key, default, exc=e)
 
         if default is None and not allow_none:
             self._default_value = self.none_obj()
         else:
             self._default_value = default
+        # endregion
 
-        self._inst_cls: type(FieldInstance) = inst_cls or FieldInstance
-        self._allow_none = allow_none
-        self._read_only = readonly
-        self._key = key
-        self._auto_cast = auto_cast
-        self._stores_uid = stores_uid
-
-        if stores_uid and not self.replace_uid_implemented:
-            raise RuntimeError(f"replace_uid function not implemented while this field stores user id. "
-                               f"Please implement the function. ({self.__class__.__qualname__})")
-
-        if default is not None and not ModelDefaultValueExt.is_default_val_ext(default):
-            try:
-                self.check_value_valid(default)
-            except Exception as e:
-                raise FieldInvalidDefaultValue(key, default, exc=e)
+        # region Setting instance class
+        if not issubclass(inst_cls, FieldInstance):
+            raise FieldInstanceClassInvalid(key, inst_cls)
+        self._inst_cls: Type[FieldInstance] = inst_cls or FieldInstance
+        # endregion
 
     @property
     def replace_uid_implemented(self) -> bool:
+        """The value should be overrided if `replace_uid()` is implemented."""
         return False
 
     def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
@@ -138,15 +180,16 @@ class BaseField(abc.ABC):
         return self._stores_uid
 
     @classmethod
+    @abc.abstractmethod
     def none_obj(cls):
         raise ValueError(f"None object not implemented for {cls}.")
 
     def _check_type_matched_not_none_(self, value, *, pass_on_castable=False):
-        """Hook of value type checking when the value is not `None` and not a extended default value."""
+        """Hook of value type checking when the value is not ``None`` and not a extended default value."""
         pass
 
     def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
-        """Hook of value validity checking when the value is not `None` and not a extended default value."""
+        """Hook of value validity checking when the value is not ``None`` and not a extended default value."""
         pass
 
     def check_type_matched(self, value, *, pass_on_castable=False):
@@ -229,15 +272,9 @@ class BaseField(abc.ABC):
 
     def is_empty(self, value) -> bool:
         """
-        Check if the value is an empty value.
-
-        If `None` is allowed, it will check if the value is `None`.
-        If `None` is not allowed, it will check if the value is either the none object or is `None`.
+        Check if the value is an empty value (either is ``None`` or ``none_obj``.
         """
-        if self.allow_none:
-            return value is None
-        else:
-            return value == self.none_obj() or value is None
+        return value is None or value == self.none_obj()
 
     def __repr__(self):
         return f"{self.__class__.__qualname__} {' (Read-only)' if self._read_only else ''} <{self._key}>"

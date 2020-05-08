@@ -167,8 +167,8 @@ class FlagEnumMixin:
     @classmethod
     def cast(cls, item: Union[str, int], *, silent_fail=False):
         """
-        Cast `item` to be the enum.
-        `item` can only be either `str` or `int`.
+        Cast ``item`` to the corresponding :class:`FlagEnumMixin`.
+        ``item`` can only be either :class:`str` or :class:`int`.
 
         :param item: The item to be casted. Can be the name or the code of the enum.
         :param silent_fail: Indicate if this function should throw an error if casting failed.

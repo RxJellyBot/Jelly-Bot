@@ -7,12 +7,15 @@ from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMat
 
 
 class TextField(BaseField):
-    def __init__(self, key, default=None, regex: str = None, allow_none=False, maxlen=2000,
-                 must_have_content=False, auto_cast=True):
+    def __init__(self, key, *, regex: str = None, maxlen=2000, must_have_content=False, **kwargs):
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+
         self._regex = regex
         self._maxlen = maxlen
         self._must_have_content = must_have_content
-        super().__init__(key, default, allow_none, auto_cast=auto_cast)
+
+        super().__init__(key, **kwargs)
 
     def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
         # Length check
@@ -37,8 +40,19 @@ class TextField(BaseField):
 
 
 class UrlField(BaseField):
-    def __init__(self, key, default=None, allow_none=False):
-        super().__init__(key, default, allow_none, readonly=True, auto_cast=True)
+    def __init__(self, key, **kwargs):
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+        if "readonly" not in kwargs:
+            kwargs["readonly"] = True
+        if "auto_cast" not in kwargs:
+            kwargs["auto_cast"] = True
+
+        super().__init__(key, **kwargs)
+
+    @classmethod
+    def none_obj(cls):
+        return ""
 
     @property
     def expected_types(self):

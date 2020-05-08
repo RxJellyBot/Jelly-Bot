@@ -23,9 +23,9 @@ class HandledMessageEvent(ABC):
     @staticmethod
     def auto_reply_model_to_handled(response_model: AutoReplyContentModel, bypass_ml_check: bool):
         """
-        Attempt to cast `AutoReplyContentModel` to be any the corresponding `HandledMessageEvent`.
+        Attempt to cast :class:`AutoReplyContentModel` to be any the corresponding :class:`HandledMessageEvent`.
 
-        :return: Casted `HandledMessageEvent`. Return `None` if no corresponding `HandledMessageEvent`.
+        :return: casted `HandledMessageEvent`. `None` if no corresponding one.
         """
         valid = \
             AutoReplyValidators.is_valid_content(response_model.content_type, response_model.content, online_check=True)
@@ -50,7 +50,7 @@ class HandledMessageEvent(ABC):
 class HandledMessageEventText(HandledMessageEvent):
     def __init__(self, content: str, bypass_multiline_check: bool = False, force_extra: bool = False):
         """
-        `bypass_multiline_check` | `force_extra` | Resulting action
+        ``bypass_multiline_check`` | ``force_extra`` | Resulting action
         F | F | Checking multiline, if over length then extra, else normal
         F | T | Content will be stored as extra
         T | F | Content will be stored as normal
