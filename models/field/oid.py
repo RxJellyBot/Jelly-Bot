@@ -16,7 +16,7 @@ class ObjectIDField(BaseField):
 
         super().__init__(key or OID_KEY, **kwargs)
 
-    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+    def _check_value_valid_not_none_(self, value):
         if not self.allow_none and not ObjectId.is_valid(value):
             raise FieldValueInvalid(self.key, value)
 

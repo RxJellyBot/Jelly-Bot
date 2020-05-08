@@ -38,6 +38,7 @@ class BaseDataTypeConverter(ABC):
     @abstractmethod
     def _convert_(cls, data: Any, type_annt):
         # Terminate if the type is already valid
+        # type annotation cannot be used with instance checks (generic may be the type annotation)
         if type(data) == type_annt:
             return data
 

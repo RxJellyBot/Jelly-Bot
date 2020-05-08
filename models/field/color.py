@@ -19,7 +19,7 @@ class ColorField(BaseField):
     def none_obj(cls):
         return ColorFactory.DEFAULT
 
-    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+    def _check_value_valid_not_none_(self, value):
         if isinstance(value, int):
             if Color.color_num_valid(value):
                 return

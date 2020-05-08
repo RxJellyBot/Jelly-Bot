@@ -1,8 +1,7 @@
-
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 
-from extutils.dt import is_tz_naive, parse_to_dt
+from extutils.dt import is_tz_naive, parse_to_dt, make_tz_aware
 
 from ._base import BaseField, FieldInstance
 from .exceptions import FieldValueInvalid
@@ -19,11 +18,19 @@ class DateTimeField(BaseField):
 
     @classmethod
     def none_obj(cls):
-        return datetime.min.replace(tzinfo=timezone.utc)
+        return make_tz_aware(datetime.min)
 
-    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+    def _check_value_valid_not_none_(self, value):
         if isinstance(value, str) and parse_to_dt(value) is None:
             raise FieldValueInvalid(self.key, value)
+
+    def cast_to_desired_type(self, value):
+        ret = super().cast_to_desired_type(value)
+
+        if isinstance(ret, datetime) and is_tz_naive(ret):
+            ret = make_tz_aware(ret)
+
+        return ret
 
     def _cast_to_desired_type_(self, value):
         if isinstance(value, str):
@@ -37,10 +44,11 @@ class DateTimeField(BaseField):
 
 
 class DateTimeFieldInstance(FieldInstance):
-    def force_set(self, value: Union[datetime, str], skip_type_check=False):
-        super().force_set(value, skip_type_check=skip_type_check)
+    def force_set(self, value: Union[datetime, str]):
+        super().force_set(value)
 
-        # Post process to ensure tz-aware after setting the value
-        # Value may be `None` when allowed, so checking `None` here
-        if self.value is not None and is_tz_naive(self.value):
-            self.value = value.replace(tzinfo=timezone.utc)
+        # - Post process to ensure tz-aware after setting the value
+        # - Checking `None here because `value` could be `None` when allowed
+        # - Type checking performed to make sure that the timezone replacement only applied on `datetime`
+        if self.value is not None and isinstance(self.value, datetime) and is_tz_naive(self.value):
+            self.value = make_tz_aware(self.value)

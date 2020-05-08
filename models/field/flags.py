@@ -31,11 +31,7 @@ class FlagField(IntegerField, ABC):
     def expected_types(self):
         return self._type
 
-    @property
-    def desired_type(self):
-        return self._type
-
-    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
+    def _check_value_valid_not_none_(self, value):
         if isinstance(value, int) and self._type.cast(value) not in self._type:
             raise FieldFlagNotFound(self.key, value, self._type)
 

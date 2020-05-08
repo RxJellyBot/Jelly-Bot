@@ -13,15 +13,15 @@ def now_utc_aware():
     return datetime.utcnow().replace(tzinfo=pytz.UTC)
 
 
-def localtime(dt=None, tz=None):
+def localtime(dt: datetime = None, tz: timezone = None):
     return timezone.localtime(dt, tz)
 
 
-def make_tz_aware(dt, tz=None):
+def make_tz_aware(dt: datetime, tz: timezone = None):
     return timezone.make_aware(dt, tz)
 
 
-def is_tz_naive(dt) -> bool:
+def is_tz_naive(dt: datetime) -> bool:
     return timezone.is_naive(dt)
 
 

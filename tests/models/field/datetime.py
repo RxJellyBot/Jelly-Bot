@@ -1,119 +1,204 @@
-from datetime import datetime, timezone
+from datetime import datetime as dt, timezone as tz
+from typing import Type, Any, Tuple
 
-from django.test import TestCase
-
-from models.field import DateTimeField
+from models.field import DateTimeField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldReadOnly,
-    FieldInvalidDefaultValue, FieldNoneNotAllowed
+    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid, FieldException
 )
 
+from ._test_val import TestFieldValue
+from ._test_prop import TestFieldProperty
 
-class TestDatetimeField(TestCase):
-    def test_properties(self):
-        f = DateTimeField("af")
-        self.assertEquals("af", f.key)
-        self.assertTrue(f.auto_cast)
-        self.assertFalse(f.read_only)
-        self.assertFalse(f.stores_uid)
-        self.assertEquals(datetime.min.replace(tzinfo=timezone.utc), f.default_value)
-        self.assertEquals(datetime, f.desired_type)
-        self.assertTupleEqual((datetime, str), f.expected_types)
-        self.assertEquals(
-            datetime(2020, 7, 2, 15, 0, 0, 0, tzinfo=timezone.utc),
-            f.cast_to_desired_type("2020-07-02 15:00+0"))
-        with self.assertRaises(FieldNoneNotAllowed):
-            f.cast_to_desired_type(None)
-        self.assertEquals(datetime.min.replace(tzinfo=timezone.utc), f.none_obj())
-        self.assertTrue(f.is_empty(None))
-        self.assertTrue(f.is_empty(datetime.min.replace(tzinfo=timezone.utc)))
-        self.assertFalse(f.is_empty(datetime(2020, 7, 2, 15, 0, 0, 0, tzinfo=timezone.utc)))
 
-        self.assertFalse(f.allow_none)
-        self.assertFalse(f.is_type_matched(None))
-        self.assertFalse(f.is_value_valid(None))
-        self.assertTrue(f.is_type_matched("XSX"))
-        self.assertFalse(f.is_value_valid("XSX"))
-        self.assertTrue(f.is_value_valid("2020-07-02 15:00+7"))
+class TestDatetimeFieldProperty(TestFieldProperty):
+    def get_field_class(self) -> Type[BaseField]:
+        return DateTimeField
 
-    def test_properties_readonly(self):
-        f = DateTimeField("af", readonly=False)
-        self.assertFalse(f.read_only)
+    def valid_not_none_value(self) -> Any:
+        return dt.now().replace(tzinfo=tz.utc)
 
-        fi = f.new()
-        fi.value = datetime(2020, 7, 2, 15, 0, 0, 0, tzinfo=timezone.utc)
+    def expected_none_object(self) -> Any:
+        return dt.min.replace(tzinfo=tz.utc)
 
-        f = DateTimeField("af", readonly=True)
-        self.assertTrue(f.read_only)
-
-        fi = f.new()
-        with self.assertRaises(FieldReadOnly):
-            fi.value = datetime(2020, 7, 2, 15, 0, 0, 0, tzinfo=timezone.utc)
-
-    def test_properties_default(self):
-        test_data = (
-            (datetime(2020, 5, 2, 15, 0, 0), datetime(2020, 5, 2, 15, 0, 0, tzinfo=timezone.utc)),
-            ("2020-05-02 15:00+0", datetime(2020, 5, 2, 15, 0, 0, tzinfo=timezone.utc))
+    def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
         )
 
-        for default_val, default_expected in test_data:
-            with self.subTest(default_val=default_val):
-                f = DateTimeField("af", default=default_val)
-                fi = f.new()
+    def get_invalid_default_values(self) -> Tuple[Any, ...]:
+        return "XSX", True, 7
 
-                self.assertEquals(default_expected, fi.value)
+    def get_expected_types(self) -> Tuple[Type[Any], ...]:
+        return dt, str
 
-    def test_properties_allow_none(self):
-        f = DateTimeField("af", allow_none=True)
-        self.assertTrue(f.allow_none)
-        self.assertTrue(f.is_type_matched(None))
-        self.assertTrue(f.is_value_valid(None))
-        self.assertTrue(f.is_type_matched(datetime(2020, 5, 2, 15, 0, 0)))
-        self.assertTrue(f.is_value_valid(datetime(2020, 5, 2, 15, 0, 0)))
-        self.assertTrue(f.is_type_matched("XSX"))
-        self.assertFalse(f.is_value_valid("XSX"))
-        self.assertTrue(f.is_value_valid("2020-07-02 15:00+7"))
+    def get_desired_type(self) -> Type[Any]:
+        return dt
 
-    def test_field_instance(self):
-        f = DateTimeField("af")
-        fi = f.new()
 
-        fi.value = datetime(2020, 5, 2, 15, 0, 0)
-        self.assertEqual(datetime(2020, 5, 2, 15, 0, 0, tzinfo=timezone.utc), fi.value)
-        fi.value = "2020-07-02 15:00+0"
-        self.assertEqual(datetime(2020, 7, 2, 15, 0, 0, tzinfo=timezone.utc), fi.value)
-        with self.assertRaises(FieldNoneNotAllowed):
-            fi.value = None
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = 7
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = True
+class TestDatetimeFieldValueDefault(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return DateTimeField("k")
 
-    def test_field_instance_readonly(self):
-        f = DateTimeField("af", readonly=True)
-        fi = f.new()
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", True),
+            (True, False),
+            (7, False)
+        )
 
-        with self.assertRaises(FieldReadOnly):
-            fi.value = datetime(2020, 5, 2, 15, 0, 0)
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", False),
+            (True, False),
+            (7, False)
+        )
 
-    def test_field_instance_allow_none(self):
-        f = DateTimeField("af", allow_none=True)
-        fi = f.new()
+    def is_auto_cast(self) -> bool:
+        return True
 
-        fi.value = None
-        self.assertIsNone(fi.value)
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
 
-    def test_field_instance_not_allow_none(self):
-        f = DateTimeField("af", allow_none=False)
-        fi = f.new()
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
 
-        with self.assertRaises(FieldNoneNotAllowed):
-            fi.value = None
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            ("XSX", FieldValueInvalid),
+            (True, FieldTypeMismatch),
+            (7, FieldTypeMismatch),
+            (None, FieldNoneNotAllowed)
+        )
 
-    def test_field_invalid_default(self):
-        with self.assertRaises(FieldInvalidDefaultValue):
-            DateTimeField("b", default=True)
-        with self.assertRaises(FieldInvalidDefaultValue):
-            DateTimeField("b", default=7)
-        with self.assertRaises(FieldInvalidDefaultValue):
-            DateTimeField("b", default="XXX")
+
+class TestDatetimeFieldValueNoAutoCast(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return DateTimeField("k", auto_cast=False)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", True),
+            (True, False),
+            (7, False)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", False),
+            (True, False),
+            (7, False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return False
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", "2020-05-07 8:00"),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            ("XSX", FieldValueInvalid),
+            (True, FieldTypeMismatch),
+            (7, FieldTypeMismatch),
+            (None, FieldNoneNotAllowed)
+        )
+
+
+class TestDatetimeFieldValueAllowNone(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return DateTimeField("k", allow_none=True)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", True),
+            (True, False),
+            (7, False)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            ("2020-05-07 8:00", True),
+            (dt(2020, 5, 7, 8, 0), True),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            ("XSX", False),
+            (True, False),
+            (7, False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, None),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            ("XSX", FieldValueInvalid),
+            (True, FieldTypeMismatch),
+            (7, FieldTypeMismatch)
+        )
+
+
+# These abstract classes will be instantiated (causing error) if not deleted
+del TestFieldValue
+del TestFieldProperty
