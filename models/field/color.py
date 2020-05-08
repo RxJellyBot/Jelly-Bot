@@ -26,7 +26,10 @@ class ColorField(BaseField):
             else:
                 raise FieldValueInvalid(self.key, value)
         elif isinstance(value, str):
-            ColorFactory.from_hex(value)
+            try:
+                ColorFactory.from_hex(value)
+            except ValueError:
+                raise FieldValueInvalid(self.key, value)
         elif isinstance(value, Color):
             pass
         else:

@@ -1,98 +1,223 @@
-from django.test import TestCase
+from typing import Type, Any, Tuple
 
 from extutils.color import Color, ColorFactory
+from field import BaseField
+from field.exceptions import FieldException
 from models.field import ColorField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed
+    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid
 )
 
+from ._test_val import TestFieldValue
+from ._test_prop import TestFieldProperty
 
-class TestColorField(TestCase):
-    def test_properties(self):
-        f = ColorField("cl")
-        self.assertEquals("cl", f.key)
-        self.assertTrue(f.auto_cast)
-        self.assertFalse(f.read_only)
-        self.assertFalse(f.stores_uid)
-        self.assertEquals(ColorFactory.DEFAULT, f.default_value)
-        self.assertEquals(Color, f.desired_type)
-        self.assertTupleEqual((Color, int, str), f.expected_types)
-        self.assertEquals(Color(5723991), f.cast_to_desired_type(5723991))
-        self.assertEquals(Color(5723991), f.cast_to_desired_type("#575757"))
-        with self.assertRaises(FieldNoneNotAllowed):
-            f.cast_to_desired_type(None)
-        self.assertEquals(ColorFactory.DEFAULT, f.none_obj())
-        self.assertTrue(f.is_empty(None))
-        self.assertTrue(f.is_empty(ColorFactory.DEFAULT))
-        self.assertFalse(f.is_empty(ColorFactory.WHITE))
 
-        self.assertFalse(f.allow_none)
-        self.assertFalse(f.is_type_matched(None))
-        self.assertFalse(f.is_value_valid(None))
-        self.assertTrue(f.is_type_matched(ColorFactory.DEFAULT))
-        self.assertTrue(f.is_value_valid(ColorFactory.DEFAULT))
-        self.assertTrue(f.is_type_matched(8000))
-        self.assertTrue(f.is_value_valid(8000))
-        self.assertTrue(f.is_type_matched(-8000))
-        self.assertFalse(f.is_value_valid(-8000))
-        self.assertTrue(f.is_type_matched("#575757"))
-        self.assertTrue(f.is_value_valid("#575757"))
-        self.assertFalse(f.is_type_matched(True))
-        self.assertFalse(f.is_value_valid(True))
+class TestColorFieldProperty(TestFieldProperty):
+    def get_field_class(self) -> Type[BaseField]:
+        return ColorField
 
-    def test_properties_allow_none(self):
-        f = ColorField("cl", allow_none=True)
-        self.assertTrue(f.allow_none)
-        self.assertTrue(f.is_type_matched(None))
-        self.assertTrue(f.is_value_valid(None))
-        self.assertTrue(f.is_type_matched(ColorFactory.DEFAULT))
-        self.assertTrue(f.is_value_valid(ColorFactory.DEFAULT))
-        self.assertTrue(f.is_type_matched(8000))
-        self.assertTrue(f.is_value_valid(8000))
-        self.assertTrue(f.is_type_matched(-8000))
-        self.assertFalse(f.is_value_valid(-8000))
-        self.assertTrue(f.is_type_matched("#575757"))
-        self.assertTrue(f.is_value_valid("#575757"))
-        self.assertFalse(f.is_type_matched(True))
-        self.assertFalse(f.is_value_valid(True))
+    def valid_not_none_value(self) -> Any:
+        return ColorFactory.WHITE
 
-    def test_field_instance(self):
-        f = ColorField("cl")
-        fi = f.new()
+    def expected_none_object(self) -> Any:
+        return ColorFactory.DEFAULT
 
-        fi.value = ColorFactory.DEFAULT
-        self.assertEqual(ColorFactory.DEFAULT, fi.value)
-        fi.value = 5723991
-        self.assertEqual(Color(5723991), fi.value)
-        fi.value = "#575757"
-        self.assertEqual(ColorFactory.from_hex("#575757"), fi.value)
-        with self.assertRaises(FieldNoneNotAllowed):
-            fi.value = None
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = True
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = []
+    def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
 
-    def test_field_instance_allow_none(self):
-        f = ColorField("cl", allow_none=True)
-        fi = f.new()
+    def get_invalid_default_values(self) -> Tuple[Any, ...]:
+        return True, -8000, 20000000, "GGGGGG"
 
-        fi.value = None
-        self.assertIsNone(fi.value)
-        fi.value = ColorFactory.DEFAULT
-        self.assertEqual(ColorFactory.DEFAULT, fi.value)
-        fi.value = 5723991
-        self.assertEqual(Color(5723991), fi.value)
-        fi.value = "#575757"
-        self.assertEqual(ColorFactory.from_hex("#575757"), fi.value)
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = True
-        with self.assertRaises(FieldTypeMismatch):
-            fi.value = []
+    def get_expected_types(self) -> Tuple[Type[Any], ...]:
+        return Color, int, str
 
-    def test_field_instance_not_allow_none(self):
-        f = ColorField("af", allow_none=False)
-        fi = f.new()
+    def get_desired_type(self) -> Type[Any]:
+        return Color
 
-        with self.assertRaises(FieldNoneNotAllowed):
-            fi.value = None
+
+class TestColorFieldValueDefault(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return ColorField("k")
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, True),
+            (20000000, True),
+            ("GGGGGG", True)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, False),
+            (20000000, False),
+            ("GGGGGG", False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (None, FieldNoneNotAllowed),
+            (True, FieldTypeMismatch),
+            (-8000, FieldValueInvalid),
+            (20000000, FieldValueInvalid),
+            ("GGGGGG", FieldValueInvalid),
+        )
+
+
+class TestColorFieldValueAllowNone(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return ColorField("k", allow_none=True)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, True),
+            (20000000, True),
+            ("GGGGGG", True)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, False),
+            (20000000, False),
+            ("GGGGGG", False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, None),
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, None),
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (True, FieldTypeMismatch),
+            (-8000, FieldValueInvalid),
+            (20000000, FieldValueInvalid),
+            ("GGGGGG", FieldValueInvalid),
+        )
+
+
+class TestColorFieldValueNoAutoCast(TestFieldValue):
+    def get_field(self) -> BaseField:
+        return ColorField("k", auto_cast=False)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, True),
+            (20000000, True),
+            ("GGGGGG", True)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (5723991, True),
+            ("#575757", True),
+            ("575757", True),
+            (Color(5723991), True),
+            (True, False),
+            (-8000, False),
+            (20000000, False),
+            ("GGGGGG", False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return False
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (5723991, Color(5723991)),
+            ("#575757", Color(5723991)),
+            ("575757", Color(5723991)),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (5723991, 5723991),
+            ("#575757", "#575757"),
+            ("575757", "575757"),
+            (Color(5723991), Color(5723991))
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        return (
+            (None, FieldNoneNotAllowed),
+            (True, FieldTypeMismatch),
+            (-8000, FieldValueInvalid),
+            (20000000, FieldValueInvalid),
+            ("GGGGGG", FieldValueInvalid),
+        )
+
+
+# These abstract classes will be instantiated (causing error) if not deleted
+del TestFieldValue
+del TestFieldProperty
