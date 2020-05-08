@@ -2,9 +2,8 @@ from typing import Tuple, Any, Type
 
 from django.test import TestCase
 
-from field import BaseField
 from field.exceptions import FieldException
-from models.field import ArrayField
+from models.field import BaseField, ArrayField
 from models.field.exceptions import (
     FieldTypeMismatch, FieldValueTypeMismatch, FieldCastingFailed,
     FieldMaxLengthReached, FieldInvalidDefaultValue, FieldNoneNotAllowed
