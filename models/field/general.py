@@ -3,8 +3,14 @@ from ._base import BaseField
 
 class GeneralField(BaseField):
     def __init__(self, key, **kwargs):
-        if "allow_none" not in kwargs:
-            kwargs["allow_none"] = False
+        """
+        ``allow_none`` is always ``True`` because the `None` object for this field is `None`.
+        """
+        if not kwargs.get("allow_none", True):
+            from mongodb.utils.logger import logger
+            logger.logger.warning(f"This `GenericField` (Key: {key}) will always allow `None`.")
+        kwargs["allow_none"] = True
+
         if "auto_cast" not in kwargs:
             kwargs["auto_cast"] = False
 
@@ -16,4 +22,4 @@ class GeneralField(BaseField):
 
     @property
     def expected_types(self):
-        return bool, int, list, dict, str
+        return str, bool, int, list, dict

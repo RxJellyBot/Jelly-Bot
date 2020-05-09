@@ -8,6 +8,8 @@ from models.field.exceptions import (
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
+__all__ = ["TestFloatFieldDefault", "TestFloatFieldAllowNone", "TestFloatFieldNoAutocast", "TestFloatFieldProperties"]
+
 
 class TestFloatFieldProperties(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:
