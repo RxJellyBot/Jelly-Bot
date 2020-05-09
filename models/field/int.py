@@ -1,12 +1,23 @@
 from ._base import BaseField
+from .exceptions import FieldValueNegative
 
 
 class IntegerField(BaseField):
-    def __init__(self, key, **kwargs):
+    def __init__(self, key, *, positive_only=False, **kwargs):
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
 
         super().__init__(key, **kwargs)
+
+        self._positive_only = positive_only
+
+    @property
+    def positive_only(self):
+        return self._positive_only
+
+    def _check_value_valid_not_none_(self, value):
+        if value < 0 and self.positive_only:
+            raise FieldValueNegative(self.key, value)
 
     @classmethod
     def none_obj(cls):
@@ -14,4 +25,4 @@ class IntegerField(BaseField):
 
     @property
     def expected_types(self):
-        return int
+        return int,

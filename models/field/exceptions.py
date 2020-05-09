@@ -97,6 +97,11 @@ class FieldInstanceClassInvalid(FieldException):
         super().__init__(key, error_msg=f"Invalid field instance class type: {inst_cls}")
 
 
+class FieldValueNegative(FieldException):
+    def __init__(self, key: str, val: Union[int, float]):
+        super().__init__(key, error_msg=f"Field value should not be negative. (Actual: {val})")
+
+
 class FieldInvalidDefaultValue(FieldException):
     def __init__(self, key: str, default_value: Any, *, exc: Exception = None):
         super().__init__(key, error_msg=f"Invalid default value. {default_value} - <{exc}>")
