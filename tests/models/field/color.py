@@ -25,6 +25,7 @@ class TestColorFieldProperty(TestFieldProperty):
 
     def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -48,6 +49,7 @@ class TestColorFieldValueDefault(TestFieldValue):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -61,6 +63,7 @@ class TestColorFieldValueDefault(TestFieldValue):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -76,6 +79,7 @@ class TestColorFieldValueDefault(TestFieldValue):
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -84,6 +88,7 @@ class TestColorFieldValueDefault(TestFieldValue):
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -107,6 +112,7 @@ class TestColorFieldValueAllowNone(TestFieldValue):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, True),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -120,6 +126,7 @@ class TestColorFieldValueAllowNone(TestFieldValue):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, True),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -136,6 +143,7 @@ class TestColorFieldValueAllowNone(TestFieldValue):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (None, None),
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -145,6 +153,7 @@ class TestColorFieldValueAllowNone(TestFieldValue):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (None, None),
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -167,6 +176,7 @@ class TestColorFieldValueNoAutoCast(TestFieldValue):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -180,6 +190,7 @@ class TestColorFieldValueNoAutoCast(TestFieldValue):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            (ColorFactory.DEFAULT, True),
             (5723991, True),
             ("#575757", True),
             ("575757", True),
@@ -195,6 +206,7 @@ class TestColorFieldValueNoAutoCast(TestFieldValue):
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, Color(5723991)),
             ("#575757", Color(5723991)),
             ("575757", Color(5723991)),
@@ -203,6 +215,7 @@ class TestColorFieldValueNoAutoCast(TestFieldValue):
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            (ColorFactory.DEFAULT, ColorFactory.DEFAULT),
             (5723991, 5723991),
             ("#575757", "#575757"),
             ("575757", "575757"),

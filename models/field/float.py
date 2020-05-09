@@ -14,4 +14,4 @@ class FloatField(BaseField):
 
     @property
     def expected_types(self):
-        return float
+        return float, int

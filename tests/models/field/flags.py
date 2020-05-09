@@ -11,6 +11,9 @@ from extutils.flags import FlagCodeEnum
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
+__all__ = ["TestEnumNoDefault", "TestEnumWithDefaultProperty", "TestEnumWithDefaultValueAllowNone",
+           "TestEnumWithDefaultValueDefault", "TestEnumWithDefaultValueNoAutocast"]
+
 
 # region No default flags
 class EnumNoDefault(FlagCodeEnum):
@@ -60,6 +63,7 @@ class TestEnumWithDefaultProperty(TestFieldProperty):
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
             ("A", EnumWithDefault.A),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A)
         )
 
@@ -81,6 +85,8 @@ class TestEnumWithDefaultValueDefault(TestFieldValue):
         return (
             (None, False),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, True),
             ("1", True),
@@ -93,6 +99,8 @@ class TestEnumWithDefaultValueDefault(TestFieldValue):
         return (
             (None, False),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, False),
             ("1", True),
@@ -108,6 +116,8 @@ class TestEnumWithDefaultValueDefault(TestFieldValue):
         return (
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A),
             ("A", EnumWithDefault.A)
         )
@@ -116,6 +126,8 @@ class TestEnumWithDefaultValueDefault(TestFieldValue):
         return (
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A),
             ("A", EnumWithDefault.A)
         )
@@ -137,6 +149,8 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
         return (
             (None, False),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, True),
             ("1", True),
@@ -149,6 +163,8 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
         return (
             (None, False),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, False),
             ("1", True),
@@ -164,6 +180,8 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
         return (
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A),
             ("A", EnumWithDefault.A)
         )
@@ -172,6 +190,8 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
         return (
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, 1),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", "1"),
             ("A", "A")
         )
@@ -193,6 +213,8 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue):
         return (
             (None, True),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, True),
             ("1", True),
@@ -205,6 +227,8 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue):
         return (
             (None, True),
             (EnumWithDefault.A, True),
+            (EnumWithDefault.B, True),
+            (2, True),
             (1, True),
             (3, False),
             ("1", True),
@@ -221,6 +245,8 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue):
             (None, None),
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A),
             ("A", EnumWithDefault.A)
         )
@@ -230,6 +256,8 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue):
             (None, None),
             (EnumWithDefault.A, EnumWithDefault.A),
             (1, EnumWithDefault.A),
+            (EnumWithDefault.B, EnumWithDefault.B),
+            (2, EnumWithDefault.B),
             ("1", EnumWithDefault.A),
             ("A", EnumWithDefault.A)
         )

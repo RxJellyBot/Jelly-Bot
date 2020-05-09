@@ -25,6 +25,8 @@ class TestDictFieldProperty(TestFieldProperty):
     def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             ({"A": 9}, {"A": 9}),
+            ({}, {}),
+            ({None: None}, {None: None})
         )
 
     def get_invalid_default_values(self) -> Tuple[Any, ...]:
@@ -45,6 +47,8 @@ class TestDictFieldValueDefault(TestFieldValue):
         return (
             (None, False),
             (True, False),
+            ({}, True),
+            ({None: None}, True),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
         )
@@ -53,6 +57,8 @@ class TestDictFieldValueDefault(TestFieldValue):
         return (
             (None, False),
             (True, False),
+            ({}, True),
+            ({None: None}, True),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
         )
@@ -62,11 +68,15 @@ class TestDictFieldValueDefault(TestFieldValue):
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
@@ -85,6 +95,8 @@ class TestDictFieldValueAllowNone(TestFieldValue):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, True),
+            ({}, True),
+            ({None: None}, True),
             (True, False),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
@@ -93,6 +105,8 @@ class TestDictFieldValueAllowNone(TestFieldValue):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, True),
+            ({}, True),
+            ({None: None}, True),
             (True, False),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
@@ -104,12 +118,16 @@ class TestDictFieldValueAllowNone(TestFieldValue):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (None, None),
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (None, None),
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
@@ -127,6 +145,8 @@ class TestDictFieldValueNoAutocast(TestFieldValue):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            ({}, True),
+            ({None: None}, True),
             (True, False),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
@@ -135,6 +155,8 @@ class TestDictFieldValueNoAutocast(TestFieldValue):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             (None, False),
+            ({}, True),
+            ({None: None}, True),
             (True, False),
             ({"A": 7}, True),
             ([("A", 9), ("B", 8)], False)
@@ -145,11 +167,15 @@ class TestDictFieldValueNoAutocast(TestFieldValue):
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
+            ({}, {}),
+            ({None: None}, {None: None}),
             ({"A": 7}, {"A": 7}),
         )
 
