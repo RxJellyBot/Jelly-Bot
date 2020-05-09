@@ -7,9 +7,9 @@ class IntegerField(BaseField):
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
 
-        super().__init__(key, **kwargs)
-
         self._positive_only = positive_only
+
+        super().__init__(key, **kwargs)
 
     @property
     def positive_only(self):
@@ -25,4 +25,4 @@ class IntegerField(BaseField):
 
     @property
     def expected_types(self):
-        return int,
+        return int, float
