@@ -11,3 +11,4 @@ from .model import *  # NOQA
 from .oid import *  # NOQA
 from .text import *  # NOQA
 from .url import *  # NOQA
+from .modelarray import *  # NOQA

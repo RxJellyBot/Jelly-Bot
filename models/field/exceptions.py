@@ -30,7 +30,7 @@ class FieldTypeMismatch(FieldException):
 
 
 class FieldValueTypeMismatch(FieldException):
-    def __init__(self, key: str, actual: type, expected: Union[type, Tuple[type]] = None, *,
+    def __init__(self, key: str, actual: type, expected: Union[type, Tuple[type, ...]] = None, *,
                  extra_message: str = None):
         if expected is None:
             expected_name = "(Unknown)"
@@ -121,3 +121,8 @@ class FieldOidStringInvalid(FieldException):
 class FieldInvalidDefaultValue(FieldException):
     def __init__(self, key: str, default_value: Any, *, exc: Exception = None):
         super().__init__(key, error_msg=f"Invalid default value. {default_value} - <{exc}>")
+
+
+class FieldValueRequired(FieldException):
+    def __init__(self, key: str):
+        super().__init__(key, error_msg=f"Field (key: {key}) requires value.")

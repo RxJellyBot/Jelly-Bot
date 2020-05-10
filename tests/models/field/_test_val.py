@@ -122,9 +122,10 @@ class TestFieldValue(TestCase, ABC):
 
     def test_set_value_to_field(self):
         f = self.get_field()
-        fi = f.new()
 
         for val_to_set, val_to_get in self.get_valid_value_to_set():
+            fi = f.new()
+
             with self.subTest(val_to_set=val_to_set, val_to_get=val_to_get):
                 fi.value = val_to_set
                 self.assertEquals(val_to_get, fi.value)
@@ -144,9 +145,10 @@ class TestFieldValue(TestCase, ABC):
 
     def test_set_invalid_value_to_field(self):
         f = self.get_field()
-        fi = f.new()
 
         for value, expected_exception in self.get_invalid_value_to_set():
+            fi = f.new()
+
             with self.subTest(value=value, expected_exception=expected_exception):
                 with self.assertRaises(expected_exception):
                     fi.value = value

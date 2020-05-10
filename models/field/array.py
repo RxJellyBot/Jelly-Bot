@@ -1,11 +1,13 @@
 import math
+from collections import abc
 
 from bson import ObjectId
 from pymongo.collection import Collection
 
 from ._base import BaseField, FieldInstance
 from .exceptions import (
-    FieldReadOnly, FieldValueTypeMismatch, FieldMaxLengthReached, FieldCastingFailed, FieldEmptyValueNotAllowed
+    FieldModelClassInvalid, FieldValueTypeMismatch, FieldMaxLengthReached,
+    FieldCastingFailed, FieldEmptyValueNotAllowed
 )
 
 
@@ -48,15 +50,21 @@ class ArrayField(BaseField):
     def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
         from models import Model
 
-        cast_type = None
+        # If the element type is `Model`, try to cast the element of the field later
+        model_type = None
         if issubclass(self._elem_type, Model):
-            cast_type = self._elem_type
+            model_type = self._elem_type
 
         for v in value:
             value_type = type(v)
 
-            if cast_type:
-                cast_type.cast_model(v)
+            if model_type:
+                # If `model_type` is available and `v` is potentially castable, attempt the cast
+                # Otherwise, throw `FieldValueTypeMismatch`
+                if isinstance(v, abc.MutableMapping):
+                    model_type.cast_model(v)
+                else:
+                    raise FieldValueTypeMismatch(self.key, value_type, (model_type, abc.MutableMapping))
             elif not value_type == self._elem_type:
                 if not attempt_cast:
                     raise FieldValueTypeMismatch(self.key, value_type, self.elem_type)
@@ -111,11 +119,31 @@ class ArrayField(BaseField):
 
 class ModelArrayField(ArrayField):
     def __init__(self, key, model_type, **kwargs):
+        from models import Model
+
         if "inst_cls" not in kwargs:
             kwargs["inst_cls"] = ModelArrayFieldInstanceFactory.generate(model_type)
 
+        if not issubclass(model_type, Model):
+            raise FieldModelClassInvalid(key, model_type)
+
         super().__init__(key, model_type, **kwargs)
         self._model_type = model_type
+
+    def cast_to_desired_type(self, value):
+        self.check_value_valid(value, attempt_cast=self.auto_cast)
+
+        if self.allow_none and value is None:
+            return None
+
+        v_new = []
+        for v in value:
+            if not type(v) == self._model_type:
+                v = self._model_type.cast_model(v)
+
+            v_new.append(v)
+
+        return v_new
 
 
 class ArrayFieldInstance(FieldInstance):
@@ -129,15 +157,6 @@ class ArrayFieldInstance(FieldInstance):
 class ModelArrayFieldInstanceFactory:
     @staticmethod
     def generate(model_type):
-        def get_val(self):
-            return [model_type.cast_model(v) for v in self._value]
-
-        def set_val(self, value):
-            if self.base.read_only:
-                raise FieldReadOnly(self.base.__class__.__qualname__)
-
-            self.force_set(value)
-
         return type(f"{model_type.__name__}ModelArrayInstance",
                     (FieldInstance,),
-                    {"value": property(fget=get_val, fset=set_val)},)
+                    {}, )

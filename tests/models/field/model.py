@@ -40,8 +40,8 @@ class TestModelFieldProperty(TestFieldProperty):
     def get_initialize_required_args(self) -> Tuple[Any, ...]:
         return ModelTest,
 
-    def valid_not_none_value(self) -> Any:
-        return ModelTest()
+    def valid_not_none_obj_value(self) -> Any:
+        return ModelTest(Id=DUMMY_OID_1)
 
     def expected_none_object(self) -> Any:
         return None

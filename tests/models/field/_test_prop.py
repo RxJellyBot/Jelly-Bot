@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from models.field import BaseField, ModelDefaultValueExt
 from models.field.exceptions import (
-    FieldReadOnly, FieldInvalidDefaultValue, FieldNoneNotAllowed, FieldInstanceClassInvalid
+    FieldReadOnly, FieldInvalidDefaultValue, FieldNoneNotAllowed, FieldInstanceClassInvalid, FieldValueRequired
 )
 
 
@@ -31,7 +31,7 @@ class TestFieldProperty(TestCase, ABC):
         return self.get_field_class()("k", *self.get_initialize_required_args(), **kwargs)
 
     @abstractmethod
-    def valid_not_none_value(self) -> Any:
+    def valid_not_none_obj_value(self) -> Any:
         """Value to be used on some tests that need this."""
         raise NotImplementedError()
 
@@ -70,7 +70,7 @@ class TestFieldProperty(TestCase, ABC):
 
         fi = f.new()
         with self.assertRaises(FieldReadOnly):
-            fi.value = self.valid_not_none_value()
+            fi.value = self.valid_not_none_obj_value()
 
     def test_not_readonly(self):
         f = self.get_initialized_field(readonly=False)
@@ -78,7 +78,7 @@ class TestFieldProperty(TestCase, ABC):
         self.assertFalse(f.read_only, "Field is readonly")
 
         fi = f.new()
-        fi.value = self.valid_not_none_value()
+        fi.value = self.valid_not_none_obj_value()
 
     # endregion
 
@@ -174,21 +174,31 @@ class TestFieldProperty(TestCase, ABC):
 
         test_data = (
             (None, True),
-            (self.valid_not_none_value(), False),
+            (self.valid_not_none_obj_value(), False),
             (f.none_obj(), True)
         )
 
         for value, expected_outcome in test_data:
-            self.assertEquals(f.is_empty(value), expected_outcome)
+            with self.subTest(value=value, expected_outcome=expected_outcome):
+                self.assertEquals(f.is_empty(value), expected_outcome)
 
     # endregion
 
     # region Extended default value
-    def test_default_ext(self):
+    def test_default_required(self):
         f = self.get_initialized_field(default=ModelDefaultValueExt.Required)
         self.assertEquals(ModelDefaultValueExt.Required, f.default_value)
+        with self.assertRaises(FieldValueRequired):
+            f.new()
+        fi = f.new(self.valid_not_none_obj_value())
+        self.assertEquals(fi.value, self.valid_not_none_obj_value())
+
+    def test_default_optional(self):
         f = self.get_initialized_field(default=ModelDefaultValueExt.Optional)
         self.assertEquals(ModelDefaultValueExt.Optional, f.default_value)
+
+        fi = f.new()
+        self.assertEquals(fi.value, f.none_obj())
 
     # endregion
 

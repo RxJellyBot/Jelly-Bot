@@ -16,7 +16,7 @@ class TestBoolFieldProperty(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:
         return BooleanField
 
-    def valid_not_none_value(self) -> Any:
+    def valid_not_none_obj_value(self) -> Any:
         return True
 
     def expected_none_object(self) -> Any:

@@ -7,7 +7,7 @@ from pymongo.collection import Collection
 
 from models.field.exceptions import (
     FieldReadOnly, FieldTypeMismatch, FieldCastingFailed, FieldNoneNotAllowed,
-    FieldInstanceClassInvalid, FieldInvalidDefaultValue
+    FieldInstanceClassInvalid, FieldInvalidDefaultValue, FieldValueRequired
 )
 
 from ._default import ModelDefaultValueExt
@@ -15,14 +15,27 @@ from ._default import ModelDefaultValueExt
 
 class FieldInstance:
     """Field instance class. This class actually stores the value."""
+    NULL_VAL_SENTINEL = object()
 
-    def __init__(self, base, value=None):
+    def __init__(self, base: 'BaseField', value=NULL_VAL_SENTINEL):
+        """
+        :raises FieldValueRequired: If the default value indicates the field requires value but turns out not
+        :raises ValueError: Field extended default value unhandled
+        """
         self._base = base
-        self._value = None  # Initialize an empty field
+        self._value = None  # Initialize an empty class field
 
         # Skipping type check on init (may fill `None`)
-        if value is None and not base.allow_none:
+        if value in (None, FieldInstance.NULL_VAL_SENTINEL) and not base.allow_none:
             self.force_set(base.none_obj())
+        elif ModelDefaultValueExt.is_default_val_ext(base.default_value) and \
+                (ModelDefaultValueExt.is_default_val_ext(value) or value == FieldInstance.NULL_VAL_SENTINEL):
+            if base.default_value == ModelDefaultValueExt.Required:
+                raise FieldValueRequired(self.base.key)
+            elif base.default_value == ModelDefaultValueExt.Optional:
+                self.force_set(base.none_obj())
+            else:
+                raise ValueError("Field extended default value unhandled.")
         else:
             self.force_set(value)
 
@@ -59,9 +72,7 @@ class FieldInstance:
         return self.base.is_empty(self.value)
 
     def __repr__(self):
-        return f"Field Instance of {self.base.__class__.__qualname__} " \
-               f"{' (Read-only)' if self.base.read_only else ''} " \
-               f"<{self.base.key}: {self.value}>"
+        return f"<{self.base.key}{'(ro)' if self.base.read_only else ''}: {self.value}>"
 
 
 class BaseField(abc.ABC):
@@ -210,7 +221,7 @@ class BaseField(abc.ABC):
         if self.allow_none:
             expected_types.append(type(None))
 
-        # Check value type
+        # Check value type\
         if not type(value) in expected_types:
             raise FieldTypeMismatch(self.key, type(value), expected_types)
 
@@ -220,7 +231,7 @@ class BaseField(abc.ABC):
     def is_type_matched(self, value, *, attempt_cast=False) -> bool:
         try:
             self.check_type_matched(value, attempt_cast=attempt_cast)
-        except Exception:
+        except Exception as _:
             return False
         else:
             return True
@@ -269,7 +280,7 @@ class BaseField(abc.ABC):
 
     @final
     def new(self, val=None) -> FieldInstance:
-        return self.instance_class(self, val or self.default_value)
+        return self.instance_class(self, val if val is not None else self.default_value)
 
     @final
     def is_empty(self, value) -> bool:

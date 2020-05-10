@@ -17,7 +17,7 @@ class TestColorFieldProperty(TestFieldProperty):
     def get_field_class(self) -> Type[BaseField]:
         return ColorField
 
-    def valid_not_none_value(self) -> Any:
+    def valid_not_none_obj_value(self) -> Any:
         return ColorFactory.WHITE
 
     def expected_none_object(self) -> Any:
