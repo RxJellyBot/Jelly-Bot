@@ -7,14 +7,39 @@ from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMat
 
 
 class TextField(BaseField):
-    def __init__(self, key, *, regex: str = None, maxlen=2000, must_have_content=False, **kwargs):
-        """
-        Default Properties Overrided:
+    DEFAULT_MAX_LENGTH = 2000
 
-        - ``allow_none`` - ``False``
+    def __init__(self, key, *, regex: str = None, maxlen: int = DEFAULT_MAX_LENGTH,
+                 must_have_content: int = False, **kwargs):
+        """
+        The max length of the string is determined by ``maxlen``.
+
+        - Set to ``None`` or :class:`math.inf` for unlimited length.
+
+        .. note::
+
+            Default Properties Overrided:
+
+            - ``allow_none`` - ``False``
+
+            Default Properties Added:
+
+            - ``regex`` - ``None``
+
+            - ``maxlen`` - ``2000``
+
+            - ``must_have_content`` - ``False``
 
         .. seealso::
             Check the document of :class:`BaseField` for other default properties.
+
+        :param regex: Regex to validate the string
+        :param maxlen: Max length of the string
+        :param must_have_content: If the string must have some content
+
+        :raises FieldMaxLengthReached: if the default value reaches to the max length
+        :raises FieldRegexNotMatch: if the regex does not match the default value
+        :raises FieldEmptyValueNotAllowed: if the defualt vlaue is empty
         """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
@@ -26,17 +51,18 @@ class TextField(BaseField):
         super().__init__(key, **kwargs)
 
     def _check_value_valid_not_none_(self, value):
-        # Length check
-        if len(value) > self._maxlen:
-            raise FieldMaxLengthReached(self.key, len(value), self._maxlen)
+        if isinstance(value, str):
+            # Length check
+            if len(value) > self._maxlen:
+                raise FieldMaxLengthReached(self.key, len(value), self._maxlen)
 
-        # Regex check
-        if self._regex is not None and not re.match(self._regex, value):
-            raise FieldRegexNotMatch(self.key, value, self._regex)
+            # Regex check
+            if self._regex is not None and not re.fullmatch(self._regex, value):
+                raise FieldRegexNotMatch(self.key, value, self._regex)
 
-        # Empty Value
-        if self._must_have_content and len(value) == 0:
-            raise FieldEmptyValueNotAllowed(self.key)
+            # Empty Value
+            if self._must_have_content and len(value) == 0:
+                raise FieldEmptyValueNotAllowed(self.key)
 
     @classmethod
     def none_obj(cls):
@@ -44,7 +70,7 @@ class TextField(BaseField):
 
     @property
     def expected_types(self):
-        return str
+        return str, int, bool
 
 
 class UrlField(BaseField):

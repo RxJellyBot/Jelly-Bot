@@ -211,7 +211,13 @@ class BaseField(abc.ABC):
             expected_types.append(type(None))
 
         # Check value type
-        if not type(value) in expected_types:
+        type_match = False
+        for t in expected_types:
+            if isinstance(value, t):
+                type_match = True
+                break
+
+        if not type_match:
             raise FieldTypeMismatch(self.key, type(value), expected_types)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
