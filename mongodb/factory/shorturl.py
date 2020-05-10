@@ -6,10 +6,10 @@ from typing import Optional
 import pymongo
 from bson import ObjectId
 
+from extutils.url import is_valid_url
 from extutils.logger import SYSTEM
 from extutils.checker import arg_type_ensure
 from models import ShortUrlRecordModel
-from models.field import UrlField
 from mongodb.factory.results import WriteOutcome, UrlShortenResult
 from mongodb.utils import CursorWithCount
 
@@ -42,7 +42,7 @@ class ShortUrlDataManager(BaseCollection):
 
     @staticmethod
     def is_valid_url(url) -> bool:
-        return UrlField.is_valid_url(url)
+        return is_valid_url(url)
 
     def __init__(self):
         super().__init__()

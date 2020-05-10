@@ -1,6 +1,6 @@
 import re
-from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
+
+from extutils.url import is_valid_url
 
 from ._base import BaseField
 from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMatch, FieldEmptyValueNotAllowed
@@ -75,12 +75,27 @@ class TextField(BaseField):
 
 class UrlField(BaseField):
     def __init__(self, key, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+
+        - ``readonly`` - ``True``
+
+        - ``auto_cast`` - **Always** ``True``
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
         if "readonly" not in kwargs:
             kwargs["readonly"] = True
-        if "auto_cast" not in kwargs:
-            kwargs["auto_cast"] = True
+
+        if not kwargs.get("auto_cast", True):
+            from mongodb.utils.logger import logger
+            logger.logger.warning(f"`autocast` of this `UrlField` (Key: {key}) is always `True`.")
+        kwargs["auto_cast"] = True
 
         super().__init__(key, **kwargs)
 
@@ -90,17 +105,8 @@ class UrlField(BaseField):
 
     @property
     def expected_types(self):
-        return str
+        return str,
 
     def _check_value_valid_not_none_(self, value):
-        if not UrlField.is_valid_url(value):
+        if not self.is_empty(value) and not is_valid_url(value):
             raise FieldInvalidUrl(self.key, value)
-
-    @staticmethod
-    def is_valid_url(url) -> bool:
-        try:
-            URLValidator()(url)
-        except ValidationError:
-            return False
-
-        return True
