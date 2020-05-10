@@ -1,14 +1,13 @@
 import math
 from datetime import datetime, timezone, timedelta, time
 
-from django.test import TestCase
-
 import pytz
 
 from extutils.dt import (
     is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds,
     TimeRange, TimeRangeEndBeforeStart, make_tz_aware
 )
+from tests.base import TestCase
 
 
 class TestDatetime(TestCase):

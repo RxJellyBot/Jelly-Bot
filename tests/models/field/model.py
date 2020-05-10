@@ -3,13 +3,13 @@ from datetime import datetime
 from typing import Type, Any, Tuple
 
 from bson import ObjectId
-from django.test import TestCase
 
 from models.field import ModelField, BaseField, IntegerField, BooleanField
 from models.field.exceptions import (
     FieldTypeMismatch, FieldException, FieldModelClassInvalid
 )
 from models import Model, OID_KEY
+from tests.base import TestCase
 
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty

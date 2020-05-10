@@ -1,9 +1,8 @@
-from django.test import TestCase
-
 from extutils.flags import (
     FlagCodeEnum, FlagSingleEnum, FlagDoubleEnum, FlagPrefixedDoubleEnum,
     is_flag_instance, is_flag_class, is_flag_single, is_flag_double
 )
+from tests.base import TestCase
 
 
 class CodeEnum(FlagCodeEnum):

@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.singleton import Singleton, SingletonABC
+from tests.base import TestCase
 
 
 class SingletonTest(metaclass=Singleton):

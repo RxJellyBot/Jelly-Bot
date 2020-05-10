@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from models import Model
+from tests.base import TestCase
 
 
 class DummyModel(Model):

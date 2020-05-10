@@ -1,12 +1,11 @@
 from typing import Type, Any, Tuple
 
-from django.test import TestCase
-
 from models.field import TextField, BaseField
 from models.field.exceptions import (
     FieldTypeMismatch, FieldNoneNotAllowed, FieldEmptyValueNotAllowed,
     FieldException, FieldMaxLengthReached, FieldRegexNotMatch, FieldInvalidDefaultValue
 )
+from tests.base import TestCase
 
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty

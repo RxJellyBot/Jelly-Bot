@@ -1,12 +1,11 @@
 from typing import Type, Any, Tuple
 
-from django.test import TestCase
-
 from models.field import FlagField, BaseField
 from models.field.exceptions import (
     FieldTypeMismatch, FieldNoneNotAllowed, FieldFlagDefaultUndefined, FieldFlagNotFound, FieldException
 )
 from extutils.flags import FlagCodeEnum
+from tests.base import TestCase
 
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty

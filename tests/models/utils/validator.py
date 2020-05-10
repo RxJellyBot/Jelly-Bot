@@ -1,7 +1,6 @@
-from django.test import TestCase
-
 from flags import AutoReplyContentType
 from models.utils import AutoReplyValidator
+from tests.base import TestCase
 
 
 class TestAutoReplyValidator(TestCase):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Tuple, Any, Type
 
-from django.test import TestCase
+from tests.base import TestCase
 
 from models.field import BaseField
 from models.field.exceptions import FieldException

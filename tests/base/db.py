@@ -3,10 +3,16 @@ import sys
 from abc import ABC
 
 import pymongo
-from django.test import TestCase
 
 from extutils import exec_timing_result
 from mongodb.factory import single_db_name
+
+from tests.base import TestCase
+
+if not single_db_name:
+    print("Utilize single DB by setting `MONGO_DB` in environment variables "
+          "to prevent possible the data corruption.")
+    sys.exit(1)
 
 mongo_url = os.environ["MONGO_URL"]
 if not mongo_url:
@@ -31,10 +37,14 @@ class TestDatabaseMixin(TestCase, ABC):
         if single_db_name:
             mongo_client.drop_database(single_db_name)
 
+        super().setUp()
+
     def tearDown(self) -> None:
         # Drop the used database
         if single_db_name:
             mongo_client.drop_database(single_db_name)
+
+        super().tearDown()
 
     @classmethod
     def db_ping_ms(cls) -> float:

@@ -1,5 +1,4 @@
 from bson import ObjectId
-from django.test import TestCase
 
 from datetime import datetime, timedelta, timezone
 import time
@@ -7,7 +6,7 @@ import time
 from extutils import exec_timing_result
 from JellyBot.systemconfig import Bot
 from mongodb.factory import RemoteControlManager
-from tests.base import TestTimeComparisonMixin, TestDatabaseMixin
+from tests.base import TestTimeComparisonMixin, TestDatabaseMixin, TestCase
 
 EXPIRY_SEC_ORG = Bot.RemoteControl.IdleDeactivateSeconds
 
@@ -35,9 +34,6 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCa
     @classmethod
     def tearDownClass(cls):
         Bot.RemoteControl.IdleDeactivateSeconds = EXPIRY_SEC_ORG
-
-    def setUp(self) -> None:
-        RemoteControlManager.drop()
 
     @staticmethod
     def wait_expiry_lock():

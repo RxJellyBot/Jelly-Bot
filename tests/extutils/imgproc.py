@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from django.test import TestCase
-
 from flags import ImageContentType
 from extutils.imgproc import ImgurClient, ImageContentProcessor
+from tests.base import TestCase
 
 
 class TestImgurClient(TestCase):

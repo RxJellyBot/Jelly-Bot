@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.color import ColorFactory, Color
+from tests.base import TestCase
 
 
 class TestColorFactory(TestCase):

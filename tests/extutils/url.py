@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.url import is_valid_url
+from tests.base import TestCase
 
 __all__ = ["TestValidUrl"]
 

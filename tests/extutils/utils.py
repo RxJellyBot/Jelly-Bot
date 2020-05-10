@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta
 
-from django.test import TestCase
-
 from extutils.utils import (
     cast_keep_none, cast_iterable, safe_cast, all_lower,
     to_snake_case, to_camel_case, split_fill, str_reduce_length, list_insert_in_between, enumerate_ranking,
     dt_to_objectid
 )
+from tests.base import TestCase
 
 
 # noinspection PyTypeChecker

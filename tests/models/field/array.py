@@ -1,6 +1,6 @@
 from typing import Tuple, Any, Type
 
-from django.test import TestCase
+from tests.base import TestCase
 
 from models import ModelDefaultValueExt
 from models.field import BaseField, ArrayField
