@@ -9,7 +9,7 @@ from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
 __all__ = ["TestIntegerFieldProperty", "TestIntegerFieldValueAllowNone",
-           "TestIntegerFieldValueDefault", "TestIntegerFieldValueNoAutocast"]
+           "TestIntegerFieldValueDefault", "TestIntegerFieldValueNoAutocast", "TestIntegerFieldValuePositiveOnly"]
 
 
 class TestIntegerFieldProperty(TestFieldProperty):

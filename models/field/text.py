@@ -8,6 +8,14 @@ from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMat
 
 class TextField(BaseField):
     def __init__(self, key, *, regex: str = None, maxlen=2000, must_have_content=False, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
 

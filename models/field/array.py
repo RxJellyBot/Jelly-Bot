@@ -11,6 +11,15 @@ from .exceptions import (
 
 class ArrayField(BaseField):
     def __init__(self, key, elem_type: type, *, max_len=0, allow_empty=True, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+        - ``inst_cls`` - :class:`ArrayFieldInstance`
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "inst_cls" not in kwargs:
             kwargs["inst_cls"] = ArrayFieldInstance
         if "allow_none" not in kwargs:

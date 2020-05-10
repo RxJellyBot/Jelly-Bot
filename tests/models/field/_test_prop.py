@@ -98,7 +98,7 @@ class TestFieldProperty(TestCase, ABC):
         """
         raise NotImplementedError()
 
-    def test_properties_default_valid(self):
+    def test_properties_default_valid_no_autocast(self):
         for default_val, expected_autocast in self.get_valid_default_values():
             with self.subTest(default_val=default_val):
                 # Default value could be invalid if `auto_cast` set to `False`
@@ -110,6 +110,8 @@ class TestFieldProperty(TestCase, ABC):
                 except FieldInvalidDefaultValue:
                     pass
 
+    def test_properties_default_valid_autocast(self):
+        for default_val, expected_autocast in self.get_valid_default_values():
             with self.subTest(default_val=default_val, expected_autocast=expected_autocast):
                 f = self.get_initialized_field(auto_cast=True, default=default_val)
                 fi = f.new()

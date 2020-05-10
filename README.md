@@ -37,3 +37,13 @@ Website: http://rnnx.cc/Website
 `Dec 30 2019` - Shutdown the stable build and merge the beta build to be the stable build.
 
 - Because the user count of the stable build is significantly less than beta build.
+
+### Useful Links used in this repository
+
+<details><summary>Documentation</summary>
+<p>
+
+- [reST syntax cheatsheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
+
+</p>
+</details>

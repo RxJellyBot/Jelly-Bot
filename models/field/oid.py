@@ -9,6 +9,15 @@ OID_KEY = "_id"
 
 class ObjectIDField(BaseField):
     def __init__(self, key=None, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+        - ``readonly`` - ``True``
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
         if "readonly" not in kwargs:

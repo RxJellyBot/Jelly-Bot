@@ -4,6 +4,14 @@ from .exceptions import FieldValueNegative
 
 class IntegerField(BaseField):
     def __init__(self, key, *, positive_only=False, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
 

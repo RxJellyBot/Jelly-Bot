@@ -9,6 +9,15 @@ from .exceptions import FieldValueInvalid
 
 class DateTimeField(BaseField):
     def __init__(self, key, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+        - ``inst_cls`` - :class:`DateTimeFieldInstance`
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         if "inst_cls" not in kwargs:
             kwargs["inst_cls"] = DateTimeFieldInstance
         if "allow_none" not in kwargs:

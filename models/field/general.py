@@ -4,7 +4,12 @@ from ._base import BaseField
 class GeneralField(BaseField):
     def __init__(self, key, **kwargs):
         """
-        ``allow_none`` is always ``True`` because the `None` object for this field is `None`.
+        Default Properties Overrided:
+
+        - ``allow_none`` - **Always** ``True`` because ``none_obj()`` is already ``None``.
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
         """
         if not kwargs.get("allow_none", True):
             from mongodb.utils.logger import logger

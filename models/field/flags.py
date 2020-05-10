@@ -20,6 +20,18 @@ class FlagField(IntegerField, ABC):
     FLAG_TYPE: FlagCodeEnum = None
 
     def __init__(self, key, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+        - ``default`` - Default value of :class:`FlagCodeEnum`
+
+        :raises ValueError: if class variable ``FLAG_TYPE`` not set
+        :raises FieldFlagDefaultUndefined: if the default value of ``FLAG_TYPE`` not defined
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         self._type = self.__class__.FLAG_TYPE
         if self._type is None:
             raise ValueError("Need to specify the FLAG_TYPE class var.")
