@@ -29,7 +29,7 @@ class ModelField(BaseField):
 
         if not kwargs.get("auto_cast", True):
             from mongodb.utils.logger import logger
-            logger.logger.warning(f"`autocast` of this `ModelField` (Key: {key}) will always being `True`.")
+            logger.logger.warning(f"`autocast` of this `ModelField` (Key: {key}) is always `True`.")
         kwargs["auto_cast"] = True
 
         if "default" not in kwargs:
