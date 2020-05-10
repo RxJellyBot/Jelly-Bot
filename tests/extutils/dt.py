@@ -7,12 +7,18 @@ import pytz
 
 from extutils.dt import (
     is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds,
-    TimeRange, TimeRangeEndBeforeStart
+    TimeRange, TimeRangeEndBeforeStart, make_tz_aware
 )
 
 
 class TestDatetime(TestCase):
     def test_dt_naive(self):
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.now())))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.utcnow())))
+        self.assertFalse(is_tz_naive(make_tz_aware(localtime().replace(tzinfo=None))))
+        self.assertFalse(is_tz_naive(make_tz_aware(now_utc_aware())))
+
+    def test_dt_make_aware(self):
         self.assertTrue(is_tz_naive(datetime.now()))
         self.assertTrue(is_tz_naive(datetime.utcnow()))
         self.assertTrue(is_tz_naive(localtime().replace(tzinfo=None)))

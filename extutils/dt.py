@@ -18,6 +18,9 @@ def localtime(dt: datetime = None, tz: timezone = None):
 
 
 def make_tz_aware(dt: datetime, tz: timezone = None):
+    if not is_tz_naive(dt):
+        return dt
+
     return timezone.make_aware(dt, tz)
 
 
