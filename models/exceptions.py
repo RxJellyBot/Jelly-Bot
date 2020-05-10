@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 
 class ModelConstructionError(Exception, ABC):
@@ -11,8 +12,8 @@ class InvalidModelError(ModelConstructionError):
 
 
 class RequiredKeyUnfilledError(ModelConstructionError):
-    def __init__(self, ks):
-        super().__init__(f"Required fields unfilled. ({', '.join(ks)})")
+    def __init__(self, model, ks: List[str]):
+        super().__init__(f"Required fields unfilled. Keys: {', '.join(ks)} / Model: {model}")
 
 
 class IdUnsupportedError(ModelConstructionError):

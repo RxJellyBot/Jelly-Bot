@@ -14,19 +14,20 @@ class FieldReadOnly(FieldException):
 
 
 class FieldTypeMismatch(FieldException):
-    def __init__(self, key: str, actual: type, expected: Union[type, Iterable[type]] = None, *,
-                 extra_message: str = None):
-        if expected is None:
+    def __init__(self, key: str, actual_type: type, actual_value: Any,
+                 expected_types: Union[type, Iterable[type]] = None, *, extra_message: str = None):
+        if expected_types is None:
             expected_name = "(Unknown)"
-        elif isinstance(expected, type):
-            expected_name = expected.__name__
+        elif isinstance(expected_types, type):
+            expected_name = expected_types.__name__
         else:
-            expected_name = " or ".join([t.__name__ for t in expected])
+            expected_name = " or ".join([t.__name__ for t in expected_types])
 
         super().__init__(
             key,
             error_msg=f"Type mismatch. {extra_message or ''} "
-                      f"Expected: {expected_name}, Actual: {actual.__name__}")
+                      f"Expected Type: {expected_name} / Actual Type: {actual_type.__name__} / "
+                      f"Actual Value: {actual_value}")
 
 
 class FieldValueTypeMismatch(FieldException):

@@ -221,9 +221,9 @@ class BaseField(abc.ABC):
         if self.allow_none:
             expected_types.append(type(None))
 
-        # Check value type\
+        # Check value type
         if not type(value) in expected_types:
-            raise FieldTypeMismatch(self.key, type(value), expected_types)
+            raise FieldTypeMismatch(self.key, type(value), value, expected_types)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
             self._check_type_matched_not_none_(value, attempt_cast=attempt_cast or self.auto_cast)

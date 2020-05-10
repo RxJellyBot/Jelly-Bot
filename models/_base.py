@@ -51,7 +51,7 @@ class Model(MutableMapping, abc.ABC):
         not_handled = self._fill_default_vals_(self.model_fields() - {to_camel_case(k) for k in self._dict_.keys()})
 
         if len(not_handled) > 0:
-            raise RequiredKeyUnfilledError(not_handled)
+            raise RequiredKeyUnfilledError(self, not_handled)
 
         self._check_validity_()
 

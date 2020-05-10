@@ -41,7 +41,7 @@ class ColorField(BaseField):
         elif isinstance(value, Color):
             pass
         else:
-            raise FieldTypeMismatch(self.key, type(value), self.expected_types)
+            raise FieldTypeMismatch(self.key, type(value), value, self.expected_types)
 
     def _cast_to_desired_type_(self, value):
         # Data store in the database is int
