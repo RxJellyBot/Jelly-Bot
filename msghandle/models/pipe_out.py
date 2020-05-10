@@ -8,7 +8,7 @@ from extutils import safe_cast
 from extutils.emailutils import MailSender
 from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 from models import AutoReplyContentModel
 
 
@@ -28,7 +28,7 @@ class HandledMessageEvent(ABC):
         :return: casted `HandledMessageEvent`. `None` if no corresponding one.
         """
         valid = \
-            AutoReplyValidators.is_valid_content(
+            AutoReplyValidator.is_valid_content(
                 response_model.content_type, response_model.content, online_check=True)
 
         if not valid:

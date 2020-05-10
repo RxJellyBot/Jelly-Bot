@@ -13,7 +13,7 @@ from extutils.dt import now_utc_aware
 from flags import ProfilePermission, AutoReplyContentType
 from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
     AutoReplyContentModel, UniqueKeywordCountResult
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
@@ -67,12 +67,13 @@ class AutoReplyModuleManager(BaseCollection):
         Returns `WriteOutcome.O_MISC` if all checks passed.
         """
         # Check validity of keyword
-        if not AutoReplyValidators.is_valid_content(kw_type, kw_content, online_check):
+        if not AutoReplyValidator.is_valid_content(kw_type, kw_content, online_check=online_check):
             return WriteOutcome.X_AR_INVALID_KEYWORD
 
         # Check validity of responses
         for response in responses:
-            if not AutoReplyValidators.is_valid_content(response.content_type, response.content, online_check):
+            if not AutoReplyValidator.is_valid_content(
+                    response.content_type, response.content, online_check=online_check):
                 return WriteOutcome.X_AR_INVALID_RESPONSE
 
         # Check module duplication

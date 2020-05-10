@@ -8,7 +8,7 @@ from extutils.emailutils import MailSender
 from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType, ExtraContentType
 from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 from mongodb.utils import CursorWithCount
 from mongodb.factory import AutoReplyManager, ExecodeManager, ExtraContentManager
 from mongodb.factory.results import WriteOutcome
@@ -134,7 +134,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     ret = []
     kw_type = AutoReplyContentType.determine(keyword)
     # Issue #124
-    if not AutoReplyValidators.is_valid_content(kw_type, keyword, online_check=True):
+    if not AutoReplyValidator.is_valid_content(kw_type, keyword, online_check=True):
         kw_type = AutoReplyContentType.TEXT
         ret.append(HandledMessageEventText(
             content=_("The type of the keyword has been automatically set to `TEXT` "
@@ -142,7 +142,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
     resp_type = AutoReplyContentType.determine(response)
     # Issue #124
-    if not AutoReplyValidators.is_valid_content(resp_type, response, online_check=True):
+    if not AutoReplyValidator.is_valid_content(resp_type, response, online_check=True):
         resp_type = AutoReplyContentType.TEXT
         ret.append(HandledMessageEventText(
             content=_("The type of the response has been automatically set to `TEXT` "

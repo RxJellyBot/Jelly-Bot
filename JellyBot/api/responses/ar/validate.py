@@ -1,7 +1,7 @@
 from JellyBot.api.static import param, result
 from JellyBot.api.responses.mixin import SerializeErrorMixin, SerializeResultExtraMixin
 from flags import AutoReplyContentType
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 
 from .._base import BaseApiResponse
 
@@ -43,8 +43,8 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
         self._handle_content_()
 
     def process_pass(self):
-        self._result = AutoReplyValidators.is_valid_content(self._data[param.Validation.CONTENT_TYPE],
-                                                            self._data[param.Validation.CONTENT])
+        self._result = AutoReplyValidator.is_valid_content(self._data[param.Validation.CONTENT_TYPE],
+                                                           self._data[param.Validation.CONTENT])
 
     def serialize_success(self) -> dict:
         return {result.DATA: self._data}

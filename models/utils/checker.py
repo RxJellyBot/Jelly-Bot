@@ -13,15 +13,12 @@ from extutils.logger import LoggerSkeleton
 
 from ..rpdata import PendingRepairDataModel
 
+__all__ = ["ModelFieldChecker"]
 
 logger = LoggerSkeleton("mongo.modelcheck", logger_name_env="MODEL_CHECK")
 
 
 class DataRepairResult(FlagCodeEnum):
-    @classmethod
-    def default(cls):
-        raise ValueError("No default value for `DataRepairResult`.")
-
     REQUIRED_MISSING = 0
     NO_PATCH_NEEDED = 1
     REPAIRED = 2
@@ -64,7 +61,6 @@ class ModelFieldChecker:
         logger.logger.info(f"Done scanning `{col_inst.full_name}`.")
 
 
-# noinspection PyUnusedLocal
 def _get_dict_models_(model_cls):
     """
     :return: [(Json Key, Default Value), (Json Key, Default Value), ...]
@@ -73,7 +69,6 @@ def _get_dict_models_(model_cls):
             if isinstance(getattr(model_cls, k), ModelField)]
 
 
-# noinspection PyUnusedLocal
 def _get_default_vals_(model_cls):
     """
     :return: [(Json Key, Default Value), (Json Key, Default Value), ...]

@@ -9,7 +9,7 @@ from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
 from models.exceptions import KeyNotExistedError
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 from extutils.utils import enumerate_ranking
 
 from ._base import Model
@@ -57,7 +57,7 @@ class AutoReplyContentModel(Model):
         if self.is_field_none("Content"):
             return ModelValidityCheckResult.X_AR_CONTENT_EMPTY
 
-        valid = AutoReplyValidators.is_valid_content(self.content_type, self.content, False)
+        valid = AutoReplyValidator.is_valid_content(self.content_type, self.content, online_check=False)
 
         if not valid:
             if self.content_type == AutoReplyContentType.IMAGE:
