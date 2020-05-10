@@ -2,6 +2,8 @@ from flags import AutoReplyContentType
 from models.utils import AutoReplyValidator
 from tests.base import TestCase
 
+__all__ = ["TestAutoReplyValidator"]
+
 
 class TestAutoReplyValidator(TestCase):
     def test_validate_text(self):

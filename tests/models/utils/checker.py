@@ -7,6 +7,8 @@ from models.field import IntegerField
 from models.utils import ModelFieldChecker
 from tests.base import TestDatabaseMixin, TestCase
 
+__all__ = ["TestDataChecker"]
+
 
 class ModelTest(Model):
     Field1 = IntegerField("f1", default=7)
@@ -34,7 +36,7 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
 
         # Checking results
         self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
-        
+
         for data in ColInst.find():
             with self.subTest(data=data):
                 if "f1" not in data:
