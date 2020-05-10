@@ -221,7 +221,7 @@ class ControlExtensionMixin(Collection):
 class BaseCollection(ControlExtensionMixin, Collection):
     database_name: str = None
     collection_name: str = None
-    model_class: type(Model) = None
+    model_class: Type[Model] = None
 
     @classmethod
     def get_db_name(cls):
