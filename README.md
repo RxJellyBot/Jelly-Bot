@@ -40,7 +40,7 @@ Website: http://rnnx.cc/Website
 
 ### Useful Links used in this repository
 
-<details><summary>Documentation</summary>
+<details><summary>Documentations</summary>
 <p>
 
 - [reST syntax cheatsheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)

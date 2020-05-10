@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Type, Any, Tuple
 
 from bson import ObjectId
@@ -29,7 +29,6 @@ class ModelTest2(Model):
 
 
 DUMMY_OID_1 = ObjectId.from_datetime(datetime.utcnow())
-DUMMY_OID_2 = ObjectId.from_datetime(datetime.utcnow() + timedelta(days=7))
 DUMMY_MODEL_DICT = {OID_KEY: DUMMY_OID_1, "f1": 5, "f2": True}
 DUMMY_MODEL_INSTANCE = ModelTest.cast_model(DUMMY_MODEL_DICT)
 

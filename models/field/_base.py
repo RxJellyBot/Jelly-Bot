@@ -70,7 +70,7 @@ class BaseField(abc.ABC):
 
     Default properties if not specified on construction
         - ``default`` - ``None``
-        - ``allow_none`` - ``True``
+        - ``allow_none`` - ``True`` | Always ``True`` if ``none_obj()`` is ``None``
         - ``readonly`` - ``False``
         - ``auto_cast`` - ``True``
         - ``inst_cls`` - :class:`FieldInstance`
@@ -84,7 +84,7 @@ class BaseField(abc.ABC):
 
         Default values
             - ``default`` - ``None``
-            - ``allow_none`` - ``True``
+            - ``allow_none`` - ``True`` | Always ``True`` if ``none_obj()`` is ``None``
             - ``readonly`` - ``False``
             - ``auto_cast`` - ``True``
             - ``inst_cls`` - :class:`FieldInstance`
@@ -99,7 +99,7 @@ class BaseField(abc.ABC):
         :param stores_uid: if the field will store UID
         """
         # region Setting field properties
-        self._allow_none = allow_none
+        self._allow_none = self.none_obj() is None or allow_none
         self._read_only = readonly
         self._key = key
         self._auto_cast = auto_cast

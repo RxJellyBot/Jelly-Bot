@@ -8,3 +8,4 @@ from .float import *  # NOQA
 from .general import *  # NOQA
 from .int import *  # NOQA
 from .model import *  # NOQA
+from .oid import *  # NOQA

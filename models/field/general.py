@@ -11,11 +11,6 @@ class GeneralField(BaseField):
         .. seealso::
             Check the document of :class:`BaseField` for other default properties.
         """
-        if not kwargs.get("allow_none", True):
-            from mongodb.utils.logger import logger
-            logger.logger.warning(f"This `GenericField` (Key: {key}) will always allow `None`.")
-        kwargs["allow_none"] = True
-
         if "auto_cast" not in kwargs:
             kwargs["auto_cast"] = False
 

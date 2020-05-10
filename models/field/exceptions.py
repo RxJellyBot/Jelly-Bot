@@ -1,4 +1,5 @@
 from abc import ABC
+from datetime import datetime
 from typing import Union, Tuple, Any, Iterable
 
 
@@ -105,6 +106,16 @@ class FieldModelClassInvalid(FieldException):
 class FieldValueNegative(FieldException):
     def __init__(self, key: str, val: Union[int, float]):
         super().__init__(key, error_msg=f"Field value should not be negative. (Actual: {val})")
+
+
+class FieldOidDatetimeOutOfRange(FieldException):
+    def __init__(self, key: str, dt: datetime):
+        super().__init__(key, error_msg=f"Datetime to initialize `ObjectId` out of range. (Actual: {dt})")
+
+
+class FieldOidStringInvalid(FieldException):
+    def __init__(self, key: str, val: str):
+        super().__init__(key, error_msg=f"Invalid string initialize `ObjectId`. (Actual: {val})")
 
 
 class FieldInvalidDefaultValue(FieldException):

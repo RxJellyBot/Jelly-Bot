@@ -137,7 +137,7 @@ class TestFieldProperty(TestCase, ABC):
 
     # region Handling `None`
     def test_allow_none_val_control(self):
-        f = self.get_initialized_field(allow_none=True)
+        f = self.get_initialized_field(allow_none=True, readonly=False)
 
         self.assertTrue(f.allow_none)
 
@@ -151,7 +151,7 @@ class TestFieldProperty(TestCase, ABC):
         self.get_initialized_field(allow_none=True, default=None)
 
     def test_not_allow_none_val_control(self):
-        f = self.get_initialized_field(allow_none=False)
+        f = self.get_initialized_field(allow_none=False, readonly=False)
 
         self.assertFalse(f.allow_none)
 

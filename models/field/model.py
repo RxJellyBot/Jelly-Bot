@@ -27,14 +27,9 @@ class ModelField(BaseField):
 
         self._model_cls = model_cls
 
-        if not kwargs.get("allow_none", True):
-            from mongodb.utils.logger import logger
-            logger.logger.warning(f"This `ModelField` (Key: {key}) will always allow `None`.")
-        kwargs["allow_none"] = True
-
         if not kwargs.get("auto_cast", True):
             from mongodb.utils.logger import logger
-            logger.logger.warning(f"This `ModelField` (Key: {key}) will always allow `None`.")
+            logger.logger.warning(f"`autocast` of this `ModelField` (Key: {key}) will always being `True`.")
         kwargs["auto_cast"] = True
 
         if "default" not in kwargs:
