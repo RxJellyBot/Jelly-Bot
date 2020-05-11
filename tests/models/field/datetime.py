@@ -10,7 +10,7 @@ from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
 
-class TestDatetimeFieldProperty(TestFieldProperty):
+class TestDatetimeFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return DateTimeField
 
@@ -37,7 +37,7 @@ class TestDatetimeFieldProperty(TestFieldProperty):
         return dt
 
 
-class TestDatetimeFieldValueDefault(TestFieldValue):
+class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DateTimeField("k")
 
@@ -95,7 +95,7 @@ class TestDatetimeFieldValueDefault(TestFieldValue):
         )
 
 
-class TestDatetimeFieldValueNoAutoCast(TestFieldValue):
+class TestDatetimeFieldValueNoAutoCast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DateTimeField("k", auto_cast=False)
 
@@ -153,7 +153,7 @@ class TestDatetimeFieldValueNoAutoCast(TestFieldValue):
         )
 
 
-class TestDatetimeFieldValueAllowNone(TestFieldValue):
+class TestDatetimeFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DateTimeField("k", allow_none=True)
 
@@ -209,8 +209,3 @@ class TestDatetimeFieldValueAllowNone(TestFieldValue):
             (True, FieldTypeMismatch),
             (7, FieldTypeMismatch)
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

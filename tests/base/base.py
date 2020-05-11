@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import final
 
 from mongodb.factory import MONGO_CLIENT, is_test_db
 from django.test import TestCase as DjangoTestCase
@@ -9,6 +10,7 @@ __all__ = ["TestCase"]
 
 class TestCase(DjangoTestCase):
     @classmethod
+    @final
     def setUpClass(cls):
         # Ensure `TEST` flag is set
         if not bool(int(os.environ.get("TEST", 0))):
@@ -22,4 +24,19 @@ class TestCase(DjangoTestCase):
                 MONGO_CLIENT.drop_database(db_name)
                 print(f"Dropped test database <{db_name}>.")
 
-        super().setUpClass()
+        cls().setUpTestClass()
+
+    @classmethod
+    def setUpTestClass(cls):
+        """Hook method to setup the test case."""
+        pass
+
+    @classmethod
+    @final
+    def tearDownClass(cls):
+        cls.tearDownTestClass()
+
+    @classmethod
+    def tearDownTestClass(cls):
+        """Hook method to tear down the test case."""
+        pass

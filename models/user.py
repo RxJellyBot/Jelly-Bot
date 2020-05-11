@@ -3,7 +3,7 @@ from typing import Optional
 from bson import ObjectId
 from cachetools import TTLCache
 
-from models.exceptions import KeyNotExistedError
+from models.exceptions import FieldKeyNotExistedError
 from extutils.locales import default_locale, default_language, LocaleInfo
 from JellyBot.systemconfig import DataQuery
 from flags import ModelValidityCheckResult, Platform
@@ -41,14 +41,14 @@ class RootUserModel(Model):
     def has_onplat_data(self) -> bool:
         try:
             return not self.is_field_none("OnPlatOids")
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return False
 
     @property
     def has_api_data(self) -> bool:
         try:
             return not self.is_field_none("ApiOid")
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return False
 
 

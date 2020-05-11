@@ -1,155 +1,163 @@
-from abc import ABC, abstractmethod
-from typing import Tuple, Any, Type
-
-from tests.base import TestCase
+from abc import abstractmethod, ABC
+from typing import Tuple, Any, Type, final
 
 from models.field import BaseField
 from models.field.exceptions import FieldException
+from tests.base import TestCase
 
 
-class TestFieldValue(TestCase, ABC):
+@final
+class TestFieldValue(ABC):
     """
     Class to test the value setting and getting of a field.
 
     This can be setup and called multiple times for a field.
+
+    To use this, inherit a new class from :class:`TestFieldValue.TestClass`.
+
+    .. seealso::
+        https://stackoverflow.com/a/25695512/11571888 to see why there's a class wrapper.
     """
 
-    @abstractmethod
-    def get_field(self) -> BaseField:
-        """
-        Should return an instantiated :class:`BaseField` to be tested on value checking.
+    class TestClass(TestCase):
+        """The class to be inherited for :class:`TestFieldValue`."""
 
-        :return:
-        """
-        raise NotImplementedError()
+        @abstractmethod
+        def get_field(self) -> BaseField:
+            """
+            Should return an instantiated :class:`BaseField` to be tested on value checking.
 
-    # region Value checks
-    @abstractmethod
-    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
-        """
-        Values that will be tested on type matching.
+            :return:
+            """
+            raise NotImplementedError()
 
-        Should return a :class:`tuple` of :class:`tuple` which
+        # region Value checks
+        @abstractmethod
+        def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+            """
+            Values that will be tested on type matching.
 
-        - 1st dimension: value pairs
+            Should return a :class:`tuple` of :class:`tuple` which
 
-        - 2nd dimension: value and the expected outcome
-        """
-        raise NotImplementedError()
+            - 1st dimension: value pairs
 
-    def test_value_type_match(self):
-        f = self.get_field()
+            - 2nd dimension: value and the expected outcome
+            """
+            raise NotImplementedError()
 
-        for value, expected_outcome in self.get_value_type_match_test():
-            with self.subTest(value=value, expected_outcome=expected_outcome):
-                if expected_outcome:
-                    self.assertTrue(f.is_type_matched(value))
-                else:
-                    self.assertFalse(f.is_type_matched(value))
+        def test_value_type_match(self):
+            f = self.get_field()
 
-    @abstractmethod
-    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
-        """
-        Values that will be tested on validity.
+            for value, expected_outcome in self.get_value_type_match_test():
+                with self.subTest(value=value, expected_outcome=expected_outcome):
+                    if expected_outcome:
+                        self.assertTrue(f.is_type_matched(value))
+                    else:
+                        self.assertFalse(f.is_type_matched(value))
 
-        Should return a :class:`tuple` of :class:`tuple` which
+        @abstractmethod
+        def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+            """
+            Values that will be tested on validity.
 
-        - 1st dimension: value pairs
+            Should return a :class:`tuple` of :class:`tuple` which
 
-        - 2nd dimension: value and the expected validity
-        """
-        raise NotImplementedError()
+            - 1st dimension: value pairs
 
-    def test_value_validity(self):
-        f = self.get_field()
+            - 2nd dimension: value and the expected validity
+            """
+            raise NotImplementedError()
 
-        for value, expected_outcome in self.get_value_validity_test():
-            with self.subTest(value=value, expected_outcome=expected_outcome):
-                if expected_outcome:
-                    self.assertTrue(f.is_value_valid(value))
-                else:
-                    self.assertFalse(f.is_value_valid(value))
+        def test_value_validity(self):
+            f = self.get_field()
 
-    # endregion
+            for value, expected_outcome in self.get_value_validity_test():
+                with self.subTest(value=value, expected_outcome=expected_outcome):
+                    if expected_outcome:
+                        self.assertTrue(f.is_value_valid(value))
+                    else:
+                        self.assertFalse(f.is_value_valid(value))
 
-    # region Autocast
-    @abstractmethod
-    def is_auto_cast(self) -> bool:
-        """If the field should auto cast."""
-        raise NotImplementedError()
+        # endregion
 
-    def test_auto_cast(self):
-        if self.is_auto_cast():
-            self.assertTrue(self.get_field().auto_cast)
-        else:
-            self.assertFalse(self.get_field().auto_cast)
+        # region Autocast
+        @abstractmethod
+        def is_auto_cast(self) -> bool:
+            """If the field should auto cast."""
+            raise NotImplementedError()
 
-    @abstractmethod
-    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
-        """
-        Values that will be casted to the desired type.
+        def test_auto_cast(self):
+            if self.is_auto_cast():
+                self.assertTrue(self.get_field().auto_cast)
+            else:
+                self.assertFalse(self.get_field().auto_cast)
 
-        Should return a :class:`tuple` of :class:`tuple` which
+        @abstractmethod
+        def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+            """
+            Values that will be casted to the desired type.
 
-        - 1st dimension: value pairs
+            Should return a :class:`tuple` of :class:`tuple` which
 
-        - 2nd dimension: value to be casted and the expected value after casting
-        """
-        raise NotImplementedError()
+            - 1st dimension: value pairs
 
-    def test_cast_value(self):
-        f = self.get_field()
+            - 2nd dimension: value to be casted and the expected value after casting
+            """
+            raise NotImplementedError()
 
-        for before, expected in self.get_values_to_cast():
-            with self.subTest(before=before, expected=expected):
-                self.assertEquals(f.cast_to_desired_type(before), expected)
+        def test_cast_value(self):
+            f = self.get_field()
 
-    # endregion
+            for before, expected in self.get_values_to_cast():
+                with self.subTest(before=before, expected=expected):
+                    self.assertEquals(f.cast_to_desired_type(before), expected)
 
-    # region Set value
-    @abstractmethod
-    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
-        """
-        Values that will be set to `FieldInstance` and the expected value after setting it.
+        # endregion
 
-        Should return a :class:`tuple` of :class:`tuple` which
+        # region Set value
+        @abstractmethod
+        def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+            """
+            Values that will be set to `FieldInstance` and the expected value after setting it.
 
-        - 1st dimension: value pairs
+            Should return a :class:`tuple` of :class:`tuple` which
 
-        - 2nd dimension: value and the expected value after setting it
-        """
-        raise NotImplementedError()
+            - 1st dimension: value pairs
 
-    def test_set_value_to_field(self):
-        f = self.get_field()
+            - 2nd dimension: value and the expected value after setting it
+            """
+            raise NotImplementedError()
 
-        for val_to_set, val_to_get in self.get_valid_value_to_set():
-            fi = f.new()
+        def test_set_value_to_field(self):
+            f = self.get_field()
 
-            with self.subTest(val_to_set=val_to_set, val_to_get=val_to_get):
-                fi.value = val_to_set
-                self.assertEquals(val_to_get, fi.value)
+            for val_to_set, val_to_get in self.get_valid_value_to_set():
+                fi = f.new()
 
-    @abstractmethod
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
-        """
-        Values that will be set to :class:`models.field._base.FieldInstance` and the exception it should throw.
+                with self.subTest(val_to_set=val_to_set, val_to_get=val_to_get):
+                    fi.value = val_to_set
+                    self.assertEquals(val_to_get, fi.value)
 
-        Should return a :class:`tuple` of :class:`tuple` which
+        @abstractmethod
+        def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+            """
+            Values that will be set to :class:`models.field._base.FieldInstance` and the exception it should throw.
 
-        - 1st dimension: value pairs
+            Should return a :class:`tuple` of :class:`tuple` which
 
-        - 2nd dimension: value and the expected class of :class:`FieldException`
-        """
-        raise NotImplementedError()
+            - 1st dimension: value pairs
 
-    def test_set_invalid_value_to_field(self):
-        f = self.get_field()
+            - 2nd dimension: value and the expected class of :class:`FieldException`
+            """
+            raise NotImplementedError()
 
-        for value, expected_exception in self.get_invalid_value_to_set():
-            fi = f.new()
+        def test_set_invalid_value_to_field(self):
+            f = self.get_field()
 
-            with self.subTest(value=value, expected_exception=expected_exception):
-                with self.assertRaises(expected_exception):
-                    fi.value = value
-    # endregion
+            for value, expected_exception in self.get_invalid_value_to_set():
+                fi = f.new()
+
+                with self.subTest(value=value, expected_exception=expected_exception):
+                    with self.assertRaises(expected_exception):
+                        fi.value = value
+        # endregion

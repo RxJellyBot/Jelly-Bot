@@ -13,7 +13,7 @@ __all__ = ["TestGeneralFieldProperty", "TestGeneralFieldValueAutocast",
            "TestGeneralFieldValueDefault", "TestGeneralFieldValueNotAllowNone"]
 
 
-class TestGeneralFieldProperty(TestFieldProperty):
+class TestGeneralFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return GeneralField
 
@@ -51,7 +51,7 @@ class TestGeneralFieldProperty(TestFieldProperty):
         pass
 
 
-class TestGeneralFieldValueDefault(TestFieldValue):
+class TestGeneralFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return GeneralField("k")
 
@@ -117,7 +117,7 @@ class TestGeneralFieldValueNotAllowNone(TestGeneralFieldValueDefault):
         return GeneralField("k", allow_none=False)
 
 
-class TestGeneralFieldValueAutocast(TestFieldValue):
+class TestGeneralFieldValueAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return GeneralField("k", auto_cast=True)
 
@@ -176,8 +176,3 @@ class TestGeneralFieldValueAutocast(TestFieldValue):
             ({"A"}, FieldTypeMismatch),
             (object(), FieldTypeMismatch),
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

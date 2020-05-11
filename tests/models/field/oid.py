@@ -17,7 +17,7 @@ __all__ = ["TestOidFieldProperty", "TestOidFieldValueAllowNone", "TestOidFieldVa
            "TestOidFieldValueNoAutocast", "TestOidFieldValueNoKey", "TestOidFieldValueNotReadonly"]
 
 
-class TestOidFieldProperty(TestFieldProperty):
+class TestOidFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return ObjectIDField
 
@@ -44,7 +44,7 @@ class TestOidFieldProperty(TestFieldProperty):
         return ObjectId
 
 
-class TestOidFieldValueDefault(TestFieldValue):
+class TestOidFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ObjectIDField("k")
 
@@ -101,7 +101,7 @@ class TestOidFieldValueDefault(TestFieldValue):
         )
 
 
-class TestOidFieldValueNotReadonly(TestFieldValue):
+class TestOidFieldValueNotReadonly(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ObjectIDField("k", readonly=False)
 
@@ -159,7 +159,7 @@ class TestOidFieldValueNotReadonly(TestFieldValue):
         )
 
 
-class TestOidFieldValueAllowNone(TestFieldValue):
+class TestOidFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ObjectIDField("k", allow_none=True)
 
@@ -217,7 +217,7 @@ class TestOidFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestOidFieldValueNoAutocast(TestFieldValue):
+class TestOidFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ObjectIDField("k", auto_cast=False)
 
@@ -280,8 +280,3 @@ class TestOidFieldValueNoKey(TestOidFieldValueDefault):
 
     def test_key_name(self):
         self.assertEquals(OID_KEY, self.get_field().key)
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

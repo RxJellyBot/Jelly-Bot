@@ -1,6 +1,7 @@
 import os
 import sys
 from abc import ABC
+from typing import final
 
 import pymongo
 
@@ -32,19 +33,29 @@ class TestDatabaseMixin(TestCase, ABC):
     # Original env var `MONGO_DB`
     _os_mongo_db_ = None
 
+    def setUpTestCase(self) -> None:
+        """Hook method to setup each test cases."""
+        pass
+
+    @final
     def setUp(self) -> None:
         # Ensure the database is clear
         if single_db_name:
             mongo_client.drop_database(single_db_name)
 
-        super().setUp()
+        self.setUpTestCase()
 
+    def tearDownTestCase(self) -> None:
+        """Hook method to tear down each test cases."""
+        pass
+
+    @final
     def tearDown(self) -> None:
         # Drop the used database
         if single_db_name:
             mongo_client.drop_database(single_db_name)
 
-        super().tearDown()
+        self.tearDownTestCase()
 
     @classmethod
     def db_ping_ms(cls) -> float:

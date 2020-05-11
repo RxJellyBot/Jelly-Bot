@@ -74,6 +74,12 @@ class FieldInstance:
     def __repr__(self):
         return f"<{self.base.key}{'(ro)' if self.base.read_only else ''}: {self.value}>"
 
+    def __eq__(self, other):
+        if isinstance(other, FieldInstance) and type(self) == type(other):
+            return self.__dict__ and other.__dict__
+        else:
+            return False
+
 
 class BaseField(abc.ABC):
     """
@@ -290,4 +296,10 @@ class BaseField(abc.ABC):
         return value is None or value == self.none_obj()
 
     def __repr__(self):
-        return f"{self.__class__.__qualname__} {' (Read-only)' if self._read_only else ''} <{self._key}>"
+        return f"{self.__class__.__qualname__}{' (Read-only)' if self._read_only else ''}<{self._key}>"
+
+    def __eq__(self, other):
+        if isinstance(other, BaseField) and type(self) == type(other):
+            return self.__dict__ == other.__dict__
+        else:
+            return False

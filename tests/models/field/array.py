@@ -17,7 +17,7 @@ __all__ = ["TestArrayFieldValueDefault", "TestArrayFieldValueAllowNone", "TestAr
            "TestArrayFieldValueNotAllowEmptyDefaultHasValue", "TestArrayFieldValueNotAllowEmptyDefaultIsOptional"]
 
 
-class TestArrayFieldProperty(TestFieldProperty):
+class TestArrayFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return ArrayField
 
@@ -49,7 +49,7 @@ class TestArrayFieldProperty(TestFieldProperty):
         return list
 
 
-class TestArrayFieldValueDefault(TestFieldValue):
+class TestArrayFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int)
 
@@ -129,7 +129,7 @@ class TestArrayFieldValueDefault(TestFieldValue):
         )
 
 
-class TestArrayFieldValueAllowNone(TestFieldValue):
+class TestArrayFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, allow_none=True)
 
@@ -210,7 +210,7 @@ class TestArrayFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestArrayFieldValueNoAutoCast(TestFieldValue):
+class TestArrayFieldValueNoAutoCast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, auto_cast=False)
 
@@ -288,7 +288,7 @@ class TestArrayFieldValueNoAutoCast(TestFieldValue):
         )
 
 
-class TestArrayFieldValueNotAllowEmptyDefaultHasValue(TestFieldValue):
+class TestArrayFieldValueNotAllowEmptyDefaultHasValue(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, default=[7], allow_empty=False)
 
@@ -324,7 +324,7 @@ class TestArrayFieldValueNotAllowEmptyDefaultHasValue(TestFieldValue):
         )
 
 
-class TestArrayFieldValueNotAllowEmptyDefaultIsOptional(TestFieldValue):
+class TestArrayFieldValueNotAllowEmptyDefaultIsOptional(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, default=ModelDefaultValueExt.Optional, allow_empty=False)
 
@@ -355,7 +355,7 @@ class TestArrayFieldValueNotAllowEmptyDefaultIsOptional(TestFieldValue):
         return ()
 
 
-class TestArrayFieldValueLengthLimited(TestFieldValue):
+class TestArrayFieldValueLengthLimited(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ArrayField("k", int, max_len=3)
 
@@ -420,8 +420,3 @@ class TestArrayFieldExtra(TestCase):
             ArrayField("af", int, max_len=-1)
         with self.assertRaises(TypeError):
             ArrayField("af", int, max_len=7.5)
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

@@ -12,7 +12,7 @@ __all__ = ["TestBoolFieldProperty", "TestBoolFieldValueDefault",
            "TestBoolFieldValueNoAutoCast", "TestBoolFieldValueAllowNone"]
 
 
-class TestBoolFieldProperty(TestFieldProperty):
+class TestBoolFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return BooleanField
 
@@ -39,7 +39,7 @@ class TestBoolFieldProperty(TestFieldProperty):
         return bool
 
 
-class TestBoolFieldValueDefault(TestFieldValue):
+class TestBoolFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return BooleanField("k")
 
@@ -96,7 +96,7 @@ class TestBoolFieldValueDefault(TestFieldValue):
         )
 
 
-class TestBoolFieldValueAllowNone(TestFieldValue):
+class TestBoolFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return BooleanField("k", allow_none=True)
 
@@ -154,7 +154,7 @@ class TestBoolFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestBoolFieldValueNoAutoCast(TestFieldValue):
+class TestBoolFieldValueNoAutoCast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return BooleanField("k")
 
@@ -209,8 +209,3 @@ class TestBoolFieldValueNoAutoCast(TestFieldValue):
             (object, FieldTypeMismatch),
             ("X", FieldTypeMismatch)
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

@@ -47,7 +47,7 @@ class EnumWithDefaultField(FlagField):
     FLAG_TYPE = EnumWithDefault
 
 
-class TestEnumWithDefaultProperty(TestFieldProperty):
+class TestEnumWithDefaultProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return EnumWithDefaultField
 
@@ -76,7 +76,7 @@ class TestEnumWithDefaultProperty(TestFieldProperty):
         return EnumWithDefault
 
 
-class TestEnumWithDefaultValueDefault(TestFieldValue):
+class TestEnumWithDefaultValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return EnumWithDefaultField("k")
 
@@ -140,7 +140,7 @@ class TestEnumWithDefaultValueDefault(TestFieldValue):
         )
 
 
-class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
+class TestEnumWithDefaultValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return EnumWithDefaultField("k", auto_cast=False)
 
@@ -204,7 +204,7 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue):
         )
 
 
-class TestEnumWithDefaultValueAllowNone(TestFieldValue):
+class TestEnumWithDefaultValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return EnumWithDefaultField("k", allow_none=True)
 
@@ -270,8 +270,3 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue):
 
 
 # endregion
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

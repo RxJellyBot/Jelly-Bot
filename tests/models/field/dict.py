@@ -12,7 +12,7 @@ __all__ = ["TestDictFieldProperty", "TestDictFieldValueAllowNone",
            "TestDictFieldValueDefault", "TestDictFieldValueNoAutocast"]
 
 
-class TestDictFieldProperty(TestFieldProperty):
+class TestDictFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return DictionaryField
 
@@ -39,7 +39,7 @@ class TestDictFieldProperty(TestFieldProperty):
         return dict
 
 
-class TestDictFieldValueDefault(TestFieldValue):
+class TestDictFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DictionaryField("k")
 
@@ -88,7 +88,7 @@ class TestDictFieldValueDefault(TestFieldValue):
         )
 
 
-class TestDictFieldValueAllowNone(TestFieldValue):
+class TestDictFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DictionaryField("k", allow_none=True)
 
@@ -138,7 +138,7 @@ class TestDictFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestDictFieldValueNoAutocast(TestFieldValue):
+class TestDictFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return DictionaryField("k", auto_cast=False)
 
@@ -185,8 +185,3 @@ class TestDictFieldValueNoAutocast(TestFieldValue):
             (7, FieldTypeMismatch),
             ([("A", 9), ("B", 8)], FieldTypeMismatch)
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

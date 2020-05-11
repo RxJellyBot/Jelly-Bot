@@ -12,7 +12,7 @@ __all__ = ["TestIntegerFieldProperty", "TestIntegerFieldValueAllowNone",
            "TestIntegerFieldValueDefault", "TestIntegerFieldValueNoAutocast", "TestIntegerFieldValuePositiveOnly"]
 
 
-class TestIntegerFieldProperty(TestFieldProperty):
+class TestIntegerFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return IntegerField
 
@@ -39,7 +39,7 @@ class TestIntegerFieldProperty(TestFieldProperty):
         return int
 
 
-class TestIntegerFieldValueDefault(TestFieldValue):
+class TestIntegerFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return IntegerField("k")
 
@@ -92,7 +92,7 @@ class TestIntegerFieldValueDefault(TestFieldValue):
         )
 
 
-class TestIntegerFieldValueNoAutocast(TestFieldValue):
+class TestIntegerFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return IntegerField("k", auto_cast=False)
 
@@ -145,7 +145,7 @@ class TestIntegerFieldValueNoAutocast(TestFieldValue):
         )
 
 
-class TestIntegerFieldValueAllowNone(TestFieldValue):
+class TestIntegerFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return IntegerField("k", allow_none=True)
 
@@ -199,7 +199,7 @@ class TestIntegerFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestIntegerFieldValuePositiveOnly(TestFieldValue):
+class TestIntegerFieldValuePositiveOnly(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return IntegerField("k", positive_only=True)
 
@@ -249,8 +249,3 @@ class TestIntegerFieldValuePositiveOnly(TestFieldValue):
             ("A", FieldTypeMismatch),
             (-5, FieldValueNegative)
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

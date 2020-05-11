@@ -1,2 +1,3 @@
-from .base import TestModel
 from .field import *  # NOQA
+
+from .ar import *  # NOQA

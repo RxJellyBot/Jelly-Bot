@@ -8,7 +8,7 @@ from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
-from models.exceptions import KeyNotExistedError
+from models.exceptions import FieldKeyNotExistedError
 from models.utils import AutoReplyValidator
 from extutils.utils import enumerate_ranking
 
@@ -81,14 +81,14 @@ class AutoReplyModuleModel(Model):
 
     KEY_KW_CONTENT = f"{key_kw}.{AutoReplyContentModel.Content.key}"
     KEY_KW_TYPE = f"{key_kw}.{AutoReplyContentModel.ContentType.key}"
-    ChannelId = ObjectIDField("ch")
+    ChannelId = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
     Active = BooleanField("at", default=True)
 
     # Type
     ReferTo = ObjectIDField("rid", allow_none=True, default=ModelDefaultValueExt.Optional)
 
     # Record
-    CreatorOid = ObjectIDField("cr", stores_uid=True)
+    CreatorOid = ObjectIDField("cr", stores_uid=True, default=ModelDefaultValueExt.Required)
     RemoverOid = ObjectIDField("rmv", stores_uid=True, default=ModelDefaultValueExt.Optional)
 
     # Property
@@ -110,14 +110,14 @@ class AutoReplyModuleModel(Model):
                 return self.refer_to
             else:
                 return None
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return None
 
     @property
     def is_reference(self) -> bool:
         try:
             return not self.is_field_none("ReferTo")
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return False
 
     @property

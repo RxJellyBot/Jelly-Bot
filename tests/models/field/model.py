@@ -33,7 +33,7 @@ DUMMY_MODEL_DICT = {OID_KEY: DUMMY_OID_1, "f1": 5, "f2": True}
 DUMMY_MODEL_INSTANCE = ModelTest.cast_model(DUMMY_MODEL_DICT)
 
 
-class TestModelFieldProperty(TestFieldProperty):
+class TestModelFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return ModelField
 
@@ -79,7 +79,7 @@ class TestModelFieldProperty(TestFieldProperty):
         pass
 
 
-class TestModelFieldValueDefault(TestFieldValue):
+class TestModelFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ModelField("k", ModelTest)
 
@@ -153,8 +153,3 @@ class TestModelFieldExtra(TestCase):
             with self.subTest(mdl_cls=mdl_cls):
                 with self.assertRaises(FieldModelClassInvalid):
                     ModelField("k", mdl_cls)
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

@@ -13,7 +13,7 @@ __all__ = ["TestColorFieldProperty", "TestColorFieldValueAllowNone",
            "TestColorFieldValueDefault", "TestColorFieldValueNoAutoCast"]
 
 
-class TestColorFieldProperty(TestFieldProperty):
+class TestColorFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return ColorField
 
@@ -42,7 +42,7 @@ class TestColorFieldProperty(TestFieldProperty):
         return Color
 
 
-class TestColorFieldValueDefault(TestFieldValue):
+class TestColorFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ColorField("k")
 
@@ -105,7 +105,7 @@ class TestColorFieldValueDefault(TestFieldValue):
         )
 
 
-class TestColorFieldValueAllowNone(TestFieldValue):
+class TestColorFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ColorField("k", allow_none=True)
 
@@ -169,7 +169,7 @@ class TestColorFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestColorFieldValueNoAutoCast(TestFieldValue):
+class TestColorFieldValueNoAutoCast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ColorField("k", auto_cast=False)
 
@@ -230,8 +230,3 @@ class TestColorFieldValueNoAutoCast(TestFieldValue):
             (20000000, FieldValueInvalid),
             ("GGGGGG", FieldValueInvalid),
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

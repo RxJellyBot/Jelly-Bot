@@ -15,7 +15,7 @@ __all__ = ["TestTextFieldExtra", "TestTextFieldProperty", "TestTextFieldValueAll
            "TestTextFieldValueNoAutocast", "TestTextFieldValueWithRegex"]
 
 
-class TestTextFieldProperty(TestFieldProperty):
+class TestTextFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return TextField
 
@@ -46,7 +46,7 @@ class TestTextFieldProperty(TestFieldProperty):
         return str
 
 
-class TestTextFieldValueDefault(TestFieldValue):
+class TestTextFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k")
 
@@ -123,7 +123,7 @@ class TestTextFieldValueDefault(TestFieldValue):
         )
 
 
-class TestTextFieldValueAllowNone(TestFieldValue):
+class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k", allow_none=True)
 
@@ -201,7 +201,7 @@ class TestTextFieldValueAllowNone(TestFieldValue):
         )
 
 
-class TestTextFieldValueNoAutocast(TestFieldValue):
+class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k", auto_cast=False)
 
@@ -278,7 +278,7 @@ class TestTextFieldValueNoAutocast(TestFieldValue):
         )
 
 
-class TestTextFieldValueMustHaveContent(TestFieldValue):
+class TestTextFieldValueMustHaveContent(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k", must_have_content=True, default="default")
 
@@ -321,7 +321,7 @@ class TestTextFieldValueMustHaveContent(TestFieldValue):
         )
 
 
-class TestTextFieldValueWithRegex(TestFieldValue):
+class TestTextFieldValueWithRegex(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k", regex="[A-F]{8}", default="AAAAAAAA")
 
@@ -371,7 +371,7 @@ class TestTextFieldValueWithRegex(TestFieldValue):
         )
 
 
-class TestTextFieldValueDifferentMaxLength(TestFieldValue):
+class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return TextField("k", maxlen=500)
 
@@ -428,8 +428,3 @@ class TestTextFieldExtra(TestCase):
     def test_default_no_content(self):
         with self.assertRaises(FieldInvalidDefaultValue):
             TextField("k", default="", must_have_content=True)
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

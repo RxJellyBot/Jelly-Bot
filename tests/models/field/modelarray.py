@@ -20,9 +20,9 @@ class ModelTest(Model):
     Field2 = BooleanField("f2")
 
 
-MODEL1 = ModelTest(Field1=7, Field2=True, from_db=True)
-MODEL2 = ModelTest(Field1=9, Field2=True, from_db=True)
-MODEL3 = ModelTest(Field1=11, Field2=True, from_db=True)
+MODEL1 = ModelTest(Field1=7, Field2=True, from_db=False)
+MODEL2 = ModelTest(Field1=9, Field2=True, from_db=False)
+MODEL3 = ModelTest(Field1=11, Field2=True, from_db=False)
 
 MODEL4_DICT = {OID_KEY: ObjectId.from_datetime(datetime.now()), "f1": 13, "f2": True}
 MODEL4_INST = ModelTest.cast_model(MODEL4_DICT)
@@ -31,7 +31,7 @@ __all__ = ["TestModelArrayFieldAllowNone", "TestModelArrayFieldExtra", "TestMode
            "TestModelArrayFieldValueDefault", "TestModelArrayFieldValueNoAutocast"]
 
 
-class TestModelArrayFieldProperty(TestFieldProperty):
+class TestModelArrayFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return ModelArrayField
 
@@ -64,7 +64,7 @@ class TestModelArrayFieldProperty(TestFieldProperty):
         return list
 
 
-class TestModelArrayFieldValueDefault(TestFieldValue):
+class TestModelArrayFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ModelArrayField("k", ModelTest)
 
@@ -131,7 +131,7 @@ class TestModelArrayFieldValueDefault(TestFieldValue):
         )
 
 
-class TestModelArrayFieldValueNoAutocast(TestFieldValue):
+class TestModelArrayFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ModelArrayField("k", ModelTest, auto_cast=False)
 
@@ -198,7 +198,7 @@ class TestModelArrayFieldValueNoAutocast(TestFieldValue):
         )
 
 
-class TestModelArrayFieldAllowNone(TestFieldValue):
+class TestModelArrayFieldAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return ModelArrayField("k", ModelTest, allow_none=True)
 
@@ -277,8 +277,3 @@ class TestModelArrayFieldExtra(TestCase):
 
         with self.assertRaises(FieldReadOnly):
             fi.value = [MODEL4_INST]
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

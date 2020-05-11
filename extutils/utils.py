@@ -91,10 +91,20 @@ def all_lower(o: [str, tuple, list, set, dict]):
 
 
 def to_snake_case(s: str):
+    """
+    Convert camel case ``s`` to snake case.
+
+    :param s: string to be converted
+    """
     return re.sub(r"(?!^)([A-Z]+)", r"_\1", s).lower()
 
 
 def to_camel_case(s: str):
+    """
+    Convert snake case ``s`` to camel case.
+
+    :param s: string to be converted
+    """
     return ''.join(x[0].upper() + x[1:] for x in s.split('_') if x)
 
 

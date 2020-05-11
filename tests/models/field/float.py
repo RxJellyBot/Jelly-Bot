@@ -11,7 +11,7 @@ from ._test_prop import TestFieldProperty
 __all__ = ["TestFloatFieldDefault", "TestFloatFieldAllowNone", "TestFloatFieldNoAutocast", "TestFloatFieldProperty"]
 
 
-class TestFloatFieldProperty(TestFieldProperty):
+class TestFloatFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return FloatField
 
@@ -41,7 +41,7 @@ class TestFloatFieldProperty(TestFieldProperty):
         return float
 
 
-class TestFloatFieldDefault(TestFieldValue):
+class TestFloatFieldDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return FloatField("k")
 
@@ -102,7 +102,7 @@ class TestFloatFieldDefault(TestFieldValue):
         )
 
 
-class TestFloatFieldAllowNone(TestFieldValue):
+class TestFloatFieldAllowNone(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return FloatField("k", allow_none=True)
 
@@ -164,7 +164,7 @@ class TestFloatFieldAllowNone(TestFieldValue):
         )
 
 
-class TestFloatFieldNoAutocast(TestFieldValue):
+class TestFloatFieldNoAutocast(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return FloatField("k", auto_cast=False)
 
@@ -223,8 +223,3 @@ class TestFloatFieldNoAutocast(TestFieldValue):
             (True, FieldTypeMismatch),
             ("A", FieldTypeMismatch),
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty

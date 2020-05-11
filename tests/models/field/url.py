@@ -13,7 +13,7 @@ __all__ = ["TestUrlFieldProperty", "TestUrlFieldValueAllowNone", "TestUrlFieldVa
            "TestUrlFieldValueDefault", "TestUrlFieldValueNoAutocast"]
 
 
-class TestUrlFieldProperty(TestFieldProperty):
+class TestUrlFieldProperty(TestFieldProperty.TestClass):
     def get_field_class(self) -> Type[BaseField]:
         return UrlField
 
@@ -46,7 +46,7 @@ class TestUrlFieldProperty(TestFieldProperty):
         pass
 
 
-class TestUrlFieldValueDefault(TestFieldValue):
+class TestUrlFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return UrlField("k")
 
@@ -138,7 +138,7 @@ class TestUrlFieldValueAllowNone(TestUrlFieldValueDefault):
         )
 
 
-class TestUrlFieldValueNotReadonly(TestFieldValue):
+class TestUrlFieldValueNotReadonly(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
         return UrlField("k", readonly=False)
 
@@ -180,8 +180,3 @@ class TestUrlFieldValueNotReadonly(TestFieldValue):
             (7, FieldTypeMismatch),
             ("X", FieldInvalidUrl),
         )
-
-
-# These abstract classes will be instantiated (causing error) if not deleted
-del TestFieldValue
-del TestFieldProperty
