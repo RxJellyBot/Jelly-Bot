@@ -11,7 +11,7 @@ from extutils.checker import arg_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import ProfilePermission, AutoReplyContentType
-from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityDataModel, OID_KEY, \
+from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityScore, OID_KEY, \
     AutoReplyContentModel, UniqueKeywordCountResult
 from models.utils import AutoReplyValidator
 from mongodb.factory.results import (
@@ -343,7 +343,7 @@ class AutoReplyManager:
         self._tag = AutoReplyModuleTagManager()
 
     def _get_tags_pop_score_(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
-            -> CursorWithCount:
+            -> List[AutoReplyTagPopularityScore]:
         # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
         # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
 
@@ -358,7 +358,7 @@ class AutoReplyManager:
         pipeline.append({"$unwind": "$" + AutoReplyModuleModel.TagIds.key})
         pipeline.append({"$group": {
             OID_KEY: "$" + AutoReplyModuleModel.TagIds.key,
-            AutoReplyTagPopularityDataModel.WeightedAvgTimeDiff.key: {
+            AutoReplyTagPopularityScore.KEY_W_AVG_TIME_DIFF: {
                 "$avg": {
                     "$divide": [
                         Database.PopularityConfig.TimeCoeffA,
@@ -372,7 +372,7 @@ class AutoReplyManager:
                                         {"$divide": [
                                             {"$subtract": [
                                                 {"$toDate": ObjectId.from_datetime(datetime.utcnow())},
-                                                {"$toDate": "$" + AutoReplyTagPopularityDataModel.Id.key}
+                                                {"$toDate": "$" + OID_KEY}
                                             ]},
                                             3600000
                                         ]},
@@ -384,39 +384,36 @@ class AutoReplyManager:
                     ]
                 }
             },
-            AutoReplyTagPopularityDataModel.Appearances.key: {"$sum": 1}
+            AutoReplyTagPopularityScore.KEY_APPEARANCE: {"$sum": 1}
         }})
         pipeline.append({"$addFields": {
-            AutoReplyTagPopularityDataModel.WeightedAppearances.key: {
+            AutoReplyTagPopularityScore.KEY_W_APPEARANCE: {
                 "$multiply": [
                     Database.PopularityConfig.AppearanceCoeffA,
                     {"$pow": [
-                        "$" + AutoReplyTagPopularityDataModel.Appearances.key,
+                        "$" + AutoReplyTagPopularityScore.KEY_APPEARANCE,
                         Database.PopularityConfig.AppearanceFunctionCoeff
                     ]}
                 ]
             }
         }})
         pipeline.append({"$addFields": {
-            AutoReplyTagPopularityDataModel.Score.key: {
+            AutoReplyTagPopularityScore.SCORE: {
                 "$subtract": [
                     {"$multiply": [
                         Database.PopularityConfig.AppearanceEquivalentWHr,
-                        "$" + AutoReplyTagPopularityDataModel.WeightedAppearances.key
+                        "$" + AutoReplyTagPopularityScore.KEY_W_APPEARANCE
                     ]},
-                    "$" + AutoReplyTagPopularityDataModel.WeightedAvgTimeDiff.key
+                    "$" + AutoReplyTagPopularityScore.KEY_W_AVG_TIME_DIFF
                 ]
             }
         }})
         pipeline.append({"$sort": {
-            AutoReplyTagPopularityDataModel.Score.key: pymongo.DESCENDING
+            AutoReplyTagPopularityScore.SCORE: pymongo.DESCENDING
         }})
         pipeline.append({"$limit": count})
 
-        # Get the count of the result
-        count_doc = min(count, self._mod.count_documents(filter_ if filter_word else {}))
-
-        return CursorWithCount(self._mod.aggregate(pipeline), count_doc, parse_cls=AutoReplyTagPopularityDataModel)
+        return [AutoReplyTagPopularityScore.parse(doc) for doc in self._mod.aggregate(pipeline)]
 
     def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
         return self._mod.add_conn_by_model(model)
@@ -456,8 +453,8 @@ class AutoReplyManager:
         """
         ret = []
 
-        for score_model in self._get_tags_pop_score_(search_keyword, count):
-            tag_data = self._tag.get_tag_data(score_model.id)
+        for pop_score in self._get_tags_pop_score_(search_keyword, count):
+            tag_data = self._tag.get_tag_data(pop_score.tag_id)
             if tag_data:
                 ret.append(tag_data.name)
 

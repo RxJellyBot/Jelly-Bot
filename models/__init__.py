@@ -5,7 +5,7 @@ from ._base import Model
 # noinspection PyUnresolvedReferences
 from .ar import (
     AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleTagModel, AutoReplyModuleExecodeModel,
-    AutoReplyTagPopularityDataModel, UniqueKeywordCountResult
+    AutoReplyTagPopularityScore, UniqueKeywordCountResult
 )
 # noinspection PyUnresolvedReferences
 from .channel import ChannelModel, ChannelConfigModel, ChannelCollectionModel

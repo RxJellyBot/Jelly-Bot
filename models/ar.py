@@ -15,7 +15,7 @@ from extutils.utils import enumerate_ranking
 from ._base import Model
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, ModelDefaultValueExt
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, ModelDefaultValueExt
 )
 
 
@@ -160,13 +160,28 @@ class AutoReplyModuleTagModel(Model):
     Color = ColorField("c")
 
 
-# TODO: Change this to `@dataclass`
-class AutoReplyTagPopularityDataModel(Model):
-    # ID will used as identifier in aggregation so `WITH_OID` is set to `True`
-    WeightedAvgTimeDiff = FloatField("w_avg_time_diff")
-    WeightedAppearances = FloatField("w_appearances")
-    Appearances = IntegerField("u_appearances")
-    Score = FloatField("score")
+@dataclass
+class AutoReplyTagPopularityScore:
+    KEY_W_AVG_TIME_DIFF = "w_atd"
+    KEY_W_APPEARANCE = "w_app"
+    KEY_APPEARANCE = "app"
+    SCORE = "sc"
+
+    tag_id: ObjectId
+    score: float
+    appearances: int
+    weighted_avg_time_diff: float
+    weighted_appearances: float
+
+    @staticmethod
+    def parse(d: dict):
+        return AutoReplyTagPopularityScore(
+            tag_id=d[OID_KEY],
+            score=d[AutoReplyTagPopularityScore.SCORE],
+            appearances=d[AutoReplyTagPopularityScore.KEY_APPEARANCE],
+            weighted_avg_time_diff=d[AutoReplyTagPopularityScore.KEY_W_AVG_TIME_DIFF],
+            weighted_appearances=d[AutoReplyTagPopularityScore.KEY_W_APPEARANCE],
+        )
 
 
 @dataclass

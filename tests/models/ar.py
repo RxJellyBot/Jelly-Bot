@@ -13,7 +13,8 @@ from models.exceptions import ModelConstructionError, InvalidModelError
 
 from ._test_base import TestModel
 
-__all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoReplyModuleExecodeModel"]
+__all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoReplyModuleExecodeModel",
+           "TestAutoReplyModuleTagModel"]
 
 
 # region AutoReplyContentModel
