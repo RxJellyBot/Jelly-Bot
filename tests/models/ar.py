@@ -3,14 +3,17 @@ from datetime import datetime, timezone
 
 from bson import ObjectId
 
+from extutils.color import ColorFactory
 from flags import AutoReplyContentType, ModelValidityCheckResult
-from models import Model, AutoReplyModuleModel, AutoReplyContentModel
+from models import (
+    Model, AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleExecodeModel, AutoReplyModuleTagModel
+)
 from models.field.exceptions import FieldEmptyValueNotAllowed
 from models.exceptions import ModelConstructionError, InvalidModelError
 
 from ._test_base import TestModel
 
-__all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel"]
+__all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoReplyModuleExecodeModel"]
 
 
 # region AutoReplyContentModel
@@ -161,4 +164,61 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
         mdl.removed_at = remove_at
         self.assertEquals(mdl.removed_at, remove_at)
 
+
+# endregion
+
+
+# region AutoReplyModuleExecodeModel
+
+
+class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
+    @classmethod
+    def get_model_class(cls) -> Type[Model]:
+        return AutoReplyModuleExecodeModel
+
+    @classmethod
+    def get_required(cls) -> Dict[Tuple[str, str], Any]:
+        return {
+            ("kw", "Keyword"): {"c": "ABC", "t": AutoReplyContentType.TEXT},
+            ("rp", "Responses"): [{"c": "DEF", "t": AutoReplyContentType.TEXT}],
+        }
+
+    @classmethod
+    def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
+        return {
+            ("p", "Pinned"): (False, True),
+            ("pr", "Private"): (False, True),
+            ("cd", "CooldownSec"): (0, 10),
+            ("t", "TagIds"): ([], [tag_1]),
+        }
+
+    def test_to_actual_model(self):
+        exc_mdl = self.get_constructed_model()
+        exc_mdl_dict = exc_mdl.to_json()
+        exc_mdl_dict["ch"] = channel_oid
+        exc_mdl_dict["cr"] = creator_oid
+
+        arm_mdl_dict = exc_mdl.to_actual_model(channel_oid, creator_oid).to_json()
+
+        # Not matching 2 dicts because actual model contains more properties
+        for ek, ev in exc_mdl_dict.items():
+            self.assertEquals(arm_mdl_dict[ek], ev)
+
+
+# endregion
+
+
+# region AutoReplyModuleTagModel
+class TestAutoReplyModuleTagModel(TestModel.TestClass):
+    @classmethod
+    def get_model_class(cls) -> Type[Model]:
+        return AutoReplyModuleTagModel
+
+    @classmethod
+    def get_required(cls) -> Dict[Tuple[str, str], Any]:
+        return {("n", "Name"): "Tag"}
+
+    @classmethod
+    def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
+        return {("c", "Color"): (ColorFactory.DEFAULT, ColorFactory.WHITE)}
 # endregion

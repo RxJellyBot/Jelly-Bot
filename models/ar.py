@@ -142,8 +142,8 @@ class AutoReplyModuleModel(Model):
 class AutoReplyModuleExecodeModel(Model):
     Keyword = ModelField(AutoReplyModuleModel.key_kw, AutoReplyContentModel,
                          default=ModelDefaultValueExt.Required)
-    Responses = ArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
-                           max_len=systemconfig.AutoReply.MaxResponses)
+    Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
+                                max_len=systemconfig.AutoReply.MaxResponses)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
@@ -156,11 +156,13 @@ class AutoReplyModuleExecodeModel(Model):
 
 
 class AutoReplyModuleTagModel(Model):
-    Name = TextField("n", must_have_content=True)
+    Name = TextField("n", must_have_content=True, default=ModelDefaultValueExt.Required)
     Color = ColorField("c")
 
 
+# TODO: Change this to `@dataclass`
 class AutoReplyTagPopularityDataModel(Model):
+    # ID will used as identifier in aggregation so `WITH_OID` is set to `True`
     WeightedAvgTimeDiff = FloatField("w_avg_time_diff")
     WeightedAppearances = FloatField("w_appearances")
     Appearances = IntegerField("u_appearances")

@@ -10,6 +10,7 @@ from models.exceptions import (
     RequiredKeyUnfilledError, IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError,
     JsonKeyNotExistedError
 )
+from models.field.exceptions import FieldReadOnly
 from tests.base import TestCase
 
 __all__ = ["TestModel"]
@@ -313,7 +314,10 @@ class TestModel(ABC):
                 mdl = self.get_constructed_model(including_optional=True)
 
                 with self.subTest(fk=fk, jk=jk, manual=manual):
-                    setattr(mdl, to_snake_case(fk), manual)
+                    try:
+                        setattr(mdl, to_snake_case(fk), manual)
+                    except FieldReadOnly:
+                        self.skipTest(f"Field key <{fk}> is readonly.")
 
                     self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
                     self.assertEquals(mdl[jk], manual)
@@ -322,7 +326,10 @@ class TestModel(ABC):
                 mdl = self.get_constructed_model(including_optional=True)
 
                 with self.subTest(fk=fk, jk=jk, manual=manual):
-                    mdl[jk] = manual
+                    try:
+                        mdl[jk] = manual
+                    except FieldReadOnly:
+                        self.skipTest(f"Json key <{fk}> is readonly.")
 
                     self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
                     self.assertEquals(mdl[jk], manual)
