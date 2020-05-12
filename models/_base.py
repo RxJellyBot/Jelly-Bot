@@ -435,6 +435,11 @@ class Model(MutableMapping, abc.ABC):
 
         :raises ModelUncastableError: model uncastable
         """
+        # TEST: (PASS) cast `None`
+        # TEST: (FAIL) cast non-`MutableMapping`
+        # TEST: (PASS) cast the model itself
+        # TEST: (PASS) `obj` with additional fields
+
         if obj is None:
             return None
 
@@ -446,31 +451,10 @@ class Model(MutableMapping, abc.ABC):
 
         init_dict = dict(obj)
         for k in obj.keys():
-            if k not in cls.model_json_keys():
+            if k not in cls.model_json():
                 del init_dict[k]
 
         return cls(**init_dict, from_db=True)
-
-    @classmethod
-    def generate_json_schema(cls, *, allow_additional=True):
-        """
-        Generate the json schema for this :class:`Model`.
-
-        :param allow_additional: allow additional field
-        """
-        required_keys = []
-        properties = {}
-        for jk in cls.model_json_keys():
-            f = getattr(cls, cls.json_key_to_field(jk), None)
-            if f is not None and f.default_value == ModelDefaultValueExt.Required:
-                required_keys.append(jk)
-                properties[jk] = f.json_schema_property()
-
-        return {
-            "additionalProperties": allow_additional,
-            "required": required_keys,
-            "properties": properties
-        }
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self.data_dict}>"

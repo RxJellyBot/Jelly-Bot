@@ -52,6 +52,3 @@ class ModelField(BaseField):
     def _cast_to_desired_type_(self, value):
         # noinspection PyUnresolvedReferences
         return self.desired_type.cast_model(value)
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return self._model_cls.generate_json_schema()

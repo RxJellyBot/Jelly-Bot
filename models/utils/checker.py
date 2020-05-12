@@ -1,4 +1,3 @@
-import os
 from abc import ABC, abstractmethod
 from threading import Thread
 from typing import Optional, List, Tuple
@@ -6,8 +5,8 @@ from typing import Optional, List, Tuple
 from pymongo.cursor import Cursor
 
 from mongodb.utils import BulkWriteDataHolder
-from models import ModelDefaultValueExt, OID_KEY
 from models.field import ModelField
+from models import ModelDefaultValueExt, OID_KEY
 from extutils.flags import FlagCodeEnum
 from extutils.emailutils import MailSender
 from extutils.logger import LoggerSkeleton
@@ -56,11 +55,8 @@ class ModelFieldChecker:
         Thread(target=ModelFieldChecker.check, args=(col_inst,)).start()
 
     @staticmethod
-    def check(col_inst, *, check_redundant=False):
+    def check(col_inst):
         ModelFieldChecker.CheckDefaultValue(col_inst).perform_check()
-
-        if check_redundant or bool(int(os.environ.get("PRODUCTION", 0))):
-            ModelFieldChecker.ReplaceRedundantField(col_inst).perform_check()
 
     class CheckDefaultValue(FieldCheckerBase):
         """
@@ -86,6 +82,13 @@ class ModelFieldChecker:
                     self._model_field_mdl_class.append((f.key, f.model_cls))
 
         def execute(self):
+            """
+            This checks the default values of the fields of a data model.
+
+            If the field does not match its given default value, then try to update it.
+
+            If the update is failed, move that data entry to a specific database for repairment.
+            """
             from mongodb.factory import PendingRepairDataManager
 
             find_query = self.build_find_query()
@@ -220,17 +223,3 @@ class ModelFieldChecker:
                       f"</ul>"
 
             MailSender.send_email_async(content, subject="Action Needed: Manual Data repairments required")
-
-    class ReplaceRedundantField(FieldCheckerBase):
-        def execute(self):
-            schema = self._model_cls.generate_json_schema(allow_additional=False)
-
-            crs = self._col_inst.find({"$nor": [{"$jsonSchema": schema}]})
-
-            if crs.count() > 0:
-                logger.logger.warning(f"{crs.count()} data have redundant field(s) to remove.")
-
-            for d in crs:
-                c = self._model_cls.cast_model(d)
-                self._col_inst.remove(c.id)
-                self._col_inst.insert_one(c)
