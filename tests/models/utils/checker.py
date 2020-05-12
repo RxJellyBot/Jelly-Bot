@@ -10,6 +10,9 @@ from tests.base import TestDatabaseMixin, TestCase
 __all__ = ["TestDataChecker"]
 
 
+# TEST: `ModelTest` use various fields #244
+
+
 class ModelTest(Model):
     Field1 = IntegerField("f1", default=7)
     Field2 = IntegerField("f2", default=ModelDefaultValueExt.Required)
@@ -89,3 +92,20 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         self.assertEquals(data["f2"], 9)
         self.assertEquals(data["f3"], 1)
         self.assertEquals(data["f4"], 0)
+
+    def test_redundant(self):
+        # Setup data
+        ColInst.insert_one({"f1": 8, "f2": 9, "f3": 1, "f4": 7, "f5": 5})
+
+        # Perform check
+        ModelFieldChecker.check(ColInst, check_redundant=True)
+
+        # Checking results
+        self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
+
+        data = ColInst.find_one()
+        self.assertEquals(data["f1"], 8)
+        self.assertEquals(data["f2"], 9)
+        self.assertEquals(data["f3"], 1)
+        self.assertEquals(data["f4"], 7)
+        self.assertFalse("f5" in data)

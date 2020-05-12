@@ -1,3 +1,4 @@
+import os
 from abc import ABC, abstractmethod
 from threading import Thread
 from typing import Optional, List, Tuple
@@ -39,14 +40,14 @@ class FieldCheckerBase(ABC):
         self.post_execute()
 
     def pre_execute(self):
-        logger.logger.info(f"Scanning <{self._col_inst.full_name}>...")
+        logger.logger.info(f"Started executing `{self.__class__.__name__}` on <{self._col_inst.full_name}>...")
 
     @abstractmethod
     def execute(self):
         raise NotImplementedError()
 
     def post_execute(self):
-        logger.logger.info(f"Done scanning <{self._col_inst.full_name}>.")
+        logger.logger.info(f"Done executing `{self.__class__.__name__}` on <{self._col_inst.full_name}>.")
 
 
 class ModelFieldChecker:
@@ -55,10 +56,21 @@ class ModelFieldChecker:
         Thread(target=ModelFieldChecker.check, args=(col_inst,)).start()
 
     @staticmethod
-    def check(col_inst):
+    def check(col_inst, *, check_redundant=False):
         ModelFieldChecker.CheckDefaultValue(col_inst).perform_check()
 
+        if check_redundant or bool(int(os.environ.get("PRODUCTION", 0))):
+            ModelFieldChecker.ReplaceRedundantField(col_inst).perform_check()
+
     class CheckDefaultValue(FieldCheckerBase):
+        """
+        Checks the default values of the fields of a data model.
+
+        If the field does not match its given default value, then try to update it.
+
+        If the update is failed, move that data entry to a specific database for repairment.
+        """
+
         def __init__(self, col_inst):
             super().__init__(col_inst)
 
@@ -67,22 +79,13 @@ class ModelFieldChecker:
             # [(Json Key, Model Class), (Json Key, Model Class), ...]
             self._model_field_mdl_class = []
 
-            for k in self._model_cls.model_fields():
-                f = getattr(self._model_cls, k)
-
+            for f in self._model_cls.model_fields().values():
                 self._model_default_vals.append((f.key, f.default_value))
 
                 if isinstance(f, ModelField):
                     self._model_field_mdl_class.append((f.key, f.model_cls))
 
         def execute(self):
-            """
-            This checks the default values of the fields of a data model.
-
-            If the field does not match its given default value, then try to update it.
-
-            If the update is failed, move that data entry to a specific database for repairment.
-            """
             from mongodb.factory import PendingRepairDataManager
 
             find_query = self.build_find_query()
@@ -118,7 +121,8 @@ class ModelFieldChecker:
 
             self.post_execute()
 
-        def build_key_filter(self, prefix: str = None):
+        @staticmethod
+        def build_key_filter(*, prefix: str = None, model_cls=None):
             if prefix is not None:
                 prefix = prefix + "."
             else:
@@ -126,17 +130,18 @@ class ModelFieldChecker:
 
             or_list = []
 
-            for key, val in self._model_default_vals:
-                if val != ModelDefaultValueExt.Optional:
-                    or_list.append({f"{prefix}{key}": {"$exists": False}})
+            if model_cls:
+                for jk, default in map(lambda f: (f.key, f.default_value), model_cls.model_fields().values()):
+                    if default != ModelDefaultValueExt.Optional:
+                        or_list.append({f"{prefix}{jk}": {"$exists": False}})
 
             return or_list
 
         def build_find_query(self):
-            or_list = self.build_key_filter()
+            or_list = self.build_key_filter(model_cls=self._model_cls)
 
             for key, model_cls in self._model_field_mdl_class:
-                or_list.extend(self.build_key_filter(key))
+                or_list.extend(self.build_key_filter(prefix=key, model_cls=model_cls))
 
             if or_list:
                 return {"$or": or_list}
@@ -218,4 +223,14 @@ class ModelFieldChecker:
 
     class ReplaceRedundantField(FieldCheckerBase):
         def execute(self):
-            pass
+            schema = self._model_cls.generate_json_schema(allow_additional=False)
+
+            crs = self._col_inst.find({"$nor": [{"$jsonSchema": schema}]})
+
+            if crs.count() > 0:
+                logger.logger.warning(f"{crs.count()} data have redundant field(s) to remove.")
+
+            for d in crs:
+                c = self._model_cls.cast_model(d)
+                self._col_inst.remove(c.id)
+                self._col_inst.insert_one(c)

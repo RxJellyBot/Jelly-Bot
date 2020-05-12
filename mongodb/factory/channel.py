@@ -152,7 +152,7 @@ class ChannelManager(BaseCollection):
         return ChannelGetResult(outcome, model)
 
     def set_config(self, channel_oid: ObjectId, json_key, config_value) -> bool:
-        if json_key not in ChannelConfigModel.model_json():
+        if json_key not in ChannelConfigModel.model_json_keys():
             raise ValueError(f"Attempt to set value to non-existing field in `ChannelModel`. ({json_key})")
 
         return self.update_one(

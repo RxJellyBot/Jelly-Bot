@@ -25,7 +25,7 @@ class UserDataIntegrationHelper:
             if cls.model_class:
                 col = MONGO_CLIENT.get_database(cls.database_name).get_collection(cls.collection_name)
 
-                for k in cls.model_class.model_fields():
+                for k in cls.model_class.model_field_keys():
                     fd: BaseField = getattr(cls.model_class, k, None)
                     if fd.stores_uid:
                         result = fd.replace_uid(col, src_root_oid, dest_root_oid)
