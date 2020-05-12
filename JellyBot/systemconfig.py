@@ -65,7 +65,6 @@ class Database:
     ExecodeExpirySeconds = 86400  # 24 Hrs
     CacheExpirySeconds = 172800  # 2 Days
     ExtraContentExpirySeconds = 2073600  # 30 Days
-    BulkWriteCount = 300
 
     BackupIntervalSeconds = 86400  # 24 Hrs
 

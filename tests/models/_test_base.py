@@ -291,7 +291,7 @@ class TestModel(ABC):
             init_json["absolutely_not_a_field"] = 7
             init_field["AbsolutelyNotAField"] = 7
 
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(JsonKeyNotExistedError):
                 self.get_model_class()(**init_json, from_db=True)
             with self.assertRaises(FieldKeyNotExistedError):
                 self.get_model_class()(**init_field, from_db=False)

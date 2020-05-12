@@ -46,4 +46,14 @@ Website: http://rnnx.cc/Website
 - [reST syntax cheatsheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
 
 </p>
-</details>
+</details> 
+
+<details><summary>Online Tools</summary>
+<p>
+
+- [Json Schema Validator](https://www.jsonschemavalidator.net/)
+
+- [`ObjectId` converter](https://steveridout.github.io/mongo-object-time/)
+
+</p>
+</details> 

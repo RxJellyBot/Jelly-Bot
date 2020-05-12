@@ -1,4 +1,3 @@
-from JellyBot.systemconfig import Database
 from models import OID_KEY, PendingRepairDataModel
 
 from ._base import single_db_name, BaseCollection
@@ -25,7 +24,7 @@ class PendingRepairDataManager:
         col = self._db.get_collection(col_full_name)
         col.create_index(f"{PendingRepairDataModel.Data.key}.{OID_KEY}", unique=True)
 
-        return BulkWriteDataHolder(col, Database.BulkWriteCount)
+        return BulkWriteDataHolder(col)
 
 
 _inst = PendingRepairDataManager()

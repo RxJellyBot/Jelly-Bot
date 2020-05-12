@@ -11,7 +11,7 @@ from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
     InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError
+    JsonKeyNotExistedError, ModelUncastableError
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
@@ -272,15 +272,15 @@ class Model(MutableMapping, abc.ABC):
     def _json_to_field_kwargs_(cls, **kwargs):
         tmp = {}
 
-        for k, v in kwargs.items():
-            fk = cls.json_key_to_field(k)  # Filter unrelated json keys
+        for jk, v in kwargs.items():
+            fk = cls.json_key_to_field(jk)  # Filter unrelated json keys
             if fk:
                 tmp[fk] = v
             else:
-                if k.lower() == "_id":
+                if jk.lower() == "_id":
                     raise IdUnsupportedError(cls.__qualname__)
                 else:
-                    raise FieldKeyNotExistedError(k, cls.__qualname__)
+                    raise JsonKeyNotExistedError(jk, cls.__qualname__)
 
         return tmp
 
@@ -394,14 +394,55 @@ class Model(MutableMapping, abc.ABC):
     @classmethod
     def cast_model(cls, obj):
         """
-        Cast ``obj`` if it is not ``None`` and not the instance of ``cls``. Otherwise, directly return ``obj``.
+        Cast ``obj`` which key is json key to this model class.
+
+        If it matches the conditions below, cast it to this model class.
+
+        - Is not ``None``
+
+            - If it's ``None``, return ``None``.
+
+        - Is not this model class
+
+            - If it's this model class, return ``obj`` without any manipulations.
+
+        - Is a :class:`MutableMapping`
+
+            - If it's not a :class:`MutableMapping`, throw :class:`InvalidModelError`.
 
         ``obj`` can be a :class:`dict` returned directly from any ``PyMongo`` data acquiring operations.
-        """
-        if obj is not None and not isinstance(obj, cls):
-            return cls(**obj, from_db=True)
 
-        return obj
+        The difference between using this and the constructor is that
+        the constructor will yield :class:`JsonKeyNotExistedError` if there's additional key in the ``dict``,
+        however this will simply omit the additional fields.
+
+        :raises ModelUncastableError: model uncastable
+        """
+        # TEST: (PASS) cast `None`
+        # TEST: (FAIL) cast non-`MutableMapping`
+        # TEST: (PASS) cast the model itself
+        # TEST: (PASS) `obj` with additional fields
+
+        if obj is None:
+            return None
+
+        if not isinstance(obj, MutableMapping):
+            raise ModelUncastableError(cls.__qualname__, f"Value to be casted is not a `MutableMapping`. > {obj}")
+
+        if isinstance(obj, cls):
+            return obj
+
+        init_dict = dict(obj)
+        for k in obj.keys():
+            if k not in cls.model_json():
+                del init_dict[k]
+
+        return cls(**init_dict, from_db=True)
+
+    @classmethod
+    def generate_json_schema(cls):
+        # TEST: create a dummy model with simple to complex data structure and test if the outcome is correct
+        pass
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self.data_dict}>"

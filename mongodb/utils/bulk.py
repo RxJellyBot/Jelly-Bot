@@ -7,10 +7,9 @@ from .logger import logger
 
 
 class BulkWriteDataHolder:
-    def __init__(self, col, flush_base: int):
+    def __init__(self, col):
         self._col = col
         self._reqs = []
-        self._flush_base = flush_base
 
     @property
     def holding_data(self) -> bool:

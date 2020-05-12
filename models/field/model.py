@@ -50,4 +50,5 @@ class ModelField(BaseField):
         return None
 
     def _cast_to_desired_type_(self, value):
-        return self.desired_type(**value, from_db=True)
+        # noinspection PyUnresolvedReferences
+        return self.desired_type.cast_model(value)
