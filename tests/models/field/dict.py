@@ -38,6 +38,11 @@ class TestDictFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return dict
 
+    def json_schema(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "object"
+        }
+
 
 class TestDictFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

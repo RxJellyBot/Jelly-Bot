@@ -72,6 +72,11 @@ class TextField(BaseField):
     def expected_types(self):
         return str, int, bool
 
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "string"
+        }
+
 
 class UrlField(BaseField):
     def __init__(self, key, **kwargs):
@@ -110,3 +115,8 @@ class UrlField(BaseField):
     def _check_value_valid_not_none_(self, value):
         if not self.is_empty(value) and not is_valid_url(value):
             raise FieldInvalidUrl(self.key, value)
+
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "string"
+        }

@@ -234,4 +234,13 @@ class TestFieldProperty(ABC):
 
         def test_desired_types(self):
             self.assertEquals(self.get_desired_type(), self.get_initialized_field().desired_type)
+
         # endregion
+
+        # region Json schema
+        @abstractmethod
+        def json_schema(self, allow_additional=True) -> dict:
+            raise NotImplementedError()
+
+        def test_json_schema(self):
+            self.assertEquals(self.get_initialized_field().json_schema_property(), self.json_schema())

@@ -45,6 +45,11 @@ class TestUrlFieldProperty(TestFieldProperty.TestClass):
     def test_properties_default_valid_no_autocast(self):
         pass
 
+    def json_schema(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "string"
+        }
+
 
 class TestUrlFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

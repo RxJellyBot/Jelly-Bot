@@ -6,6 +6,7 @@ from pymongo.cursor import Cursor
 
 from mongodb.utils import BulkWriteDataHolder
 from models import ModelDefaultValueExt, OID_KEY
+from models.field import ModelField
 from extutils.flags import FlagCodeEnum
 from extutils.emailutils import MailSender
 from extutils.logger import LoggerSkeleton
@@ -62,12 +63,17 @@ class ModelFieldChecker:
             super().__init__(col_inst)
 
             # [(Json Key, Default Value), (Json Key, Default Value), ...]
-            self._model_default_vals = [(getattr(self._model_cls, k).key, getattr(self._model_cls, k).default_value)
-                                        for k in self._model_cls.model_fields()]
-
+            self._model_default_vals = []
             # [(Json Key, Model Class), (Json Key, Model Class), ...]
-            self._model_field_mdl_class = [(getattr(self._model_cls, k).key, getattr(self._model_cls, k).default_value)
-                                           for k in self._model_cls.model_fields()]
+            self._model_field_mdl_class = []
+
+            for k in self._model_cls.model_fields():
+                f = getattr(self._model_cls, k)
+
+                self._model_default_vals.append((f.key, f.default_value))
+
+                if isinstance(f, ModelField):
+                    self._model_field_mdl_class.append((f.key, f.model_cls))
 
         def execute(self):
             """
@@ -127,7 +133,7 @@ class ModelFieldChecker:
             return or_list
 
         def build_find_query(self):
-            or_list = self.build_key_filter(self._model_cls)
+            or_list = self.build_key_filter()
 
             for key, model_cls in self._model_field_mdl_class:
                 or_list.extend(self.build_key_filter(key))

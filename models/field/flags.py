@@ -69,6 +69,11 @@ class FlagField(IntegerField, ABC):
         except (TypeError, ValueError) as e:
             raise FieldCastingFailed(self.key, value, self.desired_type, exc=e)
 
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "int"
+        }
+
 
 class APICommandField(FlagField):
     FLAG_TYPE = APICommand

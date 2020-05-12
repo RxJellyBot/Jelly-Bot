@@ -116,6 +116,11 @@ class ArrayField(BaseField):
         ack_pull = collection_inst.update_many({self.key: {"$in": [old]}}, {"$pull": {self.key: old}}).acknowledged
         return ack_pull and ack_push
 
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "array"
+        }
+
 
 class ModelArrayField(ArrayField):
     def __init__(self, key, model_type, **kwargs):
@@ -144,6 +149,12 @@ class ModelArrayField(ArrayField):
             v_new.append(v)
 
         return v_new
+
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "array",
+            "items": self._model_type.generate_json_schema(allow_additional=allow_additional)
+        }
 
 
 class ArrayFieldInstance(FieldInstance):

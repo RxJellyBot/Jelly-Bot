@@ -36,6 +36,11 @@ class TestDatetimeFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return dt
 
+    def json_schema(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "date"
+        }
+
 
 class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

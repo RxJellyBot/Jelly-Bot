@@ -63,6 +63,12 @@ class TestModelArrayFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return list
 
+    def json_schema(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "array",
+            "items": ModelTest.generate_json_schema(allow_additional=allow_additional)
+        }
+
 
 class TestModelArrayFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

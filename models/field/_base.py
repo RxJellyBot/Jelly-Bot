@@ -170,6 +170,17 @@ class BaseField(abc.ABC):
     def desired_type(self) -> type:
         return self.expected_types[0] if isinstance(self.expected_types, Iterable) else self.expected_types
 
+    @abc.abstractmethod
+    def json_schema_property(self, allow_additional=True) -> dict:
+        """
+        Property of json schema for this field.
+
+        .. seealso::
+            https://docs.mongodb.com/manual/reference/operator/query/jsonSchema/#available-keywords
+            https://docs.mongodb.com/manual/reference/bson-types/
+        """
+        raise NotImplementedError()
+
     @property
     @final
     def key(self):

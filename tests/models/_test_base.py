@@ -8,7 +8,7 @@ from extutils.utils import to_snake_case
 from models import Model, OID_KEY
 from models.exceptions import (
     RequiredKeyUnfilledError, IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError
+    JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnly
 from tests.base import TestCase
@@ -354,3 +354,26 @@ class TestModel(ABC):
                 with self.subTest(fk=fk, jk=jk, auto=auto):
                     self.assertEquals(getattr(mdl, to_snake_case(fk)), auto)
                     self.assertEquals(mdl[jk], auto)
+
+        def test_cast_model_none(self):
+            self.assertIsNone(self.get_model_class().cast_model(None))
+
+        def test_cast_model_non_mutabble_mapping(self):
+            with self.assertRaises(ModelUncastableError):
+                self.get_model_class().cast_model(1)
+            with self.assertRaises(ModelUncastableError):
+                self.get_model_class().cast_model(False)
+
+        def test_cast_constructed_model(self):
+            mdl_to_cast = self.get_constructed_model()
+            mdl_casted = self.get_model_class().cast_model(mdl_to_cast)
+            self.assertEquals(mdl_casted.to_json(), mdl_to_cast.to_json())
+
+        def test_cast_model_additional_fields(self):
+            expected_mdl_dict = self.get_constructed_model()
+            dict_to_cast = self.get_constructed_model().to_json()
+            dict_to_cast["abs_n_field"] = "$(*#^%(#^"
+
+            actual_mdl_dict = self.get_model_class().cast_model(dict_to_cast)
+
+            self.assertEquals(actual_mdl_dict, expected_mdl_dict)

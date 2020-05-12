@@ -75,6 +75,11 @@ class TestEnumWithDefaultProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return EnumWithDefault
 
+    def json_schema(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "int"
+        }
+
 
 class TestEnumWithDefaultValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

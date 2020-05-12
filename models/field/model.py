@@ -3,7 +3,7 @@ from .exceptions import FieldModelClassInvalid
 
 
 class ModelField(BaseField):
-    # noinspection PyUnresolvedReferences
+    # noinspection PyUnresolvedReferences,PyTypeChecker
     def __init__(self, key, model_cls, **kwargs):
         """
         Default Properties Overrided:
@@ -25,7 +25,7 @@ class ModelField(BaseField):
         elif not isinstance(model_cls, type) or not issubclass(model_cls, Model):
             raise FieldModelClassInvalid(key, model_cls)
 
-        self._model_cls = model_cls
+        self._model_cls: Model = model_cls
 
         if not kwargs.get("auto_cast", True):
             from mongodb.utils.logger import logger
@@ -52,3 +52,6 @@ class ModelField(BaseField):
     def _cast_to_desired_type_(self, value):
         # noinspection PyUnresolvedReferences
         return self.desired_type.cast_model(value)
+
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return self._model_cls.generate_json_schema()

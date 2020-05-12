@@ -23,3 +23,8 @@ class DictionaryField(BaseField):
     @property
     def expected_types(self):
         return dict,
+
+    def json_schema_property(self, allow_additional=True) -> dict:
+        return {
+            "bsonType": "object"
+        }
