@@ -16,6 +16,9 @@ from tests.base import TestCase
 __all__ = ["TestModel"]
 
 
+# TEST: `Model` equality test with same/diff id, same/diff data
+
+
 @final
 class TestModel(ABC):
     """
