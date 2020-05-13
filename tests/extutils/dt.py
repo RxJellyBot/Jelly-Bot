@@ -11,17 +11,27 @@ from tests.base import TestCase
 
 
 class TestDatetime(TestCase):
-    def test_dt_naive(self):
+    def test_dt_make_aware(self):
         self.assertFalse(is_tz_naive(make_tz_aware(datetime.now())))
         self.assertFalse(is_tz_naive(make_tz_aware(datetime.utcnow())))
         self.assertFalse(is_tz_naive(make_tz_aware(localtime().replace(tzinfo=None))))
         self.assertFalse(is_tz_naive(make_tz_aware(now_utc_aware())))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime(2020, 5, 7))))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.min)))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.min.replace(tzinfo=timezone.utc))))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.max)))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.max.replace(tzinfo=timezone.utc))))
 
-    def test_dt_make_aware(self):
+    def test_dt_naive(self):
         self.assertTrue(is_tz_naive(datetime.now()))
         self.assertTrue(is_tz_naive(datetime.utcnow()))
         self.assertTrue(is_tz_naive(localtime().replace(tzinfo=None)))
         self.assertFalse(is_tz_naive(now_utc_aware()))
+        self.assertTrue(is_tz_naive(datetime(2020, 5, 7)))
+        self.assertTrue(is_tz_naive(datetime.min))
+        self.assertFalse(is_tz_naive(datetime.min.replace(tzinfo=timezone.utc)))
+        self.assertTrue(is_tz_naive(datetime.max))
+        self.assertFalse(is_tz_naive(datetime.max.replace(tzinfo=timezone.utc)))
 
     def test_parse_to_dt(self):
         dt_parsed = parse_to_dt("2020-04-04 16:00")

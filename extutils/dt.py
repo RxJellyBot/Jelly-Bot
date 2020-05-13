@@ -18,7 +18,6 @@ def localtime(dt: datetime = None, tz: timezone = None):
 
 
 def make_tz_aware(dt: datetime, tz: timezone = None):
-    # TEST: Using datetime.min and datetime.max
     if not is_tz_naive(dt):
         return dt
 
@@ -29,7 +28,6 @@ def make_tz_aware(dt: datetime, tz: timezone = None):
 
 
 def is_tz_naive(dt: datetime) -> bool:
-    # TEST: Using datetime.min and datetime.max
     try:
         return timezone.is_naive(dt)
     except OverflowError:

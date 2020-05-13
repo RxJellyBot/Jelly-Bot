@@ -50,11 +50,11 @@ class RemoteControlManager(BaseCollection):
         """
         Deactivate the remote control for a specific user.
 
-        :return: If the deletion succeed.
+        :return: If the deletion is performed and succeeded
         """
         return self.delete_one({RemoteControlEntryModel.UserOid.key: user_oid,
                                 RemoteControlEntryModel.SourceChannelOid.key: source_channel_oid
-                                }).deleted_count
+                                }).deleted_count > 0
 
     def get_current(self, user_oid: ObjectId, source_channel_oid: ObjectId,
                     *, update_expiry: bool = True) -> Optional[RemoteControlEntryModel]:

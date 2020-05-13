@@ -1,1 +1,1 @@
-# TODO: Test for various channel model (`models.channel`)
+# TEST: Test for various channel model (`models.channel`)
