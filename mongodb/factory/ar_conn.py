@@ -226,7 +226,7 @@ class AutoReplyModuleManager(BaseCollection):
 
         if ret:
             now = now_utc_aware()
-            if now - ret.last_used > timedelta(seconds=ret.cooldown_sec):
+            if ret.can_be_used(now):
                 q_found = {AutoReplyModuleModel.Id.key: ret.id}
                 u_query = {
                     "$set": {AutoReplyModuleModel.LastUsed.key: now},

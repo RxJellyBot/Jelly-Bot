@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import Optional, Union
 
 from bson import ObjectId
@@ -100,8 +101,8 @@ class AutoReplyModuleModel(Model):
 
     # Stats
     CalledCount = IntegerField("c")
-    LastUsed = DateTimeField("l", allow_none=False)
-    RemovedAt = DateTimeField("rm", allow_none=False)
+    LastUsed = DateTimeField("l", allow_none=True)
+    RemovedAt = DateTimeField("rm", allow_none=True)
 
     @property
     def refer_oid(self) -> Optional[ObjectId]:
@@ -126,17 +127,23 @@ class AutoReplyModuleModel(Model):
 
     @property
     def last_used_expr(self) -> Optional[str]:
-        if self.last_used != DateTimeField.none_obj():
+        if self.last_used:
             return localtime(self.last_used).strftime("%Y-%m-%d %H:%M:%S")
         else:
             return None
 
     @property
     def removed_at_expr(self) -> Optional[str]:
-        if self.removed_at != DateTimeField.none_obj():
+        if self.removed_at:
             return localtime(self.removed_at).strftime("%Y-%m-%d %H:%M:%S")
         else:
             return None
+
+    def can_be_used(self, current_time):
+        if self.last_used:
+            return current_time - self.last_used > timedelta(seconds=self.cooldown_sec)
+        else:
+            return True
 
 
 class AutoReplyModuleExecodeModel(Model):

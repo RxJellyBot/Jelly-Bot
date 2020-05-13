@@ -123,8 +123,8 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
             ("e", "ExcludedOids"): ([], [excluded_1]),
             ("t", "TagIds"): ([], [tag_1]),
             ("c", "CalledCount"): (0, 10),
-            ("l", "LastUsed"): (datetime.min.replace(tzinfo=timezone.utc), last_used),
-            ("rm", "RemovedAt"): (datetime.min.replace(tzinfo=timezone.utc), remove_at)
+            ("l", "LastUsed"): (None, last_used),
+            ("rm", "RemovedAt"): (None, remove_at)
         }
 
     @classmethod
@@ -152,7 +152,7 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
 
     def test_last_used_repr(self):
         mdl = self.get_constructed_model()
-        self.assertEquals(mdl.last_used, datetime.min.replace(tzinfo=timezone.utc))
+        self.assertIsNone(mdl.last_used)
 
         mdl.last_used = last_used
 
@@ -160,7 +160,7 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
 
     def test_remove_at_repr(self):
         mdl = self.get_constructed_model()
-        self.assertEquals(mdl.removed_at, datetime.min.replace(tzinfo=timezone.utc))
+        self.assertIsNone(mdl.removed_at)
 
         mdl.removed_at = remove_at
         self.assertEquals(mdl.removed_at, remove_at)

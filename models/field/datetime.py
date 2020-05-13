@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Union
 
 from extutils.dt import is_tz_naive, parse_to_dt, make_tz_aware
@@ -27,7 +27,7 @@ class DateTimeField(BaseField):
 
     @classmethod
     def none_obj(cls):
-        return make_tz_aware(datetime.min)
+        return datetime.min.replace(tzinfo=timezone.utc)
 
     def _check_value_valid_not_none_(self, value):
         if isinstance(value, str) and parse_to_dt(value) is None:

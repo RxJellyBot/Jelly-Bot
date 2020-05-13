@@ -435,10 +435,6 @@ class Model(MutableMapping, abc.ABC):
 
         :raises ModelUncastableError: model uncastable
         """
-        # TEST: (PASS) cast `None`
-        # TEST: (FAIL) cast non-`MutableMapping`
-        # TEST: (PASS) cast the model itself
-        # TEST: (PASS) `obj` with additional fields
 
         if obj is None:
             return None
