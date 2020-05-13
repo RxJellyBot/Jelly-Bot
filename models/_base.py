@@ -166,6 +166,8 @@ class Model(MutableMapping, abc.ABC):
     def __eq__(self, other):
         if isinstance(other, Model):
             return self.data_dict == other.data_dict and type(self) == type(other)
+        elif isinstance(other, MutableMapping):
+            return self.to_json() == other
         else:
             return False
 
@@ -262,9 +264,9 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def _init_cache_fields_(cls):
-        s = {fk: v for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
+        s = {v for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
         if cls.WITH_OID:
-            s["Id"] = cls.Id
+            s.add(cls.Id)
 
         cls._CacheField = {cls.__qualname__: s}
 

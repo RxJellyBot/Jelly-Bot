@@ -1,23 +1,45 @@
+from datetime import datetime, timezone
+from typing import Any, Dict
+
+from bson import ObjectId
 from django.conf import settings
 
 from extutils.emailutils import EmailServer
+from extutils.color import Color
+from flags import AutoReplyContentType
 from mongodb.factory import BaseCollection
 from models import Model, ModelDefaultValueExt
-from models.field import IntegerField
+from models.field import (
+    ModelField, IntegerField, ModelArrayField, DictionaryField, FloatField, BooleanField, UrlField, TextField,
+    ObjectIDField, GeneralField, DateTimeField, ColorField, ArrayField, AutoReplyContentTypeField
+)
 from models.utils import ModelFieldChecker
 from tests.base import TestDatabaseMixin, TestCase
 
 __all__ = ["TestDataChecker"]
 
 
-# TEST: `ModelTest` use various fields #244
+class SubModel(Model):
+    WITH_OID = False
+
+    FInt = IntegerField("i2", default=8)
 
 
 class ModelTest(Model):
-    Field1 = IntegerField("f1", default=7)
-    Field2 = IntegerField("f2", default=ModelDefaultValueExt.Required)
-    Field3 = IntegerField("f3", default=ModelDefaultValueExt.Optional)
-    Field4 = IntegerField("f4")
+    FModel = ModelField("m", SubModel)
+    FInt = IntegerField("i", default=ModelDefaultValueExt.Required)
+    FModelArray = ModelArrayField("ma", SubModel, default=ModelDefaultValueExt.Optional)
+    FDict = DictionaryField("d")
+    FFloat = FloatField("f", default=7.5)
+    FBool = BooleanField("b")
+    FUrl = UrlField("u", default=ModelDefaultValueExt.Optional)
+    FText = TextField("t")
+    FOid = ObjectIDField("o")
+    FGeneral = GeneralField("g")
+    FDatetime = DateTimeField("dt")
+    FColor = ColorField("c")
+    FArray = ArrayField("a", int, default=[17, 21])
+    FArContent = AutoReplyContentTypeField("ac")
 
 
 class CollectionTest(BaseCollection):
@@ -30,9 +52,44 @@ ColInst = CollectionTest()
 
 
 class TestDataChecker(TestDatabaseMixin, TestCase):
-    def test_repair_f1(self):
+    def setUpTestCase(self) -> None:
+        self.default_dict = {
+            "m": {"i2": 7},
+            "i": 7,
+            "ma": [{"i2": 9}, {"i2": 11}],
+            "d": {"a": 10},
+            "f": 8.5,
+            "b": True,
+            "u": "https://google.com",
+            "t": "ABCDE",
+            "o": ObjectId("5ebc47c97041fb2e814b59bb"),
+            "g": 100,
+            "dt": datetime(2020, 5, 7).replace(tzinfo=timezone.utc),
+            "c": Color(5000000),
+            "a": [5, 11, 13],
+            "ac": AutoReplyContentType.TEXT
+        }
+
+    def data_field_repaired_test(self, key_to_repair: str, data: Dict[str, Any]):
+        with self.subTest(data=data):
+            if key_to_repair not in data:
+                self.fail(f"`{key_to_repair}` not repaired.")
+
+    def data_field_match_test(self, actual_data: Dict[str, Any], expected_values: Dict[str, Any]):
+        # Cast to model to apply some type casting on fields (for example, making tz-aware datetime)
+        # Cast back to dict/json for comparison effectiveness
+        actual_data = ModelTest.cast_model(actual_data).to_json()
+
+        for k, expected_v in expected_values.items():
+            with self.subTest(key=k, expected_value=expected_v):
+                self.assertTrue(k in actual_data)
+                self.assertEquals(expected_v, actual_data[k])
+
+    # region Main test body
+    def missing_has_default(self, key_to_remove: str, expected_value_after_fill: Dict[str, Any]):
         # Setup data
-        ColInst.insert_one({"f2": 5, "f3": 9, "f4": 1})
+        del self.default_dict[key_to_remove]
+        ColInst.insert_one(self.default_dict)
 
         # Perform check
         ModelFieldChecker.check(ColInst)
@@ -40,19 +97,19 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         # Checking results
         self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
 
-        for data in ColInst.find():
-            with self.subTest(data=data):
-                if "f1" not in data:
-                    self.fail("`Field1` not repaired.")
+        data = ColInst.find_one()
 
-                self.assertEquals(data["f1"], 7)
-                self.assertEquals(data["f2"], 5)
-                self.assertEquals(data["f3"], 9)
-                self.assertEquals(data["f4"], 1)
+        self.data_field_repaired_test(key_to_remove, data)
 
-    def test_repair_f2(self):
+        expected_values = expected_value_after_fill
+        expected_values.update(self.default_dict)
+
+        self.data_field_match_test(data, expected_values)
+
+    def missing_required(self, key_to_remove: str):
         # Setup data
-        ColInst.insert_one({"f1": 8, "f3": 9, "f4": 1})
+        del self.default_dict[key_to_remove]
+        ColInst.insert_one(self.default_dict)
 
         # Perform check
         ModelFieldChecker.check(ColInst)
@@ -61,9 +118,10 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         self.assertEquals(ColInst.estimated_document_count(), 0, "Data not being moved out for repair.")
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0, "Mail not sent.")
 
-    def test_repair_f3(self):
+    def missing_optional(self, key_to_remove: str):
         # Setup data
-        ColInst.insert_one({"f1": 8, "f2": 10, "f4": 1})
+        del self.default_dict[key_to_remove]
+        ColInst.insert_one(self.default_dict)
 
         # Perform check
         ModelFieldChecker.check(ColInst)
@@ -72,23 +130,49 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
 
         data = ColInst.find_one()
-        self.assertEquals(data["f1"], 8)
-        self.assertEquals(data["f2"], 10)
-        self.assertTrue("f3" not in data)
-        self.assertEquals(data["f4"], 1)
 
-    def test_repair_f4(self):
-        # Setup data
-        ColInst.insert_one({"f1": 8, "f2": 9, "f3": 1})
+        self.data_field_match_test(data, self.default_dict)
 
-        # Perform check
-        ModelFieldChecker.check(ColInst)
+    # endregion
 
-        # Checking results
-        self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
+    def test_repair_m(self):
+        self.missing_has_default("m", {"m": SubModel.generate_default()})
 
-        data = ColInst.find_one()
-        self.assertEquals(data["f1"], 8)
-        self.assertEquals(data["f2"], 9)
-        self.assertEquals(data["f3"], 1)
-        self.assertEquals(data["f4"], 0)
+    def test_repair_i(self):
+        self.missing_required("i")
+
+    def test_repair_ma(self):
+        self.missing_optional("ma")
+
+    def test_repair_d(self):
+        self.missing_has_default("d", {"d": DictionaryField.none_obj()})
+
+    def test_repair_f(self):
+        self.missing_has_default("f", {"f": ModelTest.FFloat.default_value})
+
+    def test_repair_b(self):
+        self.missing_has_default("b", {"b": BooleanField.none_obj()})
+
+    def test_repair_u(self):
+        self.missing_optional("u")
+
+    def test_repair_t(self):
+        self.missing_has_default("t", {"t": TextField.none_obj()})
+
+    def test_repair_o(self):
+        self.missing_has_default("o", {"o": ObjectIDField.none_obj()})
+
+    def test_repair_g(self):
+        self.missing_has_default("g", {"g": GeneralField.none_obj()})
+
+    def test_repair_dt(self):
+        self.missing_has_default("dt", {"dt": DateTimeField.none_obj()})
+
+    def test_repair_c(self):
+        self.missing_has_default("c", {"c": ColorField.none_obj()})
+
+    def test_repair_a(self):
+        self.missing_has_default("a", {"a": ModelTest.FArray.default_value})
+
+    def test_repair_ac(self):
+        self.missing_has_default("ac", {"ac": AutoReplyContentType.default()})
