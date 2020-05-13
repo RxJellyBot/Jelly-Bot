@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from datetime import timedelta
 from typing import Tuple, Dict, Any, Type, List, final
 from itertools import combinations
 
@@ -16,7 +17,8 @@ from tests.base import TestCase
 __all__ = ["TestModel"]
 
 
-# TEST: `Model` equality test with same/diff id, same/diff data, dict vs json
+class DummyModel(Model):
+    pass
 
 
 @final
@@ -380,3 +382,79 @@ class TestModel(ABC):
             actual_mdl_dict = self.get_model_class().cast_model(dict_to_cast)
 
             self.assertEquals(actual_mdl_dict, expected_mdl_dict)
+
+        def test_not_equal(self):
+            # Different `Model` with same structure
+            class CopiedModel(Model):
+                pass
+
+            for fk, f in zip(self.get_model_class().model_field_keys(), self.get_model_class().model_fields()):
+                setattr(CopiedModel, fk, f)
+
+            mdl = self.get_constructed_model()
+
+            items = [
+                # Unrelated different type of model
+                DummyModel(),
+                # Same structure but different type
+                CopiedModel.cast_model(dict(map(lambda x: (x[0][0], x[1]), self.get_required().items()))),
+            ]
+            # Optional values available - count of keys will differ, model should/will be different
+            if self.get_optional():
+                items.append(self.get_constructed_model(including_optional=True))
+            # Default values available - data should/will be different
+            if self.get_default():
+                items.append(self.get_constructed_model(manual_default=True))
+            # Different ID if the model class has OID
+            if self.get_model_class().WITH_OID:
+                items.append(self.get_constructed_model(
+                    id=ObjectId.from_datetime(mdl.id.generation_time + timedelta(days=1))))
+
+            for item in items:
+                with self.subTest(item=item):
+                    self.assertNotEquals(item, mdl)
+
+        def test_is_equal(self):
+            items = [
+                # Compare two constructed models
+                (
+                    self.get_constructed_model(),
+                    self.get_constructed_model()
+                ),
+                # Compare two constructed models with one converted to dict
+                (
+                    self.get_constructed_model(),
+                    self.get_constructed_model().to_json()
+                ),
+                # Compare constructed model and dict with required elements and replaced default values
+                (
+                    self.get_constructed_model(manual_default=True),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **{k[0]: v[1] for k, v in self.get_default().items()})
+                ),
+                # Compare constructed model and dict with the manipulation of 2nd and 3rd
+                (
+                    self.get_constructed_model(including_optional=True, manual_default=True),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **dict({k[0]: v[1] for k, v in self.get_default().items()},
+                                **{k[0]: v for k, v in self.get_optional().items()}))
+                )
+            ]
+
+            # No default value means no autofill
+            if not self.get_default():
+                # Compare constructed model and dict with required elements only
+                items.append((
+                    self.get_constructed_model(),
+                    {k[0]: v for k, v in self.get_required().items()}
+                ))
+                # Compare constructed model and dict with required elements and optional elements
+                items.append((
+                    self.get_constructed_model(),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **{k[0]: v for k, v in self.get_optional().items()})
+                ))
+
+            for a, b in items:
+                with self.subTest(a=a, b=b):
+                    self.assertEquals(a, b)

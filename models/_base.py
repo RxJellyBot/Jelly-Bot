@@ -19,6 +19,8 @@ from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, war
 
 class Model(MutableMapping, abc.ABC):
     """
+    Should not be inherited from another inherited :class:`Model`.
+
     Note:
         self._dict_ = {snake_case_field_key: field_instance, snake_case_field_key: field_instance...}
     """
