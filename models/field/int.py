@@ -34,8 +34,3 @@ class IntegerField(BaseField):
     @property
     def expected_types(self):
         return int, float
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "int"
-        }

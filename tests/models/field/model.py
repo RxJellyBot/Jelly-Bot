@@ -78,10 +78,6 @@ class TestModelFieldProperty(TestFieldProperty.TestClass):
     def test_not_allow_none_val_control(self):
         pass
 
-    def json_schema(self, allow_additional=True) -> dict:
-        # noinspection PyUnresolvedReferences
-        return self.get_initialized_field().model_cls.generate_json_schema()
-
 
 class TestModelFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

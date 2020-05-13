@@ -38,11 +38,6 @@ class TestIntegerFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return int
 
-    def json_schema(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "int"
-        }
-
 
 class TestIntegerFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

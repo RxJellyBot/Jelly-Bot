@@ -51,11 +51,6 @@ class DateTimeField(BaseField):
     def expected_types(self):
         return datetime, str
 
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "date"
-        }
-
 
 class DateTimeFieldInstance(FieldInstance):
     def force_set(self, value: Union[datetime, str]):

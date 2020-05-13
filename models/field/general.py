@@ -23,8 +23,3 @@ class GeneralField(BaseField):
     @property
     def expected_types(self):
         return str, bool, int, list, dict
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": ["string", "bool", "int", "array", "object"]
-        }

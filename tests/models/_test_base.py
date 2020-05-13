@@ -377,10 +377,3 @@ class TestModel(ABC):
             actual_mdl_dict = self.get_model_class().cast_model(dict_to_cast)
 
             self.assertEquals(actual_mdl_dict, expected_mdl_dict)
-
-        def test_generate_json_schema(self):
-            """Test the ability to generate json schema without any error."""
-            with self.subTest(allow_additional=True):
-                self.get_model_class().generate_json_schema(allow_additional=False)
-            with self.subTest(allow_additional=True):
-                self.get_model_class().generate_json_schema(allow_additional=False)

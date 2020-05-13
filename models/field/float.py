@@ -23,8 +23,3 @@ class FloatField(BaseField):
     @property
     def expected_types(self):
         return float, int
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "double"
-        }

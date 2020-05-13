@@ -50,11 +50,6 @@ class TestGeneralFieldProperty(TestFieldProperty.TestClass):
     def test_not_allow_none_val_control(self):
         pass
 
-    def json_schema(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": ["string", "bool", "int", "array", "object"]
-        }
-
 
 class TestGeneralFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

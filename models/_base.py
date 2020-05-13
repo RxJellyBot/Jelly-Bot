@@ -451,7 +451,7 @@ class Model(MutableMapping, abc.ABC):
 
         init_dict = dict(obj)
         for k in obj.keys():
-            if k not in cls.model_json():
+            if k not in cls.model_json_keys():
                 del init_dict[k]
 
         return cls(**init_dict, from_db=True)

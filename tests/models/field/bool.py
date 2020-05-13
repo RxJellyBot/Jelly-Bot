@@ -38,11 +38,6 @@ class TestBoolFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return bool
 
-    def json_schema(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "bool"
-        }
-
 
 class TestBoolFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

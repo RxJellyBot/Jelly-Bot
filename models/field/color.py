@@ -49,8 +49,3 @@ class ColorField(BaseField):
             return Color(value)
         else:
             return ColorFactory.from_hex(value)
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "int"
-        }

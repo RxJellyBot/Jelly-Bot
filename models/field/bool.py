@@ -23,8 +23,3 @@ class BooleanField(BaseField):
     @property
     def expected_types(self):
         return bool, int
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "bool"
-        }

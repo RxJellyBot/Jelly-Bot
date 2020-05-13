@@ -65,8 +65,3 @@ class ObjectIDField(BaseField):
 
     def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
         return collection_inst.update_many({self.key: old}, {"$set": {self.key: new}}).acknowledged
-
-    def json_schema_property(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "objectId"
-        }

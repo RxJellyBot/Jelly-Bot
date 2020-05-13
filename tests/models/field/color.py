@@ -41,11 +41,6 @@ class TestColorFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return Color
 
-    def json_schema(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "int"
-        }
-
 
 class TestColorFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:

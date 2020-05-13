@@ -43,11 +43,6 @@ class TestOidFieldProperty(TestFieldProperty.TestClass):
     def get_desired_type(self) -> Type[Any]:
         return ObjectId
 
-    def json_schema(self, allow_additional=True) -> dict:
-        return {
-            "bsonType": "objectId"
-        }
-
 
 class TestOidFieldValueDefault(TestFieldValue.TestClass):
     def get_field(self) -> BaseField:
