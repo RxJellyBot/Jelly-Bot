@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from bot.utils import calculate_expression
+from tests.base import TestCase
 
 
 class TestBotCalculator(TestCase):

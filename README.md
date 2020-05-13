@@ -1,8 +1,8 @@
 # Jelly Bot
 
+![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)
+
 Supported on Discord and LINE. Feel free to add it to your group!
-
-
 
 LINE Bot: http://rnnx.cc/Line
 
@@ -37,3 +37,23 @@ Website: http://rnnx.cc/Website
 `Dec 30 2019` - Shutdown the stable build and merge the beta build to be the stable build.
 
 - Because the user count of the stable build is significantly less than beta build.
+
+### Useful Links used in this repository
+
+<details><summary>Documentations</summary>
+<p>
+
+- [reST syntax cheatsheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
+
+</p>
+</details> 
+
+<details><summary>Online Tools</summary>
+<p>
+
+- [Json Schema Validator](https://www.jsonschemavalidator.net/)
+
+- [`ObjectId` converter](https://steveridout.github.io/mongo-object-time/)
+
+</p>
+</details> 

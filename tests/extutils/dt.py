@@ -1,18 +1,23 @@
 import math
 from datetime import datetime, timezone, timedelta, time
 
-from django.test import TestCase
-
 import pytz
 
 from extutils.dt import (
     is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds,
-    TimeRange, TimeRangeEndBeforeStart
+    TimeRange, TimeRangeEndBeforeStart, make_tz_aware
 )
+from tests.base import TestCase
 
 
 class TestDatetime(TestCase):
     def test_dt_naive(self):
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.now())))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.utcnow())))
+        self.assertFalse(is_tz_naive(make_tz_aware(localtime().replace(tzinfo=None))))
+        self.assertFalse(is_tz_naive(make_tz_aware(now_utc_aware())))
+
+    def test_dt_make_aware(self):
         self.assertTrue(is_tz_naive(datetime.now()))
         self.assertTrue(is_tz_naive(datetime.utcnow()))
         self.assertTrue(is_tz_naive(localtime().replace(tzinfo=None)))
@@ -244,7 +249,8 @@ class TestParseTimeRange(TestCase):
         self.assertFalse(tr.is_inf)
         self.assertAlmostEquals(48, tr.hr_length_org, 0)
         self.assertAlmostEquals(96, tr.hr_length, 0)
-        self.assertEquals(f"{start_mult_expected.strftime('%m-%d')} ~ {end_dt.strftime('%m-%d')}", tr.expr_period_short)
+        self.assertEquals(f"{start_mult_expected.strftime('%m-%d')} ~ {end_dt.strftime('%m-%d')}",
+                          tr.expr_period_short)
         self.assertAlmostEquals(tr.end_time_seconds, time_to_seconds(end_dt.time()), 0)
         prd = tr.get_periods()
         tr2 = TimeRange(start=start_mult_expected, end=start_dt)

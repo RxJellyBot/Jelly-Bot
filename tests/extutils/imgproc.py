@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from django.test import TestCase
-
 from flags import ImageContentType
 from extutils.imgproc import ImgurClient, ImageContentProcessor
+from tests.base import TestCase
 
 
 class TestImgurClient(TestCase):
@@ -12,7 +11,7 @@ class TestImgurClient(TestCase):
         self.assertTrue(result, "Failed to delete the test image.")
 
     def test_image_upload_url(self):
-        url = "http://bot.raenonx.cc/static/img/icon.png"
+        url = "https://raw.githubusercontent.com/RaenonX/Jelly-Bot/master/tests/res/1x1.png"
         type_ = ImageContentType.URL.key
         txt = f"Jelly Bot test upload on {datetime.now()}"
 

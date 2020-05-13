@@ -2,8 +2,19 @@ from ._base import BaseField
 
 
 class GeneralField(BaseField):
-    def __init__(self, key, default=None, allow_none=False, readonly=False):
-        super().__init__(key, default, allow_none, readonly=readonly, auto_cast=False)
+    def __init__(self, key, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - **Always** ``True`` because ``none_obj()`` is already ``None``.
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
+        if "auto_cast" not in kwargs:
+            kwargs["auto_cast"] = False
+
+        super().__init__(key, **kwargs)
 
     @classmethod
     def none_obj(cls):
@@ -11,4 +22,4 @@ class GeneralField(BaseField):
 
     @property
     def expected_types(self):
-        return bool, int, list, dict, str
+        return str, bool, int, list, dict

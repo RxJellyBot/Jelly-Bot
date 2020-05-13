@@ -45,7 +45,8 @@ class HandledEventsHolderPlatform:
             if rec_result.success:
                 self.to_send.append(
                     (MessageType.TEXT,
-                     _("{} content(s) needs to be viewed on the website because of the following reason(s):{}\nURL: {}")
+                     _("{} content(s) needs to be viewed on the website because of the following reason(s):{}\n"
+                       "URL: {}")
                      .format(
                          len(self.to_site),
                          "".join([f"\n - {reason}" for reason, content in self.to_site]),

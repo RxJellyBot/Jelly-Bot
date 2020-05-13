@@ -19,16 +19,6 @@ class PermissionQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
         return {param.Manage.Channel.CHANNEL_OID}
 
 
-class ProfileAttachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
-    post_response_class = ProfileAttachResponse
-
-    def get_api_action(self):
-        return APICommand.MG_PROFILE_ATTACH
-
-    def mandatory_keys(self) -> set:
-        return {param.Manage.Profile.PROFILE_OID, param.Manage.Profile.CHANNEL_OID}
-
-
 class ProfileDetachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
     post_response_class = ProfileDetachResponse
 
@@ -37,6 +27,16 @@ class ProfileDetachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamet
 
     def mandatory_keys(self) -> set:
         return {param.Manage.Profile.PROFILE_OID}
+
+
+class ProfileAttachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+    post_response_class = ProfileAttachResponse
+
+    def get_api_action(self):
+        return APICommand.MG_PROFILE_ATTACH
+
+    def mandatory_keys(self) -> set:
+        return {param.Manage.Profile.PROFILE_OID, param.Manage.Profile.CHANNEL_OID}
 
 
 class ProfileNameCheckView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):

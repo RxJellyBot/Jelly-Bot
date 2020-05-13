@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.boolext import StrBoolResult, str_to_bool, true_word, false_word, case_insensitive
+from tests.base import TestCase
 
 
 class TestBooleanExtension(TestCase):

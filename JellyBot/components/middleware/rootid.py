@@ -9,9 +9,9 @@ class RootUserIDInsertMiddleware(MiddlewareMixin):
     """
     Store the root user id to session if the http method is either POST or GET.
 
-    Note:
-        Must be used after using the `django.contrib.sessions.middleware.SessionMiddleware` because
-        it store the root user ID into `Session`.
+    .. note::
+        Must be used after using the :class:`django.contrib.sessions.middleware.SessionMiddleware` because
+        it store the root user ID into `Django session`.
     """
     # noinspection PyMethodMayBeStatic
     def process_request(self, request):

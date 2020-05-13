@@ -2,9 +2,9 @@ from typing import Union, Optional, List
 
 from flags import MessageType
 from bson import ObjectId
-from django.test import TestCase
 
 from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
+from tests.base import TestCase
 
 
 # noinspection PyTypeChecker

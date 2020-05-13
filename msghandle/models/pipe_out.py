@@ -8,7 +8,7 @@ from extutils import safe_cast
 from extutils.emailutils import MailSender
 from flags import MessageType, Platform, AutoReplyContentType
 from JellyBot.systemconfig import LineApi, Discord
-from models.utils import AutoReplyValidators
+from models.utils import AutoReplyValidator
 from models import AutoReplyContentModel
 
 
@@ -23,12 +23,13 @@ class HandledMessageEvent(ABC):
     @staticmethod
     def auto_reply_model_to_handled(response_model: AutoReplyContentModel, bypass_ml_check: bool):
         """
-        Attempt to cast `AutoReplyContentModel` to be any the corresponding `HandledMessageEvent`.
+        Attempt to cast :class:`AutoReplyContentModel` to be any the corresponding :class:`HandledMessageEvent`.
 
-        :return: Casted `HandledMessageEvent`. Return `None` if no corresponding `HandledMessageEvent`.
+        :return: casted `HandledMessageEvent`. `None` if no corresponding one.
         """
         valid = \
-            AutoReplyValidators.is_valid_content(response_model.content_type, response_model.content, online_check=True)
+            AutoReplyValidator.is_valid_content(
+                response_model.content_type, response_model.content, online_check=True)
 
         if not valid:
             MailSender.send_email_async(f"Invalid auto-reply content detected.\n\n"
@@ -50,7 +51,7 @@ class HandledMessageEvent(ABC):
 class HandledMessageEventText(HandledMessageEvent):
     def __init__(self, content: str, bypass_multiline_check: bool = False, force_extra: bool = False):
         """
-        `bypass_multiline_check` | `force_extra` | Resulting action
+        ``bypass_multiline_check`` | ``force_extra`` | Resulting action
         F | F | Checking multiline, if over length then extra, else normal
         F | T | Content will be stored as extra
         T | F | Content will be stored as normal

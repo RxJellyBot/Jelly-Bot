@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.color import ColorFactory, Color
+from tests.base import TestCase
 
 
 class TestColorFactory(TestCase):
@@ -86,3 +85,9 @@ class TestColor(TestCase):
         self.assertEquals("#000000", clr_hex)
         self.assertEquals("000000", clr_hex)
         self.assertNotEquals(Color(1), clr_hex)
+
+    def test_color_num_valid(self):
+        self.assertTrue(Color.color_num_valid(0))
+        self.assertTrue(Color.color_num_valid(16777215))
+        self.assertFalse(Color.color_num_valid(-1))
+        self.assertFalse(Color.color_num_valid(16777216))

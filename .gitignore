@@ -6,5 +6,5 @@ logs/
 *.log
 cache.json
 web.config
-tests/sandbox*.py
+sandbox*.py
 db.sqlite3

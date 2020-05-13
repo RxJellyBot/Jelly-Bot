@@ -5,29 +5,31 @@ from JellyBot.systemconfig import AutoReply
 from extutils import safe_cast
 
 from extutils.line_sticker import LineStickerManager
-import flags
+from flags import AutoReplyContentType
+
+__all__ = ["AutoReplyValidator"]
 
 
-class AutoReplyValidators:
+class AutoReplyValidator:
     # noinspection PyArgumentList
     @staticmethod
-    def is_valid_content(type_: flags.AutoReplyContentType, content: Any, online_check=True) -> bool:
-        if not isinstance(type_, flags.AutoReplyContentType):
-            type_ = flags.AutoReplyContentType(type_)
+    def is_valid_content(type_: AutoReplyContentType, content: Any, *, online_check=True) -> bool:
+        if not isinstance(type_, AutoReplyContentType):
+            type_ = AutoReplyContentType(type_)
 
-        if type_ == flags.AutoReplyContentType.TEXT:
+        if type_ == AutoReplyContentType.TEXT:
             return 0 < len(content.strip()) <= AutoReply.MaxContentLength
 
-        if type_ == flags.AutoReplyContentType.IMAGE:
-            return _BaseValidators.is_content_image(content, online_check)
+        if type_ == AutoReplyContentType.IMAGE:
+            return _BaseValidator.is_content_image(content, online_check)
 
-        if type_ == flags.AutoReplyContentType.LINE_STICKER:
-            return _BaseValidators.is_content_sticker(content, online_check)
+        if type_ == AutoReplyContentType.LINE_STICKER:
+            return _BaseValidator.is_content_sticker(content, online_check)
 
         return True
 
 
-class _BaseValidators:
+class _BaseValidator:
     # noinspection PyBroadException
     @staticmethod
     def is_content_image(content: Any, online_check) -> bool:

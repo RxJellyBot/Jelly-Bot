@@ -26,7 +26,7 @@ from .timer import _inst as TimerManager
 # noinspection PyPep8Naming
 from .rmc import _inst as RemoteControlManager
 
-from ._base import BaseCollection
+from ._base import BaseCollection, single_db_name, is_test_db
 
 
 def get_collection_subclasses():

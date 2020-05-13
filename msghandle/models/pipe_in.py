@@ -146,7 +146,8 @@ class MessageEventObjectFactory:
             # Use Thread so no need to wait until the update is completed
             Thread(target=ChannelManager.mark_accessibility, args=(platform, token, True)).start()
         else:
-            MailSender.send_email_async(f"Platform: {platform} / Token: {token}", subject="Channel Registration Failed")
+            MailSender.send_email_async(f"Platform: {platform} / Token: {token}",
+                                        subject="Channel Registration Failed")
 
         return ret.model
 

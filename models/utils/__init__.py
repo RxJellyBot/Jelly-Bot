@@ -1,2 +1,2 @@
 from .checker import ModelFieldChecker
-from .validators import AutoReplyValidators
+from .validators import AutoReplyValidator

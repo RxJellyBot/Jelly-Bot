@@ -47,4 +47,4 @@ class ChannelCollectionModel(Model):
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
     BotAccessible = BooleanField("acc", default=True)
-    ChildChannelOids = ArrayField("ch", elem_type=ObjectId)
+    ChildChannelOids = ArrayField("ch", ObjectId)

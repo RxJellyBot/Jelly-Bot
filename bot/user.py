@@ -51,7 +51,7 @@ def _check_on_prof_conn_(
         dict_onplat_oids: Dict[ObjectId, List[ObjectId]],
         dict_onplat_data: Dict[ObjectId, OnPlatformUserModel],
         dict_channel: Dict[ObjectId, ChannelModel]) -> bool:
-    """Return `True` if marked unavailable. Otherwise `False`."""
+    """Return ``True`` if marked unavailable. Otherwise ``False``."""
     oid_user = prof_conn.user_oid
     list_onplat_oids = dict_onplat_oids.get(oid_user)
     if not list_onplat_oids:

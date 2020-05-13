@@ -1,25 +1,51 @@
 from abc import ABC
 
 from extutils.flags import FlagCodeEnum
-from flags import APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType, MessageType, BotFeature, \
-    PermissionLevel
+from flags import (
+    APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType,
+    MessageType, BotFeature, PermissionLevel
+)
 
 from .int import IntegerField
-from .exceptions import FieldFlagNotFound
+from .exceptions import FieldFlagNotFound, FieldFlagDefaultUndefined, FieldValueInvalid, FieldCastingFailed
 
 
 class FlagField(IntegerField, ABC):
+    """
+    Base class of the ``Flag`` field.
+
+    To use, create a new class using this class as the base class
+    and specify the class variable ``FLAG_TYPE``.
+    """
     FLAG_TYPE: FlagCodeEnum = None
 
-    def __init__(self, key, default=None, allow_none=False, auto_cast=True):
+    def __init__(self, key, **kwargs):
+        """
+        Default Properties Overrided:
+
+        - ``allow_none`` - ``False``
+        - ``default`` - Default value of :class:`FlagCodeEnum`
+
+        :raises ValueError: if class variable ``FLAG_TYPE`` not set
+        :raises FieldFlagDefaultUndefined: if the default value of ``FLAG_TYPE`` not defined
+
+        .. seealso::
+            Check the document of :class:`BaseField` for other default properties.
+        """
         self._type = self.__class__.FLAG_TYPE
         if self._type is None:
             raise ValueError("Need to specify the FLAG_TYPE class var.")
 
-        if default is None:
-            default = self._type.default()
+        try:
+            if "default" not in kwargs:
+                kwargs["default"] = self._type.default()
+        except ValueError:
+            raise FieldFlagDefaultUndefined(key, self._type)
 
-        super().__init__(key, default, allow_none, auto_cast=auto_cast)
+        if "allow_none" not in kwargs:
+            kwargs["allow_none"] = False
+
+        super().__init__(key, **kwargs)
 
     @classmethod
     def none_obj(cls):
@@ -27,15 +53,21 @@ class FlagField(IntegerField, ABC):
 
     @property
     def expected_types(self):
-        return self._type
+        return self._type, int, str
 
-    @property
-    def desired_type(self):
-        return self._type
-
-    def _check_value_valid_not_none_(self, value, *, skip_type_check=False, pass_on_castable=False):
-        if isinstance(value, int) and self._type.cast(value) not in self._type:
+    def _check_value_valid_not_none_(self, value):
+        try:
+            self._type.cast(value)
+        except TypeError:
+            raise FieldValueInvalid(self.key, value)
+        except ValueError:
             raise FieldFlagNotFound(self.key, value, self._type)
+
+    def _cast_to_desired_type_(self, value):
+        try:
+            return self._type.cast(value)
+        except (TypeError, ValueError) as e:
+            raise FieldCastingFailed(self.key, value, self.desired_type, exc=e)
 
 
 class APICommandField(FlagField):

@@ -659,7 +659,8 @@ class ProfileManager:
 
     @arg_type_ensure
     def attach_profile_name(
-            self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str, target_oid: Optional[ObjectId] = None) \
+            self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str,
+            target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
         prof = self.get_profile_name(profile_name)
         if not prof:

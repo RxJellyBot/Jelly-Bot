@@ -1,7 +1,6 @@
-from JellyBot.systemconfig import Database
 from models import OID_KEY, PendingRepairDataModel
 
-from ._base import single_db_name
+from ._base import single_db_name, BaseCollection
 from .factory import MONGO_CLIENT
 from ..utils import BulkWriteDataHolder
 
@@ -16,7 +15,7 @@ class PendingRepairDataManager:
         else:
             self._db = MONGO_CLIENT.get_database(DB_NAME)
 
-    def new_bulk_holder(self, col_inst):
+    def new_bulk_holder(self, col_inst: BaseCollection) -> BulkWriteDataHolder:
         if single_db_name:
             col_full_name = f"{DB_NAME}.{col_inst.get_col_name()}"
         else:
@@ -25,7 +24,7 @@ class PendingRepairDataManager:
         col = self._db.get_collection(col_full_name)
         col.create_index(f"{PendingRepairDataModel.Data.key}.{OID_KEY}", unique=True)
 
-        return BulkWriteDataHolder(col, Database.BulkWriteCount)
+        return BulkWriteDataHolder(col)
 
 
 _inst = PendingRepairDataManager()

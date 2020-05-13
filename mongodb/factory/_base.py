@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 from threading import Thread
 from typing import Type, Optional, Tuple, Union
@@ -21,11 +22,24 @@ from mongodb.utils import CursorWithCount, backup_collection
 from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
 
-
 single_db_name = os.environ.get("MONGO_DB")
 if single_db_name:
-    SYSTEM.logger.info("MongoDB single database is activated by setting values to the environment variable 'MONGO_DB'.")
+    SYSTEM.logger.info("MongoDB single database is activated "
+                       "by setting values to the environment variable 'MONGO_DB'.")
     SYSTEM.logger.info(f"MongoDB single database name: {single_db_name}")
+elif bool(int(os.environ.get("TEST", 0))):
+    single_db_name = f"Test-{time.time_ns() // 1000000}"
+    SYSTEM.logger.info("MongoDB single database activated because `TEST` has been set to true.")
+    SYSTEM.logger.info(f"MongoDB single database name: {single_db_name}")
+
+
+def is_test_db(db_name: str):
+    if "-" in db_name:
+        prefix, epoch = db_name.split("-", 2)
+
+        return "Test" in prefix and int(epoch) < time.time_ns() // 1000000
+
+    return False
 
 
 class ControlExtensionMixin(Collection):
@@ -207,7 +221,7 @@ class ControlExtensionMixin(Collection):
 class BaseCollection(ControlExtensionMixin, Collection):
     database_name: str = None
     collection_name: str = None
-    model_class: type(Model) = None
+    model_class: Type[Model] = None
 
     @classmethod
     def get_db_name(cls):

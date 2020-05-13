@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.line_sticker import LineStickerManager
+from tests.base import TestCase
 
 
 class TestLineStickerUtils(TestCase):

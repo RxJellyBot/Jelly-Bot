@@ -1,5 +1,5 @@
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bson import ObjectId
 
@@ -25,8 +25,8 @@ class RemoteControlManager(BaseCollection):
              (RemoteControlEntryModel.SourceChannelOid.key, 1)],
             name="Entry uniqueness enforcer", unique=True)
         self.create_index(
-            RemoteControlEntryModel.LastUsed.key, name="Entry last used timestamp",
-            expireAfterSeconds=Bot.RemoteControl.IdleDeactivateSeconds)
+            RemoteControlEntryModel.ExpiryUtc.key, name="TTL for expiry",
+            expireAfterSeconds=0)
 
     def activate(
             self, user_oid: ObjectId, source_channel_oid: ObjectId, target_channel_oid: ObjectId,
@@ -39,7 +39,8 @@ class RemoteControlManager(BaseCollection):
         """
         model = RemoteControlEntryModel(
             UserOid=user_oid, SourceChannelOid=source_channel_oid, TargetChannelOid=target_channel_oid,
-            LastUsed=datetime.utcnow(), LocaleCode=locale_code)
+            ExpiryUtc=datetime.utcnow() + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds),
+            LocaleCode=locale_code)
 
         outcome, exception = self.insert_one_model(model)
 
@@ -77,11 +78,13 @@ class RemoteControlManager(BaseCollection):
 
         if update_expiry:
             # Update the object to be returned and the object in the database
-            ret.last_used = now
-            self.update_one_async(filter_, {"$set": {RemoteControlEntryModel.LastUsed.key: now}})
+            new_expiry = now + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds)
 
-        # Ensure TTL - for tests, TTL not working in millisecond scale
-        if now < ret.expiry:
+            ret.expiry_utc = new_expiry
+            self.update_one_async(filter_, {"$set": {RemoteControlEntryModel.ExpiryUtc.key: new_expiry}})
+
+        # Ensure TTL - TTL may not work under millisecond scale
+        if now < ret.expiry_utc:
             return RemoteControlEntryModel.cast_model(ret)
         else:
             return None

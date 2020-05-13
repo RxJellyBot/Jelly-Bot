@@ -13,16 +13,31 @@ def now_utc_aware():
     return datetime.utcnow().replace(tzinfo=pytz.UTC)
 
 
-def localtime(dt=None, tz=None):
+def localtime(dt: datetime = None, tz: timezone = None):
     return timezone.localtime(dt, tz)
 
 
-def make_tz_aware(dt, tz=None):
-    return timezone.make_aware(dt, tz)
+def make_tz_aware(dt: datetime, tz: timezone = None):
+    # TEST: Using datetime.min and datetime.max
+    if not is_tz_naive(dt):
+        return dt
+
+    try:
+        return timezone.make_aware(dt, tz)
+    except OverflowError:
+        return dt.replace(tzinfo=timezone.utc)
 
 
-def is_tz_naive(dt) -> bool:
-    return timezone.is_naive(dt)
+def is_tz_naive(dt: datetime) -> bool:
+    # TEST: Using datetime.min and datetime.max
+    try:
+        return timezone.is_naive(dt)
+    except OverflowError:
+        # Checking `is_naive` will call `utcoffset()`
+        # This exception will only raise if `utcoffset()` is not `None`
+
+        # This exception could occur if dt = `datetime.min`.
+        return False
 
 
 def t_delta_str(t_delta: timedelta):

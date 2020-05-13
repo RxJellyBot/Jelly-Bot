@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import Optional, Union
 
 from bson import ObjectId
@@ -8,14 +9,14 @@ from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
-from models.exceptions import KeyNotExistedError
-from models.utils import AutoReplyValidators
+from models.exceptions import FieldKeyNotExistedError
+from models.utils import AutoReplyValidator
 from extutils.utils import enumerate_ranking
 
 from ._base import Model
 from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
-    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, FloatField, ModelDefaultValueExt
+    BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, ModelDefaultValueExt
 )
 
 
@@ -57,7 +58,7 @@ class AutoReplyContentModel(Model):
         if self.is_field_none("Content"):
             return ModelValidityCheckResult.X_AR_CONTENT_EMPTY
 
-        valid = AutoReplyValidators.is_valid_content(self.content_type, self.content, False)
+        valid = AutoReplyValidator.is_valid_content(self.content_type, self.content, online_check=False)
 
         if not valid:
             if self.content_type == AutoReplyContentType.IMAGE:
@@ -75,20 +76,20 @@ class AutoReplyModuleModel(Model):
     key_kw = "kw"
 
     # Main
-    Keyword = ModelField(key_kw, default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
+    Keyword = ModelField(key_kw, AutoReplyContentModel, default=ModelDefaultValueExt.Required)
     Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
                                 max_len=systemconfig.AutoReply.MaxResponses)
 
     KEY_KW_CONTENT = f"{key_kw}.{AutoReplyContentModel.Content.key}"
     KEY_KW_TYPE = f"{key_kw}.{AutoReplyContentModel.ContentType.key}"
-    ChannelId = ObjectIDField("ch")
+    ChannelId = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
     Active = BooleanField("at", default=True)
 
     # Type
     ReferTo = ObjectIDField("rid", allow_none=True, default=ModelDefaultValueExt.Optional)
 
     # Record
-    CreatorOid = ObjectIDField("cr", stores_uid=True)
+    CreatorOid = ObjectIDField("cr", stores_uid=True, default=ModelDefaultValueExt.Required)
     RemoverOid = ObjectIDField("rmv", stores_uid=True, default=ModelDefaultValueExt.Optional)
 
     # Property
@@ -100,8 +101,8 @@ class AutoReplyModuleModel(Model):
 
     # Stats
     CalledCount = IntegerField("c")
-    LastUsed = DateTimeField("l", allow_none=False)
-    RemovedAt = DateTimeField("rm", allow_none=False)
+    LastUsed = DateTimeField("l", allow_none=True)
+    RemovedAt = DateTimeField("rm", allow_none=True)
 
     @property
     def refer_oid(self) -> Optional[ObjectId]:
@@ -110,14 +111,14 @@ class AutoReplyModuleModel(Model):
                 return self.refer_to
             else:
                 return None
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return None
 
     @property
     def is_reference(self) -> bool:
         try:
             return not self.is_field_none("ReferTo")
-        except (KeyError, KeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistedError, AttributeError):
             return False
 
     @property
@@ -126,24 +127,30 @@ class AutoReplyModuleModel(Model):
 
     @property
     def last_used_expr(self) -> Optional[str]:
-        if self.last_used != DateTimeField.none_obj():
+        if self.last_used:
             return localtime(self.last_used).strftime("%Y-%m-%d %H:%M:%S")
         else:
             return None
 
     @property
     def removed_at_expr(self) -> Optional[str]:
-        if self.removed_at != DateTimeField.none_obj():
+        if self.removed_at:
             return localtime(self.removed_at).strftime("%Y-%m-%d %H:%M:%S")
         else:
             return None
 
+    def can_be_used(self, current_time):
+        if self.last_used:
+            return current_time - self.last_used > timedelta(seconds=self.cooldown_sec)
+        else:
+            return True
+
 
 class AutoReplyModuleExecodeModel(Model):
-    Keyword = ModelField(AutoReplyModuleModel.key_kw,
-                         default=ModelDefaultValueExt.Required, model_cls=AutoReplyContentModel)
-    Responses = ArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
-                           max_len=systemconfig.AutoReply.MaxResponses)
+    Keyword = ModelField(AutoReplyModuleModel.key_kw, AutoReplyContentModel,
+                         default=ModelDefaultValueExt.Required)
+    Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
+                                max_len=systemconfig.AutoReply.MaxResponses)
     Pinned = BooleanField("p", readonly=True)
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
@@ -156,15 +163,32 @@ class AutoReplyModuleExecodeModel(Model):
 
 
 class AutoReplyModuleTagModel(Model):
-    Name = TextField("n", must_have_content=True)
+    Name = TextField("n", must_have_content=True, default=ModelDefaultValueExt.Required)
     Color = ColorField("c")
 
 
-class AutoReplyTagPopularityDataModel(Model):
-    WeightedAvgTimeDiff = FloatField("w_avg_time_diff")
-    WeightedAppearances = FloatField("w_appearances")
-    Appearances = IntegerField("u_appearances")
-    Score = FloatField("score")
+@dataclass
+class AutoReplyTagPopularityScore:
+    KEY_W_AVG_TIME_DIFF = "w_atd"
+    KEY_W_APPEARANCE = "w_app"
+    KEY_APPEARANCE = "app"
+    SCORE = "sc"
+
+    tag_id: ObjectId
+    score: float
+    appearances: int
+    weighted_avg_time_diff: float
+    weighted_appearances: float
+
+    @staticmethod
+    def parse(d: dict):
+        return AutoReplyTagPopularityScore(
+            tag_id=d[OID_KEY],
+            score=d[AutoReplyTagPopularityScore.SCORE],
+            appearances=d[AutoReplyTagPopularityScore.KEY_APPEARANCE],
+            weighted_avg_time_diff=d[AutoReplyTagPopularityScore.KEY_W_AVG_TIME_DIFF],
+            weighted_appearances=d[AutoReplyTagPopularityScore.KEY_W_APPEARANCE],
+        )
 
 
 @dataclass

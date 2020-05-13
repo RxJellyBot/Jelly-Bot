@@ -12,7 +12,7 @@ class ShortUrlRecordModel(Model):
     Code = TextField("cd", default=ModelDefaultValueExt.Required)
     Target = UrlField("tgt", default=ModelDefaultValueExt.Required)
     CreatorOid = ObjectIDField("cr", default=ModelDefaultValueExt.Required, stores_uid=True)
-    UsedTimestamp = ArrayField("ts", elem_type=datetime)
+    UsedTimestamp = ArrayField("ts", datetime)
     Disabled = BooleanField("d", default=False)
 
     @property

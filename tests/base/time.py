@@ -1,7 +1,7 @@
 import abc
 from datetime import datetime
 
-from django.test import TestCase
+from .base import TestCase
 
 
 class TestTimeComparisonMixin(TestCase, abc.ABC):

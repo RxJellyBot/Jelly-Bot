@@ -1,7 +1,6 @@
-from django.test import TestCase
-
 from extutils.dt import now_utc_aware
 from extutils.locales import sec_diff_to_utc_offset, locales
+from tests.base import TestCase
 
 
 class TestLocaleFunctions(TestCase):

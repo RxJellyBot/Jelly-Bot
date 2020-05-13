@@ -1,6 +1,5 @@
-from django.test import TestCase
-
 from extutils.emailutils import EmailServer
+from tests.base import TestCase
 
 
 class TestFakeEmailServer(TestCase):

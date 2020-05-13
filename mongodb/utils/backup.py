@@ -30,7 +30,8 @@ def backup_collection(
         logger.logger.warning(f"DB Name: {db_name} / Collection Name: {col_name} / Is single DB: {is_single_db}.")
         return
 
-    Thread(target=backup_collection_thread, args=(org_client, db_name, col_name, is_single_db, backup_interval)).start()
+    Thread(target=backup_collection_thread,
+           args=(org_client, db_name, col_name, is_single_db, backup_interval)).start()
 
 
 def backup_collection_thread(

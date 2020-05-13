@@ -26,14 +26,14 @@ class TimerModel(Model):
         return self.period_seconds > 0
 
     def get_target_time_diff(self, dt: datetime):
-        """`dt` needs to be tz-aware."""
+        """``dt`` needs to be tz-aware."""
         if self.target_time > dt:
             return self.target_time - dt
         else:
             return dt - self.target_time
 
     def is_after(self, dt: datetime):
-        """`dt` needs to be tz-aware."""
+        """``dt`` needs to be tz-aware."""
         return self.target_time >= dt
 
 

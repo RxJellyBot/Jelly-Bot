@@ -43,8 +43,9 @@ class DiscordClient(Client):
         if message.author == self.user or message.author.bot or prioritized_bot_exists(message.guild):
             return
 
-        await handle_discord_main(
-            MessageEventObjectFactory.from_discord(message)).to_platform(Platform.DISCORD).send_discord(message.channel)
+        await handle_discord_main(MessageEventObjectFactory.from_discord(message)) \
+            .to_platform(Platform.DISCORD) \
+            .send_discord(message.channel)
 
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_delete(self, channel: Union[DMChannel, GroupChannel]):

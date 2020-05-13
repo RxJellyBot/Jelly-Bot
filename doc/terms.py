@@ -49,7 +49,8 @@ terms_collection["Features"] = TermsCollection(
                        "channel members or assigned by channel manager.<br>"
                        "This system is similar to the role system of **Discord**."),
                      _("ChannelA have profiles called **A** with admin privilege and **B** for normal users.<br>"
-                       "Users who have profile **A** assigned will be able to use features that only admins can use.")),
+                       "Users who have profile **A** assigned will be able to "
+                       "use features that only admins can use.")),
      TermExplanation(_("Channel Management"),
                      _("Users will be able to adjust the settings specifically designated to the channel. "
                        "The availability of what can be adjusted will base on the user's profile."),

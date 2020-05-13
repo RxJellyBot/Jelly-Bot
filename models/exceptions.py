@@ -1,4 +1,7 @@
 from abc import ABC
+from typing import List, Type
+
+from flags import ModelValidityCheckResult
 
 
 class ModelConstructionError(Exception, ABC):
@@ -6,21 +9,31 @@ class ModelConstructionError(Exception, ABC):
 
 
 class InvalidModelError(ModelConstructionError):
-    def __init__(self, model_name, reason):
+    def __init__(self, model_name: str, reason: ModelValidityCheckResult):
         super().__init__(f"Invalid model `{model_name}`. Reason: {reason.code}")
 
 
+class ModelUncastableError(ModelConstructionError):
+    def __init__(self, model_name: str, reason: str):
+        super().__init__(f"Model `{model_name}` cannot be casted. {reason}")
+
+
 class RequiredKeyUnfilledError(ModelConstructionError):
-    def __init__(self, ks):
-        super().__init__(f"Required fields unfilled. ({', '.join(ks)})")
+    def __init__(self, model_cls: Type, ks: List[str]):
+        super().__init__(f"Required fields unfilled. Keys: {', '.join(ks)} / Model Class: {model_cls}")
 
 
 class IdUnsupportedError(ModelConstructionError):
-    def __init__(self, model_name):
+    def __init__(self, model_name: str):
         super().__init__(
-            f"`{model_name}` is not designated to have `_id` field. Set `with_oid` to True to support this.")
+            f"`{model_name}` is not designated to have `_id` field. Set `WITH_OID` to True to support this.")
 
 
-class KeyNotExistedError(ModelConstructionError):
-    def __init__(self, fk, model_name):
+class FieldKeyNotExistedError(AttributeError):
+    def __init__(self, fk: str, model_name: str):
         super().__init__(f"Field key `{fk}` not existed in the model `{model_name}`.")
+
+
+class JsonKeyNotExistedError(AttributeError):
+    def __init__(self, fk: str, model_name: str):
+        super().__init__(f"Json key `{fk}` not existed in the model `{model_name}`.")

@@ -11,3 +11,4 @@ from .dt import TestDatetime, TestParseTimeRange
 from .singleton import TestSingleton
 from .utils import TestUtilFunctions
 from .locales import TestLocaleFunctions, TestLocaleInfo
+from .url import TestValidUrl

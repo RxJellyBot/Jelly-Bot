@@ -96,7 +96,7 @@ class DailyResult(abc.ABC):
 
     @staticmethod
     def trange_ensure_not_inf(days_collected, trange, tzinfo):
-        """Ensure that time range are not `inf` length."""
+        """Ensure that time range are not :class:`math.inf` length."""
         if trange.is_inf:
             return TimeRange(range_hr=days_collected * 24, start=trange.start, end=trange.end, tzinfo_=tzinfo)
         else:
@@ -106,7 +106,7 @@ class DailyResult(abc.ABC):
     def date_list(days_collected, tzinfo, *,
                   start: Optional[datetime] = None, end: Optional[datetime] = None,
                   trange: Optional[TimeRange] = None) -> List[date]:
-        """Returns the date list within the time range. Disregard `start` and `end` if `trange` is specified."""
+        """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         ret = []
 
         if not trange:
@@ -124,7 +124,7 @@ class DailyResult(abc.ABC):
     def date_list_str(days_collected, tzinfo, *,
                       start: Optional[datetime] = None, end: Optional[datetime] = None,
                       trange: Optional[TimeRange] = None) -> List[str]:
-        """Returns the date list within the time range. Disregard `start` and `end` if `trange` is specified."""
+        """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
 

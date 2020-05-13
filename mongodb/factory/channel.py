@@ -60,7 +60,7 @@ class ChannelManager(BaseCollection):
     def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
             -> ChannelChangeNameResult:
         """
-        Update the channel name for the user. If `new_name` is falsy, then the user-specific name will be removed.
+        Update the channel name for the user. If ``new_name`` is falsy, then the user-specific name will be removed.
         """
         ex = None
         if new_name:
@@ -87,7 +87,8 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ret, ex)
 
     @arg_type_ensure
-    def get_channel_token(self, platform: Platform, token: str, auto_register: bool = False, default_name: str = None) \
+    def get_channel_token(self, platform: Platform, token: str,
+                          auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
@@ -151,7 +152,7 @@ class ChannelManager(BaseCollection):
         return ChannelGetResult(outcome, model)
 
     def set_config(self, channel_oid: ObjectId, json_key, config_value) -> bool:
-        if json_key not in ChannelConfigModel.model_json():
+        if json_key not in ChannelConfigModel.model_json_keys():
             raise ValueError(f"Attempt to set value to non-existing field in `ChannelModel`. ({json_key})")
 
         return self.update_one(

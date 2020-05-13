@@ -22,7 +22,7 @@ class StrBoolResult(Enum):
 
     def to_bool(self) -> bool:
         """
-        Cast this enum to `bool`.
+        Cast this enum to :class:`bool`.
 
         :exception ValueError: the value is unknown.
         """
