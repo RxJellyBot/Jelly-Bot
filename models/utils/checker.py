@@ -18,9 +18,6 @@ __all__ = ["ModelFieldChecker"]
 logger = LoggerSkeleton("mongo.modelcheck", logger_name_env="MODEL_CHECK")
 
 
-# TODO: #285 and related tests
-
-
 class DataRepairResult(FlagCodeEnum):
     REQUIRED_MISSING = 0
     NO_PATCH_NEEDED = 1

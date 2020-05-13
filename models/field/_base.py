@@ -76,7 +76,7 @@ class FieldInstance:
 
     def __eq__(self, other):
         if isinstance(other, FieldInstance) and type(self) == type(other):
-            return self.__dict__ and other.__dict__
+            return self.__dict__ == other.__dict__
         else:
             return False
 
