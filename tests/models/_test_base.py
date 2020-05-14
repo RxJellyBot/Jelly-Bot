@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from datetime import timedelta
 from typing import Tuple, Dict, Any, Type, List, final
 from itertools import combinations
 
@@ -71,7 +70,6 @@ class TestModel(ABC):
             return {}
 
         @classmethod
-        @abstractmethod
         def get_required(cls) -> Dict[Tuple[str, str], Any]:
             """
             Required keys and its corresponding values to be inserted to test.
@@ -82,7 +80,7 @@ class TestModel(ABC):
             Value:
                 Value to be inserted for testing.
             """
-            raise NotImplementedError()
+            return {}
 
         @classmethod
         def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
@@ -405,10 +403,6 @@ class TestModel(ABC):
             # Default values available - data should/will be different
             if self.get_default():
                 items.append(self.get_constructed_model(manual_default=True))
-            # Different ID if the model class has OID
-            if self.get_model_class().WITH_OID:
-                items.append(self.get_constructed_model(
-                    id=ObjectId.from_datetime(mdl.id.generation_time + timedelta(days=1))))
 
             for item in items:
                 with self.subTest(item=item):
@@ -418,22 +412,26 @@ class TestModel(ABC):
             items = [
                 # Compare two constructed models
                 (
+                    "Model vs Model / R",
                     self.get_constructed_model(),
                     self.get_constructed_model()
                 ),
                 # Compare two constructed models with one converted to dict
                 (
+                    "Model vs mdl2dict / R",
                     self.get_constructed_model(),
                     self.get_constructed_model().to_json()
                 ),
                 # Compare constructed model and dict with required elements and replaced default values
                 (
+                    "Model vs dict / R + D",
                     self.get_constructed_model(manual_default=True),
                     dict({k[0]: v for k, v in self.get_required().items()},
                          **{k[0]: v[1] for k, v in self.get_default().items()})
                 ),
                 # Compare constructed model and dict with the manipulation of 2nd and 3rd
                 (
+                    "Model vs dict / R + D + O",
                     self.get_constructed_model(including_optional=True, manual_default=True),
                     dict({k[0]: v for k, v in self.get_required().items()},
                          **dict({k[0]: v[1] for k, v in self.get_default().items()},
@@ -445,16 +443,18 @@ class TestModel(ABC):
             if not self.get_default():
                 # Compare constructed model and dict with required elements only
                 items.append((
+                    "Model vs dict / R",
                     self.get_constructed_model(),
                     {k[0]: v for k, v in self.get_required().items()}
                 ))
                 # Compare constructed model and dict with required elements and optional elements
                 items.append((
+                    "Model vs dict / R + O",
                     self.get_constructed_model(),
                     dict({k[0]: v for k, v in self.get_required().items()},
                          **{k[0]: v for k, v in self.get_optional().items()})
                 ))
 
-            for a, b in items:
-                with self.subTest(a=a, b=b):
+            for msg, a, b in items:
+                with self.subTest(msg=msg):
                     self.assertEquals(a, b)

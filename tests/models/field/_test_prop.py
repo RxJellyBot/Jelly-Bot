@@ -199,8 +199,11 @@ class TestFieldProperty(ABC):
             self.assertEquals(ModelDefaultValueExt.Required, f.default_value)
             with self.assertRaises(FieldValueRequired):
                 f.new()
-            fi = f.new(self.valid_not_none_obj_value())
-            self.assertEquals(fi.value, self.valid_not_none_obj_value())
+
+            # This value may change -> Calling the method twice may generate different value
+            val = self.valid_not_none_obj_value()
+            fi = f.new(val)
+            self.assertEquals(fi.value, val)
 
         def test_default_optional(self):
             f = self.get_initialized_field(default=ModelDefaultValueExt.Optional)
