@@ -37,3 +37,8 @@ class FieldKeyNotExistedError(AttributeError):
 class JsonKeyNotExistedError(AttributeError):
     def __init__(self, fk: str, model_name: str):
         super().__init__(f"Json key `{fk}` not existed in the model `{model_name}`.")
+
+
+class JsonKeyDuplicatedError(ModelConstructionError):
+    def __init__(self, dup_key: str, model_name: str):
+        super().__init__(f"Model `{model_name}` contains duplicated json key: {dup_key}.")

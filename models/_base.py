@@ -11,7 +11,7 @@ from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
     InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError
+    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
@@ -59,6 +59,7 @@ class Model(MutableMapping, abc.ABC):
         if len(not_handled) > 0:
             raise RequiredKeyUnfilledError(self.__class__, not_handled)
 
+        self._init_cache_json_keys_()  # Call this to check if there's any duplicated json key
         self._check_validity_()
 
         unused_keys = kwargs.keys() - self.model_field_keys() - self.SKIP_DEFAULT_FILLING
@@ -258,7 +259,17 @@ class Model(MutableMapping, abc.ABC):
 
     @classmethod
     def _init_cache_json_keys_(cls):
-        s = {v.key for fk, v in cls.__dict__.items() if cls._valid_model_key_(fk)}
+        s = set()
+        for fk, v in cls.__dict__.items():
+            if not cls._valid_model_key_(fk):
+                continue
+
+            jk = v.key
+            if jk in s:
+                raise JsonKeyDuplicatedError(jk, cls.__qualname__)
+
+            s.add(jk)
+
         if cls.WITH_OID:
             s.add(cls.Id.key)
 

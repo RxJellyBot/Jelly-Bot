@@ -11,8 +11,6 @@ from ._test_base import TestModel
 __all__ = ["TestChannelConfigModel", "TestChannelCollectionModel", "TestChannelModel"]
 
 
-# region ChannelConfigModel
-
 class TestChannelConfigModel(TestModel.TestClass):
     DEFAULT_POID = ObjectId()
 
@@ -34,11 +32,6 @@ class TestChannelConfigModel(TestModel.TestClass):
             ("d-name", "DefaultName"): (None, "XXX")
         }
 
-
-# endregion
-
-
-# region ChannelModel
 
 class TestChannelModel(TestModel.TestClass):
     @classmethod
@@ -70,11 +63,6 @@ class TestChannelModel(TestModel.TestClass):
         self.assertEquals(mdl.get_channel_name("DEF"), "XYZ")
 
 
-# endregion
-
-
-# region ChannelCollectionModel
-
 class TestChannelCollectionModel(TestModel.TestClass):
     CHILD_COID = [ObjectId(), ObjectId(), ObjectId()]
 
@@ -97,5 +85,3 @@ class TestChannelCollectionModel(TestModel.TestClass):
             ("acc", "BotAccessible"): (True, False),
             ("ch", "ChildChannelOids"): ([], TestChannelCollectionModel.CHILD_COID)
         }
-
-# endregion

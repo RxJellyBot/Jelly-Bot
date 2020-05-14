@@ -17,8 +17,6 @@ __all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoRep
            "TestAutoReplyModuleTagModel"]
 
 
-# region AutoReplyContentModel
-
 class TestAutoReplyContentModel(TestModel.TestClass):
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -85,11 +83,6 @@ class TestAutoReplyContentModel(TestModel.TestClass):
             self.assertIsNotNone(mdl.content_html)
             self.assertIsNotNone(str(mdl))
 
-
-# endregion
-
-
-# region AutoReplyModuleModel
 
 channel_oid = ObjectId()
 creator_oid = ObjectId()
@@ -166,12 +159,6 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
         self.assertEquals(mdl.removed_at, remove_at)
 
 
-# endregion
-
-
-# region AutoReplyModuleExecodeModel
-
-
 class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -206,10 +193,6 @@ class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
             self.assertEquals(arm_mdl_dict[ek], ev)
 
 
-# endregion
-
-
-# region AutoReplyModuleTagModel
 class TestAutoReplyModuleTagModel(TestModel.TestClass):
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -222,4 +205,3 @@ class TestAutoReplyModuleTagModel(TestModel.TestClass):
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {("c", "Color"): (ColorFactory.DEFAULT, ColorFactory.WHITE)}
-# endregion
