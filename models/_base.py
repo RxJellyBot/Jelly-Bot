@@ -11,7 +11,7 @@ from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
     InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError
+    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowed
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
@@ -88,6 +88,7 @@ class Model(MutableMapping, abc.ABC):
     def __setattr__(self, fk_sc, value):
         if to_camel_case(fk_sc) in self.model_field_keys():
             self._inner_dict_update_(fk_sc, value)
+            self._check_validity_()
         else:
             if fk_sc.lower() == "id" and not self.WITH_OID:
                 raise IdUnsupportedError(self.__class__.__qualname__)
@@ -144,6 +145,9 @@ class Model(MutableMapping, abc.ABC):
         >>> getattr(m, "int")
         IntegerField<i>
         """
+        if not self.WITH_OID and fk_sc == "id":
+            raise IdUnsupportedError(self.__class__.__qualname__)
+
         try:
             fi = self._inner_dict_get_(fk_sc)
 
@@ -154,8 +158,8 @@ class Model(MutableMapping, abc.ABC):
 
         raise FieldKeyNotExistedError(fk_sc, self.__class__.__qualname__)
 
-    def __delitem__(self, v) -> None:
-        delattr(self._dict_, v)
+    def __delitem__(self, k) -> None:
+        raise DeleteNotAllowed(self.__class__.__qualname__)
 
     def __len__(self) -> int:
         return len(self._dict_)
@@ -168,7 +172,7 @@ class Model(MutableMapping, abc.ABC):
 
     def __eq__(self, other):
         if isinstance(other, Model):
-            return self.data_dict == other.data_dict and type(self) == type(other)
+            return self._dict_ == other._dict_ and type(self) == type(other)
         elif isinstance(other, MutableMapping):
             return self.to_json() == other
         else:
@@ -202,6 +206,11 @@ class Model(MutableMapping, abc.ABC):
         return not_filled - filled - self.SKIP_DEFAULT_FILLING
 
     def _check_validity_(self):
+        """
+        Check the validity of this :class:`Model` by executing `perform_validity_check()`.
+
+        If the validation failed, execute `on_invalid()`.
+        """
         result = self.perform_validity_check()
 
         if not result.is_success:
@@ -318,26 +327,34 @@ class Model(MutableMapping, abc.ABC):
 
         return tmp
 
-    @property
-    def data_dict(self):
-        return self._dict_
-
     def pre_iter(self):
         pass
 
     def perform_validity_check(self) -> ModelValidityCheckResult:
-        """Can be overrided to check the validity of the content."""
+        """
+        Can be overrided to check the validity of the content.
+
+        Need **NOT** to be expensive.
+        """
         return ModelValidityCheckResult.default()
 
     def on_invalid(self, reason=ModelValidityCheckResult.X_UNCATEGORIZED):
         raise InvalidModelError(self.__class__.__qualname__, reason)
 
-    def is_field_none(self, fk, raise_on_not_exists=True):
+    def is_field_none(self, fn, *, raise_on_not_exists=True):
+        """
+        Check if the field is none/empty.
+
+        :param fn: field name to check (*NOT* key)
+        :param raise_on_not_exists: raise `FieldKeyNotExistedError` if the field does not exist
+        :raises FieldKeyNotExistedError: if the field does not exist and `raise_on_not_exists` is `True`
+        :return: if the field is none/empty
+        """
         try:
-            return self._inner_dict_get_(fk).is_empty()
+            return self._inner_dict_get_(fn).is_empty()
         except KeyError:
             if raise_on_not_exists:
-                raise FieldKeyNotExistedError(fk, self.__class__.__qualname__)
+                raise FieldKeyNotExistedError(fn, self.__class__.__qualname__)
             else:
                 return True
 
@@ -354,8 +371,8 @@ class Model(MutableMapping, abc.ABC):
             return None
 
     def clear_oid(self):
-        if "Id" in self._dict_:
-            del self._dict_["Id"]
+        if "id" in self._dict_:
+            del self._dict_["id"]
 
     def to_json(self):
         d = {}
@@ -416,8 +433,8 @@ class Model(MutableMapping, abc.ABC):
         return None
 
     @classmethod
-    def get_field_class(cls, field_key) -> Optional[BaseField]:
-        return getattr(cls, field_key)
+    def get_field_class_instance(cls, field_key) -> Optional[BaseField]:
+        return getattr(cls, field_key, None)
 
     @classmethod
     def generate_default(cls, **kwargs):
@@ -468,4 +485,4 @@ class Model(MutableMapping, abc.ABC):
         return cls(**init_dict, from_db=True)
 
     def __repr__(self):
-        return f"<{self.__class__.__qualname__}: {self.data_dict}>"
+        return f"<{self.__class__.__qualname__}: {self._dict_}>"

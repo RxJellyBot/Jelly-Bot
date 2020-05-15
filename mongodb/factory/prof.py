@@ -455,8 +455,9 @@ class ProfileManager:
 
         for k, v in profile_kwargs.items():
             jk = ChannelProfileModel.field_to_json_key(k)
-            if jk:
-                ret[jk] = ChannelProfileModel.get_field_class(k).cast_to_desired_type(v)
+            f = ChannelProfileModel.get_field_class_instance(k)
+            if jk and f:
+                ret[jk] = f.cast_to_desired_type(v)
 
         return ret
 

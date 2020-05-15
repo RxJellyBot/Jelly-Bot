@@ -23,7 +23,7 @@ class RequiredKeyUnfilledError(ModelConstructionError):
         super().__init__(f"Required fields unfilled. Keys: {', '.join(ks)} / Model Class: {model_cls}")
 
 
-class IdUnsupportedError(ModelConstructionError):
+class IdUnsupportedError(ModelConstructionError, KeyError, AttributeError):
     def __init__(self, model_name: str):
         super().__init__(
             f"`{model_name}` is not designated to have `_id` field. Set `WITH_OID` to True to support this.")
@@ -42,3 +42,8 @@ class JsonKeyNotExistedError(AttributeError):
 class JsonKeyDuplicatedError(ModelConstructionError):
     def __init__(self, dup_key: str, model_name: str):
         super().__init__(f"Model `{model_name}` contains duplicated json key: {dup_key}.")
+
+
+class DeleteNotAllowed(Exception):
+    def __init__(self, model_name: str):
+        super().__init__(f"Not allowed to perform `del` on {model_name}")
