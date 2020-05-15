@@ -52,6 +52,9 @@ class TestModel(ABC):
                 - 2nd element: field key name
             Value:
                 Value to be inserted for testing.
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
             return {}
 
@@ -66,6 +69,9 @@ class TestModel(ABC):
             Value:
                 - 1st element: expected default value (auto-default)
                 - 2nd element: value different from the expected one to be used for testing (manual-default)
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
             return {}
 
@@ -79,6 +85,9 @@ class TestModel(ABC):
                 - 2nd element: field key name
             Value:
                 Value to be inserted for testing.
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
             return {}
 

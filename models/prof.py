@@ -45,7 +45,7 @@ class ChannelProfileModel(Model):
 
         ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
-        return sorted(ret, key=lambda x: x.code)
+        return list(sorted(ret, key=lambda x: x.code))
 
     def pre_iter(self):
         # Will be used when the data will be passed to MongoDB
@@ -72,7 +72,7 @@ class ChannelProfileConnectionModel(Model):
     Starred = BooleanField("s", default=False)
     UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
     # ProfileOids will be empty list if the user is not in the channel
-    ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required, allow_none=False, allow_empty=True)
+    ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required)
 
     @property
     def available(self):
@@ -80,6 +80,6 @@ class ChannelProfileConnectionModel(Model):
 
 
 class PermissionPromotionRecordModel(Model):
-    SupporterOid = ObjectIDField("s", stores_uid=True)
-    TargetOid = ObjectIDField("t", stores_uid=True)
-    ProfileOid = ObjectIDField("p")
+    SupporterOid = ObjectIDField("s", default=ModelDefaultValueExt.Required, stores_uid=True)
+    TargetOid = ObjectIDField("t", default=ModelDefaultValueExt.Required, stores_uid=True)
+    ProfileOid = ObjectIDField("p", default=ModelDefaultValueExt.Required)
