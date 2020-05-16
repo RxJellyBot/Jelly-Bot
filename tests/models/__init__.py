@@ -9,3 +9,4 @@ from .execode import *  # NOQA
 from .prof import *  # NOQA
 from .rmc import *  # NOQA
 from .rpdata import *  # NOQA
+from .shorturl import *  # NOQA
