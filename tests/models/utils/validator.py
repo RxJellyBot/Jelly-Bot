@@ -17,12 +17,12 @@ class TestAutoReplyValidator(TestCase):
 
         for content, expected_outcome in content_to_check:
             with self.subTest(content=content, expected_outcome=expected_outcome):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.TEXT, content, online_check=True),
                     expected_outcome)
             with self.subTest(content=content, expected_outcome=expected_outcome):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.TEXT, content, online_check=False),
                     expected_outcome)
@@ -44,12 +44,12 @@ class TestAutoReplyValidator(TestCase):
 
         for content, expected_online, expected_offline in content_to_check:
             with self.subTest(content=content, expected_online=expected_online):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.IMAGE, content, online_check=True),
                     expected_online)
             with self.subTest(content=content, expected_offline=expected_offline):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.IMAGE, content, online_check=False),
                     expected_offline)
@@ -63,12 +63,12 @@ class TestAutoReplyValidator(TestCase):
 
         for content, expected_online, expected_offline in content_to_check:
             with self.subTest(content=content, expected_online=expected_online):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.LINE_STICKER, content, online_check=True),
                     expected_online)
             with self.subTest(content=content, expected_offline=expected_offline):
-                self.assertEquals(
+                self.assertEqual(
                     AutoReplyValidator.is_valid_content(
                         AutoReplyContentType.LINE_STICKER, content, online_check=False),
                     expected_offline)

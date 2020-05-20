@@ -65,7 +65,7 @@ class TestAddAutoReply(GetJsonResponseMixin, TestCase):
         self.assertEqual(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_DATA_EXISTS)
 
         result = _add_token_("abc2", "mno2", "channel2", "user1", 1, "New Conn. Same User.")
-        self.assertEquals(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_INSERTED)
+        self.assertEqual(result[r.RESULT][r.Results.OUTCOME], WriteOutcome.O_INSERTED)
 
     def test_add_using_api(self):
         result = self.print_and_get_json(

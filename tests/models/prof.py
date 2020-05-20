@@ -52,9 +52,9 @@ class TestChannelProfileModel(TestModel.TestClass):
 
         for model, is_mod, is_admin in data:
             with self.subTest(expected_is_mod=is_mod, model=model):
-                self.assertEquals(model.is_mod, is_mod)
+                self.assertEqual(model.is_mod, is_mod)
             with self.subTest(expected_is_admin=is_admin, model=model):
-                self.assertEquals(model.is_admin, is_admin)
+                self.assertEqual(model.is_admin, is_admin)
 
     def test_permission_list(self):
         perm_dict = {

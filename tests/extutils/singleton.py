@@ -22,14 +22,14 @@ class TestSingleton(TestCase):
     def test_singleton(self):
         a = SingletonTest()
         b = SingletonTest()
-        self.assertEquals(id(a), id(b))
+        self.assertEqual(id(a), id(b))
 
     def test_singleton_abc(self):
         a = SingletonInheritedFromABC()
         b = SingletonInheritedFromABC()
-        self.assertEquals(id(a), id(b))
+        self.assertEqual(id(a), id(b))
 
     def test_singleton_abc_double(self):
         a = SingletonDoublyInheritedFromABC()
         b = SingletonDoublyInheritedFromABC()
-        self.assertEquals(id(a), id(b))
+        self.assertEqual(id(a), id(b))

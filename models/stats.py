@@ -10,7 +10,7 @@ import pymongo
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-from extutils.dt import now_utc_aware, TimeRange
+from extutils.dt import now_utc_aware, TimeRange, is_tz_naive, make_tz_aware
 from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
@@ -53,19 +53,33 @@ class BotFeatureUsageModel(Model):
 
 # region Results - Base
 class HourlyResult(abc.ABC):
+    """
+    **Fields**
+
+    ``avg_calculatable``
+        If this result can be used to calculate daily average.
+
+    ``denom``
+        Denominators to divide the accumulated result number.
+        Will be an empty list if ``avg_calculatable`` is ``False``.
+    """
     DAYS_NONE = 0
 
-    def __init__(self, days_collected: float):
+    def __init__(self, days_collected: float, *, end_time: Optional[datetime] = None):
+        """
+        :param days_collected: "claimed" days collected of the data
+        :param end_time: end time of the data. current time in UTC if not given
+        """
         d_collected_int = math.floor(days_collected)
 
-        now = datetime.utcnow()
-        earliest = now - timedelta(days=days_collected)
-        self.avg_calculatable = d_collected_int > HourlyResult.DAYS_NONE
+        end_time = end_time or datetime.utcnow()
+        earliest = end_time - timedelta(days=days_collected)
+        self.avg_calculatable: bool = d_collected_int > HourlyResult.DAYS_NONE
 
-        self.denom = []
+        self.denom: List[float] = []
         if self.avg_calculatable:
-            add_one_end = now.hour
-            if earliest.hour > now.hour:
+            add_one_end = end_time.hour
+            if earliest.hour > end_time.hour:
                 add_one_end += 24
 
             self.denom = [d_collected_int] * 24
@@ -75,16 +89,37 @@ class HourlyResult(abc.ABC):
     @staticmethod
     def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
                             start: Optional[datetime] = None, end: Optional[datetime] = None):
-        trange = TimeRange(range_hr=hr_range, start=start, end=end)
+        """
+        Returns the count of days collected in data.
+
+        Notice that this is different from ``days_collected`` in ``__init__()`` because
+        this one connects to the database to calculate the actual days collected in the filtered dataset
+        while the one in ``__init__()`` will not be checked and assume that it is true.
+
+        ``hr_range`` will be ignored if both ``start`` and ``end`` is specified.
+        """
+        trange = TimeRange(range_hr=hr_range, start=start, end=end, end_autofill_now=False)
 
         if trange.is_inf:
             oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
 
-            if oldest:
-                # Replace to let both be Offset-naive
-                return (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
-            else:
+            if not oldest:
                 return HourlyResult.DAYS_NONE
+
+            now = now_utc_aware()
+
+            if start and is_tz_naive(start):
+                start = make_tz_aware(start)
+
+            if start and start > now:
+                return HourlyResult.DAYS_NONE
+
+            if end and is_tz_naive(end):
+                end = make_tz_aware(end)
+
+            return max(
+                ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
+                0)
         else:
             return trange.hr_length / 24
 
@@ -106,14 +141,18 @@ class DailyResult(abc.ABC):
     def date_list(days_collected, tzinfo, *,
                   start: Optional[datetime] = None, end: Optional[datetime] = None,
                   trange: Optional[TimeRange] = None) -> List[date]:
-        """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
+        """
+        Returns the date list within the time range.
+
+        Disregards ``start`` and ``end`` if ``trange`` is specified.
+        """
         ret = []
 
         if not trange:
             trange = TimeRange(range_hr=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
 
         if trange.is_inf:
-            raise ValueError("TimeRange is infinity.")
+            raise ValueError("TimeRange length is infinity.")
 
         for i in range((trange.end.date() - trange.start.date()).days + 1):
             ret.append(trange.start.date() + timedelta(days=i))
@@ -127,8 +166,6 @@ class DailyResult(abc.ABC):
         """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
-
-
 # endregion
 
 

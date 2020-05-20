@@ -69,7 +69,7 @@ class TestAutoReplyContentModel(TestModel.TestClass):
                 # If the content can be set, it should invalidate the model
                 actual_result = mdl.perform_validity_check()
 
-                self.assertEquals(actual_result, validity_result, actual_result)
+                self.assertEqual(actual_result, validity_result, actual_result)
 
     def test_content_html(self):
         """Only testing if the content can be outputted without exception."""
@@ -136,7 +136,7 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
         mdl.refer_to = oid
 
         self.assertTrue(mdl.is_reference)
-        self.assertEquals(mdl.refer_oid, oid)
+        self.assertEqual(mdl.refer_oid, oid)
 
     def test_kw_repr(self):
         mdl = self.get_constructed_model()
@@ -149,14 +149,14 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
 
         mdl.last_used = last_used
 
-        self.assertEquals(mdl.last_used, last_used)
+        self.assertEqual(mdl.last_used, last_used)
 
     def test_remove_at_repr(self):
         mdl = self.get_constructed_model()
         self.assertIsNone(mdl.removed_at)
 
         mdl.removed_at = remove_at
-        self.assertEquals(mdl.removed_at, remove_at)
+        self.assertEqual(mdl.removed_at, remove_at)
 
 
 class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
@@ -190,7 +190,7 @@ class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
 
         # Not matching 2 dicts because actual model contains more properties
         for ek, ev in exc_mdl_dict.items():
-            self.assertEquals(arm_mdl_dict[ek], ev)
+            self.assertEqual(arm_mdl_dict[ek], ev)
 
 
 class TestAutoReplyModuleTagModel(TestModel.TestClass):

@@ -9,17 +9,17 @@ class TestBooleanExtension(TestCase):
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
                 if case_insensitive:
-                    self.assertEquals(StrBoolResult.TRUE, str_to_bool(w))
-                    self.assertEquals(StrBoolResult.TRUE, str_to_bool(w_lower))
-                    self.assertEquals(StrBoolResult.TRUE, str_to_bool(w_upper))
+                    self.assertEqual(StrBoolResult.TRUE, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.TRUE, str_to_bool(w_lower))
+                    self.assertEqual(StrBoolResult.TRUE, str_to_bool(w_upper))
                 else:
-                    self.assertEquals(StrBoolResult.TRUE, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.TRUE, str_to_bool(w))
                     if w == w_lower:
-                        self.assertEquals(StrBoolResult.TRUE, str_to_bool(w_lower))
+                        self.assertEqual(StrBoolResult.TRUE, str_to_bool(w_lower))
                     else:
                         self.assertNotEquals(StrBoolResult.TRUE, str_to_bool(w_lower))
                     if w == w_upper:
-                        self.assertEquals(StrBoolResult.TRUE, str_to_bool(w_upper))
+                        self.assertEqual(StrBoolResult.TRUE, str_to_bool(w_upper))
                     else:
                         self.assertNotEquals(StrBoolResult.TRUE, str_to_bool(w_upper))
 
@@ -36,17 +36,17 @@ class TestBooleanExtension(TestCase):
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
                 if case_insensitive:
-                    self.assertEquals(StrBoolResult.FALSE, str_to_bool(w))
-                    self.assertEquals(StrBoolResult.FALSE, str_to_bool(w_lower))
-                    self.assertEquals(StrBoolResult.FALSE, str_to_bool(w_upper))
+                    self.assertEqual(StrBoolResult.FALSE, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.FALSE, str_to_bool(w_lower))
+                    self.assertEqual(StrBoolResult.FALSE, str_to_bool(w_upper))
                 else:
-                    self.assertEquals(StrBoolResult.FALSE, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.FALSE, str_to_bool(w))
                     if w == w_lower:
-                        self.assertEquals(StrBoolResult.FALSE, str_to_bool(w_lower))
+                        self.assertEqual(StrBoolResult.FALSE, str_to_bool(w_lower))
                     else:
                         self.assertNotEquals(StrBoolResult.FALSE, str_to_bool(w_lower))
                     if w == w_upper:
-                        self.assertEquals(StrBoolResult.FALSE, str_to_bool(w_upper))
+                        self.assertEqual(StrBoolResult.FALSE, str_to_bool(w_upper))
                     else:
                         self.assertNotEquals(StrBoolResult.FALSE, str_to_bool(w_upper))
 
@@ -68,17 +68,17 @@ class TestBooleanExtension(TestCase):
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
                 if case_insensitive:
-                    self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w))
-                    self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w_lower))
-                    self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w_upper))
+                    self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w_lower))
+                    self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w_upper))
                 else:
-                    self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w))
+                    self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w))
                     if w == w_lower:
-                        self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w_lower))
+                        self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w_lower))
                     else:
                         self.assertNotEquals(StrBoolResult.UNKNOWN, str_to_bool(w_lower))
                     if w == w_upper:
-                        self.assertEquals(StrBoolResult.UNKNOWN, str_to_bool(w_upper))
+                        self.assertEqual(StrBoolResult.UNKNOWN, str_to_bool(w_upper))
                     else:
                         self.assertNotEquals(StrBoolResult.UNKNOWN, str_to_bool(w_upper))
 
@@ -90,9 +90,9 @@ class TestBooleanExtension(TestCase):
                 self.assertNotEquals(StrBoolResult.FALSE, str_to_bool(w_upper))
 
     def test_str_bool_result(self):
-        self.assertEquals(True, StrBoolResult.TRUE.to_bool())
+        self.assertEqual(True, StrBoolResult.TRUE.to_bool())
         self.assertNotEquals(False, StrBoolResult.TRUE.to_bool())
-        self.assertEquals(False, StrBoolResult.FALSE.to_bool())
+        self.assertEqual(False, StrBoolResult.FALSE.to_bool())
         self.assertNotEquals(True, StrBoolResult.FALSE.to_bool())
         with self.assertRaises(ValueError):
             StrBoolResult.UNKNOWN.to_bool()

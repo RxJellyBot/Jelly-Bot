@@ -27,7 +27,7 @@ from .stats import (
     APIStatisticModel, MessageRecordModel, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
-    MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult
+    MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult, DailyResult
 )
 # noinspection PyUnresolvedReferences
 from .timer import TimerModel, TimerListResult

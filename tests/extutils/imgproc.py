@@ -16,7 +16,7 @@ class TestImgurClient(TestCase):
         txt = f"Jelly Bot test upload on {datetime.now()}"
 
         result = ImgurClient.upload_image(url, type_, txt, txt)
-        self.assertEquals(200, result.status, f"Image upload status not 200 ({result.success}).")
+        self.assertEqual(200, result.status, f"Image upload status not 200 ({result.success}).")
         self.assertTrue(result.success, "Image upload not success.")
         self.assertIsNotNone(result.link, "No image link returned.")
 
@@ -28,7 +28,7 @@ class TestImgurClient(TestCase):
         txt = f"Jelly Bot test upload on {datetime.now()}"
 
         result = ImgurClient.upload_image(img, type_, txt, txt)
-        self.assertEquals(200, result.status, f"Image upload status not 200 ({result.success}).")
+        self.assertEqual(200, result.status, f"Image upload status not 200 ({result.success}).")
         self.assertTrue(result.success, "Image upload not success.")
         self.assertIsNotNone(result.link, "No image link returned.")
 

@@ -98,8 +98,6 @@ class TimeRange:
             - `start` will be `end` - `range_hr` hrs
         > If both not specified
             - `start` will be the current time - `range_hr` hrs
-
-    `start` and `end` must be tz-aware if specified.
     """
     start: Optional[datetime] = None
     start_org: Optional[datetime] = field(init=False)
@@ -122,7 +120,8 @@ class TimeRange:
         if self.start and self.end:
             return
 
-        if range_hr:
+        # `range_hr` = 0 could be `False` so explicitly checking `None`
+        if range_hr is not None:
             if self.start:
                 self.end = self.start + timedelta(hours=range_hr)
             elif self.end:

@@ -43,7 +43,7 @@ class TestBaseModel(TestCase):
         mdl = TestBaseModel.ModelIterPreIter()
 
         for jk in mdl:
-            self.assertEquals(mdl[jk], expected_vals[jk])
+            self.assertEqual(mdl[jk], expected_vals[jk])
 
     def test_iter_no_pre(self):
         expected_vals = {
@@ -52,11 +52,11 @@ class TestBaseModel(TestCase):
         mdl = TestBaseModel.ModelIterNoPreIter()
 
         for jk in mdl:
-            self.assertEquals(mdl[jk], expected_vals[jk])
+            self.assertEqual(mdl[jk], expected_vals[jk])
 
     def test_len(self):
-        self.assertEquals(2, len(TestBaseModel.ModelIterPreIter()))
-        self.assertEquals(2, len(TestBaseModel.ModelIterNoPreIter()))
+        self.assertEqual(2, len(TestBaseModel.ModelIterPreIter()))
+        self.assertEqual(2, len(TestBaseModel.ModelIterNoPreIter()))
 
     # endregion
 
@@ -105,10 +105,10 @@ class TestBaseModel(TestCase):
         self.assertIsNone(mdl.get("_id"))
 
     def check_oid_match(self, mdl, oid):
-        self.assertEquals(mdl.id, oid)
-        self.assertEquals(mdl.get_oid(), oid)
-        self.assertEquals(mdl["_id"], oid)
-        self.assertEquals(mdl.get("_id"), oid)
+        self.assertEqual(mdl.id, oid)
+        self.assertEqual(mdl.get_oid(), oid)
+        self.assertEqual(mdl["_id"], oid)
+        self.assertEqual(mdl.get("_id"), oid)
 
     def test_oid_ops_has_oid(self):
         mdl = TestBaseModel.ModelHasOid()
@@ -170,17 +170,17 @@ class TestBaseModel(TestCase):
         # Required value provided
         mdl = TestBaseModel.TestModel.generate_default(Field2=5)
         expected = {"f1": 0, "f2": 5, "f4": 5}
-        self.assertEquals(mdl.to_json(), expected)
+        self.assertEqual(mdl.to_json(), expected)
 
         # Optional value provided
         mdl = TestBaseModel.TestModel.generate_default(Field2=5, Field3=4)
         expected = {"f1": 0, "f2": 5, "f3": 4, "f4": 5}
-        self.assertEquals(mdl.to_json(), expected)
+        self.assertEqual(mdl.to_json(), expected)
 
         # Default value overridden
         mdl = TestBaseModel.TestModel.generate_default(Field2=5, Field4=7)
         expected = {"f1": 0, "f2": 5, "f4": 7}
-        self.assertEquals(mdl.to_json(), expected)
+        self.assertEqual(mdl.to_json(), expected)
 
     # region Operations on json key / field key
     def test_model_fields(self):
@@ -214,7 +214,7 @@ class TestBaseModel(TestCase):
 
                 fk = trans[jk]
 
-                self.assertEquals(TestBaseModel.TestModel.json_key_to_field(jk), fk)
+                self.assertEqual(TestBaseModel.TestModel.json_key_to_field(jk), fk)
 
     def test_field_to_json_key(self):
         trans = {"Field1": "f1", "Field2": "f2", "Field3": "f3", "Field4": "f4", "Id": "_id"}
@@ -226,7 +226,7 @@ class TestBaseModel(TestCase):
 
                 jk = trans[fk]
 
-                self.assertEquals(TestBaseModel.TestModel.field_to_json_key(fk), jk)
+                self.assertEqual(TestBaseModel.TestModel.field_to_json_key(fk), jk)
 
     # endregion
 
@@ -244,7 +244,7 @@ class TestBaseModel(TestCase):
 
         for fk, result in is_none.items():
             with self.subTest(fk=fk, expected_result=result):
-                self.assertEquals(mdl.is_field_none(fk, raise_on_not_exists=False), result)
+                self.assertEqual(mdl.is_field_none(fk, raise_on_not_exists=False), result)
 
         for fk in not_exists:
             with self.subTest(fk=fk):
@@ -262,6 +262,6 @@ class TestBaseModel(TestCase):
 
         for fk, fv in expected.items():
             with self.subTest(field_key=fk, expected_value=fv):
-                self.assertEquals(TestBaseModel.TestModel.get_field_class_instance(fk), fv)
+                self.assertEqual(TestBaseModel.TestModel.get_field_class_instance(fk), fv)
     # endregion
     # endregion

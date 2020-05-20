@@ -275,11 +275,11 @@ class TestModel(ABC):
             oid = ObjectId()
             if self.get_model_class().WITH_OID:
                 mdl.id = oid
-                self.assertEquals(mdl.id, oid)
+                self.assertEqual(mdl.id, oid)
 
                 oid = ObjectId()
                 mdl.set_oid(oid)
-                self.assertEquals(mdl.id, oid)
+                self.assertEqual(mdl.id, oid)
             else:
                 with self.assertRaises(IdUnsupportedError):
                     mdl.id = oid
@@ -293,7 +293,7 @@ class TestModel(ABC):
             if self.get_model_class().WITH_OID:
                 mdl = self.get_model_class()(**json, from_db=True)
 
-                self.assertEquals(mdl.to_json(), json)
+                self.assertEqual(mdl.to_json(), json)
             else:
                 with self.assertRaises(IdUnsupportedError):
                     self.get_model_class()(**json, from_db=True)
@@ -331,8 +331,8 @@ class TestModel(ABC):
                     except FieldReadOnly:
                         self.skipTest(f"Field key <{fk}> is readonly.")
 
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
-                    self.assertEquals(mdl[jk], manual)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
+                    self.assertEqual(mdl[jk], manual)
 
                 # Set by json key
                 mdl = self.get_constructed_model(including_optional=True)
@@ -343,8 +343,8 @@ class TestModel(ABC):
                     except FieldReadOnly:
                         self.skipTest(f"Json key <{fk}> is readonly.")
 
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
-                    self.assertEquals(mdl[jk], manual)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
+                    self.assertEqual(mdl[jk], manual)
 
         def test_get_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
@@ -364,8 +364,8 @@ class TestModel(ABC):
                 mdl = self.get_constructed_model(including_optional=True)
 
                 with self.subTest(fk=fk, jk=jk, auto=auto):
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), auto)
-                    self.assertEquals(mdl[jk], auto)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), auto)
+                    self.assertEqual(mdl[jk], auto)
 
         def test_cast_model_none(self):
             self.assertIsNone(self.get_model_class().cast_model(None))
@@ -379,7 +379,7 @@ class TestModel(ABC):
         def test_cast_constructed_model(self):
             mdl_to_cast = self.get_constructed_model()
             mdl_casted = self.get_model_class().cast_model(mdl_to_cast)
-            self.assertEquals(mdl_casted.to_json(), mdl_to_cast.to_json())
+            self.assertEqual(mdl_casted.to_json(), mdl_to_cast.to_json())
 
         def test_cast_model_additional_fields(self):
             expected_mdl_dict = self.get_constructed_model()
@@ -388,7 +388,7 @@ class TestModel(ABC):
 
             actual_mdl_dict = self.get_model_class().cast_model(dict_to_cast)
 
-            self.assertEquals(actual_mdl_dict, expected_mdl_dict)
+            self.assertEqual(actual_mdl_dict, expected_mdl_dict)
 
         def test_not_equal(self):
             # Different `Model` with same structure
@@ -466,4 +466,4 @@ class TestModel(ABC):
 
             for msg, a, b in items:
                 with self.subTest(msg=msg):
-                    self.assertEquals(a, b)
+                    self.assertEqual(a, b)

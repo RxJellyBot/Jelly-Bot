@@ -37,5 +37,5 @@ class TestExecodeEntryModel(TestModel.TestClass):
 
     def test_expiry(self):
         mdl = self.get_constructed_model()
-        self.assertEquals(mdl.expire_time,
-                          TestExecodeEntryModel.TIMESTAMP + timedelta(seconds=Database.ExecodeExpirySeconds))
+        self.assertEqual(mdl.expire_time,
+                         TestExecodeEntryModel.TIMESTAMP + timedelta(seconds=Database.ExecodeExpirySeconds))

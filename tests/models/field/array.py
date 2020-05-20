@@ -404,7 +404,7 @@ class TestArrayFieldValueLengthLimited(TestFieldValue.TestClass):
 class TestArrayFieldExtra(TestCase):
     def test_properties_max_length(self):
         f = ArrayField("af", int, max_len=3)
-        self.assertEquals(3, f.max_len)
+        self.assertEqual(3, f.max_len)
         self.assertTrue(f.is_type_matched([1, 2]))
         self.assertTrue(f.is_value_valid([1, 2]))
         self.assertTrue(f.is_type_matched([1, 2, 3]))

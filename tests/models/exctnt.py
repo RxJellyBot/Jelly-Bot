@@ -42,14 +42,14 @@ class TestExtraContentModel(TestModel.TestClass):
 
     def test_expiry(self):
         mdl = self.get_constructed_model()
-        self.assertEquals(mdl.expires_on, mdl.timestamp + timedelta(seconds=Database.ExtraContentExpirySeconds))
+        self.assertEqual(mdl.expires_on, mdl.timestamp + timedelta(seconds=Database.ExtraContentExpirySeconds))
 
     def test_content_html(self):
         mdl = self.get_constructed_model(tp=ExtraContentType.AUTO_REPLY_SEARCH)
         self.assertIsNotNone(mdl.content_html)
 
         mdl = self.get_constructed_model(tp=ExtraContentType.PURE_TEXT, c="AAAAA")
-        self.assertEquals("AAAAA", mdl.content_html)
+        self.assertEqual("AAAAA", mdl.content_html)
 
         mdl = self.get_constructed_model(tp=ExtraContentType.EXTRA_MESSAGE, c=[("r", "c")])
         self.assertIsNotNone(mdl.content_html)

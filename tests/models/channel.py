@@ -55,12 +55,12 @@ class TestChannelModel(TestModel.TestClass):
 
     def test_get_channel_name(self):
         mdl = self.get_constructed_model(manual_default=True)
-        self.assertEquals(mdl.get_channel_name("ABC"), "DN")
-        self.assertEquals(mdl.get_channel_name("DEF"), "NAME")
+        self.assertEqual(mdl.get_channel_name("ABC"), "DN")
+        self.assertEqual(mdl.get_channel_name("DEF"), "NAME")
 
         mdl = self.get_constructed_model(manual_default=False)
-        self.assertEquals(mdl.get_channel_name("ABC"), "XYZ")
-        self.assertEquals(mdl.get_channel_name("DEF"), "XYZ")
+        self.assertEqual(mdl.get_channel_name("ABC"), "XYZ")
+        self.assertEqual(mdl.get_channel_name("DEF"), "XYZ")
 
 
 class TestChannelCollectionModel(TestModel.TestClass):

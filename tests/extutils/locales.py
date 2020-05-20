@@ -5,10 +5,10 @@ from tests.base import TestCase
 
 class TestLocaleFunctions(TestCase):
     def test_sec_diff_to_utc_offset(self):
-        self.assertEquals("-0200", sec_diff_to_utc_offset(-7200))
-        self.assertEquals("+0000", sec_diff_to_utc_offset(0))
-        self.assertEquals("+0500", sec_diff_to_utc_offset(18000))
-        self.assertEquals("+0800", sec_diff_to_utc_offset(28800))
+        self.assertEqual("-0200", sec_diff_to_utc_offset(-7200))
+        self.assertEqual("+0000", sec_diff_to_utc_offset(0))
+        self.assertEqual("+0500", sec_diff_to_utc_offset(18000))
+        self.assertEqual("+0800", sec_diff_to_utc_offset(28800))
 
 
 class TestLocaleInfo(TestCase):
@@ -24,4 +24,4 @@ class TestLocaleInfo(TestCase):
                 self.assertIsNotNone(pytzinfo.utcoffset(now))
                 self.assertIsNotNone(pytzinfo.dst(now))
                 self.assertIsNotNone(pytzinfo.tzname(now))
-                self.assertEquals(locale.pytz_code, pytzinfo.tzidentifier)
+                self.assertEqual(locale.pytz_code, pytzinfo.tzidentifier)

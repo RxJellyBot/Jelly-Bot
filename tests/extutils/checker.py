@@ -32,13 +32,13 @@ class TestArgTypeEnsure(TestCase):
 
         fn(i_out, f_out, l_out, d_out, b_out, t_out, o_out)
 
-        self.assertEquals(1, i_out)
-        self.assertEquals(7.0, f_out)
+        self.assertEqual(1, i_out)
+        self.assertEqual(7.0, f_out)
         self.assertListEqual([8, 7], l_out)
         self.assertDictEqual({8: 7, 6: 5}, d_out)
-        self.assertEquals(True, b_out)
+        self.assertEqual(True, b_out)
         self.assertTupleEqual((8, 7), t_out)
-        self.assertEquals(ObjectId("5e8c08d00000000000000000"), o_out)
+        self.assertEqual(ObjectId("5e8c08d00000000000000000"), o_out)
 
     def test_normal_fail(self):
         l_out = 7
@@ -51,7 +51,7 @@ class TestArgTypeEnsure(TestCase):
 
         fn(l_out)
 
-        self.assertEquals(7, l_out)
+        self.assertEqual(7, l_out)
 
     def test_normal_optional(self):
         a1_out = 7
@@ -68,9 +68,9 @@ class TestArgTypeEnsure(TestCase):
 
         fn(a1_out, a2_out, a3_out)
 
-        self.assertEquals("7", a1_out)
-        self.assertEquals(None, a2_out)
-        self.assertEquals("7", a3_out)
+        self.assertEqual("7", a1_out)
+        self.assertEqual(None, a2_out)
+        self.assertEqual("7", a3_out)
 
     def test_normal_union_match_first(self):
         l_out = 7
@@ -83,7 +83,7 @@ class TestArgTypeEnsure(TestCase):
 
         fn(l_out)
 
-        self.assertEquals(7, l_out)
+        self.assertEqual(7, l_out)
 
     def test_normal_union_match_second(self):
         l_out = "7"
@@ -96,7 +96,7 @@ class TestArgTypeEnsure(TestCase):
 
         fn(l_out)
 
-        self.assertEquals("7", l_out)
+        self.assertEqual("7", l_out)
 
     def test_normal_union_multi_match(self):
         a1_out = True
@@ -111,8 +111,8 @@ class TestArgTypeEnsure(TestCase):
 
         fn(a1_out, a2_out)
 
-        self.assertEquals(True, a1_out)
-        self.assertEquals(5, a2_out)
+        self.assertEqual(True, a1_out)
+        self.assertEqual(5, a2_out)
 
     def test_normal_union_not_match_castable(self):
         l_out = True
@@ -125,7 +125,7 @@ class TestArgTypeEnsure(TestCase):
 
         fn(l_out)
 
-        self.assertEquals(1, l_out)
+        self.assertEqual(1, l_out)
 
     def test_normal_union_not_match_uncastable(self):
         l_out = [1]
@@ -154,9 +154,9 @@ class TestArgTypeEnsure(TestCase):
 
         fn(a1_out, a2_out, a3_out)
 
-        self.assertEquals(MessageType.TEXT, a1_out)
-        self.assertEquals(MessageType.LOCATION, a2_out)
-        self.assertEquals("1", a3_out)
+        self.assertEqual(MessageType.TEXT, a1_out)
+        self.assertEqual(MessageType.LOCATION, a2_out)
+        self.assertEqual("1", a3_out)
 
     def test_list(self):
         l_out = 1
@@ -199,9 +199,9 @@ class TestArgTypeEnsure(TestCase):
 
         fn(a1_out, a2_out, a3_out)
 
-        self.assertEquals(1, a1_out)
-        self.assertEquals([1], a2_out)
-        self.assertEquals(1, a3_out)
+        self.assertEqual(1, a1_out)
+        self.assertEqual([1], a2_out)
+        self.assertEqual(1, a3_out)
 
     def test_normal_union_prioritized_list(self):
         a1_out = "1"
@@ -218,9 +218,9 @@ class TestArgTypeEnsure(TestCase):
 
         fn(a1_out, a2_out, a3_out)
 
-        self.assertEquals(1, a1_out)
-        self.assertEquals([1], a2_out)
-        self.assertEquals(1, a3_out)
+        self.assertEqual(1, a1_out)
+        self.assertEqual([1], a2_out)
+        self.assertEqual(1, a3_out)
 
     def test_nonsafe_fail(self):
         l_out = 7

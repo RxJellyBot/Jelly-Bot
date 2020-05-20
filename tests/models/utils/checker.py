@@ -83,7 +83,7 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         for k, expected_v in expected_values.items():
             with self.subTest(key=k, expected_value=expected_v):
                 self.assertTrue(k in actual_data)
-                self.assertEquals(expected_v, actual_data[k])
+                self.assertEqual(expected_v, actual_data[k])
 
     # region Main test body
     def missing_has_default(self, key_to_remove: str, expected_value_after_fill: Dict[str, Any]):
@@ -95,7 +95,7 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         ModelFieldChecker.check(ColInst)
 
         # Checking results
-        self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
+        self.assertEqual(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
 
         data = ColInst.find_one()
 
@@ -115,7 +115,7 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         ModelFieldChecker.check(ColInst)
 
         # Checking results
-        self.assertEquals(ColInst.estimated_document_count(), 0, "Data not being moved out for repair.")
+        self.assertEqual(ColInst.estimated_document_count(), 0, "Data not being moved out for repair.")
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0, "Mail not sent.")
 
     def missing_optional(self, key_to_remove: str):
@@ -127,7 +127,7 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         ModelFieldChecker.check(ColInst)
 
         # Checking results
-        self.assertEquals(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
+        self.assertEqual(ColInst.estimated_document_count(), 1, "Data unexpectedly lost.")
 
         data = ColInst.find_one()
 

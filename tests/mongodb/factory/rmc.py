@@ -28,11 +28,11 @@ CID_DEST = ObjectId.from_datetime(_now_ + timedelta(days=1))
 
 class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpTestClass(cls):
         Bot.RemoteControl.IdleDeactivateSeconds = EXPIRY_SEC
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownTestClass(cls):
         Bot.RemoteControl.IdleDeactivateSeconds = EXPIRY_SEC_ORG
 
     @staticmethod
@@ -56,7 +56,7 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCa
         entry = get_current.return_
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
-        self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
+        self.assertEqual(CID_DEST, entry.target_channel_oid, "Target channel not match.")
         self.assertTimeDifferenceLessEqual(expiry_expected, entry.expiry, get_current.execution_ms / 1000)
         self.assertTimeDifferenceGreaterEqual(expiry_unexpected, entry.expiry, SLEEP_SEC)
 
@@ -72,7 +72,7 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCa
         entry = RemoteControlManager.get_current(UID, CID_SRC, update_expiry=False)
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
-        self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
+        self.assertEqual(CID_DEST, entry.target_channel_oid, "Target channel not match.")
         self.assertTimeDifferenceLessEqual(expiry_expected, entry.expiry, activate_sec)
         self.assertTimeDifferenceGreaterEqual(expiry_unexpected, entry.expiry, SLEEP_SEC)
 
@@ -95,5 +95,5 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin, TestCa
         entry = RemoteControlManager.activate(UID, CID_SRC, CID_DEST)
 
         self.assertIsNotNone(entry, "Activation returned `None`")
-        self.assertEquals(CID_DEST, entry.target_channel_oid, "Target channel not match.")
+        self.assertEqual(CID_DEST, entry.target_channel_oid, "Target channel not match.")
         self.assertTimeDifferenceLessEqual(entry.expiry, expiry_expected, 0.05)

@@ -46,8 +46,8 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
 
         mdl = self.get_constructed_model(exp=exp, loc=loc)
 
-        self.assertEquals(mdl.expiry, exp_aware)
-        self.assertEquals(mdl.expiry_str, "2020-05-15 08:00:00 (UTC+0800)")
+        self.assertEqual(mdl.expiry, exp_aware)
+        self.assertEqual(mdl.expiry_str, "2020-05-15 08:00:00 (UTC+0800)")
 
     @staticmethod
     def prepare_channel_data():
@@ -60,4 +60,4 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
         expected_channel_mdl = self.prepare_channel_data()
         mdl = self.get_constructed_model(dst=expected_channel_mdl.id)
 
-        self.assertEquals(mdl.target_channel, expected_channel_mdl)
+        self.assertEqual(mdl.target_channel, expected_channel_mdl)

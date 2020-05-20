@@ -110,7 +110,7 @@ class TestFieldValue(ABC):
 
             for before, expected in self.get_values_to_cast():
                 with self.subTest(before=before, expected=expected):
-                    self.assertEquals(f.cast_to_desired_type(before), expected)
+                    self.assertEqual(f.cast_to_desired_type(before), expected)
 
         # endregion
 
@@ -136,7 +136,7 @@ class TestFieldValue(ABC):
 
                 with self.subTest(val_to_set=val_to_set, val_to_get=val_to_get):
                     fi.value = val_to_set
-                    self.assertEquals(val_to_get, fi.value)
+                    self.assertEqual(val_to_get, fi.value)
 
         @abstractmethod
         def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:

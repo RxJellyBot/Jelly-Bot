@@ -279,4 +279,4 @@ class TestOidFieldValueNoKey(TestOidFieldValueDefault):
         return ObjectIDField()
 
     def test_key_name(self):
-        self.assertEquals(OID_KEY, self.get_field().key)
+        self.assertEqual(OID_KEY, self.get_field().key)
