@@ -109,10 +109,7 @@ class TimeRange:
 
     def _localize_(self, dt: Optional[datetime]):
         if dt:
-            if is_tz_naive(dt):
-                dt = make_tz_aware(dt, self.tzinfo_)
-
-            return localtime(dt, self.tzinfo_)
+            return localtime(make_tz_aware(dt, self.tzinfo_), self.tzinfo_)
         else:
             return None
 

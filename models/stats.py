@@ -9,7 +9,7 @@ from typing import Dict, Optional, List
 import pymongo
 from bson import ObjectId
 
-from extutils.dt import now_utc_aware, TimeRange, is_tz_naive, make_tz_aware
+from extutils.dt import now_utc_aware, TimeRange, make_tz_aware
 from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
@@ -108,13 +108,13 @@ class HourlyResult(abc.ABC):
 
             now = now_utc_aware()
 
-            if start and is_tz_naive(start):
+            if start:
                 start = make_tz_aware(start)
 
             if start and start > now:
                 return HourlyResult.DAYS_NONE
 
-            if end and is_tz_naive(end):
+            if end:
                 end = make_tz_aware(end)
 
             return max(
