@@ -10,7 +10,17 @@ class ModelConstructionError(Exception, ABC):
 
 class InvalidModelError(ModelConstructionError):
     def __init__(self, model_name: str, reason: ModelValidityCheckResult):
+        self._reason = reason
         super().__init__(f"Invalid model `{model_name}`. Reason: {reason.code}")
+
+    @property
+    def reason(self) -> ModelValidityCheckResult:
+        return self._reason
+
+
+class InvalidModelFieldError(ModelConstructionError):
+    def __init__(self, model_name: str, exception: Exception):
+        super().__init__(f"Invalid model `{model_name}`. Exception: {exception}")
 
 
 class ModelUncastableError(ModelConstructionError):

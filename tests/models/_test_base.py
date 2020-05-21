@@ -7,8 +7,7 @@ from bson import ObjectId
 from extutils.utils import to_snake_case
 from models import Model, OID_KEY
 from models.exceptions import (
-    RequiredKeyUnfilledError, IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError
+    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError, JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnly
 from tests.base import TestCase
@@ -259,9 +258,9 @@ class TestModel(ABC):
                 init_dict_json, init_dict_field = self._dict_to_json_field_(required)
 
                 # Test for the expected error
-                with self.assertRaises(RequiredKeyUnfilledError):
+                with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_field, from_db=False)
-                with self.assertRaises(RequiredKeyUnfilledError):
+                with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_json, from_db=True)
 
         def test_contains_oid(self):

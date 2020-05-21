@@ -71,6 +71,9 @@ class PytzInfo(tzinfo):
     def tzidentifier(self):
         return self._base.zone
 
+    def __eq__(self, other):
+        return type(self) == type(other) and self.tzidentifier == other.tzidentifier
+
 
 def is_now_dst(tz):
     now = pytz.utc.localize(datetime.utcnow())

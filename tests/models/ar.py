@@ -8,8 +8,7 @@ from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import (
     Model, AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleExecodeModel, AutoReplyModuleTagModel
 )
-from models.field.exceptions import FieldEmptyValueNotAllowed
-from models.exceptions import ModelConstructionError, InvalidModelError
+from models.exceptions import ModelConstructionError, InvalidModelError, InvalidModelFieldError
 
 from ._test_base import TestModel
 
@@ -43,7 +42,7 @@ class TestAutoReplyContentModel(TestModel.TestClass):
             ),
             (
                 {("c", "Content"): "", ("t", "ContentType"): AutoReplyContentType.TEXT},
-                FieldEmptyValueNotAllowed
+                InvalidModelFieldError
             )
         ]
 

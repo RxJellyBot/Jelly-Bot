@@ -19,6 +19,8 @@ class RootUserConfigModel(Model):
     Language = TextField("lg", default=default_language.code, allow_none=False)
     Name = TextField("n", allow_none=False)
 
+    # FIXME: method to get language or locale object for upgradability & corresponding tests
+
     @property
     def tzinfo(self):
         return LocaleInfo.get_tzinfo(self.locale)
@@ -75,7 +77,9 @@ class OnPlatformUserModel(Model):
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
     def get_name(self, channel_data=None) -> Optional[str]:
-        if self.id not in _user_name_cache_:
+        # Checking `get_oid()` because the model might be constructed in the code (no ID) and
+        # call `get_name()` afterward without storing it to the database
+        if self.get_oid() is not None and self.id not in _user_name_cache_:
             n = None
 
             if self.platform == Platform.LINE:

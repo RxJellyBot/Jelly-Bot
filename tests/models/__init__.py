@@ -13,3 +13,4 @@ from .shorturl import *  # NOQA
 from .stats_model import *  # NOQA
 from .stats_result import *  # NOQA
 from .timer import *  # NOQA
+from .user import *  # NOQA

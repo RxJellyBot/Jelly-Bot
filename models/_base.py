@@ -11,9 +11,10 @@ from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
     InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowed
+    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowed, InvalidModelFieldError
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
+from .field.exceptions import FieldException
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
 
 
@@ -51,7 +52,10 @@ class Model(MutableMapping, abc.ABC):
         else:
             kwargs = self._camelcase_kwargs_(**kwargs)
 
-        self._input_kwargs_(**kwargs)
+        try:
+            self._input_kwargs_(**kwargs)
+        except FieldException as e:
+            raise InvalidModelFieldError(self.__class__.__qualname__, e)
 
         not_handled = self._fill_default_vals_(
             self.model_field_keys() - {to_camel_case(k) for k in self._dict_.keys()})
@@ -172,6 +176,7 @@ class Model(MutableMapping, abc.ABC):
 
     def __eq__(self, other):
         if isinstance(other, Model):
+            # noinspection PyProtectedMember
             return self._dict_ == other._dict_ and type(self) == type(other)
         elif isinstance(other, MutableMapping):
             return self.to_json() == other
