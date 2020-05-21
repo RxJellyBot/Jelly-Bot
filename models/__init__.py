@@ -24,7 +24,7 @@ from .rpdata import PendingRepairDataModel
 from .shorturl import ShortUrlRecordModel
 # noinspection PyUnresolvedReferences
 from .stats import (
-    APIStatisticModel, MessageRecordModel, BotFeatureUsageModel,
+    APIStatisticModel, MessageRecordModel, BotFeatureUsageModel, MemberMessageCountEntry,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
     MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult, DailyResult

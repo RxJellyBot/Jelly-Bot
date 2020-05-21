@@ -8,7 +8,6 @@ from typing import Dict, Optional, List
 
 import pymongo
 from bson import ObjectId
-from django.utils.translation import gettext_lazy as _
 
 from extutils.dt import now_utc_aware, TimeRange, is_tz_naive, make_tz_aware
 from extutils.utils import enumerate_ranking
@@ -18,6 +17,7 @@ from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
+from strnames.models import StatsResults
 
 
 # region Models
@@ -202,16 +202,16 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
                 category_name=cat.key,
                 data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
                 color="#777777",
-                hidden="true"
+                hidden="true"  # Will be used in JS so string of bool instead
             )
             for cat, data in count_data.items()
         ]
         count_sum = [
             CountDataEntry(
-                category_name=_("(Total)"),
+                category_name=StatsResults.CATEGORY_TOTAL,
                 data=[ct / dm for ct, dm in zip(count_sum, self.denom)] if self.avg_calculatable else count_sum,
                 color="#323232",
-                hidden="false"
+                hidden="false"  # Will be used in JS so string of bool instead
             )
         ]
 
@@ -264,7 +264,7 @@ class MeanMessageResult:
     def __init__(self, date_list: List[date], data_list: List[float], mean_days: int):
         self.date_list = date_list
         self.data_list = data_list
-        self.label = _("{} days mean").format(mean_days)
+        self.label = StatsResults.DAYS_MEAN.format(mean_days)
 
 
 class MeanMessageResultGenerator(DailyResult):
@@ -285,6 +285,8 @@ class MeanMessageResultGenerator(DailyResult):
     def generate_result(self, mean_days: int) -> MeanMessageResult:
         if mean_days > self.max_madays:
             raise ValueError("Max mean average calculation range reached.")
+        if mean_days <= 0:
+            raise ValueError("`mean_days` should be > 0.")
 
         date_list = []
         data_list = []
@@ -339,7 +341,7 @@ class CountBeforeTimeResult(DailyResult):
 
     @property
     def title(self):
-        return _("Message Count Before {}").format(strftime("%I:%M:%S %p", gmtime(self.trange.end_time_seconds)))
+        return StatsResults.COUNT_BEFORE.format(strftime("%I:%M:%S %p", gmtime(self.trange.end_time_seconds)))
 
 
 # region MemberMessageCountResult
@@ -414,7 +416,7 @@ class MemberMessageByCategoryResult:
     KEY_COUNT = "ct"
 
     def __init__(self, cursor):
-        # Hand typing this to create custom order without additional implementations
+        # Manually listing this to create custom order without additional implementations
         self.label_category = [
             MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
@@ -456,13 +458,14 @@ class BotFeatureUsageResult:
                     FeatureUsageEntry(feature_name=feature, count=d[BotFeatureUsageResult.KEY], rank=rank)
                 )
             except TypeError:
-                # Skip if the code has been added in the newer build but not in the current executing build
+                # Skip if the feature code has been added in the newer build but not in the current executing build
                 pass
 
         if incl_not_used:
             diff = {feature for feature in BotFeature}.difference({BotFeature.cast(d[OID_KEY]) for d in cursor})
+            last_rank = f"{'T' if len(diff) > 0 else ''}{len(self.data) + 1 if self.data else 1}"
             for diff_ in diff:
-                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0, rank=1))
+                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0, rank=last_rank))
 
         self.chart_label = [d.feature_name for d in self.data]
         self.chart_data = [d.count for d in self.data]
@@ -493,8 +496,8 @@ class BotFeatureHourlyAvgResult(HourlyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, incl_not_used: bool, days_collected: float):
-        super().__init__(days_collected)
+    def __init__(self, cursor, incl_not_used: bool, days_collected: float, end_time: Optional[datetime] = None):
+        super().__init__(days_collected, end_time=end_time)
 
         self.hr_range = int(days_collected * 24)
         self.label_hr = [h for h in range(24)]
@@ -529,5 +532,5 @@ class BotFeatureHourlyAvgResult(HourlyResult):
             for diff_ in diff:
                 self.data.append(UsageEntry(feature=diff_, data=[0] * 24, color="#9C0000", hidden="true"))
 
-        entry = UsageEntry(feature=_("(Total)"), data=hr_sum, color="#323232", hidden="false")
+        entry = UsageEntry(feature=StatsResults.CATEGORY_TOTAL, data=hr_sum, color="#323232", hidden="false")
         self.data = [entry] + list(sorted(self.data, key=lambda i: i.feature.code))
