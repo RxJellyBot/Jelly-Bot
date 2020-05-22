@@ -54,6 +54,6 @@ class JsonKeyDuplicatedError(ModelConstructionError):
         super().__init__(f"Model `{model_name}` contains duplicated json key: {dup_key}.")
 
 
-class DeleteNotAllowed(Exception):
+class DeleteNotAllowedError(Exception):
     def __init__(self, model_name: str):
         super().__init__(f"Not allowed to perform `del` on {model_name}")

@@ -16,7 +16,8 @@ from extutils.logger import SYSTEM
 from extutils.utils import dt_to_objectid
 from models import Model, OID_KEY
 from models.exceptions import InvalidModelError
-from models.field.exceptions import FieldReadOnly, FieldTypeMismatch, FieldValueInvalid, FieldCastingFailed
+from models.field.exceptions import FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, \
+    FieldCastingFailedError
 from models.utils import ModelFieldChecker
 from mongodb.utils import CursorWithCount, backup_collection
 from mongodb.factory import MONGO_CLIENT
@@ -122,11 +123,15 @@ class ControlExtensionMixin(Collection):
 
         return self.find_one(filter_)[OID_KEY]
 
-    def insert_one_data(self, model_cls: Type[Type[Model]], **model_args) \
+    def insert_one_data(self, model_cls: Type[Type[Model]], *, from_db: bool = False, **model_args) \
             -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
         """
-        :param model_cls: The class for the data to be sealed.
-        :param model_args: The arguments for the `Model` construction.
+        Insert an object into the database by providing its model class and the arguments to construct the model.
+
+        OID will **NOT** be attached to the returned model.
+
+        :param model_cls: class for the data to be constructed
+        :param model_args: arguments for the `Model` construction
 
         :return: model, outcome, ex
         """
@@ -136,19 +141,19 @@ class ControlExtensionMixin(Collection):
 
         try:
             if issubclass(model_cls, Model):
-                model = model_cls(**model_args)
+                model = model_cls(from_db=from_db, **model_args)
             else:
                 outcome = WriteOutcome.X_NOT_MODEL
-        except FieldReadOnly as e:
+        except FieldReadOnlyError as e:
             outcome = WriteOutcome.X_READONLY
             ex = e
-        except FieldTypeMismatch as e:
+        except FieldTypeMismatchError as e:
             outcome = WriteOutcome.X_TYPE_MISMATCH
             ex = e
-        except FieldValueInvalid as e:
+        except FieldValueInvalidError as e:
             outcome = WriteOutcome.X_INVALID_FIELD
             ex = e
-        except FieldCastingFailed as e:
+        except FieldCastingFailedError as e:
             outcome = WriteOutcome.X_CASTING_FAILED
             ex = e
         except Exception as e:
@@ -286,8 +291,9 @@ class BaseCollection(ControlExtensionMixin, Collection):
         self.on_init()
         Thread(target=self.on_init_async).start()
 
-    def insert_one_data(self, **model_args) -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
-        return super().insert_one_data(self.get_model_cls(), **model_args)
+    def insert_one_data(self, *, from_db: bool = False, **model_args) \
+            -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
+        return super().insert_one_data(self.get_model_cls(), from_db=from_db, **model_args)
 
     @property
     def data_model(self):

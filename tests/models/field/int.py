@@ -2,7 +2,7 @@ from typing import Type, Any, Tuple
 
 from models.field import IntegerField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldException, FieldNoneNotAllowed, FieldValueNegative
+    FieldTypeMismatchError, FieldError, FieldNoneNotAllowedError, FieldValueNegativeError
 )
 
 from ._test_val import TestFieldValue
@@ -84,11 +84,11 @@ class TestIntegerFieldValueDefault(TestFieldValue.TestClass):
             (6.7, 6)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (True, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (None, FieldNoneNotAllowed)
+            (True, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (None, FieldNoneNotAllowedError)
         )
 
 
@@ -137,11 +137,11 @@ class TestIntegerFieldValueNoAutocast(TestFieldValue.TestClass):
             (6.7, 6.7)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            ("A", FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError)
         )
 
 
@@ -192,10 +192,10 @@ class TestIntegerFieldValueAllowNone(TestFieldValue.TestClass):
             (6.7, 6)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (True, FieldTypeMismatch),
-            ("A", FieldTypeMismatch)
+            (True, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError)
         )
 
 
@@ -242,10 +242,10 @@ class TestIntegerFieldValuePositiveOnly(TestFieldValue.TestClass):
             (6.7, 6)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (-5, FieldValueNegative)
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (-5, FieldValueNegativeError)
         )

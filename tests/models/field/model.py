@@ -6,7 +6,7 @@ from bson import ObjectId
 
 from models.field import ModelField, BaseField, IntegerField, BooleanField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldException, FieldModelClassInvalid
+    FieldTypeMismatchError, FieldError, FieldModelClassInvalidError
 )
 from models import Model, OID_KEY
 from tests.base import TestCase
@@ -126,12 +126,12 @@ class TestModelFieldValueDefault(TestFieldValue.TestClass):
             (DUMMY_MODEL_INSTANCE, DUMMY_MODEL_INSTANCE)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (5, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            (ModelTest2(Id=DUMMY_OID_1), FieldTypeMismatch),
+            (5, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            (ModelTest2(Id=DUMMY_OID_1), FieldTypeMismatchError),
         )
 
 
@@ -151,5 +151,5 @@ class TestModelFieldExtra(TestCase):
 
         for mdl_cls in mdl_cls_to_test:
             with self.subTest(mdl_cls=mdl_cls):
-                with self.assertRaises(FieldModelClassInvalid):
+                with self.assertRaises(FieldModelClassInvalidError):
                     ModelField("k", mdl_cls)

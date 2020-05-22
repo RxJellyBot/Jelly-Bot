@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Tuple, Any, Type, final
 
 from models.field import BaseField
-from models.field.exceptions import FieldException
+from models.field.exceptions import FieldError
 from tests.base import TestCase
 
 
@@ -139,7 +139,7 @@ class TestFieldValue(ABC):
                     self.assertEqual(val_to_get, fi.value)
 
         @abstractmethod
-        def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+        def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
             """
             Values that will be set to :class:`models.field._base.FieldInstance` and the exception it should throw.
 

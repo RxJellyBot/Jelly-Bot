@@ -1,7 +1,7 @@
 from extutils.color import Color, ColorFactory
 
 from ._base import BaseField
-from .exceptions import FieldValueInvalid, FieldTypeMismatch
+from .exceptions import FieldValueInvalidError, FieldTypeMismatchError
 
 
 class ColorField(BaseField):
@@ -32,16 +32,16 @@ class ColorField(BaseField):
             if Color.color_num_valid(value):
                 return
             else:
-                raise FieldValueInvalid(self.key, value)
+                raise FieldValueInvalidError(self.key, value)
         elif isinstance(value, str):
             try:
                 ColorFactory.from_hex(value)
             except ValueError:
-                raise FieldValueInvalid(self.key, value)
+                raise FieldValueInvalidError(self.key, value)
         elif isinstance(value, Color):
             pass
         else:
-            raise FieldTypeMismatch(self.key, type(value), value, self.expected_types)
+            raise FieldTypeMismatchError(self.key, type(value), value, self.expected_types)
 
     def _cast_to_desired_type_(self, value):
         # Data store in the database is int

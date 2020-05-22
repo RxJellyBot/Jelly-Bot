@@ -3,7 +3,7 @@ from typing import Union, Optional, List
 from flags import MessageType
 from bson import ObjectId
 
-from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
+from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailedError
 from tests.base import TestCase
 
 
@@ -136,7 +136,7 @@ class TestArgTypeEnsure(TestCase):
 
             l_out = l
 
-        with self.assertRaises(TypeCastingFailed, msg=f"TypeCastingFailed not raised. Final output: {l_out}"):
+        with self.assertRaises(TypeCastingFailedError, msg=f"TypeCastingFailed not raised. Final output: {l_out}"):
             fn(l_out)
 
     def test_normal_flag(self):
@@ -175,10 +175,10 @@ class TestArgTypeEnsure(TestCase):
         l_out = [5, True, 3.7, "A"]
 
         @arg_type_ensure
-        def fn(l: List[Union[int, bool]]):
+        def fn(lst: List[Union[int, bool]]):
             nonlocal l_out
 
-            l_out = l
+            l_out = lst
 
         fn(l_out)
 
@@ -226,10 +226,10 @@ class TestArgTypeEnsure(TestCase):
         l_out = 7
 
         @arg_type_ensure(converter=NonSafeDataTypeConverter)
-        def fn(l: list):
+        def fn(lst: list):
             nonlocal l_out
 
-            l_out = l
+            l_out = lst
 
-        with self.assertRaises(TypeCastingFailed):
+        with self.assertRaises(TypeCastingFailedError):
             fn(l_out)

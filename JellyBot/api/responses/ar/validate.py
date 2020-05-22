@@ -19,7 +19,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
 
         self._result = False
 
-    # noinspection PyBroadException,PyArgumentList
+    # noinspection PyArgumentList
     def _handle_content_type_(self):
         k = param.Validation.CONTENT_TYPE
 

@@ -6,8 +6,8 @@ from bson import ObjectId
 from models import OID_KEY
 from models.field import ObjectIDField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldOidStringInvalid, FieldOidDatetimeOutOfRange,
-    FieldException, FieldReadOnly
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldOidStringInvalidError, FieldOidDatetimeOutOfRangeError,
+    FieldError, FieldReadOnlyError
 )
 
 from ._test_val import TestFieldValue
@@ -87,17 +87,17 @@ class TestOidFieldValueDefault(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (ObjectId("000000000000000000000000"), FieldReadOnly),
-            ("5eb5f2800000000000000000", FieldReadOnly),
-            (datetime(2020, 5, 9), FieldReadOnly),
-            (None, FieldReadOnly),
-            ("A", FieldReadOnly),
-            (7, FieldReadOnly),
-            (True, FieldReadOnly),
-            (datetime(1920, 1, 1), FieldReadOnly),
-            (datetime(2107, 1, 1), FieldReadOnly)
+            (ObjectId("000000000000000000000000"), FieldReadOnlyError),
+            ("5eb5f2800000000000000000", FieldReadOnlyError),
+            (datetime(2020, 5, 9), FieldReadOnlyError),
+            (None, FieldReadOnlyError),
+            ("A", FieldReadOnlyError),
+            (7, FieldReadOnlyError),
+            (True, FieldReadOnlyError),
+            (datetime(1920, 1, 1), FieldReadOnlyError),
+            (datetime(2107, 1, 1), FieldReadOnlyError)
         )
 
 
@@ -148,14 +148,14 @@ class TestOidFieldValueNotReadonly(TestFieldValue.TestClass):
             (datetime(2020, 5, 9), ObjectId("5eb5f2800000000000000000"))
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ("A", FieldOidStringInvalid),
-            (7, FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            (datetime(1920, 1, 1), FieldOidDatetimeOutOfRange),
-            (datetime(2107, 1, 1), FieldOidDatetimeOutOfRange)
+            (None, FieldNoneNotAllowedError),
+            ("A", FieldOidStringInvalidError),
+            (7, FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            (datetime(1920, 1, 1), FieldOidDatetimeOutOfRangeError),
+            (datetime(2107, 1, 1), FieldOidDatetimeOutOfRangeError)
         )
 
 
@@ -203,17 +203,17 @@ class TestOidFieldValueAllowNone(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldReadOnly),
-            (ObjectId("000000000000000000000000"), FieldReadOnly),
-            ("5eb5f2800000000000000000", FieldReadOnly),
-            (datetime(2020, 5, 9), FieldReadOnly),
-            ("A", FieldReadOnly),
-            (7, FieldReadOnly),
-            (True, FieldReadOnly),
-            (datetime(1920, 1, 1), FieldReadOnly),
-            (datetime(2107, 1, 1), FieldReadOnly)
+            (None, FieldReadOnlyError),
+            (ObjectId("000000000000000000000000"), FieldReadOnlyError),
+            ("5eb5f2800000000000000000", FieldReadOnlyError),
+            (datetime(2020, 5, 9), FieldReadOnlyError),
+            ("A", FieldReadOnlyError),
+            (7, FieldReadOnlyError),
+            (True, FieldReadOnlyError),
+            (datetime(1920, 1, 1), FieldReadOnlyError),
+            (datetime(2107, 1, 1), FieldReadOnlyError)
         )
 
 
@@ -260,17 +260,17 @@ class TestOidFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (ObjectId("000000000000000000000000"), FieldReadOnly),
-            ("5eb5f2800000000000000000", FieldReadOnly),
-            (datetime(2020, 5, 9), FieldReadOnly),
-            (None, FieldReadOnly),
-            ("A", FieldReadOnly),
-            (7, FieldReadOnly),
-            (True, FieldReadOnly),
-            (datetime(1920, 1, 1), FieldReadOnly),
-            (datetime(2107, 1, 1), FieldReadOnly)
+            (ObjectId("000000000000000000000000"), FieldReadOnlyError),
+            ("5eb5f2800000000000000000", FieldReadOnlyError),
+            (datetime(2020, 5, 9), FieldReadOnlyError),
+            (None, FieldReadOnlyError),
+            ("A", FieldReadOnlyError),
+            (7, FieldReadOnlyError),
+            (True, FieldReadOnlyError),
+            (datetime(1920, 1, 1), FieldReadOnlyError),
+            (datetime(2107, 1, 1), FieldReadOnlyError)
         )
 
 

@@ -9,12 +9,12 @@ from .logger import logger
 
 
 __all__ = [
-    "arg_type_ensure", "TypeCastingFailed",
+    "arg_type_ensure", "TypeCastingFailedError",
     "BaseDataTypeConverter", "NonSafeDataTypeConverter"
 ]
 
 
-class TypeCastingFailed(Exception):
+class TypeCastingFailedError(Exception):
     def __init__(self, data: Any, dtype: type, exception: Exception):
         self.data = data
         self.expected_type = dtype
@@ -164,7 +164,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
     def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
         logger.logger.warning(f"Type casting failed. Data: {data} / Target Type: {dtype} / Exception: {e}")
 
-        raise TypeCastingFailed(data, dtype, e)
+        raise TypeCastingFailedError(data, dtype, e)
 
 
 def arg_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):

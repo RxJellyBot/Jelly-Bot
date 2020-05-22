@@ -3,7 +3,7 @@ from typing import Type, Any, Tuple
 from extutils.color import Color, ColorFactory
 from models.field import ColorField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid, FieldException
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldValueInvalidError, FieldError
 )
 
 from ._test_val import TestFieldValue
@@ -95,13 +95,13 @@ class TestColorFieldValueDefault(TestFieldValue.TestClass):
             (Color(5723991), Color(5723991))
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            (-8000, FieldValueInvalid),
-            (20000000, FieldValueInvalid),
-            ("GGGGGG", FieldValueInvalid),
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            (-8000, FieldValueInvalidError),
+            (20000000, FieldValueInvalidError),
+            ("GGGGGG", FieldValueInvalidError),
         )
 
 
@@ -160,12 +160,12 @@ class TestColorFieldValueAllowNone(TestFieldValue.TestClass):
             (Color(5723991), Color(5723991))
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (True, FieldTypeMismatch),
-            (-8000, FieldValueInvalid),
-            (20000000, FieldValueInvalid),
-            ("GGGGGG", FieldValueInvalid),
+            (True, FieldTypeMismatchError),
+            (-8000, FieldValueInvalidError),
+            (20000000, FieldValueInvalidError),
+            ("GGGGGG", FieldValueInvalidError),
         )
 
 
@@ -222,11 +222,11 @@ class TestColorFieldValueNoAutoCast(TestFieldValue.TestClass):
             (Color(5723991), Color(5723991))
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            (-8000, FieldValueInvalid),
-            (20000000, FieldValueInvalid),
-            ("GGGGGG", FieldValueInvalid),
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            (-8000, FieldValueInvalidError),
+            (20000000, FieldValueInvalidError),
+            ("GGGGGG", FieldValueInvalidError),
         )

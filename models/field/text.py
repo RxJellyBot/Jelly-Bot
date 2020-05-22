@@ -3,7 +3,8 @@ import re
 from extutils.url import is_valid_url
 
 from ._base import BaseField
-from .exceptions import FieldInvalidUrl, FieldMaxLengthReached, FieldRegexNotMatch, FieldEmptyValueNotAllowed
+from .exceptions import FieldInvalidUrlError, FieldMaxLengthReachedError, FieldRegexNotMatchError, \
+    FieldEmptyValueNotAllowedError
 
 
 class TextField(BaseField):
@@ -54,15 +55,15 @@ class TextField(BaseField):
         if isinstance(value, str):
             # Length check
             if len(value) > self._maxlen:
-                raise FieldMaxLengthReached(self.key, len(value), self._maxlen)
+                raise FieldMaxLengthReachedError(self.key, len(value), self._maxlen)
 
             # Regex check
             if self._regex is not None and not re.fullmatch(self._regex, value):
-                raise FieldRegexNotMatch(self.key, value, self._regex)
+                raise FieldRegexNotMatchError(self.key, value, self._regex)
 
             # Empty Value
             if self._must_have_content and len(value) == 0:
-                raise FieldEmptyValueNotAllowed(self.key)
+                raise FieldEmptyValueNotAllowedError(self.key)
 
     @classmethod
     def none_obj(cls):
@@ -109,4 +110,4 @@ class UrlField(BaseField):
 
     def _check_value_valid_not_none_(self, value):
         if not self.is_empty(value) and not is_valid_url(value):
-            raise FieldInvalidUrl(self.key, value)
+            raise FieldInvalidUrlError(self.key, value)

@@ -5,8 +5,8 @@ from bson import ObjectId
 
 from models.field import ModelArrayField, BaseField, IntegerField, BooleanField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldException, FieldModelClassInvalid,
-    FieldNoneNotAllowed, FieldValueTypeMismatch, FieldReadOnly
+    FieldTypeMismatchError, FieldError, FieldModelClassInvalidError,
+    FieldNoneNotAllowedError, FieldValueTypeMismatchError, FieldReadOnlyError
 )
 from models import Model, OID_KEY
 from tests.base import TestCase
@@ -121,13 +121,13 @@ class TestModelArrayFieldValueDefault(TestFieldValue.TestClass):
             ([MODEL4_DICT], [MODEL4_INST])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (7, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, 9], FieldValueTypeMismatch),
+            (None, FieldNoneNotAllowedError),
+            (7, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, 9], FieldValueTypeMismatchError),
         )
 
 
@@ -188,13 +188,13 @@ class TestModelArrayFieldValueNoAutocast(TestFieldValue.TestClass):
             ([MODEL4_DICT], [MODEL4_DICT])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (7, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, 9], FieldValueTypeMismatch),
+            (None, FieldNoneNotAllowedError),
+            (7, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, 9], FieldValueTypeMismatchError),
         )
 
 
@@ -257,23 +257,23 @@ class TestModelArrayFieldAllowNone(TestFieldValue.TestClass):
             ([MODEL4_DICT], [MODEL4_INST])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (7, FieldTypeMismatch),
-            ("A", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, 9], FieldValueTypeMismatch),
+            (7, FieldTypeMismatchError),
+            ("A", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, 9], FieldValueTypeMismatchError),
         )
 
 
 class TestModelArrayFieldExtra(TestCase):
     def test_invalid_model_class(self):
-        with self.assertRaises(FieldModelClassInvalid):
+        with self.assertRaises(FieldModelClassInvalidError):
             ModelArrayField("k", object)
 
     def test_readonly(self):
         f = ModelArrayField("k", ModelTest, readonly=True)
         fi = f.new()
 
-        with self.assertRaises(FieldReadOnly):
+        with self.assertRaises(FieldReadOnlyError):
             fi.value = [MODEL4_INST]

@@ -6,7 +6,7 @@ from extutils.flags import FlagSingleEnum
 from .platforms import Platform
 
 
-class ChannelTypeUnidentifiable(Exception):
+class ChannelTypeUnidentifiableError(Exception):
     pass
 
 
@@ -27,7 +27,7 @@ class ChannelType(FlagSingleEnum):
         if platform == Platform.LINE:
             return LineApiUtils.get_channel_type(token)
         else:
-            raise ChannelTypeUnidentifiable()
+            raise ChannelTypeUnidentifiableError()
 
     @staticmethod
     def trans_from_discord(ctype: DiscordChannelType):

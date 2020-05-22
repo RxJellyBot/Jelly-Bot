@@ -3,7 +3,8 @@ from typing import Tuple, Any, Type, final
 
 from models.field import BaseField, ModelDefaultValueExt
 from models.field.exceptions import (
-    FieldReadOnly, FieldInvalidDefaultValue, FieldNoneNotAllowed, FieldInstanceClassInvalid, FieldValueRequired
+    FieldReadOnlyError, FieldInvalidDefaultValueError, FieldNoneNotAllowedError, FieldInstanceClassInvalidError,
+    FieldValueRequiredError
 )
 from tests.base import TestCase
 
@@ -78,7 +79,7 @@ class TestFieldProperty(ABC):
             self.assertTrue(f.read_only, "Field not readonly")
 
             fi = f.new()
-            with self.assertRaises(FieldReadOnly):
+            with self.assertRaises(FieldReadOnlyError):
                 fi.value = self.valid_not_none_obj_value()
 
         def test_not_readonly(self):
@@ -116,7 +117,7 @@ class TestFieldProperty(ABC):
                         f = self.get_initialized_field(auto_cast=False, default=default_val)
                         fi = f.new()
                         self.assertEqual(default_val, fi.value)
-                    except FieldInvalidDefaultValue:
+                    except FieldInvalidDefaultValueError:
                         pass
 
         def test_properties_default_valid_autocast(self):
@@ -139,7 +140,7 @@ class TestFieldProperty(ABC):
         def test_properties_default_invalid(self):
             for invalid_default_value in self.get_invalid_default_values():
                 with self.subTest(invalid_default_value=invalid_default_value):
-                    with self.assertRaises(FieldInvalidDefaultValue):
+                    with self.assertRaises(FieldInvalidDefaultValueError):
                         self.get_initialized_field(default=invalid_default_value)
 
         # endregion
@@ -168,7 +169,7 @@ class TestFieldProperty(ABC):
             self.assertFalse(f.is_value_valid(None))
 
             fi = f.new()
-            with self.assertRaises(FieldNoneNotAllowed):
+            with self.assertRaises(FieldNoneNotAllowedError):
                 fi.value = None
 
         def test_not_allow_none_set_default(self):
@@ -197,7 +198,7 @@ class TestFieldProperty(ABC):
         def test_default_required(self):
             f = self.get_initialized_field(default=ModelDefaultValueExt.Required)
             self.assertEqual(ModelDefaultValueExt.Required, f.default_value)
-            with self.assertRaises(FieldValueRequired):
+            with self.assertRaises(FieldValueRequiredError):
                 f.new()
 
             # This value may change -> Calling the method twice may generate different value
@@ -216,7 +217,7 @@ class TestFieldProperty(ABC):
 
         # region Test instance class
         def test_incorrect_instance_class(self):
-            with self.assertRaises(FieldInstanceClassInvalid):
+            with self.assertRaises(FieldInstanceClassInvalidError):
                 self.get_initialized_field(inst_cls=object)
 
         # endregion
