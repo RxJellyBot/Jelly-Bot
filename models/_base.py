@@ -1,6 +1,6 @@
 import abc
 from collections import MutableMapping
-from typing import Optional, Set
+from typing import Optional, Set, List
 
 from bson import ObjectId
 
@@ -488,6 +488,27 @@ class Model(MutableMapping, abc.ABC):
                 del init_dict[k]
 
         return cls(**init_dict, from_db=True)
+
+    @classmethod
+    def replace_uid(cls, col, old: ObjectId, new: ObjectId) -> List[str]:
+        """
+        Replace the values of the fields which are marked storing the uids.
+
+        :param col: collection instance
+        :param old: old value to be replaced
+        :param new: new value to replace
+        :return: name of the fields that was failed to complete the replacement if any
+        """
+        failed_names = []
+
+        for k in cls.model_field_keys():
+            fd: BaseField = getattr(cls, k, None)
+            if fd and fd.stores_uid:
+                result = fd.replace_uid(col, old, new)
+                if not result:
+                    failed_names.append(fd.__class__.__qualname__)
+
+        return failed_names
 
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self._dict_}>"

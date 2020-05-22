@@ -4,13 +4,12 @@ from bson import ObjectId
 
 from extutils.emailutils import MailSender
 from extutils.checker import arg_type_ensure
-from models.field import BaseField
 
 
 class UserDataIntegrationHelper:
     @staticmethod
     @arg_type_ensure
-    def integrate(src_root_oid: ObjectId, dest_root_oid: ObjectId) -> bool:
+    def integrate(old_oid: ObjectId, new_oid: ObjectId) -> bool:
         """
         :return: Integration succeed or not.
         """
@@ -24,13 +23,7 @@ class UserDataIntegrationHelper:
         for cls in get_collection_subclasses():
             if cls.model_class:
                 col = MONGO_CLIENT.get_database(cls.database_name).get_collection(cls.collection_name)
-
-                for k in cls.model_class.model_field_keys():
-                    fd: BaseField = getattr(cls.model_class, k, None)
-                    if fd.stores_uid:
-                        result = fd.replace_uid(col, src_root_oid, dest_root_oid)
-                        if not result:
-                            failed_names.append(fd.__class__.__qualname__)
+                failed_names.extend(cls.model_class.replace_uid(col, old_oid, new_oid))
 
         if failed_names:
             MailSender.send_email_async(
@@ -38,4 +31,4 @@ class UserDataIntegrationHelper:
                 subject="User Data Integration Failed.")
             return False
         else:
-            return RootUserManager.merge_onplat_to_api(src_root_oid, dest_root_oid).is_success
+            return RootUserManager.merge_onplat_to_api(old_oid, new_oid).is_success

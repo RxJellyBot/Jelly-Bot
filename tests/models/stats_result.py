@@ -90,7 +90,7 @@ class TestHourlyResult(TestDatabaseMixin):
                 method(*args)
 
     def prepare_data(self) -> Collection:
-        col = self.get_mongo_client().get_database(self.get_db_name()).get_collection("testcol")
+        col = self.get_collection("testcol")
 
         col.insert_one({"_id": ObjectId.from_datetime(datetime(2020, 5, 1))})
 
@@ -121,7 +121,7 @@ class TestHourlyResult(TestDatabaseMixin):
                                        0)
 
     def test_data_days_collected_no_data(self):
-        col = self.get_mongo_client().get_database(self.get_db_name()).get_collection("AAAAA")
+        col = self.get_collection("AAAAA")
         dc = TestHourlyResult.TestSample1.data_days_collected(col, {}, end=datetime(2090, 5, 31))
 
         self.assertEqual(dc, 0)
