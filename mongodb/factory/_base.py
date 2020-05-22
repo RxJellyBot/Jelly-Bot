@@ -60,6 +60,14 @@ def is_test_db(db_name: str):
 
 class ControlExtensionMixin(Collection):
     def insert_one_model(self, model: Model) -> Tuple[WriteOutcome, Optional[Exception]]:
+        """
+        Insert an object into the database by providing a constructed model.
+
+        OID will be attached iuf the insertion succeed.
+
+        :param model: model to be inserted into the database
+        :return: outcome, exception (if any)
+        """
         ex = None
 
         try:
@@ -128,12 +136,15 @@ class ControlExtensionMixin(Collection):
         """
         Insert an object into the database by providing its model class and the arguments to construct the model.
 
-        OID will **NOT** be attached to the returned model.
+        This function constructs the model and if the construction succeed, executes ``insert_one_model()``.
+
+        .. seealso::
+            Documentation of ``ControlExtensionMixin.insert_one_model()``
 
         :param model_cls: class for the data to be constructed
         :param model_args: arguments for the `Model` construction
 
-        :return: model, outcome, ex
+        :return: model, outcome, exception (if any)
         """
         model = None
         outcome: WriteOutcome = WriteOutcome.X_NOT_EXECUTED

@@ -116,7 +116,7 @@ class ModelFieldChecker:
                 logger.logger.warning(f"Manual repair required in database <{self._col_inst.full_name}>.")
 
                 result = required_write_holder.complete()
-                logger.logger.warning(f"Sending notification email...")
+                logger.logger.warning("Sending notification email...")
                 self.send_mail_async(result, required_write_holder)
 
             self.post_execute()
@@ -181,7 +181,7 @@ class ModelFieldChecker:
                 return DataRepairResult.REQUIRED_MISSING, None
             else:
                 return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, \
-                       data if changed else None
+                       data if changed else None  # NOQA: E126
 
         def repair_fields(self, data: dict, model_cls, missing: List[str]) -> bool:
             changed = False

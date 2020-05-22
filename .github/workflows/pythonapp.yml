@@ -65,11 +65,11 @@ jobs:
 
       - name: flake8 - error check
         run: |
-          flake8 . --count --select=E9,F60,F62,F7,F82,F83 --max-complexity=15 --max-line-length=119 --show-source --statistics --benchmark
+          flake8 . --config .flake8-error
 
       - name: flake8 - style check
         run: |
-          flake8 . --count --ignore=F401 --max-complexity=15 --max-line-length=119 --statistics --benchmark --exit-zero
+          flake8 . --config .flake8-style
 
       - name: Django tests
         run: |
