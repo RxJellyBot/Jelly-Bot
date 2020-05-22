@@ -4,7 +4,7 @@ from typing import Union
 from extutils.dt import parse_to_dt, make_tz_aware
 
 from ._base import BaseField, FieldInstance
-from .exceptions import FieldValueInvalid
+from .exceptions import FieldValueInvalidError
 
 
 class DateTimeField(BaseField):
@@ -31,7 +31,7 @@ class DateTimeField(BaseField):
 
     def _check_value_valid_not_none_(self, value):
         if isinstance(value, str) and parse_to_dt(value) is None:
-            raise FieldValueInvalid(self.key, value)
+            raise FieldValueInvalidError(self.key, value)
 
     def cast_to_desired_type(self, value):
         ret = super().cast_to_desired_type(value)

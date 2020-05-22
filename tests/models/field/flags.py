@@ -2,7 +2,8 @@ from typing import Type, Any, Tuple
 
 from models.field import FlagField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldFlagDefaultUndefined, FieldFlagNotFound, FieldException
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldFlagDefaultUndefinedError, FieldFlagNotFoundError,
+    FieldError
 )
 from extutils.flags import FlagCodeEnum
 from tests.base import TestCase
@@ -26,7 +27,7 @@ class EnumNoDefaultField(FlagField):
 
 class TestEnumNoDefault(TestCase):
     def test_init(self):
-        with self.assertRaises(FieldFlagDefaultUndefined):
+        with self.assertRaises(FieldFlagDefaultUndefinedError):
             EnumNoDefaultField("a")
 
 
@@ -131,12 +132,12 @@ class TestEnumWithDefaultValueDefault(TestFieldValue.TestClass):
             ("A", EnumWithDefault.A)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            ("C", FieldFlagNotFound),
-            (3, FieldFlagNotFound),
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            ("C", FieldFlagNotFoundError),
+            (3, FieldFlagNotFoundError),
         )
 
 
@@ -195,12 +196,12 @@ class TestEnumWithDefaultValueNoAutocast(TestFieldValue.TestClass):
             ("A", "A")
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            ("C", FieldFlagNotFound),
-            (3, FieldFlagNotFound),
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            ("C", FieldFlagNotFoundError),
+            (3, FieldFlagNotFoundError),
         )
 
 
@@ -261,11 +262,11 @@ class TestEnumWithDefaultValueAllowNone(TestFieldValue.TestClass):
             ("A", EnumWithDefault.A)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (True, FieldTypeMismatch),
-            ("C", FieldFlagNotFound),
-            (3, FieldFlagNotFound),
+            (True, FieldTypeMismatchError),
+            ("C", FieldFlagNotFoundError),
+            (3, FieldFlagNotFoundError),
         )
 
 

@@ -3,7 +3,7 @@ from typing import Type, Any, Tuple
 
 from models.field import DateTimeField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldValueInvalid, FieldException
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldValueInvalidError, FieldError
 )
 
 from ._test_val import TestFieldValue
@@ -86,12 +86,12 @@ class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
              dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("XSX", FieldValueInvalid),
-            (True, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            (None, FieldNoneNotAllowed)
+            ("XSX", FieldValueInvalidError),
+            (True, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            (None, FieldNoneNotAllowedError)
         )
 
 
@@ -144,12 +144,12 @@ class TestDatetimeFieldValueNoAutoCast(TestFieldValue.TestClass):
              dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("XSX", FieldValueInvalid),
-            (True, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            (None, FieldNoneNotAllowed)
+            ("XSX", FieldValueInvalidError),
+            (True, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            (None, FieldNoneNotAllowedError)
         )
 
 
@@ -203,9 +203,9 @@ class TestDatetimeFieldValueAllowNone(TestFieldValue.TestClass):
              dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("XSX", FieldValueInvalid),
-            (True, FieldTypeMismatch),
-            (7, FieldTypeMismatch)
+            ("XSX", FieldValueInvalidError),
+            (True, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError)
         )

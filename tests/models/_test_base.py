@@ -9,7 +9,7 @@ from models import Model, OID_KEY
 from models.exceptions import (
     IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError, JsonKeyNotExistedError, ModelUncastableError
 )
-from models.field.exceptions import FieldReadOnly
+from models.field.exceptions import FieldReadOnlyError
 from tests.base import TestCase
 
 __all__ = ["TestModel"]
@@ -327,7 +327,7 @@ class TestModel(ABC):
                 with self.subTest(fk=fk, jk=jk, manual=manual):
                     try:
                         setattr(mdl, to_snake_case(fk), manual)
-                    except FieldReadOnly:
+                    except FieldReadOnlyError:
                         self.skipTest(f"Field key <{fk}> is readonly.")
 
                     self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
@@ -339,7 +339,7 @@ class TestModel(ABC):
                 with self.subTest(fk=fk, jk=jk, manual=manual):
                     try:
                         mdl[jk] = manual
-                    except FieldReadOnly:
+                    except FieldReadOnlyError:
                         self.skipTest(f"Json key <{fk}> is readonly.")
 
                     self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)

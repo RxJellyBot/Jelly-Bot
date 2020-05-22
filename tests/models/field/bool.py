@@ -2,7 +2,7 @@ from typing import Type, Any, Tuple
 
 from models.field import BooleanField, BaseField
 from models.field.exceptions import (
-    FieldException, FieldNoneNotAllowed, FieldTypeMismatch
+    FieldError, FieldNoneNotAllowedError, FieldTypeMismatchError
 )
 
 from ._test_val import TestFieldValue
@@ -88,11 +88,11 @@ class TestBoolFieldValueDefault(TestFieldValue.TestClass):
             (0, False)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (object, FieldTypeMismatch),
-            (None, FieldNoneNotAllowed),
-            ("X", FieldTypeMismatch)
+            (object, FieldTypeMismatchError),
+            (None, FieldNoneNotAllowedError),
+            ("X", FieldTypeMismatchError)
         )
 
 
@@ -147,10 +147,10 @@ class TestBoolFieldValueAllowNone(TestFieldValue.TestClass):
             (0, False)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (object, FieldTypeMismatch),
-            ("X", FieldTypeMismatch)
+            (object, FieldTypeMismatchError),
+            ("X", FieldTypeMismatchError)
         )
 
 
@@ -203,9 +203,9 @@ class TestBoolFieldValueNoAutoCast(TestFieldValue.TestClass):
             (0, False)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (object, FieldTypeMismatch),
-            ("X", FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            (object, FieldTypeMismatchError),
+            ("X", FieldTypeMismatchError)
         )

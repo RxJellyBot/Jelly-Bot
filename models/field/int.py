@@ -1,5 +1,5 @@
 from ._base import BaseField
-from .exceptions import FieldValueNegative
+from .exceptions import FieldValueNegativeError
 
 
 class IntegerField(BaseField):
@@ -25,7 +25,7 @@ class IntegerField(BaseField):
 
     def _check_value_valid_not_none_(self, value):
         if value < 0 and self.positive_only:
-            raise FieldValueNegative(self.key, value)
+            raise FieldValueNegativeError(self.key, value)
 
     @classmethod
     def none_obj(cls):

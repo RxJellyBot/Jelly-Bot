@@ -2,8 +2,8 @@ from typing import Type, Any, Tuple
 
 from models.field import TextField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldEmptyValueNotAllowed,
-    FieldException, FieldMaxLengthReached, FieldRegexNotMatch, FieldInvalidDefaultValue
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldEmptyValueNotAllowedError,
+    FieldError, FieldMaxLengthReachedError, FieldRegexNotMatchError, FieldInvalidDefaultValueError
 )
 from tests.base import TestCase
 
@@ -111,15 +111,15 @@ class TestTextFieldValueDefault(TestFieldValue.TestClass):
             (7, "7")
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (object(), FieldTypeMismatch),
-            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReached),
-            ([7, 9], FieldTypeMismatch),
-            ({7: 9}, FieldTypeMismatch),
-            ({7, 9}, FieldTypeMismatch),
-            ((7, 9), FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            (object(), FieldTypeMismatchError),
+            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReachedError),
+            ([7, 9], FieldTypeMismatchError),
+            ({7: 9}, FieldTypeMismatchError),
+            ({7, 9}, FieldTypeMismatchError),
+            ((7, 9), FieldTypeMismatchError)
         )
 
 
@@ -190,14 +190,14 @@ class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
             (7, "7")
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReached),
-            (object(), FieldTypeMismatch),
-            ([7, 9], FieldTypeMismatch),
-            ({7: 9}, FieldTypeMismatch),
-            ({7, 9}, FieldTypeMismatch),
-            ((7, 9), FieldTypeMismatch)
+            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReachedError),
+            (object(), FieldTypeMismatchError),
+            ([7, 9], FieldTypeMismatchError),
+            ({7: 9}, FieldTypeMismatchError),
+            ({7, 9}, FieldTypeMismatchError),
+            ((7, 9), FieldTypeMismatchError)
         )
 
 
@@ -266,15 +266,15 @@ class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
             (7, 7)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReached),
-            ([7, 9], FieldTypeMismatch),
-            ({7: 9}, FieldTypeMismatch),
-            ({7, 9}, FieldTypeMismatch),
-            ((7, 9), FieldTypeMismatch),
-            (object(), FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            ("x" * (TextField.DEFAULT_MAX_LENGTH + 1), FieldMaxLengthReachedError),
+            ([7, 9], FieldTypeMismatchError),
+            ({7: 9}, FieldTypeMismatchError),
+            ({7, 9}, FieldTypeMismatchError),
+            ((7, 9), FieldTypeMismatchError),
+            (object(), FieldTypeMismatchError)
         )
 
 
@@ -315,9 +315,9 @@ class TestTextFieldValueMustHaveContent(TestFieldValue.TestClass):
             ("$&*)(@", "$&*)(@")
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("", FieldEmptyValueNotAllowed),
+            ("", FieldEmptyValueNotAllowedError),
         )
 
 
@@ -360,14 +360,14 @@ class TestTextFieldValueWithRegex(TestFieldValue.TestClass):
             ("ABCDEFAB", "ABCDEFAB"),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ("A", FieldRegexNotMatch),
-            ("AB", FieldRegexNotMatch),
-            ("accc", FieldRegexNotMatch),
-            ("abcdefab", FieldRegexNotMatch),
-            ("ABCDEFAG", FieldRegexNotMatch)
+            (None, FieldNoneNotAllowedError),
+            ("A", FieldRegexNotMatchError),
+            ("AB", FieldRegexNotMatchError),
+            ("accc", FieldRegexNotMatchError),
+            ("abcdefab", FieldRegexNotMatchError),
+            ("ABCDEFAG", FieldRegexNotMatchError)
         )
 
 
@@ -414,17 +414,17 @@ class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
             ("A" * 500, "A" * 500)
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("A" * 501, FieldMaxLengthReached),
+            ("A" * 501, FieldMaxLengthReachedError),
         )
 
 
 class TestTextFieldExtra(TestCase):
     def test_default_regex_not_match(self):
-        with self.assertRaises(FieldInvalidDefaultValue):
+        with self.assertRaises(FieldInvalidDefaultValueError):
             TextField("k", default="ABCDE", regex=r"[A-E]{4}")
 
     def test_default_no_content(self):
-        with self.assertRaises(FieldInvalidDefaultValue):
+        with self.assertRaises(FieldInvalidDefaultValueError):
             TextField("k", default="", must_have_content=True)

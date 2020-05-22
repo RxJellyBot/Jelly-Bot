@@ -5,7 +5,8 @@ from flags import ModelValidityCheckResult
 from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, BooleanField
 from models.exceptions import (
-    JsonKeyDuplicatedError, DeleteNotAllowed, FieldKeyNotExistedError, IdUnsupportedError, RequiredKeyUnfilledError
+    JsonKeyDuplicatedError, DeleteNotAllowedError, FieldKeyNotExistedError, IdUnsupportedError,
+    RequiredKeyUnfilledError
 )
 
 __all__ = ["TestBaseModel"]
@@ -61,7 +62,7 @@ class TestBaseModel(TestCase):
     # endregion
 
     # region Invalid
-    class TempInvalidException(Exception):
+    class TempInvalidError(Exception):
         pass
 
     class ModelOnInvalid(Model):
@@ -75,14 +76,14 @@ class TestBaseModel(TestCase):
                 return ModelValidityCheckResult.O_OK
 
         def on_invalid(self, reason=ModelValidityCheckResult.X_UNCATEGORIZED):
-            raise TestBaseModel.TempInvalidException()
+            raise TestBaseModel.TempInvalidError()
 
     def test_on_invalid(self):
-        with self.assertRaises(TestBaseModel.TempInvalidException):
+        with self.assertRaises(TestBaseModel.TempInvalidError):
             _ = TestBaseModel.ModelOnInvalid(Field1=7)
 
         mdl = TestBaseModel.ModelOnInvalid()
-        with self.assertRaises(TestBaseModel.TempInvalidException):
+        with self.assertRaises(TestBaseModel.TempInvalidError):
             mdl.field1 = 7
 
     # endregion
@@ -153,7 +154,7 @@ class TestBaseModel(TestCase):
 
         for k in d:
             mdl = TestBaseModel.TestModel.cast_model(d)
-            with self.assertRaises(DeleteNotAllowed):
+            with self.assertRaises(DeleteNotAllowedError):
                 del mdl[k]
 
     def test_to_json(self):

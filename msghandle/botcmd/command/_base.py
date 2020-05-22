@@ -12,7 +12,7 @@ from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import BotFeatureUsageDataManager
 from JellyBot.systemconfig import HostUrl
-from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
+from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailedError
 from extutils.logger import LoggerSkeleton
 from extutils.strtrans import type_translation
 
@@ -451,7 +451,7 @@ class CommandNode:
             try:
                 ret = arg_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
                 cmd_fn.record_called(e.channel_oid)
-            except TypeCastingFailed as e:
+            except TypeCastingFailedError as e:
                 ret = [HandledMessageEventText(
                     content=_("Incorrect type of data: `{}`.\n"
                               "Expected type: `{}` / Actual type: `{}`").format(

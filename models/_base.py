@@ -11,10 +11,10 @@ from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
     InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowed, InvalidModelFieldError
+    JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowedError, InvalidModelFieldError
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
-from .field.exceptions import FieldException
+from .field.exceptions import FieldError
 from .warn import warn_keys_not_used, warn_field_key_not_found_for_json_key, warn_action_failed_json_key
 
 
@@ -54,7 +54,7 @@ class Model(MutableMapping, abc.ABC):
 
         try:
             self._input_kwargs_(**kwargs)
-        except FieldException as e:
+        except FieldError as e:
             raise InvalidModelFieldError(self.__class__.__qualname__, e)
 
         not_handled = self._fill_default_vals_(
@@ -163,7 +163,7 @@ class Model(MutableMapping, abc.ABC):
         raise FieldKeyNotExistedError(fk_sc, self.__class__.__qualname__)
 
     def __delitem__(self, k) -> None:
-        raise DeleteNotAllowed(self.__class__.__qualname__)
+        raise DeleteNotAllowedError(self.__class__.__qualname__)
 
     def __len__(self) -> int:
         return len(self._dict_)

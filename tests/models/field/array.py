@@ -5,8 +5,8 @@ from tests.base import TestCase
 from models import ModelDefaultValueExt
 from models.field import BaseField, ArrayField
 from models.field.exceptions import (
-    FieldException, FieldTypeMismatch, FieldValueTypeMismatch, FieldCastingFailed,
-    FieldMaxLengthReached, FieldInvalidDefaultValue, FieldNoneNotAllowed, FieldEmptyValueNotAllowed
+    FieldError, FieldTypeMismatchError, FieldValueTypeMismatchError, FieldCastingFailedError,
+    FieldMaxLengthReachedError, FieldInvalidDefaultValueError, FieldNoneNotAllowedError, FieldEmptyValueNotAllowedError
 )
 
 from ._test_val import TestFieldValue
@@ -104,14 +104,14 @@ class TestArrayFieldValueDefault(TestFieldValue.TestClass):
             (["7", "9"], [7, 9])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ({}, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            ("7", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, object()], FieldCastingFailed),
+            (None, FieldNoneNotAllowedError),
+            ({}, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            ("7", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, object()], FieldCastingFailedError),
         )
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
@@ -185,13 +185,13 @@ class TestArrayFieldValueAllowNone(TestFieldValue.TestClass):
             (["7", "9"], [7, 9])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ({}, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            ("7", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, object()], FieldCastingFailed),
+            ({}, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            ("7", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, object()], FieldCastingFailedError),
         )
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
@@ -265,16 +265,16 @@ class TestArrayFieldValueNoAutoCast(TestFieldValue.TestClass):
             ([7, 9], [7, 9]),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ({}, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            ("7", FieldTypeMismatch),
-            (True, FieldTypeMismatch),
-            ([7, object()], FieldValueTypeMismatch),
-            ([7, "9"], FieldValueTypeMismatch),
-            (["7", "9"], FieldValueTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            ({}, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            ("7", FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            ([7, object()], FieldValueTypeMismatchError),
+            ([7, "9"], FieldValueTypeMismatchError),
+            (["7", "9"], FieldValueTypeMismatchError)
         )
 
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
@@ -317,10 +317,10 @@ class TestArrayFieldValueNotAllowEmptyDefaultHasValue(TestFieldValue.TestClass):
             ([7], [7]),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            ([], FieldEmptyValueNotAllowed)
+            (None, FieldNoneNotAllowedError),
+            ([], FieldEmptyValueNotAllowedError)
         )
 
 
@@ -351,7 +351,7 @@ class TestArrayFieldValueNotAllowEmptyDefaultIsOptional(TestFieldValue.TestClass
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return ()
 
 
@@ -394,10 +394,10 @@ class TestArrayFieldValueLengthLimited(TestFieldValue.TestClass):
             ([7, 9, 11], [7, 9, 11])
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ([7, 6, 5, 4], FieldMaxLengthReached),
-            ([7, 6, 5, 4, 3], FieldMaxLengthReached),
+            ([7, 6, 5, 4], FieldMaxLengthReachedError),
+            ([7, 6, 5, 4, 3], FieldMaxLengthReachedError),
         )
 
 
@@ -414,7 +414,7 @@ class TestArrayFieldExtra(TestCase):
         self.assertTrue(f.is_type_matched([1, 2, 3, 4, 7, 9]))
         self.assertFalse(f.is_value_valid([1, 2, 3, 4, 7, 9]))
 
-        with self.assertRaises(FieldInvalidDefaultValue):
+        with self.assertRaises(FieldInvalidDefaultValueError):
             ArrayField("af", int, max_len=5, default=[0, 1, 2, 3, 4, 5])
         with self.assertRaises(ValueError):
             ArrayField("af", int, max_len=-1)

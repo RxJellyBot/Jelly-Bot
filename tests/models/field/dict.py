@@ -2,7 +2,7 @@ from typing import Type, Any, Tuple
 
 from models.field import DictionaryField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldException
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldError
 )
 
 from ._test_val import TestFieldValue
@@ -80,11 +80,11 @@ class TestDictFieldValueDefault(TestFieldValue.TestClass):
             ({"A": 7}, {"A": 7}),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (7, FieldTypeMismatch),
-            ([("A", 9), ("B", 8)], FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            (7, FieldTypeMismatchError),
+            ([("A", 9), ("B", 8)], FieldTypeMismatchError)
         )
 
 
@@ -131,10 +131,10 @@ class TestDictFieldValueAllowNone(TestFieldValue.TestClass):
             ({"A": 7}, {"A": 7}),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (7, FieldTypeMismatch),
-            ([("A", 9), ("B", 8)], FieldTypeMismatch)
+            (7, FieldTypeMismatchError),
+            ([("A", 9), ("B", 8)], FieldTypeMismatchError)
         )
 
 
@@ -179,9 +179,9 @@ class TestDictFieldValueNoAutocast(TestFieldValue.TestClass):
             ({"A": 7}, {"A": 7}),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (7, FieldTypeMismatch),
-            ([("A", 9), ("B", 8)], FieldTypeMismatch)
+            (None, FieldNoneNotAllowedError),
+            (7, FieldTypeMismatchError),
+            ([("A", 9), ("B", 8)], FieldTypeMismatchError)
         )
