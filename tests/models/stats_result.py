@@ -234,7 +234,8 @@ class TestHourlyIntervalAverageMessageResult(TestCase):
         ]
 
     def test_empty_data(self):
-        result = HourlyIntervalAverageMessageResult([], 2)
+        result = HourlyIntervalAverageMessageResult(
+            [], 2, end_time=datetime(2020, 5, 7, 4, 0, tzinfo=timezone.utc))
 
         self.assertEqual(result.label_hr, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23])
@@ -246,7 +247,8 @@ class TestHourlyIntervalAverageMessageResult(TestCase):
         ])
 
     def test_data(self):
-        result = HourlyIntervalAverageMessageResult(self.get_cursor(), 2)
+        result = HourlyIntervalAverageMessageResult(
+            self.get_cursor(), 2, end_time=datetime(2020, 5, 7, 4, 0, tzinfo=timezone.utc))
 
         self.assertEqual(result.label_hr, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23])

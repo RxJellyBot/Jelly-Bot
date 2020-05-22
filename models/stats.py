@@ -175,8 +175,8 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, days_collected: float):
-        super().__init__(days_collected)
+    def __init__(self, cursor, days_collected: float, *, end_time: Optional[datetime] = None):
+        super().__init__(days_collected, end_time=end_time)
 
         CountDataEntry = namedtuple("CountDataEntry", ["category_name", "data", "color", "hidden"])
 
