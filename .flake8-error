@@ -1,0 +1,13 @@
+[flake8]
+count = True
+select =
+    E9,
+    F60,
+    F62,
+    F7,
+    F82,
+    F83
+max-complexity = 15
+max-line-length = 119
+show-source = True
+statistics = True

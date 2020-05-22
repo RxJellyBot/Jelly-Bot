@@ -304,7 +304,7 @@ class Model(MutableMapping, abc.ABC):
         else:
             return fk[0].isupper() and not fk.isupper() \
                    and fk in cls.__dict__ \
-                   and isinstance(cls.__dict__[fk], BaseField)
+                   and isinstance(cls.__dict__[fk], BaseField)  # NOQA: E126
 
     @classmethod
     def _json_to_field_kwargs_(cls, **kwargs):
