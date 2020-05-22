@@ -7,8 +7,7 @@ from bson import ObjectId
 from extutils.utils import to_snake_case
 from models import Model, OID_KEY
 from models.exceptions import (
-    RequiredKeyUnfilledError, IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError,
-    JsonKeyNotExistedError, ModelUncastableError
+    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError, JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnly
 from tests.base import TestCase
@@ -16,7 +15,8 @@ from tests.base import TestCase
 __all__ = ["TestModel"]
 
 
-# TEST: `Model` equality test with same/diff id, same/diff data
+class DummyModel(Model):
+    pass
 
 
 @final
@@ -51,6 +51,9 @@ class TestModel(ABC):
                 - 2nd element: field key name
             Value:
                 Value to be inserted for testing.
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
             return {}
 
@@ -65,11 +68,13 @@ class TestModel(ABC):
             Value:
                 - 1st element: expected default value (auto-default)
                 - 2nd element: value different from the expected one to be used for testing (manual-default)
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
             return {}
 
         @classmethod
-        @abstractmethod
         def get_required(cls) -> Dict[Tuple[str, str], Any]:
             """
             Required keys and its corresponding values to be inserted to test.
@@ -79,8 +84,11 @@ class TestModel(ABC):
                 - 2nd element: field key name
             Value:
                 Value to be inserted for testing.
+
+            .. note::
+                - Items in this function should **NOT** change by each function call.
             """
-            raise NotImplementedError()
+            return {}
 
         @classmethod
         def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
@@ -250,9 +258,9 @@ class TestModel(ABC):
                 init_dict_json, init_dict_field = self._dict_to_json_field_(required)
 
                 # Test for the expected error
-                with self.assertRaises(RequiredKeyUnfilledError):
+                with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_field, from_db=False)
-                with self.assertRaises(RequiredKeyUnfilledError):
+                with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_json, from_db=True)
 
         def test_contains_oid(self):
@@ -266,11 +274,11 @@ class TestModel(ABC):
             oid = ObjectId()
             if self.get_model_class().WITH_OID:
                 mdl.id = oid
-                self.assertEquals(mdl.id, oid)
+                self.assertEqual(mdl.id, oid)
 
                 oid = ObjectId()
                 mdl.set_oid(oid)
-                self.assertEquals(mdl.id, oid)
+                self.assertEqual(mdl.id, oid)
             else:
                 with self.assertRaises(IdUnsupportedError):
                     mdl.id = oid
@@ -284,7 +292,7 @@ class TestModel(ABC):
             if self.get_model_class().WITH_OID:
                 mdl = self.get_model_class()(**json, from_db=True)
 
-                self.assertEquals(mdl.to_json(), json)
+                self.assertEqual(mdl.to_json(), json)
             else:
                 with self.assertRaises(IdUnsupportedError):
                     self.get_model_class()(**json, from_db=True)
@@ -322,8 +330,8 @@ class TestModel(ABC):
                     except FieldReadOnly:
                         self.skipTest(f"Field key <{fk}> is readonly.")
 
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
-                    self.assertEquals(mdl[jk], manual)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
+                    self.assertEqual(mdl[jk], manual)
 
                 # Set by json key
                 mdl = self.get_constructed_model(including_optional=True)
@@ -334,8 +342,8 @@ class TestModel(ABC):
                     except FieldReadOnly:
                         self.skipTest(f"Json key <{fk}> is readonly.")
 
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), manual)
-                    self.assertEquals(mdl[jk], manual)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
+                    self.assertEqual(mdl[jk], manual)
 
         def test_get_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
@@ -355,8 +363,8 @@ class TestModel(ABC):
                 mdl = self.get_constructed_model(including_optional=True)
 
                 with self.subTest(fk=fk, jk=jk, auto=auto):
-                    self.assertEquals(getattr(mdl, to_snake_case(fk)), auto)
-                    self.assertEquals(mdl[jk], auto)
+                    self.assertEqual(getattr(mdl, to_snake_case(fk)), auto)
+                    self.assertEqual(mdl[jk], auto)
 
         def test_cast_model_none(self):
             self.assertIsNone(self.get_model_class().cast_model(None))
@@ -370,7 +378,7 @@ class TestModel(ABC):
         def test_cast_constructed_model(self):
             mdl_to_cast = self.get_constructed_model()
             mdl_casted = self.get_model_class().cast_model(mdl_to_cast)
-            self.assertEquals(mdl_casted.to_json(), mdl_to_cast.to_json())
+            self.assertEqual(mdl_casted.to_json(), mdl_to_cast.to_json())
 
         def test_cast_model_additional_fields(self):
             expected_mdl_dict = self.get_constructed_model()
@@ -379,4 +387,82 @@ class TestModel(ABC):
 
             actual_mdl_dict = self.get_model_class().cast_model(dict_to_cast)
 
-            self.assertEquals(actual_mdl_dict, expected_mdl_dict)
+            self.assertEqual(actual_mdl_dict, expected_mdl_dict)
+
+        def test_not_equal(self):
+            # Different `Model` with same structure
+            class CopiedModel(Model):
+                pass
+
+            for fk, f in zip(self.get_model_class().model_field_keys(), self.get_model_class().model_fields()):
+                setattr(CopiedModel, fk, f)
+
+            mdl = self.get_constructed_model()
+
+            items = [
+                # Unrelated different type of model
+                DummyModel(),
+                # Same structure but different type
+                CopiedModel.cast_model(dict(map(lambda x: (x[0][0], x[1]), self.get_required().items()))),
+            ]
+            # Optional values available - count of keys will differ, model should/will be different
+            if self.get_optional():
+                items.append(self.get_constructed_model(including_optional=True))
+            # Default values available - data should/will be different
+            if self.get_default():
+                items.append(self.get_constructed_model(manual_default=True))
+
+            for item in items:
+                with self.subTest(item=item):
+                    self.assertNotEquals(item, mdl)
+
+        def test_is_equal(self):
+            items = [
+                # Compare two constructed models
+                (
+                    "Model vs Model / R",
+                    self.get_constructed_model(),
+                    self.get_constructed_model()
+                ),
+                # Compare two constructed models with one converted to dict
+                (
+                    "Model vs mdl2dict / R",
+                    self.get_constructed_model(),
+                    self.get_constructed_model().to_json()
+                ),
+                # Compare constructed model and dict with required elements and replaced default values
+                (
+                    "Model vs dict / R + D",
+                    self.get_constructed_model(manual_default=True),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **{k[0]: v[1] for k, v in self.get_default().items()})
+                ),
+                # Compare constructed model and dict with the manipulation of 2nd and 3rd
+                (
+                    "Model vs dict / R + D + O",
+                    self.get_constructed_model(including_optional=True, manual_default=True),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **dict({k[0]: v[1] for k, v in self.get_default().items()},
+                                **{k[0]: v for k, v in self.get_optional().items()}))
+                )
+            ]
+
+            # No default value means no autofill
+            if not self.get_default():
+                # Compare constructed model and dict with required elements only
+                items.append((
+                    "Model vs dict / R",
+                    self.get_constructed_model(),
+                    {k[0]: v for k, v in self.get_required().items()}
+                ))
+                # Compare constructed model and dict with required elements and optional elements
+                items.append((
+                    "Model vs dict / R + O",
+                    self.get_constructed_model(),
+                    dict({k[0]: v for k, v in self.get_required().items()},
+                         **{k[0]: v for k, v in self.get_optional().items()})
+                ))
+
+            for msg, a, b in items:
+                with self.subTest(msg=msg):
+                    self.assertEqual(a, b)

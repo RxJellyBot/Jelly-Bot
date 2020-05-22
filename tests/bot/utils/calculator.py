@@ -12,8 +12,8 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals(expr, result.calc_expr, "Calculation expression not match.")
-        self.assertEquals("10", result.calc_result, "Calculation result not match.")
+        self.assertEqual(expr, result.calc_expr, "Calculation expression not match.")
+        self.assertEqual("10", result.calc_result, "Calculation result not match.")
         self.assertFalse(result.latex_available, "LaTeX should not be available.")
         self.assertFalse(result.has_evaluated, "Expression should not be evaluated.")
 
@@ -26,8 +26,8 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals(expr, result.calc_expr, "Calculation expression not match.")
-        self.assertEquals("10.5", result.calc_result, "Calculation result not match.")
+        self.assertEqual(expr, result.calc_expr, "Calculation expression not match.")
+        self.assertEqual("10.5", result.calc_result, "Calculation result not match.")
         self.assertFalse(result.latex_available, "LaTeX should not be available.")
         self.assertFalse(result.has_evaluated, "Expression should not be evaluated.")
 
@@ -40,11 +40,11 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals(expr, result.calc_expr, "Calculation expression not match.")
-        self.assertEquals("9/2", result.calc_result, "Calculation result not match.")
+        self.assertEqual(expr, result.calc_expr, "Calculation expression not match.")
+        self.assertEqual("9/2", result.calc_result, "Calculation result not match.")
         self.assertTrue(result.latex_available, "LaTeX should be available.")
         self.assertTrue(result.has_evaluated, "Expression should be evaluated.")
-        self.assertEquals(4.5, result.evaluated, "Evaluated result not match.")
+        self.assertEqual(4.5, result.evaluated, "Evaluated result not match.")
 
     def test_solve_equation(self):
         expr = "solve(x-1)"
@@ -55,8 +55,8 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals(expr, result.calc_expr, "Calculation expression not match.")
-        self.assertEquals("[1]", result.calc_result, "Calculation result not match.")
+        self.assertEqual(expr, result.calc_expr, "Calculation expression not match.")
+        self.assertEqual("[1]", result.calc_result, "Calculation result not match.")
         self.assertTrue(result.latex_available, "LaTeX should be available.")
         self.assertFalse(result.has_evaluated, "Expression should not be evaluated.")
 
@@ -69,8 +69,8 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals("a + 1", result.calc_expr, "Calculation expression not match.")
-        self.assertEquals("8", result.calc_result, "Calculation result not match.")
+        self.assertEqual("a + 1", result.calc_expr, "Calculation expression not match.")
+        self.assertEqual("8", result.calc_result, "Calculation result not match.")
         self.assertFalse(result.latex_available, "LaTeX should not be available.")
         self.assertFalse(result.has_evaluated, "Expression should not be evaluated.")
 
@@ -90,6 +90,6 @@ class TestBotCalculator(TestCase):
 
         result = result[0]
 
-        self.assertEquals(expr, result.calc_expr, "Calculation expression not match.")
+        self.assertEqual(expr, result.calc_expr, "Calculation expression not match.")
         self.assertFalse(result.latex_available, "LaTeX should not be available.")
         self.assertFalse(result.has_evaluated, "Expression should not be evaluated.")

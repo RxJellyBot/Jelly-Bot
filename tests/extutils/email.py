@@ -24,9 +24,9 @@ class TestFakeEmailServer(TestCase):
                     f"Mailbox of {recipient} is empty.")
 
                 mail = mails[0]
-                self.assertEquals(subject, mail.subject, "Mail subject not match.")
-                self.assertEquals(content, mail.content, "Mail content not match.")
-                self.assertEquals(sender, mail.sender, "Mail sender not match.")
+                self.assertEqual(subject, mail.subject, "Mail subject not match.")
+                self.assertEqual(content, mail.content, "Mail content not match.")
+                self.assertEqual(sender, mail.sender, "Mail sender not match.")
 
     def test_send_email_multi_recipients(self):
         sender = "a"
@@ -46,9 +46,9 @@ class TestFakeEmailServer(TestCase):
                     f"Mailbox of {recipient} is empty.")
 
                 mail = mails[0]
-                self.assertEquals(subject, mail.subject, "Mail subject not match.")
-                self.assertEquals(content, mail.content, "Mail content not match.")
-                self.assertEquals(sender, mail.sender, "Mail sender not match.")
+                self.assertEqual(subject, mail.subject, "Mail subject not match.")
+                self.assertEqual(content, mail.content, "Mail content not match.")
+                self.assertEqual(sender, mail.sender, "Mail sender not match.")
 
     def test_send_email_same_sender_recip(self):
         sender = "a"
@@ -68,6 +68,6 @@ class TestFakeEmailServer(TestCase):
                     f"Mailbox of {recipient} is empty.")
 
                 mail = mails[0]
-                self.assertEquals(subject, mail.subject, "Mail subject not match.")
-                self.assertEquals(content, mail.content, "Mail content not match.")
-                self.assertEquals(sender, mail.sender, "Mail sender not match.")
+                self.assertEqual(subject, mail.subject, "Mail subject not match.")
+                self.assertEqual(content, mail.content, "Mail content not match.")
+                self.assertEqual(sender, mail.sender, "Mail sender not match.")

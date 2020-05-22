@@ -13,7 +13,7 @@ class ModelField(BaseField):
         - ``default`` - default model of ``model_cls``
 
         :raises ValueError: if `model_cls` is `None`
-        :raises FieldModelClassInvalid: if `model_cls` is not inherit from `models.Model`
+        :raises FieldModelClassInvalid: if `model_cls` is not inherited from `models.Model`
 
         .. seealso::
             Check the document of :class:`BaseField` for other default properties.

@@ -8,16 +8,13 @@ from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import (
     Model, AutoReplyModuleModel, AutoReplyContentModel, AutoReplyModuleExecodeModel, AutoReplyModuleTagModel
 )
-from models.field.exceptions import FieldEmptyValueNotAllowed
-from models.exceptions import ModelConstructionError, InvalidModelError
+from models.exceptions import ModelConstructionError, InvalidModelError, InvalidModelFieldError
 
 from ._test_base import TestModel
 
 __all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoReplyModuleExecodeModel",
            "TestAutoReplyModuleTagModel"]
 
-
-# region AutoReplyContentModel
 
 class TestAutoReplyContentModel(TestModel.TestClass):
     @classmethod
@@ -45,7 +42,7 @@ class TestAutoReplyContentModel(TestModel.TestClass):
             ),
             (
                 {("c", "Content"): "", ("t", "ContentType"): AutoReplyContentType.TEXT},
-                FieldEmptyValueNotAllowed
+                InvalidModelFieldError
             )
         ]
 
@@ -71,7 +68,7 @@ class TestAutoReplyContentModel(TestModel.TestClass):
                 # If the content can be set, it should invalidate the model
                 actual_result = mdl.perform_validity_check()
 
-                self.assertEquals(actual_result, validity_result, actual_result)
+                self.assertEqual(actual_result, validity_result, actual_result)
 
     def test_content_html(self):
         """Only testing if the content can be outputted without exception."""
@@ -85,11 +82,6 @@ class TestAutoReplyContentModel(TestModel.TestClass):
             self.assertIsNotNone(mdl.content_html)
             self.assertIsNotNone(str(mdl))
 
-
-# endregion
-
-
-# region AutoReplyModuleModel
 
 channel_oid = ObjectId()
 creator_oid = ObjectId()
@@ -143,7 +135,7 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
         mdl.refer_to = oid
 
         self.assertTrue(mdl.is_reference)
-        self.assertEquals(mdl.refer_oid, oid)
+        self.assertEqual(mdl.refer_oid, oid)
 
     def test_kw_repr(self):
         mdl = self.get_constructed_model()
@@ -156,20 +148,14 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
 
         mdl.last_used = last_used
 
-        self.assertEquals(mdl.last_used, last_used)
+        self.assertEqual(mdl.last_used, last_used)
 
     def test_remove_at_repr(self):
         mdl = self.get_constructed_model()
         self.assertIsNone(mdl.removed_at)
 
         mdl.removed_at = remove_at
-        self.assertEquals(mdl.removed_at, remove_at)
-
-
-# endregion
-
-
-# region AutoReplyModuleExecodeModel
+        self.assertEqual(mdl.removed_at, remove_at)
 
 
 class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
@@ -203,13 +189,9 @@ class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
 
         # Not matching 2 dicts because actual model contains more properties
         for ek, ev in exc_mdl_dict.items():
-            self.assertEquals(arm_mdl_dict[ek], ev)
+            self.assertEqual(arm_mdl_dict[ek], ev)
 
 
-# endregion
-
-
-# region AutoReplyModuleTagModel
 class TestAutoReplyModuleTagModel(TestModel.TestClass):
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -222,4 +204,3 @@ class TestAutoReplyModuleTagModel(TestModel.TestClass):
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {("c", "Color"): (ColorFactory.DEFAULT, ColorFactory.WHITE)}
-# endregion

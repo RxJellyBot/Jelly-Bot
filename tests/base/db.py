@@ -57,6 +57,24 @@ class TestDatabaseMixin(TestCase, ABC):
 
         self.tearDownTestCase()
 
+    @staticmethod
+    @final
+    def get_mongo_client():
+        return mongo_client
+
+    @staticmethod
+    @final
+    def get_db_name():
+        return single_db_name
+
+    @staticmethod
+    @final
+    def get_collection(col_name):
+        client = TestDatabaseMixin.get_mongo_client()
+        db = TestDatabaseMixin.get_db_name()
+
+        return client.get_database(db).get_collection(col_name)
+
     @classmethod
     def db_ping_ms(cls) -> float:
         return exec_timing_result(mongo_client.get_database(single_db_name or "admin").command, "ping").execution_ms

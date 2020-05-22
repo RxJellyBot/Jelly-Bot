@@ -35,7 +35,7 @@ cmd_status = cmd.new_child_node(codes=["s", "cur", "status", "current"])
 )
 def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId):
     entry = RemoteControlManager.activate(
-        e.user_model.id, e.channel_model_source.id, target_channel, e.user_model.config.locale)
+        e.user_model.id, e.channel_model_source.id, target_channel, e.user_model.config.get_locale_code())
 
     if entry.target_channel:
         return [HandledMessageEventText(content=_("Remote control activated."))]
@@ -49,8 +49,13 @@ def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId)
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_deactivate(e: TextMessageEventObject):
-    RemoteControlManager.deactivate(e.user_model.id, e.channel_model_source.id)
-    return [HandledMessageEventText(content=_("Remote control deactivated."))]
+    if RemoteControlManager.deactivate(e.user_model.id, e.channel_model_source.id):
+        return [HandledMessageEventText(content=_("Remote control deactivated."))]
+    else:
+        if RemoteControlManager.get_current(e.user_model.id, e.channel_model_source.id, update_expiry=False):
+            return [HandledMessageEventText(content=_("Remote control failed to delete."))]
+        else:
+            return [HandledMessageEventText(content=_("Remote control not activated."))]
 
 
 @cmd_status.command_function(

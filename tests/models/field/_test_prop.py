@@ -48,7 +48,7 @@ class TestFieldProperty(ABC):
 
         # region Field Key
         def test_field_key(self):
-            self.assertEquals("k", self.get_initialized_field().key)
+            self.assertEqual("k", self.get_initialized_field().key)
 
         # endregion
 
@@ -58,7 +58,7 @@ class TestFieldProperty(ABC):
             raise NotImplementedError()
 
         def test_none_obj(self):
-            self.assertEquals(self.expected_none_object(), self.get_initialized_field().none_obj())
+            self.assertEqual(self.expected_none_object(), self.get_initialized_field().none_obj())
 
         # endregion
 
@@ -115,7 +115,7 @@ class TestFieldProperty(ABC):
                     try:
                         f = self.get_initialized_field(auto_cast=False, default=default_val)
                         fi = f.new()
-                        self.assertEquals(default_val, fi.value)
+                        self.assertEqual(default_val, fi.value)
                     except FieldInvalidDefaultValue:
                         pass
 
@@ -124,7 +124,7 @@ class TestFieldProperty(ABC):
                 with self.subTest(default_val=default_val, expected_autocast=expected_autocast):
                     f = self.get_initialized_field(auto_cast=True, default=default_val)
                     fi = f.new()
-                    self.assertEquals(expected_autocast, fi.value)
+                    self.assertEqual(expected_autocast, fi.value)
 
         @abstractmethod
         def get_invalid_default_values(self) -> Tuple[Any, ...]:
@@ -173,7 +173,7 @@ class TestFieldProperty(ABC):
 
         def test_not_allow_none_set_default(self):
             f = self.get_initialized_field(default=None, allow_none=False)
-            self.assertEquals(f.none_obj(), f.default_value)
+            self.assertEqual(f.none_obj(), f.default_value)
 
         # endregion
 
@@ -189,25 +189,28 @@ class TestFieldProperty(ABC):
 
             for value, expected_outcome in test_data:
                 with self.subTest(value=value, expected_outcome=expected_outcome):
-                    self.assertEquals(f.is_empty(value), expected_outcome)
+                    self.assertEqual(f.is_empty(value), expected_outcome)
 
         # endregion
 
         # region Extended default value
         def test_default_required(self):
             f = self.get_initialized_field(default=ModelDefaultValueExt.Required)
-            self.assertEquals(ModelDefaultValueExt.Required, f.default_value)
+            self.assertEqual(ModelDefaultValueExt.Required, f.default_value)
             with self.assertRaises(FieldValueRequired):
                 f.new()
-            fi = f.new(self.valid_not_none_obj_value())
-            self.assertEquals(fi.value, self.valid_not_none_obj_value())
+
+            # This value may change -> Calling the method twice may generate different value
+            val = self.valid_not_none_obj_value()
+            fi = f.new(val)
+            self.assertEqual(fi.value, val)
 
         def test_default_optional(self):
             f = self.get_initialized_field(default=ModelDefaultValueExt.Optional)
-            self.assertEquals(ModelDefaultValueExt.Optional, f.default_value)
+            self.assertEqual(ModelDefaultValueExt.Optional, f.default_value)
 
             fi = f.new()
-            self.assertEquals(fi.value, f.none_obj())
+            self.assertEqual(fi.value, f.none_obj())
 
         # endregion
 
@@ -233,6 +236,6 @@ class TestFieldProperty(ABC):
             raise NotImplementedError()
 
         def test_desired_types(self):
-            self.assertEquals(self.get_desired_type(), self.get_initialized_field().desired_type)
+            self.assertEqual(self.get_desired_type(), self.get_initialized_field().desired_type)
 
         # endregion

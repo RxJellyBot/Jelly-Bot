@@ -6,7 +6,7 @@ from models.field import DateTimeField, ObjectIDField, TextField
 
 class RemoteControlEntryModel(Model):
     UserOid = ObjectIDField("uid", default=ModelDefaultValueExt.Required, stores_uid=True)
-    LocaleCode = TextField("loc", allow_none=True)
+    LocaleCode = TextField("loc", default="Asia/Taipei")
     SourceChannelOid = ObjectIDField("src", default=ModelDefaultValueExt.Required)
     TargetChannelOid = ObjectIDField("dst", default=ModelDefaultValueExt.Required)
     ExpiryUtc = DateTimeField("exp", default=ModelDefaultValueExt.Required)

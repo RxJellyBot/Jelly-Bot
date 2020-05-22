@@ -11,13 +11,13 @@ from tests.base import TestCase
 # noinspection PyTypeChecker
 class TestUtilFunctions(TestCase):
     def test_cast_keep_none(self):
-        self.assertEquals(7, cast_keep_none("7", int))
+        self.assertEqual(7, cast_keep_none("7", int))
         self.assertIsNone(cast_keep_none(None, int))
         self.assertIsNone(cast_keep_none(None, bool))
-        self.assertEquals(True, cast_keep_none("1", bool))
-        self.assertEquals(True, cast_keep_none(1, bool))
-        self.assertEquals(False, cast_keep_none("0", bool))
-        self.assertEquals(False, cast_keep_none(0, bool))
+        self.assertEqual(True, cast_keep_none("1", bool))
+        self.assertEqual(True, cast_keep_none(1, bool))
+        self.assertEqual(False, cast_keep_none("0", bool))
+        self.assertEqual(False, cast_keep_none(0, bool))
 
     def test_cast_iterable(self):
         self.assertListEqual(
@@ -32,13 +32,13 @@ class TestUtilFunctions(TestCase):
         self.assertListEqual(
             [1, 2, [1, 2, [1, 2]]],
             cast_iterable(["1", "2", ["1", "2", ["1", "2"]]], int))
-        self.assertEquals(7, cast_iterable("7", int))
+        self.assertEqual(7, cast_iterable("7", int))
 
     def test_safe_cast(self):
         self.assertIsNone(safe_cast(None, int))
         self.assertIsNone(safe_cast(7, list))
-        self.assertEquals(7, safe_cast(7, int))
-        self.assertEquals("7", safe_cast(7, str))
+        self.assertEqual(7, safe_cast(7, int))
+        self.assertEqual("7", safe_cast(7, str))
         self.assertListEqual([1, 2], safe_cast((1, 2), list))
 
     def test_all_lower(self):
@@ -49,25 +49,25 @@ class TestUtilFunctions(TestCase):
         s5 = {"A": "LOWER"}
         s6 = {"A": ("A", "97"), "B": {"B"}}
 
-        self.assertEquals("lower", all_lower(s1))
-        self.assertEquals("LOWER", s1)
+        self.assertEqual("lower", all_lower(s1))
+        self.assertEqual("LOWER", s1)
 
         self.assertListEqual(["lower"], all_lower(s2))
-        self.assertEquals(["LOWER"], s2)
+        self.assertEqual(["LOWER"], s2)
 
         self.assertTupleEqual(("lower",), all_lower(s3))
-        self.assertEquals(("LOWER",), s3)
+        self.assertEqual(("LOWER",), s3)
 
         self.assertSetEqual({"lower"}, all_lower(s4))
-        self.assertEquals({"LOWER"}, s4)
+        self.assertEqual({"LOWER"}, s4)
 
         self.assertDictEqual({"A": "lower"}, all_lower(s5))
-        self.assertEquals({"A": "LOWER"}, s5)
+        self.assertEqual({"A": "LOWER"}, s5)
 
         self.assertDictEqual({"A": ("a", "97"), "B": {"b"}}, all_lower(s6))
-        self.assertEquals({"A": ("A", "97"), "B": {"B"}}, s6)
+        self.assertEqual({"A": ("A", "97"), "B": {"B"}}, s6)
 
-        self.assertEquals(77, all_lower(77))
+        self.assertEqual(77, all_lower(77))
 
     def test_to_snake_case(self):
         eq_pairs = [
@@ -83,7 +83,7 @@ class TestUtilFunctions(TestCase):
         ]
         for expected, actual in eq_pairs:
             with self.subTest(expected=expected, actual=actual):
-                self.assertEquals(expected, actual)
+                self.assertEqual(expected, actual)
 
     def test_to_camel_case(self):
         eq_pairs = [
@@ -98,7 +98,7 @@ class TestUtilFunctions(TestCase):
         ]
         for expected, actual in eq_pairs:
             with self.subTest(expected=expected, actual=actual):
-                self.assertEquals(expected, actual)
+                self.assertEqual(expected, actual)
 
     def test_split_fill(self):
         eq_pairs = [
@@ -131,7 +131,7 @@ class TestUtilFunctions(TestCase):
         ]
         for expected, actual in eq_pairs:
             with self.subTest(expected=expected, actual=actual):
-                self.assertEquals(expected, actual)
+                self.assertEqual(expected, actual)
 
         with self.assertRaises(ValueError):
             str_reduce_length("333", 5, suffix="12345678")

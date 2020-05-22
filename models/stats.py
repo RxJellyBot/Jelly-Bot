@@ -8,9 +8,8 @@ from typing import Dict, Optional, List
 
 import pymongo
 from bson import ObjectId
-from django.utils.translation import gettext_lazy as _
 
-from extutils.dt import now_utc_aware, TimeRange
+from extutils.dt import now_utc_aware, TimeRange, make_tz_aware
 from extutils.utils import enumerate_ranking
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
@@ -18,6 +17,7 @@ from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
+from strnames.models import StatsResults
 
 
 # region Models
@@ -53,19 +53,33 @@ class BotFeatureUsageModel(Model):
 
 # region Results - Base
 class HourlyResult(abc.ABC):
+    """
+    **Fields**
+
+    ``avg_calculatable``
+        If this result can be used to calculate daily average.
+
+    ``denom``
+        Denominators to divide the accumulated result number.
+        Will be an empty list if ``avg_calculatable`` is ``False``.
+    """
     DAYS_NONE = 0
 
-    def __init__(self, days_collected: float):
+    def __init__(self, days_collected: float, *, end_time: Optional[datetime] = None):
+        """
+        :param days_collected: "claimed" days collected of the data
+        :param end_time: end time of the data. current time in UTC if not given
+        """
         d_collected_int = math.floor(days_collected)
 
-        now = datetime.utcnow()
-        earliest = now - timedelta(days=days_collected)
-        self.avg_calculatable = d_collected_int > HourlyResult.DAYS_NONE
+        end_time = end_time or datetime.utcnow()
+        earliest = end_time - timedelta(days=days_collected)
+        self.avg_calculatable: bool = d_collected_int > HourlyResult.DAYS_NONE
 
-        self.denom = []
+        self.denom: List[float] = []
         if self.avg_calculatable:
-            add_one_end = now.hour
-            if earliest.hour > now.hour:
+            add_one_end = end_time.hour
+            if earliest.hour > end_time.hour:
                 add_one_end += 24
 
             self.denom = [d_collected_int] * 24
@@ -75,16 +89,37 @@ class HourlyResult(abc.ABC):
     @staticmethod
     def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
                             start: Optional[datetime] = None, end: Optional[datetime] = None):
-        trange = TimeRange(range_hr=hr_range, start=start, end=end)
+        """
+        Returns the count of days collected in data.
+
+        Notice that this is different from ``days_collected`` in ``__init__()`` because
+        this one connects to the database to calculate the actual days collected in the filtered dataset
+        while the one in ``__init__()`` will not be checked and assume that it is true.
+
+        ``hr_range`` will be ignored if both ``start`` and ``end`` is specified.
+        """
+        trange = TimeRange(range_hr=hr_range, start=start, end=end, end_autofill_now=False)
 
         if trange.is_inf:
             oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
 
-            if oldest:
-                # Replace to let both be Offset-naive
-                return (now_utc_aware() - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400
-            else:
+            if not oldest:
                 return HourlyResult.DAYS_NONE
+
+            now = now_utc_aware()
+
+            if start:
+                start = make_tz_aware(start)
+
+            if start and start > now:
+                return HourlyResult.DAYS_NONE
+
+            if end:
+                end = make_tz_aware(end)
+
+            return max(
+                ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
+                0)
         else:
             return trange.hr_length / 24
 
@@ -106,14 +141,18 @@ class DailyResult(abc.ABC):
     def date_list(days_collected, tzinfo, *,
                   start: Optional[datetime] = None, end: Optional[datetime] = None,
                   trange: Optional[TimeRange] = None) -> List[date]:
-        """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
+        """
+        Returns the date list within the time range.
+
+        Disregards ``start`` and ``end`` if ``trange`` is specified.
+        """
         ret = []
 
         if not trange:
             trange = TimeRange(range_hr=days_collected * 24, start=start, end=end, tzinfo_=tzinfo)
 
         if trange.is_inf:
-            raise ValueError("TimeRange is infinity.")
+            raise ValueError("TimeRange length is infinity.")
 
         for i in range((trange.end.date() - trange.start.date()).days + 1):
             ret.append(trange.start.date() + timedelta(days=i))
@@ -127,8 +166,6 @@ class DailyResult(abc.ABC):
         """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
-
-
 # endregion
 
 
@@ -165,16 +202,16 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
                 category_name=cat.key,
                 data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
                 color="#777777",
-                hidden="true"
+                hidden="true"  # Will be used in JS so string of bool instead
             )
             for cat, data in count_data.items()
         ]
         count_sum = [
             CountDataEntry(
-                category_name=_("(Total)"),
+                category_name=StatsResults.CATEGORY_TOTAL,
                 data=[ct / dm for ct, dm in zip(count_sum, self.denom)] if self.avg_calculatable else count_sum,
                 color="#323232",
-                hidden="false"
+                hidden="false"  # Will be used in JS so string of bool instead
             )
         ]
 
@@ -227,7 +264,7 @@ class MeanMessageResult:
     def __init__(self, date_list: List[date], data_list: List[float], mean_days: int):
         self.date_list = date_list
         self.data_list = data_list
-        self.label = _("{} days mean").format(mean_days)
+        self.label = StatsResults.DAYS_MEAN.format(mean_days)
 
 
 class MeanMessageResultGenerator(DailyResult):
@@ -248,6 +285,8 @@ class MeanMessageResultGenerator(DailyResult):
     def generate_result(self, mean_days: int) -> MeanMessageResult:
         if mean_days > self.max_madays:
             raise ValueError("Max mean average calculation range reached.")
+        if mean_days <= 0:
+            raise ValueError("`mean_days` should be > 0.")
 
         date_list = []
         data_list = []
@@ -302,7 +341,7 @@ class CountBeforeTimeResult(DailyResult):
 
     @property
     def title(self):
-        return _("Message Count Before {}").format(strftime("%I:%M:%S %p", gmtime(self.trange.end_time_seconds)))
+        return StatsResults.COUNT_BEFORE.format(strftime("%I:%M:%S %p", gmtime(self.trange.end_time_seconds)))
 
 
 # region MemberMessageCountResult
@@ -377,7 +416,7 @@ class MemberMessageByCategoryResult:
     KEY_COUNT = "ct"
 
     def __init__(self, cursor):
-        # Hand typing this to create custom order without additional implementations
+        # Manually listing this to create custom order without additional implementations
         self.label_category = [
             MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
@@ -419,13 +458,14 @@ class BotFeatureUsageResult:
                     FeatureUsageEntry(feature_name=feature, count=d[BotFeatureUsageResult.KEY], rank=rank)
                 )
             except TypeError:
-                # Skip if the code has been added in the newer build but not in the current executing build
+                # Skip if the feature code has been added in the newer build but not in the current executing build
                 pass
 
         if incl_not_used:
             diff = {feature for feature in BotFeature}.difference({BotFeature.cast(d[OID_KEY]) for d in cursor})
+            last_rank = f"{'T' if len(diff) > 0 else ''}{len(self.data) + 1 if self.data else 1}"
             for diff_ in diff:
-                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0, rank=1))
+                self.data.append(FeatureUsageEntry(feature_name=diff_.key, count=0, rank=last_rank))
 
         self.chart_label = [d.feature_name for d in self.data]
         self.chart_data = [d.count for d in self.data]
@@ -456,8 +496,8 @@ class BotFeatureHourlyAvgResult(HourlyResult):
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor, incl_not_used: bool, days_collected: float):
-        super().__init__(days_collected)
+    def __init__(self, cursor, incl_not_used: bool, days_collected: float, end_time: Optional[datetime] = None):
+        super().__init__(days_collected, end_time=end_time)
 
         self.hr_range = int(days_collected * 24)
         self.label_hr = [h for h in range(24)]
@@ -492,5 +532,5 @@ class BotFeatureHourlyAvgResult(HourlyResult):
             for diff_ in diff:
                 self.data.append(UsageEntry(feature=diff_, data=[0] * 24, color="#9C0000", hidden="true"))
 
-        entry = UsageEntry(feature=_("(Total)"), data=hr_sum, color="#323232", hidden="false")
+        entry = UsageEntry(feature=StatsResults.CATEGORY_TOTAL, data=hr_sum, color="#323232", hidden="false")
         self.data = [entry] + list(sorted(self.data, key=lambda i: i.feature.code))

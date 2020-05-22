@@ -1,13 +1,12 @@
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
-from django.utils.translation import gettext_lazy as _
-
-from extutils.dt import now_utc_aware, t_delta_str, localtime
+from extutils.dt import now_utc_aware, t_delta_str, localtime, make_tz_aware
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import CursorWithCount
+from strnames.models import Timer
 
 
 class TimerModel(Model):
@@ -17,7 +16,7 @@ class TimerModel(Model):
     TargetTime = DateTimeField("tt", default=ModelDefaultValueExt.Required)
     DeletionTime = DateTimeField("del", default=ModelDefaultValueExt.Optional)
     Countup = BooleanField("c", default=False)
-    PeriodSeconds = IntegerField("p", default=ModelDefaultValueExt.Optional)
+    PeriodSeconds = IntegerField("p")
     Notified = BooleanField("nt", default=False)
     NotifiedExpired = BooleanField("nt-e", default=False)
 
@@ -26,15 +25,11 @@ class TimerModel(Model):
         return self.period_seconds > 0
 
     def get_target_time_diff(self, dt: datetime):
-        """``dt`` needs to be tz-aware."""
-        if self.target_time > dt:
-            return self.target_time - dt
-        else:
-            return dt - self.target_time
+        return abs(self.target_time - make_tz_aware(dt))
 
-    def is_after(self, dt: datetime):
-        """``dt`` needs to be tz-aware."""
-        return self.target_time >= dt
+    def is_after(self, dt: datetime) -> bool:
+        """Check if the target time of the timer is after the given ``dt``."""
+        return self.target_time >= make_tz_aware(dt)
 
 
 @dataclass
@@ -44,7 +39,7 @@ class TimerListResult:
     past_done: List[TimerModel] = field(init=False, default_factory=list)
     has_data: bool = field(init=False, default=False)
 
-    cursor: InitVar[CursorWithCount] = None
+    cursor: InitVar[Union[CursorWithCount, List[TimerModel]]] = None
 
     def __iter__(self):
         for t in self.future:
@@ -77,7 +72,7 @@ class TimerListResult:
         if self.future:
             for tmr in self.future:
                 ret.append(
-                    _("- [{diff}] to {event} (at {time})").format(
+                    Timer.FUTURE.format(
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
@@ -86,7 +81,7 @@ class TimerListResult:
         if self.past_continue:
             for tmr in self.past_continue:
                 ret.append(
-                    _("- [{diff}] past {event} (at {time})").format(
+                    Timer.PAST_CONTINUE.format(
                         event=tmr.title, diff=t_delta_str(tmr.get_target_time_diff(now)),
                         time=localtime(tmr.target_time, tzinfo)
                     ))
@@ -95,10 +90,10 @@ class TimerListResult:
         if self.past_done:
             for tmr in self.past_done:
                 ret.append(
-                    _("- {event} has ended (at {time})").format(
+                    Timer.PAST_DONE.format(
                         event=tmr.title, time=localtime(tmr.target_time, tzinfo)))
 
-        # Take out separator
+        # Take out the final separator
         if ret and ret[-1] == "":
             ret = ret[:-1]
 

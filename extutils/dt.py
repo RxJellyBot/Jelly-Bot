@@ -18,7 +18,6 @@ def localtime(dt: datetime = None, tz: timezone = None):
 
 
 def make_tz_aware(dt: datetime, tz: timezone = None):
-    # TEST: Using datetime.min and datetime.max
     if not is_tz_naive(dt):
         return dt
 
@@ -29,7 +28,6 @@ def make_tz_aware(dt: datetime, tz: timezone = None):
 
 
 def is_tz_naive(dt: datetime) -> bool:
-    # TEST: Using datetime.min and datetime.max
     try:
         return timezone.is_naive(dt)
     except OverflowError:
@@ -100,8 +98,6 @@ class TimeRange:
             - `start` will be `end` - `range_hr` hrs
         > If both not specified
             - `start` will be the current time - `range_hr` hrs
-
-    `start` and `end` must be tz-aware if specified.
     """
     start: Optional[datetime] = None
     start_org: Optional[datetime] = field(init=False)
@@ -113,10 +109,7 @@ class TimeRange:
 
     def _localize_(self, dt: Optional[datetime]):
         if dt:
-            if is_tz_naive(dt):
-                dt = make_tz_aware(dt, self.tzinfo_)
-
-            return localtime(dt, self.tzinfo_)
+            return localtime(make_tz_aware(dt, self.tzinfo_), self.tzinfo_)
         else:
             return None
 
@@ -124,7 +117,8 @@ class TimeRange:
         if self.start and self.end:
             return
 
-        if range_hr:
+        # `range_hr` = 0 could be `False` so explicitly checking `None`
+        if range_hr is not None:
             if self.start:
                 self.end = self.start + timedelta(hours=range_hr)
             elif self.end:

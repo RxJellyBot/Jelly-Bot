@@ -73,7 +73,8 @@ class ExtraContentHTMLTransformer:
         from mongodb.factory import ChannelManager, AutoReplyManager
         from mongodb.helper import IdentitySearcher
 
-        if not model.content:
+        # Early termination for falsy or not-an-array content
+        if not model.content or not isinstance(model.content, list):
             return ""
 
         tab_list: List[str] = []

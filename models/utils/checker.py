@@ -72,7 +72,7 @@ class ModelFieldChecker:
             # [(Json Key, Model Class), (Json Key, Model Class), ...]
             self._model_field_mdl_class = []
 
-            for f in self._model_cls.model_fields().values():
+            for f in self._model_cls.model_fields():
                 self._model_default_vals.append((f.key, f.default_value))
 
                 if isinstance(f, ModelField):
@@ -131,7 +131,7 @@ class ModelFieldChecker:
             or_list = []
 
             if model_cls:
-                for jk, default in map(lambda f: (f.key, f.default_value), model_cls.model_fields().values()):
+                for jk, default in map(lambda f: (f.key, f.default_value), model_cls.model_fields()):
                     if default != ModelDefaultValueExt.Optional:
                         or_list.append({f"{prefix}{jk}": {"$exists": False}})
 
@@ -164,14 +164,13 @@ class ModelFieldChecker:
 
         def repair_single_data(self, required_write_holder: BulkWriteDataHolder, data: dict) -> \
                 Tuple[DataRepairResult, Optional[dict]]:
-            changed = [False]  # Make it a list so the value inside can be referenced as pointer not value
             missing = []
-
-            self.repair_fields(data, changed, missing)
+            changed = self.repair_fields(data, self._model_cls, missing)
 
             # Check all fields of the model field
             for key, model_cls in self._model_field_mdl_class:
-                self.repair_fields(data[key], changed, missing)
+                # `self.repair_fields()` first so it will always being executed (short circuit)
+                changed = self.repair_fields(data[key], model_cls, missing) or changed
 
             if len(missing) > 0:
                 required_write_holder.repsert_single(
@@ -184,8 +183,10 @@ class ModelFieldChecker:
                 return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, \
                        data if changed else None
 
-        def repair_fields(self, data: dict, changed: List[bool], missing: List[bool]):
-            for json_key, default_val in self._model_default_vals:
+        def repair_fields(self, data: dict, model_cls, missing: List[str]) -> bool:
+            changed = False
+
+            for json_key, default_val in map(lambda f: (f.key, f.default_value), model_cls.model_fields()):
                 if json_key not in data:
                     try:
                         if default_val == ModelDefaultValueExt.Required:
@@ -194,10 +195,12 @@ class ModelFieldChecker:
                             pass  # Optional so no change
                         else:
                             data[json_key] = default_val
-                            changed[0] = True
+                            changed = True
                     except KeyError:
                         raise ValueError(f"Default value rule not set "
                                          f"for json key `{json_key}` in `{self._model_cls.__qualname__}`.")
+
+            return changed
 
         @staticmethod
         def print_scanning_result(counter: dict):

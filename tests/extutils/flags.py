@@ -88,10 +88,10 @@ class TestFlagMisc(TestCase):
 
 class TestFlagCodeEnum(TestCase):
     def test_enum_equals(self):
-        self.assertEquals(1, CodeEnum.A)
-        self.assertEquals("1", CodeEnum.A)
+        self.assertEqual(1, CodeEnum.A)
+        self.assertEqual("1", CodeEnum.A)
         self.assertNotEquals(2, CodeEnum.A)
-        self.assertEquals(CodeEnum.A, CodeEnum.A)
+        self.assertEqual(CodeEnum.A, CodeEnum.A)
         self.assertNotEquals(CodeEnum.A, CodeEnum.B)
 
     def test_enum_greater(self):
@@ -107,14 +107,14 @@ class TestFlagCodeEnum(TestCase):
         self.assertLessEqual(CodeEnum.A, CodeEnum.A)
 
     def test_enum_properties(self):
-        self.assertEquals(1, CodeEnum.A.code)
-        self.assertEquals("1", CodeEnum.A.code_str)
+        self.assertEqual(1, CodeEnum.A.code)
+        self.assertEqual("1", CodeEnum.A.code_str)
 
     def test_enum_cast(self):
-        self.assertEquals(1, int(CodeEnum.A))
-        self.assertEquals(CodeEnum.A, CodeEnum.cast(1))
-        self.assertEquals(CodeEnum.A, CodeEnum.cast("1"))
-        self.assertEquals(CodeEnum.A, CodeEnum.cast("A"))
+        self.assertEqual(1, int(CodeEnum.A))
+        self.assertEqual(CodeEnum.A, CodeEnum.cast(1))
+        self.assertEqual(CodeEnum.A, CodeEnum.cast("1"))
+        self.assertEqual(CodeEnum.A, CodeEnum.cast("A"))
         with self.assertRaises(TypeError):
             CodeEnum.cast(True)
         with self.assertRaises(ValueError):
@@ -139,11 +139,11 @@ class TestFlagCodeEnum(TestCase):
 
 class TestFlagSingleCodeEnum(TestCase):
     def test_enum_equals(self):
-        self.assertEquals(1, CodeSingleEnum.A)
-        self.assertEquals("1", CodeSingleEnum.A)
+        self.assertEqual(1, CodeSingleEnum.A)
+        self.assertEqual("1", CodeSingleEnum.A)
         self.assertNotEquals("C", CodeSingleEnum.A)
         self.assertNotEquals(2, CodeSingleEnum.A)
-        self.assertEquals(CodeSingleEnum.A, CodeSingleEnum.A)
+        self.assertEqual(CodeSingleEnum.A, CodeSingleEnum.A)
         self.assertNotEquals(CodeSingleEnum.A, CodeSingleEnum.B)
 
     def test_enum_greater(self):
@@ -159,15 +159,15 @@ class TestFlagSingleCodeEnum(TestCase):
         self.assertLessEqual(CodeSingleEnum.A, CodeSingleEnum.A)
 
     def test_enum_properties(self):
-        self.assertEquals(1, CodeSingleEnum.A.code)
-        self.assertEquals("1", CodeSingleEnum.A.code_str)
-        self.assertEquals("C", CodeSingleEnum.A.key)
+        self.assertEqual(1, CodeSingleEnum.A.code)
+        self.assertEqual("1", CodeSingleEnum.A.code_str)
+        self.assertEqual("C", CodeSingleEnum.A.key)
 
     def test_enum_cast(self):
-        self.assertEquals(1, int(CodeSingleEnum.A))
-        self.assertEquals(CodeSingleEnum.A, CodeSingleEnum.cast(1))
-        self.assertEquals(CodeSingleEnum.A, CodeSingleEnum.cast("1"))
-        self.assertEquals(CodeSingleEnum.A, CodeSingleEnum.cast("A"))
+        self.assertEqual(1, int(CodeSingleEnum.A))
+        self.assertEqual(CodeSingleEnum.A, CodeSingleEnum.cast(1))
+        self.assertEqual(CodeSingleEnum.A, CodeSingleEnum.cast("1"))
+        self.assertEqual(CodeSingleEnum.A, CodeSingleEnum.cast("A"))
         with self.assertRaises(TypeError):
             CodeSingleEnum.cast(True)
         with self.assertRaises(ValueError):
@@ -192,12 +192,12 @@ class TestFlagSingleCodeEnum(TestCase):
 
 class TestFlagDoubleCodeEnum(TestCase):
     def test_enum_equals(self):
-        self.assertEquals(1, CodeDoubleEnum.A)
-        self.assertEquals("1", CodeDoubleEnum.A)
+        self.assertEqual(1, CodeDoubleEnum.A)
+        self.assertEqual("1", CodeDoubleEnum.A)
         self.assertNotEquals("C", CodeDoubleEnum.A)
         self.assertNotEquals("E", CodeDoubleEnum.A)
         self.assertNotEquals(2, CodeDoubleEnum.A)
-        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.A)
+        self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.A)
         self.assertNotEquals(CodeDoubleEnum.A, CodeDoubleEnum.B)
 
     def test_enum_greater(self):
@@ -213,16 +213,16 @@ class TestFlagDoubleCodeEnum(TestCase):
         self.assertLessEqual(CodeDoubleEnum.A, CodeDoubleEnum.A)
 
     def test_enum_properties(self):
-        self.assertEquals(1, CodeDoubleEnum.A.code)
-        self.assertEquals("1", CodeDoubleEnum.A.code_str)
-        self.assertEquals("C", CodeDoubleEnum.A.key)
-        self.assertEquals("E", CodeDoubleEnum.A.description)
+        self.assertEqual(1, CodeDoubleEnum.A.code)
+        self.assertEqual("1", CodeDoubleEnum.A.code_str)
+        self.assertEqual("C", CodeDoubleEnum.A.key)
+        self.assertEqual("E", CodeDoubleEnum.A.description)
 
     def test_enum_cast(self):
-        self.assertEquals(1, int(CodeDoubleEnum.A))
-        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.cast(1))
-        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.cast("1"))
-        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.cast("A"))
+        self.assertEqual(1, int(CodeDoubleEnum.A))
+        self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.cast(1))
+        self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.cast("1"))
+        self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.cast("A"))
         with self.assertRaises(TypeError):
             CodeDoubleEnum.cast(True)
         with self.assertRaises(ValueError):
@@ -241,18 +241,18 @@ class TestFlagDoubleCodeEnum(TestCase):
         self.assertFalse(CodeDoubleEnum.contains(False))
 
     def test_enum_default(self):
-        self.assertEquals(CodeDoubleEnum.A, CodeDoubleEnum.default())
+        self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.default())
 
 
 class TestFlagPrefixedDoubleCodeEnum(TestCase):
     def test_enum_equals(self):
-        self.assertEquals(1, CodePrefixedDoubleEnum.A)
-        self.assertEquals("1", CodePrefixedDoubleEnum.A)
-        self.assertEquals("P1", CodePrefixedDoubleEnum.A)
+        self.assertEqual(1, CodePrefixedDoubleEnum.A)
+        self.assertEqual("1", CodePrefixedDoubleEnum.A)
+        self.assertEqual("P1", CodePrefixedDoubleEnum.A)
         self.assertNotEquals("C", CodePrefixedDoubleEnum.A)
         self.assertNotEquals("E", CodePrefixedDoubleEnum.A)
         self.assertNotEquals(2, CodePrefixedDoubleEnum.A)
-        self.assertEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.A)
+        self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.A)
         self.assertNotEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.B)
 
     def test_enum_greater(self):
@@ -268,17 +268,17 @@ class TestFlagPrefixedDoubleCodeEnum(TestCase):
         self.assertLessEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.A)
 
     def test_enum_properties(self):
-        self.assertEquals(1, CodePrefixedDoubleEnum.A.code)
-        self.assertEquals("P1", CodePrefixedDoubleEnum.A.code_str)
-        self.assertEquals("C", CodePrefixedDoubleEnum.A.key)
-        self.assertEquals("E", CodePrefixedDoubleEnum.A.description)
+        self.assertEqual(1, CodePrefixedDoubleEnum.A.code)
+        self.assertEqual("P1", CodePrefixedDoubleEnum.A.code_str)
+        self.assertEqual("C", CodePrefixedDoubleEnum.A.key)
+        self.assertEqual("E", CodePrefixedDoubleEnum.A.description)
 
     def test_enum_cast(self):
-        self.assertEquals(1, int(CodePrefixedDoubleEnum.A))
-        self.assertEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast(1))
-        self.assertEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("1"))
-        self.assertEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("P1"))
-        self.assertEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("A"))
+        self.assertEqual(1, int(CodePrefixedDoubleEnum.A))
+        self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast(1))
+        self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("1"))
+        self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("P1"))
+        self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.cast("A"))
         with self.assertRaises(TypeError):
             CodePrefixedDoubleEnum.cast(True)
         with self.assertRaises(ValueError):

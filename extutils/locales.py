@@ -32,12 +32,22 @@ class LocaleInfo:
         return LocaleInfo.get_tzinfo(self.pytz_code)
 
     @staticmethod
-    def get_tzinfo(tzname: Optional[str]) -> Optional['PytzInfo']:
-        """Get the corresponding `pytz` tzinfo. If `tzname` is `None`. Returns `None`."""
+    def get_tzinfo(tzname: Optional[str], *, silent_fail: bool = False) -> Optional['PytzInfo']:
+        """
+        Get the corresponding ``pytz`` tzinfo.
+
+        If ``tzname`` is ``None`` or timezone not found and ``silent_fail`` is ``True``, return ``None``.
+        """
         if tzname is None:
             return None
 
-        return PytzInfo(pytz.timezone(tzname))
+        try:
+            return PytzInfo(pytz.timezone(tzname))
+        except pytz.exceptions.UnknownTimeZoneError as e:
+            if silent_fail:
+                return None
+
+            raise e
 
 
 @dataclass
@@ -70,6 +80,9 @@ class PytzInfo(tzinfo):
     @property
     def tzidentifier(self):
         return self._base.zone
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.tzidentifier == other.tzidentifier
 
 
 def is_now_dst(tz):
