@@ -114,7 +114,7 @@ class TestModel(ABC):
 
             :return: combinations of the optional keys
             """
-            optional_keys = self.get_optional().keys()
+            optional_keys = self.get_optional()
             ret = []
 
             for count in range(len(optional_keys) + 1):
@@ -129,7 +129,7 @@ class TestModel(ABC):
 
             :return: combinations of the required keys
             """
-            required_keys = self.get_required().keys()
+            required_keys = self.get_required()
             ret = []
 
             for count in range(1, len(required_keys) + 1):
@@ -144,7 +144,7 @@ class TestModel(ABC):
 
             :return: combinations of the default keys
             """
-            default_keys = self.get_default().keys()
+            default_keys = self.get_default()
             ret = []
 
             for count in range(len(default_keys) + 1):
@@ -214,7 +214,7 @@ class TestModel(ABC):
 
                 # Get default keys to manually fill
                 for manual_defaults in self.get_default_key_combinations():
-                    for dfk in default_val.keys():
+                    for dfk in default_val:
                         jk, fk = dfk
                         auto_default, manual_default = default_val[dfk]
 

@@ -222,14 +222,14 @@ class TestHourlyIntervalAverageMessageResult(TestCase):
                     HourlyIntervalAverageMessageResult.KEY_HR: 4,
                     HourlyIntervalAverageMessageResult.KEY_CATEGORY: MessageType.TEXT
                 },
-                HourlyIntervalAverageMessageResult.KEY_COUNT: 50
+                HourlyIntervalAverageMessageResult.KEY_COUNT: 18
             },
             {
                 "_id": {
                     HourlyIntervalAverageMessageResult.KEY_HR: 4,
                     HourlyIntervalAverageMessageResult.KEY_CATEGORY: MessageType.IMAGE
                 },
-                HourlyIntervalAverageMessageResult.KEY_COUNT: 1
+                HourlyIntervalAverageMessageResult.KEY_COUNT: 21
             }
         ]
 
@@ -252,12 +252,12 @@ class TestHourlyIntervalAverageMessageResult(TestCase):
                                            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23])
         self.assertEqual(result.hr_range, 48)
         self.assertEqual(result.data, [
-            (StatsResults.CATEGORY_TOTAL, [0, 0, 0, 125, 25.5, 0, 0, 0, 0, 0, 0, 0,
+            (StatsResults.CATEGORY_TOTAL, [0, 0, 0, 125, 13, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#323232", "false"),
-            (MessageType.TEXT.key, [0, 0, 0, 75, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            (MessageType.TEXT.key, [0, 0, 0, 75, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#777777", "true"),
-            (MessageType.IMAGE.key, [0, 0, 0, 50, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            (MessageType.IMAGE.key, [0, 0, 0, 50, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#777777", "true")
         ])
 

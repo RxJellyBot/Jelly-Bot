@@ -9,7 +9,7 @@ from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import TimerManager
 from JellyBot.systemconfig import Bot
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 
 cmd = CommandNode(

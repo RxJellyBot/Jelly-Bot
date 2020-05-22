@@ -7,7 +7,7 @@ from mongodb.helper import MessageStatsDataProcessor, IdentitySearcher
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["info", "id"], order_idx=500, name=_("Information"),
@@ -17,7 +17,7 @@ cmd_ch = cmd.new_child_node(codes=["ch", "channel"])
 cmd_id = cmd.new_child_node(codes=["id"])
 
 
-def _user_id_section_(e: TextMessageEventObject):
+def _user_id_section(e: TextMessageEventObject):
     ret = [_("User ID: `{}`").format(e.user_model.id)]
 
     if e.user_token:
@@ -26,17 +26,17 @@ def _user_id_section_(e: TextMessageEventObject):
     return ret
 
 
-def _channel_id_section_(e: TextMessageEventObject):
+def _channel_id_section(e: TextMessageEventObject):
     return [_("Channel ID: `{}`").format(e.channel_model.id),
             _("Channel Token: `{}`").format(e.channel_model.token)]
 
 
-def _channel_info_url_(e: TextMessageEventObject):
+def _channel_info_url(e: TextMessageEventObject):
     return [_("Channel Detailed Info URL: {}{}").format(
         HostUrl, reverse("info.channel", kwargs={"channel_oid": e.channel_oid}))]
 
 
-def _chcoll_id_section_(e: TextMessageEventObject):
+def _chcoll_id_section(e: TextMessageEventObject):
     ret = []
 
     if e.chcoll_model:
@@ -46,14 +46,14 @@ def _chcoll_id_section_(e: TextMessageEventObject):
     return ret
 
 
-def _chcoll_info_url_(e: TextMessageEventObject):
+def _chcoll_info_url(e: TextMessageEventObject):
     if e.chcoll_model:
         return [_("Channel Collection Detailed Info URL: {}{}").format(
             HostUrl, reverse("info.chcoll", kwargs={"chcoll_oid": e.chcoll_model.id}))]
     return []
 
 
-def _user_ranking_section_(e: TextMessageEventObject):
+def _user_ranking_section(e: TextMessageEventObject):
     ret = []
 
     rk_ch_1d = MessageStatsDataProcessor.get_user_channel_ranking(
@@ -80,7 +80,7 @@ def _user_ranking_section_(e: TextMessageEventObject):
     return ret
 
 
-def _channel_msg_count_list_section_(e: TextMessageEventObject, limit):
+def _channel_msg_count_list_section(e: TextMessageEventObject, limit):
     ret = []
 
     mem_stats = MessageStatsDataProcessor.get_user_channel_messages(
@@ -96,7 +96,7 @@ def _channel_msg_count_list_section_(e: TextMessageEventObject, limit):
     return ret
 
 
-def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
+def _chcoll_msg_count_list_section(e: TextMessageEventObject, limit):
     ret = []
 
     if e.chcoll_model:
@@ -118,9 +118,9 @@ def _chcoll_msg_count_list_section_(e: TextMessageEventObject, limit):
 def check_ids(e: TextMessageEventObject):
     ret = []
 
-    ret.extend(_chcoll_id_section_(e))
-    ret.extend(_channel_id_section_(e))
-    ret.extend(_user_id_section_(e))
+    ret.extend(_chcoll_id_section(e))
+    ret.extend(_channel_id_section(e))
+    ret.extend(_user_id_section(e))
 
     return "\n".join(ret)
 
@@ -131,14 +131,14 @@ def check_channel_info(e: TextMessageEventObject):
 
     limit = 10
 
-    ret.extend(_chcoll_id_section_(e))
-    ret.extend(_chcoll_info_url_(e))
-    ret.extend(_channel_id_section_(e))
-    ret.extend(_channel_info_url_(e))
+    ret.extend(_chcoll_id_section(e))
+    ret.extend(_chcoll_info_url(e))
+    ret.extend(_channel_id_section(e))
+    ret.extend(_channel_info_url(e))
 
     ret.append("")
-    ret.extend(_chcoll_msg_count_list_section_(e, limit))
-    ret.extend(_channel_msg_count_list_section_(e, limit))
+    ret.extend(_chcoll_msg_count_list_section(e, limit))
+    ret.extend(_channel_msg_count_list_section(e, limit))
 
     return "\n".join(ret)
 
@@ -147,8 +147,8 @@ def check_channel_info(e: TextMessageEventObject):
 def check_sender_identity(e: TextMessageEventObject):
     ret = []
 
-    ret.extend(_user_id_section_(e))
-    ret.extend(_user_ranking_section_(e))
+    ret.extend(_user_id_section(e))
+    ret.extend(_user_ranking_section(e))
 
     return "\n".join(ret)
 

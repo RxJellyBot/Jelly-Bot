@@ -8,7 +8,7 @@ from flags import BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import Bot
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["rd", "rdm", "random"], order_idx=1500, name=_("Random"),

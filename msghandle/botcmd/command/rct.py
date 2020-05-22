@@ -7,7 +7,7 @@ from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.helper import MessageStatsDataProcessor
 from JellyBot.systemconfig import HostUrl, Bot
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["rct", "recent", "r", "l", "last"], order_idx=500, name=_("Recent Activity"),

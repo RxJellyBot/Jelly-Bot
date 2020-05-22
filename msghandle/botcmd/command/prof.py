@@ -14,7 +14,7 @@ from mongodb.factory.results import OperationOutcome
 from mongodb.factory import ProfileManager
 from mongodb.helper import ProfileHelper
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["pf", "prof", "profile"], order_idx=250, name=_("Profile Management"),
@@ -52,14 +52,14 @@ class PermissionParseResult:
         return len(self.skipped) > 0
 
 
-def _parse_name_(channel_oid: ObjectId, name: str):
+def _parse_name(channel_oid: ObjectId, name: str):
     if ProfileManager.is_name_available(channel_oid, name):
         return name
     else:
         return None
 
 
-def _parse_color_(color: Union[str, Color]):
+def _parse_color(color: Union[str, Color]):
     if isinstance(color, str):
         try:
             return ColorFactory.from_hex(color)
@@ -71,7 +71,7 @@ def _parse_color_(color: Union[str, Color]):
         raise TypeError()
 
 
-def _parse_permission_(permission: str, max_perm_lv: PermissionLevel) -> PermissionParseResult:
+def _parse_permission(permission: str, max_perm_lv: PermissionLevel) -> PermissionParseResult:
     result = PermissionParseResult()
 
     permission = permission.split(",")
@@ -94,7 +94,7 @@ def _parse_permission_(permission: str, max_perm_lv: PermissionLevel) -> Permiss
     return result
 
 
-def _parse_permission_level_(perm_lv: Union[str, PermissionLevel]):
+def _parse_permission_level(perm_lv: Union[str, PermissionLevel]):
     return PermissionLevel.cast(perm_lv, silent_fail=True)
 
 
@@ -153,21 +153,21 @@ def profile_create_internal(
 
     # --- Parse name
 
-    prof_name = _parse_name_(e.channel_oid, name)
+    prof_name = _parse_name(e.channel_oid, name)
     if not prof_name:
         return [HandledMessageEventText(content=_("The profile name `{}` is unavailable in this channel. "
                                                   "Please choose a different one.").format(name))]
 
     # --- Parse color
 
-    color = _parse_color_(color)
+    color = _parse_color(color)
     if not color:
         return [HandledMessageEventText(
             content=_("Failed to parse color. Make sure it is in the format of `81D8D0`."))]
 
     # --- Parse permission level
 
-    perm_lv = _parse_permission_level_(perm_lv)
+    perm_lv = _parse_permission_level(perm_lv)
     if not perm_lv:
         return [HandledMessageEventText(
             content=_("Failed to parse permission level. Make sure it is a valid level or check the documentation."))]
@@ -178,7 +178,7 @@ def profile_create_internal(
     if isinstance(permission, str):
         max_perm_lv = ProfileManager.get_highest_permission_level(profiles)
 
-        parsed_perm = _parse_permission_(permission, max_perm_lv)
+        parsed_perm = _parse_permission(permission, max_perm_lv)
         if parsed_perm.has_skipped:
             msg_on_hold.append(HandledMessageEventText(
                 content=_("Strings below were skipped because it cannot be understood as permission:\n{}").format(

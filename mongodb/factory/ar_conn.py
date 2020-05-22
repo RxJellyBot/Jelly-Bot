@@ -57,14 +57,15 @@ class AutoReplyModuleManager(BaseCollection):
             -> WriteOutcome:
         """
         Perform the following checks and return the corresponding result:
-        - Validity of the keyword
-            - `WriteOutcome.X_AR_INVALID_KEYWORD` if invalid
-        - Validity of the responses
-            - `WriteOutcome.X_AR_INVALID_RESPONSE` if invalid
-        - Module duplicated
-            - `WriteOutcome.O_DATA_EXISTS` if duplicated
 
-        Returns `WriteOutcome.O_MISC` if all checks passed.
+        - Validity of the keyword
+            - ``WriteOutcome.X_AR_INVALID_KEYWORD`` if invalid
+        - Validity of the responses
+            - ``WriteOutcome.X_AR_INVALID_RESPONSE`` if invalid
+        - Module duplicated
+            - ``WriteOutcome.O_DATA_EXISTS`` if duplicated
+
+        Returns ``WriteOutcome.O_MISC`` if all checks passed.
         """
         # Check validity of keyword
         if not AutoReplyValidator.is_valid_content(kw_type, kw_content, online_check=online_check):

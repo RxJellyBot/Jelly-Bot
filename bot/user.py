@@ -11,7 +11,7 @@ from extutils.emailutils import MailSender
 from extutils.logger import SYSTEM
 
 
-def _perform_existence_check_(set_name_to_cache: bool):
+def _perform_existence_check(set_name_to_cache: bool):
     list_prof_conn = list(ProfileManager.get_available_connections())
 
     def fn():
@@ -91,4 +91,4 @@ def _check_on_prof_conn_(
 
 
 def perform_existence_check(set_name_to_cache: bool):
-    Thread(target=_perform_existence_check_, args=(set_name_to_cache,)).start()
+    Thread(target=_perform_existence_check, args=(set_name_to_cache,)).start()

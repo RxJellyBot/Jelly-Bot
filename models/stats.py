@@ -255,9 +255,9 @@ class DailyMessageResult(DailyResult):
                 data[dt] = [DataPoint(count=dp, percentage=0.0, is_max=False) for dp in pts]
 
         self.data_sum = [data_sum[k] for k in
-                         sorted(data_sum.keys(), key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
+                         sorted(data_sum, key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
         self.data = [ResultEntry(date=date_, data=data[date_])
-                     for date_ in sorted(data.keys(), key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
+                     for date_ in sorted(data, key=lambda x: datetime.strptime(x, DailyResult.FMT_DATE))]
 
 
 class MeanMessageResult:
@@ -528,7 +528,7 @@ class BotFeatureHourlyAvgResult(HourlyResult):
                      for ft, data in data_points.items()]
 
         if incl_not_used:
-            diff = {feature for feature in BotFeature}.difference(data_points.keys())
+            diff = {feature for feature in BotFeature}.difference(data_points)
             for diff_ in diff:
                 self.data.append(UsageEntry(feature=diff_, data=[0] * 24, color="#9C0000", hidden="true"))
 

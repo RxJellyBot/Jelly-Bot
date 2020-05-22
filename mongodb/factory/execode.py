@@ -106,7 +106,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
                 try:
                     required_keys = ExecodeRequiredKeys.get_required_keys(tk_model.action_type)
 
-                    lacking_keys = required_keys.difference(execode_kwargs.keys())
+                    lacking_keys = required_keys.difference(execode_kwargs)
                     if len(lacking_keys) == 0:
                         try:
                             cmpl_outcome = ExecodeCompletor.complete_execode(tk_model, execode_kwargs)

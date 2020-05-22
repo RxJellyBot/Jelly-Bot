@@ -15,7 +15,7 @@ from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl, Bot
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 __all__ = ["cmd_main"]
 

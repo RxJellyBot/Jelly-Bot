@@ -6,7 +6,7 @@ from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject
 from mongodb.factory import ExecodeManager
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["uintg", "userintegrate"], order_idx=2000, name=_("User Data Integration"),

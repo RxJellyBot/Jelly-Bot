@@ -151,7 +151,7 @@ class TestBaseModel(TestCase):
     def test_del(self):
         d = {"f1": 1, "f2": 2, "f3": 3, "f4": 4}
 
-        for k in d.keys():
+        for k in d:
             mdl = TestBaseModel.TestModel.cast_model(d)
             with self.assertRaises(DeleteNotAllowed):
                 del mdl[k]

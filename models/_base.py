@@ -58,7 +58,7 @@ class Model(MutableMapping, abc.ABC):
             raise InvalidModelFieldError(self.__class__.__qualname__, e)
 
         not_handled = self._fill_default_vals_(
-            self.model_field_keys() - {to_camel_case(k) for k in self._dict_.keys()})
+            self.model_field_keys() - {to_camel_case(k) for k in self._dict_})
 
         if len(not_handled) > 0:
             raise RequiredKeyUnfilledError(self.__class__, not_handled)
@@ -483,7 +483,7 @@ class Model(MutableMapping, abc.ABC):
             return obj
 
         init_dict = dict(obj)
-        for k in obj.keys():
+        for k in obj:
             if k not in cls.model_json_keys():
                 del init_dict[k]
 

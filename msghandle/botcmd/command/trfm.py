@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from flags import BotFeature
 from msghandle.models import TextMessageEventObject
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["tf", "trfm", "transform", "rp", "replace"], order_idx=1000, name=_("Transform/Replace"),

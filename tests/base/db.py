@@ -6,11 +6,11 @@ from typing import final
 import pymongo
 
 from extutils import exec_timing_result
-from mongodb.factory import single_db_name
+from mongodb.factory import SINGLE_DB_NAME
 
 from tests.base import TestCase
 
-if not single_db_name:
+if not SINGLE_DB_NAME:
     print("Utilize single DB by setting `MONGO_DB` in environment variables "
           "to prevent possible the data corruption.")
     sys.exit(1)
@@ -40,8 +40,8 @@ class TestDatabaseMixin(TestCase, ABC):
     @final
     def setUp(self) -> None:
         # Ensure the database is clear
-        if single_db_name:
-            mongo_client.drop_database(single_db_name)
+        if SINGLE_DB_NAME:
+            mongo_client.drop_database(SINGLE_DB_NAME)
 
         self.setUpTestCase()
 
@@ -52,8 +52,8 @@ class TestDatabaseMixin(TestCase, ABC):
     @final
     def tearDown(self) -> None:
         # Drop the used database
-        if single_db_name:
-            mongo_client.drop_database(single_db_name)
+        if SINGLE_DB_NAME:
+            mongo_client.drop_database(SINGLE_DB_NAME)
 
         self.tearDownTestCase()
 
@@ -65,7 +65,7 @@ class TestDatabaseMixin(TestCase, ABC):
     @staticmethod
     @final
     def get_db_name():
-        return single_db_name
+        return SINGLE_DB_NAME
 
     @staticmethod
     @final
@@ -77,4 +77,4 @@ class TestDatabaseMixin(TestCase, ABC):
 
     @classmethod
     def db_ping_ms(cls) -> float:
-        return exec_timing_result(mongo_client.get_database(single_db_name or "admin").command, "ping").execution_ms
+        return exec_timing_result(mongo_client.get_database(SINGLE_DB_NAME or "admin").command, "ping").execution_ms
