@@ -19,11 +19,17 @@ class RootUserConfigModel(Model):
     Language = TextField("lg", default=default_language.code, allow_none=False)
     Name = TextField("n", allow_none=False)
 
-    # FIXME: method to get language or locale object for upgradability & corresponding tests
+    def get_pytz_code(self) -> str:
+        """Return the pytz code. If the locale is invalid / not found, return the default one."""
+        tzinfo = self.tzinfo
+        if tzinfo:
+            return tzinfo.tzidentifier
+        else:
+            return default_locale.pytz_code
 
     @property
     def tzinfo(self):
-        return LocaleInfo.get_tzinfo(self.locale)
+        return LocaleInfo.get_tzinfo(self.locale, silent_fail=True)
 
 
 class RootUserModel(Model):

@@ -31,8 +31,15 @@ class TestRootUserConfigModel(TestModel.TestClass):
     def test_get_tzinfo(self):
         mdl = self.get_constructed_model(manual_default=False)
         self.assertEqual(LocaleInfo.get_tzinfo(default_locale.pytz_code), mdl.tzinfo)
+        self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
+
         mdl = self.get_constructed_model(manual_default=True)
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
+        self.assertEqual("US/Central", mdl.get_pytz_code())
+
+        mdl = self.get_constructed_model(l="US/Centralll")
+        self.assertIsNone(mdl.tzinfo)
+        self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
 
 
 class TestRootUserModelFillApi(TestModel.TestClass):

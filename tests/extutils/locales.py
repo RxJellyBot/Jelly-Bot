@@ -1,5 +1,7 @@
+from pytz.exceptions import UnknownTimeZoneError
+
 from extutils.dt import now_utc_aware
-from extutils.locales import sec_diff_to_utc_offset, locales
+from extutils.locales import sec_diff_to_utc_offset, locales, LocaleInfo
 from tests.base import TestCase
 
 
@@ -25,3 +27,12 @@ class TestLocaleInfo(TestCase):
                 self.assertIsNotNone(pytzinfo.dst(now))
                 self.assertIsNotNone(pytzinfo.tzname(now))
                 self.assertEqual(locale.pytz_code, pytzinfo.tzidentifier)
+
+    def test_get_tzinfo(self):
+        self.assertIsNone(LocaleInfo.get_tzinfo(None))
+        self.assertIsNotNone(LocaleInfo.get_tzinfo("US/Central"))
+
+        with self.assertRaises(UnknownTimeZoneError):
+            LocaleInfo.get_tzinfo("US/Centralll")
+
+        self.assertIsNone(LocaleInfo.get_tzinfo("US/Centralll", silent_fail=True))
