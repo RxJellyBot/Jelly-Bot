@@ -4,7 +4,7 @@ from typing import Optional
 from bson import ObjectId
 from django.urls import reverse
 
-from models import Model
+from models import ExtraContentModel
 from JellyBot.systemconfig import HostUrl
 
 from ._base import ModelResult
@@ -13,7 +13,7 @@ from ._base import ModelResult
 @dataclass
 class RecordExtraContentResult(ModelResult):
     exception: Optional[Exception] = None
-    model: Optional[Model] = None
+    model: Optional[ExtraContentModel] = None
 
     @property
     def model_id(self) -> Optional[ObjectId]:
