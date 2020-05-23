@@ -41,7 +41,8 @@ class UserProfileManager(BaseCollection):
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
                             profile_oids: Union[ObjectId, List[ObjectId]]) -> OperationOutcome:
         """
-        Attach `ChannelPermissionProfileModel` and return the update result.
+        Attach a profile onto a the user whose uid is ``root_uid`` using the ID of the profile
+        and return the update result.
         """
         id_ = self.update_one(
             {
@@ -77,7 +78,7 @@ class UserProfileManager(BaseCollection):
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
-        Get the `ChannelProfileConnectionModel` of the specified user in the specified channel.
+        Get the :class:`ChannelProfileConnectionModel` of the specified user in the specified channel.
 
         :return: `None` if not found.
         """
@@ -252,7 +253,7 @@ class ProfileDataManager(BaseCollection):
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
-        Automatically creates a default profile for `channel_oid` if not exists.
+        Automatically creates a default profile for ``channel_oid`` if not exists.
         """
         ex = None
 
@@ -308,7 +309,7 @@ class ProfileDataManager(BaseCollection):
         """
         Create a profile.
 
-        Uses `kwargs` to construct a `ChannelProfileModel` then insert the model into the database.
+        Uses ``kwargs`` to construct a :class:`ChannelProfileModel` then insert the model into the database.
 
         :param kwargs: `dict` to construct a `ChannelProfileModel`.
         """
@@ -320,7 +321,7 @@ class ProfileDataManager(BaseCollection):
         """
         Create a profile.
 
-        Insert the passed-in `model` into the database.
+        Insert the passed-in ``model`` into the database.
 
         :param model: `ChannelProfileModel` to be inserted.
         """
@@ -331,7 +332,7 @@ class ProfileDataManager(BaseCollection):
     @arg_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         """
-        Update a profile using the data in `update_dict`.
+        Update a profile using the data in ``update_dict``.
 
         :param update_dict: `dict` of data to be updated. Key is the field key of `ChannelProfileModel`.
         """
@@ -391,7 +392,7 @@ class ProfileManager:
     @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
         """
-        Register a new profile with the user's oid and the constructed `ChannelProfileModel`.
+        Register a new profile with the user's oid and the constructed :class:`ChannelProfileModel`.
 
         :param root_uid: User's OID.
         :param model: Constructed `ChannelProfileModel` to be inserted.
@@ -408,10 +409,11 @@ class ProfileManager:
         """
         Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
 
-        After processing, it returns a `dict` with field keys which can be used to create a `ChannelProfileModel`.
+        After processing, it returns a ``dict`` with field keys
+        which can be used to create a :class:`ChannelProfileModel`.
 
-        :param profile_kwargs: A `dict` to be processed.
-        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`.
+        :param profile_kwargs: A `dict` to be processed
+        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`
         """
         # --- Collate `PermissionLevel`
         perm_lv = PermissionLevel.cast(profile_kwargs["PermissionLevel"])
@@ -446,7 +448,8 @@ class ProfileManager:
         """
         Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
-        After processing, it returns a `dict` with json keys which can be used as the operand of `$set` for updating.
+        After processing, it returns a ``dict`` with json keys
+        which can be used as the operand of ``$set`` for updating.
 
         :param profile_kwargs: A `dict` to be processed.
         :return: a `dict` with py keys which can be used as the operand of `$set` for updating.
@@ -469,7 +472,7 @@ class ProfileManager:
 
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
-        Get the `list` of `ChannelProfileModel` of the specified user.
+        Get the ``list`` of :class:`ChannelProfileModel` of the specified user.
 
         :return: `None` on not found.
         """
@@ -632,7 +635,7 @@ class ProfileManager:
         return self._conn.get_profile_user_oids(profile_oid)
 
     def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
-        """Get a `dict` which key is the profile OID and value is the user OID who have the corresponding profile."""
+        """Get a ``dict`` which key is the profile OID and value is the user OID who have the corresponding profile."""
         return self._conn.get_profiles_user_oids(profile_oid)
 
     def is_name_available(self, channel_oid: ObjectId, name: str):
@@ -676,7 +679,7 @@ class ProfileManager:
         """
         Attach profile to the target.
 
-        If `target_oid` is `None`, then the profile will be attached to self.
+        If ``target_oid`` is ``None``, then the profile will be attached to self.
         """
         # --- Check target
 

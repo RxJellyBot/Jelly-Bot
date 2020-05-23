@@ -204,7 +204,7 @@ class ControlExtensionMixin(Collection):
     def find_cursor_with_count(
             self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> CursorWithCount:
-        self._attach_time_range(filter_, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(filter_, hours_within=hours_within, start=start, end=end)
 
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
@@ -212,17 +212,16 @@ class ControlExtensionMixin(Collection):
     def find_one_casted(self, filter_, *args, parse_cls: Type[Model] = None, **kwargs) -> Optional[Model]:
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
-    # noinspection PyUnboundLocalVariable
     @staticmethod
-    def _attach_time_range(filter_: dict, *, hours_within: Optional[int] = None,
-                           start: Optional[datetime] = None, end: Optional[datetime] = None,
-                           range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
+    def attach_time_range(filter_: dict, *, hours_within: Optional[int] = None,
+                          start: Optional[datetime] = None, end: Optional[datetime] = None,
+                          range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
         """
-        Attach parsed time range to the filter.
+        Attach parsed time range to ``filter_``.
 
-        Data which creation time (generation time of `_id`) is out of the given time range will be filtered out.
+        Data which creation time (generation time of ``_id``) is out of the given time range will be filtered out.
 
-        If `trange` is specified, `hours_within`, `start`, `end`, `range_mult` will be ignored.
+        If ``trange`` is specified, ``hours_within``, ``start``, ``end``, ``range_mult`` will be ignored.
         """
         id_filter = {}
 

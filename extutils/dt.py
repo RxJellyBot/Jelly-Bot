@@ -52,7 +52,7 @@ def t_delta_str(t_delta: timedelta):
 
 def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:
     """
-    Parse `dt_str` to a tz-aware `datetime`.
+    Parse ``dt_str`` to a tz-aware :class:`datetime`.
 
     :param dt_str: `str` to be parsed.
     :param tzinfo_: tzinfo to be applied to the datetime. Uses UTC if not provided.

@@ -146,7 +146,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         trange = TimeRange(
             range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
 
-        self._attach_time_range(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         # $switch expression for time range
         switch_branches = []
@@ -188,7 +188,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> MemberMessageByCategoryResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self._attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -209,7 +209,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self._attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         pipeline = [
             {"$match": match_d},
@@ -234,7 +234,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             DailyMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self._attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         pipeline = [
             {"$match": match_d},
@@ -275,7 +275,7 @@ class MessageRecordStatisticsManager(BaseCollection):
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
         trange.set_start_day_offset(-max_mean_days)
 
-        self._attach_time_range(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -308,7 +308,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
-        self._attach_time_range(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -354,7 +354,7 @@ class MessageRecordStatisticsManager(BaseCollection):
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
-        self._attach_time_range(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -402,7 +402,7 @@ class BotFeatureUsageDataManager(BaseCollection):
             -> BotFeatureUsageResult:
         filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
 
-        self._attach_time_range(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},
@@ -421,7 +421,7 @@ class BotFeatureUsageDataManager(BaseCollection):
             tzinfo_: PytzInfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
         filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
 
-        self._attach_time_range(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},
@@ -451,7 +451,7 @@ class BotFeatureUsageDataManager(BaseCollection):
         if member_oid_list:
             filter_[BotFeatureUsageModel.SenderRootOid.key] = {"$in": member_oid_list}
 
-        self._attach_time_range(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},
