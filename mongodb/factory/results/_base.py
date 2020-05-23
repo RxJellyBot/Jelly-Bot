@@ -14,7 +14,8 @@ class BaseResult(ABC):
     exception: Optional[Exception]
 
     def serialize(self) -> dict:
-        return {result.Results.EXCEPTION: str(self.exception), result.Results.OUTCOME: self.outcome.code}
+        return {result.Results.EXCEPTION: repr(self.exception),
+                result.Results.OUTCOME: self.outcome.code}
 
     @property
     def success(self) -> bool:

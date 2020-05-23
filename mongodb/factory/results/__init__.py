@@ -1,5 +1,6 @@
 from ._outcome import WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome
-from ._base import BaseResult
+from ._base import BaseResult, ModelResult
+
 from .user import (
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult,
     RootUserRegistrationResult, GetRootUserDataApiResult, RootUserUpdateResult,
