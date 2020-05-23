@@ -209,7 +209,7 @@ class ControlExtensionMixin(Collection):
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls: Type[Model] = None, **kwargs) -> Optional[Model]:
+    def find_one_casted(self, filter_, *args, parse_cls: Type[Model], **kwargs) -> Optional[Model]:
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod
@@ -219,7 +219,7 @@ class ControlExtensionMixin(Collection):
         """
         Attach parsed time range to ``filter_``.
 
-        Data which creation time (generation time of ``_id``) is out of the given time range will be filtered out.
+        Both start and end time are inclusive.
 
         If ``trange`` is specified, ``hours_within``, ``start``, ``end``, ``range_mult`` will be ignored.
         """
@@ -233,17 +233,16 @@ class ControlExtensionMixin(Collection):
 
         gt_oid = dt_to_objectid(trange.start)
         if trange.start and gt_oid:
-            id_filter["$gt"] = gt_oid
+            id_filter["$gte"] = gt_oid
 
         lt_oid = dt_to_objectid(trange.end)
         if trange.end and lt_oid:
-            id_filter["$lt"] = lt_oid
+            id_filter["$lte"] = lt_oid
 
         # Modifying filter
 
         if id_filter:
             if OID_KEY in filter_:
-                filter_[OID_KEY] = {"$eq": filter_[OID_KEY]}
                 filter_[OID_KEY].update(id_filter)
             else:
                 filter_[OID_KEY] = id_filter
