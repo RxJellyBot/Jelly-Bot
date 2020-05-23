@@ -2,7 +2,6 @@ from datetime import datetime, timezone, date, timedelta
 from time import gmtime, strftime
 
 from bson import ObjectId
-from django.test import TestCase
 from pymongo.collection import Collection
 
 from extutils.dt import TimeRange
@@ -14,6 +13,7 @@ from models import (
     MemberMessageCountEntry, BotFeatureUsageResult, BotFeaturePerUserUsageResult, BotFeatureHourlyAvgResult
 )
 from strnames.models import StatsResults
+from tests.base import TestCase
 
 __all__ = ["TestDailyResult", "TestHourlyResult", "TestHourlyIntervalAverageMessageResult", "TestDailyMessageResult",
            "TestMeanMessageResultGenerator", "TestMemberDailyMessageResult", "TestMemberMessageCountResult",

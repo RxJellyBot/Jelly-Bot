@@ -1,5 +1,4 @@
 from bson import ObjectId
-from django.test import TestCase
 
 from flags import ModelValidityCheckResult
 from models import Model, ModelDefaultValueExt
@@ -8,6 +7,7 @@ from models.exceptions import (
     JsonKeyDuplicatedError, DeleteNotAllowedError, FieldKeyNotExistError, IdUnsupportedError,
     RequiredKeyNotFilledError
 )
+from tests.base import TestCase
 
 __all__ = ["TestBaseModel"]
 
