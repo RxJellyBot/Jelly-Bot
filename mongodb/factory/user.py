@@ -16,7 +16,7 @@ from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserCon
 from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
-from ._mixin import GenerateTokenMixin
+from .mixin import GenerateTokenMixin
 from .results import (
     WriteOutcome, GetOutcome, UpdateOutcome,
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, RootUserRegistrationResult,

@@ -26,7 +26,10 @@ from .timer import _inst as TimerManager
 # noinspection PyPep8Naming
 from .rmc import _inst as RemoteControlManager
 
-from ._base import BaseCollection, ControlExtensionMixin, SINGLE_DB_NAME, is_test_db, get_single_db_name
+from ._base import BaseCollection
+from ._dbctrl import SINGLE_DB_NAME, is_test_db, get_single_db_name
+
+from .mixin import GenerateTokenMixin, ControlExtensionMixin
 
 
 def get_collection_subclasses():

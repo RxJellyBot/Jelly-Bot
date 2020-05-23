@@ -16,7 +16,7 @@ from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
-from ._mixin import GenerateTokenMixin
+from .mixin import GenerateTokenMixin
 
 
 DB_NAME = "execode"

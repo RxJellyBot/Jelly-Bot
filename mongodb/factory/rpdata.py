@@ -1,10 +1,10 @@
 from models import OID_KEY, PendingRepairDataModel
 from extutils.mongo import get_codec_options
 
-from ._base import SINGLE_DB_NAME, BaseCollection
+from ._base import BaseCollection
+from ._dbctrl import SINGLE_DB_NAME
 from .factory import MONGO_CLIENT
 from ..utils import BulkWriteDataHolder
-
 
 DB_NAME = "pdrp"
 
