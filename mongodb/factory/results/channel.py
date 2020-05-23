@@ -1,26 +1,26 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from models import Model
+from models import ChannelModel, ChannelCollectionModel
 from ._base import ModelResult
 
 
 @dataclass
 class ChannelRegistrationResult(ModelResult):
-    pass
+    model: ChannelModel
 
 
 @dataclass
 class ChannelGetResult(ModelResult):
     exception: Optional[Exception] = None
-    model: Optional[Model] = None
+    model: Optional[ChannelModel] = None
 
 
 @dataclass
 class ChannelChangeNameResult(ModelResult):
-    pass
+    model: ChannelModel
 
 
 @dataclass
 class ChannelCollectionRegistrationResult(ModelResult):
-    pass
+    model: ChannelCollectionModel
