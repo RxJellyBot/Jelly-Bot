@@ -20,7 +20,12 @@ class InvalidModelError(ModelConstructionError):
 
 class InvalidModelFieldError(ModelConstructionError):
     def __init__(self, model_name: str, exception: Exception):
+        self._inner = exception
         super().__init__(f"Invalid model `{model_name}`. Exception: {exception}")
+
+    @property
+    def inner_exception(self) -> Exception:
+        return self._inner
 
 
 class ModelUncastableError(ModelConstructionError):

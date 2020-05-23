@@ -23,7 +23,7 @@ def _perform_existence_check(set_name_to_cache: bool):
 
         with ThreadPoolExecutor(max_workers=4, thread_name_prefix="ExstCheck") as executor:
             futures = [
-                executor.submit(_check_on_prof_conn_, d, set_name_to_cache, dict_onplat_oids, dict_onplat_data,
+                executor.submit(_check_on_prof_conn, d, set_name_to_cache, dict_onplat_oids, dict_onplat_data,
                                 dict_channel)
                 for d in list_prof_conn
             ]
@@ -45,7 +45,7 @@ def _perform_existence_check(set_name_to_cache: bool):
     SYSTEM.logger.info(f"User channel existence check completed in {result.execution_ms:.2f} ms.")
 
 
-def _check_on_prof_conn_(
+def _check_on_prof_conn(
         prof_conn: ChannelProfileConnectionModel,
         set_name_to_cache: bool,
         dict_onplat_oids: Dict[ObjectId, List[ObjectId]],

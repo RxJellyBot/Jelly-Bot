@@ -38,7 +38,7 @@ class ArrayField(BaseField):
         self._allow_empty = allow_empty
         super().__init__(key, **kwargs)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         # Check emptiness
         if not self._allow_empty and len(value) == 0:
             raise FieldEmptyValueNotAllowedError(self.key)
@@ -47,7 +47,7 @@ class ArrayField(BaseField):
         if len(value) > self.max_len:
             raise FieldMaxLengthReachedError(self.key, len(value), self.max_len)
 
-    def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
+    def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         from models import Model
 
         # If the element type is `Model`, try to cast the element of the field later

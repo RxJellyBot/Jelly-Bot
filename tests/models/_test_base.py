@@ -164,11 +164,11 @@ class TestModel(ABC):
             json = dict(map(lambda x: (x[0][0], x[1]), self.get_required().items()))
 
             if manual_default:
-                json_default, _ = self._dict_to_json_field_(self.get_default())
+                json_default, _ = self._dict_to_json_field(self.get_default())
                 json.update({k: v[1] for k, v in json_default.items()})
 
             if including_optional:
-                json_optional, _ = self._dict_to_json_field_(self.get_optional())
+                json_optional, _ = self._dict_to_json_field(self.get_optional())
                 json.update(json_optional)
 
             json.update(jkwargs)
@@ -177,7 +177,7 @@ class TestModel(ABC):
 
         @staticmethod
         @final
-        def _dict_to_json_field_(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             """
             Process ``d`` to return a ``dict`` with json key (1st returned element)
             and the other ``dict`` with field key.
@@ -205,7 +205,7 @@ class TestModel(ABC):
 
             for optional_keys in self.get_optional_key_combinations():
                 # Get required dict
-                expected_json, expected_field = self._dict_to_json_field_(self.get_required())
+                expected_json, expected_field = self._dict_to_json_field(self.get_required())
 
                 # Insert all optionals
                 for opk in optional_keys:
@@ -236,7 +236,7 @@ class TestModel(ABC):
 
         def test_model_construct_invalid(self):
             for init_dict, expected_error in self.get_required_invalid():
-                init_json, init_field = self._dict_to_json_field_(init_dict)
+                init_json, init_field = self._dict_to_json_field(init_dict)
 
                 with self.subTest(init_json=init_json, expected_error=expected_error):
                     with self.assertRaises(expected_error):
@@ -255,7 +255,7 @@ class TestModel(ABC):
                     del required[rk]
 
                 # Initialize dict to construct the model
-                init_dict_json, init_dict_field = self._dict_to_json_field_(required)
+                init_dict_json, init_dict_field = self._dict_to_json_field(required)
 
                 # Test for the expected error
                 with self.assertRaises(ModelConstructionError):
@@ -298,7 +298,7 @@ class TestModel(ABC):
                     self.get_model_class()(**json, from_db=True)
 
         def test_init_non_exist(self):
-            init_json, init_field = self._dict_to_json_field_(self.get_required())
+            init_json, init_field = self._dict_to_json_field(self.get_required())
             init_json["absolutely_not_a_field"] = 7
             init_field["AbsolutelyNotAField"] = 7
 

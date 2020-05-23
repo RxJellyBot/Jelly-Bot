@@ -15,7 +15,7 @@ from extutils.dt import TimeRange
 from extutils.logger import SYSTEM
 from extutils.utils import dt_to_objectid
 from models import Model, OID_KEY
-from models.exceptions import InvalidModelError
+from models.exceptions import InvalidModelError, InvalidModelFieldError
 from models.field.exceptions import FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, \
     FieldCastingFailedError
 from models.utils import ModelFieldChecker
@@ -83,7 +83,7 @@ class ControlExtensionMixin(Collection):
         except DuplicateKeyError as e:
             # The model's ID will be set by the call `self.insert_one()`,
             # so if the data exists, then we should get the object ID of it and insert it onto the model.
-            model.set_oid(self._get_duplicated_doc_id_(model.to_json()))
+            model.set_oid(self._get_duplicated_doc_id(model.to_json()))
 
             outcome = WriteOutcome.O_DATA_EXISTS
             ex = e
@@ -96,7 +96,7 @@ class ControlExtensionMixin(Collection):
 
         return outcome, ex
 
-    def _get_duplicated_doc_id_(self, model_dict: dict):
+    def _get_duplicated_doc_id(self, model_dict: dict):
         unique_keys = []
 
         # Get unique indexes
@@ -155,18 +155,19 @@ class ControlExtensionMixin(Collection):
                 model = model_cls(from_db=from_db, **model_args)
             else:
                 outcome = WriteOutcome.X_NOT_MODEL
-        except FieldReadOnlyError as e:
-            outcome = WriteOutcome.X_READONLY
+        except InvalidModelFieldError as e:
             ex = e
-        except FieldTypeMismatchError as e:
-            outcome = WriteOutcome.X_TYPE_MISMATCH
-            ex = e
-        except FieldValueInvalidError as e:
-            outcome = WriteOutcome.X_INVALID_FIELD
-            ex = e
-        except FieldCastingFailedError as e:
-            outcome = WriteOutcome.X_CASTING_FAILED
-            ex = e
+
+            if isinstance(e.inner_exception, FieldCastingFailedError):
+                outcome = WriteOutcome.X_CASTING_FAILED
+            elif isinstance(e.inner_exception, FieldValueInvalidError):
+                outcome = WriteOutcome.X_INVALID_FIELD
+            elif isinstance(e.inner_exception, FieldTypeMismatchError):
+                outcome = WriteOutcome.X_TYPE_MISMATCH
+            elif isinstance(e.inner_exception, FieldReadOnlyError):
+                outcome = WriteOutcome.X_READONLY
+            else:
+                outcome = WriteOutcome.X_INVALID_MODEL_FIELD
         except Exception as e:
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
@@ -203,7 +204,7 @@ class ControlExtensionMixin(Collection):
     def find_cursor_with_count(
             self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> CursorWithCount:
-        self._attach_time_range_(filter_, hours_within=hours_within, start=start, end=end)
+        self._attach_time_range(filter_, hours_within=hours_within, start=start, end=end)
 
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
@@ -213,9 +214,9 @@ class ControlExtensionMixin(Collection):
 
     # noinspection PyUnboundLocalVariable
     @staticmethod
-    def _attach_time_range_(filter_: dict, *, hours_within: Optional[int] = None,
-                            start: Optional[datetime] = None, end: Optional[datetime] = None,
-                            range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
+    def _attach_time_range(filter_: dict, *, hours_within: Optional[int] = None,
+                           start: Optional[datetime] = None, end: Optional[datetime] = None,
+                           range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
         """
         Attach parsed time range to the filter.
 

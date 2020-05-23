@@ -49,6 +49,6 @@ class ModelField(BaseField):
     def none_obj(cls):
         return None
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         # noinspection PyUnresolvedReferences
         return self.desired_type.cast_model(value)

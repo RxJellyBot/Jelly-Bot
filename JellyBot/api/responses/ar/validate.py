@@ -19,8 +19,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
 
         self._result = False
 
-    # noinspection PyArgumentList
-    def _handle_content_type_(self):
+    def _handle_content_type(self):
         k = param.Validation.CONTENT_TYPE
 
         if self._content_type is None:
@@ -31,7 +30,7 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
             except Exception:
                 self._err[k] = self._content_type
 
-    def _handle_content_(self):
+    def _handle_content(self):
         k = param.Validation.CONTENT
         self._data[k] = self._content
 
@@ -39,8 +38,8 @@ class ContentValidationResponse(SerializeErrorMixin, SerializeResultExtraMixin, 
         return self._content and self._content_type and self._result
 
     def pre_process(self):
-        self._handle_content_type_()
-        self._handle_content_()
+        self._handle_content_type()
+        self._handle_content()
 
     def process_pass(self):
         self._result = AutoReplyValidator.is_valid_content(self._data[param.Validation.CONTENT_TYPE],

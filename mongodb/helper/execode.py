@@ -17,16 +17,16 @@ class ExecodeCompletor:
         xparams = ExecodeParameterCollator.collate_parameters(Execode(action), xparams)
 
         if action == Execode.AR_ADD:
-            return ExecodeCompletor._excde_ar_add_(execode_entry, xparams)
+            return ExecodeCompletor._excde_ar_add(execode_entry, xparams)
         elif action == Execode.REGISTER_CHANNEL:
-            return ExecodeCompletor._excde_register_channel_(execode_entry, xparams)
+            return ExecodeCompletor._excde_register_channel(execode_entry, xparams)
         elif action == Execode.INTEGRATE_USER_DATA:
-            return ExecodeCompletor._excde_user_data_integration_(execode_entry, xparams)
+            return ExecodeCompletor._excde_user_data_integration(execode_entry, xparams)
         else:
             raise NoCompleteActionError(action)
 
     @staticmethod
-    def _excde_ar_add_(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
+    def _excde_ar_add(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         cnl = ChannelManager.register(xparams[param.AutoReply.PLATFORM], xparams[param.AutoReply.CHANNEL_TOKEN])
         if not cnl.success:
             return ExecodeCompletionOutcome.X_AR_REGISTER_CHANNEL
@@ -43,7 +43,7 @@ class ExecodeCompletor:
         return ExecodeCompletionOutcome.O_OK
 
     @staticmethod
-    def _excde_register_channel_(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
+    def _excde_register_channel(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         try:
             channel_data = ChannelManager.register(
                 xparams[param.Execode.PLATFORM], xparams[param.Execode.CHANNEL_TOKEN])
@@ -61,7 +61,7 @@ class ExecodeCompletor:
         return ExecodeCompletionOutcome.O_OK
 
     @staticmethod
-    def _excde_user_data_integration_(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
+    def _excde_user_data_integration(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         try:
             # `xparams` is casted from QueryDict, so get the value using [0]
             success = UserDataIntegrationHelper.integrate(
@@ -79,15 +79,15 @@ class ExecodeParameterCollator:
     @staticmethod
     def collate_parameters(action: Execode, xparams: dict) -> dict:
         if action == Execode.AR_ADD:
-            return ExecodeParameterCollator._execode_ar_add_(action, xparams)
+            return ExecodeParameterCollator._execode_ar_add(action, xparams)
         elif action == Execode.REGISTER_CHANNEL:
-            return ExecodeParameterCollator._execode_conn_channel_(xparams)
+            return ExecodeParameterCollator._execode_conn_channel(xparams)
         else:
             return xparams
 
     # noinspection PyArgumentList
     @staticmethod
-    def _execode_ar_add_(action: Execode, xparams: dict) -> dict:
+    def _execode_ar_add(action: Execode, xparams: dict) -> dict:
         k = param.AutoReply.PLATFORM
         if xparams.get(k) is None or len(xparams[k][0]) == 0:
             raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.EMPTY_CONTENT)
@@ -104,7 +104,7 @@ class ExecodeParameterCollator:
 
     # noinspection PyArgumentList
     @staticmethod
-    def _execode_conn_channel_(xparams: dict) -> dict:
+    def _execode_conn_channel(xparams: dict) -> dict:
         return {k: v[0] if isinstance(v, list) else v for k, v in xparams.items()}
 
 

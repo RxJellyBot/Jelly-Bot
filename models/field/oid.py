@@ -29,7 +29,7 @@ class ObjectIDField(BaseField):
 
         super().__init__(key or OID_KEY, **kwargs)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if self.allow_none and value is None:
             return
 
@@ -41,7 +41,7 @@ class ObjectIDField(BaseField):
             except struct.error:
                 raise FieldOidDatetimeOutOfRangeError(self.key, value)
 
-    def _cast_to_desired_type_(self, value) -> Any:
+    def _cast_to_desired_type(self, value) -> Any:
         if isinstance(value, datetime):
             return ObjectId.from_datetime(value)
         elif isinstance(value, str):

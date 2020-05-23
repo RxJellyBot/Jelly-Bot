@@ -47,11 +47,11 @@ class AutoReplyModuleManager(BaseCollection):
             name="Index to get module")
 
     @staticmethod
-    def _has_access_to_pinned_(channel_oid: ObjectId, user_oid: ObjectId):
+    def _has_access_to_pinned(channel_oid: ObjectId, user_oid: ObjectId):
         perms = ProfileManager.get_user_permissions(channel_oid, user_oid)
         return ProfilePermission.AR_ACCESS_PINNED_MODULE in perms
 
-    def _validate_content_(
+    def _validate_content(
             self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
             channel_oid: ObjectId, online_check) \
             -> WriteOutcome:
@@ -90,7 +90,7 @@ class AutoReplyModuleManager(BaseCollection):
 
         return WriteOutcome.O_MISC
 
-    def _delete_recent_module_(self, keyword):
+    def _delete_recent_module(self, keyword):
         """Delete modules which is created and marked inactive within `Bot.AutoReply.DeleteDataMins` minutes."""
         now = now_utc_aware()
 
@@ -111,7 +111,7 @@ class AutoReplyModuleManager(BaseCollection):
             keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], creator_oid: ObjectId,
             channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
             -> AutoReplyModuleAddResult:
-        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned_(channel_oid, creator_oid)
+        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(channel_oid, creator_oid)
 
         # Terminate if someone without permission wants to create a pinned model
         if pinned and not access_to_pinned:
@@ -124,7 +124,7 @@ class AutoReplyModuleManager(BaseCollection):
                  AutoReplyModuleModel.Pinned.key: True}) > 0:
             return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
 
-        validate_outcome = self._validate_content_(
+        validate_outcome = self._validate_content(
             keyword, kw_type, responses, channel_oid, online_check=True)
 
         if not validate_outcome.is_success:
@@ -158,17 +158,17 @@ class AutoReplyModuleManager(BaseCollection):
                     AutoReplyModuleModel.ChannelId.key: channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
-                self._remove_update_ops_(creator_oid),
+                self._remove_update_ops(creator_oid),
                 collation=case_insensitive_collation
             )
-            self._delete_recent_module_(keyword)
+            self._delete_recent_module(keyword)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel, online_check=True) -> AutoReplyModuleAddResult:
         model.clear_oid()
 
-        validate_outcome = self._validate_content_(
+        validate_outcome = self._validate_content(
             model.keyword.content, model.keyword.content_type, model.responses, model.channel_id, online_check)
 
         if validate_outcome != WriteOutcome.O_MISC:
@@ -177,12 +177,12 @@ class AutoReplyModuleManager(BaseCollection):
         outcome, ex = self.insert_one_model(model)
 
         if outcome.is_success:
-            self._delete_recent_module_(model.keyword.content)
+            self._delete_recent_module(model.keyword.content)
 
         return AutoReplyModuleAddResult(outcome, model, ex)
 
     @arg_type_ensure
-    def _remove_update_ops_(self, remover_oid: ObjectId):
+    def _remove_update_ops(self, remover_oid: ObjectId):
         return {"$set": {
             AutoReplyModuleModel.Active.key: False,
             AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
@@ -196,10 +196,10 @@ class AutoReplyModuleManager(BaseCollection):
             AutoReplyModuleModel.Active.key: True
         }
 
-        if not AutoReplyModuleManager._has_access_to_pinned_(channel_oid, remover_oid):
+        if not AutoReplyModuleManager._has_access_to_pinned(channel_oid, remover_oid):
             q[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_many_outcome(q, self._remove_update_ops_(remover_oid), collation=case_insensitive_collation)
+        ret = self.update_many_outcome(q, self._remove_update_ops(remover_oid), collation=case_insensitive_collation)
 
         if ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
@@ -343,7 +343,7 @@ class AutoReplyManager:
         self._mod = AutoReplyModuleManager()
         self._tag = AutoReplyModuleTagManager()
 
-    def _get_tags_pop_score_(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
+    def _get_tags_pop_score(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[AutoReplyTagPopularityScore]:
         # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
         # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
@@ -454,7 +454,7 @@ class AutoReplyManager:
         """
         ret = []
 
-        for pop_score in self._get_tags_pop_score_(search_keyword, count):
+        for pop_score in self._get_tags_pop_score(search_keyword, count):
             tag_data = self._tag.get_tag_data(pop_score.tag_id)
             if tag_data:
                 ret.append(tag_data.name)

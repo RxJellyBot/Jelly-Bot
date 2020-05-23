@@ -117,9 +117,9 @@ class RootUserManager(BaseCollection):
             RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
             partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
-    def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
-                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
-                   on_exist=None) \
+    def _register(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
+                  oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
+                  on_exist=None) \
             -> RootUserRegistrationResult:
         user_reg_result = u_reg_func(*args)
         user_reg_oid = None
@@ -159,9 +159,9 @@ class RootUserManager(BaseCollection):
         return self.get_root_data_api_token(api_token).success
 
     def register_onplat(self, platform, user_token) -> RootUserRegistrationResult:
-        return self._register_(self._mgr_onplat.register, self._mgr_onplat.get_onplat, self.get_root_data_onplat_oid,
-                               "OnPlatOids", WriteOutcome.X_ON_CONN_ONPLAT, WriteOutcome.X_ON_REG_ONPLAT,
-                               (platform, user_token), hint="OnPlatform", conn_arg_list=True)
+        return self._register(self._mgr_onplat.register, self._mgr_onplat.get_onplat, self.get_root_data_onplat_oid,
+                              "OnPlatOids", WriteOutcome.X_ON_CONN_ONPLAT, WriteOutcome.X_ON_REG_ONPLAT,
+                              (platform, user_token), hint="OnPlatform", conn_arg_list=True)
 
     def register_google(self, id_data: GoogleIdentityUserData) -> RootUserRegistrationResult:
         def on_exist():
@@ -169,9 +169,9 @@ class RootUserManager(BaseCollection):
                                              APIUserModel.Email.key: {"$ne": id_data.email}},
                                             {"$set": {APIUserModel.Email.key: id_data.email}})
 
-        return self._register_(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
-                               "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
-                               (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
+        return self._register(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
+                              "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
+                              (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
 
     @arg_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:

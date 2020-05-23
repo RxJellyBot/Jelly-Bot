@@ -10,24 +10,24 @@ from msghandle import load_handling_functions
 __all__ = ["signal_discord_ready", "signal_django_ready"]
 
 
-_ready_ = {
+_ready = {
     "Discord": False,
     "Django": False
 }
 
 
 def signal_django_ready():
-    _ready_["Discord"] = True
-    _check_all_ready_()
+    _ready["Discord"] = True
+    _check_all_ready()
 
 
 def signal_discord_ready():
-    _ready_["Django"] = True
-    _check_all_ready_()
+    _ready["Django"] = True
+    _check_all_ready()
 
 
-def _check_all_ready_():
-    if all(_ready_.values()):
+def _check_all_ready():
+    if all(_ready.values()):
         on_system_fully_ready()
 
 

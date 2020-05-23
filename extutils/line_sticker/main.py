@@ -22,7 +22,7 @@ class LineStickerManager:
     def __init__(self):
         self._tmp_dir = tempfile.TemporaryFile(prefix="LineSticker")
 
-    # def _get_content_(self, sticker_type, pack_id, list_ids):
+    # def _get_content(self, sticker_type, pack_id, list_ids):
     #     """
     #     :param sticker_type: The type of the sticker
     #     :type sticker_type: LineStickerType
@@ -177,10 +177,10 @@ class LineStickerMetadata:
         return int(self._dict["packageId"])
 
     def get_title(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object_("title", locale)
+        return self._get_localized_object("title", locale)
 
     def get_author(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object_("author", locale)
+        return self._get_localized_object("author", locale)
 
     @property
     def stickers(self) -> List[int]:
@@ -198,7 +198,7 @@ class LineStickerMetadata:
     def has_se(self):
         return self._dict.get("hasSound", False)
 
-    def _get_localized_object_(self, key, locale):
+    def _get_localized_object(self, key, locale):
         localized_object = self._dict.get(key)
         if localized_object is not None:
             localized_str_ret = localized_object.get(locale)

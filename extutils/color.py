@@ -64,13 +64,13 @@ class ColorFactory:
         :exception ValueError: if any or `red`, `green` or `blue` is invalid.
         """
 
-        def _val_check_(val, name):
+        def _val_check(val, name):
             if val < 0 or val > 255:
                 raise ValueError(f"Invalid {name} value. Should be 0~255. ({val})")
 
-        _val_check_(red, "RED")
-        _val_check_(green, "GREEN")
-        _val_check_(blue, "BLUE")
+        _val_check(red, "RED")
+        _val_check(green, "GREEN")
+        _val_check(blue, "BLUE")
 
         return Color(red * 65536 + green * 256 + blue)
 

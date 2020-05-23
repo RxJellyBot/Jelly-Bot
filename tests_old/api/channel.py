@@ -38,11 +38,11 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
         ChannelManager.register(1, "channel1")
 
     def test_main(self):
-        self._issue_channel_register_execode_()
-        self._complete_registration_no_channel_id_()
-        self._complete_registration_()
+        self._issue_channel_register_execode()
+        self._complete_registration_no_channel_id()
+        self._complete_registration()
 
-    def _issue_channel_register_execode_(self):
+    def _issue_channel_register_execode(self):
         result = self.print_and_get_json(
             "POST",
             reverse("api.id.channel.register_execode"),
@@ -52,7 +52,7 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
         self.assertTrue(result[r.SUCCESS])
         self.TEST_EXECODE = result[r.RESULT][r.ExecodeResponse.EXECODE]
 
-    def _complete_registration_no_channel_id_(self):
+    def _complete_registration_no_channel_id(self):
         result = self.print_and_get_json(
             "POST",
             reverse("api.execode.complete"),
@@ -61,7 +61,7 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
 
         self.assertFalse(result[r.SUCCESS])
 
-    def _complete_registration_(self):
+    def _complete_registration(self):
         result = self.print_and_get_json(
             "POST",
             reverse("api.execode.complete"),

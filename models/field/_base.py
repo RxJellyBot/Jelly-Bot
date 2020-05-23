@@ -204,11 +204,11 @@ class BaseField(abc.ABC):
     def none_obj(cls) -> Any:
         raise ValueError(f"None object not implemented for {cls}.")
 
-    def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
+    def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         """Hook of value type checking when the value is not ``None`` and not a extended default value."""
         pass
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         """Hook of value validity checking when the value is not ``None`` and not a extended default value."""
         pass
 
@@ -232,7 +232,7 @@ class BaseField(abc.ABC):
             raise FieldTypeMismatchError(self.key, type(value), value, expected_types)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
-            self._check_type_matched_not_none_(value, attempt_cast=attempt_cast or self.auto_cast)
+            self._check_type_matched_not_none(value, attempt_cast=attempt_cast or self.auto_cast)
 
     def is_type_matched(self, value, *, attempt_cast=False) -> bool:
         try:
@@ -251,7 +251,7 @@ class BaseField(abc.ABC):
         self.check_type_matched(value, attempt_cast=attempt_cast)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
-            self._check_value_valid_not_none_(value)
+            self._check_value_valid_not_none(value)
 
     def is_value_valid(self, value, *, attempt_cast=False) -> bool:
         try:
@@ -275,9 +275,9 @@ class BaseField(abc.ABC):
             else:
                 raise FieldNoneNotAllowedError(self.key)
         else:
-            return self._cast_to_desired_type_(value)
+            return self._cast_to_desired_type(value)
 
-    def _cast_to_desired_type_(self, value) -> Any:
+    def _cast_to_desired_type(self, value) -> Any:
         """
         Method hook to be called if `cast_to_desired_type()` is called
         and the given value type is not the desired type.

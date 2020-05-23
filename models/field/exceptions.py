@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import datetime
-from typing import Union, Tuple, Any, Iterable
+from typing import Union, Tuple, Any, Iterable, Optional
 
 
 class FieldError(ABC, Exception):
@@ -47,8 +47,8 @@ class FieldValueTypeMismatchError(FieldError):
 
 
 class FieldValueInvalidError(FieldError):
-    def __init__(self, key: str, value: Any):
-        super().__init__(key, error_msg=f"Invalid value: {value}")
+    def __init__(self, key: str, value: Optional[Any] = None, *, error_msg: Optional[str] = None):
+        super().__init__(key, error_msg=error_msg or f"Invalid value: {value}")
 
 
 class FieldCastingFailedError(FieldError):
@@ -59,27 +59,27 @@ class FieldCastingFailedError(FieldError):
                       f"Exception: {exc}")
 
 
-class FieldNoneNotAllowedError(FieldError):
+class FieldNoneNotAllowedError(FieldValueInvalidError):
     def __init__(self, key: str):
         super().__init__(key, error_msg="`None` not allowed.")
 
 
-class FieldEmptyValueNotAllowedError(FieldError):
+class FieldEmptyValueNotAllowedError(FieldValueInvalidError):
     def __init__(self, key: str):
         super().__init__(key, error_msg="Empty value not allowed.")
 
 
-class FieldMaxLengthReachedError(FieldError):
+class FieldMaxLengthReachedError(FieldValueInvalidError):
     def __init__(self, key: str, cur_len: int, max_len: int):
         super().__init__(key, error_msg=f"Max length reached. {cur_len}/{max_len}")
 
 
-class FieldInvalidUrlError(FieldError):
+class FieldInvalidUrlError(FieldValueInvalidError):
     def __init__(self, key: str, url: str):
         super().__init__(key, error_msg=f"Invalid URL: {url}")
 
 
-class FieldFlagNotFoundError(FieldError):
+class FieldFlagNotFoundError(FieldValueInvalidError):
     def __init__(self, key: str, obj: Any, flag):
         super().__init__(key, error_msg=f"Object ({obj}) not found in the flag ({flag}).")
 
@@ -89,7 +89,7 @@ class FieldFlagDefaultUndefinedError(FieldError):
         super().__init__(key, error_msg=f"Default value of the flag ({flag}) undefined.")
 
 
-class FieldRegexNotMatchError(FieldError):
+class FieldRegexNotMatchError(FieldValueInvalidError):
     def __init__(self, key: str, value: str, regex: str):
         super().__init__(key, error_msg=f"Regex ({regex}) not match with ({value}).")
 
@@ -104,17 +104,17 @@ class FieldModelClassInvalidError(FieldError):
         super().__init__(key, error_msg=f"Invalid model class type: {model_cls}")
 
 
-class FieldValueNegativeError(FieldError):
+class FieldValueNegativeError(FieldValueInvalidError):
     def __init__(self, key: str, val: Union[int, float]):
         super().__init__(key, error_msg=f"Field value should not be negative. (Actual: {val})")
 
 
-class FieldOidDatetimeOutOfRangeError(FieldError):
+class FieldOidDatetimeOutOfRangeError(FieldValueInvalidError):
     def __init__(self, key: str, dt: datetime):
         super().__init__(key, error_msg=f"Datetime to initialize `ObjectId` out of range. (Actual: {dt})")
 
 
-class FieldOidStringInvalidError(FieldError):
+class FieldOidStringInvalidError(FieldValueInvalidError):
     def __init__(self, key: str, val: str):
         super().__init__(key, error_msg=f"Invalid string initialize `ObjectId`. (Actual: {val})")
 
@@ -124,6 +124,6 @@ class FieldInvalidDefaultValueError(FieldError):
         super().__init__(key, error_msg=f"Invalid default value. {default_value} - <{exc}>")
 
 
-class FieldValueRequiredError(FieldError):
+class FieldValueRequiredError(FieldValueInvalidError):
     def __init__(self, key: str):
         super().__init__(key, error_msg=f"Field (key: {key}) requires value.")

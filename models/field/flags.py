@@ -56,7 +56,7 @@ class FlagField(IntegerField, ABC):
     def expected_types(self):
         return self._type, int, str
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         try:
             self._type.cast(value)
         except TypeError:
@@ -64,7 +64,7 @@ class FlagField(IntegerField, ABC):
         except ValueError:
             raise FieldFlagNotFoundError(self.key, value, self._type)
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         try:
             return self._type.cast(value)
         except (TypeError, ValueError) as e:

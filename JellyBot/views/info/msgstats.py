@@ -24,39 +24,39 @@ KEY_MSG_DAILY_USER = "msg_daily_user"
 KEY_MSG_USER_CHANNEL = "channel_user_msg"
 
 
-def _msg_intv_flow_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
+def _msg_intv_flow(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
     return KEY_MSG_INTV_FLOW, MessageRecordStatisticsManager.hourly_interval_message_count(
         channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end)
 
 
-def _msg_intv_count_(
+def _msg_intv_count(
         channel_data, tzinfo, available_only, *, hours_within=None, start=None, end=None, period_count=None):
     return KEY_MSG_INTV_COUNT, MessageStatsDataProcessor.get_user_channel_message_count_interval(
         channel_data, hours_within=hours_within, start=start, end=end,
         period_count=period_count, tz=tzinfo, available_only=available_only)
 
 
-def _msg_daily_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
+def _msg_daily(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
     return KEY_MSG_DAILY, MessageRecordStatisticsManager.daily_message_count(
         channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end)
 
 
-def _msg_mean_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
+def _msg_mean(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
     return KEY_MSG_MEAN, MessageRecordStatisticsManager.mean_message_count(
         channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end, max_mean_days=14)
 
 
-def _msg_before_time_(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
+def _msg_before_time(channel_oid, tzinfo, *, hours_within=None, start=None, end=None):
     return KEY_MSG_BEFORE_TIME, MessageRecordStatisticsManager.message_count_before_time(
         channel_oid, tzinfo_=tzinfo, hours_within=hours_within, start=start, end=end)
 
 
-def _msg_user_daily_(channel_data, tzinfo, available_only, *, hours_within=None, start=None, end=None):
+def _msg_user_daily(channel_data, tzinfo, available_only, *, hours_within=None, start=None, end=None):
     return KEY_MSG_DAILY_USER, MessageStatsDataProcessor.get_user_daily_message(
         channel_data, tz=tzinfo, hours_within=hours_within, start=start, end=end, available_only=available_only)
 
 
-def _channel_user_msg_(channel_data, available_only, *, hours_within=None, start=None, end=None):
+def _channel_user_msg(channel_data, available_only, *, hours_within=None, start=None, end=None):
     return KEY_MSG_USER_CHANNEL, MessageStatsDataProcessor.get_user_channel_messages(
         channel_data, hours_within=hours_within, start=start, end=end, available_only=available_only)
 
@@ -68,19 +68,19 @@ def get_msg_stats_data_package(
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="MsgStats") as executor:
         available_only = not incl_unav
 
-        futures = [executor.submit(_msg_intv_flow_, channel_data.id, tzinfo,
+        futures = [executor.submit(_msg_intv_flow, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),
-                   executor.submit(_msg_intv_count_, channel_data, tzinfo, available_only,
+                   executor.submit(_msg_intv_count, channel_data, tzinfo, available_only,
                                    hours_within=hours_within, start=start, end=end, period_count=period_count),
-                   executor.submit(_msg_daily_, channel_data.id, tzinfo,
+                   executor.submit(_msg_daily, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),
-                   executor.submit(_msg_before_time_, channel_data.id, tzinfo,
+                   executor.submit(_msg_before_time, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),
-                   executor.submit(_msg_mean_, channel_data.id, tzinfo,
+                   executor.submit(_msg_mean, channel_data.id, tzinfo,
                                    hours_within=hours_within, start=start, end=end),
-                   executor.submit(_msg_user_daily_, channel_data, tzinfo, available_only,
+                   executor.submit(_msg_user_daily, channel_data, tzinfo, available_only,
                                    hours_within=hours_within, start=start, end=end),
-                   executor.submit(_channel_user_msg_, channel_data, available_only,
+                   executor.submit(_channel_user_msg, channel_data, available_only,
                                    hours_within=hours_within, start=start, end=end)]
 
         # Non-lock call & Free resources when execution is done

@@ -51,7 +51,7 @@ class TextField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if isinstance(value, str):
             # Length check
             if len(value) > self._maxlen:
@@ -108,6 +108,6 @@ class UrlField(BaseField):
     def expected_types(self):
         return str,
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if not self.is_empty(value) and not is_valid_url(value):
             raise FieldInvalidUrlError(self.key, value)

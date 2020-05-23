@@ -209,7 +209,7 @@ def profile_create_internal(
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold
 
 
-def _output_profile_txt_(result_entries):
+def _output_profile_txt(result_entries):
     entries = []
     for entry in result_entries:
         profile = entry.profile
@@ -248,7 +248,7 @@ def profile_query(e: TextMessageEventObject, keyword: str):
     if not result:
         return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
 
-    return [HandledMessageEventText(content=_output_profile_txt_(result))]
+    return [HandledMessageEventText(content=_output_profile_txt(result))]
 
 
 # endregion
@@ -269,7 +269,7 @@ def profile_list(e: TextMessageEventObject):
     if not result:
         return [HandledMessageEventText(content=_("No profile in this channel."))]
 
-    return [HandledMessageEventText(content=_output_profile_txt_(result))]
+    return [HandledMessageEventText(content=_output_profile_txt(result))]
 
 
 # endregion
@@ -281,7 +281,7 @@ cmd_attach = cmd.new_child_node(
     description=_("Attach profile to either self or a member."))
 
 
-def _output_attach_outcome_(outcome: OperationOutcome):
+def _output_attach_outcome(outcome: OperationOutcome):
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Profile attached."))]
     else:
@@ -297,7 +297,7 @@ def _output_attach_outcome_(outcome: OperationOutcome):
     arg_help=[_help_name_]
 )
 def profile_attach_self(e: TextMessageEventObject, name: str):
-    return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
+    return _output_attach_outcome(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
 
 
 @cmd_attach.command_function(
@@ -306,7 +306,7 @@ def profile_attach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be attached to the profile.")]
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_attach_outcome_(
+    return _output_attach_outcome(
         ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
 
 
@@ -319,7 +319,7 @@ cmd_detach = cmd.new_child_node(
     description=_("Detach profile from either self or a member."))
 
 
-def _output_detach_outcome_(outcome: OperationOutcome):
+def _output_detach_outcome(outcome: OperationOutcome):
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Profile detached."))]
     else:
@@ -334,7 +334,7 @@ def _output_detach_outcome_(outcome: OperationOutcome):
     arg_help=[_help_name_]
 )
 def profile_detach_self(e: TextMessageEventObject, name: str):
-    return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id))
+    return _output_detach_outcome(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id))
 
 
 @cmd_detach.command_function(
@@ -343,7 +343,7 @@ def profile_detach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be detached from the profile.")]
 )
 def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_detach_outcome_(
+    return _output_detach_outcome(
         ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))
 
 

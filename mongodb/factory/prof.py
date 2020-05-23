@@ -293,7 +293,7 @@ class ProfileDataManager(BaseCollection):
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
     def create_default_profile(self, channel_oid: ObjectId) -> CreateProfileResult:
-        default_profile, outcome, ex = self._create_profile_(channel_oid, Name=_("Default Profile"))
+        default_profile, outcome, ex = self._create_profile(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_inserted:
             set_success = ChannelManager.set_config(
@@ -340,7 +340,7 @@ class ProfileDataManager(BaseCollection):
     def delete_profile(self, profile_oid: ObjectId):
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
-    def _create_profile_(self, channel_oid: ObjectId, **fk_param):
+    def _create_profile(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
 
@@ -650,7 +650,7 @@ class ProfileManager:
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
-    def _attach_detach_permission_check_(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
+    def _attach_detach_permission_check(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
         permissions = self.get_user_permissions(channel_oid, user_oid)
 
         if target_oid and user_oid != target_oid:
@@ -688,7 +688,7 @@ class ProfileManager:
 
         # --- Check permissions
 
-        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
             return OperationOutcome.X_INSUFFICIENT_PERMISSION
 
         # --- Check profile attachable
@@ -729,7 +729,7 @@ class ProfileManager:
 
         # --- Check permissions
 
-        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
             return OperationOutcome.X_INSUFFICIENT_PERMISSION
 
         # --- Detach profile

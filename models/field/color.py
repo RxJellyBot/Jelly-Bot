@@ -27,7 +27,7 @@ class ColorField(BaseField):
     def none_obj(cls):
         return ColorFactory.DEFAULT
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if isinstance(value, int):
             if Color.color_num_valid(value):
                 return
@@ -43,7 +43,7 @@ class ColorField(BaseField):
         else:
             raise FieldTypeMismatchError(self.key, type(value), value, self.expected_types)
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         # Data store in the database is int
         if isinstance(value, int):
             return Color(value)

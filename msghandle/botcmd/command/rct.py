@@ -15,7 +15,7 @@ cmd = CommandNode(
 cmd_msg = cmd.new_child_node(codes=["m", "msg", "message"])
 
 
-def _content_recent_msgs_(e: TextMessageEventObject, limit: int):
+def _content_recent_msgs(e: TextMessageEventObject, limit: int):
     limit = min(Bot.RecentActivity.DefaultLimitCountDirect, limit)
 
     ctnt = []
@@ -28,7 +28,7 @@ def _content_recent_msgs_(e: TextMessageEventObject, limit: int):
     return HandledMessageEventText(content="\n".join(ctnt))
 
 
-def _link_recent_msgs_(e: TextMessageEventObject, limit: int):
+def _link_recent_msgs(e: TextMessageEventObject, limit: int):
     qd = QueryDict("", mutable=True)
     qd.update({"limit": limit})
 
@@ -51,7 +51,7 @@ def _link_recent_msgs_(e: TextMessageEventObject, limit: int):
     cooldown_sec=Bot.RecentActivity.CooldownSeconds
 )
 def get_recent_messages(e: TextMessageEventObject, limit: int):
-    return [_content_recent_msgs_(e, limit), _link_recent_msgs_(e, limit)]
+    return [_content_recent_msgs(e, limit), _link_recent_msgs(e, limit)]
 
 
 @cmd_msg.command_function(

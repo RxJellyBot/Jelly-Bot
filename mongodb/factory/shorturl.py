@@ -49,9 +49,9 @@ class ShortUrlDataManager(BaseCollection):
 
         self.available = ShortUrlDataManager.check_service()
 
-        self.code_length = self._calc_code_length_()
+        self.code_length = self._calc_code_length()
 
-    def _calc_code_length_(self) -> int:
+    def _calc_code_length(self) -> int:
         doc_count = self.count_documents({})
 
         if doc_count > 0:

@@ -29,7 +29,7 @@ class DateTimeField(BaseField):
     def none_obj(cls):
         return datetime.min.replace(tzinfo=timezone.utc)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if isinstance(value, str) and parse_to_dt(value) is None:
             raise FieldValueInvalidError(self.key, value)
 
@@ -41,7 +41,7 @@ class DateTimeField(BaseField):
 
         return ret
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         if isinstance(value, str):
             return parse_to_dt(value)
         else:
