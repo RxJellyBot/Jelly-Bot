@@ -10,7 +10,7 @@ from models import OID_KEY
 from extutils.utils import to_snake_case, to_camel_case
 
 from .exceptions import (
-    InvalidModelError, RequiredKeyUnfilledError, IdUnsupportedError, FieldKeyNotExistedError,
+    InvalidModelError, RequiredKeyNotFilledError, IdUnsupportedError, FieldKeyNotExistError,
     JsonKeyNotExistedError, ModelUncastableError, JsonKeyDuplicatedError, DeleteNotAllowedError, InvalidModelFieldError
 )
 from .field import ObjectIDField, ModelField, ModelDefaultValueExt, BaseField, IntegerField, ModelArrayField
@@ -61,7 +61,7 @@ class Model(MutableMapping, abc.ABC):
             self.model_field_keys() - {to_camel_case(k) for k in self._dict_})
 
         if len(not_handled) > 0:
-            raise RequiredKeyUnfilledError(self.__class__, not_handled)
+            raise RequiredKeyNotFilledError(self.__class__, not_handled)
 
         self._init_cache_json_keys()  # Call this to check if there's any duplicated json key
         self._check_validity()
@@ -97,7 +97,7 @@ class Model(MutableMapping, abc.ABC):
             if fk_sc.lower() == "id" and not self.WITH_OID:
                 raise IdUnsupportedError(self.__class__.__qualname__)
             else:
-                raise FieldKeyNotExistedError(fk_sc, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(fk_sc, self.__class__.__qualname__)
 
     def __getitem__(self, jk):
         """
@@ -160,7 +160,7 @@ class Model(MutableMapping, abc.ABC):
         except KeyError:
             pass
 
-        raise FieldKeyNotExistedError(fk_sc, self.__class__.__qualname__)
+        raise FieldKeyNotExistError(fk_sc, self.__class__.__qualname__)
 
     def __delitem__(self, k) -> None:
         raise DeleteNotAllowedError(self.__class__.__qualname__)
@@ -191,7 +191,7 @@ class Model(MutableMapping, abc.ABC):
             if k in self.model_field_keys():
                 self._inner_dict_create(k, v)
             else:
-                raise FieldKeyNotExistedError(k, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(k, self.__class__.__qualname__)
 
     def _fill_default_vals(self, not_filled):
         filled = set()
@@ -206,7 +206,7 @@ class Model(MutableMapping, abc.ABC):
 
                         filled.add(k)
             else:
-                raise FieldKeyNotExistedError(k, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(k, self.__class__.__qualname__)
 
         return not_filled - filled - self.SKIP_DEFAULT_FILLING
 
@@ -230,7 +230,7 @@ class Model(MutableMapping, abc.ABC):
             if attr:
                 self._dict_[to_snake_case(fk)] = attr.new(v)
             else:
-                raise FieldKeyNotExistedError(fk, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
     def _inner_dict_get(self, fk):
         if fk.lower() == "id":
@@ -359,7 +359,7 @@ class Model(MutableMapping, abc.ABC):
             return self._inner_dict_get(fn).is_empty()
         except KeyError:
             if raise_on_not_exists:
-                raise FieldKeyNotExistedError(fn, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(fn, self.__class__.__qualname__)
             else:
                 return True
 

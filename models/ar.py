@@ -9,7 +9,7 @@ from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
-from models.exceptions import FieldKeyNotExistedError
+from models.exceptions import FieldKeyNotExistError
 from models.utils import AutoReplyValidator
 from extutils.utils import enumerate_ranking
 
@@ -111,14 +111,14 @@ class AutoReplyModuleModel(Model):
                 return self.refer_to
             else:
                 return None
-        except (KeyError, FieldKeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistError, AttributeError):
             return None
 
     @property
     def is_reference(self) -> bool:
         try:
             return not self.is_field_none("ReferTo")
-        except (KeyError, FieldKeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistError, AttributeError):
             return False
 
     @property

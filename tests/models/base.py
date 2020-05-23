@@ -5,8 +5,8 @@ from flags import ModelValidityCheckResult
 from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, BooleanField
 from models.exceptions import (
-    JsonKeyDuplicatedError, DeleteNotAllowedError, FieldKeyNotExistedError, IdUnsupportedError,
-    RequiredKeyUnfilledError
+    JsonKeyDuplicatedError, DeleteNotAllowedError, FieldKeyNotExistError, IdUnsupportedError,
+    RequiredKeyNotFilledError
 )
 
 __all__ = ["TestBaseModel"]
@@ -98,7 +98,7 @@ class TestBaseModel(TestCase):
         Field1 = IntegerField("i")
 
     def check_oid_not_exists(self, mdl):
-        with self.assertRaises(FieldKeyNotExistedError if mdl.WITH_OID else IdUnsupportedError):
+        with self.assertRaises(FieldKeyNotExistError if mdl.WITH_OID else IdUnsupportedError):
             _ = mdl.id
         self.assertIsNone(mdl.get_oid())
         with self.assertRaises(KeyError if mdl.WITH_OID else IdUnsupportedError):
@@ -165,7 +165,7 @@ class TestBaseModel(TestCase):
 
     def test_generate_default(self):
         # No value given (Required value also not given)
-        with self.assertRaises(RequiredKeyUnfilledError):
+        with self.assertRaises(RequiredKeyNotFilledError):
             TestBaseModel.TestModel.generate_default()
 
         # Required value provided
@@ -249,7 +249,7 @@ class TestBaseModel(TestCase):
 
         for fk in not_exists:
             with self.subTest(fk=fk):
-                with self.assertRaises(FieldKeyNotExistedError):
+                with self.assertRaises(FieldKeyNotExistError):
                     mdl.is_field_none(fk, raise_on_not_exists=True)
 
     def test_get_field_class_instance(self):

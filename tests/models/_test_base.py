@@ -7,7 +7,7 @@ from bson import ObjectId
 from extutils.utils import to_snake_case
 from models import Model, OID_KEY
 from models.exceptions import (
-    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError, JsonKeyNotExistedError, ModelUncastableError
+    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistError, JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnlyError
 from tests.base import TestCase
@@ -304,13 +304,13 @@ class TestModel(ABC):
 
             with self.assertRaises(JsonKeyNotExistedError):
                 self.get_model_class()(**init_json, from_db=True)
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(FieldKeyNotExistError):
                 self.get_model_class()(**init_field, from_db=False)
 
         def test_set_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
 
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(FieldKeyNotExistError):
                 mdl.absolutely_not_a_field = 7
             with self.assertRaises(JsonKeyNotExistedError):
                 mdl["abs_n_field"] = 7
@@ -348,7 +348,7 @@ class TestModel(ABC):
         def test_get_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
 
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(FieldKeyNotExistError):
                 _ = getattr(mdl, "absolutely_not_a_field")
             with self.assertRaises(JsonKeyNotExistedError):
                 _ = mdl["abs_n_field"]

@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 from threading import Thread
-from typing import Type, Optional, Tuple, Union
+from typing import Type, Optional, Tuple, Union, final
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -15,9 +15,11 @@ from extutils.dt import TimeRange
 from extutils.logger import SYSTEM
 from extutils.utils import dt_to_objectid
 from models import Model, OID_KEY
-from models.exceptions import InvalidModelError, InvalidModelFieldError
-from models.field.exceptions import FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, \
-    FieldCastingFailedError
+from models.exceptions import InvalidModelError, InvalidModelFieldError, RequiredKeyNotFilledError, \
+    FieldKeyNotExistError
+from models.field.exceptions import (
+    FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, FieldCastingFailedError
+)
 from models.utils import ModelFieldChecker
 from mongodb.utils import CursorWithCount, backup_collection
 from mongodb.factory import MONGO_CLIENT
@@ -168,6 +170,12 @@ class ControlExtensionMixin(Collection):
                 outcome = WriteOutcome.X_READONLY
             else:
                 outcome = WriteOutcome.X_INVALID_MODEL_FIELD
+        except RequiredKeyNotFilledError as e:
+            outcome = WriteOutcome.X_REQUIRED_NOT_FILLED
+            ex = e
+        except FieldKeyNotExistError as e:
+            outcome = WriteOutcome.X_FIELD_NOT_EXIST
+            ex = e
         except Exception as e:
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
             ex = e
@@ -280,6 +288,7 @@ class BaseCollection(ControlExtensionMixin, Collection):
         else:
             return cls.model_class
 
+    @final
     def on_init(self):
         if not os.environ.get("NO_FIELD_CHECK"):
             ModelFieldChecker.check_async(self)
