@@ -1,6 +1,7 @@
 [flake8]
 count = True
 ignore =
+    # module imported but not used (actually using but somehow not detected)
     F401
 exclude =
     tests_old/

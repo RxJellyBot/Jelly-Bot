@@ -1,11 +1,19 @@
 [flake8]
 count = True
 select =
+    # Runtime errors (Syndax, Indentation, IO)
     E9,
+    # Dictionary keyt name repeated
     F60,
+    # Expression-unpacking-related
     F62,
-    F7,
+    # Wild statements
+    F70,
+    # Syntax error in documentation
+    F72,
+    # Undefined names
     F82,
+    # Duplicated argument names
     F83
 max-complexity = 15
 max-line-length = 119

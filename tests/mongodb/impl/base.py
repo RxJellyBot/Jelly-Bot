@@ -14,7 +14,7 @@ from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidEr
 from mongodb.factory import get_single_db_name, is_test_db, ControlExtensionMixin, BaseCollection
 from mongodb.factory.results import WriteOutcome
 
-__all__ = ["TestDbControl", "TestControlExtensionMixin"]
+__all__ = ["TestDbControl", "TestControlExtensionMixin", "TestBaseCollection"]
 
 
 class TestDbControl(TestCase):
