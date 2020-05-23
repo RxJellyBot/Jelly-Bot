@@ -40,8 +40,6 @@ class AutoReplyResponse:
     TAGS = "tags"
     COOLDOWN_SEC = "cooldown"
 
-    ADD_RESULT = "addResult"
-
 
 class ExecodeResponse:
     LACKING_KEYS = Common.LACKING_KEYS

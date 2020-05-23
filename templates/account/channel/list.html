@@ -101,18 +101,18 @@
             }
         }
 
-        function changeStar(channel_oid, new_val) {
+        function changeStar(channelOid, newVal) {
             let url = `{% url "api.id.channel.star_change" %}`;
-            let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channel_oid}&{{ static_keys_param.Manage.Channel.STAR }}=${new_val}&{{ static_keys_param.LOCAL_REFER }}=true`;
+            let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channelOid}&{{ static_keys_param.Manage.Channel.STAR }}=${newVal}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             xhrPostRequest(url, params);
         }
 
-        function detachProfile(profile_oid, channel_oid, onLoad) {
+        function detachProfile(profileOid, channelOid, onLoad) {
             let url = `{% url "api.id.profile.detach" %}`;
-            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}`
-                + `&{{ static_keys_param.Common.CHANNEL_OID }}=${channel_oid}`;
-                + `&{{ static_keys_param.LOCAL_REFER }}=true`;
+            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profileOid}`
+                + `&{{ static_keys_param.Common.CHANNEL_OID }}=${channelOid}`;
+            +`&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             xhrPostRequest(url, params, onLoad);
         }

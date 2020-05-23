@@ -134,7 +134,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     ret = []
     kw_type = AutoReplyContentType.determine(keyword)
     # Issue #124
-    if not AutoReplyValidator.is_valid_content(kw_type, keyword, online_check=True):
+    if not AutoReplyValidator.is_valid_content(kw_type, keyword):
         kw_type = AutoReplyContentType.TEXT
         ret.append(HandledMessageEventText(
             content=_("The type of the keyword has been automatically set to `TEXT` "
@@ -142,7 +142,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
     resp_type = AutoReplyContentType.determine(response)
     # Issue #124
-    if not AutoReplyValidator.is_valid_content(resp_type, response, online_check=True):
+    if not AutoReplyValidator.is_valid_content(resp_type, response):
         resp_type = AutoReplyContentType.TEXT
         ret.append(HandledMessageEventText(
             content=_("The type of the response has been automatically set to `TEXT` "

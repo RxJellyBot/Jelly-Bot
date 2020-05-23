@@ -324,6 +324,7 @@ class CommandNode:
         This will be replaced by the description of `feature_flag` even if specified.
         :param scope: Usable scope of the command function.
         :param feature_flag: Feature flag of the command function.
+        :param cooldown_sec: cooldown of the command in seconds
         """
         if not arg_help:
             arg_help = []

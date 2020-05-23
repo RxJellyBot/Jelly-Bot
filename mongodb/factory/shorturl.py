@@ -75,10 +75,10 @@ class ShortUrlDataManager(BaseCollection):
     @arg_type_ensure
     def create_record(self, target: str, creator_oid: ObjectId) -> UrlShortenResult:
         if not ShortUrlDataManager.is_valid_url(target):
-            return UrlShortenResult(WriteOutcome.X_INVALID_URL, None)
+            return UrlShortenResult(WriteOutcome.X_INVALID_URL)
 
         model, outcome, ex = self.insert_one_data(Code=self.generate_code(), Target=target, CreatorOid=creator_oid)
-        return UrlShortenResult(outcome, model, ex)
+        return UrlShortenResult(outcome, ex, model)
 
     @arg_type_ensure
     def get_target(self, code: str) -> Optional[str]:

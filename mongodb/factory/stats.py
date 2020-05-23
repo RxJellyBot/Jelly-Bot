@@ -39,7 +39,7 @@ class APIStatisticsManager(BaseCollection):
             ApiAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
             Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
 
-        return RecordAPIStatisticsResult(outcome, entry, ex)
+        return RecordAPIStatisticsResult(outcome, ex, entry)
 
 
 class MessageRecordStatisticsManager(BaseCollection):

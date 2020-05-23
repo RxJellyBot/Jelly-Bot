@@ -50,7 +50,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         entry, outcome, ex = self.insert_one_data(
             CreatorOid=root_uid, Execode=execode, ActionType=execode_type, Timestamp=now, Data=data)
 
-        return EnqueueExecodeResult(outcome, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds), ex)
+        return EnqueueExecodeResult(outcome, ex, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds))
 
     def get_queued_execodes(self, root_uid: ObjectId) -> CursorWithCount:
         filter_ = {ExecodeEntryModel.CreatorOid.key: root_uid}
@@ -68,12 +68,12 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         ret = self.find_one_casted(cond, parse_cls=ExecodeEntryModel)
 
         if ret:
-            return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, ret)
+            return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, model=ret)
         else:
             if self.count_documents({ExecodeEntryModel.Execode.key: execode}) > 0:
-                return GetExecodeEntryResult(GetOutcome.X_EXECODE_TYPE_INCORRECT, None)
+                return GetExecodeEntryResult(GetOutcome.X_EXECODE_TYPE_INCORRECT)
             else:
-                return GetExecodeEntryResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT, None)
+                return GetExecodeEntryResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT)
 
     def remove_execode(self, execode: str):
         self.delete_one({ExecodeEntryModel.Execode.key: execode})
@@ -85,6 +85,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         :param execode: The Execode.
         :param execode_kwargs: Arguments for completing the Execode. Could carry more data than the required keys
             of the type of the execode to be completed.
+        :param action: Execode action type
         """
         lacking_keys = set()
         ex = None
@@ -139,7 +140,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         else:
             outcome = OperationOutcome.X_EXECODE_EMPTY
 
-        return CompleteExecodeResult(outcome, cmpl_outcome, tk_model, lacking_keys, ex)
+        return CompleteExecodeResult(outcome, ex, tk_model, lacking_keys, cmpl_outcome)
 
 
 _inst = ExecodeManager()

@@ -259,24 +259,24 @@ class ProfileDataManager(BaseCollection):
 
         cnl = ChannelManager.get_channel_oid(channel_oid)
         if not cnl:
-            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_NOT_FOUND, None, ex)
+            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_NOT_FOUND, ex)
 
         try:
             prof_oid = cnl.config.default_profile_oid
         except AttributeError:
-            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, None, ex)
+            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
             perm_prof = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
 
             if perm_prof:
-                return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, perm_prof, ex)
+                return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, ex, perm_prof)
 
         create_result = self.create_default_profile(channel_oid)
 
         return GetPermissionProfileResult(
             GetOutcome.O_ADDED if create_result.success else GetOutcome.X_DEFAULT_PROFILE_ERROR,
-            create_result.model, ex)
+            ex, create_result.model)
 
     def get_attachable_profiles(
             self, channel_oid: ObjectId, existing_permissions: Set[ProfilePermission],
@@ -303,7 +303,7 @@ class ProfileDataManager(BaseCollection):
             if not set_success:
                 outcome = WriteOutcome.X_ON_SET_CONFIG
 
-        return CreateProfileResult(outcome, default_profile, ex)
+        return CreateProfileResult(outcome, ex, default_profile)
 
     def create_profile(self, kwargs) -> CreateProfileResult:
         """
@@ -315,7 +315,7 @@ class ProfileDataManager(BaseCollection):
         """
         model, outcome, ex = self.insert_one_data(**kwargs)
 
-        return CreateProfileResult(outcome, model, ex)
+        return CreateProfileResult(outcome, ex, model)
 
     def create_profile_model(self, model: ChannelProfileModel) -> CreateProfileResult:
         """
@@ -327,13 +327,14 @@ class ProfileDataManager(BaseCollection):
         """
         outcome, ex = self.insert_one_model(model)
 
-        return CreateProfileResult(outcome, model, ex)
+        return CreateProfileResult(outcome, ex, model)
 
     @arg_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         """
         Update a profile using the data in ``update_dict``.
 
+        :param profile_oid: OID of the profile to be updated
         :param update_dict: `dict` of data to be updated. Key is the field key of `ChannelProfileModel`.
         """
         return self.update_many_outcome({OID_KEY: profile_oid}, {"$set": update_dict})

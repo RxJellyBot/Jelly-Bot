@@ -115,20 +115,20 @@ class AutoReplyModuleManager(BaseCollection):
 
         # Terminate if someone without permission wants to create a pinned model
         if pinned and not access_to_pinned:
-            return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION, None, None)
+            return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION)
 
         # Terminate if someone cannot access pinned module but attempt to overwrite the existing one
         if not access_to_pinned and self.count_documents(
                 {AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
                  AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
                  AutoReplyModuleModel.Pinned.key: True}) > 0:
-            return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED, None, None)
+            return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED)
 
         validate_outcome = self._validate_content(
             keyword, kw_type, responses, channel_oid, online_check=True)
 
         if not validate_outcome.is_success:
-            return AutoReplyModuleAddResult(validate_outcome, None, None)
+            return AutoReplyModuleAddResult(validate_outcome)
 
         model, outcome, ex = \
             self.insert_one_data(
@@ -163,7 +163,7 @@ class AutoReplyModuleManager(BaseCollection):
             )
             self._delete_recent_module(keyword)
 
-        return AutoReplyModuleAddResult(outcome, model, ex)
+        return AutoReplyModuleAddResult(outcome, ex, model)
 
     def add_conn_by_model(self, model: AutoReplyModuleModel, online_check=True) -> AutoReplyModuleAddResult:
         model.clear_oid()
@@ -172,14 +172,14 @@ class AutoReplyModuleManager(BaseCollection):
             model.keyword.content, model.keyword.content_type, model.responses, model.channel_id, online_check)
 
         if validate_outcome != WriteOutcome.O_MISC:
-            return AutoReplyModuleAddResult(validate_outcome, None, None)
+            return AutoReplyModuleAddResult(validate_outcome)
 
         outcome, ex = self.insert_one_model(model)
 
         if outcome.is_success:
             self._delete_recent_module(model.keyword.content)
 
-        return AutoReplyModuleAddResult(outcome, model, ex)
+        return AutoReplyModuleAddResult(outcome, ex, model)
 
     @arg_type_ensure
     def _remove_update_ops(self, remover_oid: ObjectId):
@@ -321,7 +321,7 @@ class AutoReplyModuleTagManager(BaseCollection):
             else:
                 outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
 
-        return AutoReplyModuleTagGetResult(outcome, tag_data, ex)
+        return AutoReplyModuleTagGetResult(outcome, ex, tag_data)
 
     def search_tags(self, tag_keyword: str) -> CursorWithCount:
         """

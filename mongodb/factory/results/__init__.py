@@ -5,14 +5,11 @@ from .user import (
     RootUserRegistrationResult, GetRootUserDataApiResult, RootUserUpdateResult,
     GetRootUserDataResult
 )
-from .ar import (
-    AutoReplyContentAddResult, AutoReplyModuleAddResult,
-    AutoReplyContentGetResult, AutoReplyModuleTagGetResult
-)
+from .ar import AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 from .channel import (
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
 )
-from .statistics import RecordAPIStatisticsResult, MessageRecordResult
+from .statistics import RecordAPIStatisticsResult
 from .execode import EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult
 from .perm import GetPermissionProfileResult, CreateProfileResult
 from .exctnt import RecordExtraContentResult

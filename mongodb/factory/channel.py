@@ -36,7 +36,7 @@ class ChannelManager(BaseCollection):
         if outcome.data_found:
             entry = self.get_channel_token(platform, token)
 
-        return ChannelRegistrationResult(outcome, entry, ex)
+        return ChannelRegistrationResult(outcome, ex, entry)
 
     @arg_type_ensure
     def deregister(self, platform: Platform, token: str) -> WriteOutcome:
@@ -84,7 +84,7 @@ class ChannelManager(BaseCollection):
             outcome = OperationOutcome.X_ERROR
             ex = e
 
-        return ChannelChangeNameResult(outcome, ret, ex)
+        return ChannelChangeNameResult(outcome, ex, ret)
 
     @arg_type_ensure
     def get_channel_token(self, platform: Platform, token: str,
@@ -149,7 +149,7 @@ class ChannelManager(BaseCollection):
         else:
             outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
 
-        return ChannelGetResult(outcome, model)
+        return ChannelGetResult(outcome, model=model)
 
     def set_config(self, channel_oid: ObjectId, json_key, config_value) -> bool:
         if json_key not in ChannelConfigModel.model_json_keys():
@@ -186,7 +186,7 @@ class ChannelCollectionManager(BaseCollection):
             entry = self.get_chcoll(platform, token)
             self.append_child_channel(entry.id, child_channel_oid)
 
-        return ChannelCollectionRegistrationResult(outcome, entry, ex)
+        return ChannelCollectionRegistrationResult(outcome, ex, entry)
 
     @arg_type_ensure
     def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:

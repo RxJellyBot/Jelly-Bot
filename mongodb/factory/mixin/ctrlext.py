@@ -99,10 +99,13 @@ class ControlExtensionMixin(Collection):
 
         This function constructs the model and if the construction succeed, executes ``insert_one_model()``.
 
+        ``from_db`` determines the key type of ``model_args`` (json key or field key).
+
         .. seealso::
             Documentation of ``ControlExtensionMixin.insert_one_model()``
 
         :param model_cls: class for the data to be constructed
+        :param from_db: if the values in `model_args` comes from the database
         :param model_args: arguments for the `Model` construction
 
         :return: model, outcome, exception (if any)

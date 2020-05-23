@@ -98,7 +98,7 @@ class OnPlatformIdentityManager(BaseCollection):
             if entry is None:
                 outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
 
-        return OnPlatformUserRegistrationResult(outcome, entry, ex)
+        return OnPlatformUserRegistrationResult(outcome, ex, entry)
 
 
 class RootUserManager(BaseCollection):
@@ -152,8 +152,8 @@ class RootUserManager(BaseCollection):
         else:
             overall_outcome = oc_onreg_failed
 
-        return RootUserRegistrationResult(overall_outcome,
-                                          build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
+        return RootUserRegistrationResult(overall_outcome, build_conn_ex, build_conn_entry,
+                                          build_conn_outcome, user_reg_result, hint)
 
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
@@ -171,7 +171,7 @@ class RootUserManager(BaseCollection):
 
         return self._register(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
                               "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
-                              (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
+                              (id_data,), hint="APIUser", on_exist=on_exist)
 
     @arg_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
@@ -254,7 +254,7 @@ class RootUserManager(BaseCollection):
                     f"API Token: {token} / OID of Missing On Platform Data: {' | '.join([str(i) for i in missing])}",
                     subject="On Platform Data not found")
 
-        return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
+        return GetRootUserDataApiResult(outcome, None, entry, api_u_data, onplat_list)
 
     @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
@@ -321,7 +321,7 @@ class RootUserManager(BaseCollection):
             else:
                 outcome = GetOutcome.O_CACHE_DB
 
-        return GetRootUserDataResult(outcome, rt_user_data)
+        return GetRootUserDataResult(outcome, None, rt_user_data)
 
     @arg_type_ensure
     def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
@@ -394,7 +394,7 @@ class RootUserManager(BaseCollection):
         else:
             outcome = UpdateOutcome.X_NOT_FOUND
 
-        return RootUserUpdateResult(outcome, updated)
+        return RootUserUpdateResult(outcome, None, updated)
 
 
 _inst = RootUserManager()
