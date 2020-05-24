@@ -67,12 +67,12 @@
                         "{{ static_keys_param.Execode.ACTION_TYPE_ID }}": "{{ excde_type_code }}",
                         "{{ static_keys_param.LOCAL_REFER }}": true
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: (jqXHR, textStatus, errorThrown) => {
                         console.log(`Send Execode Ajax failed. (${textStatus})`);
                         console.log(errorThrown);
                         failedCallBack();
                     },
-                    success: function (data) {
+                    success: data => {
                         if (data.success) {
                             okCallBack(data);
                         } else {

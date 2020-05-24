@@ -2,7 +2,7 @@
 
 <!--suppress JSDuplicatedDeclaration, JSUnusedGlobalSymbols -->
 <script type="text/javascript">
-    $(document).ready(function () {
+    $(document).ready(() => {
         initEvents();
         initElems();
     });
@@ -18,7 +18,7 @@
     }
 
     function shortenClicked() {
-        let invalidMessage = validateUrl();
+        const invalidMessage = validateUrl();
         if (invalidMessage) {
             generateAlert("danger", invalidMessage);
         } else {
@@ -27,13 +27,13 @@
     }
 
     function copyClicked() {
-        let input = $("input#shortenedUrl");
-        let btnDiv = $("div#copyDiv");
+        const input = $("input#shortenedUrl");
+        const btnDiv = $("div#copyDiv");
         input.focus();
         input.select();
 
         try {
-            let ok = document.execCommand('copy');
+            const ok = document.execCommand('copy');
             if (ok) {
                 btnDiv.attr("data-original-title", "{% trans "URL copied to the clipboard" %}");
             } else {
@@ -47,7 +47,7 @@
     }
 
     function validateUrl() {
-        let url = $("input#shortenUrl").val();
+        const url = $("input#shortenUrl").val();
 
         if (!(url.startsWith("http://") || url.startsWith("https://"))) {
             return "{% trans "URL to be shortened must starts with either http:// or https://." %}";
@@ -65,7 +65,7 @@
             },
             type: "POST",
             url: "{% url "api.service.shorturl.short" %}",
-            success: function (response) {
+            success: response => {
                 console.log(response);
 
                 if ("{{ static_keys_result.SUCCESS }}" in response) {
@@ -73,7 +73,7 @@
                         generateAlert("info", "{% trans "URL Shortened. Refresh the page to see the record in the list." %}");
                         updateResultSection(response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Service.ShortUrl.SHORTENED_URL }}"]);
                     } else {
-                        let outcome = response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"];
+                        const outcome = response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"];
                         generateAlert("danger", `{% trans "URL Failed to be shortened. Outcome code: " %}${outcome}`);
                         updateResultSection();
                     }
@@ -82,7 +82,7 @@
                     updateResultSection();
                 }
             },
-            error: function (xhr) {
+            error: xhr => {
                 generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
                 updateResultSection();
             }
@@ -100,10 +100,10 @@
 
     function notImplemented() {
         // Clear up modal for displaying not implemented message (Keyword to search "NotImplementedModal")
-        $("button.action-delete").click(function() {
+        $("button.action-delete").click(() => {
             $("div#modalNotImplemented").modal("show");
         });
-        $("button.action-update").click(function() {
+        $("button.action-update").click(() => {
             $("div#modalNotImplemented").modal("show");
         });
     }

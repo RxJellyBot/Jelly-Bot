@@ -7,7 +7,7 @@
     // https://chartjs-plugin-datalabels.netlify.com/guide/getting-started.html#registration
     Chart.plugins.unregister(ChartDataLabels);
 
-    let chartBgColors = [
+    const chartBgColors = [
         "rgba(255, 99, 132, 0.2)",
         "rgba(255, 159, 64, 0.2)",
         "rgba(255, 205, 86, 0.2)",
@@ -16,7 +16,7 @@
         "rgba(153, 102, 255, 0.2)",
         "rgba(201, 203, 207, 0.2)"
     ];
-    let chartBorderColors = [
+    const chartBorderColors = [
         "rgb(255, 99, 132)",
         "rgb(255, 159, 64)",
         "rgb(255, 205, 86)",
@@ -26,7 +26,7 @@
         "rgb(201, 203, 207)"
     ];
 
-    let defaults = {
+    const defaults = {
         labels: {
             fontFamily: "\"Segoe UI\", \"Microsoft JhengHei UI\", \"Roboto\", serif, sans-serif",
             fontSize: 13

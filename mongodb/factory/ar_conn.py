@@ -304,7 +304,7 @@ class AutoReplyModuleTagManager(BaseCollection):
 
     def get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
         ex = None
-        tag_data = self.find_one_casted(
+        tag_data: Optional[AutoReplyModuleTagModel] = self.find_one_casted(
             {AutoReplyModuleTagModel.Name.key: name},
             parse_cls=AutoReplyModuleTagModel,
             collation=case_insensitive_collation)

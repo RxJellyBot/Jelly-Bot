@@ -2,12 +2,12 @@
 
 <script type="text/javascript">
     function checkNameValidity(cid, name, onLoaded) {
-        let url = `{% url "api.id.profile.name" %}?{{ static_keys_param.Manage.Profile.CHANNEL_OID }}=${cid}&{{ static_keys_param.Manage.Profile.NAME }}=${name}&{{ static_keys_param.LOCAL_REFER }}=true`;
+        const url = `{% url "api.id.profile.name" %}?{{ static_keys_param.Manage.Profile.CHANNEL_OID }}=${cid}&{{ static_keys_param.Manage.Profile.NAME }}=${name}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         xhr.responseType = "json";
-        xhr.onload = function () {
+        xhr.onload = () => {
             onLoaded(xhr.response["{{ static_keys_result.RESULT }}"]);
         };
         xhr.send();

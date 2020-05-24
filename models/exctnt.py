@@ -18,6 +18,10 @@ class ExtraContentModel(Model):
     Type = ExtraContentTypeField("tp")
     Title = TextField("t", default=ModelDefaultValueExt.Optional)
     Content = GeneralField("c", default=ModelDefaultValueExt.Required)
+    # Not using `datetime.now()` as default value because
+    #   - Value will be fixed to the timestamp of the application boot time
+    #   - Hard to pass the value to the test
+    #   - Reduces the flexibility of setting the expiry of the extra content
     Timestamp = DateTimeField("e", default=ModelDefaultValueExt.Required)
     ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Optional)
 

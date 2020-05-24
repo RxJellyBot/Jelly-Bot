@@ -48,10 +48,10 @@
     <!--suppress JSUnresolvedVariable, JSUnresolvedFunction -->
     <script type="text/javascript" async>
         function googleSignIn() {
-            gapi.load('auth2', function () {
+            gapi.load('auth2', () => {
                 gapi.auth2.init({
                     "client_id": "431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com"
-                }).signIn({"prompt": "select_account"}).then(function(googleUser) {
+                }).signIn({"prompt": "select_account"}).then(googleUser => {
                     onGoogleSignedIn(googleUser);
                 });
             });

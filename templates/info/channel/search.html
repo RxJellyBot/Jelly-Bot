@@ -15,12 +15,13 @@
                 <ul>
                     <li>
                         {% blocktrans trimmed %}
-                            Keyword could be a fragment of the <b>message</b> or <b>the default name of the channel</b>.
+                            Keyword could be a fragment of the <strong>message</strong> or
+                            <strong>the default name of the channel</strong>.
                         {% endblocktrans %}
                     </li>
                     <li>
                         {% blocktrans trimmed %}
-                            Channel which is set to be private will <b>NOT</b> appear.
+                            Channel which is set to be private will <strong>NOT</strong> appear.
                         {% endblocktrans %}
                     </li>
                 </ul>
@@ -104,10 +105,10 @@
 {% block ex-script %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $("button#search").click(function () {
+            $("button#search").click(() => {
                 window.location.search = `?w=${$("input#keyword").val()}`;
             });
-            $(this).keyup(function (e) {
+            $(this).keyup(e => {
                 if (e.which === 13) {
                     window.location.search = `?w=${$("input#keyword").val()}`;
                 }

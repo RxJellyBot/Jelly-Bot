@@ -164,19 +164,19 @@
 {% block ex-script %}
     {% include "components/interactive-table-js.html" %}
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready(() => {
             $("form.profile-detach").submit(function (e) {
-                let profileName = "{{ profile_data.name }}";
-                let userName = $(this).find("button").data("uname");
-                let confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}
+                const profileName = "{{ profile_data.name }}";
+                const userName = $(this).find("button").data("uname");
+                const confirmMsg = `{% blocktrans trimmed %}Are you sure to detach ${profileName} from ${userName}
                     ?{% endblocktrans %}`;
 
                 if (!confirm(confirmMsg)) {
                     e.preventDefault();
                 }
             });
-            $("form.profile-delete").submit(function (e) {
-                let confirmMsg = `{% blocktrans trimmed %}Are you sure to delete this profile?{% endblocktrans %}`;
+            $("form.profile-delete").submit(e => {
+                const confirmMsg = `{% blocktrans trimmed %}Are you sure to delete this profile?{% endblocktrans %}`;
 
                 if (!confirm(confirmMsg)) {
                     e.preventDefault();

@@ -2,7 +2,7 @@
 
 <script type="text/javascript">
     // noinspection JSUnusedGlobalSymbols
-    let tagSplitter = "{{ tag_splitter }}";  // Used in artag.js
+    const tagSplitter = "{{ tag_splitter }}";  // Used in artag.js
 
     function getChannelDataEndpointUrl(platVal, channel) {
         return `{% url "api.id.channel.data" %}?{{ static_keys_param.DataQuery.Channel.PLATFORM }}=${platVal}&{{ static_keys_param.DataQuery.Channel.CHANNEL_TOKEN }}=${channel}&{{ static_keys_param.LOCAL_REFER }}=true`;
@@ -12,13 +12,13 @@
         if (channel === "") {
             fnOnLoad(false);
         } else {
-            let url = getChannelDataEndpointUrl(platVal, channel);
+            const url = getChannelDataEndpointUrl(platVal, channel);
 
-            let xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open("GET", url);
             xhr.responseType = "json";
-            xhr.onload = function () {
-                let success = xhr.response["{{ static_keys_result.SUCCESS }}"];
+            xhr.onload = () => {
+                const success = xhr.response["{{ static_keys_result.SUCCESS }}"];
 
                 fnOnLoad(success);
                 console.log("Check Channel Membership (Async)");
@@ -30,18 +30,18 @@
     }
 
     function hasChannelMembership(platVal, channel) {
-        let url = getChannelDataEndpointUrl(platVal, channel);
+        const url = getChannelDataEndpointUrl(platVal, channel);
 
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("GET", url, false);
         xhr.send();
 
-        let response = xhr.response;
+        const response = xhr.response;
 
         console.log("Check Channel Membership");
         console.log(response);
 
-        let success = response["{{ static_keys_result.SUCCESS }}"];
+        const success = response["{{ static_keys_result.SUCCESS }}"];
 
         postCheckChannel(response, success);
     }
@@ -55,7 +55,7 @@
     }
 
     function collectData() {
-        let param = new URLSearchParams();
+        const param = new URLSearchParams();
 
         // Attach KEYWORD and RESPONSES
         $("div.content-check:not(.d-none)").find("textarea").each(function () {
@@ -108,7 +108,7 @@
             url = "{% url "api.ar.add_execode" %}"
         }
 
-        xhrPostRequest(url, collectData(), function (xhr) {
+        xhrPostRequest(url, collectData(), xhr => {
             hideAllSubmitMsg();
             try {
                 updateArCode(xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.Results.OUTCOME }}"]);
@@ -129,14 +129,14 @@
     }
 
     function validateContent(type, content, fnOnLoad) {
-        let url = `{% url "api.ar.validate" %}?{{ static_keys_param.Validation.CONTENT }}=${encodeURIComponent(content)}&{{ static_keys_param.Validation.CONTENT_TYPE }}=${type}`;
+        const url = `{% url "api.ar.validate" %}?{{ static_keys_param.Validation.CONTENT }}=${encodeURIComponent(content)}&{{ static_keys_param.Validation.CONTENT_TYPE }}=${type}`;
 
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         xhr.responseType = "json";
-        xhr.onload = function () {
-            let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
-            let result = xhr.response.{{ static_keys_result.RESULT }} || false;
+        xhr.onload = () => {
+            const success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+            const result = xhr.response.{{ static_keys_result.RESULT }} || false;
 
             fnOnLoad(success, result);
         };
@@ -144,13 +144,13 @@
     }
 
     function searchTagsByPopularity(word, onFound, onNotFound, onResult) {
-        let url = `{% url "api.ar.tag.pop" %}?{{ static_keys_param.DataQuery.KEYWORD }}=${encodeURIComponent(word)}`;
+        const url = `{% url "api.ar.tag.pop" %}?{{ static_keys_param.DataQuery.KEYWORD }}=${encodeURIComponent(word)}`;
 
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         xhr.responseType = "json";
-        xhr.onload = function () {
-            let resp = xhr.response["{{ static_keys_result.RESULT }}"];
+        xhr.onload = () => {
+            const resp = xhr.response["{{ static_keys_result.RESULT }}"];
 
             onResult();
             if (resp.length > 0) {
@@ -163,13 +163,13 @@
     }
 
     function checkAccessPinnedPermission(coid) {
-        let url = `{% url "api.id.perm" %}?{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${coid}&{{ static_keys_param.LOCAL_REFER }}=true`;
+        const url = `{% url "api.id.perm" %}?{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${coid}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-        let xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
         xhr.responseType = "json";
-        xhr.onload = function () {
-            let resp = xhr.response["{{ static_keys_result.RESULT }}"];
+        xhr.onload = () => {
+            const resp = xhr.response["{{ static_keys_result.RESULT }}"];
             if (resp) {
                 enablePinnedModuleAccess(resp.includes({{ perm_pin_access }}));
             }
@@ -200,7 +200,7 @@
         // ------------------------------
 
         // Determine if to display modal or not
-        let msgAvailable = errmsgs.length > 0;
+        const msgAvailable = errmsgs.length > 0;
 
         if (msgAvailable) {
             $("div#modalSubmitMessage").html(errmsgs.join("<br>"));
@@ -212,15 +212,15 @@
 
     // Refresh the validity markers of the textareas and return corresponding error message if any
     function formValidateContentRefreshMarker() {
-        let errMsg = [];
+        const errMsg = [];
 
         $("div.txtarea-count").each(function () {
             if (!$(this).parent().hasClass("d-none")) {
-                let valid = validateTextArea($(this), $(this).find("textarea"));
+                const valid = validateTextArea($(this), $(this).find("textarea"));
                 if (!valid) {
-                    let name = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+                    const name = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
                     {% blocktrans trimmed %}
-                        let msg = `The content of <b>${name}</b> is invalid.</b>`;
+                        const msg = `The content of <strong>${name}</strong> is invalid.</b>`;
                     {% endblocktrans %}
                     errMsg.push(msg);
                 }
@@ -231,15 +231,15 @@
     }
 
     function formValidateContentLength() {
-        let errmsgs = [];
+        const errmsgs = [];
 
-        $("div.content-check:not(.d-none)").each(function () {
+        $("div.content-check:not(.d-none)").each(() => {
             let progBar = $(this).find("div.progress-bar");
             let valNow = parseInt(progBar.attr("aria-valuenow"));
             let valMax = parseInt(progBar.attr("aria-valuemax"));
 
-            let overlimit = valNow > valMax;
-            let empty = valNow === 0;
+            const overlimit = valNow > valMax;
+            const empty = valNow === 0;
 
             if (overlimit || empty) {
                 // Display tooltip of invalid length
@@ -248,16 +248,16 @@
                 updateArCode(null);
 
                 // Push Error Messages
-                let txtareaFor = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+                const txtareaFor = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
 
                 if (overlimit) {
                     {% blocktrans trimmed %}
-                        let msg = `The content length of <b>${txtareaFor}</b> is overlimit. (Limit: ${valMax} / Current: <b>${valNow})</b>`;
+                        const msg = `The content length of <strong>${txtareaFor}</strong> is overlimit. (Limit: ${valMax} / Current: <strong>${valNow})</strong>`;
                     {% endblocktrans %}
                     errmsgs.push(msg);
                 } else if (empty) {
                     {% blocktrans trimmed %}
-                        let msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;
+                        const msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;
                     {% endblocktrans %}
                     errmsgs.push(msg);
                 }
@@ -268,8 +268,8 @@
     }
 
     function formValidateChannel() {
-        let plat = $("select#arPlatform option:selected").val();
-        let channelToken = $("input#arChannelToken").val();
+        const plat = $("select#arPlatform option:selected").val();
+        const channelToken = $("input#arChannelToken").val();
 
         if (!hasChannelMembership(plat, channelToken)) {
             return ['{% trans "Channel validation failed. Recheck the input channel info." %}'];

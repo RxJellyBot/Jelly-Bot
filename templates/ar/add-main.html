@@ -16,7 +16,7 @@
             {% endwith %}
         </div>
 
-        <b class="d-none" id="respProp" data-max="{{ max_responses }}"></b>
+        <strong class="d-none" id="respProp" data-max="{{ max_responses }}"></strong>
 
         {% for i in ""|ljust:max_responses %}
             <div class="form-group content-check d-none" id="respGroup{{ forloop.counter }}">
@@ -33,10 +33,10 @@
         {% endfor %}
 
         <div class="form-group float-right">
-            <button type="button" class="btn btn-outline-primary mr-2 arRespBtnAdd"><b><span
-                    style="font-family: monospace;">+</span></b></button>
-            <button type="button" class="btn btn-outline-primary arRespBtnDel" disabled><b><span
-                    style="font-family: monospace;">-</span></b></button>
+            <button type="button" class="btn btn-outline-primary mr-2 arRespBtnAdd"><strong><span
+                    style="font-family: monospace;">+</span></strong></button>
+            <button type="button" class="btn btn-outline-primary arRespBtnDel" disabled><strong><span
+                    style="font-family: monospace;">-</span></strong></button>
         </div>
     </div>
 </div>
