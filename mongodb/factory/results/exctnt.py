@@ -24,4 +24,7 @@ class RecordExtraContentResult(ModelResult):
 
     @property
     def url(self) -> str:
-        return f'{HostUrl}{reverse("page.extra", kwargs={"page_id": str(self.model_id)})}'
+        if self.model_id:
+            return f'{HostUrl}{reverse("page.extra", kwargs={"page_id": str(self.model_id)})}'
+        else:
+            return ""
