@@ -73,9 +73,7 @@
     <script src="{% static "js/utils/xhr.js" %}" type="text/javascript"></script>
     <script src="{% static "js/account/channel_list.js" %}" type="text/javascript"></script>
     <script type="text/javascript">
-        $(document).ready(() => {
-            $("input.channel-name").keyup(onChannelNameKeyup);
-        });
+        $(document).ready(() => $("input.channel-name").keyup(onChannelNameKeyup));
 
         function onChannelNameKeyup(e) {
             const elem = $(this);

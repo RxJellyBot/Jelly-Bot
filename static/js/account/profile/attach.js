@@ -1,6 +1,4 @@
-$(document).ready(function () {
-    $("button.attach").click(onAttachClick);
-});
+$(document).ready(() => $("button.attach").click(onAttachClick));
 
 function onAttachClick() {
     attachProfile(

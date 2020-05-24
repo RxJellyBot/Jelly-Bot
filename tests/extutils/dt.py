@@ -35,7 +35,7 @@ class TestDatetime(TestCase):
 
     def test_parse_to_dt(self):
         dt_parsed = parse_to_dt("2020-04-04 16:00")
-        dt_expected = datetime(2020, 4, 4, 16, 0, 0, 0, tzinfo=pytz.UTC)
+        dt_expected = datetime(2020, 4, 4, 16, tzinfo=pytz.UTC)
         self.assertFalse(is_tz_naive(dt_parsed))
         self.assertEqual(dt_expected, dt_parsed)
         self.assertEqual(dt_expected.tzinfo, dt_parsed.tzinfo)
@@ -43,7 +43,7 @@ class TestDatetime(TestCase):
 
         dt_parsed = parse_to_dt("2020-04-04 16:00+0200")
         tz_expected = timezone(timedelta(hours=2))
-        dt_expected = datetime(2020, 4, 4, 16, 0, 0, 0, tzinfo=tz_expected)
+        dt_expected = datetime(2020, 4, 4, 16, tzinfo=tz_expected)
 
         self.assertFalse(is_tz_naive(dt_parsed))
         self.assertEqual(dt_expected, dt_parsed)

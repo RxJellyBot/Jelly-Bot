@@ -65,7 +65,7 @@
             },
             type: "POST",
             url: "{% url "api.service.shorturl.short" %}",
-            success: response => {
+            success(response) {
                 console.log(response);
 
                 if ("{{ static_keys_result.SUCCESS }}" in response) {
@@ -82,7 +82,7 @@
                     updateResultSection();
                 }
             },
-            error: xhr => {
+            error(xhr) {
                 generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
                 updateResultSection();
             }
@@ -100,12 +100,10 @@
 
     function notImplemented() {
         // Clear up modal for displaying not implemented message (Keyword to search "NotImplementedModal")
-        $("button.action-delete").click(() => {
-            $("div#modalNotImplemented").modal("show");
-        });
-        $("button.action-update").click(() => {
-            $("div#modalNotImplemented").modal("show");
-        });
+        const notImplElem = $("div#modalNotImplemented");
+
+        $("button.action-delete").click(() => notImplElem.modal("show"));
+        $("button.action-update").click(() => notImplElem.modal("show"));
     }
 
     function getUpdateTargetEndpointUrl(target, code) {

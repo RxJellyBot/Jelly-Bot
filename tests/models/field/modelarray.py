@@ -20,9 +20,9 @@ class ModelTest(Model):
     Field2 = BooleanField("f2")
 
 
-MODEL1 = ModelTest(Field1=7, Field2=True, from_db=False)
-MODEL2 = ModelTest(Field1=9, Field2=True, from_db=False)
-MODEL3 = ModelTest(Field1=11, Field2=True, from_db=False)
+MODEL1 = ModelTest(Field1=7, Field2=True)
+MODEL2 = ModelTest(Field1=9, Field2=True)
+MODEL3 = ModelTest(Field1=11, Field2=True)
 
 MODEL4_DICT = {OID_KEY: ObjectId.from_datetime(datetime.now()), "f1": 13, "f2": True}
 MODEL4_INST = ModelTest.cast_model(MODEL4_DICT)

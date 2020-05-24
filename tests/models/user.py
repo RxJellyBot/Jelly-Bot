@@ -29,6 +29,7 @@ class TestRootUserConfigModel(TestModel.TestClass):
         }
 
     def test_get_tzinfo(self):
+        # noinspection PyArgumentEqualDefault
         mdl = self.get_constructed_model(manual_default=False)
         self.assertEqual(LocaleInfo.get_tzinfo(default_locale.pytz_code), mdl.tzinfo)
         self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())

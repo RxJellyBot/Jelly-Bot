@@ -101,6 +101,7 @@ class TestUtilFunctions(TestCase):
                 self.assertEqual(expected, actual)
 
     def test_split_fill(self):
+        # noinspection PyArgumentEqualDefault
         eq_pairs = [
             (["A", "B", "C", "D", "D"], split_fill("A,B,C", 5, delim=",", fill="D")),
             (["A", "B", "C"], split_fill("A,B,C", 3, delim=",", fill="D")),

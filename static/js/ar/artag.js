@@ -6,7 +6,7 @@ function searchTag() {
     if (!searchLock) {
         searchLock = true;
 
-        let txt = $("input#arTagKeyword").val();
+        const txt = $("input#arTagKeyword").val();
 
         if (txt.includes(tagSplitter) || txt.length === 0) {
             $("div#tagSearchErr").tooltip('enable').tooltip('show').tooltip('disable');
@@ -15,18 +15,14 @@ function searchTag() {
         }
 
         searchTagsByPopularity(txt,
-            function (tag_name_arr) {
+            tag_name_arr => {
                 if (!tag_name_arr.includes(txt)) {
                     attachTagButton(txt);
                 }
 
-                tag_name_arr.forEach(function (tag_name) {
-                    attachTagButton(tag_name);
-                });
+                tag_name_arr.forEach(tag_name => attachTagButton(tag_name));
             },
-            function () {
-                attachTagButton(txt);
-            },
+            () => attachTagButton(txt),
             clearSearchResults
         );
         searchLock = false;
@@ -35,9 +31,7 @@ function searchTag() {
 
 function attachTagButton(txt) {
     if (txt) {
-        $("div#arTagSearchResult").append(generateTagButtonDOM(txt, function (event) {
-            addToSelectedTags($(event.target).text());
-        }));
+        $("div#arTagSearchResult").append(generateTagButtonDOM(txt, event => addToSelectedTags($(event.target).text())));
     }
 }
 
@@ -54,48 +48,46 @@ function addToSelectedTags(txt) {
 }
 
 function generatTagBOMSelfDestruct(txt) {
-    return generateTagButtonDOM(txt, function (event) {
+    return generateTagButtonDOM(txt, event => {
         $(event.target).parent().remove();
         selectedTags = selectedTags.filter(e => e !== txt);
     })
 }
 
 function generateTagButtonDOM(txt, btnOnClick = null) {
-    let elem = $.parseHTML(`<div class="d-inline"><button type="button" class="btn btn-outline-success mb-1 ar-tag">${txt}</button>&nbsp;</div>`);
+    const elem = $.parseHTML(`<div class="d-inline"><button type="button" class="btn btn-outline-success mb-1 ar-tag">${txt}</button>&nbsp;</div>`);
 
     if (btnOnClick) {
-        elem.forEach(function (element) {
-            $(element).find("button").click(btnOnClick);
-        });
+        elem.forEach(element => $(element).find("button").click(btnOnClick));
     }
     return elem;
 }
 
 function getTagsByPopularity(onFound, onNotFound) {
-    searchTagsByPopularity("", onFound, onNotFound, function () {
+    searchTagsByPopularity("", onFound, onNotFound, () => {
     });
 }
 
-$(document).ready(function () {
+$(document).ready(() => {
     getTagsByPopularity(
-        function (tag_name_arr) {
+        tag_name_arr => {
             $("div#arTagPopMsg").addClass("d-none");
 
-            tag_name_arr.forEach(function (tag_name) {
-                $("div#arTagPop").append(generateTagButtonDOM(tag_name, function (event) {
-                    addToSelectedTags($(event.target).text());
-                }));
-            })
+            tag_name_arr
+                .forEach(tag_name =>
+                    $("div#arTagPop").append(
+                        generateTagButtonDOM(tag_name, event => addToSelectedTags($(event.target).text()))
+                    )
+                )
         },
-        function () {
-            $("div#arTagPopMsg").removeClass("d-none");
-        });
+        () => $("div#arTagPopMsg").removeClass("d-none"));
     $("button#arTagSearch").click(searchTag);
 
-    $("input#arTagKeyword").keyup(function (e) {
+    $("input#arTagKeyword").keyup(e => {
         if (e.which === 13) {
             searchTag();
             return false;
         }
+        return true;
     });
 });

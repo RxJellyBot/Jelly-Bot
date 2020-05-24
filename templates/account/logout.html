@@ -22,7 +22,7 @@
     <script src="https://apis.google.com/js/platform.js?onload=init" type="text/javascript"></script>
     <!--suppress JSUnresolvedFunction, JSUnresolvedVariable -->
     <script type="text/javascript">
-        gapi.load('auth2', () => {
+        gapi.load('auth2', () =>
             gapi.auth2.init({
                 client_id: '431200420774-7afo4f29me83citervt7tpkpbq8736ka.apps.googleusercontent.com'
             }).then(gauth => {
@@ -31,8 +31,7 @@
             }, err => {
                 console.log("Error occurred during logout.");
                 console.log(err);
-            });
-        });
+            }));
 
     </script>
 {% endblock %}

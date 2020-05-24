@@ -91,14 +91,14 @@
 
 {% block ex-script %}
     <script type="text/javascript">
-        $(document).ready(() => {
+        $(document).ready(() =>
             $("button#get-execode").click(() => {
+                const execodeErrorElem = $("div#get-execode-error");
                 const xhr = new XMLHttpRequest();
+
                 xhr.open("POST", `{% url "api.id.channel.register_execode" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
                 xhr.responseType = "json";
-                xhr.onloadstart = () => {
-                    $("div#get-execode-error").addClass("d-none");
-                };
+                xhr.onloadstart = () => execodeErrorElem.addClass("d-none");
                 xhr.onload = () => {
                     $("code#new-execode").text(
                         xhr.response.{{ static_keys_result.SUCCESS }} ?
@@ -113,12 +113,9 @@
                         $("div#get-execode-tips").addClass("d-none");
                     }, parseInt({{ register_cooldown }}) * 1000);
                 };
-                xhr.onerror = () => {
-                    $("div#get-execode-error").removeClass("d-none");
-                };
+                xhr.onerror = () => execodeErrorElem.removeClass("d-none");
                 xhr.send();
-            });
-        });
+            }));
     </script>
     <script src="{% static "js/account/register.js" %}" type="text/javascript"></script>
 {% endblock %}

@@ -218,7 +218,7 @@
             if (!$(this).parent().hasClass("d-none")) {
                 const valid = validateTextArea($(this), $(this).find("textarea"));
                 if (!valid) {
-                    const name = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+                    const name = $(`label[for='${$(this).find("textarea").attr("id")}']`).text();
                     {% blocktrans trimmed %}
                         const msg = `The content of <strong>${name}</strong> is invalid.</b>`;
                     {% endblocktrans %}
@@ -234,9 +234,9 @@
         const errmsgs = [];
 
         $("div.content-check:not(.d-none)").each(() => {
-            let progBar = $(this).find("div.progress-bar");
-            let valNow = parseInt(progBar.attr("aria-valuenow"));
-            let valMax = parseInt(progBar.attr("aria-valuemax"));
+            const progBar = $(this).find("div.progress-bar");
+            const valNow = parseInt(progBar.attr("aria-valuenow"));
+            const valMax = parseInt(progBar.attr("aria-valuemax"));
 
             const overlimit = valNow > valMax;
             const empty = valNow === 0;
@@ -248,7 +248,7 @@
                 updateArCode(null);
 
                 // Push Error Messages
-                const txtareaFor = $("label[for='" + $(this).find("textarea").attr("id") + "']").text();
+                const txtareaFor = $(`label[for='${$(this).find("textarea").attr("id")}']`).text();
 
                 if (overlimit) {
                     {% blocktrans trimmed %}
@@ -257,7 +257,7 @@
                     errmsgs.push(msg);
                 } else if (empty) {
                     {% blocktrans trimmed %}
-                        const msg = `The content length of <b>${txtareaFor}</b> cannot be 0.`;
+                        const msg = `The content length of <strong>${txtareaFor}</strong> cannot be 0.`;
                     {% endblocktrans %}
                     errmsgs.push(msg);
                 }

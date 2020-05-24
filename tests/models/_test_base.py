@@ -307,12 +307,12 @@ class TestModel(ABC):
             for init_dict, expected_error in self.get_invalid():
                 init_json, init_field = self._dict_to_json_field(init_dict)
 
+                with self.subTest(init_field=init_field, expected_error=expected_error):
+                    with self.assertRaises(expected_error):
+                        self.get_model_class()(**init_field)
                 with self.subTest(init_json=init_json, expected_error=expected_error):
                     with self.assertRaises(expected_error):
                         self.get_model_class()(**init_json, from_db=True)
-                with self.subTest(init_field=init_field, expected_error=expected_error):
-                    with self.assertRaises(expected_error):
-                        self.get_model_class()(**init_field, from_db=False)
 
         def test_model_construct_missing_required(self):
             for required_keys in self.get_required_key_combinations():
@@ -328,7 +328,7 @@ class TestModel(ABC):
 
                 # Test for the expected error
                 with self.assertRaises(ModelConstructionError):
-                    self.get_model_class()(**init_dict_field, from_db=False)
+                    self.get_model_class()(**init_dict_field)
                 with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_json, from_db=True)
 
@@ -371,10 +371,10 @@ class TestModel(ABC):
             init_json["absolutely_not_a_field"] = 7
             init_field["AbsolutelyNotAField"] = 7
 
+            with self.assertRaises(FieldKeyNotExistError):
+                self.get_model_class()(**init_field)
             with self.assertRaises(JsonKeyNotExistedError):
                 self.get_model_class()(**init_json, from_db=True)
-            with self.assertRaises(FieldKeyNotExistError):
-                self.get_model_class()(**init_field, from_db=False)
 
         def test_set_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)

@@ -1,19 +1,20 @@
-$(function () {
+$(() => {
     $('div[data-toggle="tooltip"]').tooltip();
     $('div.tooltip-hide[data-toggle="tooltip"]').tooltip('disable');
 });
 
-$(document).ready(function () {
+$(document).ready(() => {
     initEvents();
     initLayout();
 });
 
 function keyEventHandle() {
-    $(window).keydown(function (event) {
+    $(window).keydown(event => {
         if (event.which === 13 && !$(document.activeElement).is("input#arTagKeyword, textarea")) {
             $("form#arForm").submit();
             return false;
         }
+        return true;
     });
 }
 
@@ -34,15 +35,15 @@ function initEvents() {
 
 function regPanelSwitch() {
     $("div[data-btn-id]").addClass("d-none");
-    $("div[data-btn-id=" + regId + "]").removeClass("d-none");
+    $(`div[data-btn-id=${regId}]`).removeClass("d-none");
 }
 
 function initProperties() {
     $("div.btn-div").click(function () {
         if (!$(this).hasClass("disabled")) {
-            let input_target = $("input#" + $(this).data("input"));
+            const inputTarget = $(`input#${$(this).data("input")}`);
 
-            input_target.val(reverseVal(input_target.val()));
+            inputTarget.val(reverseVal(inputTarget.val()));
             $(this).toggleClass("active");
         }
     });
@@ -55,7 +56,7 @@ function initResponsesSection() {
     $("button.arRespBtnAdd").click(function () {
         responseCount++;
 
-        $("div#respGroup" + responseCount).removeClass("d-none");
+        $(`div#respGroup${responseCount}`).removeClass("d-none");
 
         if (responseCount >= $("b#respProp").data("max")) {
             $(this).prop("disabled", true);
@@ -63,7 +64,7 @@ function initResponsesSection() {
         $("button.arRespBtnDel").prop("disabled", false);
     });
     $("button.arRespBtnDel").click(function () {
-        $("div#respGroup" + responseCount).addClass("d-none");
+        $(`div#respGroup${responseCount}`).addClass("d-none");
 
         responseCount--;
 
@@ -76,35 +77,29 @@ function initResponsesSection() {
 
 function initTextAreas() {
     $("div.txtarea-count").each(function () {
-        let parent = $(this);
-        let txtArea = $(this).find("textarea");
-        let id = "[data-count=" + txtArea.attr("id") + "]";
+        const parent = $(this);
+        const txtArea = $(this).find("textarea");
+        const id = `[data-count=${txtArea.attr("id")}]`;
         $(this).init(function () {
-            $(this).find("span[data-type=current]" + id).text(0);
+            $(this).find(`span[data-type=current]${id}`).text(0);
         }).on("input", function () {
             updateTextAreaPercentBar($(this), txtArea, id);
-
-            // submitBtnDisable(percentage > 100);
         });
 
-        txtArea.on("blur", function () {
-            validateTextArea(parent, txtArea);
-        });
+        txtArea.on("blur", () => validateTextArea(parent, txtArea));
 
-        $(this).find("select.ar-type").change(function () {
-            validateTextArea(parent, txtArea);
-        })
+        $(this).find("select.ar-type").change(() => validateTextArea(parent, txtArea))
     })
 }
 
-function updateTextAreaPercentBar(area_base, txtArea, id) {
-    let currentCount = txtArea.val().length;
-    let progBar = area_base.find("div[data-type=progress]" + id);
+function updateTextAreaPercentBar(areaBase, txtArea, id) {
+    const currentCount = txtArea.val().length;
+    const progBar = areaBase.find(`div[data-type=progress]${id}`);
 
-    let percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
+    const percentage = currentCount / parseFloat(progBar.attr("aria-valuemax")) * 100;
 
-    area_base.find("span[data-type=current]" + id).text(currentCount);
-    progBar.attr("aria-valuenow", currentCount).css("width", percentage + "%");
+    areaBase.find(`span[data-type=current]${id}`).text(currentCount);
+    progBar.attr("aria-valuenow", currentCount).css("width", `${percentage}%`);
 
     if (percentage > 100) {
         progBar.addClass("bg-danger");
@@ -115,7 +110,7 @@ function updateTextAreaPercentBar(area_base, txtArea, id) {
 
 // Return if the given text area is valid
 function validateTextArea(parent, txtArea) {
-    validateContent(parent.find("select.ar-type option:selected").val(), txtArea.val(), function (success, result) {
+    validateContent(parent.find("select.ar-type option:selected").val(), txtArea.val(), (success, result) => {
         hideAllValidClasses(txtArea);
 
         if (success && result) {
@@ -134,9 +129,7 @@ function initRegSelection() {
 
         regPanelSwitch();
     });
-    $("button#arChannelCheck").click(function () {
-        validateChannelInfo();
-    });
+    $("button#arChannelCheck").click(() => validateChannelInfo());
     $("select#arChannel").change(function () {
         onChannelMemberSelected($(this).children("option:selected"));
     });
@@ -161,14 +154,12 @@ function onChannelMemberSelected(option) {
 }
 
 function formSubmitHandle() {
-    $(document).ready(function () {
+    $(document).ready(() => {
         keyEventHandle();
-        $("button.arSubmit").click(function () {
-            $("form#arForm").submit();
-        })
+        $("button.arSubmit").click(() => $("form#arForm").submit())
     });
 
-    $("form#arForm").submit(function () {
+    $("form#arForm").submit(() => {
         submitBtnDisable(true);
         updateLastSubmissionTime();
 
@@ -197,11 +188,11 @@ function formSubmitHandle() {
 }
 
 function validateChannelInfo() {
-    let arPlatVal = $("select#arPlatform option:selected").val();
-    let arChannelToken = $("input#arChannelToken").val();
+    const arPlatVal = $("select#arPlatform option:selected").val();
+    const arChannelToken = $("input#arChannelToken").val();
 
-    checkChannelMembershipAsync(arPlatVal, arChannelToken, function (exists) {
-        let elem = $("input#arChannelToken");
+    checkChannelMembershipAsync(arPlatVal, arChannelToken, exists => {
+        const elem = $("input#arChannelToken");
         elem.removeClass("is-valid is-invalid");
         if (typeof exists !== "undefined" && exists) {
             elem.addClass("is-valid");
@@ -240,12 +231,12 @@ function onSubmissionFailed(error) {
 function resetForm() {
     // Clear all <textarea> and reset percent bar
     $("div.content-check:not(.d-none)").each(function () {
-        let txtArea = $(this).find("textarea").first();
+        const txtArea = $(this).find("textarea").first();
         txtArea.val("");
         updateTextAreaPercentBar(
             $(this).find("div.txtarea-count").first(),
             txtArea,
-            "[data-count=" + $(this).attr("id") + "]");
+            `[data-count=${$(this).attr("id")}]`);
     });
 
     // Hide All
@@ -268,7 +259,7 @@ function reverseVal(str) {
 }
 
 function updateArCode(code) {
-    let link = $("a#arCodeLink");
+    const link = $("a#arCodeLink");
     link.attr("href", link.data("prefix") + code);
 
     if (code) {

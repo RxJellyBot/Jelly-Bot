@@ -53,6 +53,7 @@ class TestChannelModel(TestModel.TestClass):
             ("acc", "BotAccessible"): (True, False)
         }
 
+    # noinspection PyArgumentEqualDefault
     def test_get_channel_name(self):
         mdl = self.get_constructed_model(manual_default=True)
         self.assertEqual(mdl.get_channel_name("ABC"), "DN")

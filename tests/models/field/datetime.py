@@ -22,9 +22,9 @@ class TestDatetimeFieldProperty(TestFieldProperty.TestClass):
 
     def get_valid_default_values(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_invalid_default_values(self) -> Tuple[Any, ...]:
@@ -46,8 +46,8 @@ class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
             (None, False),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", True),
             (True, False),
             (7, False)
@@ -58,8 +58,8 @@ class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
             (None, False),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", False),
             (True, False),
             (7, False)
@@ -71,19 +71,19 @@ class TestDatetimeFieldValueDefault(TestFieldValue.TestClass):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
@@ -104,8 +104,8 @@ class TestDatetimeFieldValueNoAutoCast(TestFieldValue.TestClass):
             (None, False),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", True),
             (True, False),
             (7, False)
@@ -116,8 +116,8 @@ class TestDatetimeFieldValueNoAutoCast(TestFieldValue.TestClass):
             (None, False),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", False),
             (True, False),
             (7, False)
@@ -129,19 +129,19 @@ class TestDatetimeFieldValueNoAutoCast(TestFieldValue.TestClass):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
             ("2020-05-07 8:00", "2020-05-07 8:00"),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
@@ -162,8 +162,8 @@ class TestDatetimeFieldValueAllowNone(TestFieldValue.TestClass):
             (None, True),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", True),
             (True, False),
             (7, False)
@@ -174,8 +174,8 @@ class TestDatetimeFieldValueAllowNone(TestFieldValue.TestClass):
             (None, True),
             (dt.min.replace(tzinfo=tz.utc), True),
             ("2020-05-07 8:00", True),
-            (dt(2020, 5, 7, 8, 0), True),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc), True),
+            (dt(2020, 5, 7, 8), True),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc), True),
             ("XSX", False),
             (True, False),
             (7, False)
@@ -188,19 +188,19 @@ class TestDatetimeFieldValueAllowNone(TestFieldValue.TestClass):
         return (
             (None, None),
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             (dt.min.replace(tzinfo=tz.utc), dt.min.replace(tzinfo=tz.utc)),
-            ("2020-05-07 8:00", dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0), dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
-            (dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc),
-             dt(2020, 5, 7, 8, 0).replace(tzinfo=tz.utc)),
+            ("2020-05-07 8:00", dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8), dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
+            (dt(2020, 5, 7, 8).replace(tzinfo=tz.utc),
+             dt(2020, 5, 7, 8).replace(tzinfo=tz.utc)),
         )
 
     def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
