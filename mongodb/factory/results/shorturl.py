@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from JellyBot.api.static import result
-from models import Model
+from models import ShortUrlRecordModel
 
 from ._base import ModelResult
 
@@ -10,7 +10,7 @@ from ._base import ModelResult
 @dataclass
 class UrlShortenResult(ModelResult):
     exception: Optional[Exception] = None
-    model: Optional[Model] = None
+    model: Optional[ShortUrlRecordModel] = None
 
     def serialize(self) -> dict:
         d = super().serialize()

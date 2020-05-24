@@ -5,6 +5,7 @@ from models import ModelDefaultValueExt, Model
 from models.field import (
     TextField, UrlField, ArrayField, ObjectIDField, BooleanField
 )
+from strnames.models import ShortUrl
 
 
 class ShortUrlRecordModel(Model):
@@ -21,4 +22,8 @@ class ShortUrlRecordModel(Model):
 
     @property
     def short_url(self) -> str:
-        return f"{os.environ['SERVICE_SHORT_URL']}/{self.code}"
+        root_url = os.environ.get("SERVICE_SHORT_URL")
+        if not root_url:
+            return ShortUrl.SERVICE_NOT_AVAILABLE
+
+        return f"{root_url}/{self.code}"
