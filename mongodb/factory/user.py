@@ -222,7 +222,7 @@ class RootUserManager(BaseCollection):
 
         return str_not_found if str_not_found else None
 
-    def get_root_data_api_token(self, token: str) -> GetRootUserDataResult:
+    def get_root_data_api_token(self, token: str, *, skip_on_plat=False) -> GetRootUserDataResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
         entry = None
         onplat_list = []
@@ -237,7 +237,7 @@ class RootUserManager(BaseCollection):
                 entry = root_u_data
                 outcome = GetOutcome.O_CACHE_DB
 
-        if outcome.is_success and entry.has_onplat_data:
+        if not skip_on_plat and outcome.is_success and entry.has_onplat_data:
             missing = []
 
             for oid in entry.on_plat_oids:

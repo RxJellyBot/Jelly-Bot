@@ -19,7 +19,6 @@ def handle_member_join(request, event, destination):
     for user in event.joined.members:
         uid = user.user_id
 
-        # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
         udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
 
         if udata_result.success and cdata:
@@ -40,7 +39,6 @@ def handle_member_left(request, event, destination):
     for user in event.left.members:
         uid = user.user_id
 
-        # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
         udata_result = RootUserManager.get_root_data_onplat(Platform.LINE, uid)
         cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
 

@@ -118,8 +118,7 @@ class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
     def _handle_api_token(self, param_dict):
         api_token = param_dict.get(param.Common.API_TOKEN)
         if api_token is not None:
-            # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
-            rt_result = RootUserManager.get_root_data_api_token(api_token)
+            rt_result = RootUserManager.get_root_data_api_token(api_token, skip_on_plat=True)
             if rt_result.success:
                 self._sender_oid = rt_result.model.id
             else:
@@ -129,7 +128,6 @@ class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
         platform = param_dict.get(param.Common.PLATFORM)
         channel_token = param_dict.get(param.Common.CHANNEL_TOKEN)
         if platform is not None and channel_token is not None:
-            # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
             rt_result = RootUserManager.get_root_data_onplat(platform, channel_token)
             if rt_result.success:
                 self._sender_oid = rt_result.model.id

@@ -112,7 +112,6 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_member_join(self, member: Member):
-        # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
         udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
@@ -125,7 +124,6 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_member_remove(self, member: Member):
-        # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
         udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 

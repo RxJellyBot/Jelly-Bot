@@ -27,7 +27,6 @@ class RootUserIDInsertMiddleware(MiddlewareMixin):
             platform = qd.get(param.Common.PLATFORM)
 
             if user_token is not None and platform is not None:
-                # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
                 rt_result = RootUserManager.get_root_data_onplat(platform, user_token)
                 if rt_result.success:
                     request.session[Session.USER_ROOT_ID] = str(rt_result.model.id)
@@ -36,8 +35,7 @@ class RootUserIDInsertMiddleware(MiddlewareMixin):
             api_token = request.COOKIES.get(Cookies.USER_TOKEN) or qd.get(param.Common.API_TOKEN)
 
             if api_token is not None:
-                # OPTIMIZE: skip the steps of getting the API / OnPlat model (unnecessary)
-                rt_result = RootUserManager.get_root_data_api_token(api_token)
+                rt_result = RootUserManager.get_root_data_api_token(api_token, skip_on_plat=True)
                 if rt_result.success:
                     request.session[Session.USER_ROOT_ID] = str(rt_result.model.id)
                     return
