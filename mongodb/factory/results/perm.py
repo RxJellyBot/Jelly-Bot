@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from models import Model
+from models import ChannelProfileModel
 
 from ._base import ModelResult
 
 
 @dataclass
 class GetPermissionProfileResult(ModelResult):
-    model: Optional[Model] = None
+    model: Optional[ChannelProfileModel] = None
 
 
 @dataclass
 class CreateProfileResult(ModelResult):
-    pass
+    model: Optional[ChannelProfileModel] = None
