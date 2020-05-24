@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Type
 
 from models import Model, ExtraContentModel
@@ -8,10 +9,12 @@ __all__ = ["TestRecordExtraContentResult"]
 
 
 class TestRecordExtraContentResult(TestOnModelResult.TestClass):
+    TS = datetime.utcnow()
+
     @classmethod
     def get_result_class(cls) -> Type[ModelResult]:
         return RecordExtraContentResult
 
     @classmethod
     def get_constructed_model(cls) -> Model:
-        return ExtraContentModel(Content="AAAAA")
+        return ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS)

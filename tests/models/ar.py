@@ -17,6 +17,8 @@ __all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoRep
 
 
 class TestAutoReplyContentModel(TestModel.TestClass):
+    KEY_SKIP_CHECK_INVALID = {("t", "ContentType")}
+
     @classmethod
     def get_model_class(cls) -> Type[Model]:
         return AutoReplyContentModel
@@ -30,7 +32,7 @@ class TestAutoReplyContentModel(TestModel.TestClass):
         return {("c", "Content"): "https://i.imgur.com/p7qm0vx.jpg"}
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {("c", "Content"): "87A", ("t", "ContentType"): AutoReplyContentType.LINE_STICKER},

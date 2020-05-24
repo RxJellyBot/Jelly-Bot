@@ -43,6 +43,8 @@ class TestRootUserConfigModel(TestModel.TestClass):
 
 
 class TestRootUserModelFillApi(TestModel.TestClass):
+    KEY_SKIP_CHECK = {("api", "ApiOid")}
+
     ONPLAT = ObjectId()
     API = ObjectId()
     CONFIG = RootUserConfigModel()
@@ -58,7 +60,7 @@ class TestRootUserModelFillApi(TestModel.TestClass):
         }
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {},
@@ -80,6 +82,8 @@ class TestRootUserModelFillApi(TestModel.TestClass):
 
 
 class TestRootUserModelFillOnPlat(TestModel.TestClass):
+    KEY_SKIP_CHECK = {("op", "OnPlatOids")}
+
     ONPLAT = ObjectId()
     API = ObjectId()
     CONFIG = RootUserConfigModel()
@@ -95,7 +99,7 @@ class TestRootUserModelFillOnPlat(TestModel.TestClass):
         }
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {},
@@ -145,7 +149,7 @@ class TestAPIUserModel(TestModel.TestClass):
         return APIUserModel
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {

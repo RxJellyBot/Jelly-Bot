@@ -1,11 +1,11 @@
 from abc import abstractmethod, ABC
-from typing import Tuple, Dict, Any, Type, List, final
+from typing import Tuple, Dict, Any, Type, List, final, Set
 from itertools import combinations
 
 from bson import ObjectId
 
 from extutils.utils import to_snake_case
-from models import Model, OID_KEY
+from models import Model, OID_KEY, ModelDefaultValueExt
 from models.exceptions import (
     IdUnsupportedError, ModelConstructionError, FieldKeyNotExistError, JsonKeyNotExistedError, ModelUncastableError
 )
@@ -26,12 +26,81 @@ class TestModel(ABC):
 
     To use this, inherit a new class from :class:`TestModel.TestClass`.
 
+    Default value of the fields will be validated at the beginning of the tests.
+    If the validation failed, the test will **NOT** execute.
+
+    Configure class variable ``KEY_SKIP_CHECK`` and ``KEY_SKIP_CHECK_INVALID``
+    to set the keys to bypass the validation.
+
     .. seealso::
         https://stackoverflow.com/a/25695512/11571888 to see why there's a class wrapper.
     """
 
     class TestClass(TestCase):
         """The class to be inherited for :class:`TestModel`."""
+
+        KEY_SKIP_CHECK: Set[Tuple[str, str]] = set()
+        """Keys ``(Json, Field)`` to bypass the field default value validation."""
+
+        KEY_SKIP_CHECK_INVALID: Set[Tuple[str, str]] = set()
+        """Keys ``(Json, Field)`` to bypass the field default value validation for invalid model construction."""
+
+        @classmethod
+        def setUpTestClass(cls):
+            cls.validate_fields()
+
+        @classmethod
+        @final
+        def validate_fields(cls):
+            # Validate REQUIRED
+            for k in cls.get_required().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Required:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not REQUIRED. @{cls.__qualname__}")
+
+            # Validate INVALID REQUIRED
+            keys = set()
+            for comb in cls.get_invalid():
+                init_args, exc = comb
+                keys.update(init_args.keys())
+            keys -= cls.KEY_SKIP_CHECK_INVALID
+
+            for k in keys:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Required:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not REQUIRED. @{cls.__qualname__}")
+
+            # Validate OPTIONAL
+            for k in cls.get_optional().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Optional:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not OPTIONAL. @{cls.__qualname__}")
+
+            # Validate DEFAULT
+            for k in cls.get_default().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if ModelDefaultValueExt.is_default_val_ext(fc.default_value):
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"should not be extended default value. @{cls.__qualname__}")
 
         @classmethod
         @abstractmethod
@@ -91,11 +160,11 @@ class TestModel(ABC):
             return {}
 
         @classmethod
-        def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+        def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
             """
-            List of a tuple which contains:
+            List of a ``tuple`` which contains:
 
-            - A ``dict`` which required keys and its corresponding INVALID values.
+            - A ``dict`` containing the keys and its corresponding **INVALID** values to initialize the model.
 
                 Key:
                     - 1st element: json key name
@@ -235,7 +304,7 @@ class TestModel(ABC):
                         self.assertDictEqual(actual_field, expected_json)
 
         def test_model_construct_invalid(self):
-            for init_dict, expected_error in self.get_required_invalid():
+            for init_dict, expected_error in self.get_invalid():
                 init_json, init_field = self._dict_to_json_field(init_dict)
 
                 with self.subTest(init_json=init_json, expected_error=expected_error):
