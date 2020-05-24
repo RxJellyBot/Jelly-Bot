@@ -4,7 +4,7 @@ from typing import Set, Optional
 
 from JellyBot.api.static import result
 from flags import ExecodeCompletionOutcome
-from models import Model
+from models import ExecodeEntryModel
 
 from ._base import BaseResult, ModelResult
 
@@ -24,13 +24,18 @@ class EnqueueExecodeResult(BaseResult):
 @dataclass
 class GetExecodeEntryResult(ModelResult):
     exception: Optional[Exception] = None
-    model: Optional[Model] = None
+    model: Optional[ExecodeEntryModel] = None
 
 
 @dataclass
 class CompleteExecodeResult(ModelResult):
+    model: Optional[ExecodeEntryModel]
     lacking_keys: Set[str]
     completion_outcome: ExecodeCompletionOutcome
+
+    @property
+    def success(self) -> bool:
+        return super().success and not self.lacking_keys
 
     def serialize(self) -> dict:
         d = super().serialize()
