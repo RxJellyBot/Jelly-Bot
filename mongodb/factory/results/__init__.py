@@ -3,8 +3,7 @@ from ._base import BaseResult, ModelResult
 
 from .user import (
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult,
-    RootUserRegistrationResult, GetRootUserDataApiResult, RootUserUpdateResult,
-    GetRootUserDataResult
+    RootUserRegistrationResult, RootUserUpdateResult, GetRootUserDataResult
 )
 from .ar import AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 from .channel import (

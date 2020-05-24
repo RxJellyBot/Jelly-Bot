@@ -5,3 +5,4 @@ from .execode import *  # NOQA
 from .perm import *  # NOQA
 from .shorturl import *  # NOQA
 from .statistics import *  # NOQA
+from .user import *  # NOQA

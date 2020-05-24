@@ -20,7 +20,7 @@ from .mixin import GenerateTokenMixin
 from .results import (
     WriteOutcome, GetOutcome, UpdateOutcome,
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, RootUserRegistrationResult,
-    GetRootUserDataApiResult, RootUserUpdateResult, GetRootUserDataResult
+    RootUserUpdateResult, GetRootUserDataResult
 )
 
 DB_NAME = "user"
@@ -222,7 +222,7 @@ class RootUserManager(BaseCollection):
 
         return str_not_found if str_not_found else None
 
-    def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
+    def get_root_data_api_token(self, token: str) -> GetRootUserDataResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
         entry = None
         onplat_list = []
@@ -254,7 +254,38 @@ class RootUserManager(BaseCollection):
                     f"API Token: {token} / OID of Missing On Platform Data: {' | '.join([str(i) for i in missing])}",
                     subject="On Platform Data not found")
 
-        return GetRootUserDataApiResult(outcome, None, entry, api_u_data, onplat_list)
+        return GetRootUserDataResult(outcome, None, entry, api_u_data, onplat_list)
+
+    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
+        on_plat_data = self.get_onplat_data(platform, user_token)
+        rt_user_data = None
+
+        if on_plat_data is None and auto_register:
+            on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
+
+            if on_plat_reg_result.success:
+                on_plat_data = self.get_onplat_data(platform, user_token)
+
+        if on_plat_data is None:
+            outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
+        else:
+            rt_user_data = self.get_root_data_onplat_oid(on_plat_data.id)
+
+            if rt_user_data is None:
+                if auto_register:
+                    reg_result = self.register_onplat(platform, user_token)
+
+                    if reg_result.success:
+                        rt_user_data = reg_result.model
+                        outcome = GetOutcome.O_ADDED
+                    else:
+                        outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
+                else:
+                    outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
+            else:
+                outcome = GetOutcome.O_CACHE_DB
+
+        return GetRootUserDataResult(outcome, None, rt_user_data)
 
     @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
@@ -291,37 +322,6 @@ class RootUserManager(BaseCollection):
     @arg_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
-
-    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
-        on_plat_data = self.get_onplat_data(platform, user_token)
-        rt_user_data = None
-
-        if on_plat_data is None and auto_register:
-            on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
-
-            if on_plat_reg_result.success:
-                on_plat_data = self.get_onplat_data(platform, user_token)
-
-        if on_plat_data is None:
-            outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-        else:
-            rt_user_data = self.get_root_data_onplat_oid(on_plat_data.id)
-
-            if rt_user_data is None:
-                if auto_register:
-                    reg_result = self.register_onplat(platform, user_token)
-
-                    if reg_result.success:
-                        rt_user_data = reg_result.model
-                        outcome = GetOutcome.O_ADDED
-                    else:
-                        outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-                else:
-                    outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
-            else:
-                outcome = GetOutcome.O_CACHE_DB
-
-        return GetRootUserDataResult(outcome, None, rt_user_data)
 
     @arg_type_ensure
     def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
@@ -389,7 +389,7 @@ class RootUserManager(BaseCollection):
             return_document=ReturnDocument.AFTER)
 
         if updated:
-            updated = RootUserConfigModel.cast_model(updated)
+            updated = RootUserModel.cast_model(updated)
             outcome = UpdateOutcome.O_UPDATED
         else:
             outcome = UpdateOutcome.X_NOT_FOUND

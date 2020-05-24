@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from JellyBot.api.static import result
-from models import OnPlatformUserModel, APIUserModel
+from models import OnPlatformUserModel, APIUserModel, RootUserModel
 
 from ._base import ModelResult
 from ._outcome import WriteOutcome
@@ -16,6 +16,7 @@ class IdentityRegistrationResult(ModelResult, ABC):
 
 @dataclass
 class OnSiteUserRegistrationResult(IdentityRegistrationResult):
+    model: Optional[APIUserModel]
     token: Optional[str]
 
     def serialize(self) -> dict:
@@ -26,34 +27,36 @@ class OnSiteUserRegistrationResult(IdentityRegistrationResult):
 
 @dataclass
 class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
-    pass
+    model: Optional[OnPlatformUserModel]
 
 
 @dataclass
 class GetRootUserDataResult(ModelResult):
-    pass
-
-
-@dataclass
-class GetRootUserDataApiResult(GetRootUserDataResult):
-    model_api: APIUserModel
-    model_onplat_list: List[OnPlatformUserModel]
+    model: Optional[RootUserModel]
+    model_api: Optional[APIUserModel] = None
+    model_onplat_list: Optional[List[OnPlatformUserModel]] = None
 
 
 @dataclass
 class RootUserRegistrationResult(ModelResult):
+    model: Optional[RootUserModel]
     conn_outcome: WriteOutcome
     idt_reg_result: IdentityRegistrationResult
     hint: str
 
     def serialize(self) -> dict:
         d = super().serialize()
-        d.update(**{result.UserManagementResponse.CONN_OUTCOME: self.conn_outcome,
-                    result.UserManagementResponse.REG_RESULT: self.idt_reg_result.serialize(),
-                    result.UserManagementResponse.HINT: self.hint})
+        d.update(**{
+            result.UserManagementResponse.CONN_OUTCOME:
+                self.conn_outcome,
+            result.UserManagementResponse.REG_RESULT:
+                self.idt_reg_result.serialize() if self.idt_reg_result else None,
+            result.UserManagementResponse.HINT:
+                self.hint
+        })
         return d
 
 
 @dataclass
 class RootUserUpdateResult(ModelResult):
-    pass
+    model: Optional[RootUserModel]
