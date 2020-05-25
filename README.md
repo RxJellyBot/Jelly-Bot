@@ -38,6 +38,18 @@ Website: http://rnnx.cc/Website
 
 - Because the user count of the stable build is significantly less than beta build.
 
+### Miscellaneous information
+
+#### Code linter
+
+- `flake8`
+
+- `pylint`
+
+#### Docstring framework
+
+`reStructuredText`
+
 ### Useful Links used in this repository
 
 <details><summary>Documentations</summary>

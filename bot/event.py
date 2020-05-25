@@ -1,3 +1,10 @@
+"""
+This module contains events for the bot to trigger after certain conditions are met.
+
+Methods prefixed with ``signal_`` should be called when the certain event occurs.
+
+Methods prefixed with ``on_`` will be executed on all of the events specified occur.
+"""
 from django.conf import settings
 
 from JellyBot.systemconfig import System
@@ -17,11 +24,13 @@ _ready = {
 
 
 def signal_django_ready():
+    """Method to be called when the Django application is ready."""
     _ready["Discord"] = True
     _check_all_ready()
 
 
 def signal_discord_ready():
+    """Method to be called when the Discord bot is ready."""
     _ready["Django"] = True
     _check_all_ready()
 
@@ -32,7 +41,7 @@ def _check_all_ready():
 
 
 def on_system_fully_ready():
-    """Code to execute on system fully prepared."""
+    """Code to execute when the system is fully prepared. (Discord bot and Django application ready)"""
     load_handling_functions()
     record_boot_dt()
 

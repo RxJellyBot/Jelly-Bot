@@ -1,3 +1,6 @@
+"""
+Calculator using ``sympy.sympify`` to perform calculation by passing ``str``.
+"""
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
@@ -13,39 +16,48 @@ from msghandle.models import HandledMessageCalculateResult
 
 
 def calculate_expression(expr: str, output_error: bool = False) -> List[HandledMessageCalculateResult]:
-    ns = {"_clash1": _clash1}
+    """
+    Calculate the expression ``expr`` using ``sympify()``.
+
+    :param expr: expression to be calculated
+    :param output_error: output the error if any during the calculation
+    :return: packed calculation result
+    """
+    ns_sympy = {"_clash1": _clash1}
 
     try:
         if "\n" in expr:
             msgs = expr.split("\n")
             expr = msgs[-1]
 
-            exec_("\n".join(msgs[:-1]), ns)
+            exec_("\n".join(msgs[:-1]), ns_sympy)
 
-        return [HandledMessageCalculateResult(expr_before=expr, expr_after=sympify(expr, ns))]
-    except SympifyError as e:
+        ret = [HandledMessageCalculateResult(expr_before=expr, expr_after=sympify(expr, ns_sympy))]
+    except SympifyError as ex:
         logger.logger.debug(
-            f"Exception occurred for text message calculator. Expr: {e.expr} / Base Exception: {e.base_exc}")
+            "Exception occurred for text message calculator. Expr: %s / Base Exception: %s", ex.expr, ex.base_exc)
 
         if output_error:
-            return [HandledMessageCalculateResult(
+            ret = [HandledMessageCalculateResult(
                 expr_before=expr,
-                expr_after=_("I have difficulty understanding you.\n{} ({})").format(e.expr, e.base_exc))]
+                expr_after=_("I have difficulty understanding you.\n%s (%s)") % (ex.expr, ex.base_exc))]
         else:
-            return []
-    except NameError as e:
-        logger.logger.debug(f"Exception occurred for text message calculator. Message: {e.args}")
+            ret = []
+    except NameError as ex:
+        logger.logger.debug("Exception occurred for text message calculator. Message: %s", ex.args)
 
         if output_error:
-            return [HandledMessageCalculateResult(
+            ret = [HandledMessageCalculateResult(
                 expr_before=expr,
-                expr_after=_("WTF are you talking about?\n{}").format(e.args))]
+                expr_after=_("WTF are you talking about?\n{}") % ex.args)]
         else:
-            return []
-    except SyntaxError as e:
+            ret = []
+    except SyntaxError as ex:
         if output_error:
-            return [HandledMessageCalculateResult(
+            ret = [HandledMessageCalculateResult(
                 expr_before=expr,
-                expr_after=_("I can't understand.\n{} ({})").format(e.args, e.text))]
+                expr_after=_("I can't understand.\n{} ({})") % (ex.args, ex.text))]
         else:
-            return []
+            ret = []
+
+    return ret

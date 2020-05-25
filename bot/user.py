@@ -1,3 +1,6 @@
+"""
+Functions to perform actions related to user identity.
+"""
 from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Thread
 from typing import Dict, List
@@ -14,7 +17,7 @@ from extutils.logger import SYSTEM
 def _perform_existence_check(set_name_to_cache: bool):
     list_prof_conn = list(ProfileManager.get_available_connections())
 
-    def fn():
+    def _fn():
         marked_unavailable = 0
 
         dict_onplat_oids = RootUserManager.get_root_to_onplat_dict()
@@ -36,13 +39,13 @@ def _perform_existence_check(set_name_to_cache: bool):
                 if ret:
                     marked_unavailable += 1
 
-        SYSTEM.logger.info(f"Marked {marked_unavailable} connections unavailable.")
+        SYSTEM.logger.info("Marked %s connections unavailable.", marked_unavailable)
 
-    SYSTEM.logger.info(f"Performing user channel existence check on {len(list_prof_conn)} connections...")
+    SYSTEM.logger.info("Performing user channel existence check on %d connections...", len(list_prof_conn))
 
-    result = exec_timing_result(fn)
+    result = exec_timing_result(_fn)
 
-    SYSTEM.logger.info(f"User channel existence check completed in {result.execution_ms:.2f} ms.")
+    SYSTEM.logger.info("User channel existence check completed in %.2f ms.", result.execution_ms)
 
 
 def _check_on_prof_conn(
@@ -74,11 +77,11 @@ def _check_on_prof_conn(
             )
             continue
 
-        n = model_onplat.get_name(model_channel)
+        name = model_onplat.get_name(model_channel)
 
-        if n:
+        if name:
             if set_name_to_cache:
-                set_uname_cache(model_onplat.id, n)
+                set_uname_cache(model_onplat.id, name)
 
             break
 
@@ -91,4 +94,9 @@ def _check_on_prof_conn(
 
 
 def perform_existence_check(set_name_to_cache: bool):
+    """
+    Perform user existence check and set the user name to the cache **asynchronously**.
+
+    :param set_name_to_cache: if the user name should be set to the user name cache
+    """
     Thread(target=_perform_existence_check, args=(set_name_to_cache,)).start()

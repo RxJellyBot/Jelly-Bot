@@ -1,0 +1,4 @@
+# Template .pylintrc file https://raw.githubusercontent.com/datawire/quark/master/.pylintrc
+
+[FORMAT]
+max-line-length=119
