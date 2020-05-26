@@ -1,5 +1,5 @@
 from ._base import BaseField
-from .exceptions import FieldModelClassInvalid
+from .exceptions import FieldModelClassInvalidError
 
 
 class ModelField(BaseField):
@@ -23,7 +23,7 @@ class ModelField(BaseField):
         if model_cls is None:
             raise ValueError("`model_cls` needs to be specified for parsing.")
         elif not isinstance(model_cls, type) or not issubclass(model_cls, Model):
-            raise FieldModelClassInvalid(key, model_cls)
+            raise FieldModelClassInvalidError(key, model_cls)
 
         self._model_cls: Model = model_cls
 
@@ -49,6 +49,6 @@ class ModelField(BaseField):
     def none_obj(cls):
         return None
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         # noinspection PyUnresolvedReferences
         return self.desired_type.cast_model(value)

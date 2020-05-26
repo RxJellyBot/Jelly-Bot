@@ -30,7 +30,6 @@ class AutoReplyValidator:
 
 
 class _BaseValidator:
-    # noinspection PyBroadException
     @staticmethod
     def is_content_image(content: Any, online_check) -> bool:
         if online_check:

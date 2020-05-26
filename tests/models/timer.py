@@ -2,12 +2,12 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
-from django.test import TestCase
 
 from extutils.dt import now_utc_aware, t_delta_str, localtime
 from extutils.locales import LocaleInfo
 from models import Model, TimerModel, TimerListResult, RootUserModel, RootUserConfigModel
 from strnames.models import Timer
+from tests.base import TestCase
 
 from ._test_base import TestModel
 

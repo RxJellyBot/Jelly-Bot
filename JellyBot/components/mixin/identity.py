@@ -26,7 +26,7 @@ class ChannelOidRequiredMixin(View):
         return get_channel_data(kwargs)
 
     # noinspection PyUnusedLocal
-    def _get_channel_data_(self, *args, **kwargs):
+    def _get_channel_data(self, *args, **kwargs):
         if not self._channel_data:
             self._channel_data = self.get_channel_data(*args, **kwargs)
         return self._channel_data

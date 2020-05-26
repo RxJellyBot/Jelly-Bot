@@ -6,7 +6,7 @@ from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import ShortUrlDataManager
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["surl", "short", "st", "url"], order_idx=800, name=_("Shorten URL"),

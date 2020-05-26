@@ -41,7 +41,8 @@ class UserProfileManager(BaseCollection):
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
                             profile_oids: Union[ObjectId, List[ObjectId]]) -> OperationOutcome:
         """
-        Attach `ChannelPermissionProfileModel` and return the update result.
+        Attach a profile onto a the user whose uid is ``root_uid`` using the ID of the profile
+        and return the update result.
         """
         id_ = self.update_one(
             {
@@ -77,7 +78,7 @@ class UserProfileManager(BaseCollection):
     def get_user_profile_conn(self, channel_oid: ObjectId, root_uid: ObjectId) \
             -> Optional[ChannelProfileConnectionModel]:
         """
-        Get the `ChannelProfileConnectionModel` of the specified user in the specified channel.
+        Get the :class:`ChannelProfileConnectionModel` of the specified user in the specified channel.
 
         :return: `None` if not found.
         """
@@ -252,30 +253,30 @@ class ProfileDataManager(BaseCollection):
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
-        Automatically creates a default profile for `channel_oid` if not exists.
+        Automatically creates a default profile for ``channel_oid`` if not exists.
         """
         ex = None
 
         cnl = ChannelManager.get_channel_oid(channel_oid)
         if not cnl:
-            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_NOT_FOUND, None, ex)
+            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_NOT_FOUND, ex)
 
         try:
             prof_oid = cnl.config.default_profile_oid
         except AttributeError:
-            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, None, ex)
+            return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
             perm_prof = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
 
             if perm_prof:
-                return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, perm_prof, ex)
+                return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, ex, perm_prof)
 
         create_result = self.create_default_profile(channel_oid)
 
         return GetPermissionProfileResult(
             GetOutcome.O_ADDED if create_result.success else GetOutcome.X_DEFAULT_PROFILE_ERROR,
-            create_result.model, ex)
+            ex, create_result.model)
 
     def get_attachable_profiles(
             self, channel_oid: ObjectId, existing_permissions: Set[ProfilePermission],
@@ -293,7 +294,7 @@ class ProfileDataManager(BaseCollection):
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
     def create_default_profile(self, channel_oid: ObjectId) -> CreateProfileResult:
-        default_profile, outcome, ex = self._create_profile_(channel_oid, Name=_("Default Profile"))
+        default_profile, outcome, ex = self._create_profile(channel_oid, Name=_("Default Profile"))
 
         if outcome.is_inserted:
             set_success = ChannelManager.set_config(
@@ -302,37 +303,38 @@ class ProfileDataManager(BaseCollection):
             if not set_success:
                 outcome = WriteOutcome.X_ON_SET_CONFIG
 
-        return CreateProfileResult(outcome, default_profile, ex)
+        return CreateProfileResult(outcome, ex, default_profile)
 
     def create_profile(self, kwargs) -> CreateProfileResult:
         """
         Create a profile.
 
-        Uses `kwargs` to construct a `ChannelProfileModel` then insert the model into the database.
+        Uses ``kwargs`` to construct a :class:`ChannelProfileModel` then insert the model into the database.
 
         :param kwargs: `dict` to construct a `ChannelProfileModel`.
         """
         model, outcome, ex = self.insert_one_data(**kwargs)
 
-        return CreateProfileResult(outcome, model, ex)
+        return CreateProfileResult(outcome, ex, model)
 
     def create_profile_model(self, model: ChannelProfileModel) -> CreateProfileResult:
         """
         Create a profile.
 
-        Insert the passed-in `model` into the database.
+        Insert the passed-in ``model`` into the database.
 
         :param model: `ChannelProfileModel` to be inserted.
         """
         outcome, ex = self.insert_one_model(model)
 
-        return CreateProfileResult(outcome, model, ex)
+        return CreateProfileResult(outcome, ex, model)
 
     @arg_type_ensure
     def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
         """
-        Update a profile using the data in `update_dict`.
+        Update a profile using the data in ``update_dict``.
 
+        :param profile_oid: OID of the profile to be updated
         :param update_dict: `dict` of data to be updated. Key is the field key of `ChannelProfileModel`.
         """
         return self.update_many_outcome({OID_KEY: profile_oid}, {"$set": update_dict})
@@ -340,7 +342,7 @@ class ProfileDataManager(BaseCollection):
     def delete_profile(self, profile_oid: ObjectId):
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
-    def _create_profile_(self, channel_oid: ObjectId, **fk_param):
+    def _create_profile(self, channel_oid: ObjectId, **fk_param):
         return self.insert_one_data(
             ChannelOid=channel_oid, **fk_param)
 
@@ -391,7 +393,7 @@ class ProfileManager:
     @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
         """
-        Register a new profile with the user's oid and the constructed `ChannelProfileModel`.
+        Register a new profile with the user's oid and the constructed :class:`ChannelProfileModel`.
 
         :param root_uid: User's OID.
         :param model: Constructed `ChannelProfileModel` to be inserted.
@@ -408,10 +410,11 @@ class ProfileManager:
         """
         Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
 
-        After processing, it returns a `dict` with field keys which can be used to create a `ChannelProfileModel`.
+        After processing, it returns a ``dict`` with field keys
+        which can be used to create a :class:`ChannelProfileModel`.
 
-        :param profile_kwargs: A `dict` to be processed.
-        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`.
+        :param profile_kwargs: A `dict` to be processed
+        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`
         """
         # --- Collate `PermissionLevel`
         perm_lv = PermissionLevel.cast(profile_kwargs["PermissionLevel"])
@@ -446,7 +449,8 @@ class ProfileManager:
         """
         Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
-        After processing, it returns a `dict` with json keys which can be used as the operand of `$set` for updating.
+        After processing, it returns a ``dict`` with json keys
+        which can be used as the operand of ``$set`` for updating.
 
         :param profile_kwargs: A `dict` to be processed.
         :return: a `dict` with py keys which can be used as the operand of `$set` for updating.
@@ -469,7 +473,7 @@ class ProfileManager:
 
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
-        Get the `list` of `ChannelProfileModel` of the specified user.
+        Get the ``list`` of :class:`ChannelProfileModel` of the specified user.
 
         :return: `None` on not found.
         """
@@ -632,7 +636,7 @@ class ProfileManager:
         return self._conn.get_profile_user_oids(profile_oid)
 
     def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
-        """Get a `dict` which key is the profile OID and value is the user OID who have the corresponding profile."""
+        """Get a ``dict`` which key is the profile OID and value is the user OID who have the corresponding profile."""
         return self._conn.get_profiles_user_oids(profile_oid)
 
     def is_name_available(self, channel_oid: ObjectId, name: str):
@@ -650,7 +654,7 @@ class ProfileManager:
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
-    def _attach_detach_permission_check_(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
+    def _attach_detach_permission_check(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
         permissions = self.get_user_permissions(channel_oid, user_oid)
 
         if target_oid and user_oid != target_oid:
@@ -676,7 +680,7 @@ class ProfileManager:
         """
         Attach profile to the target.
 
-        If `target_oid` is `None`, then the profile will be attached to self.
+        If ``target_oid`` is ``None``, then the profile will be attached to self.
         """
         # --- Check target
 
@@ -688,7 +692,7 @@ class ProfileManager:
 
         # --- Check permissions
 
-        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
             return OperationOutcome.X_INSUFFICIENT_PERMISSION
 
         # --- Check profile attachable
@@ -729,7 +733,7 @@ class ProfileManager:
 
         # --- Check permissions
 
-        if not self._attach_detach_permission_check_(channel_oid, user_oid, target_oid):
+        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
             return OperationOutcome.X_INSUFFICIENT_PERMISSION
 
         # --- Detach profile

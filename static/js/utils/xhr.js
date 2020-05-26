@@ -2,7 +2,7 @@
 
 // noinspection JSUnusedGlobalSymbols
 function xhrPostRequest(url, params, onLoad = null, preSend = null) {
-    let xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
 
     xhr.open("POST", url);
 
@@ -13,7 +13,7 @@ function xhrPostRequest(url, params, onLoad = null, preSend = null) {
 
     xhr.responseType = "json";
 
-    xhr.onload = function () {
+    xhr.onload = () => {
         if (onLoad) {
             onLoad(xhr);
         }

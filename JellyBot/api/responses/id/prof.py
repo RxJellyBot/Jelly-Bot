@@ -55,7 +55,7 @@ class ProfileResponseBase(
         self._profile_oid = self._param_dict[param.Manage.Profile.PROFILE_OID]
         self._target_oid = self._param_dict[param.Manage.Profile.TARGET] or self._sender_oid
 
-    def _handle_profile_oid_(self):
+    def _handle_profile_oid(self):
         self._profile_oid = safe_cast(self._profile_oid, ObjectId)
         if not self._profile_oid:
             self._err[param.Manage.Profile.PROFILE_OID] = self._profile_oid
@@ -63,7 +63,7 @@ class ProfileResponseBase(
     def pre_process(self):
         super().pre_process()
 
-        self._handle_profile_oid_()
+        self._handle_profile_oid()
 
     def pass_condition(self) -> bool:
         return super().pass_condition() and self._profile_oid is not None and self._sender_oid is not None

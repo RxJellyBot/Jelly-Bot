@@ -14,7 +14,7 @@ from mongodb.factory.results import OperationOutcome
 from mongodb.factory import ProfileManager
 from mongodb.helper import ProfileHelper
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["pf", "prof", "profile"], order_idx=250, name=_("Profile Management"),
@@ -52,14 +52,14 @@ class PermissionParseResult:
         return len(self.skipped) > 0
 
 
-def _parse_name_(channel_oid: ObjectId, name: str):
+def _parse_name(channel_oid: ObjectId, name: str):
     if ProfileManager.is_name_available(channel_oid, name):
         return name
     else:
         return None
 
 
-def _parse_color_(color: Union[str, Color]):
+def _parse_color(color: Union[str, Color]):
     if isinstance(color, str):
         try:
             return ColorFactory.from_hex(color)
@@ -71,7 +71,7 @@ def _parse_color_(color: Union[str, Color]):
         raise TypeError()
 
 
-def _parse_permission_(permission: str, max_perm_lv: PermissionLevel) -> PermissionParseResult:
+def _parse_permission(permission: str, max_perm_lv: PermissionLevel) -> PermissionParseResult:
     result = PermissionParseResult()
 
     permission = permission.split(",")
@@ -94,7 +94,7 @@ def _parse_permission_(permission: str, max_perm_lv: PermissionLevel) -> Permiss
     return result
 
 
-def _parse_permission_level_(perm_lv: Union[str, PermissionLevel]):
+def _parse_permission_level(perm_lv: Union[str, PermissionLevel]):
     return PermissionLevel.cast(perm_lv, silent_fail=True)
 
 
@@ -153,21 +153,21 @@ def profile_create_internal(
 
     # --- Parse name
 
-    prof_name = _parse_name_(e.channel_oid, name)
+    prof_name = _parse_name(e.channel_oid, name)
     if not prof_name:
         return [HandledMessageEventText(content=_("The profile name `{}` is unavailable in this channel. "
                                                   "Please choose a different one.").format(name))]
 
     # --- Parse color
 
-    color = _parse_color_(color)
+    color = _parse_color(color)
     if not color:
         return [HandledMessageEventText(
             content=_("Failed to parse color. Make sure it is in the format of `81D8D0`."))]
 
     # --- Parse permission level
 
-    perm_lv = _parse_permission_level_(perm_lv)
+    perm_lv = _parse_permission_level(perm_lv)
     if not perm_lv:
         return [HandledMessageEventText(
             content=_("Failed to parse permission level. Make sure it is a valid level or check the documentation."))]
@@ -178,7 +178,7 @@ def profile_create_internal(
     if isinstance(permission, str):
         max_perm_lv = ProfileManager.get_highest_permission_level(profiles)
 
-        parsed_perm = _parse_permission_(permission, max_perm_lv)
+        parsed_perm = _parse_permission(permission, max_perm_lv)
         if parsed_perm.has_skipped:
             msg_on_hold.append(HandledMessageEventText(
                 content=_("Strings below were skipped because it cannot be understood as permission:\n{}").format(
@@ -209,7 +209,7 @@ def profile_create_internal(
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold
 
 
-def _output_profile_txt_(result_entries):
+def _output_profile_txt(result_entries):
     entries = []
     for entry in result_entries:
         profile = entry.profile
@@ -248,7 +248,7 @@ def profile_query(e: TextMessageEventObject, keyword: str):
     if not result:
         return [HandledMessageEventText(content=_("No profile with the keyword `{}` was found.").format(keyword))]
 
-    return [HandledMessageEventText(content=_output_profile_txt_(result))]
+    return [HandledMessageEventText(content=_output_profile_txt(result))]
 
 
 # endregion
@@ -269,7 +269,7 @@ def profile_list(e: TextMessageEventObject):
     if not result:
         return [HandledMessageEventText(content=_("No profile in this channel."))]
 
-    return [HandledMessageEventText(content=_output_profile_txt_(result))]
+    return [HandledMessageEventText(content=_output_profile_txt(result))]
 
 
 # endregion
@@ -281,7 +281,7 @@ cmd_attach = cmd.new_child_node(
     description=_("Attach profile to either self or a member."))
 
 
-def _output_attach_outcome_(outcome: OperationOutcome):
+def _output_attach_outcome(outcome: OperationOutcome):
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Profile attached."))]
     else:
@@ -297,7 +297,7 @@ def _output_attach_outcome_(outcome: OperationOutcome):
     arg_help=[_help_name_]
 )
 def profile_attach_self(e: TextMessageEventObject, name: str):
-    return _output_attach_outcome_(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
+    return _output_attach_outcome(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
 
 
 @cmd_attach.command_function(
@@ -306,7 +306,7 @@ def profile_attach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be attached to the profile.")]
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_attach_outcome_(
+    return _output_attach_outcome(
         ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
 
 
@@ -319,7 +319,7 @@ cmd_detach = cmd.new_child_node(
     description=_("Detach profile from either self or a member."))
 
 
-def _output_detach_outcome_(outcome: OperationOutcome):
+def _output_detach_outcome(outcome: OperationOutcome):
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Profile detached."))]
     else:
@@ -334,7 +334,7 @@ def _output_detach_outcome_(outcome: OperationOutcome):
     arg_help=[_help_name_]
 )
 def profile_detach_self(e: TextMessageEventObject, name: str):
-    return _output_detach_outcome_(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id))
+    return _output_detach_outcome(ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id))
 
 
 @cmd_detach.command_function(
@@ -343,7 +343,7 @@ def profile_detach_self(e: TextMessageEventObject, name: str):
     arg_help=[_help_name_, _("The OID of the target user to be detached from the profile.")]
 )
 def profile_detach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
-    return _output_detach_outcome_(
+    return _output_detach_outcome(
         ProfileManager.detach_profile_name(e.channel_oid, name, e.user_model.id, target_oid))
 
 

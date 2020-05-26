@@ -1,12 +1,13 @@
 from bson import ObjectId
-from django.test import TestCase
 
 from flags import ModelValidityCheckResult
 from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, BooleanField
 from models.exceptions import (
-    JsonKeyDuplicatedError, DeleteNotAllowed, FieldKeyNotExistedError, IdUnsupportedError, RequiredKeyUnfilledError
+    JsonKeyDuplicatedError, DeleteNotAllowedError, FieldKeyNotExistError, IdUnsupportedError,
+    RequiredKeyNotFilledError
 )
+from tests.base import TestCase
 
 __all__ = ["TestBaseModel"]
 
@@ -61,7 +62,7 @@ class TestBaseModel(TestCase):
     # endregion
 
     # region Invalid
-    class TempInvalidException(Exception):
+    class TempInvalidError(Exception):
         pass
 
     class ModelOnInvalid(Model):
@@ -75,14 +76,14 @@ class TestBaseModel(TestCase):
                 return ModelValidityCheckResult.O_OK
 
         def on_invalid(self, reason=ModelValidityCheckResult.X_UNCATEGORIZED):
-            raise TestBaseModel.TempInvalidException()
+            raise TestBaseModel.TempInvalidError()
 
     def test_on_invalid(self):
-        with self.assertRaises(TestBaseModel.TempInvalidException):
+        with self.assertRaises(TestBaseModel.TempInvalidError):
             _ = TestBaseModel.ModelOnInvalid(Field1=7)
 
         mdl = TestBaseModel.ModelOnInvalid()
-        with self.assertRaises(TestBaseModel.TempInvalidException):
+        with self.assertRaises(TestBaseModel.TempInvalidError):
             mdl.field1 = 7
 
     # endregion
@@ -97,7 +98,7 @@ class TestBaseModel(TestCase):
         Field1 = IntegerField("i")
 
     def check_oid_not_exists(self, mdl):
-        with self.assertRaises(FieldKeyNotExistedError if mdl.WITH_OID else IdUnsupportedError):
+        with self.assertRaises(FieldKeyNotExistError if mdl.WITH_OID else IdUnsupportedError):
             _ = mdl.id
         self.assertIsNone(mdl.get_oid())
         with self.assertRaises(KeyError if mdl.WITH_OID else IdUnsupportedError):
@@ -151,9 +152,9 @@ class TestBaseModel(TestCase):
     def test_del(self):
         d = {"f1": 1, "f2": 2, "f3": 3, "f4": 4}
 
-        for k in d.keys():
+        for k in d:
             mdl = TestBaseModel.TestModel.cast_model(d)
-            with self.assertRaises(DeleteNotAllowed):
+            with self.assertRaises(DeleteNotAllowedError):
                 del mdl[k]
 
     def test_to_json(self):
@@ -164,7 +165,7 @@ class TestBaseModel(TestCase):
 
     def test_generate_default(self):
         # No value given (Required value also not given)
-        with self.assertRaises(RequiredKeyUnfilledError):
+        with self.assertRaises(RequiredKeyNotFilledError):
             TestBaseModel.TestModel.generate_default()
 
         # Required value provided
@@ -248,7 +249,7 @@ class TestBaseModel(TestCase):
 
         for fk in not_exists:
             with self.subTest(fk=fk):
-                with self.assertRaises(FieldKeyNotExistedError):
+                with self.assertRaises(FieldKeyNotExistError):
                     mdl.is_field_none(fk, raise_on_not_exists=True)
 
     def test_get_field_class_instance(self):

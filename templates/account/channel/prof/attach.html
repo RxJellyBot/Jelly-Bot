@@ -25,20 +25,20 @@
         <script src="{% static "js/account/profile/attach.js" %}" type="text/javascript"></script>
         <script type="text/javascript">
             function attachProfile(poid, cid, target) {
-                let url = `{% url "api.id.profile.attach" %}`;
-                let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${poid}`
+                const url = `{% url "api.id.profile.attach" %}`;
+                const params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${poid}`
                     + `&{{ static_keys_param.Manage.Profile.CHANNEL_OID }}=${cid}`
                     + `&{{ static_keys_param.Manage.Profile.TARGET }}=${target}`
                     + `&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-                xhrPostRequest(url, params, function (xhr) {
-                    let success = xhr.response["{{ static_keys_result.SUCCESS }}"];
+                xhrPostRequest(url, params, xhr => {
+                    const success = xhr.response["{{ static_keys_result.SUCCESS }}"];
 
                     if (success) {
                         generateAlert("info", "{% trans "Profile attached." %}");
                     } else {
-                        let message = "{% trans "Profile failed to attach." %}";
-                        let result = xhr.response["{{ static_keys_result.RESULT }}"];
+                        const message = "{% trans "Profile failed to attach." %}";
+                        const result = xhr.response["{{ static_keys_result.RESULT }}"];
                         generateAlert("info", `${message} (${result})`);
                     }
                 });

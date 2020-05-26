@@ -21,7 +21,7 @@ class AccountLoginView(View):
     def get(self, request, *args, **kwargs):
         return render_template(request, _("Login"), "account/login.html")
 
-    # noinspection PyMethodMayBeStatic, PyUnusedLocal, PyBroadException
+    # noinspection PyMethodMayBeStatic, PyUnusedLocal
     def post(self, request, *args, **kwargs):
         s = str(_("An unknown error occurred."))
         s_contact = " " + str(_("Contact the administrator of the website."))

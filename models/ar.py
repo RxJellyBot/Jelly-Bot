@@ -9,7 +9,7 @@ from extutils.line_sticker import LineStickerManager
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
-from models.exceptions import FieldKeyNotExistedError
+from models.exceptions import FieldKeyNotExistError
 from models.utils import AutoReplyValidator
 from extutils.utils import enumerate_ranking
 
@@ -20,14 +20,14 @@ from .field import (
 )
 
 
-def _content_to_str_(content_type, content):
+def _content_to_str(content_type, content):
     if content_type == AutoReplyContentType.TEXT:
         return content
     else:
         return f"({content_type.key} / {content})"
 
 
-def _content_to_html_(content_type, content):
+def _content_to_html(content_type, content):
     if content_type == AutoReplyContentType.TEXT:
         return content.replace("\n", "<br>").replace(" ", "&nbsp;")
     elif content_type == AutoReplyContentType.IMAGE:
@@ -48,7 +48,7 @@ class AutoReplyContentModel(Model):
 
     @property
     def content_html(self):
-        return _content_to_html_(self.content_type, self.content)
+        return _content_to_html(self.content_type, self.content)
 
     # noinspection PyAttributeOutsideInit
     def perform_validity_check(self) -> ModelValidityCheckResult:
@@ -69,7 +69,7 @@ class AutoReplyContentModel(Model):
         return ModelValidityCheckResult.O_OK
 
     def __str__(self):
-        return _content_to_str_(self.content_type, self.content)
+        return _content_to_str(self.content_type, self.content)
 
 
 class AutoReplyModuleModel(Model):
@@ -111,14 +111,14 @@ class AutoReplyModuleModel(Model):
                 return self.refer_to
             else:
                 return None
-        except (KeyError, FieldKeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistError, AttributeError):
             return None
 
     @property
     def is_reference(self) -> bool:
         try:
             return not self.is_field_none("ReferTo")
-        except (KeyError, FieldKeyNotExistedError, AttributeError):
+        except (KeyError, FieldKeyNotExistError, AttributeError):
             return False
 
     @property
@@ -201,11 +201,11 @@ class UniqueKeywordCountEntry:
 
     def __post_init__(self):
         self.word_type = AutoReplyContentType.cast(self.word_type)
-        self.word = _content_to_html_(self.word_type, self.word)
+        self.word = _content_to_html(self.word_type, self.word)
 
     @property
     def word_str(self):
-        return _content_to_str_(self.word_type, self.word)
+        return _content_to_str(self.word_type, self.word)
 
 
 class UniqueKeywordCountResult:

@@ -1,23 +1,23 @@
 from models import OID_KEY, PendingRepairDataModel
 from extutils.mongo import get_codec_options
 
-from ._base import single_db_name, BaseCollection
+from ._base import BaseCollection
+from ._dbctrl import SINGLE_DB_NAME
 from .factory import MONGO_CLIENT
 from ..utils import BulkWriteDataHolder
-
 
 DB_NAME = "pdrp"
 
 
 class PendingRepairDataManager:
     def __init__(self):
-        if single_db_name:
-            self._db = MONGO_CLIENT.get_database(single_db_name)
+        if SINGLE_DB_NAME:
+            self._db = MONGO_CLIENT.get_database(SINGLE_DB_NAME)
         else:
             self._db = MONGO_CLIENT.get_database(DB_NAME)
 
     def new_bulk_holder(self, col_inst: BaseCollection) -> BulkWriteDataHolder:
-        if single_db_name:
+        if SINGLE_DB_NAME:
             col_full_name = f"{DB_NAME}.{col_inst.get_col_name()}"
         else:
             col_full_name = col_inst.full_name

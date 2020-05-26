@@ -3,7 +3,7 @@ from typing import Type, Any, Tuple
 
 from models.field import UrlField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldNoneNotAllowed, FieldException, FieldInvalidUrl, FieldReadOnly
+    FieldTypeMismatchError, FieldNoneNotAllowedError, FieldError, FieldInvalidUrlError, FieldReadOnlyError
 )
 
 from ._test_val import TestFieldValue
@@ -79,13 +79,13 @@ class TestUrlFieldValueDefault(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ("https://google.com", FieldReadOnly),
-            (None, FieldReadOnly),
-            (True, FieldReadOnly),
-            (7, FieldReadOnly),
-            ("X", FieldReadOnly),
+            ("https://google.com", FieldReadOnlyError),
+            (None, FieldReadOnlyError),
+            (True, FieldReadOnlyError),
+            (7, FieldReadOnlyError),
+            ("X", FieldReadOnlyError),
         )
 
 
@@ -128,13 +128,13 @@ class TestUrlFieldValueAllowNone(TestUrlFieldValueDefault):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return ()
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldReadOnly),
-            ("https://google.com", FieldReadOnly),
-            (True, FieldReadOnly),
-            (7, FieldReadOnly),
-            ("X", FieldReadOnly),
+            (None, FieldReadOnlyError),
+            ("https://google.com", FieldReadOnlyError),
+            (True, FieldReadOnlyError),
+            (7, FieldReadOnlyError),
+            ("X", FieldReadOnlyError),
         )
 
 
@@ -173,10 +173,10 @@ class TestUrlFieldValueNotReadonly(TestFieldValue.TestClass):
             ("https://google.com", "https://google.com"),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            (None, FieldNoneNotAllowed),
-            (True, FieldTypeMismatch),
-            (7, FieldTypeMismatch),
-            ("X", FieldInvalidUrl),
+            (None, FieldNoneNotAllowedError),
+            (True, FieldTypeMismatchError),
+            (7, FieldTypeMismatchError),
+            ("X", FieldInvalidUrlError),
         )

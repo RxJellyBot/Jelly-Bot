@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(() => {
     $("button.star-btn").click(onStarBtnClick);
     $("button.detach-profile").click(onDetachClick);
 });
@@ -11,8 +11,6 @@ function onStarBtnClick() {
 
 function onDetachClick() {
     if (confirm(detachConfirmMessage($(this).data("pname")))) {
-        detachProfile($(this).data("poid"), $(this).data("coid"), function () {
-            location.reload();
-        });
+        detachProfile($(this).data("poid"), $(this).data("coid"), () => location.reload());
     }
 }

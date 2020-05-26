@@ -29,7 +29,7 @@ class HandledMessageEvent(ABC):
         """
         valid = \
             AutoReplyValidator.is_valid_content(
-                response_model.content_type, response_model.content, online_check=True)
+                response_model.content_type, response_model.content)
 
         if not valid:
             MailSender.send_email_async(f"Invalid auto-reply content detected.\n\n"

@@ -7,7 +7,8 @@ from flags import (
 )
 
 from .int import IntegerField
-from .exceptions import FieldFlagNotFound, FieldFlagDefaultUndefined, FieldValueInvalid, FieldCastingFailed
+from .exceptions import FieldFlagNotFoundError, FieldFlagDefaultUndefinedError, FieldValueInvalidError, \
+    FieldCastingFailedError
 
 
 class FlagField(IntegerField, ABC):
@@ -40,7 +41,7 @@ class FlagField(IntegerField, ABC):
             if "default" not in kwargs:
                 kwargs["default"] = self._type.default()
         except ValueError:
-            raise FieldFlagDefaultUndefined(key, self._type)
+            raise FieldFlagDefaultUndefinedError(key, self._type)
 
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
@@ -55,19 +56,19 @@ class FlagField(IntegerField, ABC):
     def expected_types(self):
         return self._type, int, str
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         try:
             self._type.cast(value)
         except TypeError:
-            raise FieldValueInvalid(self.key, value)
+            raise FieldValueInvalidError(self.key, value)
         except ValueError:
-            raise FieldFlagNotFound(self.key, value, self._type)
+            raise FieldFlagNotFoundError(self.key, value, self._type)
 
-    def _cast_to_desired_type_(self, value):
+    def _cast_to_desired_type(self, value):
         try:
             return self._type.cast(value)
         except (TypeError, ValueError) as e:
-            raise FieldCastingFailed(self.key, value, self.desired_type, exc=e)
+            raise FieldCastingFailedError(self.key, value, self.desired_type, exc=e)
 
 
 class APICommandField(FlagField):

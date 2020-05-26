@@ -6,8 +6,8 @@ from bson import ObjectId
 from pymongo.collection import Collection
 
 from models.field.exceptions import (
-    FieldReadOnly, FieldTypeMismatch, FieldCastingFailed, FieldNoneNotAllowed,
-    FieldInstanceClassInvalid, FieldInvalidDefaultValue, FieldValueRequired
+    FieldReadOnlyError, FieldTypeMismatchError, FieldCastingFailedError, FieldNoneNotAllowedError,
+    FieldInstanceClassInvalidError, FieldInvalidDefaultValueError, FieldValueRequiredError
 )
 
 from ._default import ModelDefaultValueExt
@@ -31,7 +31,7 @@ class FieldInstance:
         elif ModelDefaultValueExt.is_default_val_ext(base.default_value) and \
                 (ModelDefaultValueExt.is_default_val_ext(value) or value == FieldInstance.NULL_VAL_SENTINEL):
             if base.default_value == ModelDefaultValueExt.Required:
-                raise FieldValueRequired(self.base.key)
+                raise FieldValueRequiredError(self.base.key)
             elif base.default_value == ModelDefaultValueExt.Optional:
                 self.force_set(base.none_obj())
             else:
@@ -51,7 +51,7 @@ class FieldInstance:
     def value(self, value):
         """Set the value with readonly check."""
         if self.base.read_only:
-            raise FieldReadOnly(self.base.__class__.__qualname__)
+            raise FieldReadOnlyError(self.base.__class__.__qualname__)
 
         self.force_set(value)
 
@@ -64,7 +64,7 @@ class FieldInstance:
             try:
                 value = self.base.cast_to_desired_type(value)
             except (TypeError, ValueError) as e:
-                raise FieldCastingFailed(self.base.key, value, self.base.desired_type, exc=e)
+                raise FieldCastingFailedError(self.base.key, value, self.base.desired_type, exc=e)
 
         self._value = value
 
@@ -135,7 +135,7 @@ class BaseField(abc.ABC):
             try:
                 self.check_value_valid(default)
             except Exception as e:
-                raise FieldInvalidDefaultValue(self.key, default, exc=e)
+                raise FieldInvalidDefaultValueError(self.key, default, exc=e)
 
         if default is None and not allow_none:
             self._default_value = self.none_obj()
@@ -145,7 +145,7 @@ class BaseField(abc.ABC):
 
         # region Setting instance class
         if not issubclass(inst_cls, FieldInstance):
-            raise FieldInstanceClassInvalid(key, inst_cls)
+            raise FieldInstanceClassInvalidError(key, inst_cls)
         self._inst_cls: Type[FieldInstance] = inst_cls or FieldInstance
         # endregion
 
@@ -204,18 +204,18 @@ class BaseField(abc.ABC):
     def none_obj(cls) -> Any:
         raise ValueError(f"None object not implemented for {cls}.")
 
-    def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
+    def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         """Hook of value type checking when the value is not ``None`` and not a extended default value."""
         pass
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         """Hook of value validity checking when the value is not ``None`` and not a extended default value."""
         pass
 
     def check_type_matched(self, value, *, attempt_cast=False):
         # Check if the value is `None`.
         if not self.allow_none and value is None:
-            raise FieldNoneNotAllowed(self.key)
+            raise FieldNoneNotAllowedError(self.key)
 
         # Expected types may not be an iterable
         expected_types = self.expected_types
@@ -229,15 +229,15 @@ class BaseField(abc.ABC):
 
         # Check value type
         if not type(value) in expected_types:
-            raise FieldTypeMismatch(self.key, type(value), value, expected_types)
+            raise FieldTypeMismatchError(self.key, type(value), value, expected_types)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
-            self._check_type_matched_not_none_(value, attempt_cast=attempt_cast or self.auto_cast)
+            self._check_type_matched_not_none(value, attempt_cast=attempt_cast or self.auto_cast)
 
     def is_type_matched(self, value, *, attempt_cast=False) -> bool:
         try:
             self.check_type_matched(value, attempt_cast=attempt_cast)
-        except Exception as _:
+        except Exception:
             return False
         else:
             return True
@@ -251,7 +251,7 @@ class BaseField(abc.ABC):
         self.check_type_matched(value, attempt_cast=attempt_cast)
 
         if value is not None and not ModelDefaultValueExt.is_default_val_ext(value):
-            self._check_value_valid_not_none_(value)
+            self._check_value_valid_not_none(value)
 
     def is_value_valid(self, value, *, attempt_cast=False) -> bool:
         try:
@@ -273,11 +273,11 @@ class BaseField(abc.ABC):
             if self.allow_none:
                 return None
             else:
-                raise FieldNoneNotAllowed(self.key)
+                raise FieldNoneNotAllowedError(self.key)
         else:
-            return self._cast_to_desired_type_(value)
+            return self._cast_to_desired_type(value)
 
-    def _cast_to_desired_type_(self, value) -> Any:
+    def _cast_to_desired_type(self, value) -> Any:
         """
         Method hook to be called if `cast_to_desired_type()` is called
         and the given value type is not the desired type.

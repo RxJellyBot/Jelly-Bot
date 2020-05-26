@@ -42,19 +42,19 @@ class AutoReplyAddBaseResponse(
         self._cooldown = self._param_dict[param.AutoReply.COOLDOWN]
         self._is_local = bool(param_dict.get(param.LOCAL_REFER, False))
 
-    def _handle_keyword_(self):
-        self._handle_keyword_type_()
+    def _handle_keyword(self):
+        self._handle_keyword_type()
 
         k = result.AutoReplyResponse.KEYWORD
         self._data[k] = self._keyword
 
-    def _handle_keyword_type_(self):
+    def _handle_keyword_type(self):
         self._keyword_type = int(self._keyword_type or AutoReplyContentType.default())
 
         if self._keyword_type == AutoReplyContentType.IMAGE:
             self._err[result.AutoReplyResponse.KEYWORD] = False
 
-    def _handle_responses_(self):
+    def _handle_responses(self):
         k = result.AutoReplyResponse.RESPONSES
 
         if len(self._responses) > systemconfig.AutoReply.MaxContentLength:
@@ -77,15 +77,15 @@ class AutoReplyAddBaseResponse(
                 ContentType=int(self._response_types[idx] or AutoReplyContentType.default()))
              for idx, resp in enumerate(self._responses)]
 
-    def _handle_private_(self):
+    def _handle_private(self):
         k = result.AutoReplyResponse.PRIVATE
         self._flag[k] = self._private
 
-    def _handle_pinned_(self):
+    def _handle_pinned(self):
         k = result.AutoReplyResponse.PINNED
         self._flag[k] = self._pinned
 
-    def _handle_tags_(self):
+    def _handle_tags(self):
         k = result.AutoReplyResponse.TAGS
 
         if self._tags:
@@ -102,19 +102,19 @@ class AutoReplyAddBaseResponse(
 
             self._tags = tag_ids
 
-        self._flag[k] = self._tags
+        self._flag[k] = self._tags = self._tags or []
 
-    def _handle_cooldown_(self):
+    def _handle_cooldown(self):
         k = result.AutoReplyResponse.COOLDOWN_SEC
         self._flag[k] = self._cooldown
 
     def pre_process(self):
-        self._handle_keyword_()
-        self._handle_responses_()
-        self._handle_pinned_()
-        self._handle_private_()
-        self._handle_tags_()
-        self._handle_cooldown_()
+        self._handle_keyword()
+        self._handle_responses()
+        self._handle_pinned()
+        self._handle_private()
+        self._handle_tags()
+        self._handle_cooldown()
 
     def serialize_success(self) -> dict:
         d = super().serialize_success()

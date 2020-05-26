@@ -18,6 +18,10 @@ class ExtraContentModel(Model):
     Type = ExtraContentTypeField("tp")
     Title = TextField("t", default=ModelDefaultValueExt.Optional)
     Content = GeneralField("c", default=ModelDefaultValueExt.Required)
+    # Not using `datetime.now()` as default value because
+    #   - Value will be fixed to the timestamp of the application boot time
+    #   - Hard to pass the value to the test
+    #   - Reduces the flexibility of setting the expiry of the extra content
     Timestamp = DateTimeField("e", default=ModelDefaultValueExt.Required)
     ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Optional)
 
@@ -36,14 +40,14 @@ class ExtraContentHTMLTransformer:
         if model.type == ExtraContentType.PURE_TEXT:
             return str(model.content)
         elif model.type == ExtraContentType.EXTRA_MESSAGE:
-            return ExtraContentHTMLTransformer._trans_ex_message_(model)
+            return ExtraContentHTMLTransformer._trans_ex_message(model)
         elif model.type == ExtraContentType.AUTO_REPLY_SEARCH:
-            return ExtraContentHTMLTransformer._trans_ar_search_(model)
+            return ExtraContentHTMLTransformer._trans_ar_search(model)
         else:
             return f"Unhandled extra content type: {model.type}"
 
     @staticmethod
-    def _trans_ex_message_(model: ExtraContentModel) -> str:
+    def _trans_ex_message(model: ExtraContentModel) -> str:
         if not model.content:
             return ""
 
@@ -69,7 +73,7 @@ class ExtraContentHTMLTransformer:
                f'</div></div>'
 
     @staticmethod
-    def _trans_ar_search_(model: ExtraContentModel) -> str:
+    def _trans_ar_search(model: ExtraContentModel) -> str:
         from mongodb.factory import ChannelManager, AutoReplyManager
         from mongodb.helper import IdentitySearcher
 

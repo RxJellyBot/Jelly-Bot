@@ -16,11 +16,11 @@ from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserCon
 from mongodb.factory.results import OperationOutcome
 
 from ._base import BaseCollection
-from ._mixin import GenerateTokenMixin
+from .mixin import GenerateTokenMixin
 from .results import (
     WriteOutcome, GetOutcome, UpdateOutcome,
     OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, RootUserRegistrationResult,
-    GetRootUserDataApiResult, RootUserUpdateResult, GetRootUserDataResult
+    RootUserUpdateResult, GetRootUserDataResult
 )
 
 DB_NAME = "user"
@@ -98,7 +98,7 @@ class OnPlatformIdentityManager(BaseCollection):
             if entry is None:
                 outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
 
-        return OnPlatformUserRegistrationResult(outcome, entry, ex)
+        return OnPlatformUserRegistrationResult(outcome, ex, entry)
 
 
 class RootUserManager(BaseCollection):
@@ -117,9 +117,9 @@ class RootUserManager(BaseCollection):
             RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
             partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
 
-    def _register_(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
-                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
-                   on_exist=None) \
+    def _register(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
+                  oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
+                  on_exist=None) \
             -> RootUserRegistrationResult:
         user_reg_result = u_reg_func(*args)
         user_reg_oid = None
@@ -152,16 +152,16 @@ class RootUserManager(BaseCollection):
         else:
             overall_outcome = oc_onreg_failed
 
-        return RootUserRegistrationResult(overall_outcome,
-                                          build_conn_entry, build_conn_outcome, build_conn_ex, user_reg_result, hint)
+        return RootUserRegistrationResult(overall_outcome, build_conn_ex, build_conn_entry,
+                                          build_conn_outcome, user_reg_result, hint)
 
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
 
     def register_onplat(self, platform, user_token) -> RootUserRegistrationResult:
-        return self._register_(self._mgr_onplat.register, self._mgr_onplat.get_onplat, self.get_root_data_onplat_oid,
-                               "OnPlatOids", WriteOutcome.X_ON_CONN_ONPLAT, WriteOutcome.X_ON_REG_ONPLAT,
-                               (platform, user_token), hint="OnPlatform", conn_arg_list=True)
+        return self._register(self._mgr_onplat.register, self._mgr_onplat.get_onplat, self.get_root_data_onplat_oid,
+                              "OnPlatOids", WriteOutcome.X_ON_CONN_ONPLAT, WriteOutcome.X_ON_REG_ONPLAT,
+                              (platform, user_token), hint="OnPlatform", conn_arg_list=True)
 
     def register_google(self, id_data: GoogleIdentityUserData) -> RootUserRegistrationResult:
         def on_exist():
@@ -169,9 +169,9 @@ class RootUserManager(BaseCollection):
                                              APIUserModel.Email.key: {"$ne": id_data.email}},
                                             {"$set": {APIUserModel.Email.key: id_data.email}})
 
-        return self._register_(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
-                               "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
-                               (id_data,), hint="APIUser", conn_arg_list=False, on_exist=on_exist)
+        return self._register(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
+                              "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
+                              (id_data,), hint="APIUser", on_exist=on_exist)
 
     @arg_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
@@ -222,7 +222,7 @@ class RootUserManager(BaseCollection):
 
         return str_not_found if str_not_found else None
 
-    def get_root_data_api_token(self, token: str) -> GetRootUserDataApiResult:
+    def get_root_data_api_token(self, token: str, *, skip_on_plat=False) -> GetRootUserDataResult:
         api_u_data = self._mgr_api.get_user_data_token(token)
         entry = None
         onplat_list = []
@@ -237,7 +237,7 @@ class RootUserManager(BaseCollection):
                 entry = root_u_data
                 outcome = GetOutcome.O_CACHE_DB
 
-        if outcome.is_success and entry.has_onplat_data:
+        if not skip_on_plat and outcome.is_success and entry.has_onplat_data:
             missing = []
 
             for oid in entry.on_plat_oids:
@@ -254,7 +254,38 @@ class RootUserManager(BaseCollection):
                     f"API Token: {token} / OID of Missing On Platform Data: {' | '.join([str(i) for i in missing])}",
                     subject="On Platform Data not found")
 
-        return GetRootUserDataApiResult(outcome, entry, api_u_data, onplat_list)
+        return GetRootUserDataResult(outcome, None, entry, api_u_data, onplat_list)
+
+    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
+        on_plat_data = self.get_onplat_data(platform, user_token)
+        rt_user_data = None
+
+        if on_plat_data is None and auto_register:
+            on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
+
+            if on_plat_reg_result.success:
+                on_plat_data = self.get_onplat_data(platform, user_token)
+
+        if on_plat_data is None:
+            outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
+        else:
+            rt_user_data = self.get_root_data_onplat_oid(on_plat_data.id)
+
+            if rt_user_data is None:
+                if auto_register:
+                    reg_result = self.register_onplat(platform, user_token)
+
+                    if reg_result.success:
+                        rt_user_data = reg_result.model
+                        outcome = GetOutcome.O_ADDED
+                    else:
+                        outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
+                else:
+                    outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
+            else:
+                outcome = GetOutcome.O_CACHE_DB
+
+        return GetRootUserDataResult(outcome, None, rt_user_data)
 
     @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
@@ -291,37 +322,6 @@ class RootUserManager(BaseCollection):
     @arg_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
         return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
-
-    def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
-        on_plat_data = self.get_onplat_data(platform, user_token)
-        rt_user_data = None
-
-        if on_plat_data is None and auto_register:
-            on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
-
-            if on_plat_reg_result.success:
-                on_plat_data = self.get_onplat_data(platform, user_token)
-
-        if on_plat_data is None:
-            outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-        else:
-            rt_user_data = self.get_root_data_onplat_oid(on_plat_data.id)
-
-            if rt_user_data is None:
-                if auto_register:
-                    reg_result = self.register_onplat(platform, user_token)
-
-                    if reg_result.success:
-                        rt_user_data = reg_result.model
-                        outcome = GetOutcome.O_ADDED
-                    else:
-                        outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-                else:
-                    outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
-            else:
-                outcome = GetOutcome.O_CACHE_DB
-
-        return GetRootUserDataResult(outcome, rt_user_data)
 
     @arg_type_ensure
     def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
@@ -389,12 +389,12 @@ class RootUserManager(BaseCollection):
             return_document=ReturnDocument.AFTER)
 
         if updated:
-            updated = RootUserConfigModel.cast_model(updated)
+            updated = RootUserModel.cast_model(updated)
             outcome = UpdateOutcome.O_UPDATED
         else:
             outcome = UpdateOutcome.X_NOT_FOUND
 
-        return RootUserUpdateResult(outcome, updated)
+        return RootUserUpdateResult(outcome, None, updated)
 
 
 _inst = RootUserManager()

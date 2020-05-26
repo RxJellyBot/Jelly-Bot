@@ -3,7 +3,7 @@ from typing import Type, Any, Tuple
 
 from models.field import GeneralField, BaseField
 from models.field.exceptions import (
-    FieldTypeMismatch, FieldException
+    FieldTypeMismatchError, FieldError
 )
 
 from ._test_val import TestFieldValue
@@ -104,11 +104,11 @@ class TestGeneralFieldValueDefault(TestFieldValue.TestClass):
             ({"A": "B"}, {"A": "B"}),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ((5, 9), FieldTypeMismatch),
-            ({"A"}, FieldTypeMismatch),
-            (object(), FieldTypeMismatch),
+            ((5, 9), FieldTypeMismatchError),
+            ({"A"}, FieldTypeMismatchError),
+            (object(), FieldTypeMismatchError),
         )
 
 
@@ -170,9 +170,9 @@ class TestGeneralFieldValueAutocast(TestFieldValue.TestClass):
             ({"A": "B"}, str({"A": "B"})),
         )
 
-    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldException]], ...]:
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
-            ((5, 9), FieldTypeMismatch),
-            ({"A"}, FieldTypeMismatch),
-            (object(), FieldTypeMismatch),
+            ((5, 9), FieldTypeMismatchError),
+            ({"A"}, FieldTypeMismatchError),
+            (object(), FieldTypeMismatchError),
         )

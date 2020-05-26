@@ -29,7 +29,7 @@ class BaseApiResponse(abc.ABC):
         return True
 
     # noinspection PyMethodMayBeStatic
-    def _serialize_(self) -> dict:
+    def _serialize(self) -> dict:
         return dict()
 
     @abc.abstractmethod
@@ -45,7 +45,7 @@ class BaseApiResponse(abc.ABC):
         if len(self._err) == 0:
             self.process_pass()
 
-        d = self._serialize_()
+        d = self._serialize()
         is_success = self.is_success()
 
         if is_success:

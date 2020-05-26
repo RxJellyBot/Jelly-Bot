@@ -49,16 +49,16 @@ class FlagCodeMixin(FlagMixin):
         return self._code
 
     def __lt__(self, other):
-        return self._cmp_(other) < 0
+        return self._cmp(other) < 0
 
     def __le__(self, other):
-        return self._cmp_(other) <= 0
+        return self._cmp(other) <= 0
 
     def __gt__(self, other):
-        return self._cmp_(other) > 0
+        return self._cmp(other) > 0
 
     def __ge__(self, other):
-        return self._cmp_(other) >= 0
+        return self._cmp(other) >= 0
 
     def __eq__(self, other):
         if isinstance(other, int):
@@ -76,7 +76,7 @@ class FlagCodeMixin(FlagMixin):
     def __hash__(self):
         return hash((self.__class__, self._code))
 
-    def _cmp_(self, other) -> int:
+    def _cmp(self, other) -> int:
         if isinstance(other, self.__class__):
             return self._code - other._code
         elif isinstance(other, int):

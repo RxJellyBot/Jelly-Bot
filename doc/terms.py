@@ -1,14 +1,20 @@
+"""
+Terms used in the bot.
+"""
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List
 
-from JellyBot.systemconfig import Database
-
 from django.utils.translation import gettext_lazy as _
+
+from JellyBot.systemconfig import Database
 
 
 @dataclass
 class TermExplanation:
+    """
+    An entry for a term and its explanation.
+    """
     term: str
     description: str
     example: str
@@ -16,6 +22,9 @@ class TermExplanation:
 
 @dataclass
 class TermsCollection:
+    """
+    A holder containing multiple terms.
+    """
     name: str
     terms: List[TermExplanation]
 
@@ -38,9 +47,9 @@ terms_collection["Features"] = TermsCollection(
                        "somebody typed **A** wherever Jelly BOT can see, so Jelly BOT will reply **B** back.")),
      TermExplanation(_("Execode"),
                      _("The users provide partial required information for an operation, then the system will yield a "
-                       "code (Execode) to the users for completing it while holding it for {:d} hrs.<br>"
+                       "code (Execode) to the users for completing it while holding it for %d hrs.<br>"
                        "Users will need to use the given Execode with the lacking information for completing the "
-                       "operation before it expires.").format(Database.ExecodeExpirySeconds // 3600),
+                       "operation before it expires.") % (Database.ExecodeExpirySeconds // 3600),
                      _("User B created an Auto-Reply module on the website and choose the issue an Execode option. "
                        "Then, he submit the Execode in the channel, so the Auto-Reply module is registered.")),
      TermExplanation(_("Profile System/Permission"),

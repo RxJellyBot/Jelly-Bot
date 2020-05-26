@@ -39,7 +39,7 @@ class APIStatisticsManager(BaseCollection):
             ApiAction=api_action, SenderOid=sender_oid, Parameter=parameter, Response=response, Success=success,
             Timestamp=datetime.utcnow(), PathInfo=path_info, PathInfoFull=path_info_full, PathParameter=org_param)
 
-        return RecordAPIStatisticsResult(outcome, entry, ex)
+        return RecordAPIStatisticsResult(outcome, ex, entry)
 
 
 class MessageRecordStatisticsManager(BaseCollection):
@@ -112,7 +112,7 @@ class MessageRecordStatisticsManager(BaseCollection):
     # Statistics
 
     @staticmethod
-    def _channel_oids_filter_(channel_oids: Union[ObjectId, List[ObjectId]]):
+    def _channel_oids_filter(channel_oids: Union[ObjectId, List[ObjectId]]):
         if isinstance(channel_oids, ObjectId):
             return {MessageRecordModel.ChannelOid.key: channel_oids}
         elif isinstance(channel_oids, list):
@@ -142,11 +142,11 @@ class MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None, period_count: int = 3,
             tzinfo_: Optional[tzinfo] = None) \
             -> MemberMessageCountResult:
-        match_d = self._channel_oids_filter_(channel_oids)
+        match_d = self._channel_oids_filter(channel_oids)
         trange = TimeRange(
             range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
 
-        self._attach_time_range_(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         # $switch expression for time range
         switch_branches = []
@@ -187,8 +187,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> MemberMessageByCategoryResult:
-        match_d = self._channel_oids_filter_(channel_oids)
-        self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
+        match_d = self._channel_oids_filter(channel_oids)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -208,8 +208,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             HourlyIntervalAverageMessageResult:
-        match_d = self._channel_oids_filter_(channel_oids)
-        self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
+        match_d = self._channel_oids_filter(channel_oids)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         pipeline = [
             {"$match": match_d},
@@ -233,8 +233,8 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             DailyMessageResult:
-        match_d = self._channel_oids_filter_(channel_oids)
-        self._attach_time_range_(match_d, hours_within=hours_within, start=start, end=end)
+        match_d = self._channel_oids_filter(channel_oids)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
 
         pipeline = [
             {"$match": match_d},
@@ -270,12 +270,12 @@ class MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo(),
             max_mean_days: int = 5) -> \
             MeanMessageResultGenerator:
-        match_d = self._channel_oids_filter_(channel_oids)
+        match_d = self._channel_oids_filter(channel_oids)
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
         trange.set_start_day_offset(-max_mean_days)
 
-        self._attach_time_range_(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -304,11 +304,11 @@ class MessageRecordStatisticsManager(BaseCollection):
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
             start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             CountBeforeTimeResult:
-        match_d = self._channel_oids_filter_(channel_oids)
+        match_d = self._channel_oids_filter(channel_oids)
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
-        self._attach_time_range_(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -350,11 +350,11 @@ class MessageRecordStatisticsManager(BaseCollection):
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
             tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
             MemberDailyMessageResult:
-        match_d = self._channel_oids_filter_(channel_oids)
+        match_d = self._channel_oids_filter(channel_oids)
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
-        self._attach_time_range_(match_d, trange=trange)
+        self.attach_time_range(match_d, trange=trange)
 
         pipeline = [
             {"$match": match_d},
@@ -402,7 +402,7 @@ class BotFeatureUsageDataManager(BaseCollection):
             -> BotFeatureUsageResult:
         filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
 
-        self._attach_time_range_(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},
@@ -421,7 +421,7 @@ class BotFeatureUsageDataManager(BaseCollection):
             tzinfo_: PytzInfo = UTC.to_tzinfo()) -> BotFeatureHourlyAvgResult:
         filter_ = {BotFeatureUsageModel.ChannelOid.key: channel_oid}
 
-        self._attach_time_range_(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},
@@ -451,7 +451,7 @@ class BotFeatureUsageDataManager(BaseCollection):
         if member_oid_list:
             filter_[BotFeatureUsageModel.SenderRootOid.key] = {"$in": member_oid_list}
 
-        self._attach_time_range_(filter_, hours_within=hours_within)
+        self.attach_time_range(filter_, hours_within=hours_within)
 
         pipeline = [
             {"$match": filter_},

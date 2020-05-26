@@ -1,1 +1,1 @@
-from .arg import arg_type_ensure, TypeCastingFailed, BaseDataTypeConverter, NonSafeDataTypeConverter
+from .arg import arg_type_ensure, TypeCastingFailedError, BaseDataTypeConverter, NonSafeDataTypeConverter

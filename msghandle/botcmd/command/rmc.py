@@ -6,7 +6,7 @@ from mongodb.factory import RemoteControlManager
 from JellyBot.systemconfig import Bot
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 cmd = CommandNode(
     codes=["rmc", "remote"], order_idx=800, name=_("Remote Control"),

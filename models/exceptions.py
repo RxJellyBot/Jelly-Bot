@@ -20,7 +20,12 @@ class InvalidModelError(ModelConstructionError):
 
 class InvalidModelFieldError(ModelConstructionError):
     def __init__(self, model_name: str, exception: Exception):
+        self._inner = exception
         super().__init__(f"Invalid model `{model_name}`. Exception: {exception}")
+
+    @property
+    def inner_exception(self) -> Exception:
+        return self._inner
 
 
 class ModelUncastableError(ModelConstructionError):
@@ -28,9 +33,9 @@ class ModelUncastableError(ModelConstructionError):
         super().__init__(f"Model `{model_name}` cannot be casted. {reason}")
 
 
-class RequiredKeyUnfilledError(ModelConstructionError):
+class RequiredKeyNotFilledError(ModelConstructionError):
     def __init__(self, model_cls: Type, ks: List[str]):
-        super().__init__(f"Required fields unfilled. Keys: {', '.join(ks)} / Model Class: {model_cls}")
+        super().__init__(f"Required fields not filled. Keys: {', '.join(ks)} / Model Class: {model_cls}")
 
 
 class IdUnsupportedError(ModelConstructionError, KeyError, AttributeError):
@@ -39,7 +44,7 @@ class IdUnsupportedError(ModelConstructionError, KeyError, AttributeError):
             f"`{model_name}` is not designated to have `_id` field. Set `WITH_OID` to True to support this.")
 
 
-class FieldKeyNotExistedError(AttributeError):
+class FieldKeyNotExistError(AttributeError):
     def __init__(self, fk: str, model_name: str):
         super().__init__(f"Field key `{fk}` not existed in the model `{model_name}`.")
 
@@ -54,6 +59,6 @@ class JsonKeyDuplicatedError(ModelConstructionError):
         super().__init__(f"Model `{model_name}` contains duplicated json key: {dup_key}.")
 
 
-class DeleteNotAllowed(Exception):
+class DeleteNotAllowedError(Exception):
     def __init__(self, model_name: str):
         super().__init__(f"Not allowed to perform `del` on {model_name}")

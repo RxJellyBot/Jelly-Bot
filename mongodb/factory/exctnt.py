@@ -29,8 +29,9 @@ class ExtraContentManager(BaseCollection):
 
     def record_extra_message(self, content: list, title: str = None, channel_oid: ObjectId = None):
         """
-        :param title: Title of the extra message.
         :param content: [(<REASON>, <MESSAGE_CONTENT>), (<REASON>, <MESSAGE_CONTENT>)...]
+        :param title: Title of the extra message.
+        :param channel_oid: channel oid of this extra message
         """
         content = cast_iterable(content, str)
 
@@ -48,7 +49,7 @@ class ExtraContentManager(BaseCollection):
         model, outcome, ex = self.insert_one_data(
             Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow(), ChannelOid=channel_oid)
 
-        return RecordExtraContentResult(outcome, model, ex)
+        return RecordExtraContentResult(outcome, ex, model)
 
     @arg_type_ensure
     def get_content(self, content_id: ObjectId) -> Optional[ExtraContentModel]:

@@ -33,7 +33,7 @@ class ProfileHelper:
         ret = []
 
         names = IdentitySearcher.get_batch_user_name(
-            ProfileManager.get_profile_user_oids(profile_oid), channel_model, on_not_found=None)
+            ProfileManager.get_profile_user_oids(profile_oid), channel_model)
 
         remove_self = ProfilePermission.PRF_CONTROL_SELF in permissions
         remove_member = ProfilePermission.PRF_CONTROL_MEMBER in permissions
@@ -73,7 +73,7 @@ class ProfileHelper:
         user_oids = []
         for k, v in user_oids_dict.items():
             user_oids.extend(v)
-        user_names = IdentitySearcher.get_batch_user_name(user_oids, channel_model, on_not_found=None)
+        user_names = IdentitySearcher.get_batch_user_name(user_oids, channel_model)
 
         for prof in profs:
             uids = user_oids_dict.get(prof.id, [])

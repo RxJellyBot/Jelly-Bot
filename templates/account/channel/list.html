@@ -73,20 +73,18 @@
     <script src="{% static "js/utils/xhr.js" %}" type="text/javascript"></script>
     <script src="{% static "js/account/channel_list.js" %}" type="text/javascript"></script>
     <script type="text/javascript">
-        $(document).ready(function () {
-            $("input.channel-name").keyup(onChannelNameKeyup);
-        });
+        $(document).ready(() => $("input.channel-name").keyup(onChannelNameKeyup));
 
         function onChannelNameKeyup(e) {
-            let elem = $(this);
+            const elem = $(this);
             elem.removeClass("is-valid is-invalid");
 
             if (e.which === 13) {
-                let url = `{% url "api.id.channel.name_change" %}`;
-                let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
+                const url = `{% url "api.id.channel.name_change" %}`;
+                const params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${$(this).data("channel")}&{{ static_keys_param.Manage.Channel.NEW_NAME }}=${$(this).val()}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
-                xhrPostRequest(url, params, function (xhr) {
-                    let success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
+                xhrPostRequest(url, params, xhr => {
+                    const success = xhr.response.{{ static_keys_result.SUCCESS }} || false;
 
                     onNameChangeLoad(success, xhr.response, elem);
                 });
@@ -101,18 +99,18 @@
             }
         }
 
-        function changeStar(channel_oid, new_val) {
-            let url = `{% url "api.id.channel.star_change" %}`;
-            let params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channel_oid}&{{ static_keys_param.Manage.Channel.STAR }}=${new_val}&{{ static_keys_param.LOCAL_REFER }}=true`;
+        function changeStar(channelOid, newVal) {
+            const url = `{% url "api.id.channel.star_change" %}`;
+            const params = `{{ static_keys_param.Manage.Channel.CHANNEL_OID }}=${channelOid}&{{ static_keys_param.Manage.Channel.STAR }}=${newVal}&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             xhrPostRequest(url, params);
         }
 
-        function detachProfile(profile_oid, channel_oid, onLoad) {
-            let url = `{% url "api.id.profile.detach" %}`;
-            let params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profile_oid}`
-                + `&{{ static_keys_param.Common.CHANNEL_OID }}=${channel_oid}`;
-                + `&{{ static_keys_param.LOCAL_REFER }}=true`;
+        function detachProfile(profileOid, channelOid, onLoad) {
+            const url = `{% url "api.id.profile.detach" %}`;
+            const params = `{{ static_keys_param.Manage.Profile.PROFILE_OID }}=${profileOid}`
+                + `&{{ static_keys_param.Common.CHANNEL_OID }}=${channelOid}`;
+            +`&{{ static_keys_param.LOCAL_REFER }}=true`;
 
             xhrPostRequest(url, params, onLoad);
         }

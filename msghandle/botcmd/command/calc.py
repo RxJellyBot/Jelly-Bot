@@ -4,7 +4,7 @@ from flags import BotFeature
 from bot.utils import calculate_expression
 from msghandle.models import TextMessageEventObject
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 
 
 cmd = CommandNode(

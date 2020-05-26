@@ -6,7 +6,7 @@ from bson import ObjectId
 from pymongo.collection import Collection
 
 from ._base import BaseField
-from .exceptions import FieldOidStringInvalid, FieldOidDatetimeOutOfRange, FieldValueInvalid
+from .exceptions import FieldOidStringInvalidError, FieldOidDatetimeOutOfRangeError, FieldValueInvalidError
 
 OID_KEY = "_id"
 
@@ -29,19 +29,19 @@ class ObjectIDField(BaseField):
 
         super().__init__(key or OID_KEY, **kwargs)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         if self.allow_none and value is None:
             return
 
         if isinstance(value, str) and not ObjectId.is_valid(value):
-            raise FieldOidStringInvalid(self.key, value)
+            raise FieldOidStringInvalidError(self.key, value)
         if isinstance(value, datetime):
             try:
                 ObjectId.from_datetime(value)
             except struct.error:
-                raise FieldOidDatetimeOutOfRange(self.key, value)
+                raise FieldOidDatetimeOutOfRangeError(self.key, value)
 
-    def _cast_to_desired_type_(self, value) -> Any:
+    def _cast_to_desired_type(self, value) -> Any:
         if isinstance(value, datetime):
             return ObjectId.from_datetime(value)
         elif isinstance(value, str):
@@ -49,7 +49,7 @@ class ObjectIDField(BaseField):
         elif isinstance(value, ObjectId):
             return value
         else:
-            raise FieldValueInvalid(self.key, value)
+            raise FieldValueInvalidError(self.key, value)
 
     @classmethod
     def none_obj(cls):

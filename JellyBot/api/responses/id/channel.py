@@ -85,13 +85,13 @@ class ChannelStarChangeResponse(
     def pre_process(self):
         super().pre_process()
 
-        self._handle_star_()
-        self._handle_channel_oid_()
+        self._handle_star()
+        self._handle_channel_oid()
 
-    def _handle_channel_oid_(self):
+    def _handle_channel_oid(self):
         self._channel_oid = safe_cast(self._channel_oid, ObjectId)
 
-    def _handle_star_(self):
+    def _handle_star(self):
         self._star = str_to_bool(self._star).to_bool()
 
     def process_pass(self):

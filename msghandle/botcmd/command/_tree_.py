@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from JellyBot.systemconfig import Bot, HostUrl
 from msghandle.models import HandledMessageEventText
 
-from ._base_ import CommandNode
+from ._base import CommandNode
 from .trfm import cmd as cmd_trfm
 from .uintg import cmd as cmd_uintg
 from .id import cmd as cmd_id

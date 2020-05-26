@@ -231,9 +231,9 @@ class UserMessageCountIntervalResult:
 
 class MessageStatsDataProcessor:
     @staticmethod
-    def _get_user_msg_stats_(msg_result: MemberMessageByCategoryResult,
-                             ch_data: Union[ChannelModel, ChannelCollectionModel] = None,
-                             available_only: bool = True) -> UserMessageStats:
+    def _get_user_msg_stats(msg_result: MemberMessageByCategoryResult,
+                            ch_data: Union[ChannelModel, ChannelCollectionModel] = None,
+                            available_only: bool = True) -> UserMessageStats:
         entries: List[UserMessageStatsEntry] = []
 
         if isinstance(ch_data, ChannelModel):
@@ -256,7 +256,7 @@ class MessageStatsDataProcessor:
             max_individual_msg: int = max(individual_msgs)
 
             uid_handled = IdentitySearcher.get_batch_user_name(
-                msg_rec.keys(), ch_data, on_not_found="(N/A)")
+                msg_rec, ch_data, on_not_found="(N/A)")
 
             for uid, name in uid_handled.items():
                 data_cat = msg_rec[uid]
@@ -282,7 +282,7 @@ class MessageStatsDataProcessor:
                 org_stats=[], msg_count=0, label_category=msg_result.label_category)
 
     @staticmethod
-    def _get_user_msg_ranking_(
+    def _get_user_msg_ranking(
             channel_oids: Union[List[ObjectId], ObjectId], root_oid: ObjectId, *,
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None):
         data = sorted(
@@ -305,7 +305,7 @@ class MessageStatsDataProcessor:
         available_dict = {d.user_oid: d.available
                           for d in ProfileManager.get_channel_members(channel_data.id, available_only=available_only)}
         uname_dict = IdentitySearcher.get_batch_user_name(
-            list(available_dict.keys()),
+            list(available_dict),
             channel_data, on_not_found="(N/A)")
         result = MessageRecordStatisticsManager.member_daily_message_count(
             channel_data.id, hours_within=hours_within, start=start, end=end, tzinfo_=tz)
@@ -318,7 +318,7 @@ class MessageStatsDataProcessor:
         # Ordered by the date
         proc_count = {}
         proc_rank = {}
-        for oid in uname_dict.keys():
+        for oid in uname_dict:
             proc_count[oid] = []
             proc_rank[oid] = []
 
@@ -330,7 +330,7 @@ class MessageStatsDataProcessor:
             actv_mbr.append(len(data_of_date))
 
             # Get and sort the daily message count
-            collated_count = {oid: data_of_date.get(oid, 0) for oid in proc_count.keys()}
+            collated_count = {oid: data_of_date.get(oid, 0) for oid in proc_count}
             sorted_count = list(sorted(collated_count.items(), key=lambda x: x[1], reverse=True))
 
             # Insert daily count and rank
@@ -352,7 +352,7 @@ class MessageStatsDataProcessor:
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
             available_only: bool = True) \
             -> UserMessageStats:
-        return MessageStatsDataProcessor._get_user_msg_stats_(
+        return MessageStatsDataProcessor._get_user_msg_stats(
             MessageRecordStatisticsManager.get_user_messages_by_category(
                 channel_data.id, hours_within=hours_within, start=start, end=end),
             channel_data, available_only
@@ -364,7 +364,7 @@ class MessageStatsDataProcessor:
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
             available_only: bool = True) \
             -> UserMessageStats:
-        return MessageStatsDataProcessor._get_user_msg_stats_(
+        return MessageStatsDataProcessor._get_user_msg_stats(
             MessageRecordStatisticsManager.get_user_messages_by_category(
                 chcoll_data.child_channel_oids, hours_within=hours_within, start=start, end=end),
             chcoll_data, available_only=available_only
@@ -375,7 +375,7 @@ class MessageStatsDataProcessor:
             channel_data: ChannelModel, root_oid: ObjectId, *,
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> UserMessageRanking:
-        return MessageStatsDataProcessor._get_user_msg_ranking_(
+        return MessageStatsDataProcessor._get_user_msg_ranking(
             channel_data.id, root_oid, hours_within=hours_within, start=start, end=end)
 
     @staticmethod
@@ -383,7 +383,7 @@ class MessageStatsDataProcessor:
             chcoll_data: ChannelCollectionModel, root_oid: ObjectId, *,
             hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None) \
             -> UserMessageRanking:
-        return MessageStatsDataProcessor._get_user_msg_ranking_(
+        return MessageStatsDataProcessor._get_user_msg_ranking(
             chcoll_data.child_channel_oids, root_oid, hours_within=hours_within, start=start, end=end)
 
     @staticmethod
@@ -445,7 +445,7 @@ class BotUsageStatsDataProcessor:
 
         usage_data = BotFeatureUsageDataManager.get_channel_per_user_usage(
             channel_data.id, hours_within=hours_within, member_oid_list=[d.user_oid for d in members]).data
-        uid_handled = IdentitySearcher.get_batch_user_name(usage_data.keys(), channel_data)
+        uid_handled = IdentitySearcher.get_batch_user_name(usage_data, channel_data)
 
         for uid, name in uid_handled.items():
             usage_dict = usage_data[uid]

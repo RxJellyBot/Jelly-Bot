@@ -1,15 +1,15 @@
 from abc import abstractmethod, ABC
-from typing import Tuple, Dict, Any, Type, List, final
+from typing import Tuple, Dict, Any, Type, List, final, Set
 from itertools import combinations
 
 from bson import ObjectId
 
 from extutils.utils import to_snake_case
-from models import Model, OID_KEY
+from models import Model, OID_KEY, ModelDefaultValueExt
 from models.exceptions import (
-    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistedError, JsonKeyNotExistedError, ModelUncastableError
+    IdUnsupportedError, ModelConstructionError, FieldKeyNotExistError, JsonKeyNotExistedError, ModelUncastableError
 )
-from models.field.exceptions import FieldReadOnly
+from models.field.exceptions import FieldReadOnlyError
 from tests.base import TestCase
 
 __all__ = ["TestModel"]
@@ -26,12 +26,81 @@ class TestModel(ABC):
 
     To use this, inherit a new class from :class:`TestModel.TestClass`.
 
+    Default value of the fields will be validated at the beginning of the tests.
+    If the validation failed, the test will **NOT** execute.
+
+    Configure class variable ``KEY_SKIP_CHECK`` and ``KEY_SKIP_CHECK_INVALID``
+    to set the keys to bypass the validation.
+
     .. seealso::
         https://stackoverflow.com/a/25695512/11571888 to see why there's a class wrapper.
     """
 
     class TestClass(TestCase):
         """The class to be inherited for :class:`TestModel`."""
+
+        KEY_SKIP_CHECK: Set[Tuple[str, str]] = set()
+        """Keys ``(Json, Field)`` to bypass the field default value validation."""
+
+        KEY_SKIP_CHECK_INVALID: Set[Tuple[str, str]] = set()
+        """Keys ``(Json, Field)`` to bypass the field default value validation for invalid model construction."""
+
+        @classmethod
+        def setUpTestClass(cls):
+            cls.validate_fields()
+
+        @classmethod
+        @final
+        def validate_fields(cls):
+            # Validate REQUIRED
+            for k in cls.get_required().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Required:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not REQUIRED. @{cls.__qualname__}")
+
+            # Validate INVALID REQUIRED
+            keys = set()
+            for comb in cls.get_invalid():
+                init_args, exc = comb
+                keys.update(init_args.keys())
+            keys -= cls.KEY_SKIP_CHECK_INVALID
+
+            for k in keys:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Required:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not REQUIRED. @{cls.__qualname__}")
+
+            # Validate OPTIONAL
+            for k in cls.get_optional().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.default_value != ModelDefaultValueExt.Optional:
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"is not OPTIONAL. @{cls.__qualname__}")
+
+            # Validate DEFAULT
+            for k in cls.get_default().keys() - cls.KEY_SKIP_CHECK:
+                jk, fk = k
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if ModelDefaultValueExt.is_default_val_ext(fc.default_value):
+                    raise ValueError(f"The default value of the field with field key `{fk}` "
+                                     f"should not be extended default value. @{cls.__qualname__}")
 
         @classmethod
         @abstractmethod
@@ -91,11 +160,11 @@ class TestModel(ABC):
             return {}
 
         @classmethod
-        def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+        def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
             """
-            List of a tuple which contains:
+            List of a ``tuple`` which contains:
 
-            - A ``dict`` which required keys and its corresponding INVALID values.
+            - A ``dict`` containing the keys and its corresponding **INVALID** values to initialize the model.
 
                 Key:
                     - 1st element: json key name
@@ -114,7 +183,7 @@ class TestModel(ABC):
 
             :return: combinations of the optional keys
             """
-            optional_keys = self.get_optional().keys()
+            optional_keys = self.get_optional()
             ret = []
 
             for count in range(len(optional_keys) + 1):
@@ -129,7 +198,7 @@ class TestModel(ABC):
 
             :return: combinations of the required keys
             """
-            required_keys = self.get_required().keys()
+            required_keys = self.get_required()
             ret = []
 
             for count in range(1, len(required_keys) + 1):
@@ -144,7 +213,7 @@ class TestModel(ABC):
 
             :return: combinations of the default keys
             """
-            default_keys = self.get_default().keys()
+            default_keys = self.get_default()
             ret = []
 
             for count in range(len(default_keys) + 1):
@@ -164,11 +233,11 @@ class TestModel(ABC):
             json = dict(map(lambda x: (x[0][0], x[1]), self.get_required().items()))
 
             if manual_default:
-                json_default, _ = self._dict_to_json_field_(self.get_default())
+                json_default, _ = self._dict_to_json_field(self.get_default())
                 json.update({k: v[1] for k, v in json_default.items()})
 
             if including_optional:
-                json_optional, _ = self._dict_to_json_field_(self.get_optional())
+                json_optional, _ = self._dict_to_json_field(self.get_optional())
                 json.update(json_optional)
 
             json.update(jkwargs)
@@ -177,7 +246,7 @@ class TestModel(ABC):
 
         @staticmethod
         @final
-        def _dict_to_json_field_(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             """
             Process ``d`` to return a ``dict`` with json key (1st returned element)
             and the other ``dict`` with field key.
@@ -205,7 +274,7 @@ class TestModel(ABC):
 
             for optional_keys in self.get_optional_key_combinations():
                 # Get required dict
-                expected_json, expected_field = self._dict_to_json_field_(self.get_required())
+                expected_json, expected_field = self._dict_to_json_field(self.get_required())
 
                 # Insert all optionals
                 for opk in optional_keys:
@@ -214,7 +283,7 @@ class TestModel(ABC):
 
                 # Get default keys to manually fill
                 for manual_defaults in self.get_default_key_combinations():
-                    for dfk in default_val.keys():
+                    for dfk in default_val:
                         jk, fk = dfk
                         auto_default, manual_default = default_val[dfk]
 
@@ -235,15 +304,15 @@ class TestModel(ABC):
                         self.assertDictEqual(actual_field, expected_json)
 
         def test_model_construct_invalid(self):
-            for init_dict, expected_error in self.get_required_invalid():
-                init_json, init_field = self._dict_to_json_field_(init_dict)
+            for init_dict, expected_error in self.get_invalid():
+                init_json, init_field = self._dict_to_json_field(init_dict)
 
+                with self.subTest(init_field=init_field, expected_error=expected_error):
+                    with self.assertRaises(expected_error):
+                        self.get_model_class()(**init_field)
                 with self.subTest(init_json=init_json, expected_error=expected_error):
                     with self.assertRaises(expected_error):
                         self.get_model_class()(**init_json, from_db=True)
-                with self.subTest(init_field=init_field, expected_error=expected_error):
-                    with self.assertRaises(expected_error):
-                        self.get_model_class()(**init_field, from_db=False)
 
         def test_model_construct_missing_required(self):
             for required_keys in self.get_required_key_combinations():
@@ -255,11 +324,11 @@ class TestModel(ABC):
                     del required[rk]
 
                 # Initialize dict to construct the model
-                init_dict_json, init_dict_field = self._dict_to_json_field_(required)
+                init_dict_json, init_dict_field = self._dict_to_json_field(required)
 
                 # Test for the expected error
                 with self.assertRaises(ModelConstructionError):
-                    self.get_model_class()(**init_dict_field, from_db=False)
+                    self.get_model_class()(**init_dict_field)
                 with self.assertRaises(ModelConstructionError):
                     self.get_model_class()(**init_dict_json, from_db=True)
 
@@ -298,19 +367,19 @@ class TestModel(ABC):
                     self.get_model_class()(**json, from_db=True)
 
         def test_init_non_exist(self):
-            init_json, init_field = self._dict_to_json_field_(self.get_required())
+            init_json, init_field = self._dict_to_json_field(self.get_required())
             init_json["absolutely_not_a_field"] = 7
             init_field["AbsolutelyNotAField"] = 7
 
+            with self.assertRaises(FieldKeyNotExistError):
+                self.get_model_class()(**init_field)
             with self.assertRaises(JsonKeyNotExistedError):
                 self.get_model_class()(**init_json, from_db=True)
-            with self.assertRaises(FieldKeyNotExistedError):
-                self.get_model_class()(**init_field, from_db=False)
 
         def test_set_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
 
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(FieldKeyNotExistError):
                 mdl.absolutely_not_a_field = 7
             with self.assertRaises(JsonKeyNotExistedError):
                 mdl["abs_n_field"] = 7
@@ -327,7 +396,7 @@ class TestModel(ABC):
                 with self.subTest(fk=fk, jk=jk, manual=manual):
                     try:
                         setattr(mdl, to_snake_case(fk), manual)
-                    except FieldReadOnly:
+                    except FieldReadOnlyError:
                         self.skipTest(f"Field key <{fk}> is readonly.")
 
                     self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
@@ -339,7 +408,7 @@ class TestModel(ABC):
                 with self.subTest(fk=fk, jk=jk, manual=manual):
                     try:
                         mdl[jk] = manual
-                    except FieldReadOnly:
+                    except FieldReadOnlyError:
                         self.skipTest(f"Json key <{fk}> is readonly.")
 
                     self.assertEqual(getattr(mdl, to_snake_case(fk)), manual)
@@ -348,7 +417,7 @@ class TestModel(ABC):
         def test_get_non_exist(self):
             mdl = self.get_constructed_model(manual_default=True, including_optional=True)
 
-            with self.assertRaises(FieldKeyNotExistedError):
+            with self.assertRaises(FieldKeyNotExistError):
                 _ = getattr(mdl, "absolutely_not_a_field")
             with self.assertRaises(JsonKeyNotExistedError):
                 _ = mdl["abs_n_field"]

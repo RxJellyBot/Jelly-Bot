@@ -6,8 +6,8 @@ from pymongo.collection import Collection
 
 from ._base import BaseField, FieldInstance
 from .exceptions import (
-    FieldModelClassInvalid, FieldValueTypeMismatch, FieldMaxLengthReached,
-    FieldCastingFailed, FieldEmptyValueNotAllowed
+    FieldModelClassInvalidError, FieldValueTypeMismatchError, FieldMaxLengthReachedError,
+    FieldCastingFailedError, FieldEmptyValueNotAllowedError
 )
 
 
@@ -38,16 +38,16 @@ class ArrayField(BaseField):
         self._allow_empty = allow_empty
         super().__init__(key, **kwargs)
 
-    def _check_value_valid_not_none_(self, value):
+    def _check_value_valid_not_none(self, value):
         # Check emptiness
         if not self._allow_empty and len(value) == 0:
-            raise FieldEmptyValueNotAllowed(self.key)
+            raise FieldEmptyValueNotAllowedError(self.key)
 
         # Check length
         if len(value) > self.max_len:
-            raise FieldMaxLengthReached(self.key, len(value), self.max_len)
+            raise FieldMaxLengthReachedError(self.key, len(value), self.max_len)
 
-    def _check_type_matched_not_none_(self, value, *, attempt_cast=False):
+    def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         from models import Model
 
         # If the element type is `Model`, try to cast the element of the field later
@@ -64,15 +64,15 @@ class ArrayField(BaseField):
                 if isinstance(v, abc.MutableMapping):
                     model_type.cast_model(v)
                 else:
-                    raise FieldValueTypeMismatch(self.key, value_type, (model_type, abc.MutableMapping))
+                    raise FieldValueTypeMismatchError(self.key, value_type, (model_type, abc.MutableMapping))
             elif not value_type == self._elem_type:
                 if not attempt_cast:
-                    raise FieldValueTypeMismatch(self.key, value_type, self.elem_type)
+                    raise FieldValueTypeMismatchError(self.key, value_type, self.elem_type)
 
                 try:
                     self._elem_type(v)
                 except Exception as e:
-                    raise FieldCastingFailed(self.key, v, self.elem_type, exc=e)
+                    raise FieldCastingFailedError(self.key, v, self.elem_type, exc=e)
 
     @classmethod
     def none_obj(cls):
@@ -125,7 +125,7 @@ class ModelArrayField(ArrayField):
             kwargs["inst_cls"] = ModelArrayFieldInstanceFactory.generate(model_type)
 
         if not issubclass(model_type, Model):
-            raise FieldModelClassInvalid(key, model_type)
+            raise FieldModelClassInvalidError(key, model_type)
 
         super().__init__(key, model_type, **kwargs)
         self._model_type = model_type

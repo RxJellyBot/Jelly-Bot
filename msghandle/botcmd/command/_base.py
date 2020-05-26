@@ -12,7 +12,7 @@ from flags import CommandScopeCollection, CommandScope, ChannelType, BotFeature
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from mongodb.factory import BotFeatureUsageDataManager
 from JellyBot.systemconfig import HostUrl
-from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailed
+from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailedError
 from extutils.logger import LoggerSkeleton
 from extutils.strtrans import type_translation
 
@@ -140,7 +140,7 @@ class CommandNode:
         self._case_insensitive = case_insensitive
         self._fn_cache = {}
 
-    def _register_(self, arg_count: int, fn: CommandFunction):
+    def _register(self, arg_count: int, fn: CommandFunction):
         if arg_count in self._fn:
             logger.logger.warning(
                 f"A function({self._fn[arg_count].fn.__qualname__}) has already existed in function holder. "
@@ -231,19 +231,19 @@ class CommandNode:
 
         return s
 
-    def _get_usage_all_code_(self, node, suffix):
+    def _get_usage_all_code(self, node, suffix):
         if node.is_root:
             return [str(node.prefix + node.main_splitter + suffix)]
         else:
             ret = []
 
             for code in node.command_codes:
-                ret.extend(self._get_usage_all_code_(node.parent, code + node.main_splitter + suffix))
+                ret.extend(self._get_usage_all_code(node.parent, code + node.main_splitter + suffix))
 
             return ret
 
     def get_all_usage(self) -> List[str]:
-        return self._get_usage_all_code_(self, "")
+        return self._get_usage_all_code(self, "")
 
     @property
     def name(self) -> Optional[str]:
@@ -259,7 +259,7 @@ class CommandNode:
 
     @property
     def max_arg_count(self) -> int:
-        return max(self._fn.keys()) if self._fn else -1
+        return max(self._fn) if self._fn else -1
 
     @property
     def functions(self) -> List[CommandFunction]:
@@ -324,6 +324,7 @@ class CommandNode:
         This will be replaced by the description of `feature_flag` even if specified.
         :param scope: Usable scope of the command function.
         :param feature_flag: Feature flag of the command function.
+        :param cooldown_sec: cooldown of the command in seconds
         """
         if not arg_help:
             arg_help = []
@@ -342,7 +343,7 @@ class CommandNode:
             s = signature(f)
             # This length count needs to include the first parameter - e: TextEventObject for every function
             if len(s.parameters) > arg_count:
-                self._register_(
+                self._register(
                     arg_count, CommandFunction(
                         arg_count, arg_help, f, self, feature_flag, description, scope, cooldown_sec))
             else:
@@ -366,7 +367,7 @@ class CommandNode:
             return None
 
     @staticmethod
-    def _split_args_(s: str, splitter: str, arg_count: int) -> List[str]:
+    def _split_args(s: str, splitter: str, arg_count: int) -> List[str]:
         if not s:
             return []
 
@@ -404,7 +405,7 @@ class CommandNode:
         return ret
 
     @staticmethod
-    def _sanitize_args_(args_list: List[str]):
+    def _sanitize_args(args_list: List[str]):
         ret = []
         for arg in args_list:
             # Strip the arg
@@ -419,7 +420,7 @@ class CommandNode:
         return ret
 
     @staticmethod
-    def _merge_overlength_args_(args_list: List[str], splitter: str, max_count: int):
+    def _merge_overlength_args(args_list: List[str], splitter: str, max_count: int):
         if 0 < max_count < len(args_list):
             idx = max_count - 1
             args_list[idx] = splitter.join(args_list[idx:])
@@ -430,7 +431,7 @@ class CommandNode:
             return args_list
 
     # noinspection PyMethodMayBeStatic
-    def _handle_fn_(self, e: TextMessageEventObject, cmd_fn: callable, args: List[str] = None):
+    def _handle_fn(self, e: TextMessageEventObject, cmd_fn: callable, args: List[str] = None):
         ret: List[HandledMessageEventText]
 
         if not e.remote_activated and not cmd_fn.scope.is_in_scope(e.channel_type):
@@ -451,7 +452,7 @@ class CommandNode:
             try:
                 ret = arg_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
                 cmd_fn.record_called(e.channel_oid)
-            except TypeCastingFailed as e:
+            except TypeCastingFailedError as e:
                 ret = [HandledMessageEventText(
                     content=_("Incorrect type of data: `{}`.\n"
                               "Expected type: `{}` / Actual type: `{}`").format(
@@ -473,14 +474,14 @@ class CommandNode:
             max_arg_count = self.max_arg_count
 
         if args is None:
-            args = self._split_args_(command, splitter, max_arg_count)
-            args = self._sanitize_args_(args)
+            args = self._split_args(command, splitter, max_arg_count)
+            args = self._sanitize_args(args)
 
-        args = self._merge_overlength_args_(args, splitter, max_arg_count)
+        args = self._merge_overlength_args(args, splitter, max_arg_count)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
-            return self._handle_fn_(e, cmd_fn, args)
+            return self._handle_fn(e, cmd_fn, args)
 
         if args:
             cmd_code, cmd_args = args[0], args[1:]

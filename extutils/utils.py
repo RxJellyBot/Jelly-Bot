@@ -183,23 +183,23 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
     :param t_prefix: attach "T" in front of the ranking
     :param is_tie: lambda expression to check if the current and the previous item are the same
     """
-    _null_ = object()
+    _null = object()
 
     iterator = iter(iterable_sorted)
 
-    prev = next(iterator, _null_)
+    prev = next(iterator, _null)
     rank = start
     temp = []
 
-    while prev != _null_:
-        curr = next(iterator, _null_)
+    while prev != _null:
+        curr = next(iterator, _null)
 
         # Check tied
-        while curr != _null_ and is_tie(curr, prev):
+        while curr != _null and is_tie(curr, prev):
             temp.append(prev)
 
             prev = curr
-            curr = next(iterator, _null_)
+            curr = next(iterator, _null)
 
         # Add prefix if any is tied
         for d in temp:

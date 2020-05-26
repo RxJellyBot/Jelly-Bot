@@ -1,13 +1,13 @@
 from typing import Dict, Tuple, Any, Type, List
 
 from bson import ObjectId
-from django.test import TestCase
 
 from extutils import exec_timing_result
 from extutils.locales import default_locale, default_language, LocaleInfo
 from flags import ModelValidityCheckResult, Platform
 from models import RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel
 from models.exceptions import InvalidModelError, ModelConstructionError, InvalidModelFieldError
+from tests.base import TestCase
 
 from ._test_base import TestModel
 
@@ -29,6 +29,7 @@ class TestRootUserConfigModel(TestModel.TestClass):
         }
 
     def test_get_tzinfo(self):
+        # noinspection PyArgumentEqualDefault
         mdl = self.get_constructed_model(manual_default=False)
         self.assertEqual(LocaleInfo.get_tzinfo(default_locale.pytz_code), mdl.tzinfo)
         self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
@@ -37,12 +38,14 @@ class TestRootUserConfigModel(TestModel.TestClass):
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
         self.assertEqual("US/Central", mdl.get_pytz_code())
 
-        mdl = self.get_constructed_model(l="US/Centralll")
+        mdl = self.get_constructed_model(l="US/Centralll")  # NOQA: E741
         self.assertIsNone(mdl.tzinfo)
         self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
 
 
 class TestRootUserModelFillApi(TestModel.TestClass):
+    KEY_SKIP_CHECK = {("api", "ApiOid")}
+
     ONPLAT = ObjectId()
     API = ObjectId()
     CONFIG = RootUserConfigModel()
@@ -58,7 +61,7 @@ class TestRootUserModelFillApi(TestModel.TestClass):
         }
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {},
@@ -80,6 +83,8 @@ class TestRootUserModelFillApi(TestModel.TestClass):
 
 
 class TestRootUserModelFillOnPlat(TestModel.TestClass):
+    KEY_SKIP_CHECK = {("op", "OnPlatOids")}
+
     ONPLAT = ObjectId()
     API = ObjectId()
     CONFIG = RootUserConfigModel()
@@ -95,7 +100,7 @@ class TestRootUserModelFillOnPlat(TestModel.TestClass):
         }
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {},
@@ -145,7 +150,7 @@ class TestAPIUserModel(TestModel.TestClass):
         return APIUserModel
 
     @classmethod
-    def get_required_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
+    def get_invalid(cls) -> List[Tuple[Dict[Tuple[str, str], Any], Type[ModelConstructionError]]]:
         return [
             (
                 {

@@ -27,26 +27,26 @@ def construct_nav(request, nav_param):
     # ----------------------------
 
     # Attach hidden item
-    _attach_hidden_(nav, home_item, current_path, nav_param)
+    _attach_hidden(nav, home_item, current_path, nav_param)
 
     # Collect items to Nav Bar
     nav.add_item(home_item)
 
     if keys.Cookies.USER_TOKEN in request.COOKIES:
-        nav.add_item(_construct_my_account_(current_path, home_item, nav_param))
+        nav.add_item(_construct_my_account(current_path, home_item, nav_param))
     else:
         nav.add_item(login_item)
 
-    nav.add_item(_construct_auto_reply_(current_path, home_item, nav_param))
-    nav.add_item(_construct_info_(current_path, home_item, nav_param))
-    nav.add_item(_construct_docs_(current_path, home_item, nav_param))
-    nav.add_item(_construct_services_(current_path, home_item))
+    nav.add_item(_construct_auto_reply(current_path, home_item, nav_param))
+    nav.add_item(_construct_info(current_path, home_item, nav_param))
+    nav.add_item(_construct_docs(current_path, home_item, nav_param))
+    nav.add_item(_construct_services(current_path, home_item))
     nav.add_item(about_item)
 
     return nav
 
 
-def __attach__(holder, nav_type, current_path, label, endpoint, nav_param, parent_item):
+def _attach_item(holder, nav_type, current_path, label, endpoint, nav_param, parent_item):
     try:
         holder.add_item(nav_items_factory(
             nav_type, current_path, label=label,
@@ -55,15 +55,15 @@ def __attach__(holder, nav_type, current_path, label, endpoint, nav_param, paren
         pass
 
 
-def _attach_hidden_(nav, home_item, current_path, nav_param):
+def _attach_hidden(nav, home_item, current_path, nav_param):
     # Extra Content Page
-    __attach__(nav, NavHidden, current_path, _("Extra Content"), "page.extra", nav_param, home_item)
+    _attach_item(nav, NavHidden, current_path, _("Extra Content"), "page.extra", nav_param, home_item)
 
     # Account Logout
-    __attach__(nav, NavHidden, current_path, _("Logout"), "account.logout", nav_param, home_item)
+    _attach_item(nav, NavHidden, current_path, _("Logout"), "account.logout", nav_param, home_item)
 
 
-def _construct_my_account_(current_path, parent, nav_param):
+def _construct_my_account(current_path, parent, nav_param):
     my_account_parent = nav_items_factory(
         NavDropdown, current_path, label=_("My Account"), parent=parent, link=reverse("account.main"))
     my_account_parent.add_item(nav_items_factory(
@@ -80,32 +80,32 @@ def _construct_my_account_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Settings"), link=reverse("account.settings"), parent=my_account_parent))
 
     # Hidden Items
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Channel Registration"),
         "account.channel.connect", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Channel Management"),
         "account.channel.manage", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Integrate Account"),
         "account.integrate", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Create Profile"),
         "account.profile.create", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Attach Profile"),
         "account.profile.attach", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("Edit Profile"),
         "account.profile.edit", nav_param, my_account_parent)
-    __attach__(
+    _attach_item(
         my_account_parent, NavHidden, current_path, _("List Profile"),
         "account.profile.list", nav_param, my_account_parent)
 
     return my_account_parent
 
 
-def _construct_auto_reply_(current_path, parent, nav_param):
+def _construct_auto_reply(current_path, parent, nav_param):
     auto_reply_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Auto Reply"), parent=parent, link=reverse("page.ar.main"))
     auto_reply_parent.add_item(nav_items_factory(
@@ -124,17 +124,17 @@ def _construct_auto_reply_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Search"), link=reverse("page.ar.search.list"), parent=auto_reply_parent))
 
     # Hidden Items
-    __attach__(auto_reply_parent, NavHidden, current_path,
-               _("Auto-Reply Ranking - {}").format(nav_param.get("channel_oid", "N/A")),
-               "page.ar.ranking.channel", nav_param, auto_reply_parent)
-    __attach__(auto_reply_parent, NavHidden, current_path,
-               _("Auto-Reply Search - {}").format(nav_param.get("channel_oid", "N/A")),
-               "page.ar.search.channel", nav_param, auto_reply_parent)
+    _attach_item(auto_reply_parent, NavHidden, current_path,
+                 _("Auto-Reply Ranking - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "page.ar.ranking.channel", nav_param, auto_reply_parent)
+    _attach_item(auto_reply_parent, NavHidden, current_path,
+                 _("Auto-Reply Search - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "page.ar.search.channel", nav_param, auto_reply_parent)
 
     return auto_reply_parent
 
 
-def _construct_info_(current_path, parent, nav_param):
+def _construct_info(current_path, parent, nav_param):
     info_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Info"), parent=parent)
 
@@ -142,29 +142,29 @@ def _construct_info_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Channel"), link=reverse("info.channel.search"), parent=info_parent))
 
     # Hidden Items
-    __attach__(info_parent, NavHidden, current_path,
-               _("Channel - {}").format(nav_param.get("channel_oid", "N/A")),
-               "info.channel", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path,
-               _("Channel Message Stats - {}").format(nav_param.get("channel_oid", "N/A")),
-               "info.channel.msgstats", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path,
-               _("Bot Usage Stats - {}").format(nav_param.get("channel_oid", "N/A")),
-               "info.channel.botstats", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path,
-               _("Recent Messages - {}").format(nav_param.get("channel_oid", "N/A")),
-               "info.channel.recent.message", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path,
-               _("Profile Info - {}").format(nav_param.get("profile_oid", "N/A")),
-               "info.profile", nav_param, info_parent)
-    __attach__(info_parent, NavHidden, current_path,
-               _("Channel Collection Info - {}").format(nav_param.get("chcoll_oid", "N/A")),
-               "info.chcoll", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Channel - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "info.channel", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Channel Message Stats - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "info.channel.msgstats", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Bot Usage Stats - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "info.channel.botstats", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Recent Messages - {}").format(nav_param.get("channel_oid", "N/A")),
+                 "info.channel.recent.message", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Profile Info - {}").format(nav_param.get("profile_oid", "N/A")),
+                 "info.profile", nav_param, info_parent)
+    _attach_item(info_parent, NavHidden, current_path,
+                 _("Channel Collection Info - {}").format(nav_param.get("chcoll_oid", "N/A")),
+                 "info.chcoll", nav_param, info_parent)
 
     return info_parent
 
 
-def _construct_docs_(current_path, parent, nav_param):
+def _construct_docs(current_path, parent, nav_param):
     docs_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Documentation"), parent=parent)
 
@@ -204,14 +204,14 @@ def _construct_docs_(current_path, parent, nav_param):
         NavEntry, current_path, label=_("Permission"), link=reverse("page.doc.prof.perm"), parent=docs_parent))
 
     # Hidden Items
-    __attach__(
+    _attach_item(
         docs_parent, NavHidden, current_path, _("Bot Command - {}").format(nav_param.get("code")),
         "page.doc.botcmd.cmd", nav_param, cmd_list)
 
     return docs_parent
 
 
-def _construct_services_(current_path, parent):
+def _construct_services(current_path, parent):
     service_parent = nav_items_factory(
         NavDropdown, current_path, label=_("Special Services"), parent=parent)
     service_parent.add_item(nav_items_factory(

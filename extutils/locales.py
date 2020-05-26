@@ -10,7 +10,7 @@ import pytz
 
 
 def sec_diff_to_utc_offset(s_diff: float):
-    """take `s_diff` and translate it into UTC offset string (example: +0500)."""
+    """take ``s_diff`` and translate it into UTC offset string (example: +0500)."""
     is_pos = s_diff >= 0
     s_diff = int(abs(s_diff))
     h = s_diff // 3600

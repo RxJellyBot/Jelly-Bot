@@ -64,7 +64,7 @@ class TestChannelProfileModel(TestModel.TestClass):
         mdl = self.get_constructed_model(perm=perm_dict)
 
         expected = {perm for perm, active in ProfilePermissionDefault.get_default_dict().items() if active}
-        expected.update(perm_dict.keys())
+        expected.update(perm_dict)
 
         self.assertSetEqual(set(mdl.permission_list), expected)
 

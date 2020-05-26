@@ -61,6 +61,9 @@ class WriteOutcome(BaseOutcome):
         302 - Field Type Mismatch
         303 - Field Invalid
         304 - Field Casting Failed
+        305 - Required Key not Filled
+        306 - Field Key not Exist
+        399 - Misc
 
     4xx - Problems related to cache
         401 - Missing in Cache, Attempted Insertion
@@ -154,6 +157,15 @@ class WriteOutcome(BaseOutcome):
     X_CASTING_FAILED = \
         304, _("X: Casting Failed"), \
         _("The data cannot be casted to the desired type. Check the datatype of the provided data.")
+    X_REQUIRED_NOT_FILLED = \
+        305, _("X: Required not Filled"), \
+        _("Required key of the model not filled.")
+    X_FIELD_NOT_EXIST = \
+        306, _("X: Field Key not Exist"), \
+        _("Field key does not exist in the model.")
+    X_INVALID_MODEL_FIELD = \
+        399, _("X: Invalid Model Field"), \
+        _("There are fields in the model containing invalid values.")
     X_CACHE_MISSING_ATTEMPTED_INSERT = \
         401, _("X: Missing in Cache, Attempted Insertion"), \
         _("The data was not found and the system has attempted to insert a new data but failed.")

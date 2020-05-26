@@ -108,7 +108,7 @@ class LoggerSkeleton:
             LogFileHandler(name),
             LogSevereFileHandler()
         ]
-        self._handlers_apply_formatter_(self._fmt)
+        self._handlers_apply_formatter(self._fmt)
         self._core = logging.getLogger(name)
 
         # Configs
@@ -119,11 +119,11 @@ class LoggerSkeleton:
             self._core.addHandler(handler)
 
     def temp_apply_format(self, fmt_str, level, msg, *args, **kwargs):
-        self._handlers_apply_formatter_(LogFormatter(fmt_str))
+        self._handlers_apply_formatter(LogFormatter(fmt_str))
         self._core.log(level, msg, *args, **kwargs)
-        self._handlers_apply_formatter_(self._fmt)
+        self._handlers_apply_formatter(self._fmt)
 
-    def _handlers_apply_formatter_(self, fmt):
+    def _handlers_apply_formatter(self, fmt):
         for handler in self._handlers:
             handler.setFormatter(fmt)
 

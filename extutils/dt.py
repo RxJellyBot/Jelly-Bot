@@ -52,7 +52,7 @@ def t_delta_str(t_delta: timedelta):
 
 def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:
     """
-    Parse `dt_str` to a tz-aware `datetime`.
+    Parse ``dt_str`` to a tz-aware :class:`datetime`.
 
     :param dt_str: `str` to be parsed.
     :param tzinfo_: tzinfo to be applied to the datetime. Uses UTC if not provided.
@@ -107,13 +107,13 @@ class TimeRange:
     tzinfo_: Optional[tzinfo] = None
     end_autofill_now: InitVar[bool] = True
 
-    def _localize_(self, dt: Optional[datetime]):
+    def _localize(self, dt: Optional[datetime]):
         if dt:
             return localtime(make_tz_aware(dt, self.tzinfo_), self.tzinfo_)
         else:
             return None
 
-    def _fill_start_end_(self, now: datetime, range_hr: int, end_autofill_now: bool):
+    def _fill_start_end(self, now: datetime, range_hr: int, end_autofill_now: bool):
         if self.start and self.end:
             return
 
@@ -133,11 +133,11 @@ class TimeRange:
         now = localtime(now_utc_aware(), self.tzinfo_)
 
         # Localize start and end timestamp if exists
-        self.start = self._localize_(self.start)
-        self.end = self._localize_(self.end)
+        self.start = self._localize(self.start)
+        self.end = self._localize(self.end)
 
         # Auto fill
-        self._fill_start_end_(now, range_hr, end_autofill_now)
+        self._fill_start_end(now, range_hr, end_autofill_now)
 
         # Time order check
         if self.start and self.end and self.start > self.end:
@@ -190,16 +190,16 @@ class TimeRange:
 
         ret = []
 
-        _idx_ = 0
-        _lbound_ = self.start
-        _hbound_ = self.start + timedelta(hours=self.hr_length_org)
+        _idx = 0
+        _lbound = self.start
+        _hbound = self.start + timedelta(hours=self.hr_length_org)
 
-        while _hbound_ <= self.end:
-            ret.append(TimeRange(start=_lbound_, end=_hbound_, tzinfo_=self.tzinfo_))
+        while _hbound <= self.end:
+            ret.append(TimeRange(start=_lbound, end=_hbound, tzinfo_=self.tzinfo_))
 
-            _idx_ += 1
-            _lbound_ += timedelta(hours=self.hr_length_org)
-            _hbound_ += timedelta(hours=self.hr_length_org)
+            _idx += 1
+            _lbound += timedelta(hours=self.hr_length_org)
+            _hbound += timedelta(hours=self.hr_length_org)
 
         return ret
 

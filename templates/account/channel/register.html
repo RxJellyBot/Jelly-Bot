@@ -43,7 +43,7 @@
                                         {% blocktrans trimmed %}
                                             In case the main method doesn't work, please get an Execode below,
                                             then use it to complete the registration at
-                                            where Jelly Bot supports using <b>Complete Execode</b> function.
+                                            where Jelly Bot supports using <strong>Complete Execode</strong> function.
                                         {% endblocktrans %}
                                         <ul class="text-left">
                                             <li>{% trans "Doing so will only grants you a default permission profile." %}</li>
@@ -91,15 +91,15 @@
 
 {% block ex-script %}
     <script type="text/javascript">
-        $(document).ready(function () {
-            $("button#get-execode").click(function () {
-                let xhr = new XMLHttpRequest();
+        $(document).ready(() =>
+            $("button#get-execode").click(() => {
+                const execodeErrorElem = $("div#get-execode-error");
+                const xhr = new XMLHttpRequest();
+
                 xhr.open("POST", `{% url "api.id.channel.register_execode" %}?{{ static_keys_param.AutoReply.API_TOKEN }}={{ api_token }}`);
                 xhr.responseType = "json";
-                xhr.onloadstart = function () {
-                    $("div#get-execode-error").addClass("d-none");
-                };
-                xhr.onload = function () {
+                xhr.onloadstart = () => execodeErrorElem.addClass("d-none");
+                xhr.onload = () => {
                     $("code#new-execode").text(
                         xhr.response.{{ static_keys_result.SUCCESS }} ?
                             xhr.response["{{ static_keys_result.RESULT }}"]["{{ static_keys_result.ExecodeResponse.EXECODE }}"] :
@@ -108,17 +108,14 @@
                     $("button#get-execode").prop("disabled", true);
                     $("div#get-execode-tips").removeClass("d-none");
 
-                    setTimeout(function () {
+                    setTimeout(() => {
                         $("button#get-execode").prop("disabled", false);
                         $("div#get-execode-tips").addClass("d-none");
                     }, parseInt({{ register_cooldown }}) * 1000);
                 };
-                xhr.onerror = function () {
-                    $("div#get-execode-error").removeClass("d-none");
-                };
+                xhr.onerror = () => execodeErrorElem.removeClass("d-none");
                 xhr.send();
-            });
-        });
+            }));
     </script>
     <script src="{% static "js/account/register.js" %}" type="text/javascript"></script>
 {% endblock %}

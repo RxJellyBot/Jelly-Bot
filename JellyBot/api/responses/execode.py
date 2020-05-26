@@ -20,17 +20,17 @@ class ExecodeCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMixin,
     def pass_condition(self) -> bool:
         return self._execode and self._result.success
 
-    def _handle_execode_(self):
+    def _handle_execode(self):
         if not self._execode:
             self._err[result.ExecodeResponse.EXECODE] = self._execode
 
-    def _handle_action_type_(self):
+    def _handle_action_type(self):
         if self._action_type:
             self._action_type = Execode.cast(int(self._action_type))
 
     def pre_process(self):
-        self._handle_execode_()
-        self._handle_action_type_()
+        self._handle_execode()
+        self._handle_action_type()
         self._result = ExecodeManager.complete_execode(self._execode, self.param_dict, action=self._action_type)
 
     def process_pass(self):

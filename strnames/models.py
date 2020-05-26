@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["StatsResults", "Timer"]
+__all__ = ["StatsResults", "Timer", "ShortUrl"]
 
 
 class StatsResults:
@@ -15,3 +15,7 @@ class Timer:
     PAST_CONTINUE = _("- [{diff}] past {event} (at {time})")
     PAST_DONE = _("- {event} has ended (at {time})")
     FUTURE = _("- [{diff}] to {event} (at {time})")
+
+
+class ShortUrl:
+    SERVICE_NOT_AVAILABLE = _("(Short URL service unavailable)")
