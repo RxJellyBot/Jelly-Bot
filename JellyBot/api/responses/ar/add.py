@@ -102,7 +102,7 @@ class AutoReplyAddBaseResponse(
 
             self._tags = tag_ids
 
-        self._flag[k] = self._tags
+        self._flag[k] = self._tags = self._tags or []
 
     def _handle_cooldown(self):
         k = result.AutoReplyResponse.COOLDOWN_SEC
