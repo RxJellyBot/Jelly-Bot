@@ -32,15 +32,15 @@ class TestRootUserConfigModel(TestModel.TestClass):
         # noinspection PyArgumentEqualDefault
         mdl = self.get_constructed_model(manual_default=False)
         self.assertEqual(LocaleInfo.get_tzinfo(default_locale.pytz_code), mdl.tzinfo)
-        self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
+        self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
 
         mdl = self.get_constructed_model(manual_default=True)
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
-        self.assertEqual("US/Central", mdl.get_pytz_code())
+        self.assertEqual("US/Central", mdl.pytz_code)
 
         mdl = self.get_constructed_model(l="US/Centralll")  # NOQA: E741
         self.assertIsNone(mdl.tzinfo)
-        self.assertEqual(default_locale.pytz_code, mdl.get_pytz_code())
+        self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
 
 
 class TestRootUserModelFillApi(TestModel.TestClass):
