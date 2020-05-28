@@ -1,5 +1,7 @@
 import re
 
+from django.utils.functional import Promise
+
 from extutils.url import is_valid_url
 
 from ._base import BaseField
@@ -71,7 +73,8 @@ class TextField(BaseField):
 
     @property
     def expected_types(self):
-        return str, int, bool
+        # `Promise` will include `__proxy__` for i18n strings
+        return str, int, bool, Promise
 
 
 class UrlField(BaseField):

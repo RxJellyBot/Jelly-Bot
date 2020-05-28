@@ -16,7 +16,9 @@ class ModelValidityCheckResult(FlagOutcomeMixin, FlagDoubleEnum):
     1xx - Auto Reply
         10x - Content Validations
             101 - Empty Content
+
             102 - Image Validation Failed
+
             103 - LINE Sticker Validation Failed
 
     2xx - Identity Managements

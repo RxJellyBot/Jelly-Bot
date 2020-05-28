@@ -31,7 +31,8 @@ class ChannelManager(BaseCollection):
     def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
         entry, outcome, ex = self.insert_one_data(
             Platform=platform, Token=token,
-            Config=ChannelConfigModel.generate_default(DefaultName=default_name))
+            Config=ChannelConfigModel.generate_default(
+                DefaultName=default_name))
 
         if outcome.data_found:
             entry = self.get_channel_token(platform, token)
