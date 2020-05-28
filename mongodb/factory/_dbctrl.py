@@ -20,12 +20,12 @@ def get_single_db_name():
 
 
 SINGLE_DB_NAME = get_single_db_name()
-if SINGLE_DB_NAME:
+if bool(int(os.environ.get("TEST", 0))):
+    SYSTEM.logger.info("MongoDB single database activated because `TEST` has been set to true.")
+    SYSTEM.logger.info(f"MongoDB single database name: {SINGLE_DB_NAME}")
+elif SINGLE_DB_NAME:
     SYSTEM.logger.info("MongoDB single database is activated "
                        "by setting values to the environment variable 'MONGO_DB'.")
-    SYSTEM.logger.info(f"MongoDB single database name: {SINGLE_DB_NAME}")
-elif bool(int(os.environ.get("TEST", 0))):
-    SYSTEM.logger.info("MongoDB single database activated because `TEST` has been set to true.")
     SYSTEM.logger.info(f"MongoDB single database name: {SINGLE_DB_NAME}")
 
 

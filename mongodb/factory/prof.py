@@ -56,14 +56,12 @@ class UserProfileManager(BaseCollection):
             upsert=True).upserted_id
 
         if id_:
-            # noinspection PyTypeChecker
             model: ChannelProfileConnectionModel = self.find_one_casted(
                 {OID_KEY: id_}, parse_cls=ChannelProfileConnectionModel)
 
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
         else:
-            # noinspection PyTypeChecker
             model: ChannelProfileConnectionModel = self.find_one_casted(
                 {ChannelProfileConnectionModel.UserOid.key: root_uid},
                 parse_cls=ChannelProfileConnectionModel)
@@ -267,7 +265,7 @@ class ProfileDataManager(BaseCollection):
             return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
-            perm_prof = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
+            perm_prof: ChannelProfileModel = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
 
             if perm_prof:
                 return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, ex, perm_prof)
@@ -294,7 +292,7 @@ class ProfileDataManager(BaseCollection):
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
     def create_default_profile(self, channel_oid: ObjectId) -> CreateProfileResult:
-        default_profile, outcome, ex = self._create_profile(channel_oid, Name=_("Default Profile"))
+        default_profile, outcome, ex = self._create_profile(channel_oid, Name=str(_("Default Profile")))
 
         if outcome.is_inserted:
             set_success = ChannelManager.set_config(
@@ -627,7 +625,8 @@ class ProfileManager:
 
         # Remove default profile
         channel_data = ChannelManager.get_channel_oid(channel_oid)
-        del attachables[channel_data.config.default_profile_oid]
+        if channel_data.config.default_profile_oid in attachables:
+            del attachables[channel_data.config.default_profile_oid]
 
         return list(attachables.values())
 

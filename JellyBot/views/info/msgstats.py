@@ -148,7 +148,10 @@ class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, Vi
             channel_data.model, get_current_timezone(), incl_unav,
             hours_within=hours_within, start=dt_start, end=dt_end, period_count=period_count)
 
-        hours_within = pkg[KEY_MSG_INTV_FLOW].hr_range or hours_within
+        # Display the max of the time range of the given one and in the result
+        # so that the time range appears on the page will be the time range of the data
+        hours_within = \
+            max(hours_within, pkg[KEY_MSG_INTV_FLOW].hr_range) if hours_within else pkg[KEY_MSG_INTV_FLOW].hr_range
         msg_count = pkg[KEY_MSG_USER_CHANNEL].msg_count
 
         ctxt = {

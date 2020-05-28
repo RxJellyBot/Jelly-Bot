@@ -65,7 +65,6 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         if action:
             cond[ExecodeEntryModel.ActionType.key] = action
 
-        # noinspection PyTypeChecker
         ret: ExecodeEntryModel = self.find_one_casted(cond, parse_cls=ExecodeEntryModel)
 
         if ret:

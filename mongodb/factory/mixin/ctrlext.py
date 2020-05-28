@@ -1,6 +1,6 @@
 from datetime import datetime
 from threading import Thread
-from typing import Type, Optional, Tuple, Union
+from typing import Type, Optional, Tuple, Union, TypeVar
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -17,6 +17,8 @@ from models.field.exceptions import (
 )
 from mongodb.utils import CursorWithCount
 from mongodb.factory.results import WriteOutcome
+
+T = TypeVar('T', bound=Model)
 
 
 class ControlExtensionMixin(Collection):
@@ -92,8 +94,8 @@ class ControlExtensionMixin(Collection):
 
         return self.find_one(filter_)[OID_KEY]
 
-    def insert_one_data(self, model_cls: Type[Type[Model]], *, from_db: bool = False, **model_args) \
-            -> Tuple[Optional[Model], WriteOutcome, Optional[Exception]]:
+    def insert_one_data(self, model_cls: Type[Type[T]], *, from_db: bool = False, **model_args) \
+            -> Tuple[Optional[T], WriteOutcome, Optional[Exception]]:
         """
         Insert an object into the database by providing its model class and the arguments to construct the model.
 
@@ -179,7 +181,7 @@ class ControlExtensionMixin(Collection):
         return CursorWithCount(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls: Type[Model], **kwargs) -> Optional[Model]:
+    def find_one_casted(self, filter_, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod

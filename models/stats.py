@@ -217,7 +217,7 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
 
         self.data = count_sum + count_data
 
-        self.hr_range = int(days_collected * 24)
+        self.hr_range = round(days_collected * 24)
 
 
 class DailyMessageResult(DailyResult):

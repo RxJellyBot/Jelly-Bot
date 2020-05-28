@@ -1,5 +1,7 @@
 from typing import Type, Any, Tuple
 
+from django.utils.functional import Promise
+
 from models.field import TextField, BaseField
 from models.field.exceptions import (
     FieldTypeMismatchError, FieldNoneNotAllowedError, FieldEmptyValueNotAllowedError,
@@ -40,7 +42,7 @@ class TestTextFieldProperty(TestFieldProperty.TestClass):
         return "x" * (TextField.DEFAULT_MAX_LENGTH + 1), [7, 9], {7: 9}, {7, 9}, (7, 9)
 
     def get_expected_types(self) -> Tuple[Type[Any], ...]:
-        return str, int, bool
+        return str, int, bool, Promise
 
     def get_desired_type(self) -> Type[Any]:
         return str
