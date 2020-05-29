@@ -1,3 +1,6 @@
+"""
+Logger of the Discord bot.
+"""
 from extutils.logger import LoggerSkeleton
 
 __all__ = ["DISCORD", "DISCORD_INTERNAL"]

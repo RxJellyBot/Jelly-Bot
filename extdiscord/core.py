@@ -8,42 +8,52 @@ import threading
 from django.utils.translation import gettext_lazy as _
 
 from discord import (
-    Client, Member, User, Guild, ChannelType,
+    Client, Member, Guild, ChannelType,
     GroupChannel, DMChannel, TextChannel, VoiceChannel, CategoryChannel,
     Activity, ActivityType)
 
 from bot.event import signal_discord_ready
 from extdiscord.utils import channel_full_repr
+from extdiscord.handle import handle_discord_main
+from extdiscord.logger import DISCORD
 from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import Platform
-from extdiscord import handle_discord_main
-from extdiscord.logger import DISCORD
 from mongodb.factory import ChannelManager, ChannelCollectionManager, RootUserManager, ProfileManager
 from msghandle.models import MessageEventObjectFactory
 
 from .token_ import discord_token
-from .utils.cnflprvt import prioritized_bot_exists, initialize
+from .utils.cnflprvt import BotConflictionPreventer
 
-__all__ = ["run_server", "_inst"]
+__all__ = ["run_server", "DiscordClientWrapper"]
 
 
 class DiscordClient(Client):
-    # Events: https://discordpy.readthedocs.io/en/latest/api.html#event-reference
+    """
+    Discord bot client. This is the main class of the discord bot event handler.
+
+    .. seealso::
+        Discord bot events: https://discordpy.readthedocs.io/en/latest/api.html#event-reference
+    """
 
     async def on_ready(self):
-        from msghandle.botcmd.command import cmd_help
+        """Contains the code to be executed when the bot is ready."""
+        # Not importing at the top level because the app will not be ready yet (translation unavailable)
+        from msghandle.botcmd.command import cmd_help  # pylint: disable=C0415
 
-        DISCORD.logger.info(f"Logged in as {self.user}.")
+        DISCORD.logger.info("Logged in as %s.", self.user)
 
-        initialize(self.user.id)
+        BotConflictionPreventer.initialize(self.user.id)
         signal_discord_ready()
 
         await self.change_presence(activity=Activity(name=cmd_help.get_usage(), type=ActivityType.watching))
 
     async def on_message(self, message):
+        """Contains the code to be executed when a message is being received."""
         # Prevent self reading and bot resonate
-        if message.author == self.user or message.author.bot or prioritized_bot_exists(message.guild):
+        if message.author == self.user \
+                or message.author.bot \
+                or BotConflictionPreventer.prioritized_bot_exists(message.guild):
             return
 
         await handle_discord_main(MessageEventObjectFactory.from_discord(message)) \
@@ -52,6 +62,7 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_delete(self, channel: Union[DMChannel, GroupChannel]):
+        """Contains the code to be executed when a private channel is deleted."""
         if not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
             warn_txt = f"Private Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
             DISCORD.logger.warning(warn_txt)
@@ -66,6 +77,7 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     async def on_private_channel_update(self, before: GroupChannel, after: GroupChannel):
+        """Contains the code to be executed when the info of a private channel is updated."""
         if str(before) != str(after) \
                 and not ChannelManager.update_channel_default_name(Platform.DISCORD, after.id, str(after)).is_success:
             warn_txt = f"Private Channel Name UPDATED but the name was not updated. Channel token: {after.id} / " \
@@ -75,6 +87,7 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_guild_channel_delete(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        """Contains the code to be executed when a channel of a Discord server is deleted."""
         if channel.type == ChannelType.text \
                 and not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
             warn_txt = f"Guild Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
@@ -83,6 +96,7 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_guild_channel_create(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        """Contains the code to be executed when a channel of a Discord server is created."""
         if channel.type == ChannelType.text:
             reg_result = ChannelManager.register(Platform.DISCORD, channel.id, channel_full_repr(channel))
 
@@ -103,6 +117,7 @@ class DiscordClient(Client):
             self,
             before: Union[TextChannel, VoiceChannel, CategoryChannel],
             after: Union[TextChannel, VoiceChannel, CategoryChannel]):
+        """Contains the code to be executed when the info of a channel of a Discord server is updated."""
         if str(before) != str(after):
             update_result = ChannelCollectionManager.update_default_name(
                 Platform.DISCORD, after.guild.id, channel_full_repr(after))
@@ -115,6 +130,7 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_member_join(self, member: Member):
+        """Contains the code to be executed when a member joined a channel."""
         udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
@@ -123,10 +139,11 @@ class DiscordClient(Client):
 
         sys_channel = member.guild.system_channel
         if sys_channel:
-            await sys_channel.send(_("{} joined the server.").format(member.mention))
+            await sys_channel.send(_("%s joined the server.") % member.mention)
 
     # noinspection PyMethodMayBeStatic
     async def on_member_remove(self, member: Member):
+        """Contains the code to be executed when a member left a channel."""
         udata_result = RootUserManager.get_root_data_onplat(Platform.DISCORD, member.id, auto_register=True)
         cdata = ChannelManager.get_channel_token(Platform.DISCORD, member.guild.id, auto_register=True)
 
@@ -135,66 +152,109 @@ class DiscordClient(Client):
 
         sys_channel = member.guild.system_channel
         if sys_channel:
-            await sys_channel.send(_("{} left the server.").format(member.mention))
+            await sys_channel.send(_("%s left the server.") % member.mention)
 
-    async def on_guild_join(self, guild: Guild):
-        pass
-
-    async def on_guild_remove(self, guild: Guild):
-        pass
-
-    async def on_group_join(self, channel: GroupChannel, user: User):
-        pass
-
-    async def on_group_remove(self, channel: GroupChannel, user: User):
-        pass
+    # Other available hooks:
+    #   on_guild_join(self, guild: Guild) -> bot joined a server
+    #   on_guild_remove(self, guild: Guild) -> bot can no longer reach a server
+    #   on_group_join(self, channel: GroupChannel, user: User) -> bot joined a group
+    #   on_group_remove(self, channel: GroupChannel, user: User) -> bot can no longer reach a group
 
 
-class DiscordClientWrapper:
+class _DiscordClientWrapper:
     def __init__(self):
         self._loop = asyncio.new_event_loop()
         self._core = DiscordClient(loop=self._loop)
+        self._thread = None
 
     def run(self, token):
+        """
+        Blocking call to run the discord client.
+
+        :param token: Discord bot token
+
+        .. seealso::
+            ``Client.run()``
+        """
         self._core.run(token)
 
+    def start_async(self):
+        """
+        Start the bot asynchronously by creating a thread and run it if not yet run.
+
+        Nothing happens or changes if the bot is already running.
+        """
+        if not self._thread:
+            self._thread = threading.Thread(
+                target=DiscordClientWrapper.discord_loop.run_until_complete,
+                args=(DiscordClientWrapper.start(discord_token),))
+            self._thread.start()
+
     async def start(self, token):
+        """
+        Non-blocking call to run the discord client. (using ``async`` and ``await``)
+
+        Returns a coroutine.
+
+        :param token: Discord bot token
+
+        .. seealso::
+            ``Client.start()``
+        """
         await self._core.start(token)
 
     @arg_type_ensure
     def get_user_name_safe(self, uid: int) -> Optional[str]:
+        """
+        Get the user name by providing the uid safely (Should not fail if not found).
+
+        :param uid: Discord user id
+        :return: the name of the user. `None` if not found.
+        """
         udata = self._core.get_user(uid)
 
         if udata:
             return str(udata)
-        else:
-            return None
+
+        return None
 
     @arg_type_ensure
     def get_guild(self, gid: int) -> Optional[Guild]:
+        """
+        Get the guild/server object by providing the gid.
+
+        :param gid: Discord guild/server id
+        :return: guild object if available
+        """
         return self._core.get_guild(gid)
 
     def latency(self) -> float:
+        """
+        Get the bot connection latency.
+
+        :return: connection latency in milliseconds
+        """
         return self._core.latency
 
     @property
     def discord_client(self):
+        """Discord bot client object."""
         return self._core
 
     @property
     def discord_loop(self):
+        """The :class:`asyncio` loop in which the discord bot client is running."""
         return self._loop
 
 
-_inst = DiscordClientWrapper()
-_discord_thread = None
+DiscordClientWrapper = _DiscordClientWrapper()
 
 
 def run_server():
-    # Obtained from https://github.com/Rapptz/discord.py/issues/710#issuecomment-395609297
-    global _discord_thread
+    """
+    Start the discord bot.
 
-    if not _discord_thread:
-        _discord_thread = threading.Thread(
-            target=_inst.discord_loop.run_until_complete, args=(_inst.start(discord_token),))
-        _discord_thread.start()
+    .. note::
+        Obtained from https://github.com/Rapptz/discord.py/issues/710#issuecomment-395609297
+    """
+    DiscordClientWrapper.start_async()

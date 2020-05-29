@@ -1,3 +1,6 @@
+"""
+Functions related to the main event handling.
+"""
 import traceback
 
 from extutils.emailutils import MailSender
@@ -12,22 +15,25 @@ from .logger import DISCORD
 __all__ = ["handle_discord_main", "handle_error"]
 
 
-def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
+def handle_discord_main(event: Event) -> HandledMessageEventsHolder:
+    """Main function to handle the message received from the discord bot."""
     try:
-        if isinstance(e, (TextMessageEventObject, ImageMessageEventObject)):
-            return handle_message_main(e)
+        if isinstance(event, (TextMessageEventObject, ImageMessageEventObject)):
+            return handle_message_main(event)
         else:
-            DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw if hasattr(e, 'raw') else e}")
-            return HandledMessageEventsHolder(e.channel_model)
-    except Exception as ex:
+            DISCORD.logger.info(f"Discord event object not handled. "
+                                f"Raw: {event.raw if hasattr(event, 'raw') else event}")
+            return HandledMessageEventsHolder(event.channel_model)
+    except Exception as ex:  # pylint: disable=W0703
         handle_error(ex)
-        return HandledMessageEventsHolder(e.channel_model)
+        return HandledMessageEventsHolder(event.channel_model)
 
 
-def handle_error(e: Exception):
+def handle_error(ex: Exception):
+    """Function to be called when any error occurred during the discord message handling."""
     subject = "Error on Discord Message Processing"
 
-    html = f"<h4>{e}</h4>\n" \
+    html = f"<h4>{ex}</h4>\n" \
            f"<hr>\n" \
            f"<pre>Traceback:\n" \
            f"{traceback.format_exc()}</pre>\n"
