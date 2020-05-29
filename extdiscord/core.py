@@ -70,7 +70,8 @@ class DiscordClient(Client):
 
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_create(self, channel: Union[DMChannel, GroupChannel]):
-        if not ChannelManager.register(Platform.DISCORD, channel.id, str(channel)).success:
+        """Contains the code to be executed when a private channel is created."""
+        if not ChannelManager.ensure_register(Platform.DISCORD, channel.id, str(channel)).success:
             warn_txt = f"Private Channel CREATED but the registration was failed. Channel token: {channel.id}"
             DISCORD.logger.warning(warn_txt)
             MailSender.send_email_async(warn_txt, subject="Discord private channel creation failed")
