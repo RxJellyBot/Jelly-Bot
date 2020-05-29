@@ -19,8 +19,9 @@ class RootUserConfigModel(Model):
     Language = TextField("lg", default=default_language.code, allow_none=False)
     Name = TextField("n", allow_none=False)
 
-    def get_pytz_code(self) -> str:
-        """Return the pytz code. If the locale is invalid / not found, return the default one."""
+    @property
+    def pytz_code(self) -> str:
+        """``pytz`` code of this config. If the locale is invalid / not found, return the default one."""
         tzinfo = self.tzinfo
         if tzinfo:
             return tzinfo.tzidentifier
