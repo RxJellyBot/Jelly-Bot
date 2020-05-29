@@ -1,1 +1,1 @@
-from .replaceuid import *  # NOQA
+from .replaceuid import *  # noqa

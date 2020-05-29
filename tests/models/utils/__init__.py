@@ -1,2 +1,2 @@
-from .validator import *  # NOQA
-from .checker import *  # NOQA
+from .validator import *  # noqa
+from .checker import *  # noqa

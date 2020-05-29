@@ -181,7 +181,7 @@ class ModelFieldChecker:
                 return DataRepairResult.REQUIRED_MISSING, None
             else:
                 return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, \
-                       data if changed else None  # NOQA: E126
+                       data if changed else None  # noqa: E126
 
         def repair_fields(self, data: dict, model_cls, missing: List[str]) -> bool:
             changed = False
