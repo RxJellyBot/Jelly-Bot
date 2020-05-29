@@ -1,3 +1,6 @@
+"""
+Core objects for direct control on the Discord bot.
+"""
 import asyncio
 from typing import Optional, Union
 import threading

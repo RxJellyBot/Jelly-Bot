@@ -85,20 +85,18 @@
 {% block ex-script %}
     <script type="text/javascript" src="{% static "js/utils/generator.js" %}"></script>
     <script type="text/javascript">
-        $(() => {
-            $("[data-toggle=tooltip]").tooltip();
-        });
+        $(() => $("[data-toggle=tooltip]").tooltip());
         $(document).ready(() => {
-            let formElem = $("form");
+            const formElem = $("form");
             formElem.submit(() => {
-                let submitBtnElem = $("button.submit");
+                const submitBtnElem = $("button.submit");
                 submitBtnElem.prop("disabled", true);
                 $.ajax({
                     data: formElem.serialize(),
                     type: "post",
                     url: "{% url "account.settings" %}",
                     success(response) {
-                        let s = response.split("/", 2);
+                        const s = response.split("/", 2);
                         if (s.length < 2) {
                             generateAlert("info", s);
                         } else {
