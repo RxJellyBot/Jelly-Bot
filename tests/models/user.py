@@ -38,7 +38,7 @@ class TestRootUserConfigModel(TestModel.TestClass):
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
         self.assertEqual("US/Central", mdl.pytz_code)
 
-        mdl = self.get_constructed_model(l="US/Centralll")  # NOQA: E741
+        mdl = self.get_constructed_model(l="US/Centralll")  # noqa: E741
         self.assertIsNone(mdl.tzinfo)
         self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
 

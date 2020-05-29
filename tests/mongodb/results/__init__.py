@@ -1,8 +1,8 @@
-from .ar import *  # NOQA
-from .channel import *  # NOQA
-from .exctnt import *  # NOQA
-from .execode import *  # NOQA
-from .perm import *  # NOQA
-from .shorturl import *  # NOQA
-from .statistics import *  # NOQA
-from .user import *  # NOQA
+from .ar import *  # noqa
+from .channel import *  # noqa
+from .exctnt import *  # noqa
+from .execode import *  # noqa
+from .perm import *  # noqa
+from .shorturl import *  # noqa
+from .statistics import *  # noqa
+from .user import *  # noqa

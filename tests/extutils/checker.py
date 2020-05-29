@@ -19,7 +19,7 @@ class TestArgTypeEnsure(TestCase):
         o_out = "5e8c08d00000000000000000"
 
         @arg_type_ensure
-        def fn(i: int, f: float, l: list, d: dict, b: bool, t: tuple, o: ObjectId):  # NOQA: E741
+        def fn(i: int, f: float, l: list, d: dict, b: bool, t: tuple, o: ObjectId):  # noqa: E741
             nonlocal i_out, f_out, l_out, d_out, b_out, t_out, o_out
 
             i_out = i
@@ -44,7 +44,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = 7
 
         @arg_type_ensure
-        def fn(l: list):  # NOQA: E741
+        def fn(l: list):  # noqa: E741
             nonlocal l_out
 
             l_out = l
@@ -76,7 +76,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = 7
 
         @arg_type_ensure
-        def fn(l: Union[int, str]):  # NOQA: E741
+        def fn(l: Union[int, str]):  # noqa: E741
             nonlocal l_out
 
             l_out = l
@@ -89,7 +89,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = "7"
 
         @arg_type_ensure
-        def fn(l: Union[int, str]):  # NOQA: E741
+        def fn(l: Union[int, str]):  # noqa: E741
             nonlocal l_out
 
             l_out = l
@@ -118,7 +118,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = True
 
         @arg_type_ensure
-        def fn(l: Union[int, str]):  # NOQA: E741
+        def fn(l: Union[int, str]):  # noqa: E741
             nonlocal l_out
 
             l_out = l
@@ -131,7 +131,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = [1]
 
         @arg_type_ensure(converter=NonSafeDataTypeConverter)
-        def fn(l: Union[int, float]):  # NOQA: E741
+        def fn(l: Union[int, float]):  # noqa: E741
             nonlocal l_out
 
             l_out = l
@@ -162,7 +162,7 @@ class TestArgTypeEnsure(TestCase):
         l_out = 1
 
         @arg_type_ensure
-        def fn(l: List[int]):  # NOQA: E741
+        def fn(l: List[int]):  # noqa: E741
             nonlocal l_out
 
             l_out = l

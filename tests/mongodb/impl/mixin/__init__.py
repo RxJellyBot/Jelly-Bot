@@ -1,2 +1,2 @@
-from .ctrlext import *  # NOQA
-from .gentok import *  # NOQA
+from .ctrlext import *  # noqa
+from .gentok import *  # noqa

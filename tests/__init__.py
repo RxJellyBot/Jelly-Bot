@@ -1,4 +1,4 @@
-from .bot import *  # NOQA
-from .extutils import *  # NOQA
-from .models import *  # NOQA
-from .mongodb import *  # NOQA
+from .bot import *  # noqa
+from .extutils import *  # noqa
+from .models import *  # noqa
+from .mongodb import *  # noqa
