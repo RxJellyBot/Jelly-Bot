@@ -102,7 +102,7 @@ class OnPlatformUserModel(Model):
                 else:
                     n = LineApiWrapper.get_user_name_safe(self.token)
             elif self.platform == Platform.DISCORD:
-                from extdiscord import DiscordClientWrapper
+                from extdiscord.core import DiscordClientWrapper
 
                 n = DiscordClientWrapper.get_user_name_safe(self.token)
 
