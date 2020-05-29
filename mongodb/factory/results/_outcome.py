@@ -125,10 +125,10 @@ class WriteOutcome(BaseOutcome):
         110, _("X: Invalid URL"), \
         _("The URL is invalid. Maybe missing the schema or the URL did not return 200.")
     X_AR_INVALID_KEYWORD = \
-        110, _("X: (Auto Reply) Invalid Keyword"), \
+        111, _("X: (Auto Reply) Invalid Keyword"), \
         _("The keyword contains invalid content.")
     X_AR_INVALID_RESPONSE = \
-        111, _("X: (Auto Reply) Invalid Response"), \
+        112, _("X: (Auto Reply) Invalid Response"), \
         _("One or more of the responses contains invalid content.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
@@ -145,6 +145,9 @@ class WriteOutcome(BaseOutcome):
     X_INVALID_MODEL = \
         205, _("X: Invalid Model"), \
         _("Some data of the model is invalid.")
+    X_MODEL_KEY_NOT_EXIST = \
+        206, _("X: Model not Exist"), \
+        _("Some model key does not exist.")
     X_READONLY = \
         301, _("X: Readonly"), \
         _("There are some fields that are being attempted to modify are read-only.")

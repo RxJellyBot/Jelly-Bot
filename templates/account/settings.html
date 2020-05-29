@@ -85,31 +85,34 @@
 {% block ex-script %}
     <script type="text/javascript" src="{% static "js/utils/generator.js" %}"></script>
     <script type="text/javascript">
-        $(() => $("[data-toggle=tooltip]").tooltip());
-        $(document).ready(() =>
-            $("form").submit(() => {
-                const submitBtn = $("button.submit");
-
-                submitBtn.prop("disabled", true);
+        $(() => {
+            $("[data-toggle=tooltip]").tooltip();
+        });
+        $(document).ready(() => {
+            let formElem = $("form");
+            formElem.submit(() => {
+                let submitBtnElem = $("button.submit");
+                submitBtnElem.prop("disabled", true);
                 $.ajax({
-                    data: $(this).serialize(),
+                    data: formElem.serialize(),
                     type: "post",
                     url: "{% url "account.settings" %}",
                     success(response) {
-                        const s = response.split("/", 2);
+                        let s = response.split("/", 2);
                         if (s.length < 2) {
                             generateAlert("info", s);
                         } else {
                             generateAlert(s[0], s[1]);
                         }
-                        submitBtn.prop("disabled", false);
+                        submitBtnElem.prop("disabled", false);
                     },
                     error(xhr) {
                         generateAlert("warning", `Error: ${xhr.status} - ${xhr.statusText}`);
-                        submitBtn.prop("disabled", false);
+                        submitBtnElem.prop("disabled", false);
                     }
                 });
                 return false;
-            }));
+            })
+        });
     </script>
 {% endblock %}
