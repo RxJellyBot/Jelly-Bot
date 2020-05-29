@@ -125,6 +125,10 @@ jobs:
         run: |
           pylint doc
 
+      - name: Lint on `extdiscord`
+        run: |
+          pylint extdiscord
+
   django-tests:
     runs-on: windows-latest
 
