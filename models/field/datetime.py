@@ -17,6 +17,9 @@ class DateTimeField(BaseField):
 
         .. seealso::
             Check the document of :class:`BaseField` for other default properties.
+
+        .. note::
+            All time get from this field will be in UTC.
         """
         if "inst_cls" not in kwargs:
             kwargs["inst_cls"] = DateTimeFieldInstance
@@ -58,6 +61,6 @@ class DateTimeFieldInstance(FieldInstance):
         # - Checking `None here because `value` could be `None` when allowed
         # - Type checking performed to make sure that the timezone replacement only applied on `datetime`
         if value is not None and isinstance(value, datetime):
-            value = make_tz_aware(value)
+            value = make_tz_aware(value, tz=timezone.utc)
 
         super().force_set(value)

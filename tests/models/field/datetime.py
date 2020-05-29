@@ -5,9 +5,20 @@ from models.field import DateTimeField, BaseField
 from models.field.exceptions import (
     FieldTypeMismatchError, FieldNoneNotAllowedError, FieldValueInvalidError, FieldError
 )
+from tests.base import TestCase
 
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
+
+__all__ = ["TestDatetimeFieldExtra", "TestDatetimeFieldProperty", "TestDatetimeFieldValueAllowNone",
+           "TestDatetimeFieldValueDefault", "TestDatetimeFieldValueNoAutoCast"]
+
+
+class TestDatetimeFieldExtra(TestCase):
+    def test_value_is_utc(self):
+        self.assertEqual(DateTimeField("dt").new().value.tzinfo, tz.utc)
+        self.assertEqual(DateTimeField("dt", default=dt.now()).new().value.tzinfo, tz.utc)
+        self.assertEqual(DateTimeField("dt", default=dt.utcnow()).new().value.tzinfo, tz.utc)
 
 
 class TestDatetimeFieldProperty(TestFieldProperty.TestClass):

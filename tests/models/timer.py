@@ -132,7 +132,7 @@ class TestTimerListResult(TestCase):
 
     def test_to_string(self):
         now = now_utc_aware()
-        seoul_tzinfo = LocaleInfo.get_tzinfo("Asia/Taipei")
+        taipei_tzinfo = LocaleInfo.get_tzinfo("Asia/Taipei")
 
         actual_str = self.get_data().to_string(self.get_user_model())
 
@@ -140,24 +140,24 @@ class TestTimerListResult(TestCase):
             Timer.FUTURE.format(
                 event=TestTimerListResult.TMR_3.title,
                 diff=t_delta_str(TestTimerListResult.TMR_3.get_target_time_diff(now)),
-                time=localtime(TestTimerListResult.TMR_3.target_time, seoul_tzinfo)
+                time=localtime(TestTimerListResult.TMR_3.target_time, taipei_tzinfo)
             ),
             Timer.FUTURE.format(
                 event=TestTimerListResult.TMR_4.title,
                 diff=t_delta_str(TestTimerListResult.TMR_4.get_target_time_diff(now)),
-                time=localtime(TestTimerListResult.TMR_4.target_time, seoul_tzinfo)
+                time=localtime(TestTimerListResult.TMR_4.target_time, taipei_tzinfo)
             ),
             "",
             Timer.PAST_CONTINUE.format(
                 event=TestTimerListResult.TMR_2.title,
                 diff=t_delta_str(TestTimerListResult.TMR_2.get_target_time_diff(now)),
-                time=localtime(TestTimerListResult.TMR_2.target_time, seoul_tzinfo)
+                time=localtime(TestTimerListResult.TMR_2.target_time, taipei_tzinfo)
             ),
             "",
             Timer.PAST_DONE.format(
                 event=TestTimerListResult.TMR_1.title,
                 diff=t_delta_str(TestTimerListResult.TMR_1.get_target_time_diff(now)),
-                time=localtime(TestTimerListResult.TMR_1.target_time, seoul_tzinfo)
+                time=localtime(TestTimerListResult.TMR_1.target_time, taipei_tzinfo)
             )
         ]
         expected_str = "\n".join(expected_str)
