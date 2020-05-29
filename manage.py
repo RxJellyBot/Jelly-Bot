@@ -16,7 +16,7 @@ def django_main():
 
 
 def discord_main():
-    from extdiscord import run_server
+    from extdiscord.core import run_server
 
     run_server()
 
