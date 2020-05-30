@@ -24,7 +24,7 @@ def handle_unfollow(request, event, destination):
 
 # noinspection PyUnusedLocal
 def handle_join(request, event, destination):
-    ChannelManager.register(Platform.LINE, LineApiUtils.get_channel_id(event))
+    ChannelManager.ensure_register(Platform.LINE, LineApiUtils.get_channel_id(event))
     LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Bot joined a group.",
                            extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
 

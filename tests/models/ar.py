@@ -181,18 +181,6 @@ class TestAutoReplyModuleExecodeModel(TestModel.TestClass):
             ("t", "TagIds"): ([], [tag_1]),
         }
 
-    def test_to_actual_model(self):
-        exc_mdl = self.get_constructed_model()
-        exc_mdl_dict = exc_mdl.to_json()
-        exc_mdl_dict["ch"] = channel_oid
-        exc_mdl_dict["cr"] = creator_oid
-
-        arm_mdl_dict = exc_mdl.to_actual_model(channel_oid, creator_oid).to_json()
-
-        # Not matching 2 dicts because actual model contains more properties
-        for ek, ev in exc_mdl_dict.items():
-            self.assertEqual(arm_mdl_dict[ek], ev)
-
 
 class TestAutoReplyModuleTagModel(TestModel.TestClass):
     @classmethod

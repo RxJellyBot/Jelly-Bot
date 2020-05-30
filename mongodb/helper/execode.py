@@ -1,10 +1,9 @@
 from flags import Platform, ExecodeCollationFailedReason, ExecodeCompletionOutcome, Execode
 from JellyBot.api.static import param
-from models import AutoReplyModuleExecodeModel, ExecodeEntryModel
+from models import ExecodeEntryModel, AutoReplyModuleModel
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
 from mongodb.helper import UserDataIntegrationHelper
-
 
 __all__ = ["ExecodeCompletor", "ExecodeParameterCollator", "ExecodeRequiredKeys"]
 
@@ -27,17 +26,17 @@ class ExecodeCompletor:
 
     @staticmethod
     def _excde_ar_add(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
-        cnl = ChannelManager.register(xparams[param.AutoReply.PLATFORM], xparams[param.AutoReply.CHANNEL_TOKEN])
+        cnl = ChannelManager.ensure_register(xparams[param.AutoReply.PLATFORM], xparams[param.AutoReply.CHANNEL_TOKEN])
         if not cnl.success:
             return ExecodeCompletionOutcome.X_AR_REGISTER_CHANNEL
 
-        try:
-            conn = AutoReplyModuleExecodeModel(**action_model.data, from_db=True).to_actual_model(
-                cnl.model.id, action_model.creator_oid)
-        except Exception:
-            return ExecodeCompletionOutcome.X_MODEL_CONSTRUCTION
+        add_conn_result = AutoReplyManager.add_conn(
+            **action_model.data,
+            **{AutoReplyModuleModel.ChannelId.key: cnl.model.id,
+               AutoReplyModuleModel.CreatorOid.key: action_model.creator_oid},
+            from_db=True)
 
-        if not AutoReplyManager.add_conn_by_model(conn).success:
+        if not add_conn_result.success:
             return ExecodeCompletionOutcome.X_AR_REGISTER_MODULE
 
         return ExecodeCompletionOutcome.O_OK
@@ -45,7 +44,7 @@ class ExecodeCompletor:
     @staticmethod
     def _excde_register_channel(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         try:
-            channel_data = ChannelManager.register(
+            channel_data = ChannelManager.ensure_register(
                 xparams[param.Execode.PLATFORM], xparams[param.Execode.CHANNEL_TOKEN])
         except Exception:
             return ExecodeCompletionOutcome.X_IDT_CHANNEL_ERROR

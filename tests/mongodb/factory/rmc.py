@@ -8,6 +8,8 @@ from JellyBot.systemconfig import Bot
 from mongodb.factory import RemoteControlManager
 from tests.base import TestTimeComparisonMixin, TestDatabaseMixin
 
+__all__ = ["TestRemoteControlHolder"]
+
 EXPIRY_SEC_ORG = Bot.RemoteControl.IdleDeactivateSeconds
 
 EXPIRY_SEC = max(0.3, TestDatabaseMixin.db_ping_ms() / 1000 * 1.5)

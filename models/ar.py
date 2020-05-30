@@ -95,7 +95,7 @@ class AutoReplyModuleModel(Model):
     # Property
     Pinned = BooleanField("p")
     Private = BooleanField("pr")
-    CooldownSec = IntegerField("cd")
+    CooldownSec = IntegerField("cd", positive_only=True)
     ExcludedOids = ArrayField("e", ObjectId, stores_uid=True)
     TagIds = ArrayField("t", ObjectId)
 
@@ -155,11 +155,6 @@ class AutoReplyModuleExecodeModel(Model):
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     TagIds = ArrayField("t", ObjectId)
-
-    def to_actual_model(self, channel_id: ObjectId, creator_oid: ObjectId):
-        return AutoReplyModuleModel(
-            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelId.key: channel_id,
-                                               AutoReplyModuleModel.CreatorOid.key: creator_oid})
 
 
 class AutoReplyModuleTagModel(Model):
