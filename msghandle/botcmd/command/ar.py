@@ -1,5 +1,4 @@
 from typing import List
-import traceback
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from extutils.emailutils import MailSender
 from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType, ExtraContentType
-from models import AutoReplyModuleExecodeModel, AutoReplyContentModel
+from models import AutoReplyContentModel, AutoReplyModuleModel
 from models.utils import AutoReplyValidator
 from mongodb.utils import CursorWithCount
 from mongodb.factory import AutoReplyManager, ExecodeManager, ExtraContentManager
@@ -45,6 +44,8 @@ cmd_del = cmd_main.new_child_node(codes=["d", "del"])
 cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
 cmd_info = cmd_main.new_child_node(codes=["i", "info"])
 cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
+
+
 # endregion
 
 
@@ -77,22 +78,11 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
             ).format(excde_entry.creator_oid, e.user_model.id))
         ]
 
-    try:
-        ar_model = AutoReplyModuleExecodeModel(**excde_entry.data, from_db=True).to_actual_model(
-            e.channel_oid, excde_entry.creator_oid)
-    except Exception as ex:
-        MailSender.send_email_async(
-            "Failed to construct an Auto-reply module using Execode.<br>"
-            f"User ID: {e.user_model.id}<br>"
-            f"Channel ID: {e.channel_oid}<br>"
-            f"Execode: {excde_entry.execode}<br>"
-            f"Exception: <pre>{traceback.format_exception(None, ex, ex.__traceback__)}</pre>",
-            subject="Failed to construct AR module")
-
-        return [HandledMessageEventText(content=_(
-            "Failed to create auto-reply module. An error report was sent for investigation."))]
-
-    add_result = AutoReplyManager.add_conn_by_model(ar_model)
+    add_result = AutoReplyManager.add_conn(
+        **excde_entry.data,
+        **{AutoReplyModuleModel.ChannelId.key: e.channel_oid,
+           AutoReplyModuleModel.CreatorOid.key: excde_entry.creator_oid},
+        from_db=True)
 
     if not add_result.success:
         MailSender.send_email_async(
@@ -132,27 +122,30 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
 )
 def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
     ret = []
-    kw_type = AutoReplyContentType.determine(keyword)
-    # Issue #124
-    if not AutoReplyValidator.is_valid_content(kw_type, keyword):
-        kw_type = AutoReplyContentType.TEXT
-        ret.append(HandledMessageEventText(
-            content=_("The type of the keyword has been automatically set to `TEXT` "
-                      "because the validation was failed.")))
 
-    resp_type = AutoReplyContentType.determine(response)
-    # Issue #124
-    if not AutoReplyValidator.is_valid_content(resp_type, response):
-        resp_type = AutoReplyContentType.TEXT
-        ret.append(HandledMessageEventText(
-            content=_("The type of the response has been automatically set to `TEXT` "
-                      "because the validation was failed.")))
+    def determine_type(content, error_text):
+        type_ = AutoReplyContentType.determine(content)
+        # https://github.com/RaenonX/Jelly-Bot/issues/124
+        if not AutoReplyValidator.is_valid_content(kw_type, keyword):
+            type_ = AutoReplyContentType.TEXT
+            ret.append(HandledMessageEventText(content=error_text))
 
-    add_result = AutoReplyManager.add_conn_complete(
-        keyword, kw_type, [AutoReplyContentModel(Content=response, ContentType=resp_type)],
-        e.user_model.id, e.channel_oid,
-        Bot.AutoReply.DefaultPinned, Bot.AutoReply.DefaultPrivate, Bot.AutoReply.DefaultTags,
-        Bot.AutoReply.DefaultCooldownSecs)
+        return type_
+
+    kw_type = determine_type(
+        keyword,
+        _("The type of the keyword has been automatically set to `TEXT` because the validation was failed."))
+    resp_type = determine_type(
+        response,
+        _("The type of the response has been automatically set to `TEXT` because the validation was failed."))
+
+    add_result = AutoReplyManager.add_conn(
+        Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type),
+        Responses=[AutoReplyContentModel(Content=response, ContentType=resp_type)],
+        ChannelId=e.channel_oid, CreatorOid=e.user_model.id, Pinned=Bot.AutoReply.DefaultPinned,
+        Private=Bot.AutoReply.DefaultPrivate, TagIds=Bot.AutoReply.DefaultTags,
+        CooldownSec=Bot.AutoReply.DefaultCooldownSecs
+    )
 
     if add_result.outcome.is_success:
         ret.append(HandledMessageEventText(
@@ -170,6 +163,8 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
                 add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
 
     return ret
+
+
 # endregion
 
 
@@ -201,6 +196,8 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
                           "Code: {}\n"
                           "Visit {} to see the code explanation.").format(
                     outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+
+
 # endregion
 
 
@@ -220,8 +217,8 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
 
     if not conn_list.empty:
         ctnt = _("Usable Keywords ({}):").format(len(conn_list)) + \
-            "\n\n" + \
-            "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+               "\n\n" + \
+               "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:
@@ -241,8 +238,8 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
 
     if not conn_list.empty:
         ctnt = _("Usable Keywords ({}):").format(len(conn_list)) \
-            + "\n\n" \
-            + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
+               + "\n\n" \
+               + "<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
 
         return [HandledMessageEventText(content=ctnt, force_extra=True)]
     else:

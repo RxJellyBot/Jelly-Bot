@@ -8,6 +8,14 @@ class ModelConstructionError(Exception, ABC):
     pass
 
 
+class ModelOperationError(Exception, ABC):
+    pass
+
+
+class ModelKeyNotExistError(AttributeError, ABC):
+    pass
+
+
 class InvalidModelError(ModelConstructionError):
     def __init__(self, model_name: str, reason: ModelValidityCheckResult):
         self._reason = reason
@@ -44,12 +52,12 @@ class IdUnsupportedError(ModelConstructionError, KeyError, AttributeError):
             f"`{model_name}` is not designated to have `_id` field. Set `WITH_OID` to True to support this.")
 
 
-class FieldKeyNotExistError(AttributeError):
+class FieldKeyNotExistError(ModelKeyNotExistError):
     def __init__(self, fk: str, model_name: str):
         super().__init__(f"Field key `{fk}` not existed in the model `{model_name}`.")
 
 
-class JsonKeyNotExistedError(AttributeError):
+class JsonKeyNotExistedError(ModelKeyNotExistError):
     def __init__(self, fk: str, model_name: str):
         super().__init__(f"Json key `{fk}` not existed in the model `{model_name}`.")
 
@@ -59,6 +67,6 @@ class JsonKeyDuplicatedError(ModelConstructionError):
         super().__init__(f"Model `{model_name}` contains duplicated json key: {dup_key}.")
 
 
-class DeleteNotAllowedError(Exception):
+class DeleteNotAllowedError(ModelOperationError):
     def __init__(self, model_name: str):
         super().__init__(f"Not allowed to perform `del` on {model_name}")

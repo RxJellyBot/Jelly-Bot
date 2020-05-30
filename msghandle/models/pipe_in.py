@@ -141,7 +141,7 @@ class MessageEventObjectFactory:
     @staticmethod
     def _ensure_channel_(platform: Platform, token: Union[int, str], default_name: str = None) \
             -> Optional[ChannelModel]:
-        ret = ChannelManager.register(platform, token, default_name=default_name)
+        ret = ChannelManager.ensure_register(platform, token, default_name=default_name)
         if ret.success:
             # Use Thread so no need to wait until the update is completed
             Thread(target=ChannelManager.mark_accessibility, args=(platform, token, True)).start()
@@ -170,7 +170,7 @@ class MessageEventObjectFactory:
     @staticmethod
     def _ensure_channel_parent_(
             platform: Platform, token: Union[int, str], child_channel_oid: ObjectId, default_name: str):
-        return ChannelCollectionManager.register(platform, token, child_channel_oid, default_name).model
+        return ChannelCollectionManager.ensure_register(platform, token, child_channel_oid, default_name).model
 
     @staticmethod
     def from_line(event: MessageEvent, destination: str) -> MessageEventObject:

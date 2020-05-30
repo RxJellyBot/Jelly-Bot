@@ -79,7 +79,7 @@ class HandleChannelRegisterOidMixin(HandleChannelMixin, HandlePlatformMixin, ABC
         super().__init__(param_dict, sender_oid)
 
     def get_channel_oid(self):
-        c = ChannelManager.register(self._platform, self._channel_token)
+        c = ChannelManager.ensure_register(self._platform, self._channel_token)
         if c.success:
             return c.model.id
         else:

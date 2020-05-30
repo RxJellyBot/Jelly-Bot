@@ -11,8 +11,11 @@ from extutils.checker import arg_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import ProfilePermission, AutoReplyContentType
-from models import AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityScore, OID_KEY, \
+from models import (
+    AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityScore, OID_KEY,
     AutoReplyContentModel, UniqueKeywordCountResult
+)
+from models.exceptions import ModelConstructionError, ModelKeyNotExistError
 from models.utils import AutoReplyValidator
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
@@ -38,7 +41,7 @@ class AutoReplyModuleManager(BaseCollection):
     def __init__(self):
         super().__init__()
 
-        # Using `_validate_content_` to track the uniqueness of the modules instead of creating a index
+        # Using `_validate_content` to track the uniqueness of the modules instead of creating a index
         self.create_index(
             [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
              (AutoReplyModuleModel.KEY_KW_TYPE, 1),
@@ -51,10 +54,7 @@ class AutoReplyModuleManager(BaseCollection):
         perms = ProfileManager.get_user_permissions(channel_oid, user_oid)
         return ProfilePermission.AR_ACCESS_PINNED_MODULE in perms
 
-    def _validate_content(
-            self, kw_content: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
-            channel_oid: ObjectId, online_check) \
-            -> WriteOutcome:
+    def _validate_content(self, mdl: AutoReplyModuleModel, *, online_check=True) -> WriteOutcome:
         """
         Perform the following checks and return the corresponding result:
 
@@ -65,14 +65,18 @@ class AutoReplyModuleManager(BaseCollection):
         - Module duplicated
             - ``WriteOutcome.O_DATA_EXISTS`` if duplicated
 
-        Returns ``WriteOutcome.O_MISC`` if all checks passed.
+        Returns ``WriteOutcome.O_MISC`` if the validation passed.
+
+        :param mdl: model to be validated
+        :return: validation result
         """
         # Check validity of keyword
-        if not AutoReplyValidator.is_valid_content(kw_type, kw_content, online_check=online_check):
+        if not AutoReplyValidator.is_valid_content(
+                mdl.keyword.content_type, mdl.keyword.content, online_check=online_check):
             return WriteOutcome.X_AR_INVALID_KEYWORD
 
         # Check validity of responses
-        for response in responses:
+        for response in mdl.responses:
             if not AutoReplyValidator.is_valid_content(
                     response.content_type, response.content, online_check=online_check):
                 return WriteOutcome.X_AR_INVALID_RESPONSE
@@ -80,10 +84,9 @@ class AutoReplyModuleManager(BaseCollection):
         # Check module duplication
         if self.count_documents(
                 {
-                    AutoReplyModuleModel.KEY_KW_CONTENT: kw_content,
-                    AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
-                    AutoReplyModuleModel.Responses.key: responses,
-                    AutoReplyModuleModel.ChannelId.key: channel_oid
+                    AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
+                    AutoReplyModuleModel.Responses.key: mdl.responses,
+                    AutoReplyModuleModel.ChannelId.key: mdl.channel_id
                 },
                 collation=case_insensitive_collation) > 0:
             return WriteOutcome.O_DATA_EXISTS
@@ -97,7 +100,6 @@ class AutoReplyModuleManager(BaseCollection):
         self.delete_many(
             {
                 OID_KEY: {
-                    "$lt": ObjectId.from_datetime(now),
                     "$gt": ObjectId.from_datetime(now - timedelta(minutes=Bot.AutoReply.DeleteDataMins))
                 },
                 AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
@@ -106,36 +108,78 @@ class AutoReplyModuleManager(BaseCollection):
             collation=case_insensitive_collation if AutoReply.CaseInsensitive else None
         )
 
-    def add_conn_complete(
-            self,
-            keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel], creator_oid: ObjectId,
-            channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId], cooldown_sec: int) \
-            -> AutoReplyModuleAddResult:
-        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(channel_oid, creator_oid)
+    @arg_type_ensure
+    def _remove_update_ops(self, remover_oid: ObjectId):
+        return {"$set": {
+            AutoReplyModuleModel.Active.key: False,
+            AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
+            AutoReplyModuleModel.RemoverOid.key: remover_oid
+        }}
 
-        # Terminate if someone without permission wants to create a pinned model
-        if pinned and not access_to_pinned:
+    def _model_inherit_props(self, mdl: AutoReplyModuleModel):
+        mdl_original = self.get_conn(mdl.keyword.content, mdl.keyword.content_type, mdl.channel_id)
+        if mdl_original:
+            mdl.cooldown_sec = mdl_original.cooldown_sec
+            mdl.tag_ids = mdl_original.tag_ids
+            mdl.private = mdl_original.private
+
+    def add_conn(self, *, online_check=True, **kwargs) -> AutoReplyModuleAddResult:
+        """
+        Add a auto-reply module to the database.
+
+        If any :class:`ModelConstructionError` occurred during the model construction
+            :class:`WriteOutcome.X_INVALID_MODEL` will be returned as the outcome
+
+        If any :class:`ModelKeyNotExistError` occurred during the model construction
+            :class:`WriteOutcome.X_MODEL_KEY_NOT_EXIST` will be returned as the outcome
+
+        If any :class:`ModelKeyNotExistError` occurred during the model construction
+            :class:`WriteOutcome.X_MODEL_KEY_NOT_EXIST` will be returned as the outcome
+
+        If the model is marked as **PINNED**, but the creator does not have the corresponding permission
+            :class:`WriteOutcome.X_INSUFFICIENT_PERMISSION` will be returned as the outcome
+
+        If the creator does not have the corresponding permission
+            :class:`WriteOutcome.X_PINNED_CONTENT_EXISTED` will be returned as the outcome
+
+        If the content of the keyword is invalid
+            :class:`WriteOutcome.X_AR_INVALID_KEYWORD` will be returned as the outcome
+
+        If the content of any of the responses is invalid
+            :class:`WriteOutcome.X_AR_INVALID_RESPONSE` will be returned as the outcome
+
+        :param online_check: validate the content online
+        :param kwargs: kwargs to construct a `AutoReplyModuleModel`
+        :return: serializable result of the connection addition
+        """
+        # Create a model
+        try:
+            mdl = AutoReplyModuleModel(**kwargs)
+        except ModelConstructionError as ex:
+            return AutoReplyModuleAddResult(WriteOutcome.X_INVALID_MODEL, ex)
+        except ModelKeyNotExistError as ex:
+            return AutoReplyModuleAddResult(WriteOutcome.X_MODEL_KEY_NOT_EXIST, ex)
+
+        # Pinned module creation permission check
+        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(mdl.channel_id, mdl.creator_oid)
+
+        if mdl.pinned and not access_to_pinned:
             return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION)
 
         # Terminate if someone cannot access pinned module but attempt to overwrite the existing one
-        if not access_to_pinned and self.count_documents(
-                {AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
-                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+        if not mdl.pinned and self.count_documents(
+                {AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
                  AutoReplyModuleModel.Pinned.key: True}) > 0:
             return AutoReplyModuleAddResult(WriteOutcome.X_PINNED_CONTENT_EXISTED)
 
-        validate_outcome = self._validate_content(
-            keyword, kw_type, responses, channel_oid, online_check=True)
+        validate_outcome = self._validate_content(mdl, online_check=online_check)
 
         if not validate_outcome.is_success:
             return AutoReplyModuleAddResult(validate_outcome)
 
-        model, outcome, ex = \
-            self.insert_one_data(
-                Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type), Responses=responses,
-                CreatorOid=creator_oid, Pinned=pinned, Private=private, CooldownSec=cooldown_sec, TagIds=tag_ids,
-                ChannelId=channel_oid
-            )
+        self._model_inherit_props(mdl)
+
+        outcome, ex = self.insert_one_model(mdl)
 
         # Duplication was already checked when validating the content
         # However, the module ID is not acquired during check, so the module insertion still performed
@@ -144,7 +188,7 @@ class AutoReplyModuleManager(BaseCollection):
             # Check unique indexes of what "same" means
 
             self.update_many_outcome(
-                {AutoReplyModuleModel.Id.key: model.id},
+                {AutoReplyModuleModel.Id.key: mdl.id},
                 {"$set": {AutoReplyModuleModel.Active.key: True}})
 
         if outcome.is_success:
@@ -152,42 +196,17 @@ class AutoReplyModuleManager(BaseCollection):
 
             self.update_many_outcome(
                 {
-                    AutoReplyModuleModel.Id.key: {"$ne": model.id},
-                    AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
-                    AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
-                    AutoReplyModuleModel.ChannelId.key: channel_oid,
+                    AutoReplyModuleModel.Id.key: {"$ne": mdl.id},
+                    AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
+                    AutoReplyModuleModel.ChannelId.key: mdl.channel_id,
                     AutoReplyModuleModel.Active.key: True
                 },
-                self._remove_update_ops(creator_oid),
+                self._remove_update_ops(mdl.creator_oid),
                 collation=case_insensitive_collation
             )
-            self._delete_recent_module(keyword)
+            self._delete_recent_module(mdl.keyword.content)
 
-        return AutoReplyModuleAddResult(outcome, ex, model)
-
-    def add_conn_by_model(self, model: AutoReplyModuleModel, online_check=True) -> AutoReplyModuleAddResult:
-        model.clear_oid()
-
-        validate_outcome = self._validate_content(
-            model.keyword.content, model.keyword.content_type, model.responses, model.channel_id, online_check)
-
-        if validate_outcome != WriteOutcome.O_MISC:
-            return AutoReplyModuleAddResult(validate_outcome)
-
-        outcome, ex = self.insert_one_model(model)
-
-        if outcome.is_success:
-            self._delete_recent_module(model.keyword.content)
-
-        return AutoReplyModuleAddResult(outcome, ex, model)
-
-    @arg_type_ensure
-    def _remove_update_ops(self, remover_oid: ObjectId):
-        return {"$set": {
-            AutoReplyModuleModel.Active.key: False,
-            AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
-            AutoReplyModuleModel.RemoverOid.key: remover_oid
-        }}
+        return AutoReplyModuleAddResult(outcome, ex, mdl)
 
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         q = {
@@ -201,7 +220,9 @@ class AutoReplyModuleManager(BaseCollection):
 
         ret = self.update_many_outcome(q, self._remove_update_ops(remover_oid), collation=case_insensitive_collation)
 
-        if ret == WriteOutcome.X_NOT_FOUND:
+        if ret.is_success:
+            self._delete_recent_module(keyword)
+        elif ret == WriteOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
             # then it must because of the insufficient permission. Otherwise, it's really not found
             q[AutoReplyModuleModel.Pinned.key] = True
@@ -416,16 +437,8 @@ class AutoReplyManager:
 
         return [AutoReplyTagPopularityScore.parse(doc) for doc in self._mod.aggregate(pipeline)]
 
-    def add_conn_by_model(self, model: AutoReplyModuleModel) -> AutoReplyModuleAddResult:
-        return self._mod.add_conn_by_model(model)
-
-    def add_conn_complete(
-            self, keyword: str, kw_type: AutoReplyContentType, responses: List[AutoReplyContentModel],
-            creator_oid: ObjectId, channel_oid: ObjectId, pinned: bool, private: bool, tag_ids: List[ObjectId],
-            cooldown_sec: int) \
-            -> AutoReplyModuleAddResult:
-        return self._mod.add_conn_complete(keyword, kw_type, responses, creator_oid, channel_oid, pinned, private,
-                                           tag_ids, cooldown_sec)
+    def add_conn(self, **kwargs) -> AutoReplyModuleAddResult:
+        return self._mod.add_conn(**kwargs)
 
     def del_conn(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)

@@ -43,16 +43,15 @@ class AutoReplyAddBaseResponse(
         self._is_local = bool(param_dict.get(param.LOCAL_REFER, False))
 
     def _handle_keyword(self):
-        self._handle_keyword_type()
-
-        k = result.AutoReplyResponse.KEYWORD
-        self._data[k] = self._keyword
-
-    def _handle_keyword_type(self):
         self._keyword_type = int(self._keyword_type or AutoReplyContentType.default())
 
         if self._keyword_type == AutoReplyContentType.IMAGE:
             self._err[result.AutoReplyResponse.KEYWORD] = False
+
+        k = result.AutoReplyResponse.KEYWORD
+        self._data[k] = self._keyword
+
+        self._keyword = AutoReplyContentModel(Content=self._keyword, ContentType=self._keyword_type)
 
     def _handle_responses(self):
         k = result.AutoReplyResponse.RESPONSES
@@ -133,9 +132,11 @@ class AutoReplyAddBaseResponse(
 
 class AutoReplyAddResponse(HandleChannelRegisterOidMixin, AutoReplyAddBaseResponse):
     def process_pass(self):
-        self._result = AutoReplyManager.add_conn_complete(
-            self._keyword, self._keyword_type, self._responses, self._sender_oid, self.get_channel_oid(),
-            self._pinned, self._private, self._tags, self._cooldown)
+        self._result = AutoReplyManager.add_conn(
+            Keyword=self._keyword, Responses=self._responses, ChannelId=self.get_channel_oid(),
+            CreatorOid=self._sender_oid, Pinned=self._pinned, Private=self._private, TagIds=self._tags,
+            CooldownSec=self._cooldown
+        )
 
     def is_success(self) -> bool:
         try:
@@ -148,8 +149,8 @@ class AutoReplyAddExecodeResponse(AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = ExecodeManager.enqueue_execode(
             self._sender_oid, Execode.AR_ADD, AutoReplyModuleExecodeModel,
-            Keyword=AutoReplyContentModel(Content=self._keyword, ContentType=self._keyword_type),
-            Responses=self._responses, Pinned=self._pinned, Private=self._pinned, TagIds=self._tags,
+            Keyword=self._keyword, Responses=self._responses,
+            Pinned=self._pinned, Private=self._pinned, TagIds=self._tags,
             CooldownSec=self._cooldown)
 
     def is_success(self) -> bool:

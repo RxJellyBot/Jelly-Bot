@@ -28,7 +28,7 @@ class ChannelManager(BaseCollection):
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @arg_type_ensure
-    def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
+    def ensure_register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
         entry, outcome, ex = self.insert_one_data(
             Platform=platform, Token=token,
             Config=ChannelConfigModel.generate_default(
@@ -95,7 +95,7 @@ class ChannelManager(BaseCollection):
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
 
         if not ret and auto_register:
-            reg_result = self.register(platform, token, default_name=default_name)
+            reg_result = self.ensure_register(platform, token, default_name=default_name)
             if reg_result.success:
                 ret = reg_result.model
             else:
@@ -174,7 +174,7 @@ class ChannelCollectionManager(BaseCollection):
         self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
 
     @arg_type_ensure
-    def register(
+    def ensure_register(
             self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
             -> ChannelCollectionRegistrationResult:
         if not default_name:
