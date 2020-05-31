@@ -50,9 +50,8 @@ class TestModel(ABC):
             cls.validate_fields()
 
         @classmethod
-        @final
-        def validate_fields(cls):
-            # Append lazy field keys to skip the checks
+        def _validate_skip_lazy(cls):
+            """Append default lazy fields to the list of keys to skip the checks."""
             for fk in cls.get_model_class().model_field_keys():
                 fc = cls.get_model_class().get_field_class_instance(fk)
                 if not fc:
@@ -64,7 +63,8 @@ class TestModel(ABC):
                     cls.KEY_SKIP_CHECK.add(k)
                     cls.KEY_SKIP_CHECK_INVALID.add(k)
 
-            # Validate REQUIRED
+        @classmethod
+        def _validate_required(cls):
             for k in cls.get_required().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -75,7 +75,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not REQUIRED. @{cls.__qualname__}")
 
-            # Validate INVALID REQUIRED
+        @classmethod
+        def _validate_required_invalid(cls):
             keys = set()
             for comb in cls.get_invalid():
                 init_args, exc = comb
@@ -92,7 +93,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not REQUIRED. @{cls.__qualname__}")
 
-            # Validate OPTIONAL
+        @classmethod
+        def _validate_optional(cls):
             for k in cls.get_optional().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -103,7 +105,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not OPTIONAL. @{cls.__qualname__}")
 
-            # Validate DEFAULT
+        @classmethod
+        def _validate_default(cls):
             for k in cls.get_default().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -113,6 +116,24 @@ class TestModel(ABC):
                 if ModelDefaultValueExt.is_default_val_ext(fc.default_value):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"should not be extended default value. @{cls.__qualname__}")
+
+        @classmethod
+        @final
+        def validate_fields(cls):
+            # Append lazy field keys to skip the checks
+            cls._validate_skip_lazy()
+
+            # Validate REQUIRED
+            cls._validate_required()
+
+            # Validate INVALID REQUIRED
+            cls._validate_required_invalid()
+
+            # Validate OPTIONAL
+            cls._validate_optional()
+
+            # Validate DEFAULT
+            cls._validate_default()
 
         @classmethod
         @abstractmethod
