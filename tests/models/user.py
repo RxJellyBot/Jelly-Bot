@@ -5,7 +5,10 @@ from bson import ObjectId
 from extutils import exec_timing_result
 from extutils.locales import default_locale, default_language, LocaleInfo
 from flags import ModelValidityCheckResult, Platform
-from models import RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel
+from models import (
+    RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel,
+    ChannelConfigModel
+)
 from models.exceptions import InvalidModelError, ModelConstructionError, InvalidModelFieldError
 from tests.base import TestCase
 
@@ -200,14 +203,16 @@ class TestOnPlatformUserModel(TestModel.TestClass):
         }
 
     def test_get_name(self):
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="U1234567890")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="U1234567890",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model()
         mdl.set_oid(ObjectId())
         self.assertIsNone(mdl.get_name(cmdl))
         self.assertEqual("U1234567890 (LINE)", mdl.get_name_str(cmdl))
 
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model(t="Ubff224fa18b8cf010da6d6bc88da8f55")
         mdl.set_oid(ObjectId())
@@ -215,7 +220,8 @@ class TestOnPlatformUserModel(TestModel.TestClass):
         self.assertNotEqual("Ubff224fa18b8cf010da6d6bc88da8f55 (LINE)", mdl.get_name_str(cmdl))
 
     def test_get_name_cache(self):
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model(t="Ubff224fa18b8cf010da6d6bc88da8f55")
         mdl.set_oid(ObjectId())

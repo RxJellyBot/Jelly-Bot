@@ -37,44 +37,72 @@ class WriteOutcome(BaseOutcome):
 
     1xx - Problems related to the preparation processes
         101 - Insufficient Permission
+
         102 - Channel type identification failed
+
         103 - (Auto Reply) Pinned module existed
+
         104 - Registering Channel
+
         105 - Registering OnPlatform User ID
+
         106 - Registering API User ID
+
         107 - Connecting OnPlatform User ID
+
         108 - Connecting API User ID
+
         109 - Config Setting Failed
+
         110 - Invalid URL
+
         111 - (Auto Reply) Invalid keyword content
+
         112 - (Auto Reply) Invalid response content
+
+        113 - (Channel) Default profile creation failed
 
     2xx - Problems related to the model
         201 - Not Serializable
+
         202 - Not Acknowledged
+
         203 - Not Found
+
         204 - Not Entry
+
         205 - Invalid
+
+        206 - Field Key not Exists
 
     3xx - Problems related to the field of an model
         301 - Field Readonly
+
         302 - Field Type Mismatch
+
         303 - Field Invalid
+
         304 - Field Casting Failed
+
         305 - Required Key not Filled
+
         306 - Field Key not Exist
+
         399 - Misc
 
     4xx - Problems related to cache
         401 - Missing in Cache, Attempted Insertion
+
         402 - Missing in Cache, Aborted Insertion
 
     8xx - Unknown Problems
         801 - Model Construction Unknown
+
         802 - Insertion Unknown
 
     9xx - Problems related to execution
         901 - Not executed
+
         902 - Exception occurred
     """
     @property
@@ -130,6 +158,9 @@ class WriteOutcome(BaseOutcome):
     X_AR_INVALID_RESPONSE = \
         112, _("X: (Auto Reply) Invalid Response"), \
         _("One or more of the responses contains invalid content.")
+    X_CNL_DEFAULT_CREATE_FAILED = \
+        112, _("X: (Channel) Default Profile Creation Failed"), \
+        _("Failed to create a default profile for the channel.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")

@@ -52,6 +52,18 @@ class TestModel(ABC):
         @classmethod
         @final
         def validate_fields(cls):
+            # Append lazy field keys to skip the checks
+            for fk in cls.get_model_class().model_field_keys():
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.is_default_lazy:
+                    k = (fc.key, fk)
+
+                    cls.KEY_SKIP_CHECK.add(k)
+                    cls.KEY_SKIP_CHECK_INVALID.add(k)
+
             # Validate REQUIRED
             for k in cls.get_required().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k

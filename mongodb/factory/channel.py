@@ -29,15 +29,31 @@ class ChannelManager(BaseCollection):
 
     @arg_type_ensure
     def ensure_register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
-        entry, outcome, ex = self.insert_one_data(
-            Platform=platform, Token=token,
-            Config=ChannelConfigModel.generate_default(
-                DefaultName=default_name))
+        """
+        Register the channel if not yet registered.
 
-        if outcome.data_found:
-            entry = self.get_channel_token(platform, token)
+        Return the existing or registered :class:`ChannelModel`.
+        """
+        mdl = self.get_channel_token(platform, token)
 
-        return ChannelRegistrationResult(outcome, ex, entry)
+        if not mdl:
+            # Inline import because it will create a loop if imported outside
+            from mongodb.factory import ProfileManager
+
+            channel_oid = ObjectId()
+            create_result = ProfileManager.create_default_profile(channel_oid, set_to_channel=False)
+
+            if not create_result.success:
+                return ChannelRegistrationResult(WriteOutcome.X_CNL_DEFAULT_CREATE_FAILED)
+
+            config = ChannelConfigModel.generate_default(
+                DefaultName=default_name, DefaultProfileOid=create_result.model.id)
+
+            mdl, outcome, ex = self.insert_one_data(Platform=platform, Token=token, Config=config)
+
+            return ChannelRegistrationResult(outcome, ex, mdl)
+
+        return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
 
     @arg_type_ensure
     def deregister(self, platform: Platform, token: str) -> WriteOutcome:
@@ -88,7 +104,7 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ex, ret)
 
     @arg_type_ensure
-    def get_channel_token(self, platform: Platform, token: str,
+    def get_channel_token(self, platform: Platform, token: str, *,
                           auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = self.find_one_casted(

@@ -67,14 +67,10 @@ class ModelFieldChecker:
         def __init__(self, col_inst):
             super().__init__(col_inst)
 
-            # [(Json Key, Default Value), (Json Key, Default Value), ...]
-            self._model_default_vals = []
             # [(Json Key, Model Class), (Json Key, Model Class), ...]
             self._model_field_mdl_class = []
 
             for f in self._model_cls.model_fields():
-                self._model_default_vals.append((f.key, f.default_value))
-
                 if isinstance(f, ModelField):
                     self._model_field_mdl_class.append((f.key, f.model_cls))
 
