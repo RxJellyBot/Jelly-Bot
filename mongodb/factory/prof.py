@@ -251,7 +251,12 @@ class ProfileDataManager(BaseCollection):
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
-        Automatically creates a default profile for ``channel_oid`` if not exists.
+        Get the default profile of the channel.
+
+        Creates a default profile for ``channel_oid`` and set it to the channel if not exists.
+
+        :param channel_oid: channel to get the default profile
+        :return: result of getting the default profile
         """
         ex = None
 
@@ -291,10 +296,10 @@ class ProfileDataManager(BaseCollection):
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
-    def create_default_profile(self, channel_oid: ObjectId) -> CreateProfileResult:
+    def create_default_profile(self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> CreateProfileResult:
         default_profile, outcome, ex = self._create_profile(channel_oid, Name=str(_("Default Profile")))
 
-        if outcome.is_inserted:
+        if set_to_channel and outcome.is_inserted:
             set_success = ChannelManager.set_config(
                 channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
@@ -364,6 +369,19 @@ class ProfileManager:
 
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
         Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
+
+    def create_default_profile(
+            self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> GetPermissionProfileResult:
+        """
+        Create a default profile for ``channel_oid``.
+
+        Set the default profile to the channel if ``set_to_channel`` is ``True``.
+
+        :param channel_oid: channel to get the default profile
+        :param set_to_channel: if the created profile should be set to the channel
+        :return: result of creating the default profile
+        """
+        return self._prof.create_default_profile(channel_oid, set_to_channel=set_to_channel)
 
     @arg_type_ensure
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):

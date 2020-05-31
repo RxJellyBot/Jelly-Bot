@@ -12,6 +12,8 @@ class TestCase(DjangoTestCase):
     @classmethod
     @final
     def setUpClass(cls):
+        print(f"Setup {cls.__qualname__}...")
+
         # Ensure `TEST` flag is set
         if not bool(int(os.environ.get("TEST", 0))):
             # protect possible data corruption

@@ -1,16 +1,28 @@
 import abc
 from collections.abc import Iterable
-from typing import Tuple, Type, Any, final
+from dataclasses import dataclass, field
+from typing import Tuple, Type, Any, final, Dict
 
 from bson import ObjectId
 from pymongo.collection import Collection
 
+from models.exceptions import RequiredKeyNotFilledError
 from models.field.exceptions import (
     FieldReadOnlyError, FieldTypeMismatchError, FieldCastingFailedError, FieldNoneNotAllowedError,
     FieldInstanceClassInvalidError, FieldInvalidDefaultValueError, FieldValueRequiredError
 )
 
 from ._default import ModelDefaultValueExt
+
+
+@dataclass
+class Lazy:
+    fn: callable
+    args: Tuple[Any] = field(default_factory=tuple)
+    kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    def call(self):
+        return self.fn(*self.args, **self.kwargs)
 
 
 class FieldInstance:
@@ -28,8 +40,9 @@ class FieldInstance:
         # Skipping type check on init (may fill `None`)
         if value in (None, FieldInstance.NULL_VAL_SENTINEL) and not base.allow_none:
             self.force_set(base.none_obj())
-        elif ModelDefaultValueExt.is_default_val_ext(base.default_value) and \
-                (ModelDefaultValueExt.is_default_val_ext(value) or value == FieldInstance.NULL_VAL_SENTINEL):
+        elif not base.is_default_lazy \
+                and ModelDefaultValueExt.is_default_val_ext(base.default_value) \
+                and (value == FieldInstance.NULL_VAL_SENTINEL or ModelDefaultValueExt.is_default_val_ext(value)):
             if base.default_value == ModelDefaultValueExt.Required:
                 raise FieldValueRequiredError(self.base.key)
             elif base.default_value == ModelDefaultValueExt.Optional:
@@ -130,8 +143,12 @@ class BaseField(abc.ABC):
                                f"Override the property `replace_uid_implemented` if the function is implemented.")
         # endregion
 
+        self._default_is_lazy = isinstance(default, Lazy)
+
         # region Setting default value
-        if default is not None and not ModelDefaultValueExt.is_default_val_ext(default):
+        if default is not None \
+                and not ModelDefaultValueExt.is_default_val_ext(default) \
+                and not self.is_default_lazy:
             try:
                 self.check_value_valid(default)
             except Exception as e:
@@ -177,7 +194,18 @@ class BaseField(abc.ABC):
 
     @property
     def default_value(self):
-        return self._default_value
+        if self.is_default_lazy:
+            try:
+                return self._default_value.call()
+            except RequiredKeyNotFilledError:
+                return ModelDefaultValueExt.Required
+        else:
+            return self._default_value
+
+    @property
+    @final
+    def is_default_lazy(self) -> bool:
+        return self._default_is_lazy
 
     @property
     def read_only(self) -> bool:

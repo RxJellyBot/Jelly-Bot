@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from extutils.locales import LocaleInfo
 from flags import Platform
-from models import Model, RemoteControlEntryModel, ChannelModel
+from models import Model, RemoteControlEntryModel, ChannelModel, ChannelConfigModel
 from mongodb.factory import ChannelManager
 
 from ._test_base import TestModel
@@ -51,7 +51,9 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
 
     @staticmethod
     def prepare_channel_data():
-        c_model = ChannelModel(Platform=Platform.LINE, Token="ABC")
+        c_model = ChannelModel(
+            Platform=Platform.LINE, Token="ABC",
+            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
         ChannelManager.insert_one_model(c_model)
 
         return c_model

@@ -7,7 +7,8 @@ from ._base import ModelResult
 
 @dataclass
 class ChannelRegistrationResult(ModelResult):
-    model: ChannelModel
+    exception: Optional[Exception] = None
+    model: Optional[ChannelModel] = None
 
 
 @dataclass

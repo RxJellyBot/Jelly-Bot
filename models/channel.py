@@ -21,8 +21,7 @@ class ChannelConfigModel(Model):
     EnableCalculator = BooleanField("e-calc", default=True)
     EnableBotCommand = BooleanField("e-bot", default=True)
     InfoPrivate = BooleanField("prv", default=False)
-    # TODO: Change the below to be a required field and not allowing none
-    DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
+    DefaultProfileOid = ObjectIDField("d-prof", default=ModelDefaultValueExt.Required, allow_none=False)
     DefaultName = TextField("d-name", allow_none=True)
 
 
