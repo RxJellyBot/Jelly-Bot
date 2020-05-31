@@ -126,7 +126,7 @@ class TestAutoReplyModuleModel(TestModel.TestClass):
         return {
             ("kw", "Keyword"): {"c": "ABC", "t": AutoReplyContentType.TEXT},
             ("rp", "Responses"): [{"c": "DEF", "t": AutoReplyContentType.TEXT}],
-            ("ch", "ChannelId"): channel_oid,
+            ("ch", "ChannelOid"): channel_oid,
             ("cr", "CreatorOid"): creator_oid
         }
 

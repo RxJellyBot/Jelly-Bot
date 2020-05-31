@@ -22,7 +22,7 @@ class TestAutoReplyModuleAddResult(TestOnModelResult.TestClass):
         return AutoReplyModuleModel(
             Keyword=AutoReplyContentModel(Content="A"),
             Responses=[AutoReplyContentModel(Content="B")],
-            ChannelId=TestAutoReplyModuleAddResult.CHANNEL_OID,
+            ChannelOid=TestAutoReplyModuleAddResult.CHANNEL_OID,
             CreatorOid=TestAutoReplyModuleAddResult.CREATOR_OID
         )
 

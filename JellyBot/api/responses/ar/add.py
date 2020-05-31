@@ -133,7 +133,7 @@ class AutoReplyAddBaseResponse(
 class AutoReplyAddResponse(HandleChannelRegisterOidMixin, AutoReplyAddBaseResponse):
     def process_pass(self):
         self._result = AutoReplyManager.add_conn(
-            Keyword=self._keyword, Responses=self._responses, ChannelId=self.get_channel_oid(),
+            Keyword=self._keyword, Responses=self._responses, ChannelOid=self.get_channel_oid(),
             CreatorOid=self._sender_oid, Pinned=self._pinned, Private=self._private, TagIds=self._tags,
             CooldownSec=self._cooldown
         )
