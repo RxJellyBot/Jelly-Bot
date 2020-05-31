@@ -8,7 +8,7 @@ from extutils.utils import str_reduce_length
 from flags import BotFeature, CommandScopeCollection, Execode, AutoReplyContentType, ExtraContentType
 from models import AutoReplyContentModel, AutoReplyModuleModel
 from models.utils import AutoReplyValidator
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from mongodb.factory import AutoReplyManager, ExecodeManager, ExtraContentManager
 from mongodb.factory.results import WriteOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
@@ -202,7 +202,7 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
 
 
 # region List / Query / Info / Ranking
-def get_list_of_keyword_html(conn_list: CursorWithCount) -> List[str]:
+def get_list_of_keyword_html(conn_list: ExtendedCursor[AutoReplyModuleModel]) -> List[str]:
     return [f"- {conn.keyword.content_html}<br>" for conn in conn_list]
 
 

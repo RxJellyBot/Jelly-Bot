@@ -11,7 +11,7 @@ from extutils.logger import SYSTEM
 from extutils.checker import arg_type_ensure
 from models import ShortUrlRecordModel
 from mongodb.factory.results import WriteOutcome, UrlShortenResult
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 
 from ._base import BaseCollection
 
@@ -94,9 +94,9 @@ class ShortUrlDataManager(BaseCollection):
         return self.find_one_casted({ShortUrlRecordModel.Code.key: code}, parse_cls=ShortUrlRecordModel)
 
     @arg_type_ensure
-    def get_user_record(self, creator_oid: ObjectId) -> CursorWithCount:
+    def get_user_record(self, creator_oid: ObjectId) -> ExtendedCursor[ShortUrlRecordModel]:
         filter_ = {ShortUrlRecordModel.CreatorOid.key: creator_oid}
-        crs = CursorWithCount(self.find(filter_), self.count_documents(filter_), parse_cls=ShortUrlRecordModel)
+        crs = ExtendedCursor(self.find(filter_), self.count_documents(filter_), parse_cls=ShortUrlRecordModel)
         return crs.sort([(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 
     @arg_type_ensure

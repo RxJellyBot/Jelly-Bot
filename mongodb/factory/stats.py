@@ -18,7 +18,7 @@ from models import (
     MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult
 )
 from mongodb.factory.results import RecordAPIStatisticsResult
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from ._base import BaseCollection
 
 DB_NAME = "stats"
@@ -69,7 +69,8 @@ class MessageRecordStatisticsManager(BaseCollection):
         )
 
     @arg_type_ensure
-    def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+    def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> ExtendedCursor[MessageRecordModel]:
         return self.find_cursor_with_count(
             {MessageRecordModel.ChannelOid.key: channel_oid}, parse_cls=MessageRecordModel
         ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)

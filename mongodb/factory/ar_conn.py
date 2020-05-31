@@ -22,7 +22,7 @@ from mongodb.factory.results import (
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
 from mongodb.utils import (
-    CursorWithCount, case_insensitive_collation
+    ExtendedCursor, case_insensitive_collation
 )
 from mongodb.factory import ProfileManager
 
@@ -287,7 +287,7 @@ class AutoReplyModuleManager(BaseCollection):
         return ret
 
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, *, active_only: bool = True) \
-            -> CursorWithCount:
+            -> ExtendedCursor[AutoReplyModuleModel]:
         """Sort by used count (desc)."""
         filter_ = {
             AutoReplyModuleModel.ChannelOid.key: channel_oid
@@ -302,13 +302,13 @@ class AutoReplyModuleManager(BaseCollection):
         return self.find_cursor_with_count(
             filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
-    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
+    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> ExtendedCursor[AutoReplyModuleModel]:
         return self \
             .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel) \
             .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
-            -> CursorWithCount[AutoReplyModuleModel]:
+            -> ExtendedCursor[AutoReplyModuleModel]:
         ret = self.find_cursor_with_count(
             {AutoReplyModuleModel.ChannelOid.key: channel_oid},
             parse_cls=AutoReplyModuleModel
@@ -373,7 +373,7 @@ class AutoReplyModuleTagManager(BaseCollection):
 
         return AutoReplyModuleTagGetResult(outcome, ex, tag_data)
 
-    def search_tags(self, tag_keyword: str) -> CursorWithCount:
+    def search_tags(self, tag_keyword: str) -> ExtendedCursor[AutoReplyModuleTagModel]:
         """
         Accepts a keyword to search. Case-insensitive.
 
@@ -507,10 +507,10 @@ class AutoReplyManager:
         return self._tag.get_insert(name, color)
 
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
-            -> CursorWithCount:
+            -> ExtendedCursor[AutoReplyModuleModel]:
         return self._mod.get_conn_list(channel_oid, keyword, active_only=active_only)
 
-    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
+    def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> ExtendedCursor[AutoReplyModuleModel]:
         return self._mod.get_conn_list_oids(conn_oids)
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
