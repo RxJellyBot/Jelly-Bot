@@ -21,28 +21,32 @@ fn_dict = {
 }
 
 
-def handle_msg_main(request, event, destination):
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Message event",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
-
-    if isinstance(event.message, TextMessage):
+def _get_message_type(event_message) -> MessageType:
+    if isinstance(event_message, TextMessage):
         msg_type = MessageType.TEXT
-    elif isinstance(event.message, ImageMessage):
+    elif isinstance(event_message, ImageMessage):
         msg_type = MessageType.IMAGE
-    elif isinstance(event.message, VideoMessage):
+    elif isinstance(event_message, VideoMessage):
         msg_type = MessageType.VIDEO
-    elif isinstance(event.message, AudioMessage):
+    elif isinstance(event_message, AudioMessage):
         msg_type = MessageType.AUDIO
-    elif isinstance(event.message, LocationMessage):
+    elif isinstance(event_message, LocationMessage):
         msg_type = MessageType.LOCATION
-    elif isinstance(event.message, StickerMessage):
+    elif isinstance(event_message, StickerMessage):
         msg_type = MessageType.LINE_STICKER
-    elif isinstance(event.message, FileMessage):
+    elif isinstance(event_message, FileMessage):
         msg_type = MessageType.FILE
     else:
         msg_type = MessageType.UNKNOWN
 
-    fn = fn_dict.get(msg_type)
+    return msg_type
+
+
+def handle_msg_main(request, event, destination):
+    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Message event",
+                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+
+    fn = fn_dict.get(_get_message_type(event.message))
 
     try:
         if fn:

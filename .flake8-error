@@ -15,7 +15,7 @@ select =
     F82,
     # Duplicated argument names
     F83
-max-complexity = 15
+max-complexity = 10
 max-line-length = 119
 show-source = True
 statistics = True

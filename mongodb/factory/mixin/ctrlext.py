@@ -22,6 +22,49 @@ T = TypeVar('T', bound=Model)
 
 
 class ControlExtensionMixin(Collection):
+    @staticmethod
+    def _dup_doc_id_handle_compound_idx(filter_: dict, model_dict: dict, unique_key):
+        for key, order in unique_key:
+            data = model_dict.get(key)
+            if data is not None:
+                if isinstance(data, list):
+                    filter_[key] = {"$elemMatch": {"$in": data}}
+                else:
+                    filter_[key] = data
+
+    @staticmethod
+    def _dup_doc_id_handle_single_idx(or_list: list, model_dict: dict, unique_key):
+        key, order = unique_key[0]
+
+        data = model_dict.get(key)
+        if data is not None:
+            if isinstance(data, list):
+                or_list.append({key: {"$elemMatch": {"$in": data}}})
+            else:
+                or_list.append({key: data})
+
+    def _get_duplicated_doc_id(self, model_dict: dict):
+        unique_keys = []
+
+        # Get unique indexes
+        for idx_info in self.index_information().values():
+            if idx_info.get("unique", False):
+                unique_keys.append(idx_info["key"])
+
+        filter_ = {}
+        or_list = []
+        for unique_key in unique_keys:
+            if len(unique_key) > 1:
+                # Compound Index
+                self._dup_doc_id_handle_compound_idx(filter_, model_dict, unique_key)
+            else:
+                self._dup_doc_id_handle_single_idx(or_list, model_dict, unique_key)
+
+        if or_list:
+            filter_["$or"] = or_list
+
+        return self.find_one(filter_)[OID_KEY]
+
     def insert_one_model(self, model: Model) -> Tuple[WriteOutcome, Optional[Exception]]:
         """
         Insert an object into the database by providing a constructed model.
@@ -59,40 +102,20 @@ class ControlExtensionMixin(Collection):
 
         return outcome, ex
 
-    def _get_duplicated_doc_id(self, model_dict: dict):
-        unique_keys = []
+    @staticmethod
+    def _field_error_to_outcome(e: InvalidModelFieldError) -> WriteOutcome:
+        if isinstance(e.inner_exception, FieldCastingFailedError):
+            outcome = WriteOutcome.X_CASTING_FAILED
+        elif isinstance(e.inner_exception, FieldValueInvalidError):
+            outcome = WriteOutcome.X_INVALID_FIELD
+        elif isinstance(e.inner_exception, FieldTypeMismatchError):
+            outcome = WriteOutcome.X_TYPE_MISMATCH
+        elif isinstance(e.inner_exception, FieldReadOnlyError):
+            outcome = WriteOutcome.X_READONLY
+        else:
+            outcome = WriteOutcome.X_INVALID_MODEL_FIELD
 
-        # Get unique indexes
-        for idx_info in self.index_information().values():
-            if idx_info.get("unique", False):
-                unique_keys.append(idx_info["key"])
-
-        filter_ = {}
-        or_list = []
-        for unique_key in unique_keys:
-            if len(unique_key) > 1:
-                # Compound Index
-                for key, order in unique_key:
-                    data = model_dict.get(key)
-                    if data is not None:
-                        if isinstance(data, list):
-                            filter_[key] = {"$elemMatch": {"$in": data}}
-                        else:
-                            filter_[key] = data
-            else:
-                key, order = unique_key[0]
-
-                data = model_dict.get(key)
-                if data is not None:
-                    if isinstance(data, list):
-                        or_list.append({key: {"$elemMatch": {"$in": data}}})
-                    else:
-                        or_list.append({key: data})
-
-        if or_list:
-            filter_["$or"] = or_list
-
-        return self.find_one(filter_)[OID_KEY]
+        return outcome
 
     def insert_one_data(self, model_cls: Type[Type[T]], *, from_db: bool = False, **model_args) \
             -> Tuple[Optional[T], WriteOutcome, Optional[Exception]]:
@@ -122,18 +145,8 @@ class ControlExtensionMixin(Collection):
             else:
                 outcome = WriteOutcome.X_NOT_MODEL
         except InvalidModelFieldError as e:
+            outcome = self._field_error_to_outcome(e)
             ex = e
-
-            if isinstance(e.inner_exception, FieldCastingFailedError):
-                outcome = WriteOutcome.X_CASTING_FAILED
-            elif isinstance(e.inner_exception, FieldValueInvalidError):
-                outcome = WriteOutcome.X_INVALID_FIELD
-            elif isinstance(e.inner_exception, FieldTypeMismatchError):
-                outcome = WriteOutcome.X_TYPE_MISMATCH
-            elif isinstance(e.inner_exception, FieldReadOnlyError):
-                outcome = WriteOutcome.X_READONLY
-            else:
-                outcome = WriteOutcome.X_INVALID_MODEL_FIELD
         except RequiredKeyNotFilledError as e:
             outcome = WriteOutcome.X_REQUIRED_NOT_FILLED
             ex = e

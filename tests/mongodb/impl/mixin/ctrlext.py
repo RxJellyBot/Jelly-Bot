@@ -149,6 +149,8 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(mdl.get_oid())
 
+    # TEST: Compound unique index
+
     def test_update_many_outcome(self):
         self.collection.insert_many([
             {"a": 7, "b": [8]},
