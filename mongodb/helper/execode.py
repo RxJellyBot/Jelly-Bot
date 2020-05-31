@@ -32,7 +32,7 @@ class ExecodeCompletor:
 
         add_conn_result = AutoReplyManager.add_conn(
             **action_model.data,
-            **{AutoReplyModuleModel.ChannelId.key: cnl.model.id,
+            **{AutoReplyModuleModel.ChannelOid.key: cnl.model.id,
                AutoReplyModuleModel.CreatorOid.key: action_model.creator_oid},
             from_db=True)
 

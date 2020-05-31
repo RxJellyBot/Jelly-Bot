@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from bson import ObjectId
 
@@ -18,6 +18,9 @@ from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
     BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, ModelDefaultValueExt
 )
+
+__all__ = ["AutoReplyContentModel", "AutoReplyModuleModel", "AutoReplyModuleExecodeModel", "AutoReplyModuleTagModel",
+           "AutoReplyTagPopularityScore", "UniqueKeywordCountEntry", "UniqueKeywordCountResult"]
 
 
 def _content_to_str(content_type, content):
@@ -82,7 +85,7 @@ class AutoReplyModuleModel(Model):
 
     KEY_KW_CONTENT = f"{key_kw}.{AutoReplyContentModel.Content.key}"
     KEY_KW_TYPE = f"{key_kw}.{AutoReplyContentModel.ContentType.key}"
-    ChannelId = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
+    ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
     Active = BooleanField("at", default=True)
 
     # Type
@@ -192,7 +195,7 @@ class UniqueKeywordCountEntry:
     word_type: Union[int, AutoReplyContentType]
     count_usage: int
     count_module: int
-    rank: int
+    rank: str
 
     def __post_init__(self):
         self.word_type = AutoReplyContentType.cast(self.word_type)
@@ -211,7 +214,7 @@ class UniqueKeywordCountResult:
     KEY_COUNT_MODULE = "cm"
 
     def __init__(self, crs, limit: Optional[int] = None):
-        self.data = []
+        self.data: List[UniqueKeywordCountEntry] = []
 
         usage_key = UniqueKeywordCountResult.KEY_COUNT_USAGE
 

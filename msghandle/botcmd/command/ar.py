@@ -80,7 +80,7 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
 
     add_result = AutoReplyManager.add_conn(
         **excde_entry.data,
-        **{AutoReplyModuleModel.ChannelId.key: e.channel_oid,
+        **{AutoReplyModuleModel.ChannelOid.key: e.channel_oid,
            AutoReplyModuleModel.CreatorOid.key: excde_entry.creator_oid},
         from_db=True)
 
@@ -142,7 +142,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     add_result = AutoReplyManager.add_conn(
         Keyword=AutoReplyContentModel(Content=keyword, ContentType=kw_type),
         Responses=[AutoReplyContentModel(Content=response, ContentType=resp_type)],
-        ChannelId=e.channel_oid, CreatorOid=e.user_model.id, Pinned=Bot.AutoReply.DefaultPinned,
+        ChannelOid=e.channel_oid, CreatorOid=e.user_model.id, Pinned=Bot.AutoReply.DefaultPinned,
         Private=Bot.AutoReply.DefaultPrivate, TagIds=Bot.AutoReply.DefaultTags,
         CooldownSec=Bot.AutoReply.DefaultCooldownSecs
     )

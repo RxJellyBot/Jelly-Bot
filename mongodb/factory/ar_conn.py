@@ -45,7 +45,7 @@ class AutoReplyModuleManager(BaseCollection):
         self.create_index(
             [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
              (AutoReplyModuleModel.KEY_KW_TYPE, 1),
-             (AutoReplyModuleModel.ChannelId.key, 1),
+             (AutoReplyModuleModel.ChannelOid.key, 1),
              (AutoReplyModuleModel.Active.key, 1)],
             name="Index to get module")
 
@@ -86,7 +86,7 @@ class AutoReplyModuleManager(BaseCollection):
                 {
                     AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
                     AutoReplyModuleModel.Responses.key: mdl.responses,
-                    AutoReplyModuleModel.ChannelId.key: mdl.channel_id
+                    AutoReplyModuleModel.ChannelOid.key: mdl.channel_oid
                 },
                 collation=case_insensitive_collation) > 0:
             return WriteOutcome.O_DATA_EXISTS
@@ -117,7 +117,9 @@ class AutoReplyModuleManager(BaseCollection):
         }}
 
     def _model_inherit_props(self, mdl: AutoReplyModuleModel):
-        mdl_original = self.get_conn(mdl.keyword.content, mdl.keyword.content_type, mdl.channel_id)
+        mdl_original = self.get_conn(
+            mdl.keyword.content, mdl.keyword.content_type, mdl.channel_oid, update_count=False)
+
         if mdl_original:
             mdl.cooldown_sec = mdl_original.cooldown_sec
             mdl.tag_ids = mdl_original.tag_ids
@@ -161,7 +163,7 @@ class AutoReplyModuleManager(BaseCollection):
             return AutoReplyModuleAddResult(WriteOutcome.X_MODEL_KEY_NOT_EXIST, ex)
 
         # Pinned module creation permission check
-        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(mdl.channel_id, mdl.creator_oid)
+        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(mdl.channel_oid, mdl.creator_oid)
 
         if mdl.pinned and not access_to_pinned:
             return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION)
@@ -198,7 +200,7 @@ class AutoReplyModuleManager(BaseCollection):
                 {
                     AutoReplyModuleModel.Id.key: {"$ne": mdl.id},
                     AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
-                    AutoReplyModuleModel.ChannelId.key: mdl.channel_id,
+                    AutoReplyModuleModel.ChannelOid.key: mdl.channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
                 self._remove_update_ops(mdl.creator_oid),
@@ -211,7 +213,7 @@ class AutoReplyModuleManager(BaseCollection):
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
         q = {
             AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
-            AutoReplyModuleModel.ChannelId.key: channel_oid,
+            AutoReplyModuleModel.ChannelOid.key: channel_oid,
             AutoReplyModuleModel.Active.key: True
         }
 
@@ -232,40 +234,63 @@ class AutoReplyModuleManager(BaseCollection):
         return ret
 
     @arg_type_ensure
-    def get_conn(self, keyword: str, keyword_type: AutoReplyContentType,
-                 channel_oid: ObjectId, case_insensitive: bool = True) -> \
+    def get_conn(self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
+                 update_count_async: bool = True, update_count: bool = True) -> \
             Optional[AutoReplyModuleModel]:
+        """
+        Get a auto reply module by providing the keyword, its type and the channel oid.
+
+        Only returns the active module if exists.
+
+        The called count of the returned module **includes** the current call.
+
+        :param keyword: expected keyword of the module to get
+        :param keyword_type: expected type of the keyword of the module to get
+        :param channel_oid: expected affilitated channel
+        :param update_count: if the called count should be updated
+        :param update_count_async: if the called count update should be performed asynchronously
+        :return: an active auto reply module if exists
+        """
         ret: Optional[AutoReplyModuleModel] = \
             self.find_one_casted(
                 {
                     AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
                     AutoReplyModuleModel.KEY_KW_TYPE: keyword_type,
-                    AutoReplyModuleModel.ChannelId.key: channel_oid,
+                    AutoReplyModuleModel.ChannelOid.key: channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
                 parse_cls=AutoReplyModuleModel,
-                collation=case_insensitive_collation if case_insensitive else None)
+                collation=case_insensitive_collation if AutoReply.CaseInsensitive else None)
 
-        if ret:
-            now = now_utc_aware()
-            if ret.can_be_used(now):
-                q_found = {AutoReplyModuleModel.Id.key: ret.id}
-                u_query = {
-                    "$set": {AutoReplyModuleModel.LastUsed.key: now},
-                    "$inc": {AutoReplyModuleModel.CalledCount.key: 1}
-                }
+        if not ret:
+            return None
 
+        now = now_utc_aware()
+        if not ret.can_be_used(now):
+            return None
+
+        if update_count:
+            q_found = {AutoReplyModuleModel.Id.key: ret.id}
+            u_query = {
+                "$set": {AutoReplyModuleModel.LastUsed.key: now},
+                "$inc": {AutoReplyModuleModel.CalledCount.key: 1}
+            }
+
+            # Normally async is preferred to boost the speed, no async update for tests
+            if update_count_async:
                 self.update_one_async(q_found, u_query)
-                return ret
+            else:
+                self.update_one(q_found, u_query)
 
-        return None
+            ret.called_count += 1
 
-    def get_conn_list(
-            self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
+        return ret
+
+    def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, *, active_only: bool = True) \
             -> CursorWithCount:
         """Sort by used count (desc)."""
         filter_ = {
-            AutoReplyModuleModel.ChannelId.key: channel_oid
+            AutoReplyModuleModel.ChannelOid.key: channel_oid
         }
 
         if keyword:
@@ -282,9 +307,10 @@ class AutoReplyModuleManager(BaseCollection):
             .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel) \
             .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
-    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) -> CursorWithCount:
+    def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+            -> CursorWithCount[AutoReplyModuleModel]:
         ret = self.find_cursor_with_count(
-            {AutoReplyModuleModel.ChannelId.key: channel_oid},
+            {AutoReplyModuleModel.ChannelOid.key: channel_oid},
             parse_cls=AutoReplyModuleModel
         ).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
@@ -296,7 +322,7 @@ class AutoReplyModuleManager(BaseCollection):
     def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> UniqueKeywordCountResult:
         pipeline = [
-            {"$match": {AutoReplyModuleModel.ChannelId.key: channel_oid}},
+            {"$match": {AutoReplyModuleModel.ChannelOid.key: channel_oid}},
             {"$group": {
                 OID_KEY: {
                     UniqueKeywordCountResult.KEY_WORD: "$" + AutoReplyModuleModel.KEY_KW_CONTENT,
@@ -305,7 +331,10 @@ class AutoReplyModuleManager(BaseCollection):
                 UniqueKeywordCountResult.KEY_COUNT_USAGE: {"$sum": "$" + AutoReplyModuleModel.CalledCount.key},
                 UniqueKeywordCountResult.KEY_COUNT_MODULE: {"$sum": 1}
             }},
-            {"$sort": {UniqueKeywordCountResult.KEY_COUNT_USAGE: pymongo.DESCENDING}}
+            {"$sort": {
+                UniqueKeywordCountResult.KEY_COUNT_USAGE: pymongo.DESCENDING,
+                UniqueKeywordCountResult.KEY_COUNT_MODULE: pymongo.DESCENDING
+            }}
         ]
 
         if limit:
@@ -444,13 +473,13 @@ class AutoReplyManager:
         return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)
 
     def get_responses(
-            self, keyword: str, keyword_type: AutoReplyContentType,
-            channel_oid: ObjectId, case_insensitive: bool = True) -> List[Tuple[AutoReplyContentModel, bool]]:
+            self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId) \
+            -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         :return: Empty list (length of 0) if no corresponding response.
                 [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
         """
-        mod = self._mod.get_conn(keyword, keyword_type, channel_oid, case_insensitive=case_insensitive)
+        mod = self._mod.get_conn(keyword, keyword_type, channel_oid)
         resp_ctnt = []
 
         if mod:
@@ -479,7 +508,7 @@ class AutoReplyManager:
 
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> CursorWithCount:
-        return self._mod.get_conn_list(channel_oid, keyword, active_only)
+        return self._mod.get_conn_list(channel_oid, keyword, active_only=active_only)
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> CursorWithCount:
         return self._mod.get_conn_list_oids(conn_oids)
