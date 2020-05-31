@@ -6,7 +6,7 @@ from pymongo import ReturnDocument
 from extutils.checker import arg_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel, OID_KEY
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
@@ -125,7 +125,7 @@ class ChannelManager(BaseCollection):
                 in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
 
     @arg_type_ensure
-    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
+    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> ExtendedCursor[ChannelModel]:
         filter_ = \
             {
                 f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":

@@ -5,7 +5,7 @@ from typing import List, Union
 from extutils.dt import now_utc_aware, t_delta_str, localtime, make_tz_aware
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from strnames.models import Timer
 
 
@@ -39,7 +39,7 @@ class TimerListResult:
     past_done: List[TimerModel] = field(init=False, default_factory=list)
     has_data: bool = field(init=False, default=False)
 
-    cursor: InitVar[Union[CursorWithCount, List[TimerModel]]] = None
+    cursor: InitVar[Union[ExtendedCursor[TimerModel], List[TimerModel]]] = None
 
     def __iter__(self):
         for t in self.future:

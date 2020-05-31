@@ -1,5 +1,12 @@
-class CursorWithCount:
-    def __init__(self, cursor, count, parse_cls=None):
+from models import Model
+
+from typing import Generic, TypeVar, Type
+
+T = TypeVar("T", bound=Model)
+
+
+class ExtendedCursor(Generic[T]):
+    def __init__(self, cursor, count, parse_cls: Type[T] = None):
         self._cursor = cursor
         self._count = count
         self._parse_cls = parse_cls

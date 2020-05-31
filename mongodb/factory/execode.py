@@ -10,7 +10,7 @@ from mongodb.factory.results import (
 )
 from models import ExecodeEntryModel, Model
 from models.exceptions import ModelConstructionError
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from mongodb.helper import ExecodeRequiredKeys, ExecodeCompletor
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from JellyBot.systemconfig import Database
@@ -52,9 +52,9 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
 
         return EnqueueExecodeResult(outcome, ex, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds))
 
-    def get_queued_execodes(self, root_uid: ObjectId) -> CursorWithCount:
+    def get_queued_execodes(self, root_uid: ObjectId) -> ExtendedCursor[ExecodeEntryModel]:
         filter_ = {ExecodeEntryModel.CreatorOid.key: root_uid}
-        return CursorWithCount(self.find(filter_), self.count_documents(filter_), parse_cls=ExecodeEntryModel)
+        return ExtendedCursor(self.find(filter_), self.count_documents(filter_), parse_cls=ExecodeEntryModel)
 
     def clear_all_execodes(self, root_uid: ObjectId):
         self.delete_many({ExecodeEntryModel.CreatorOid.key: root_uid})

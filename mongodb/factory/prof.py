@@ -15,7 +15,7 @@ from mongodb.factory import ChannelManager
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome, GetPermissionProfileResult, CreateProfileResult
 )
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
     ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel)
@@ -138,7 +138,7 @@ class UserProfileManager(BaseCollection):
 
         return ret
 
-    def get_available_connections(self) -> CursorWithCount:
+    def get_available_connections(self) -> ExtendedCursor[ChannelProfileConnectionModel]:
         return self.find_cursor_with_count(
             {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
             parse_cls=ChannelProfileConnectionModel)
@@ -279,7 +279,7 @@ class ProfileDataManager(BaseCollection):
     def get_attachable_profiles(
             self, channel_oid: ObjectId, existing_permissions: Set[ProfilePermission],
             highest_perm_lv: PermissionLevel) \
-            -> CursorWithCount:
+            -> ExtendedCursor[ChannelProfileModel]:
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
 
         # noinspection PyTypeChecker
@@ -617,7 +617,7 @@ class ProfileManager:
             -> List[ObjectId]:
         return [mdl.user_oid for mdl in self.get_channel_members(channel_oid, available_only=available_only)]
 
-    def get_available_connections(self) -> CursorWithCount:
+    def get_available_connections(self) -> ExtendedCursor[ChannelProfileConnectionModel]:
         return self._conn.get_available_connections()
 
     def get_attachable_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:

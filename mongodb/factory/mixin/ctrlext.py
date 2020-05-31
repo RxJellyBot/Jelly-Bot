@@ -15,7 +15,7 @@ from models.exceptions import InvalidModelError, InvalidModelFieldError, Require
 from models.field.exceptions import (
     FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, FieldCastingFailedError
 )
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import WriteOutcome
 
 T = TypeVar('T', bound=Model)
@@ -174,11 +174,11 @@ class ControlExtensionMixin(Collection):
             target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
 
     def find_cursor_with_count(
-            self, filter_, *args, parse_cls=None, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> CursorWithCount:
+            self, filter_, *args, parse_cls: Type[T] = None, hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> ExtendedCursor[T]:
         self.attach_time_range(filter_, hours_within=hours_within, start=start, end=end)
 
-        return CursorWithCount(
+        return ExtendedCursor(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
