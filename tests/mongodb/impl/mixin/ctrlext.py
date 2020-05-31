@@ -149,7 +149,17 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(mdl.get_oid())
 
-    # TEST: Compound unique index
+    def test_insert_one_data_duplicated_compound_key(self):
+        self.collection.create_index([("i", 1), ("b", 1)], unique=True)
+
+        self.collection.insert_one_model(TestControlExtensionMixin.ModelTest(i=5, b=True, from_db=True))
+
+        mdl, outcome, exception = \
+            self.collection.insert_one_data(TestControlExtensionMixin.ModelTest, IntF=5, BoolF=True)
+
+        self.assertIsInstance(exception, DuplicateKeyError)
+        self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
+        self.assertIsNotNone(mdl.get_oid())
 
     def test_update_many_outcome(self):
         self.collection.insert_many([
