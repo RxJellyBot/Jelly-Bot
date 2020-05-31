@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Type, Optional
+from typing import Type, Optional, Tuple
 
 from bson import ObjectId
 
@@ -78,6 +78,31 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
     def remove_execode(self, execode: str):
         self.delete_one({ExecodeEntryModel.Execode.key: execode})
 
+    def _attempt_complete_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: dict) \
+            -> Tuple[OperationOutcome, Optional[ExecodeCompletionOutcome], Optional[Exception]]:
+        cmpl_outcome = None
+        ex = None
+
+        try:
+            cmpl_outcome = ExecodeCompletor.complete_execode(tk_model, execode_kwargs)
+
+            if cmpl_outcome.is_success:
+                outcome = OperationOutcome.O_COMPLETED
+                self.remove_execode(execode)
+            else:
+                outcome = OperationOutcome.X_COMPLETION_FAILED
+        except NoCompleteActionError as e:
+            outcome = OperationOutcome.X_NO_COMPLETE_ACTION
+            ex = e
+        except ExecodeCollationError as e:
+            outcome = OperationOutcome.X_COLLATION_ERROR
+            ex = e
+        except Exception as e:
+            outcome = OperationOutcome.X_COMPLETION_ERROR
+            ex = e
+
+        return outcome, cmpl_outcome, ex
+
     def complete_execode(self, execode: str, execode_kwargs: dict, action: Execode = None) -> CompleteExecodeResult:
         """
         Finalize the pending Execode.
@@ -111,23 +136,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
 
                 lacking_keys = required_keys.difference(execode_kwargs)
                 if len(lacking_keys) == 0:
-                    try:
-                        cmpl_outcome = ExecodeCompletor.complete_execode(tk_model, execode_kwargs)
-
-                        if cmpl_outcome.is_success:
-                            outcome = OperationOutcome.O_COMPLETED
-                            self.remove_execode(execode)
-                        else:
-                            outcome = OperationOutcome.X_COMPLETION_FAILED
-                    except NoCompleteActionError as e:
-                        outcome = OperationOutcome.X_NO_COMPLETE_ACTION
-                        ex = e
-                    except ExecodeCollationError as e:
-                        outcome = OperationOutcome.X_COLLATION_ERROR
-                        ex = e
-                    except Exception as e:
-                        outcome = OperationOutcome.X_COMPLETION_ERROR
-                        ex = e
+                    outcome, cmpl_outcome, ex = self._attempt_complete_complete(execode, tk_model, execode_kwargs)
                 else:
                     outcome = OperationOutcome.X_KEYS_LACKING
             except ModelConstructionError as e:

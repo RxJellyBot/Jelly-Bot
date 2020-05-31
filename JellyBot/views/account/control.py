@@ -21,6 +21,38 @@ class AccountLoginView(View):
     def get(self, request, *args, **kwargs):
         return render_template(request, _("Login"), "account/login.html")
 
+    @staticmethod
+    def _process_result(result):
+        token = None
+
+        if result.outcome.is_success:
+            s = AccountLoginView.PASS_SIGNAL
+            token = result.idt_reg_result.token
+        elif result.outcome == WriteOutcome.X_NOT_EXECUTED:
+            s = _("Registration process not performed.")
+        elif result.outcome == WriteOutcome.X_NOT_ACKNOWLEDGED:
+            s = _("New user data creation failed.")
+        elif result.outcome == WriteOutcome.X_NOT_SERIALIZABLE:
+            s = _("The data cannot be passed into the server.")
+        else:
+            s = _(
+                "An unknown error occurred during the new user data registration. "
+                "Code: {} / Registration Code: {}.").format(
+                result.outcome.code, result.idt_reg_result.outcome.code)
+
+        return s, token
+
+    @staticmethod
+    def _send_reg_failed_email(result):
+        MailSender.send_email_async(
+            f"Result: {result.serialize()}<br>"
+            f"Outcome: {result.outcome}<br>"
+            f"Exception: {result.exception}<br>"
+            f"Registration: {result.idt_reg_result.outcome}<br>"
+            f"Registration Exception: {result.idt_reg_result.exception}<br>",
+            subject="New user data registration failed"
+        )
+
     # noinspection PyMethodMayBeStatic, PyUnusedLocal
     def post(self, request, *args, **kwargs):
         s = str(_("An unknown error occurred."))
@@ -29,30 +61,10 @@ class AccountLoginView(View):
 
         try:
             result = RootUserManager.register_google(get_identity_data(request.POST.get("idtoken")))
-            if result.outcome.is_success:
-                s = AccountLoginView.PASS_SIGNAL
-                token = result.idt_reg_result.token
-            elif result.outcome == WriteOutcome.X_NOT_EXECUTED:
-                s = _("Registration process not performed.")
-            elif result.outcome == WriteOutcome.X_NOT_ACKNOWLEDGED:
-                s = _("New user data creation failed.")
-            elif result.outcome == WriteOutcome.X_NOT_SERIALIZABLE:
-                s = _("The data cannot be passed into the server.")
-            else:
-                s = _(
-                    "An unknown error occurred during the new user data registration. "
-                    "Code: {} / Registration Code: {}.").format(
-                    result.outcome.code, result.idt_reg_result.outcome.code)
+            s, token = self._process_result(result)
 
             if not result.outcome.is_success:
-                MailSender.send_email_async(
-                    f"Result: {result.serialize()}<br>"
-                    f"Outcome: {result.outcome}<br>"
-                    f"Exception: {result.exception}<br>"
-                    f"Registration: {result.idt_reg_result.outcome}<br>"
-                    f"Registration Exception: {result.idt_reg_result.exception}<br>",
-                    subject="New user data registration failed"
-                )
+                self._send_reg_failed_email(result)
         except IDIssuerIncorrect as ex1:
             s = str(ex1)
         except Exception as ex2:
