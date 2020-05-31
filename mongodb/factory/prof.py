@@ -420,11 +420,15 @@ class ProfileManager:
 
         # --- Collate `Permission`
         perm_dict = {}
+        keys_to_remove = set()
         # Fill turned-on permissions
         for k, v in profile_kwargs.items():
             if k.startswith("Permission."):
                 perm_dict[k[len("Permission."):]] = True
-                del profile_kwargs[k]
+                keys_to_remove.add(k)
+
+        for k in keys_to_remove:
+            del profile_kwargs[k]
 
         # Fill default overriden permissions by permission level
         for perm in ProfilePermissionDefault.get_overridden_permissions(perm_lv):
