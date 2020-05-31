@@ -7,7 +7,8 @@ from extutils.dt import now_utc_aware
 from flags import AutoReplyContentType, PermissionLevel, ProfilePermission, Platform
 from models import AutoReplyContentModel, AutoReplyModuleModel
 from models.ar import UniqueKeywordCountEntry
-from models.exceptions import FieldKeyNotExistError
+from models.exceptions import FieldKeyNotExistError, InvalidModelFieldError
+from models.field.exceptions import FieldValueNegativeError
 from mongodb.factory.results import WriteOutcome
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
@@ -37,8 +38,9 @@ class _TestArModuleSample(TestDatabaseMixin):
     - 11th model: Keyword = E / Response = G / Is Pinned / Creator II
     - 12th model: Keyword = 1 (Text) / Response A
     - 13th model: Keyword = 1 (Sticker) / Response A
-    - 14th model: invalid param
+    - 14th model: invalid param (additional not in use)
     - 15th model: response sticker ID invalid
+    - 16th model: negative cooldown
     """
 
     CREATOR_OID = ObjectId()
@@ -299,6 +301,21 @@ class _TestArModuleSample(TestDatabaseMixin):
         private = False
         tag_ids = []
         cooldown = 0
+
+        return {
+            "Keyword": keyword, "Responses": responses, "ChannelOid": channel_oid, "CreatorOid": creator_oid,
+            "Pinned": pinned, "Private": private, "TagIds": tag_ids, "CooldownSec": cooldown
+        }
+
+    def get_mdl_16_args(self):
+        keyword = AutoReplyContentModel(Content="F", ContentType=AutoReplyContentType.TEXT)
+        responses = [AutoReplyContentModel(Content="1", ContentType=AutoReplyContentType.LINE_STICKER)]
+        creator_oid = self.CREATOR_OID
+        channel_oid = self.channel_oid
+        pinned = False
+        private = False
+        tag_ids = []
+        cooldown = -5
 
         return {
             "Keyword": keyword, "Responses": responses, "ChannelOid": channel_oid, "CreatorOid": creator_oid,
@@ -724,20 +741,20 @@ class TestArModuleManager(_TestArModuleSample, TestTimeComparisonMixin, TestData
         mdl_expected.called_count = 1
         self.assertEqual(mdl, mdl_expected)
 
+    def test_add_negative_cooldown(self):
+        result = self.inst.add_conn(**self.get_mdl_16_args())
+        self.assertEqual(result.outcome, WriteOutcome.X_INVALID_MODEL)
+        self.assertIsInstance(result.exception, InvalidModelFieldError)
+        self.assertIsInstance(result.exception.inner_exception, FieldValueNegativeError)
+        self.assertFalse(result.success)
+        self.assertIsNone(result.model, self.get_mdl_13())
+
     def test_add_short_time_overwrite_perma_remove(self):
         self.inst.add_conn(**self.get_mdl_1_args())
         mdl = self.inst.add_conn(**self.get_mdl_2_args()).model
 
         self.assertEqual(self.inst.count_documents({}), 1)
         self.assertEqual(self.inst.find_one(), mdl)
-
-    def test_del_short_time_overwrite_perma_remove(self):
-        self.inst.add_conn(**self.get_mdl_1_args())
-
-        self.inst.module_mark_inactive(
-            self.get_mdl_1().keyword.content, self.get_mdl_1().channel_oid, self.get_mdl_1().creator_oid)
-
-        self.assertEqual(self.inst.count_documents({}), 0)
 
     def test_add_long_time_overwrite_preserve(self):
         args = self.get_mdl_1_args()
@@ -747,6 +764,14 @@ class TestArModuleManager(_TestArModuleSample, TestTimeComparisonMixin, TestData
         self.inst.add_conn(**self.get_mdl_2_args())
 
         self.assertEqual(self.inst.count_documents({}), 2)
+
+    def test_del_short_time_overwrite_perma_remove(self):
+        self.inst.add_conn(**self.get_mdl_1_args())
+
+        self.inst.module_mark_inactive(
+            self.get_mdl_1().keyword.content, self.get_mdl_1().channel_oid, self.get_mdl_1().creator_oid)
+
+        self.assertEqual(self.inst.count_documents({}), 0)
 
     def test_del_long_time_overwrite_preserve(self):
         args = self.get_mdl_1_args()
