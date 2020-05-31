@@ -79,11 +79,11 @@ function initTextAreas() {
     $("div.txtarea-count").each(function () {
         const parent = $(this);
         const txtArea = $(this).find("textarea");
-        const id = `[data-count=${txtArea.attr("id")}]`;
+        const prop = `[data-count=${txtArea.attr("id")}]`;
         $(this).init(function () {
-            $(this).find(`span[data-type=current]${id}`).text(0);
+            $(this).find(`span[data-type=current]${prop}`).text(0);
         }).on("input", function () {
-            updateTextAreaPercentBar($(this), txtArea, id);
+            updateTextAreaPercentBar($(this), txtArea, prop);
         });
 
         txtArea.on("blur", () => validateTextArea(parent, txtArea));
