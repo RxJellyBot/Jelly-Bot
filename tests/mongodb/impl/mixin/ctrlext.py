@@ -223,9 +223,8 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
         ])
 
         actual_mdl = self.collection.find_one_casted({"i": 7}, parse_cls=TestControlExtensionMixin.ModelTest)
-        actual_mdl.clear_oid()
 
-        self.assertEqual(actual_mdl, TestControlExtensionMixin.ModelTest(i=7, b=True, from_db=True))
+        self.assertModelEqual(actual_mdl, TestControlExtensionMixin.ModelTest(i=7, b=True, from_db=True))
 
     def test_attach_time_range(self):
         dt_start = datetime(2020, 5, 6)

@@ -394,9 +394,11 @@ class AutoReplyManager:
 
     def _get_tags_pop_score(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[AutoReplyTagPopularityScore]:
-        # Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
-        # Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
-
+        """
+        .. seealso::
+            Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
+            Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
+        """
         pipeline = []
         filter_ = {
             AutoReplyModuleModel.TagIds.key: {"$in": [tag_data.id for tag_data in self._tag.search_tags(filter_word)]}
@@ -472,18 +474,22 @@ class AutoReplyManager:
         return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)
 
     def get_responses(
-            self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId) \
+            self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
+            update_count_async: bool = True) \
             -> List[Tuple[AutoReplyContentModel, bool]]:
         """
-        :return: Empty list (length of 0) if no corresponding response.
-                [(<RESPONSE_MODEL>, <BYPASS_MULTILINE>), (<RESPONSE_MODEL>, <BYPASS_MULTILINE>)...]
+        Get the responses and a flag indicating
+        if the content can be displayed without redirecting the user to visit the webpage.
+
+        The flag is determined by the cooldown of the module. The content is **NOT** checked for this flag.
+
+        :return: list of the responses and a redirection necessity flag
         """
-        mod = self._mod.get_conn(keyword, keyword_type, channel_oid)
+        mod = self._mod.get_conn(keyword, keyword_type, channel_oid, update_count_async=update_count_async)
         resp_ctnt = []
 
         if mod:
-            resp_ctnt = [(AutoReplyContentModel.cast_model(resp_mod),
-                          mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds)
+            resp_ctnt = [(resp_mod, mod.cooldown_sec > AutoReply.BypassMultilineCDThresholdSeconds)
                          for resp_mod in mod.responses]
 
         return resp_ctnt
