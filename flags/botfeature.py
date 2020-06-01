@@ -102,17 +102,17 @@ class BotFeature(FlagDoubleEnum):
         1019, _("Text / Timer / List (Keyword)"), _("Get the timer(s) with the designated keyword.")
 
     TXT_PF_CREATE = \
-        1021, _("Text / Profile / Create"), _("Add a timer.")
+        1021, _("Text / Profile / Create"), _("Add a profile.")
     TXT_PF_QUERY = \
-        1022, _("Text / Profile / Query"), _("List all timers.")
+        1022, _("Text / Profile / Query"), _("List profiles which contain the given keyword.")
     TXT_PF_LIST = \
-        1023, _("Text / Profile / List"), _("List all timers.")
+        1023, _("Text / Profile / List"), _("List all profiles.")
     TXT_PF_ATTACH = \
-        1024, _("Text / Profile / Attach"), _("Delete a timer.")
+        1024, _("Text / Profile / Attach"), _("Attach a profile to a user.")
     TXT_PF_DETACH = \
-        1025, _("Text / Profile / Detach"), _("Get the timer(s) with the designated keyword.")
+        1025, _("Text / Profile / Detach"), _("Detach a profile from a user.")
     TXT_PF_DELETE = \
-        1026, _("Text / Profile / Delete"), _("Get the timer(s) with the designated keyword.")
+        1026, _("Text / Profile / Delete"), _("Delete a profile.")
 
     TXT_INFO_ID = \
         1101, _("Text / Information / Check IDs"), _("Check the ID of current channel and self.")
