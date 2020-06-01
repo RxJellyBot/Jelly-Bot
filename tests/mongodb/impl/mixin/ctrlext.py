@@ -4,18 +4,18 @@ from bson import InvalidDocument, ObjectId
 from pymongo.errors import DuplicateKeyError
 
 from extutils.mongo import get_codec_options
-from tests.base import TestDatabaseMixin
 from models import Model
 from models.exceptions import InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
 from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultValueExt
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
 from mongodb.factory import ControlExtensionMixin
 from mongodb.factory.results import WriteOutcome
+from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestControlExtensionMixin"]
 
 
-class TestControlExtensionMixin(TestDatabaseMixin):
+class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
     collection = None
 
     class CollectionTest(ControlExtensionMixin):
@@ -195,8 +195,7 @@ class TestControlExtensionMixin(TestDatabaseMixin):
 
         for actual_mdl, expected_mdl in zip(crs, expected_mdls):
             with self.subTest(expected_mdl):
-                actual_mdl.clear_oid()
-                self.assertEqual(actual_mdl, expected_mdl)
+                self.assertModelEqual(actual_mdl, expected_mdl)
 
     def test_find_cursor_with_count_no_cls(self):
         self.collection.insert_many([

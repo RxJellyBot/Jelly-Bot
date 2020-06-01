@@ -12,7 +12,7 @@ from models.field.exceptions import FieldValueNegativeError
 from mongodb.factory.results import WriteOutcome
 from mongodb.factory import ChannelManager
 
-from ._base import TestArModuleManagerBase
+from ._base_ar_mod import TestArModuleManagerBase
 
 __all__ = ["TestArModuleManagerAdd"]
 
@@ -24,8 +24,7 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, self.get_mdl_1())
+        self.assertModelEqual(result.model, self.get_mdl_1())
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.channel_oid)
@@ -41,8 +40,7 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, self.get_mdl_2())
+        self.assertModelEqual(result.model, self.get_mdl_2())
 
         mdl = self.inst.get_conn(
             self.get_mdl_2().keyword.content, self.get_mdl_2().keyword.content_type, self.channel_oid)
@@ -58,8 +56,7 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, self.get_mdl_4())
+        self.assertModelEqual(result.model, self.get_mdl_4())
 
         mdl = self.inst.get_conn(
             self.get_mdl_4().keyword.content, self.get_mdl_4().keyword.content_type, self.channel_oid)
@@ -137,8 +134,7 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, self.get_mdl_1())
+        self.assertModelEqual(result.model, self.get_mdl_1())
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.channel_oid)
@@ -159,14 +155,12 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, mdl_expected)
+        self.assertModelEqual(result.model, mdl_expected)
 
         mdl = self.inst.get_conn(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_inherit_original_inactive(self):
         self.inst.add_conn(**self.get_mdl_3_args())
@@ -183,10 +177,9 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_2().keyword.content, self.get_mdl_2().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_2()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_pinned_has_permission(self):
         self.grant_access_pin_permission()
@@ -201,10 +194,9 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_5().keyword.content, self.get_mdl_5().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_5()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_pinned_overwrite_has_permission(self):
         self.grant_access_pin_permission()
@@ -220,10 +212,9 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_10().keyword.content, self.get_mdl_10().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_10()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_pinned_no_permission(self):
         result = self.inst.add_conn(**self.get_mdl_5_args())
@@ -268,10 +259,9 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_6().keyword.content, self.get_mdl_6().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_5()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_same_content_different_type(self):
         result = self.inst.add_conn(**self.get_mdl_12_args())
@@ -284,25 +274,22 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_12().keyword.content, self.get_mdl_12().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_12()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
         result = self.inst.add_conn(**self.get_mdl_13_args())
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        result.model.clear_oid()
-        self.assertEqual(result.model, self.get_mdl_13())
+        self.assertModelEqual(result.model, self.get_mdl_13())
 
         mdl = self.inst.get_conn(
             self.get_mdl_13().keyword.content, self.get_mdl_13().keyword.content_type, self.channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_13()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_add_negative_cooldown(self):
         result = self.inst.add_conn(**self.get_mdl_16_args())
@@ -430,24 +417,21 @@ class TestArModuleManagerAdd(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_1()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
         mdl = self.inst.get_conn(
             self.get_mdl_4().keyword.content, self.get_mdl_4().keyword.content_type, self.get_mdl_4().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_4()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
         mdl = self.inst.get_conn(
             self.get_mdl_6().keyword.content, self.get_mdl_6().keyword.content_type, self.get_mdl_6().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_6()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_get_on_cooldown(self):
         self.inst.add_conn(**self.get_mdl_3_args())

@@ -362,8 +362,7 @@ class AutoReplyModuleTagManager(BaseCollection):
         if tag_data:
             outcome = GetOutcome.O_CACHE_DB
         else:
-            model, outcome, ex = \
-                self.insert_one_data(Name=name, Color=color)
+            model, outcome, ex = self.insert_one_data(Name=name, Color=color)
 
             if outcome.is_success:
                 tag_data = model
@@ -375,9 +374,9 @@ class AutoReplyModuleTagManager(BaseCollection):
 
     def search_tags(self, tag_keyword: str) -> ExtendedCursor[AutoReplyModuleTagModel]:
         """
-        Accepts a keyword to search. Case-insensitive.
+        Accepts a keyword to search. Case-insensitive. ``tag_keyword`` can be regex.
 
-        :param tag_keyword: Can be regex.
+        :param tag_keyword: keyword to search the tag
         """
         return self.find_cursor_with_count(
             {AutoReplyModuleTagModel.Name.key: {"$regex": tag_keyword, "$options": "i"}},

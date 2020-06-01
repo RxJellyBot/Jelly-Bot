@@ -6,7 +6,7 @@ from flags import AutoReplyContentType, PermissionLevel, ProfilePermission, Plat
 from models import AutoReplyContentModel, AutoReplyModuleModel
 from mongodb.factory import ProfileManager, ChannelManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
-from tests.base import TestDatabaseMixin, TestTimeComparisonMixin
+from tests.base import TestDatabaseMixin, TestTimeComparisonMixin, TestModelMixin
 
 
 class TestArModuleSample(TestDatabaseMixin):
@@ -315,7 +315,7 @@ class TestArModuleSample(TestDatabaseMixin):
         }
 
 
-class TestArModuleManagerBase(TestArModuleSample, TestTimeComparisonMixin, TestDatabaseMixin):
+class TestArModuleManagerBase(TestArModuleSample, TestTimeComparisonMixin, TestDatabaseMixin, TestModelMixin):
     inst = None
 
     @classmethod
