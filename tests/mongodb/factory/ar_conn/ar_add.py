@@ -8,12 +8,36 @@ from models.field.exceptions import FieldValueNegativeError
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestModelMixin
 
-from ._base_ar_mod import TestAutoReplyModuleManagerBase
+from ._base_ar import TestAutoReplyManagerBase
 
-__all__ = ["TestAutoReplyModuleManagerAdd"]
+__all__ = ["TestAutoReplyManagerAdd"]
 
 
-class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBase.TestClass):
+class TestAutoReplyManagerAdd(TestAutoReplyManagerBase.TestClass, TestModelMixin):
+    def _check_model_exists(self, model: AutoReplyModuleModel, *, active_only: bool = True):
+        kw = model.keyword.content
+        kw_type = model.keyword.content_type
+
+        filter_ = {
+            AutoReplyModuleModel.KEY_KW_CONTENT: kw,
+            AutoReplyModuleModel.KEY_KW_TYPE: kw_type,
+            AutoReplyModuleModel.Active.key: True
+        }
+
+        self.assertModelEqual(
+            model,
+            self.module_col.find_one_casted(filter_, parse_cls=AutoReplyModuleModel))
+
+    def _check_model_not_exists(self, model_args: dict):
+        kw = model_args["Keyword"].content
+        kw_type = model_args["Keyword"].content_type
+
+        self.assertIsNone(
+            self.module_col.find_one_casted({
+                AutoReplyModuleModel.KEY_KW_CONTENT: kw,
+                AutoReplyModuleModel.KEY_KW_TYPE: kw_type
+            }, parse_cls=AutoReplyModuleModel))
+
     def test_add_single_not_pinned(self):
         result = self.inst.add_conn(**self.get_mdl_1_args())
 
@@ -22,11 +46,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_1())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_1()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_1())
 
     def test_add_duplicated_kw_overwrite(self):
         self.inst.add_conn(**self.get_mdl_1_args())
@@ -37,11 +57,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_2())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_2().keyword.content, self.get_mdl_2().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_2()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_2())
 
     def test_add_duplicated_response(self):
         self.inst.add_conn(**self.get_mdl_1_args())
@@ -52,11 +68,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_4())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_4().keyword.content, self.get_mdl_4().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_4()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_4())
 
     def test_add_kw_invalid_sticker_id(self):
         result = self.inst.add_conn(**self.get_mdl_8_args())
@@ -66,10 +78,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_8_args()["Keyword"].content, self.get_mdl_9_args()["Keyword"].content_type,
-            self.channel_oid)
-        self.assertIsNone(mdl)
+        self._check_model_not_exists(self.get_mdl_8_args())
 
     def test_add_resp_invalid_sticker_id(self):
         result = self.inst.add_conn(**self.get_mdl_15_args())
@@ -79,10 +88,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_15_args()["Keyword"].content, self.get_mdl_15_args()["Keyword"].content_type,
-            self.channel_oid)
-        self.assertIsNone(mdl)
+        self._check_model_not_exists(self.get_mdl_15_args())
 
     def test_add_kw_invalid_image_url(self):
         result = self.inst.add_conn(**self.get_mdl_9_args())
@@ -92,10 +98,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_9_args()["Keyword"].content, self.get_mdl_9_args()["Keyword"].content_type,
-            self.channel_oid)
-        self.assertIsNone(mdl)
+        self._check_model_not_exists(self.get_mdl_9_args())
 
     def test_add_invalid_param(self):
         result = self.inst.add_conn(**self.get_mdl_14_args())
@@ -105,21 +108,15 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_14_args()["Keyword"].content, self.get_mdl_14_args()["Keyword"].content_type,
-            self.channel_oid)
-        self.assertIsNone(mdl)
+        self._check_model_not_exists(self.get_mdl_14_args())
 
     def test_add_back_after_del(self):
         # Add one first
         self.inst.add_conn(**self.get_mdl_1_args())
 
         # Delete one and test get
-        self.inst.module_mark_inactive(
-            self.get_mdl_1().keyword.content, self.channel_oid, self.CREATOR_OID)
-        mdl = self.inst.get_conn(
-            self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.channel_oid)
-        self.assertIsNone(mdl)
+        self.inst.del_conn(self.get_mdl_1().keyword.content, self.channel_oid, self.CREATOR_OID)
+        self._check_model_not_exists(self.get_mdl_1_args())
 
         # Add the same back
         result = self.inst.add_conn(**self.get_mdl_1_args())
@@ -129,11 +126,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_1())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_1()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_1())
 
     def test_add_inherit_from_active(self):
         kwargs = self.get_mdl_3_args()
@@ -149,15 +142,11 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, mdl_expected)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.channel_oid)
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(mdl_expected)
 
     def test_add_inherit_original_inactive(self):
         self.inst.add_conn(**self.get_mdl_3_args())
-        self.inst.module_mark_inactive(
-            self.get_mdl_3().keyword.content, self.channel_oid, self.CREATOR_OID)
+        self.inst.del_conn(self.get_mdl_3().keyword.content, self.channel_oid, self.CREATOR_OID)
 
         result = self.inst.add_conn(**self.get_mdl_2_args())
 
@@ -166,11 +155,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_2())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_2().keyword.content, self.get_mdl_2().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_2()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_2())
 
     def test_add_pinned_has_permission(self):
         self.grant_access_pin_permission()
@@ -180,13 +165,10 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
         self.assertTrue(result.success)
-        self.assertModelEqual(result.model, self.get_mdl_5())
+        result.model.clear_oid()
+        self.assertEqual(result.model, self.get_mdl_5())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_5().keyword.content, self.get_mdl_5().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_5()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_5())
 
     def test_add_pinned_overwrite_has_permission(self):
         self.grant_access_pin_permission()
@@ -199,11 +181,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_10())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_10().keyword.content, self.get_mdl_10().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_10()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_10())
 
     def test_add_pinned_no_permission(self):
         result = self.inst.add_conn(**self.get_mdl_5_args())
@@ -213,9 +191,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_5().keyword.content, self.get_mdl_5().keyword.content_type, self.channel_oid)
-        self.assertIsNone(mdl)
+        self._check_model_not_exists(self.get_mdl_5_args())
 
     def test_add_pinned_overwrite_no_permission(self):
         self.grant_access_pin_permission()
@@ -228,11 +204,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_11().keyword.content, self.get_mdl_11().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_5()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_5())
 
     def test_add_pinned_overwrite_not_pinned(self):
         self.grant_access_pin_permission()
@@ -245,11 +217,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_6().keyword.content, self.get_mdl_6().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_5()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_5())
 
     def test_add_same_content_different_type(self):
         result = self.inst.add_conn(**self.get_mdl_12_args())
@@ -259,11 +227,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_12())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_12().keyword.content, self.get_mdl_12().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_12()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_12())
 
         result = self.inst.add_conn(**self.get_mdl_13_args())
 
@@ -272,11 +236,7 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.assertTrue(result.success)
         self.assertModelEqual(result.model, self.get_mdl_13())
 
-        mdl = self.inst.get_conn(
-            self.get_mdl_13().keyword.content, self.get_mdl_13().keyword.content_type, self.channel_oid)
-        mdl_expected = self.get_mdl_13()
-        mdl_expected.called_count = 1
-        self.assertModelEqual(mdl, mdl_expected)
+        self._check_model_exists(self.get_mdl_13())
 
     def test_add_negative_cooldown(self):
         result = self.inst.add_conn(**self.get_mdl_16_args())
@@ -290,8 +250,8 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
         self.inst.add_conn(**self.get_mdl_1_args())
         mdl = self.inst.add_conn(**self.get_mdl_2_args()).model
 
-        self.assertEqual(self.inst.count_documents({}), 1)
-        self.assertEqual(self.inst.find_one(), mdl)
+        self.assertEqual(self.module_col.count_documents({}), 1)
+        self.assertEqual(self.module_col.find_one(), mdl)
 
     def test_add_long_time_overwrite_preserve(self):
         args = self.get_mdl_1_args()
@@ -300,4 +260,4 @@ class TestAutoReplyModuleManagerAdd(TestModelMixin, TestAutoReplyModuleManagerBa
 
         self.inst.add_conn(**self.get_mdl_2_args())
 
-        self.assertEqual(self.inst.count_documents({}), 2)
+        self.assertEqual(self.module_col.count_documents({}), 2)

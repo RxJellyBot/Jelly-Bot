@@ -3,13 +3,14 @@ import time
 from flags import AutoReplyContentType
 from models import AutoReplyContentModel
 from models.ar import UniqueKeywordCountEntry
+from tests.base import TestModelMixin
 
-from ._base_ar_mod import TestArModuleManagerBase
+from ._base_ar_mod import TestAutoReplyModuleManagerBase
 
-__all__ = ["TestArModuleManagerOther"]
+__all__ = ["TestAutoReplyModuleManagerOther"]
 
 
-class TestArModuleManagerOther(TestArModuleManagerBase):
+class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManagerBase.TestClass):
     def test_get_count_call(self):
         mdl = self.inst.add_conn(**self.get_mdl_1_args()).model
         self.assertEqual(mdl.called_count, 0)
