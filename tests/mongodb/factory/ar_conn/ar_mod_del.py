@@ -10,7 +10,7 @@ from models.ar import UniqueKeywordCountEntry
 from mongodb.factory.results import WriteOutcome
 from mongodb.factory import ChannelManager
 
-from ._base import TestArModuleManagerBase
+from ._base_ar_mod import TestArModuleManagerBase
 
 __all__ = ["TestArModuleManagerDelete"]
 
@@ -59,10 +59,9 @@ class TestArModuleManagerDelete(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_5().keyword.content, self.get_mdl_5().keyword.content_type, self.get_mdl_5().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_5()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_del_mark_remover_and_time(self):
         args = self.get_mdl_1_args()
@@ -118,24 +117,21 @@ class TestArModuleManagerDelete(TestArModuleManagerBase):
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_1()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
         mdl = self.inst.get_conn(
             self.get_mdl_4().keyword.content, self.get_mdl_4().keyword.content_type, self.get_mdl_4().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_4()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
         mdl = self.inst.get_conn(
             self.get_mdl_6().keyword.content, self.get_mdl_6().keyword.content_type, self.get_mdl_6().channel_oid)
-        mdl.clear_oid()
         mdl_expected = self.get_mdl_6()
         mdl_expected.called_count = 1
-        self.assertEqual(mdl, mdl_expected)
+        self.assertModelEqual(mdl, mdl_expected)
 
     def test_get_on_cooldown(self):
         self.inst.add_conn(**self.get_mdl_3_args())
