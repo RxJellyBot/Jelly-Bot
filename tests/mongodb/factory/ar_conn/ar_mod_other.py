@@ -69,7 +69,7 @@ class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManager
         self.inst.get_conn(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid)
 
-        time.sleep(1.3)  # Cooldown of model #3 is 1 sec
+        time.sleep(3.3)  # Cooldown of model #3 is 3 sec
         self.assertIsNotNone(
             self.inst.get_conn(
                 self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid))
