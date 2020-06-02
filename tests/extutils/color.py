@@ -91,3 +91,8 @@ class TestColor(TestCase):
         self.assertTrue(Color.color_num_valid(16777215))
         self.assertFalse(Color.color_num_valid(-1))
         self.assertFalse(Color.color_num_valid(16777216))
+
+    def test_color_hash(self):
+        hash(Color(0))
+        hash(Color(50000))
+        hash(Color(16777215))

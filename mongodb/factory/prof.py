@@ -300,10 +300,10 @@ class ProfileDataManager(BaseCollection):
         default_profile, outcome, ex = self._create_profile(channel_oid, Name=str(_("Default Profile")))
 
         if set_to_channel and outcome.is_inserted:
-            set_success = ChannelManager.set_config(
+            set_result = ChannelManager.set_config(
                 channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
 
-            if not set_success:
+            if not set_result.is_success:
                 outcome = WriteOutcome.X_ON_SET_CONFIG
 
         return CreateProfileResult(outcome, ex, default_profile)

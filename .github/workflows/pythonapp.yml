@@ -171,7 +171,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Django tests
+      - name: Test independent utils (`bot` / `extutils`)
+        run: |
+          python manage.py test tests.bot
+          python manage.py test tests.extutils
+
+      - name: Test base data structures (`models`)
+        run: |
+          python manage.py test tests.models
+
+      - name: Test data controller (`mongodb`)
+        run: |
+          python manage.py test tests.mongodb
+
+      - name: All tests (Double check)
         run: |
           python manage.py test tests
 

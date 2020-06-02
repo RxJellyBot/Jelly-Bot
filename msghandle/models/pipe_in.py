@@ -170,7 +170,8 @@ class MessageEventObjectFactory:
     @staticmethod
     def _ensure_channel_parent_(
             platform: Platform, token: Union[int, str], child_channel_oid: ObjectId, default_name: str):
-        return ChannelCollectionManager.ensure_register(platform, token, child_channel_oid, default_name).model
+        return ChannelCollectionManager.ensure_register(
+            platform, token, child_channel_oid, default_name=default_name).model
 
     @staticmethod
     def from_line(event: MessageEvent, destination: str) -> MessageEventObject:

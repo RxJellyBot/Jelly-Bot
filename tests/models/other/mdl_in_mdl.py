@@ -31,3 +31,85 @@ class TestNestedModel(TestCase):
 
     def test_inner_get_default_value(self):
         self.assertEqual(InnerModel.Field.default_value, ModelDefaultValueExt.Required)
+
+    def test_hash(self):
+        hash(OuterModel(Field=InnerModel(Field=True)))
+
+    def test_eq(self):
+        self.assertEqual(OuterModel(Field=InnerModel(Field=True)),
+                         OuterModel(Field=InnerModel(Field=True)))
+
+    def test_set_differentiate(self):
+        mdl = OuterModel(Field=InnerModel(Field=True))
+        mdl2 = OuterModel(Field=InnerModel(Field=True))
+
+        self.assertEqual({mdl} - {mdl2}, set())
+        self.assertEqual({mdl}.difference({mdl2}), set())
+
+    def test_set_differentiate_multi(self):
+        s1 = {OuterModel(Field=InnerModel(Field=True)), OuterModel(Field=InnerModel(Field=False))}
+
+        s2 = {OuterModel(Field=InnerModel(Field=True))}
+
+        expected_s = {OuterModel(Field=InnerModel(Field=False))}
+
+        self.assertEqual(s1 - s2, expected_s)
+        self.assertEqual(s1.difference(s2), expected_s)
+
+
+from bson import ObjectId
+from models import ChannelModel, ChannelConfigModel
+from flags import Platform
+
+
+class TestSandbox(TestCase):
+    def test_hash(self):
+        hash(ChannelModel(Platform=Platform.LINE, Token="U123",
+                          Config=ChannelConfigModel(DefaultProfileOid=ObjectId())))
+
+    def test_eq(self):
+        doid = ObjectId()
+
+        self.assertEqual(ChannelModel(Platform=Platform.LINE, Token="U123",
+                                      Config=ChannelConfigModel(DefaultProfileOid=doid)),
+                         ChannelModel(Platform=Platform.LINE, Token="U123",
+                                      Config=ChannelConfigModel(DefaultProfileOid=doid)))
+
+    def test_set_differentiate(self):
+        doid = ObjectId()
+
+        mdl = ChannelModel(Platform=Platform.LINE, Token="U123",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid))
+        mdl2 = ChannelModel(Platform=Platform.LINE, Token="U123",
+                            Config=ChannelConfigModel(DefaultProfileOid=doid))
+
+        self.assertEqual({mdl} - {mdl2}, set())
+        self.assertEqual({mdl}.difference({mdl2}), set())
+
+    def test_set_differentiate_multi(self):
+        doid3 = ObjectId()
+        doid4 = ObjectId()
+        doid5 = ObjectId()
+        doid6 = ObjectId()
+
+        s1 = {ChannelModel(Platform=Platform.LINE, Token="U123",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid3)),
+              ChannelModel(Platform=Platform.LINE, Token="U124",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid4)),
+              ChannelModel(Platform=Platform.LINE, Token="U125",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid5)),
+              ChannelModel(Platform=Platform.LINE, Token="U126",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid6))}
+
+        s2 = {ChannelModel(Platform=Platform.LINE, Token="U126",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid6)),
+              ChannelModel(Platform=Platform.LINE, Token="U125",
+                           Config=ChannelConfigModel(DefaultProfileOid=doid5))}
+
+        expected_s = {ChannelModel(Platform=Platform.LINE, Token="U123",
+                                   Config=ChannelConfigModel(DefaultProfileOid=doid3)),
+                      ChannelModel(Platform=Platform.LINE, Token="U124",
+                                   Config=ChannelConfigModel(DefaultProfileOid=doid4))}
+
+        self.assertEqual(s1 - s2, expected_s)
+        self.assertEqual(s1.difference(s2), expected_s)
