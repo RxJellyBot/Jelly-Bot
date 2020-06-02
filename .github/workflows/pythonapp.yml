@@ -134,7 +134,7 @@ jobs:
 
     needs: [prepare]
 
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     env:
       SECRET_KEY: ${{ secrets.DjangoSecretKey }}
