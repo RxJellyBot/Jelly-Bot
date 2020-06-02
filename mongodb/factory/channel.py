@@ -150,9 +150,13 @@ class ChannelManager(BaseCollection):
             -> ExtendedCursor[ChannelModel]:
         filter_ = \
             {"$or": [
-                {f"{ChannelModel.Token.key}": {"$regex": default_name, "$options": "i"}},
-                {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
-                     {"$regex": default_name, "$options": "i"}}
+                {
+                    f"{ChannelModel.Token.key}": {"$regex": default_name, "$options": "i"}
+                },
+                {
+                    f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                        {"$regex": default_name, "$options": "i"}
+                }
             ]}
 
         if hide_private:
