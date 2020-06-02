@@ -129,7 +129,21 @@ class AutoReplyModuleModel(Model):
         return f"{str(self.keyword)}"
 
     @property
+    def created_at_expr(self) -> str:
+        """
+        Expression of the module creation timestamp.
+
+        Used in module info displaying on the website.
+        """
+        return localtime(self.id.generation_time).strftime("%Y-%m-%d %H:%M:%S")
+
+    @property
     def last_used_expr(self) -> Optional[str]:
+        """
+        Expression of the module last used timestamp.
+
+        Used in module info displaying on the website.
+        """
         if self.last_used:
             return localtime(self.last_used).strftime("%Y-%m-%d %H:%M:%S")
         else:
@@ -137,6 +151,11 @@ class AutoReplyModuleModel(Model):
 
     @property
     def removed_at_expr(self) -> Optional[str]:
+        """
+        Expression of the module removal timestamp.
+
+        Used in module info displaying on the website.
+        """
         if self.removed_at:
             return localtime(self.removed_at).strftime("%Y-%m-%d %H:%M:%S")
         else:
