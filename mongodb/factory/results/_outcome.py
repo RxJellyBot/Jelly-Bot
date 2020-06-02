@@ -95,6 +95,9 @@ class WriteOutcome(BaseOutcome):
 
         402 - Missing in Cache, Aborted Insertion
 
+    5ss - Problems related to intermediate process
+        501 - Channel not found
+
     8xx - Unknown Problems
         801 - Model Construction Unknown
 
@@ -206,6 +209,9 @@ class WriteOutcome(BaseOutcome):
     X_CACHE_MISSING_ABORT_INSERT = \
         402, _("X: Missing in Cache, Aborted Insertion"), \
         _("The data was not found and the system aborted to insert a new data.")
+    X_CHANNEL_NOT_FOUND = \
+        501, _("X: Channel Not Found"), \
+        _("Channel data not found. Register the channel first.")
     X_CONSTRUCT_UNKNOWN = \
         801, _("X: Model Construction Unknown"), \
         _("An unknown occurred during the construction of a data model.")
@@ -434,18 +440,33 @@ class UpdateOutcome(BaseOutcome):
     """
     # SUCCESS
 
+    -101 - Found (not updated)
+
     -1 - Success
 
     ================================
 
     # FAILED
 
-    1xx - Problems related to Model
+    1xx - Problems related to model
         101 - Model not found
+
+    2xx - Problems related to model field
+        N/A
+
+    3xx - Problems related to the intermediate process
+        301 - Channel not Found
+
+        302 - Config not exists
+
+        303 - Config type mismatch
+
+        304 - Config value invalid
 
     9xx - Problems related to execution
         901 - Not executed
     """
+
     @property
     def code_prefix(self) -> str:
         return "U"
@@ -454,12 +475,27 @@ class UpdateOutcome(BaseOutcome):
     def default(cls):
         return UpdateOutcome.X_NOT_EXECUTED
 
+    O_FOUND = \
+        -101, _("O: Found"), \
+        _("The data was found but not updated.")
     O_UPDATED = \
         -1, _("O: Success"), \
         _("The updating operation succeed.")
     X_NOT_FOUND = \
-        101, _("X: Not found"), \
+        101, _("X: Not Found"), \
         _("The data for updating is not found.")
+    X_CHANNEL_NOT_FOUND = \
+        301, _("X: Channel Not Found"), \
+        _("Channel data not found. Register the channel first.")
+    X_CONFIG_NOT_EXISTS = \
+        302, _("X: Config Not Exists"), \
+        _("Specified config field does not exist.")
+    X_CONFIG_TYPE_MISMATCH = \
+        303, _("X: Config Type Mismatch"), \
+        _("The type of the new value does not match the expected type(s) of the config.")
+    X_CONFIG_VALUE_INVALID = \
+        304, _("X: Config Value Invalid"), \
+        _("The new config value is invalid for the corresponding field.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The operation had not been executed.")

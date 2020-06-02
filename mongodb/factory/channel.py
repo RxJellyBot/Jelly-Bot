@@ -8,7 +8,7 @@ from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel, OID_KEY
 from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import (
-    WriteOutcome, GetOutcome, OperationOutcome,
+    WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
 )
 
@@ -28,7 +28,8 @@ class ChannelManager(BaseCollection):
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @arg_type_ensure
-    def ensure_register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
+    def ensure_register(self, platform: Platform, token: str, *, default_name: str = None) \
+            -> ChannelRegistrationResult:
         """
         Register the channel if not yet registered.
 
@@ -61,10 +62,14 @@ class ChannelManager(BaseCollection):
 
     @arg_type_ensure
     def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
-        return self.update_many_outcome(
+        result = self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
+        if result == WriteOutcome.X_NOT_FOUND:
+            return WriteOutcome.X_CHANNEL_NOT_FOUND
+        else:
+            return result
 
     @arg_type_ensure
     def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
@@ -116,13 +121,13 @@ class ChannelManager(BaseCollection):
                 ret = reg_result.model
             else:
                 raise ValueError(
-                    f"Channel registration failed in ChannelManager.get_channel_token. "
+                    f"Channel registration failed in `ChannelManager.get_channel_token`. "
                     f"Platform: {platform} / Token: {token}")
 
         return ret
 
     @arg_type_ensure
-    def get_channel_oid(self, channel_oid: ObjectId, hide_private: bool = False) -> Optional[ChannelModel]:
+    def get_channel_oid(self, channel_oid: ObjectId, *, hide_private: bool = False) -> Optional[ChannelModel]:
         filter_ = {ChannelModel.Id.key: channel_oid}
 
         if hide_private:
@@ -130,7 +135,7 @@ class ChannelManager(BaseCollection):
 
         return self.find_one_casted(filter_, parse_cls=ChannelModel)
 
-    def get_channel_dict(self, channel_oid_list: List[ObjectId], accessbible_only: bool = False) \
+    def get_channel_dict(self, channel_oid_list: List[ObjectId], *, accessbible_only: bool = False) \
             -> Dict[ObjectId, ChannelModel]:
         filter_ = {OID_KEY: {"$in": channel_oid_list}}
 
@@ -141,40 +146,49 @@ class ChannelManager(BaseCollection):
                 in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
 
     @arg_type_ensure
-    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> ExtendedCursor[ChannelModel]:
+    def get_channel_default_name(self, default_name: str, *, hide_private: bool = True) \
+            -> ExtendedCursor[ChannelModel]:
         filter_ = \
-            {
-                f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
-                    {"$regex": default_name, "$options": "i"}
-            }
+            {"$or": [
+                {f"{ChannelModel.Token.key}": {"$regex": default_name, "$options": "i"}},
+                {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                     {"$regex": default_name, "$options": "i"}}
+            ]}
 
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
 
-    # noinspection PyArgumentList
-    @arg_type_ensure
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
-        if not isinstance(platform, Platform):
-            platform = Platform(platform)
-
         model = self.get_channel_token(platform, token)
 
         if model is not None:
             outcome = GetOutcome.O_CACHE_DB
         else:
-            outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
+            outcome = GetOutcome.X_CHANNEL_NOT_FOUND
 
         return ChannelGetResult(outcome, model=model)
 
-    def set_config(self, channel_oid: ObjectId, json_key, config_value) -> bool:
+    def set_config(self, channel_oid: ObjectId, json_key, config_value) -> UpdateOutcome:
         if json_key not in ChannelConfigModel.model_json_keys():
-            raise ValueError(f"Attempt to set value to non-existing field in `ChannelModel`. ({json_key})")
+            return UpdateOutcome.X_CONFIG_NOT_EXISTS
 
-        return self.update_one(
+        fk = ChannelConfigModel.json_key_to_field(json_key)
+        if not getattr(ChannelConfigModel, fk).is_type_matched(config_value):
+            return UpdateOutcome.X_CONFIG_TYPE_MISMATCH
+
+        if not getattr(ChannelConfigModel, fk).is_value_valid(config_value):
+            return UpdateOutcome.X_CONFIG_VALUE_INVALID
+
+        result = self.update_one_outcome(
             {ChannelModel.Id.key: channel_oid},
-            {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
+            {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}})
+
+        if result == UpdateOutcome.X_NOT_FOUND:
+            return UpdateOutcome.X_CHANNEL_NOT_FOUND
+        else:
+            return result
 
 
 class ChannelCollectionManager(BaseCollection):

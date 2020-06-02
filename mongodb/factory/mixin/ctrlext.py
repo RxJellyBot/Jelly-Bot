@@ -10,13 +10,14 @@ from pymongo.errors import DuplicateKeyError
 from extutils.dt import TimeRange
 from extutils.utils import dt_to_objectid
 from models import Model, OID_KEY
-from models.exceptions import InvalidModelError, InvalidModelFieldError, RequiredKeyNotFilledError, \
-    FieldKeyNotExistError
+from models.exceptions import (
+    InvalidModelError, InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
+)
 from models.field.exceptions import (
     FieldReadOnlyError, FieldTypeMismatchError, FieldValueInvalidError, FieldCastingFailedError
 )
 from mongodb.utils import ExtendedCursor
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import WriteOutcome, UpdateOutcome
 
 T = TypeVar('T', bound=Model)
 
@@ -164,6 +165,19 @@ class ControlExtensionMixin(Collection):
             raise ex
 
         return model, outcome, ex
+
+    def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> UpdateOutcome:
+        update_result = self.update_one(filter_, update, upsert=upsert, collation=collation)
+
+        if update_result.matched_count > 0:
+            if update_result.modified_count > 0:
+                outcome = UpdateOutcome.O_UPDATED
+            else:
+                outcome = UpdateOutcome.O_FOUND
+        else:
+            outcome = UpdateOutcome.X_NOT_FOUND
+
+        return outcome
 
     def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
         update_result = self.update_many(filter_, update, upsert=upsert, collation=collation)

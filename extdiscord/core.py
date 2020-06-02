@@ -71,7 +71,7 @@ class DiscordClient(Client):
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_create(self, channel: Union[DMChannel, GroupChannel]):
         """Contains the code to be executed when a private channel is created."""
-        if not ChannelManager.ensure_register(Platform.DISCORD, channel.id, str(channel)).success:
+        if not ChannelManager.ensure_register(Platform.DISCORD, channel.id, default_name=str(channel)).success:
             warn_txt = f"Private Channel CREATED but the registration was failed. Channel token: {channel.id}"
             DISCORD.logger.warning(warn_txt)
             MailSender.send_email_async(warn_txt, subject="Discord private channel creation failed")
@@ -99,7 +99,8 @@ class DiscordClient(Client):
     async def on_guild_channel_create(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
         """Contains the code to be executed when a channel of a Discord server is created."""
         if channel.type == ChannelType.text:
-            reg_result = ChannelManager.ensure_register(Platform.DISCORD, channel.id, channel_full_repr(channel))
+            reg_result = ChannelManager.ensure_register(Platform.DISCORD, channel.id,
+                                                        default_name=channel_full_repr(channel))
 
             if not reg_result.success:
                 warn_txt = f"Guild Channel CREATED but the registration was failed. Channel token: {channel.id}"
@@ -107,7 +108,7 @@ class DiscordClient(Client):
                 MailSender.send_email_async(warn_txt, subject="Discord guild channel creation failed")
 
             if not ChannelCollectionManager.ensure_register(
-                    Platform.DISCORD, channel.guild.id, reg_result.model.id, str(channel.guild)).success:
+                    Platform.DISCORD, channel.guild.id, reg_result.model.id, default_name=str(channel.guild)).success:
                 warn_txt = f"Guild Channel CREATED but the collection registration was failed. " \
                            f"Channel token: {channel.id}"
                 DISCORD.logger.warning(warn_txt)

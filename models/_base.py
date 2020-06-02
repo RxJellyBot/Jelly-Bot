@@ -176,15 +176,28 @@ class Model(MutableMapping, abc.ABC):
 
     def __eq__(self, other):
         if isinstance(other, Model):
-            # noinspection PyProtectedMember
-            return self._dict_ == other._dict_ and type(self) == type(other)
+            return self.to_json() == other.to_json() and type(self) == type(other)
         elif isinstance(other, MutableMapping):
             return self.to_json() == other
         else:
             return False
 
     def __hash__(self):
-        return super().__hash__()
+        d = self.to_json()
+
+        hash_list = []
+
+        for k, v in d.items():
+            if isinstance(v, list):
+                v = tuple(v)
+            elif isinstance(v, dict):
+                v = tuple(v.items())
+            elif isinstance(v, Model):
+                v = hash(v)
+
+            hash_list.append((k, v))
+
+        return hash(tuple(hash_list))
 
     def _input_kwargs(self, **kwargs):
         for k, v in kwargs.items():
