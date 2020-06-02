@@ -14,6 +14,10 @@ __all__ = ["TestChannelManager"]
 class TestChannelManager(TestModelMixin, TestDatabaseMixin):
     inst = None
 
+    @classmethod
+    def setUpTestClass(cls):
+        cls.inst = ChannelManager()
+
     def _add_channels(self) -> Dict[ObjectId, ChannelModel]:
         oids = {}
 
@@ -58,10 +62,6 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
     @staticmethod
     def _match_default_name_criteria(w: str, mdl: ChannelModel):
         return w in mdl.token or (mdl.config.default_name and w in mdl.config.default_name)
-
-    @classmethod
-    def setUpTestClass(cls):
-        cls.inst = ChannelManager()
 
     def test_register_new(self):
         result = self.inst.ensure_register(Platform.LINE, "U1234567")
