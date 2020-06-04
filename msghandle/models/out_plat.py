@@ -12,17 +12,10 @@ from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
 from JellyBot.systemconfig import PlatformConfig
 from mongodb.factory import ExtraContentManager
+from strnames.msghandle import ToSiteReason
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder, HandledMessageEvent, \
     HandledMessageEventText
-
-
-class ToSiteReason:
-    TOO_LONG = _("Message length overlimit")
-    TOO_MANY_RESPONSES = _("Responses length overlimit")
-    TOO_MANY_LINES = _("Too many lines")
-    LATEX_AVAILABLE = _("LaTeX available")
-    FORCED_ONSITE = _("Content was forced to be displayed on the website")
 
 
 class HandledEventsHolderPlatform:
@@ -38,9 +31,8 @@ class HandledEventsHolderPlatform:
 
         if len(self.to_site) > 0:
             rec_result = ExtraContentManager.record_extra_message(
-                self.to_site,
-                datetime.now(tz=timezone.utc).strftime("%m-%d %H:%M:%S UTC%z"),
-                channel_oid=holder.channel_model.id)
+                holder.channel_model.id, self.to_site,
+                datetime.now(tz=timezone.utc).strftime("%m-%d %H:%M:%S UTC%z"))
 
             if rec_result.success:
                 self.to_send.append(

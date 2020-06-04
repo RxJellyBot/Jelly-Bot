@@ -160,7 +160,7 @@ class TestArModuleSample(ABC):
 
             Tag #: ``2``
 
-            Cooldown: ``3``
+            Cooldown: ``1``
             """
             keyword = AutoReplyContentModel(Content="A", ContentType=AutoReplyContentType.TEXT)
             responses = [AutoReplyContentModel(Content="D", ContentType=AutoReplyContentType.TEXT)]
@@ -169,7 +169,7 @@ class TestArModuleSample(ABC):
             pinned = False
             private = True
             tag_ids = [ObjectId(), ObjectId()]
-            cooldown = 3
+            cooldown = 1
 
             return {
                 "Keyword": keyword, "Responses": responses, "ChannelOid": channel_oid, "CreatorOid": creator_oid,

@@ -57,7 +57,8 @@ class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManager
         self.inst.add_conn(**self.get_mdl_3_args())
         # Call once to record last used time
         self.inst.get_conn(
-            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid)
+            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
+            update_count_async=False)
 
         self.assertIsNone(
             self.inst.get_conn(
@@ -69,7 +70,7 @@ class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManager
         self.inst.get_conn(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid)
 
-        time.sleep(3.3)  # Cooldown of model #3 is 3 sec
+        time.sleep(1.1)  # Cooldown of model #3 is 1 sec
         self.assertIsNotNone(
             self.inst.get_conn(
                 self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid))
