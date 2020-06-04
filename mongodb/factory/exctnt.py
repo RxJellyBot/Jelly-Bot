@@ -6,6 +6,7 @@ from JellyBot.systemconfig import Database
 from flags import ExtraContentType
 from models import ExtraContentModel, OID_KEY
 from mongodb.factory.results import RecordExtraContentResult, WriteOutcome
+from extutils.dt import now_utc_aware
 from extutils.checker import arg_type_ensure
 from extutils.utils import cast_iterable
 
@@ -55,7 +56,7 @@ class ExtraContentManager(BaseCollection):
             return RecordExtraContentResult(WriteOutcome.X_EMPTY_CONTENT)
 
         model, outcome, ex = self.insert_one_data(
-            Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow(), ChannelOid=channel_oid)
+            Type=type_, Title=title, Content=content, Timestamp=now_utc_aware(for_mongo=True), ChannelOid=channel_oid)
 
         return RecordExtraContentResult(outcome, ex, model)
 

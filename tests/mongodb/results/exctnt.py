@@ -13,6 +13,7 @@ __all__ = ["TestRecordExtraContentResult"]
 
 
 class TestRecordExtraContentResult(TestOnModelResult.TestClass):
+    COID = ObjectId()
     TS = datetime.utcnow()
 
     @classmethod
@@ -21,11 +22,12 @@ class TestRecordExtraContentResult(TestOnModelResult.TestClass):
 
     @classmethod
     def get_constructed_model(cls) -> Model:
-        return ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS)
+        return ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS,
+                                 ChannelOid=TestRecordExtraContentResult.COID)
 
     def test_get_model_id(self):
         oid = ObjectId()
-        mdl = ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS)
+        mdl = ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS, ChannelOid=ObjectId())
         mdl.set_oid(oid)
         r = RecordExtraContentResult(WriteOutcome.O_INSERTED, model=mdl)
         self.assertEqual(r.model_id, oid)
@@ -35,7 +37,7 @@ class TestRecordExtraContentResult(TestOnModelResult.TestClass):
 
     def test_get_url(self):
         oid = ObjectId()
-        mdl = ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS)
+        mdl = ExtraContentModel(Content="AAAAA", Timestamp=TestRecordExtraContentResult.TS, ChannelOid=ObjectId())
         mdl.set_oid(oid)
         r = RecordExtraContentResult(WriteOutcome.O_INSERTED, model=mdl)
         self.assertEqual(r.url, f'{HostUrl}{reverse("page.extra", kwargs={"page_id": str(oid)})}')

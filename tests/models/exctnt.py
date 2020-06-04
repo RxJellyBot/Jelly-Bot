@@ -30,14 +30,14 @@ class TestExtraContentModel(TestModel.TestClass):
     def get_optional(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("t", "Title"): "Head",
-            ("ch", "ChannelOid"): TestExtraContentModel.CHANNEL_OID,
         }
 
     @classmethod
     def get_required(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("c", "Content"): "ABCD",
-            ("e", "Timestamp"): TestExtraContentModel.TIMESTAMP
+            ("e", "Timestamp"): TestExtraContentModel.TIMESTAMP,
+            ("ch", "ChannelOid"): TestExtraContentModel.CHANNEL_OID
         }
 
     def test_expiry(self):

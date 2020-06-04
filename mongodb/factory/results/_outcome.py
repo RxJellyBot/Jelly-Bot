@@ -62,6 +62,8 @@ class WriteOutcome(BaseOutcome):
 
         113 - (Channel) Default profile creation failed
 
+        114 - Empty content
+
     2xx - Problems related to the model
         201 - Not Serializable
 
@@ -162,8 +164,11 @@ class WriteOutcome(BaseOutcome):
         112, _("X: (Auto Reply) Invalid Response"), \
         _("One or more of the responses contains invalid content.")
     X_CNL_DEFAULT_CREATE_FAILED = \
-        112, _("X: (Channel) Default Profile Creation Failed"), \
+        113, _("X: (Channel) Default Profile Creation Failed"), \
         _("Failed to create a default profile for the channel.")
+    X_EMPTY_CONTENT = \
+        114, _("X: Empty Content"), \
+        _("The content to be stored is empty.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")

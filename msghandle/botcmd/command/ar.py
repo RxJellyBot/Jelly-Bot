@@ -259,10 +259,9 @@ def auto_reply_module_detail(e: TextMessageEventObject, keyword: str):
 
     if not conn_list.empty:
         result = ExtraContentManager.record_content(
-            ExtraContentType.AUTO_REPLY_SEARCH, [module.id for module in conn_list],
+            ExtraContentType.AUTO_REPLY_SEARCH, e.channel_oid, [module.id for module in conn_list],
             _("Auto-Reply module with keyword {} in {}").format(
-                keyword, e.channel_model.get_channel_name(e.user_model.id)),
-            channel_oid=e.channel_oid)
+                keyword, e.channel_model.get_channel_name(e.user_model.id)))
 
         if result.success:
             content = _("Visit {} to see the result.").format(result.url)

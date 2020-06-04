@@ -9,8 +9,36 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-def now_utc_aware():
-    return datetime.utcnow().replace(tzinfo=pytz.UTC)
+def now_utc_aware(*, for_mongo: bool = False) -> datetime:
+    """
+    Return the current tz-aware :class:`datetime` with its timezone set to :class:`pytz.UTC`.
+
+    -----
+
+    If ``for_mongo`` is ``True``, the precision will be decreased to 1ms. if not, then it will be 1us.
+
+    MongoDB only records time with 1ms precision.
+    Setting ``for_mongo`` appropriately can eliminate the false negative of the tests.
+
+    Step flow that have a great chance to cause false inequality:
+
+    - Create a model with current timestamp
+
+    - Store that model to the database
+
+    - Get that model from the database
+
+    At 1 and 2, the datetime may looks like ``...:52.300125``, but at 3, the acquire model will be ``...:52.300``.
+
+    :param for_mongo: if this timestamp will be used as a data field of a MongoDB entry
+    :return: current tz-aware datetime with timezone set to UTC
+    """
+    dt = datetime.utcnow().replace(tzinfo=pytz.UTC)
+
+    if for_mongo:
+        dt = dt.replace(microsecond=dt.microsecond // 1000 * 1000)
+
+    return dt
 
 
 def localtime(dt: datetime = None, tz: timezone = None):
