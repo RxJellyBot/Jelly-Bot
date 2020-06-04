@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Optional, Any
+from typing import Optional, Any, List, Tuple
 
 from bson import ObjectId
 
@@ -27,24 +26,33 @@ class ExtraContentManager(BaseCollection):
         self.create_index(ExtraContentModel.Timestamp.key,
                           expireAfterSeconds=Database.ExtraContentExpirySeconds, name="Timestamp")
 
-    def record_extra_message(self, content: list, title: str = None, channel_oid: ObjectId = None):
+    def record_extra_message(self, channel_oid: ObjectId, content: List[Tuple[str, str]], title: str = None) \
+            -> RecordExtraContentResult:
         """
-        :param content: [(<REASON>, <MESSAGE_CONTENT>), (<REASON>, <MESSAGE_CONTENT>)...]
-        :param title: Title of the extra message.
+        Record an extra message.
+
+        The 1st element of the content being passed in is
+        the text reason of why the message is being recorded as an extra message.
+
+        The 2nd element of the content being passed in is
+        the message content.
+
         :param channel_oid: channel oid of this extra message
+        :param content: message content to be recorded along with the reason
+        :param title: title of the extra message
         """
         content = cast_iterable(content, str)
 
-        return self.record_content(ExtraContentType.EXTRA_MESSAGE, content, title, channel_oid)
+        return self.record_content(ExtraContentType.EXTRA_MESSAGE, channel_oid, content, title)
 
     def record_content(
-            self, type_: ExtraContentType, content: Any, title: str = None, channel_oid: ObjectId = None) \
+            self, type_: ExtraContentType, channel_oid: ObjectId, content: Any, title: str = None) \
             -> RecordExtraContentResult:
         if not title:
             title = ExtraContentManager.DefaultTitle
 
         if not content:
-            return RecordExtraContentResult(WriteOutcome.X_NOT_EXECUTED)
+            return RecordExtraContentResult(WriteOutcome.X_EMPTY_CONTENT)
 
         model, outcome, ex = self.insert_one_data(
             Type=type_, Title=title, Content=content, Timestamp=datetime.utcnow(), ChannelOid=channel_oid)
