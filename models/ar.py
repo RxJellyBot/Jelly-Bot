@@ -169,6 +169,8 @@ class AutoReplyModuleModel(Model):
 
 
 class AutoReplyModuleExecodeModel(Model):
+    WITH_OID = False
+
     Keyword = ModelField(AutoReplyModuleModel.key_kw, AutoReplyContentModel,
                          default=ModelDefaultValueExt.Required)
     Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,

@@ -1,8 +1,12 @@
+from bson import ObjectId
+from bson.errors import InvalidId
+
 from flags import Platform, ExecodeCollationFailedReason, ExecodeCompletionOutcome, Execode
 from JellyBot.api.static import param
 from models import ExecodeEntryModel, AutoReplyModuleModel
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
+from mongodb.factory.results import OperationOutcome
 from mongodb.helper import UserDataIntegrationHelper
 
 __all__ = ["ExecodeCompletor", "ExecodeParameterCollator", "ExecodeRequiredKeys"]
@@ -44,32 +48,37 @@ class ExecodeCompletor:
     @staticmethod
     def _excde_register_channel(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         try:
-            channel_data = ChannelManager.ensure_register(
+            reg_result = ChannelManager.ensure_register(
                 xparams[param.Execode.PLATFORM], xparams[param.Execode.CHANNEL_TOKEN])
         except Exception:
             return ExecodeCompletionOutcome.X_IDT_CHANNEL_ERROR
 
-        if channel_data:
+        if reg_result.success:
             try:
-                ProfileManager.register_new_default(channel_data.model.id, action_model.creator_oid)
+                ProfileManager.register_new_default(reg_result.model.id, action_model.creator_oid)
             except Exception:
                 return ExecodeCompletionOutcome.X_IDT_REGISTER_DEFAULT_PROFILE
         else:
-            return ExecodeCompletionOutcome.X_IDT_CHANNEL_NOT_FOUND
+            return ExecodeCompletionOutcome.X_IDT_CHANNEL_ENSURE_FAILED
 
         return ExecodeCompletionOutcome.O_OK
 
     @staticmethod
     def _excde_user_data_integration(action_model: ExecodeEntryModel, xparams: dict) -> ExecodeCompletionOutcome:
         try:
-            # `xparams` is casted from QueryDict, so get the value using [0]
-            success = UserDataIntegrationHelper.integrate(
-                action_model.creator_oid, xparams.get(param.Execode.USER_OID)[0])
+            result = UserDataIntegrationHelper.integrate(action_model.creator_oid, xparams[param.Execode.USER_OID])
         except Exception:
             return ExecodeCompletionOutcome.X_IDT_INTEGRATION_ERROR
 
-        if not success:
-            return ExecodeCompletionOutcome.X_IDT_INTEGRATION_FAILED
+        if not result.is_success:
+            if result == OperationOutcome.X_SRC_DATA_NOT_FOUND:
+                return ExecodeCompletionOutcome.X_IDT_SOURCE_NOT_FOUND
+            elif result == OperationOutcome.X_DEST_DATA_NOT_FOUND:
+                return ExecodeCompletionOutcome.X_IDT_TARGET_NOT_FOUND
+            elif result == OperationOutcome.X_SAME_SRC_DEST:
+                return ExecodeCompletionOutcome.X_IDT_SOURCE_EQ_TARGET
+            else:
+                return ExecodeCompletionOutcome.X_IDT_INTEGRATION_FAILED
 
         return ExecodeCompletionOutcome.O_OK
 
@@ -81,10 +90,11 @@ class ExecodeParameterCollator:
             return ExecodeParameterCollator._execode_ar_add(action, xparams)
         elif action == Execode.REGISTER_CHANNEL:
             return ExecodeParameterCollator._execode_conn_channel(xparams)
+        elif action == Execode.INTEGRATE_USER_DATA:
+            return ExecodeParameterCollator._execode_user_integrate(action, xparams)
         else:
             return xparams
 
-    # noinspection PyArgumentList
     @staticmethod
     def _execode_ar_add(action: Execode, xparams: dict) -> dict:
         k = param.AutoReply.PLATFORM
@@ -92,7 +102,9 @@ class ExecodeParameterCollator:
             raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.EMPTY_CONTENT)
         else:
             try:
-                xparams[k] = Platform(int(xparams[k][0]))
+                xparams[k] = Platform.cast(xparams[k][0])
+            except KeyError as e:
+                raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.MISSING_KEY, e)
             except Exception as e:
                 raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.MISC, e)
 
@@ -101,16 +113,30 @@ class ExecodeParameterCollator:
 
         return xparams
 
-    # noinspection PyArgumentList
     @staticmethod
     def _execode_conn_channel(xparams: dict) -> dict:
         return {k: v[0] if isinstance(v, list) else v for k, v in xparams.items()}
+
+    @staticmethod
+    def _execode_user_integrate(action: Execode, xparams: dict) -> dict:
+        k = param.Execode.USER_OID
+
+        try:
+            xparams[k] = ObjectId(xparams[k])
+        except InvalidId as e:
+            raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.OBJECT_ID_INVALID, e)
+        except KeyError as e:
+            raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.MISSING_KEY, e)
+        except Exception as e:
+            raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.MISC, e)
+
+        return xparams
 
 
 class ExecodeRequiredKeys:
     @staticmethod
     def get_required_keys(execode_type: Execode) -> set:
-        st = {param.Execode.EXECODE}
+        st = set()
 
         if execode_type == Execode.AR_ADD:
             st.add(param.AutoReply.CHANNEL_TOKEN)

@@ -26,7 +26,7 @@ class ExecodeCompleteApiResponse(SerializeErrorMixin, SerializeResultExtraMixin,
 
     def _handle_action_type(self):
         if self._action_type:
-            self._action_type = Execode.cast(int(self._action_type))
+            self._action_type = Execode.cast(self._action_type)
 
     def pre_process(self):
         self._handle_execode()

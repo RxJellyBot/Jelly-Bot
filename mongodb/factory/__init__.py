@@ -33,8 +33,4 @@ from .mixin import GenerateTokenMixin, ControlExtensionMixin
 
 
 def get_collection_subclasses():
-    return BaseCollection.__subclasses__()
-
-
-def is_base_collection(o: object):
-    return isinstance(o, BaseCollection)
+    return [cls for cls in BaseCollection.__subclasses__() if cls.__module__.split(".")[:2] == ["mongodb", "factory"]]

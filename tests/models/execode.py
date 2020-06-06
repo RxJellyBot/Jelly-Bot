@@ -32,7 +32,7 @@ class TestExecodeEntryModel(TestModel.TestClass):
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {
-            ("d", "Data"): (None, {"A": "B"})
+            ("d", "Data"): ({}, {"A": "B"})
         }
 
     def test_expiry(self):

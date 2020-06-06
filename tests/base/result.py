@@ -13,38 +13,62 @@ class _TestResult(ABC, TestCase):
     @classmethod
     @abstractmethod
     def get_result_class(cls):
+        """Class of the result to be tested."""
         raise NotImplementedError()
 
     @classmethod
     @final
     def get_result(cls, *args):
+        """Get the construted result instance, which the outcome is success."""
         return cls.get_result_class()(
             WriteOutcome.O_DATA_EXISTS, None, *args, *cls.result_args_all_no_error())
 
     @classmethod
     @final
     def get_result_has_error(cls, *args):
+        """Get the construted result instance, which the outcome is failed."""
         return cls.get_result_class()(
             WriteOutcome.X_NOT_EXECUTED, ValueError("Test error"), *args, *cls.result_args_all_has_error())
 
     @classmethod
     def result_args_all_no_error(cls) -> Tuple[Any, ...]:
+        """
+        Arguments to construct a success result instance excluding ``outcome`` and ``exception``.
+
+        This will be directly called to construct a result instance.
+        """
         return cls.result_args_no_error()
 
     @classmethod
     def result_args_no_error(cls) -> Tuple[Any, ...]:
+        """
+        Additional arguments to construct a success result instance excluding ``outcome`` and ``exception``.
+        """
         return ()
 
     @classmethod
     def result_args_all_has_error(cls) -> Tuple[Any, ...]:
+        """
+        Arguments to construct a failed result instance excluding ``outcome`` and ``exception``.
+
+        This will be directly called to construct a result instance.
+        """
         return cls.result_args_has_error()
 
     @classmethod
     def result_args_has_error(cls) -> Tuple[Any, ...]:
+        """
+        Additional arguments to construct a failed result instance excluding ``outcome`` and ``exception``.
+        """
         return ()
 
     @classmethod
-    def default_serialized(cls):
+    def default_serialized(cls) -> dict:
+        """
+        Get the expected serialized successful result.
+
+        :return: expected serialized successful result
+        """
         return {
             result.Results.EXCEPTION: "None",
             result.Results.OUTCOME: -101
@@ -52,6 +76,11 @@ class _TestResult(ABC, TestCase):
 
     @classmethod
     def default_serialized_error(cls):
+        """
+        Get the expected serialized failing result.
+
+        :return: expected serialized failing result
+        """
         return {
             result.Results.EXCEPTION: "ValueError('Test error')",
             result.Results.OUTCOME: 901
@@ -94,13 +123,16 @@ class TestOnModelResult(ABC):
         @classmethod
         @abstractmethod
         def get_constructed_model(cls) -> Model:
+            """A constructed model to be put into the successful result."""
             raise NotImplementedError()
 
         @classmethod
+        @final
         def result_args_all_no_error(cls) -> Tuple[Any, ...]:
             return (cls.get_constructed_model(),) + cls.result_args_no_error()
 
         @classmethod
+        @final
         def result_args_all_has_error(cls) -> Tuple[Any, ...]:
             return (None,) + cls.result_args_has_error()
 
