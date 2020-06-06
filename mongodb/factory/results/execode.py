@@ -6,16 +6,19 @@ from JellyBot.api.static import result
 from flags import ExecodeCompletionOutcome
 from models import ExecodeEntryModel
 
-from ._base import BaseResult, ModelResult
+from ._base import ModelResult
 
 
 @dataclass
-class EnqueueExecodeResult(BaseResult):
-    execode: str
-    expiry: datetime
+class EnqueueExecodeResult(ModelResult):
+    exception: Optional[Exception] = None
+    model: Optional[ExecodeEntryModel] = None
+    execode: Optional[str] = None
+    expiry: Optional[datetime] = None
 
     def serialize(self) -> dict:
         d = super().serialize()
+
         d.update(**{result.ExecodeResponse.EXECODE: self.execode,
                     result.ExecodeResponse.EXPIRY: self.expiry})
         return d

@@ -15,8 +15,10 @@ class ExecodeEntryModel(Model):
                         regex=fr"\w{{{EXECODE_LENGTH}}}", must_have_content=True)
     ActionType = ExecodeField("a", default=ModelDefaultValueExt.Required)
     Timestamp = DateTimeField("t", default=ModelDefaultValueExt.Required)
-    Data = DictionaryField("d", allow_none=True)
+    Data = DictionaryField("d")
 
     @property
     def expire_time(self) -> Optional[datetime]:
         return localtime(self.timestamp) + timedelta(seconds=systemconfig.Database.ExecodeExpirySeconds)
+
+    # TODO: action type and data match (prevalidate and a method to get the data)

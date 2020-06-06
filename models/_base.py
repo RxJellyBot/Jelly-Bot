@@ -517,7 +517,7 @@ class Model(MutableMapping, abc.ABC):
         for k in cls.model_field_keys():
             fd: BaseField = getattr(cls, k, None)
             if fd and fd.stores_uid:
-                result = fd.replace_uid(col, old, new)
+                result = fd.replace_uid(col, old, new)  # TODO: New session, reverse on failed?
                 if not result:
                     failed_names.append(fd.__class__.__qualname__)
 

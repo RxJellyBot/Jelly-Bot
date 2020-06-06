@@ -64,6 +64,8 @@ class WriteOutcome(BaseOutcome):
 
         114 - Empty content
 
+        115 - (Execode) Unknown Action
+
     2xx - Problems related to the model
         201 - Not Serializable
 
@@ -99,6 +101,8 @@ class WriteOutcome(BaseOutcome):
 
     5ss - Problems related to intermediate process
         501 - Channel not found
+
+        502 - Model class not provided
 
     8xx - Unknown Problems
         801 - Model Construction Unknown
@@ -169,6 +173,9 @@ class WriteOutcome(BaseOutcome):
     X_EMPTY_CONTENT = \
         114, _("X: Empty Content"), \
         _("The content to be stored is empty.")
+    X_ACTION_UNKNOWN = \
+        115, _("X: (Execode) Unknown Action"), \
+        _("The action type of the Execode is unknown.")
     X_NOT_SERIALIZABLE = \
         201, _("X: Not Serializable"), \
         _("The processed data cannot be serialized.")
@@ -217,6 +224,9 @@ class WriteOutcome(BaseOutcome):
     X_CHANNEL_NOT_FOUND = \
         501, _("X: Channel Not Found"), \
         _("Channel data not found. Register the channel first.")
+    X_NO_MODEL_CLASS = \
+        502, _("X: No model class"), \
+        _("Model class not provided.")
     X_CONSTRUCT_UNKNOWN = \
         801, _("X: Model Construction Unknown"), \
         _("An unknown occurred during the construction of a data model.")
@@ -306,8 +316,8 @@ class GetOutcome(BaseOutcome):
     X_DEFAULT_PROFILE_ERROR = \
         303, _("X: Default Profile Error"), \
         _("An error occurred when creating a default profile.")
-    X_EXECODE_TYPE_INCORRECT = \
-        311, _("X: Incorrect Execode type"), \
+    X_EXECODE_TYPE_MISMATCH = \
+        311, _("X: Execode Type Mismatch"), \
         _("The type of the given Execode doesn't match the desired one.")
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
@@ -326,12 +336,19 @@ class OperationOutcome(BaseOutcome):
 
     1xx - Problems related to Execode
         101 - Execode Not Found
-        102 - Keys Lacking
+
+        102 - Args Lacking
+
         103 - Completion Failed
+
         104 - Completion Process not Implemented
+
         105 - Completion Error
+
         106 - Empty Execode
+
         107 - Collation Error
+
         108 - Type Mismatch
 
     2xx - Problems related to Channel
@@ -339,15 +356,22 @@ class OperationOutcome(BaseOutcome):
 
     3xx - Problems related to User Data
         301 - Source is identical to destination
+
         302 - Source user data not found
+
         303 - Destination user data not found
 
     4xx - Problems related to Permission Control
         401 - Insufficient permission
+
         402 - Cannot be attached
+
         403 - Profile not found with the name
+
         404 - No attachable profiles
+
         405 - Target not in channel
+
         406 - Detach failed
 
     5xx - Problems related to Model
@@ -355,8 +379,13 @@ class OperationOutcome(BaseOutcome):
 
     9xx - Problems related to execution
         901 - Not executed
+
         902 - Not updated
+
         903 - not deleted
+
+        904 - User integration failed
+
         999 - Error
     """
     @property
@@ -373,9 +402,9 @@ class OperationOutcome(BaseOutcome):
     X_EXECODE_NOT_FOUND = \
         101, _("X: Execode Not Found"), \
         _("No enqueued Execode found.")
-    X_KEYS_LACKING = \
-        102, _("X: Keys Lacking"), \
-        _("There are keys lacking so that the Execode cannot be completed.")
+    X_ARGS_LACKING = \
+        102, _("X: Args Lacking"), \
+        _("Missing required arguments to complete the action.")
     X_COMPLETION_FAILED = \
         103, _("X: Completion Failed"), \
         _("The action completion was failed.")
@@ -425,17 +454,20 @@ class OperationOutcome(BaseOutcome):
         406, _("X: Detach failed"), \
         _("Failed to detach the profile from the target.")
     X_CONSTRUCTION_ERROR = \
-        501, _("X: Construction Error"), \
+        501, _("X: Construction error"), \
         _("An error occurred during model construction.")
     X_NOT_EXECUTED = \
-        901, _("X: Not Executed"), \
+        901, _("X: Not executed"), \
         _("The operation had not been executed.")
     X_NOT_UPDATED = \
-        902, _("X: Not Updated"), \
+        902, _("X: Not updated"), \
         _("Update operation not performed.")
     X_NOT_DELETED = \
-        903, _("X: Not Deleted"), \
+        903, _("X: Not deleted"), \
         _("Delete operation not performed.")
+    X_INTEGRATION_FAILED = \
+        904, _("X: User integration failed"), \
+        _("User integration ID replacement process failed.")
     X_ERROR = \
         999, _("X: Error"), \
         _("An error has occurred during the process execution.")

@@ -10,7 +10,7 @@ from mongodb.factory.results import (
     BaseResult, ModelResult, OperationOutcome,
     EnqueueExecodeResult, GetExecodeEntryResult, CompleteExecodeResult
 )
-from tests.base import TestOnModelResult, TestOnBaseResult
+from tests.base import TestOnModelResult
 
 __all__ = ["TestEnqueueExecodeResult", "TestGetExecodeEntryResult", "TestCompleteExecodeResult"]
 
@@ -18,12 +18,16 @@ mdl = ExecodeEntryModel(Execode="ABCDEFGHIJ", CreatorOid=ObjectId(),
                         ActionType=Execode.AR_ADD, Timestamp=datetime.utcnow())
 
 
-class TestEnqueueExecodeResult(TestOnBaseResult.TestClass):
+class TestEnqueueExecodeResult(TestOnModelResult.TestClass):
     EXPIRY = datetime.utcnow()
 
     @classmethod
     def get_result_class(cls) -> Type[BaseResult]:
         return EnqueueExecodeResult
+
+    @classmethod
+    def get_constructed_model(cls) -> Model:
+        return mdl
 
     @classmethod
     def result_args_no_error(cls) -> Tuple[Any, ...]:

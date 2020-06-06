@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Type, Optional, Tuple
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from flags import Execode, ExecodeCompletionOutcome
 from mongodb.factory.results import (
     EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult,
@@ -12,6 +13,7 @@ from models import ExecodeEntryModel, Model
 from models.exceptions import ModelConstructionError
 from mongodb.utils import ExtendedCursor
 from mongodb.helper import ExecodeRequiredKeys, ExecodeCompletor
+from mongodb.factory.results import WriteOutcome
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from JellyBot.systemconfig import Database
 
@@ -39,27 +41,43 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
     def enqueue_execode(
             self, root_uid: ObjectId, execode_type: Execode, data_cls: Type[Model] = None, **data_kw_args) -> \
             EnqueueExecodeResult:
+        """
+        Enqueue an Execode action.
+
+        :param root_uid: user to execute the enqueued Execode
+        :param execode_type: type of the execode
+        :param data_cls: model class of the additional data class
+        :param data_kw_args: arguments to construct the model
+        :return: enqueuing result
+        """
         execode = self.generate_hex_token()
-        now = datetime.utcnow()
+        now = now_utc_aware(for_mongo=True)
 
-        if data_cls is not None:
-            data = data_cls(**data_kw_args)
+        if not data_cls and data_kw_args:
+            return EnqueueExecodeResult(WriteOutcome.X_NO_MODEL_CLASS)
+
+        if data_cls:
+            try:
+                data = data_cls(**data_kw_args).to_json()
+            except ModelConstructionError as ex:
+                return EnqueueExecodeResult(WriteOutcome.X_INVALID_MODEL, ex)
         else:
-            data = data_kw_args
+            data = {}
 
-        entry, outcome, ex = self.insert_one_data(
+        if execode_type == Execode.UNKNOWN:
+            return EnqueueExecodeResult(WriteOutcome.X_ACTION_UNKNOWN)
+
+        model, outcome, ex = self.insert_one_data(
             CreatorOid=root_uid, Execode=execode, ActionType=execode_type, Timestamp=now, Data=data)
 
-        return EnqueueExecodeResult(outcome, ex, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds))
+        return EnqueueExecodeResult(
+            outcome, ex, model, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds))
 
     def get_queued_execodes(self, root_uid: ObjectId) -> ExtendedCursor[ExecodeEntryModel]:
         filter_ = {ExecodeEntryModel.CreatorOid.key: root_uid}
         return ExtendedCursor(self.find(filter_), self.count_documents(filter_), parse_cls=ExecodeEntryModel)
 
-    def clear_all_execodes(self, root_uid: ObjectId):
-        self.delete_many({ExecodeEntryModel.CreatorOid.key: root_uid})
-
-    def get_execode_entry(self, execode: str, action: Execode) -> GetExecodeEntryResult:
+    def get_execode_entry(self, execode: str, action: Optional[Execode] = None) -> GetExecodeEntryResult:
         cond = {ExecodeEntryModel.Execode.key: execode}
 
         if action:
@@ -71,7 +89,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
             return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, model=ret)
         else:
             if self.count_documents({ExecodeEntryModel.Execode.key: execode}) > 0:
-                return GetExecodeEntryResult(GetOutcome.X_EXECODE_TYPE_INCORRECT)
+                return GetExecodeEntryResult(GetOutcome.X_EXECODE_TYPE_MISMATCH)
             else:
                 return GetExecodeEntryResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT)
 
@@ -80,7 +98,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
 
     def _attempt_complete_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: dict) \
             -> Tuple[OperationOutcome, Optional[ExecodeCompletionOutcome], Optional[Exception]]:
-        cmpl_outcome = None
+        cmpl_outcome = ExecodeCompletionOutcome.X_NOT_EXECUTED
         ex = None
 
         try:
@@ -103,19 +121,18 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
 
         return outcome, cmpl_outcome, ex
 
-    def complete_execode(self, execode: str, execode_kwargs: dict, action: Execode = None) -> CompleteExecodeResult:
+    def complete_execode(self, execode: str, execode_kwargs: dict, action: Optional[Execode] = None) \
+            -> CompleteExecodeResult:
         """
         Finalize the pending Execode.
 
-        :param execode: The Execode.
-        :param execode_kwargs: Arguments for completing the Execode. Could carry more data than the required keys
-            of the type of the execode to be completed.
-        :param action: Execode action type
+        :param execode: execode of the action to be completed
+        :param execode_kwargs: arguments may be needed to complete the Execode action
+        :param action: type of the Execode action
         """
         lacking_keys = set()
         ex = None
         tk_model: Optional[ExecodeEntryModel] = None
-        cmpl_outcome = None
 
         # Force type to be dict because the type of `execode_kwargs` might be django QueryDict
         if type(execode_kwargs) != dict:
@@ -138,14 +155,18 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
                 if len(lacking_keys) == 0:
                     outcome, cmpl_outcome, ex = self._attempt_complete_complete(execode, tk_model, execode_kwargs)
                 else:
-                    outcome = OperationOutcome.X_KEYS_LACKING
+                    outcome = OperationOutcome.X_ARGS_LACKING
+                    cmpl_outcome = ExecodeCompletionOutcome.X_ARGS_LACKING
             except ModelConstructionError as e:
                 outcome = OperationOutcome.X_CONSTRUCTION_ERROR
+                cmpl_outcome = ExecodeCompletionOutcome.X_MODEL_CONSTRUCTION
                 ex = e
         else:
+            cmpl_outcome = ExecodeCompletionOutcome.X_EXECODE_NOT_FOUND
+
             if get_execode.outcome == GetOutcome.X_NOT_FOUND_ABORTED_INSERT:
                 outcome = OperationOutcome.X_EXECODE_NOT_FOUND
-            elif get_execode.outcome == GetOutcome.X_EXECODE_TYPE_INCORRECT:
+            elif get_execode.outcome == GetOutcome.X_EXECODE_TYPE_MISMATCH:
                 outcome = OperationOutcome.X_EXECODE_TYPE_MISMATCH
             else:
                 outcome = OperationOutcome.X_ERROR
