@@ -1,4 +1,4 @@
-from .factory import MONGO_CLIENT
+from .factory import MONGO_CLIENT, new_mongo_session
 # noinspection PyPep8Naming
 from .rpdata import _inst as PendingRepairDataManager
 # noinspection PyPep8Naming

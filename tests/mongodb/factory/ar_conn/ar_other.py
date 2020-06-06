@@ -18,7 +18,7 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
         for i in range(1, 4):
             self.inst.get_responses(
                 self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid,
-                update_count_async=False
+                update_async=False
             )
 
             mdl = self.module_col.find_one_casted({
@@ -54,10 +54,12 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
         self.inst.add_conn(**self.get_mdl_3_args())
         # Call once to record last used time
         self.inst.get_responses(
-            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid)
+            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
+            update_async=False)
 
         resp = self.inst.get_responses(
-            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid)
+            self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
+            update_async=False)
         self.assertEqual(resp, [])
 
         mdl = self.module_col.find_one_casted({
@@ -71,13 +73,13 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
         # Call once to record last used time
         self.inst.get_responses(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
-            update_count_async=False
+            update_async=False
         )
 
         time.sleep(3.3)  # Cooldown of model #3 is 3 sec
         resp = self.inst.get_responses(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
-            update_count_async=False
+            update_async=False
         )
         self.assertEqual(resp, [(self.get_mdl_3().responses[0], False)])
 
