@@ -33,6 +33,7 @@ def is_test_db(db_name: str):
     if "-" in db_name:
         prefix, epoch = db_name.split("-", 2)
 
-        return "Test" in prefix and int(epoch) < time.time_ns() // 1000000
+        # Consider the database created 10 mins before this call as the test database
+        return "Test" in prefix and int(epoch) < time.time_ns() // 1000000 - 600000
 
     return False

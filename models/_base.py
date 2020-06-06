@@ -3,6 +3,7 @@ from collections import MutableMapping
 from typing import Optional, Set, List
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 
 from flags import ModelValidityCheckResult
 from extutils.checker import arg_type_ensure
@@ -503,13 +504,15 @@ class Model(MutableMapping, abc.ABC):
         return cls(**init_dict, from_db=True)
 
     @classmethod
-    def replace_uid(cls, col, old: ObjectId, new: ObjectId) -> List[str]:
+    def replace_uid(cls, col, old: ObjectId, new: ObjectId, session: ClientSession) -> List[str]:
         """
         Replace the values of the fields which are marked storing the uids.
 
         :param col: collection instance
         :param old: old value to be replaced
         :param new: new value to replace
+        :param session: MongoDB client session
+
         :return: name of the fields that was failed to complete the replacement if any
         """
         failed_names = []
@@ -517,7 +520,7 @@ class Model(MutableMapping, abc.ABC):
         for k in cls.model_field_keys():
             fd: BaseField = getattr(cls, k, None)
             if fd and fd.stores_uid:
-                result = fd.replace_uid(col, old, new)  # TODO: New session, reverse on failed?
+                result = fd.replace_uid(col, old, new, session)
                 if not result:
                     failed_names.append(fd.__class__.__qualname__)
 

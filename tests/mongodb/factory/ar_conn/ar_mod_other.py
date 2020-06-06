@@ -17,17 +17,17 @@ class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManager
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid,
-            update_count_async=False)
+            update_async=False)
         self.assertEqual(mdl.called_count, 1)
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid,
-            update_count_async=False)
+            update_async=False)
         self.assertEqual(mdl.called_count, 2)
 
         mdl = self.inst.get_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_1().keyword.content_type, self.get_mdl_1().channel_oid,
-            update_count_async=False)
+            update_async=False)
         self.assertEqual(mdl.called_count, 3)
 
     def test_get_after_add_multi(self):
@@ -58,7 +58,7 @@ class TestAutoReplyModuleManagerOther(TestModelMixin, TestAutoReplyModuleManager
         # Call once to record last used time
         self.inst.get_conn(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
-            update_count_async=False)
+            update_async=False)
 
         self.assertIsNone(
             self.inst.get_conn(

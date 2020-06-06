@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Tuple, Type, Any, final, Dict
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 
 from models.exceptions import RequiredKeyNotFilledError
@@ -171,9 +172,14 @@ class BaseField(abc.ABC):
         """The value should be overrided if `replace_uid()` is implemented."""
         return False
 
-    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId, session: ClientSession) -> bool:
         """
-        :return: Action has been acknowledges or not.
+        Replace the field content if this field is marked as storing the UID. (``stores_uid`` is ``True``)
+
+        Actions that should be reversed (basically all actions) if the replacement failed
+        should pass ``session`` to the database command so that the reversal is achievable.
+
+        :return: action acknowledged
         """
         raise RuntimeError(f"uid_replace function called but not implemented. ({self.__class__.__qualname__})")
 

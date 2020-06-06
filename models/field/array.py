@@ -2,6 +2,7 @@ import math
 from collections import abc
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 
 from ._base import BaseField, FieldInstance
@@ -111,9 +112,11 @@ class ArrayField(BaseField):
     def replace_uid_implemented(self) -> bool:
         return True
 
-    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
-        ack_push = collection_inst.update_many({self.key: {"$in": [old]}}, {"$push": {self.key: new}}).acknowledged
-        ack_pull = collection_inst.update_many({self.key: {"$in": [old]}}, {"$pull": {self.key: old}}).acknowledged
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId, session: ClientSession) -> bool:
+        ack_push = collection_inst.update_many(
+            {self.key: {"$in": [old]}}, {"$push": {self.key: new}}, session=session).acknowledged
+        ack_pull = collection_inst.update_many(
+            {self.key: {"$in": [old]}}, {"$pull": {self.key: old}}, session=session).acknowledged
         return ack_pull and ack_push
 
 

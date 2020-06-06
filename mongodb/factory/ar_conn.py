@@ -235,7 +235,7 @@ class AutoReplyModuleManager(BaseCollection):
 
     @arg_type_ensure
     def get_conn(self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
-                 update_count_async: bool = True, update_count: bool = True) -> \
+                 update_async: bool = True, update_count: bool = True) -> \
             Optional[AutoReplyModuleModel]:
         """
         Get a auto reply module by providing the keyword, its type and the channel oid.
@@ -248,7 +248,7 @@ class AutoReplyModuleManager(BaseCollection):
         :param keyword_type: expected type of the keyword of the module to get
         :param channel_oid: expected affilitated channel
         :param update_count: if the called count should be updated
-        :param update_count_async: if the called count update should be performed asynchronously
+        :param update_async: if the info update should be performed asynchronously
         :return: an active auto reply module if exists
         """
         ret: Optional[AutoReplyModuleModel] = \
@@ -277,7 +277,7 @@ class AutoReplyModuleManager(BaseCollection):
             }
 
             # Normally async is preferred to boost the speed, no async update for tests
-            if update_count_async:
+            if update_async:
                 self.update_one_async(q_found, u_query)
             else:
                 self.update_one(q_found, u_query)
@@ -475,7 +475,7 @@ class AutoReplyManager:
 
     def get_responses(
             self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
-            update_count_async: bool = True) \
+            update_async: bool = True) \
             -> List[Tuple[AutoReplyContentModel, bool]]:
         """
         Get the responses and a flag indicating
@@ -485,7 +485,7 @@ class AutoReplyManager:
 
         :return: list of the responses and a redirection necessity flag
         """
-        mod = self._mod.get_conn(keyword, keyword_type, channel_oid, update_count_async=update_count_async)
+        mod = self._mod.get_conn(keyword, keyword_type, channel_oid, update_async=update_async)
         resp_ctnt = []
 
         if mod:
