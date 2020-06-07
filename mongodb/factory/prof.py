@@ -119,6 +119,16 @@ class UserProfileManager(BaseCollection):
         return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
 
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        """
+        Get a :class:`dict` which for each element:
+
+            key is each user listed in ``user_oids`` and
+
+            value is the OIDs of the channel they are in.
+
+        :param user_oids: list of users to be checked
+        :return: a `dict` containing the information described above
+        """
         k = "in_channel"
         ret = {}
 

@@ -1,12 +1,16 @@
+"""
+This module contains the method to be called if any error occurred during event handling.
+"""
 import traceback
 
 from linebot import exceptions
 
 from extutils.emailutils import MailSender
-from extline import LINE, ExtraKey
+from extline.logger import LINE
 
 
 def handle_error(exception: Exception, extra_note: str, event, destination):
+    """Method to be called if any error occurred during event handling."""
     if isinstance(exception, exceptions.LineBotApiError):
         # e.status_code, e.error.message, e.error.details
         message = f"LINE API Error.\n" \
@@ -16,11 +20,11 @@ def handle_error(exception: Exception, extra_note: str, event, destination):
     else:
         message = f"Error occured on LINE webhook.\nNote: {extra_note}"
 
-    __log_error__(message, event, destination)
-    __send_email__(message, event, destination)
+    _log_error(message, event, destination)
+    _send_email(message, event, destination)
 
 
-def __send_email__(msg, event, destination):
+def _send_email(msg, event, destination):
     html = f"<h4>{msg}</h4>\n" \
            f"<hr>\n" \
            f"<pre>Traceback:\n" \
@@ -32,5 +36,5 @@ def __send_email__(msg, event, destination):
     MailSender.send_email_async(html, subject="Error on LINE webhook")
 
 
-def __log_error__(msg, event, destination):
-    LINE.logger.error(msg, exc_info=True, extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+def _log_error(msg, event, destination):
+    LINE.logger.error(msg, exc_info=True, extra={LINE.KEY_EVENT: event, LINE.KEY_DEST: destination})

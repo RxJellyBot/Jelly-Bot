@@ -1,8 +1,9 @@
-import logging
-
-from extline import LINE, ExtraKey, event_dest_fmt
+"""
+This module contains the function to handle the default/unhandled type event.
+"""
+from extline.logger import LINE
 
 
 def handle_default(event, destination):
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Unhandled event.",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+    """Method to be called upon receiving an unhandled type event."""
+    LINE.log_event("Unhandled event.", event=event, dest=destination)

@@ -1,3 +1,7 @@
+"""
+Contains various functions for handling different type of event.
+"""
+
 from .main import handle_main
 from .message import handle_msg_main
 from .default import handle_default
