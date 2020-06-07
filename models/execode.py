@@ -3,7 +3,9 @@ from typing import Optional
 
 from extutils.dt import localtime
 from JellyBot import systemconfig
-from models import Model, ModelDefaultValueExt
+from flags import ModelValidityCheckResult, Execode
+from models import Model, ModelDefaultValueExt, AutoReplyModuleExecodeModel
+from models.exceptions import ModelConstructionError
 from models.field import TextField, ExecodeField, DateTimeField, DictionaryField, ObjectIDField
 
 
@@ -21,4 +23,15 @@ class ExecodeEntryModel(Model):
     def expire_time(self) -> Optional[datetime]:
         return localtime(self.timestamp) + timedelta(seconds=systemconfig.Database.ExecodeExpirySeconds)
 
-    # TODO: action type and data match (prevalidate and a method to get the data)
+    def perform_validity_check(self) -> ModelValidityCheckResult:
+        if self.action_type == Execode.UNKNOWN:
+            return ModelValidityCheckResult.X_EXC_ACTION_UNKNOWN
+        elif self.action_type == Execode.AR_ADD:
+            try:
+                AutoReplyModuleExecodeModel(**self.data, from_db=True)
+            except ModelConstructionError:
+                return ModelValidityCheckResult.X_EXC_DATA_ERROR
+            except Exception:
+                return ModelValidityCheckResult.X_ERROR
+
+        return ModelValidityCheckResult.O_OK
