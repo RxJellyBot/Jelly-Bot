@@ -15,7 +15,7 @@ from tests.base import TestOnModelResult
 __all__ = ["TestEnqueueExecodeResult", "TestGetExecodeEntryResult", "TestCompleteExecodeResult"]
 
 mdl = ExecodeEntryModel(Execode="ABCDEFGHIJ", CreatorOid=ObjectId(),
-                        ActionType=Execode.AR_ADD, Timestamp=datetime.utcnow())
+                        ActionType=Execode.INTEGRATE_USER_DATA, Timestamp=datetime.utcnow())
 
 
 class TestEnqueueExecodeResult(TestOnModelResult.TestClass):
