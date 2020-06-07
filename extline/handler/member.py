@@ -1,18 +1,19 @@
-import logging
-
-from django.utils.translation import gettext_lazy as _
-
+"""
+This module contains various functions to handle various types of member event.
+"""
 from linebot.models import MemberJoinedEvent, MemberLeftEvent
 
 from flags import Platform
-from extline import LINE, ExtraKey, event_dest_fmt, LineApiUtils, LineApiWrapper
 from mongodb.factory import RootUserManager, ChannelManager, ProfileManager
+
+from ..logger import LINE
+from ..wrapper import LineApiUtils, LineApiWrapper
 
 __all__ = ["handle_member_main"]
 
 
-# noinspection PyUnusedLocal
-def handle_member_join(request, event, destination):
+def handle_member_join(_, event, destination):
+    """Method to be called to handle LINE member join event."""
     cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
     joined_names = []
 
@@ -28,14 +29,13 @@ def handle_member_join(request, event, destination):
             if uname:
                 joined_names.append(uname)
 
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Join Group.",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+    LINE.log_event("A member joined the group.", event=event, dest=destination)
 
     LineApiWrapper.reply_text(event.reply_token, _("{} joined the group.").format(" & ".join(joined_names)))
 
 
-# noinspection PyUnusedLocal
-def handle_member_left(request, event, destination):
+def handle_member_left(_, event, destination):
+    """Method to be called to handle LINE member left event."""
     for user in event.left.members:
         uid = user.user_id
 
@@ -45,15 +45,14 @@ def handle_member_left(request, event, destination):
         if udata_result.success and cdata:
             ProfileManager.mark_unavailable_async(cdata.id, udata_result.model.id)
 
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "LINE Left Group.",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+    LINE.log_event("A member left the group.", event=event, dest=destination)
 
 
 def handle_member_main(request, event, destination):
+    """Method to be called to handle all types of the member event."""
     if isinstance(event, MemberJoinedEvent):
         handle_member_join(request, event, destination)
     elif isinstance(event, MemberLeftEvent):
         handle_member_left(request, event, destination)
     else:
-        LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Unhandled LINE member event.",
-                               extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+        LINE.log_event("Unhandled LINE member event.", event=event, dest=destination)

@@ -1,3 +1,6 @@
+"""
+Contains the main objects necessary for the LINE bot webhook to operate.
+"""
 import os
 import sys
 
@@ -17,9 +20,15 @@ if not line_secret:
     sys.exit(1)
 
 line_parser = WebhookParser(line_secret)
+"""LINE's webhook parser."""
 
 
 def line_handle_event(request, body, signature):
+    """
+    Main function to be called upon receiving a LINE webhook event.
+
+    This function will call the corresponding event handling function.
+    """
     payload = line_parser.parse(body, signature, as_payload=True)
 
     for event in payload.events:
