@@ -18,7 +18,7 @@ Get the database ping to count in the database communication lag while reducing 
 Cannot be too short because the actual code execution may not be completed before the expiry
 """
 
-SLEEP_SEC = EXPIRY_SEC * 0.1
+SLEEP_SEC = EXPIRY_SEC * 0.03
 """
 Must be shorter than `EXPIRY_SEC` or the entry will disappear before testing it
 """
@@ -67,7 +67,7 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
 
     def test_get_current_not_update_expiry(self):
         # Storing the expiry timestamp before the actual one is created
-        # to reduce the time offset caused ny db-app comm lag
+        # to reduce the time offset caused by db-app comm lag
         expiry_expected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
         activate_sec = exec_timing_result(RemoteControlManager.activate, UID, CID_SRC, CID_DEST).execution_ms / 1000
 
