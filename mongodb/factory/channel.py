@@ -14,16 +14,17 @@ from mongodb.factory.results import (
 
 from ._base import BaseCollection
 
+__all__ = ["ChannelManager", "ChannelCollectionManager"]
+
 DB_NAME = "channel"
 
 
-class ChannelManager(BaseCollection):
+class _ChannelManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "dict"
     model_class = ChannelModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
@@ -195,13 +196,12 @@ class ChannelManager(BaseCollection):
             return result
 
 
-class ChannelCollectionManager(BaseCollection):
+class _ChannelCollectionManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "collection"
     model_class = ChannelCollectionModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelCollectionModel.Platform.key, 1), (ChannelCollectionModel.Token.key, 1)],
             name="Channel Collection Identity", unique=True)
@@ -256,5 +256,5 @@ class ChannelCollectionManager(BaseCollection):
             {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})
 
 
-_inst = ChannelManager()
-_inst2 = ChannelCollectionManager()
+ChannelManager = _ChannelManager()
+ChannelCollectionManager = _ChannelCollectionManager()

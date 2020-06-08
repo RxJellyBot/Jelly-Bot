@@ -9,17 +9,17 @@ from models import RemoteControlEntryModel
 
 from ._base import BaseCollection
 
+__all__ = ["RemoteControlManager"]
+
 DB_NAME = "rmc"
 
 
-class RemoteControlManager(BaseCollection):
+class _RemoteControlManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "data"
     model_class = RemoteControlEntryModel
 
-    def __init__(self):
-        super().__init__()
-
+    def build_indexes(self):
         self.create_index(
             [(RemoteControlEntryModel.UserOid.key, 1),
              (RemoteControlEntryModel.SourceChannelOid.key, 1)],
@@ -90,4 +90,4 @@ class RemoteControlManager(BaseCollection):
             return None
 
 
-_inst = RemoteControlManager()
+RemoteControlManager = _RemoteControlManager()

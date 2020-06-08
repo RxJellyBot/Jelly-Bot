@@ -21,16 +21,15 @@ from mongodb.factory.results import RecordAPIStatisticsResult
 from mongodb.utils import ExtendedCursor
 from ._base import BaseCollection
 
+__all__ = ["APIStatisticsManager", "MessageRecordStatisticsManager", "BotFeatureUsageDataManager"]
+
 DB_NAME = "stats"
 
 
-class APIStatisticsManager(BaseCollection):
+class _APIStatisticsManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "api"
     model_class = APIStatisticModel
-
-    def __init__(self):
-        super().__init__()
 
     @arg_type_ensure
     def record_stats(self, api_action: APICommand, sender_oid: ObjectId, parameter: dict, response: dict,
@@ -42,13 +41,10 @@ class APIStatisticsManager(BaseCollection):
         return RecordAPIStatisticsResult(outcome, ex, entry)
 
 
-class MessageRecordStatisticsManager(BaseCollection):
+class _MessageRecordStatisticsManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "msg"
     model_class = MessageRecordModel
-
-    def __init__(self):
-        super().__init__()
 
     @arg_type_ensure
     def record_message_async(
@@ -381,7 +377,7 @@ class MessageRecordStatisticsManager(BaseCollection):
             trange=trange)
 
 
-class BotFeatureUsageDataManager(BaseCollection):
+class _BotFeatureUsageDataManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "bot"
     model_class = BotFeatureUsageModel
@@ -474,6 +470,6 @@ class BotFeatureUsageDataManager(BaseCollection):
         return BotFeaturePerUserUsageResult(list(self.aggregate(pipeline)))
 
 
-_inst = APIStatisticsManager()
-_inst2 = MessageRecordStatisticsManager()
-_inst3 = BotFeatureUsageDataManager()
+APIStatisticsManager = _APIStatisticsManager()
+MessageRecordStatisticsManager = _MessageRecordStatisticsManager()
+BotFeatureUsageDataManager = _BotFeatureUsageDataManager()

@@ -52,6 +52,10 @@ ColInst = CollectionTest()
 
 
 class TestDataChecker(TestDatabaseMixin, TestCase):
+    @staticmethod
+    def collections_to_reset():
+        return [ColInst]
+
     def setUpTestCase(self) -> None:
         self.default_dict = {
             "m": {"i2": 7},

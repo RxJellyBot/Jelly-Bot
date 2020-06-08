@@ -20,11 +20,12 @@ from JellyBot.systemconfig import Database
 from ._base import BaseCollection
 from .mixin import GenerateTokenMixin
 
+__all__ = ["ExecodeManager"]
 
 DB_NAME = "execode"
 
 
-class ExecodeManager(GenerateTokenMixin, BaseCollection):
+class _ExecodeManager(GenerateTokenMixin, BaseCollection):
     token_length = ExecodeEntryModel.EXECODE_LENGTH
     token_key = ExecodeEntryModel.Execode.key
 
@@ -32,8 +33,7 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
     collection_name = "main"
     model_class = ExecodeEntryModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(ExecodeEntryModel.Execode.key, name="Execode", unique=True)
         self.create_index(ExecodeEntryModel.Timestamp.key,
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.ExecodeExpirySeconds)
@@ -174,4 +174,4 @@ class ExecodeManager(GenerateTokenMixin, BaseCollection):
         return CompleteExecodeResult(outcome, ex, tk_model, lacking_keys, cmpl_outcome)
 
 
-_inst = ExecodeManager()
+ExecodeManager = _ExecodeManager()

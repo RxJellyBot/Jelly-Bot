@@ -12,6 +12,7 @@ from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mongodb.factory import ChannelManager
+from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome, GetPermissionProfileResult, CreateProfileResult
 )
@@ -22,16 +23,17 @@ from models import (
 
 from ._base import BaseCollection
 
+__all__ = ["ProfileManager", "ProfileDataManager", "UserProfileManager", "PermissionPromotionRecordHolder"]
+
 DB_NAME = "channel"
 
 
-class UserProfileManager(BaseCollection):
+class _UserProfileManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "user"
     model_class = ChannelProfileConnectionModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelProfileConnectionModel.UserOid.key, pymongo.DESCENDING),
              (ChannelProfileConnectionModel.ChannelOid.key, pymongo.DESCENDING)],
@@ -205,13 +207,12 @@ class UserProfileManager(BaseCollection):
         ).modified_count > 0
 
 
-class ProfileDataManager(BaseCollection):
+class _ProfileDataManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "prof"
     model_class = ChannelProfileModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelProfileModel.ChannelOid.key, pymongo.DESCENDING),
              (ChannelProfileModel.Name.key, pymongo.ASCENDING)],
@@ -369,23 +370,28 @@ class ProfileDataManager(BaseCollection):
                                      ChannelProfileModel.ChannelOid.key: channel_oid}) == 0
 
 
-class PermissionPromotionRecordHolder(BaseCollection):
+class _PermissionPromotionRecordHolder(BaseCollection):
     database_name = DB_NAME
     collection_name = "promo"
     model_class = PermissionPromotionRecordModel
 
 
-class ProfileManager:
+class _ProfileManager(ClearableCollectionMixin):
     def __init__(self):
-        self._conn = UserProfileManager()
-        self._prof = ProfileDataManager()
-        self._promo = PermissionPromotionRecordHolder()
+        self._conn = _UserProfileManager()
+        self._prof = _ProfileDataManager()
+        self._promo = _PermissionPromotionRecordHolder()
+
+    def clear(self):
+        self._conn.clear()
+        self._prof.clear()
+        self._promo.clear()
 
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
         Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
 
     def create_default_profile(
-            self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> GetPermissionProfileResult:
+            self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> CreateProfileResult:
         """
         Create a default profile for ``channel_oid``.
 
@@ -670,7 +676,7 @@ class ProfileManager:
         """Get a list containing the user OID who have the profile."""
         return self._conn.get_profile_user_oids(profile_oid)
 
-    def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
+    def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """Get a ``dict`` which key is the profile OID and value is the user OID who have the corresponding profile."""
         return self._conn.get_profiles_user_oids(profile_oid)
 
@@ -787,4 +793,7 @@ class ProfileManager:
         return self._prof.delete_profile(profile_oid)
 
 
-_inst = ProfileManager()
+UserProfileManager = _UserProfileManager()
+ProfileDataManager = _ProfileDataManager()
+PermissionPromotionRecordHolder = _PermissionPromotionRecordHolder()
+ProfileManager = _ProfileManager()

@@ -6,10 +6,12 @@ from ._dbctrl import SINGLE_DB_NAME
 from .factory import MONGO_CLIENT
 from ..utils import BulkWriteDataHolder
 
+__all__ = ["PendingRepairDataManager"]
+
 DB_NAME = "pdrp"
 
 
-class PendingRepairDataManager:
+class _PendingRepairDataManager:
     def __init__(self):
         if SINGLE_DB_NAME:
             self._db = MONGO_CLIENT.get_database(SINGLE_DB_NAME)
@@ -28,4 +30,4 @@ class PendingRepairDataManager:
         return BulkWriteDataHolder(col)
 
 
-_inst = PendingRepairDataManager()
+PendingRepairDataManager = _PendingRepairDataManager()

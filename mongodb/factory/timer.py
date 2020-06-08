@@ -13,16 +13,17 @@ from JellyBot.systemconfig import Bot
 
 from ._base import BaseCollection
 
+__all__ = ["TimerManager"]
+
 DB_NAME = "timer"
 
 
-class TimerManager(BaseCollection):
+class _TimerManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "timer"
     model_class = TimerModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(TimerModel.Keyword.key)
         self.create_index(TimerModel.DeletionTime.key, expireAfterSeconds=0)
 
@@ -115,4 +116,4 @@ class TimerManager(BaseCollection):
         return message_frequency * 13.5 + 495
 
 
-_inst = TimerManager()
+TimerManager = _TimerManager()

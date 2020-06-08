@@ -8,23 +8,22 @@ __all__ = ["TestAutoReplyModuleTagManager"]
 
 
 class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
-    inst = None
+    @staticmethod
+    def collections_to_reset():
+        return [AutoReplyModuleTagManager]
 
     @classmethod
-    def setUpTestClass(cls):
-        cls.inst = AutoReplyModuleTagManager()
-
-    def _insert_5_tags(self):
-        self.inst.get_insert("TAG1", ColorFactory.WHITE)
-        self.inst.get_insert("TAG2", ColorFactory.WHITE)
-        self.inst.get_insert("TAG3", ColorFactory.WHITE)
-        self.inst.get_insert("TAG4", ColorFactory.WHITE)
-        self.inst.get_insert("TAG5", ColorFactory.WHITE)
+    def _insert_5_tags(cls):
+        AutoReplyModuleTagManager.get_insert("TAG1", ColorFactory.WHITE)
+        AutoReplyModuleTagManager.get_insert("TAG2", ColorFactory.WHITE)
+        AutoReplyModuleTagManager.get_insert("TAG3", ColorFactory.WHITE)
+        AutoReplyModuleTagManager.get_insert("TAG4", ColorFactory.WHITE)
+        AutoReplyModuleTagManager.get_insert("TAG5", ColorFactory.WHITE)
 
     def test_get_insert_default_color(self):
         expected_mdl = AutoReplyModuleTagModel(Name="TAG", Color=ColorFactory.DEFAULT)
 
-        result = self.inst.get_insert("TAG")
+        result = AutoReplyModuleTagManager.get_insert("TAG")
 
         self.assertEqual(result.outcome, GetOutcome.O_ADDED)
         self.assertTrue(result.success)
@@ -33,7 +32,7 @@ class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
     def test_get_insert_custom_color(self):
         expected_mdl = AutoReplyModuleTagModel(Name="TAG", Color=ColorFactory.WHITE)
 
-        result = self.inst.get_insert("TAG", ColorFactory.WHITE)
+        result = AutoReplyModuleTagManager.get_insert("TAG", ColorFactory.WHITE)
 
         self.assertEqual(result.outcome, GetOutcome.O_ADDED)
         self.assertTrue(result.success)
@@ -42,8 +41,8 @@ class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
     def test_get_insert_existed(self):
         expected_mdl = AutoReplyModuleTagModel(Name="TAG", Color=ColorFactory.WHITE)
 
-        self.inst.get_insert("TAG", ColorFactory.WHITE)
-        result = self.inst.get_insert("TAG", ColorFactory.WHITE)
+        AutoReplyModuleTagManager.get_insert("TAG", ColorFactory.WHITE)
+        result = AutoReplyModuleTagManager.get_insert("TAG", ColorFactory.WHITE)
 
         self.assertEqual(result.outcome, GetOutcome.O_CACHE_DB)
         self.assertTrue(result.success)
@@ -54,7 +53,7 @@ class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
 
         expected = [AutoReplyModuleTagModel(Name="TAG5", Color=ColorFactory.WHITE)]
 
-        self.assertModelSequenceEqual(list(self.inst.search_tags("TAG5")), expected)
+        self.assertModelSequenceEqual(list(AutoReplyModuleTagManager.search_tags("TAG5")), expected)
 
     def test_search_regex(self):
         self._insert_5_tags()
@@ -67,9 +66,9 @@ class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
             AutoReplyModuleTagModel(Name="TAG1", Color=ColorFactory.WHITE)
         ]
 
-        self.assertModelSequenceEqual(list(self.inst.search_tags("TAG")), expected)
+        self.assertModelSequenceEqual(list(AutoReplyModuleTagManager.search_tags("TAG")), expected)
 
     def test_get_tag_data(self):
-        result = self.inst.get_insert("TAG", ColorFactory.WHITE)
+        result = AutoReplyModuleTagManager.get_insert("TAG", ColorFactory.WHITE)
 
-        self.assertEqual(self.inst.get_tag_data(result.model.get_oid()), result.model)
+        self.assertEqual(AutoReplyModuleTagManager.get_tag_data(result.model.get_oid()), result.model)
