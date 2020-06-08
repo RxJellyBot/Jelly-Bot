@@ -38,6 +38,7 @@ class UserProfileManager(BaseCollection):
             name="Profile Connection Identity",
             unique=True)
 
+    @arg_type_ensure
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
                             profile_oids: Union[ObjectId, List[ObjectId]]) -> OperationOutcome:
         """
@@ -78,18 +79,14 @@ class UserProfileManager(BaseCollection):
         """
         Get the :class:`ChannelProfileConnectionModel` of the specified user in the specified channel.
 
-        :return: `None` if not found.
+        :return: `ChannelProfileConnectionModel` if exists
         """
+        return self.find_one_casted(
+            {ChannelProfileConnectionModel.UserOid.key: root_uid,
+             ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
+            parse_cls=ChannelProfileConnectionModel)
 
-        if channel_oid and root_uid:
-            return self.find_one_casted(
-                {ChannelProfileConnectionModel.UserOid.key: root_uid,
-                 ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
-                parse_cls=ChannelProfileConnectionModel)
-        else:
-            return None
-
-    def get_user_channel_profiles(self, root_uid: ObjectId, inside_only: bool = True) \
+    def get_user_channel_profiles(self, root_uid: ObjectId, *, inside_only: bool = True) \
             -> List[ChannelProfileConnectionModel]:
         filter_ = {ChannelProfileConnectionModel.UserOid.key: root_uid}
 
@@ -106,12 +103,12 @@ class UserProfileManager(BaseCollection):
             ]
         ))
 
-    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=True) \
+    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=True) \
             -> List[ChannelProfileConnectionModel]:
         if isinstance(channel_oid, ObjectId):
-            filter_ = {ChannelProfileConnectionModel.ChannelOid.key: {"$in": [channel_oid]}}
-        else:
-            filter_ = {ChannelProfileConnectionModel.ChannelOid.key: {"$in": channel_oid}}
+            channel_oid = [channel_oid]
+
+        filter_ = {ChannelProfileConnectionModel.ChannelOid.key: {"$in": channel_oid}}
 
         if available_only:
             filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
@@ -144,7 +141,7 @@ class UserProfileManager(BaseCollection):
         ]
 
         for d in self.aggregate(pipeline):
-            ret[d[OID_KEY]] = d[k]
+            ret[d[OID_KEY]] = set(d[k])
 
         return ret
 
@@ -154,21 +151,22 @@ class UserProfileManager(BaseCollection):
             parse_cls=ChannelProfileConnectionModel)
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
-        filter_ = {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}
-        return [mdl.user_oid for mdl in self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel)]
+        # Using native MongoDB method to boost the performance
+        k = ChannelProfileConnectionModel.UserOid.key
+        return [mdl[k] for mdl in self.find({ChannelProfileConnectionModel.ProfileOids.key: profile_oid})]
 
-    def get_profiles_user_oids(self, profile_oids: Iterable[ObjectId]) -> Dict[ObjectId, List[ObjectId]]:
+    def get_profiles_user_oids(self, profile_oids: Iterable[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         ret = {}
         filter_ = {ChannelProfileConnectionModel.ProfileOids.key: {"$in": profile_oids}}
 
         for conn in self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel):
             user_oid = conn.user_oid
 
-            for prof_oid in conn.profile_oids:
+            for prof_oid in set(conn.profile_oids).intersection(profile_oids):
                 if prof_oid in ret:
-                    ret[prof_oid].append(user_oid)
+                    ret[prof_oid].add(user_oid)
                 else:
-                    ret[prof_oid] = [user_oid]
+                    ret[prof_oid] = {user_oid}
 
         return ret
 
@@ -535,8 +533,8 @@ class ProfileManager:
 
         return current_max
 
-    def get_user_channel_profiles(self, root_uid: Optional[ObjectId], inside_only: bool = True,
-                                  accessbible_only: bool = True) \
+    def get_user_channel_profiles(self, root_uid: Optional[ObjectId], *,
+                                  inside_only: bool = True, accessbible_only: bool = True) \
             -> List[ChannelProfileListEntry]:
         if root_uid is None:
             return []
@@ -549,7 +547,7 @@ class ProfileManager:
         channel_oid_list = []
         profile_oid_list = []
         prof_conns = []
-        for d in self._conn.get_user_channel_profiles(root_uid, inside_only):
+        for d in self._conn.get_user_channel_profiles(root_uid, inside_only=inside_only):
             channel_oid_list.append(d.channel_oid)
             profile_oid_list.extend(d.profile_oids)
             prof_conns.append(d)
@@ -639,7 +637,7 @@ class ProfileManager:
 
     def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
             -> List[ChannelProfileConnectionModel]:
-        return self._conn.get_channel_members(channel_oid, available_only)
+        return self._conn.get_channel_members(channel_oid, available_only=available_only)
 
     def get_channel_member_oids(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
             -> List[ObjectId]:

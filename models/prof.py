@@ -48,7 +48,7 @@ class ChannelProfileModel(Model):
         return list(sorted(ret, key=lambda x: x.code))
 
     def pre_iter(self):
-        # Will be used when the data will be passed to MongoDB
+        # Will be used when this model is being passed to MongoDB
         d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
 
         for perm_cat in ProfilePermission:

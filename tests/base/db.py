@@ -9,7 +9,7 @@ from tests.base import TestCase
 
 if not SINGLE_DB_NAME:
     print("Utilize single DB by setting `MONGO_DB` in environment variables "
-          "to prevent possible the data corruption.")
+          "to prevent the possible data corruption.")
     sys.exit(1)
 
 
@@ -31,8 +31,7 @@ class TestDatabaseMixin(TestCase, ABC):
     @final
     def setUp(self) -> None:
         # Ensure the database is clear
-        if SINGLE_DB_NAME:
-            MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
+        MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
 
         self.setUpTestCase()
 
@@ -43,8 +42,7 @@ class TestDatabaseMixin(TestCase, ABC):
     @final
     def tearDown(self) -> None:
         # Drop the used database
-        if SINGLE_DB_NAME:
-            MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
+        MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
 
         self.tearDownTestCase()
 
