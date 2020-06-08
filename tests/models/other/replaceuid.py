@@ -19,6 +19,7 @@ class TestReplaceUid(TestDatabaseMixin):
 
     def setUpTestCase(self) -> None:
         col = self.get_collection("testcol")
+        col.delete_many({})
         col.insert_one({"o": TestReplaceUid.OLD, "a": [TestReplaceUid.OLD]})
 
     def test_replace_oid(self):

@@ -1,9 +1,9 @@
 import sys
 from abc import ABC
-from typing import final
+from typing import final, List
 
 from extutils import exec_timing_result
-from mongodb.factory import SINGLE_DB_NAME, MONGO_CLIENT
+from mongodb.factory import SINGLE_DB_NAME, MONGO_CLIENT, BaseCollection
 
 from tests.base import TestCase
 
@@ -24,14 +24,24 @@ class TestDatabaseMixin(TestCase, ABC):
     # Original env var `MONGO_DB`
     _os_mongo_db_ = None
 
+    @staticmethod
+    def collections_to_reset():
+        """
+        Collection instances to reset on the start of each test cases.
+
+        :rtype: List[BaseCollection]
+        """
+        return []
+
     def setUpTestCase(self) -> None:
         """Hook method to setup each test cases."""
         pass
 
     @final
     def setUp(self) -> None:
-        # Ensure the database is clear
-        MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
+        # Clear related collections
+        for col in self.collections_to_reset():
+            col.clear()
 
         self.setUpTestCase()
 
@@ -41,9 +51,6 @@ class TestDatabaseMixin(TestCase, ABC):
 
     @final
     def tearDown(self) -> None:
-        # Drop the used database
-        MONGO_CLIENT.drop_database(SINGLE_DB_NAME)
-
         self.tearDownTestCase()
 
     @staticmethod

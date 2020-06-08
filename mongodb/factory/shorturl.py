@@ -15,10 +15,12 @@ from mongodb.utils import ExtendedCursor
 
 from ._base import BaseCollection
 
+__all__ = ["ShortUrlDataManager"]
+
 DB_NAME = "surl"
 
 
-class ShortUrlDataManager(BaseCollection):
+class _ShortUrlDataManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "data"
     model_class = ShortUrlRecordModel
@@ -38,7 +40,7 @@ class ShortUrlDataManager(BaseCollection):
         else:
             service_url = f"{service_url}/test"
 
-        return ShortUrlDataManager.is_valid_url(service_url)
+        return _ShortUrlDataManager.is_valid_url(service_url)
 
     @staticmethod
     def is_valid_url(url) -> bool:
@@ -47,7 +49,7 @@ class ShortUrlDataManager(BaseCollection):
     def __init__(self):
         super().__init__()
 
-        self.available = ShortUrlDataManager.check_service()
+        self.available = _ShortUrlDataManager.check_service()
 
         self.code_length = self._calc_code_length()
 
@@ -55,15 +57,15 @@ class ShortUrlDataManager(BaseCollection):
         doc_count = self.count_documents({})
 
         if doc_count > 0:
-            calc = math.ceil(math.log(self.count_documents({}), len(ShortUrlDataManager.AVAILABLE_CHARACTERS)))
+            calc = math.ceil(math.log(self.count_documents({}), len(_ShortUrlDataManager.AVAILABLE_CHARACTERS)))
         else:
             calc = 0
 
-        return max(calc, ShortUrlDataManager.MIN_CODE_LENGTH)
+        return max(calc, _ShortUrlDataManager.MIN_CODE_LENGTH)
 
     def generate_code(self):
         def generate():
-            return "".join([random.choice(ShortUrlDataManager.AVAILABLE_CHARACTERS) for _ in range(self.code_length)])
+            return "".join([random.choice(_ShortUrlDataManager.AVAILABLE_CHARACTERS) for _ in range(self.code_length)])
 
         code = generate()
         # Check if not existed in the database
@@ -74,7 +76,7 @@ class ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def create_record(self, target: str, creator_oid: ObjectId) -> UrlShortenResult:
-        if not ShortUrlDataManager.is_valid_url(target):
+        if not _ShortUrlDataManager.is_valid_url(target):
             return UrlShortenResult(WriteOutcome.X_INVALID_URL)
 
         model, outcome, ex = self.insert_one_data(Code=self.generate_code(), Target=target, CreatorOid=creator_oid)
@@ -101,7 +103,7 @@ class ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:
-        if not ShortUrlDataManager.is_valid_url(new_target):
+        if not _ShortUrlDataManager.is_valid_url(new_target):
             return False
 
         return self.update_many_outcome(
@@ -110,4 +112,4 @@ class ShortUrlDataManager(BaseCollection):
         ).is_success
 
 
-_inst = ShortUrlDataManager()
+ShortUrlDataManager = _ShortUrlDataManager()

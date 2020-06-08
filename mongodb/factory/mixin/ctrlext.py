@@ -88,8 +88,9 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_NOT_SERIALIZABLE
             ex = e
         except DuplicateKeyError as e:
-            # The model's ID will be set by the call `self.insert_one()`,
-            # so if the data exists, then we should get the object ID of it and insert it onto the model.
+            # A whole new model ID will be set when calling `self.insert_one()`.
+            # However, that is not the desired if a conflicting data is already in the database.
+            # `self._get_duplicated_doc_id()` will get the OID of the conflicting data.
             model.set_oid(self._get_duplicated_doc_id(model.to_json()))
 
             outcome = WriteOutcome.O_DATA_EXISTS

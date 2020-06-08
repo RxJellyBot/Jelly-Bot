@@ -8,7 +8,7 @@ from models import Model
 from models.exceptions import InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
 from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultValueExt
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
-from mongodb.factory import ControlExtensionMixin
+from mongodb.factory import ControlExtensionMixin, ClearableCollectionMixin
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 
@@ -18,8 +18,9 @@ __all__ = ["TestControlExtensionMixin"]
 class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
     collection = None
 
-    class CollectionTest(ControlExtensionMixin):
-        pass
+    class CollectionTest(ControlExtensionMixin, ClearableCollectionMixin):
+        def clear(self):
+            self.delete_many({})
 
     class ModelTest(Model):
         IntF = IntegerField("i", positive_only=True)
@@ -31,6 +32,10 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
         def __init__(self, from_db=False):
             super().__init__(from_db=from_db)
             raise ValueError()
+
+    @staticmethod
+    def collections_to_reset():
+        return [TestControlExtensionMixin.collection]
 
     @classmethod
     def setUpTestClass(cls):
@@ -149,6 +154,8 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(mdl.get_oid())
 
+        self.collection.drop_indexes()
+
     def test_insert_one_data_duplicated_compound_key(self):
         self.collection.create_index([("i", 1), ("b", 1)], unique=True)
 
@@ -160,6 +167,8 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
         self.assertIsInstance(exception, DuplicateKeyError)
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(mdl.get_oid())
+
+        self.collection.drop_indexes()
 
     def test_update_many_outcome(self):
         self.collection.insert_many([

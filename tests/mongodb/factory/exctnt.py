@@ -14,15 +14,13 @@ __all__ = ["TestExtraContentManager"]
 class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMixin):
     CHANNEL_OID = ObjectId()
 
-    inst = None
-
-    @classmethod
-    def setUpTestClass(cls):
-        cls.inst = ExtraContentManager()
+    @staticmethod
+    def collections_to_reset():
+        return [ExtraContentManager]
 
     def test_rec_extra_message(self):
         rec_time = now_utc_aware(for_mongo=True)
-        result = self.inst.record_extra_message(self.CHANNEL_OID, [(ToSiteReason.FORCED_ONSITE, "A")], "T")
+        result = ExtraContentManager.record_extra_message(self.CHANNEL_OID, [(ToSiteReason.FORCED_ONSITE, "A")], "T")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertTrue(result.success)
@@ -36,8 +34,8 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
 
     def test_rec_no_title(self):
         rec_time = now_utc_aware(for_mongo=True)
-        result = self.inst.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID,
-                                          [(str(ToSiteReason.FORCED_ONSITE), "A")], "T")
+        result = ExtraContentManager.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID,
+                                                    [(str(ToSiteReason.FORCED_ONSITE), "A")], "T")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertTrue(result.success)
@@ -50,7 +48,7 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
         self.assertTimeDifferenceLessEqual(result.model.timestamp, rec_time, 2)
 
     def test_rec_no_content(self):
-        result = self.inst.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID, [], "T")
+        result = ExtraContentManager.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID, [], "T")
 
         self.assertEqual(result.outcome, WriteOutcome.X_EMPTY_CONTENT)
         self.assertFalse(result.success)
@@ -59,7 +57,7 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
 
     def test_rec_content_pure_text(self):
         rec_time = now_utc_aware(for_mongo=True)
-        result = self.inst.record_content(ExtraContentType.PURE_TEXT, self.CHANNEL_OID, "ABCDE", "T")
+        result = ExtraContentManager.record_content(ExtraContentType.PURE_TEXT, self.CHANNEL_OID, "ABCDE", "T")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertTrue(result.success)
@@ -72,8 +70,8 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
 
     def test_rec_content_ex_message(self):
         rec_time = now_utc_aware(for_mongo=True)
-        result = self.inst.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID,
-                                          [(str(ToSiteReason.FORCED_ONSITE), "A")], "T")
+        result = ExtraContentManager.record_content(ExtraContentType.EXTRA_MESSAGE, self.CHANNEL_OID,
+                                                    [(str(ToSiteReason.FORCED_ONSITE), "A")], "T")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertTrue(result.success)
@@ -89,7 +87,7 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
         ar_oids = [ObjectId(), ObjectId()]
 
         rec_time = now_utc_aware(for_mongo=True)
-        result = self.inst.record_content(ExtraContentType.AUTO_REPLY_SEARCH, self.CHANNEL_OID, ar_oids, "T")
+        result = ExtraContentManager.record_content(ExtraContentType.AUTO_REPLY_SEARCH, self.CHANNEL_OID, ar_oids, "T")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertTrue(result.success)
@@ -101,6 +99,6 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
         self.assertTimeDifferenceLessEqual(result.model.timestamp, rec_time, 2)
 
     def test_get_content(self):
-        result = self.inst.record_content(ExtraContentType.PURE_TEXT, self.CHANNEL_OID, "ABCDE", "T")
+        result = ExtraContentManager.record_content(ExtraContentType.PURE_TEXT, self.CHANNEL_OID, "ABCDE", "T")
 
-        self.assertEqual(self.inst.get_content(result.model_id), result.model)
+        self.assertEqual(ExtraContentManager.get_content(result.model_id), result.model)

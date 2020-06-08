@@ -21,6 +21,7 @@ from mongodb.factory.results import (
     WriteOutcome, GetOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
+from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.utils import (
     ExtendedCursor, case_insensitive_collation
 )
@@ -28,19 +29,19 @@ from mongodb.factory import ProfileManager
 
 from ._base import BaseCollection
 
+__all__ = ["AutoReplyManager", "AutoReplyModuleManager", "AutoReplyModuleTagManager"]
+
 DB_NAME = "ar"
 
 
-class AutoReplyModuleManager(BaseCollection):
+class _AutoReplyModuleManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "conn"
     model_class = AutoReplyModuleModel
 
     cache_name = f"{database_name}.{collection_name}"
 
-    def __init__(self):
-        super().__init__()
-
+    def build_indexes(self):
         # Using `_validate_content` to track the uniqueness of the modules instead of creating a index
         self.create_index(
             [(AutoReplyModuleModel.KEY_KW_CONTENT, 1),
@@ -163,7 +164,7 @@ class AutoReplyModuleManager(BaseCollection):
             return AutoReplyModuleAddResult(WriteOutcome.X_MODEL_KEY_NOT_EXIST, ex)
 
         # Pinned module creation permission check
-        access_to_pinned = AutoReplyModuleManager._has_access_to_pinned(mdl.channel_oid, mdl.creator_oid)
+        access_to_pinned = _AutoReplyModuleManager._has_access_to_pinned(mdl.channel_oid, mdl.creator_oid)
 
         if mdl.pinned and not access_to_pinned:
             return AutoReplyModuleAddResult(WriteOutcome.X_INSUFFICIENT_PERMISSION)
@@ -217,7 +218,7 @@ class AutoReplyModuleManager(BaseCollection):
             AutoReplyModuleModel.Active.key: True
         }
 
-        if not AutoReplyModuleManager._has_access_to_pinned(channel_oid, remover_oid):
+        if not _AutoReplyModuleManager._has_access_to_pinned(channel_oid, remover_oid):
             q[AutoReplyModuleModel.Pinned.key] = False
 
         ret = self.update_many_outcome(q, self._remove_update_ops(remover_oid), collation=case_insensitive_collation)
@@ -343,13 +344,12 @@ class AutoReplyModuleManager(BaseCollection):
         return UniqueKeywordCountResult(self.aggregate(pipeline), limit)
 
 
-class AutoReplyModuleTagManager(BaseCollection):
+class _AutoReplyModuleTagManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "tag"
     model_class = AutoReplyModuleTagModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(AutoReplyModuleTagModel.Name.key, name="Auto Reply Tag Identity", unique=True)
 
     def get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
@@ -387,10 +387,14 @@ class AutoReplyModuleTagManager(BaseCollection):
         return self.find_one_casted({OID_KEY: tag_oid}, parse_cls=AutoReplyModuleTagModel)
 
 
-class AutoReplyManager:
+class _AutoReplyManager(ClearableCollectionMixin):
     def __init__(self):
-        self._mod = AutoReplyModuleManager()
-        self._tag = AutoReplyModuleTagManager()
+        self._mod = _AutoReplyModuleManager()
+        self._tag = _AutoReplyModuleTagManager()
+
+    def clear(self):
+        self._mod.clear()
+        self._tag.clear()
 
     def _get_tags_pop_score(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[AutoReplyTagPopularityScore]:
@@ -528,4 +532,6 @@ class AutoReplyManager:
         return self._mod.get_unique_keyword_count_stats(channel_oid, limit)
 
 
-_inst = AutoReplyManager()
+AutoReplyManager = _AutoReplyManager()
+AutoReplyModuleManager = _AutoReplyModuleManager()
+AutoReplyModuleTagManager = _AutoReplyModuleTagManager()

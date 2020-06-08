@@ -15,11 +15,9 @@ __all__ = ["TestAutoReplyModuleManagerBase"]
 
 class TestAutoReplyModuleManagerBase(ABC):
     class TestClass(TestArModuleSample.TestClass):
-        inst = None
-
-        @classmethod
-        def setUpTestClass(cls):
-            cls.inst = AutoReplyModuleManager()
+        @staticmethod
+        def collections_to_reset():
+            return [AutoReplyModuleManager]
 
         def grant_access_pin_permission(self):
             reg_result = ChannelManager.ensure_register(Platform.LINE, "U123456")
@@ -63,7 +61,7 @@ class TestAutoReplyModuleManagerBase(ABC):
                 Responses=[AutoReplyContentModel(Content="B", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid, CalledCount=4, Active=False
             )
-            self.inst.insert_one_model(mdl)
+            AutoReplyModuleManager.insert_one_model(mdl)
             oids.append(mdl.id)
 
             mdl = AutoReplyModuleModel(
@@ -71,7 +69,7 @@ class TestAutoReplyModuleManagerBase(ABC):
                 Responses=[AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid, CalledCount=3, Active=False
             )
-            self.inst.insert_one_model(mdl)
+            AutoReplyModuleManager.insert_one_model(mdl)
             oids.append(mdl.id)
 
             mdl = AutoReplyModuleModel(
@@ -79,7 +77,7 @@ class TestAutoReplyModuleManagerBase(ABC):
                 Responses=[AutoReplyContentModel(Content="D", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid
             )
-            self.inst.insert_one_model(mdl)
+            AutoReplyModuleManager.insert_one_model(mdl)
             oids.append(mdl.id)
 
             return oids
@@ -100,25 +98,25 @@ class TestAutoReplyModuleManagerBase(ABC):
             """
             self._add_call_module_kw_a()
 
-            self.inst.insert_one_model(AutoReplyModuleModel(
+            AutoReplyModuleManager.insert_one_model(AutoReplyModuleModel(
                 Keyword=AutoReplyContentModel(Content="B", ContentType=AutoReplyContentType.TEXT),
                 Responses=[AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid, CalledCount=9
             ))
 
-            self.inst.insert_one_model(AutoReplyModuleModel(
+            AutoReplyModuleManager.insert_one_model(AutoReplyModuleModel(
                 Keyword=AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT),
                 Responses=[AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid
             ))
 
-            self.inst.insert_one_model(AutoReplyModuleModel(
+            AutoReplyModuleManager.insert_one_model(AutoReplyModuleModel(
                 Keyword=AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT),
                 Responses=[AutoReplyContentModel(Content="E", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid
             ))
 
-            self.inst.insert_one_model(AutoReplyModuleModel(
+            AutoReplyModuleManager.insert_one_model(AutoReplyModuleModel(
                 Keyword=AutoReplyContentModel(Content="D", ContentType=AutoReplyContentType.TEXT),
                 Responses=[AutoReplyContentModel(Content="C", ContentType=AutoReplyContentType.TEXT)],
                 CreatorOid=self.CREATOR_OID, ChannelOid=self.channel_oid,

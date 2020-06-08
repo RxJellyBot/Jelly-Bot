@@ -12,18 +12,19 @@ from extutils.utils import cast_iterable
 
 from ._base import BaseCollection
 
+__all__ = ["ExtraContentManager"]
+
 DB_NAME = "ex"
 
 
-class ExtraContentManager(BaseCollection):
+class _ExtraContentManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "content"
     model_class = ExtraContentModel
 
     DefaultTitle = "-"
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(ExtraContentModel.Timestamp.key,
                           expireAfterSeconds=Database.ExtraContentExpirySeconds, name="Timestamp")
 
@@ -50,7 +51,7 @@ class ExtraContentManager(BaseCollection):
             self, type_: ExtraContentType, channel_oid: ObjectId, content: Any, title: str = None) \
             -> RecordExtraContentResult:
         if not title:
-            title = ExtraContentManager.DefaultTitle
+            title = _ExtraContentManager.DefaultTitle
 
         if not content:
             return RecordExtraContentResult(WriteOutcome.X_EMPTY_CONTENT)
@@ -65,4 +66,4 @@ class ExtraContentManager(BaseCollection):
         return self.find_one_casted({OID_KEY: content_id}, parse_cls=ExtraContentModel)
 
 
-_inst = ExtraContentManager()
+ExtraContentManager = _ExtraContentManager()
