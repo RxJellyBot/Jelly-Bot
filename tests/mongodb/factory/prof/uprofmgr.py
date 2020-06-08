@@ -22,6 +22,37 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
     def setUpTestClass(cls):
         cls.inst = UserProfileManager()
 
+    def _sample_channels(self):
+        mdls = [
+            ChannelProfileConnectionModel(
+                ChannelOid=ObjectId(), UserOid=self.USER_OID, ProfileOids=[]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1])
+        ]
+
+        return mdls
+
+    def _sample_channels_insert(self):
+        mdls = [
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID_2, ProfileOids=[])
+        ]
+        self.inst.insert_many(mdls)
+
+        return mdls
+
     def test_attach_new_one(self):
         result = self.inst.user_attach_profile(self.CHANNEL_OID, self.USER_OID, self.PROF_OID_1)
 
@@ -132,22 +163,6 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         self.assertIsNone(mdl)
 
-    def _sample_channels(self):
-        mdls = [
-            ChannelProfileConnectionModel(
-                ChannelOid=ObjectId(), UserOid=self.USER_OID, ProfileOids=[]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1])
-        ]
-
-        return mdls
-
     def test_get_user_channel_inside_only(self):
         mdls = self._sample_channels()
         self.inst.insert_many(mdls)
@@ -248,24 +263,15 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
             set(self.inst.get_channel_members(self.CHANNEL_OID, available_only=False)),
             set(mdls))
 
-    def test_get_channel_not_exists(self):
-        self.assertModelSetEqual(set(self.inst.get_channel_members(ObjectId())), set())
-        self.assertModelSetEqual(set(self.inst.get_channel_members(ObjectId(), available_only=False)), set())
-
-    def _sample_channels_insert(self):
-        mdls = [
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]),
-            ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID_2, ProfileOids=[])
-        ]
+    def test_get_channel_member_empty_param(self):
+        mdls = self._sample_channels()
         self.inst.insert_many(mdls)
 
-        return mdls
+        self.assertEqual(self.inst.get_channel_members([]), [])
+
+    def test_get_channel_member_not_exists(self):
+        self.assertEqual(self.inst.get_channel_members(ObjectId()), [])
+        self.assertEqual(self.inst.get_channel_members(ObjectId(), available_only=False), [])
 
     def test_user_channel_dict(self):
         self._sample_channels_insert()
@@ -293,6 +299,11 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
     def test_user_channel_dict_no_channel(self):
         self.assertDictEqual(self.inst.get_users_exist_channel_dict([self.USER_OID]), {})
+
+    def test_user_channel_dict_empty_param(self):
+        self._sample_channels_insert()
+
+        self.assertEqual(self.inst.get_users_exist_channel_dict([]), {})
 
     def test_available_conns(self):
         mdls = self._sample_channels_insert()
@@ -341,8 +352,27 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
             {self.PROF_OID_1: {self.USER_OID, self.USER_OID_2}}
         )
 
+    def test_profs_oids_partial_miss(self):
+        mdls = [
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]),
+            ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1]),
+        ]
+        self.inst.insert_many(mdls)
+
+        self.assertDictEqual(
+            self.inst.get_profiles_user_oids([self.PROF_OID_1, ObjectId()]),
+            {self.PROF_OID_1: {self.USER_OID, self.USER_OID_2}}
+        )
+
     def test_profs_oids_no_prof(self):
         self.assertDictEqual(self.inst.get_profiles_user_oids([self.PROF_OID_1]), {})
+
+    def test_profs_oids_empty_param(self):
+        self._sample_channels_insert()
+
+        self.assertDictEqual(self.inst.get_profiles_user_oids([]), {})
 
     def test_user_in_channel(self):
         mdl = ChannelProfileConnectionModel(
