@@ -221,6 +221,13 @@ class ProfileDataManager(BaseCollection):
         super().on_init_async()
 
         cmds = []
+        cmds.extend(self._fill_new_permission())
+
+        if cmds:
+            self.bulk_write(cmds)
+
+    def _fill_new_permission(self):
+        cmds = []
 
         for perm_cat in ProfilePermission:
             perm_key = f"{ChannelProfileModel.Permission.key}.{perm_cat.code}"
@@ -236,8 +243,7 @@ class ProfileDataManager(BaseCollection):
                     )
                 )
 
-        if cmds:
-            self.bulk_write(cmds)
+        return cmds
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
