@@ -53,6 +53,17 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         return mdls
 
+    def test_add_duplicate(self):
+        self.assertEqual(
+            self.inst.insert_one_model(ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[]))[0],
+            WriteOutcome.O_INSERTED)
+        self.assertEqual(
+            self.inst.insert_one_model(ChannelProfileConnectionModel(
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]))[0],
+            WriteOutcome.O_DATA_EXISTS
+        )
+
     def test_attach_new_one(self):
         result = self.inst.user_attach_profile(self.CHANNEL_OID, self.USER_OID, self.PROF_OID_1)
 

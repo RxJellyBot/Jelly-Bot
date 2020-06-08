@@ -5,7 +5,7 @@ import time
 
 from extutils import exec_timing_result
 from JellyBot.systemconfig import Bot
-from mongodb.factory import RemoteControlManager
+from mongodb.factory.rmc import RemoteControlManager
 from tests.base import TestTimeComparisonMixin, TestDatabaseMixin
 
 __all__ = ["TestRemoteControlHolder"]
@@ -32,9 +32,14 @@ CID_DEST = ObjectId.from_datetime(_now_ + timedelta(days=1))
 
 
 class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
+    inst = None
+
     @classmethod
     def setUpTestClass(cls):
         Bot.RemoteControl.IdleDeactivateSeconds = EXPIRY_SEC
+        cls.inst = RemoteControlManager()
+
+    # TEST: Check enforcer unique
 
     @classmethod
     def tearDownTestClass(cls):
@@ -52,12 +57,12 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
         # Storing the expiry timestamp before the actual one is created
         # to reduce the time offset caused ny db-app comm lag
         expiry_unexpected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
-        RemoteControlManager.activate(UID, CID_SRC, CID_DEST)
+        self.inst.activate(UID, CID_SRC, CID_DEST)
 
         self.sleep_lock()
 
         expiry_expected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
-        get_current = exec_timing_result(RemoteControlManager.get_current, UID, CID_SRC)
+        get_current = exec_timing_result(self.inst.get_current, UID, CID_SRC)
         entry = get_current.return_
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
@@ -69,12 +74,12 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
         # Storing the expiry timestamp before the actual one is created
         # to reduce the time offset caused by db-app comm lag
         expiry_expected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
-        activate_sec = exec_timing_result(RemoteControlManager.activate, UID, CID_SRC, CID_DEST).execution_ms / 1000
+        activate_sec = exec_timing_result(self.inst.activate, UID, CID_SRC, CID_DEST).execution_ms / 1000
 
         self.sleep_lock()
 
         expiry_unexpected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
-        entry = RemoteControlManager.get_current(UID, CID_SRC, update_expiry=False)
+        entry = self.inst.get_current(UID, CID_SRC, update_expiry=False)
 
         self.assertIsNotNone(entry, "Entry not found in the holder.")
         self.assertEqual(CID_DEST, entry.target_channel_oid, "Target channel not match.")
@@ -82,22 +87,22 @@ class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
         self.assertTimeDifferenceGreaterEqual(expiry_unexpected, entry.expiry, SLEEP_SEC)
 
     def test_auto_deactivate(self):
-        RemoteControlManager.activate(UID, CID_SRC, CID_DEST)
+        self.inst.activate(UID, CID_SRC, CID_DEST)
         self.wait_expiry_lock()
-        self.assertIsNone(RemoteControlManager.get_current(UID, CID_SRC, update_expiry=False),
+        self.assertIsNone(self.inst.get_current(UID, CID_SRC, update_expiry=False),
                           "Entry still inside the holder.")
 
     def test_manual_deactivate(self):
-        RemoteControlManager.activate(UID, CID_SRC, CID_DEST)
-        RemoteControlManager.deactivate(UID, CID_SRC)
-        self.assertIsNone(RemoteControlManager.get_current(UID, CID_SRC, update_expiry=False),
+        self.inst.activate(UID, CID_SRC, CID_DEST)
+        self.inst.deactivate(UID, CID_SRC)
+        self.assertIsNone(self.inst.get_current(UID, CID_SRC, update_expiry=False),
                           "Entry still inside the holder.")
 
     def test_activate(self):
         # Storing the expiry timestamp before the actual one is created
         # to reduce the time offset caused ny db-app comm lag
         expiry_expected = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(seconds=EXPIRY_SEC)
-        entry = RemoteControlManager.activate(UID, CID_SRC, CID_DEST)
+        entry = self.inst.activate(UID, CID_SRC, CID_DEST)
 
         self.assertIsNotNone(entry, "Activation returned `None`")
         self.assertEqual(CID_DEST, entry.target_channel_oid, "Target channel not match.")
