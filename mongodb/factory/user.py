@@ -62,7 +62,7 @@ class _APIUserManager(GenerateTokenMixin, BaseCollection):
                 if ex is not None:
                     outcome = WriteOutcome.X_EXCEPTION_OCCURRED
                 else:
-                    outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
+                    outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
             else:
                 token = entry.token
 
@@ -96,7 +96,7 @@ class _OnPlatformIdentityManager(BaseCollection):
         if not outcome.is_inserted:
             entry = self.get_onplat(platform, user_token)
             if entry is None:
-                outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
+                outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
 
         return OnPlatformUserRegistrationResult(outcome, ex, entry)
 
@@ -147,7 +147,7 @@ class _RootUserManager(BaseCollection):
                 build_conn_entry = root_from_oid_func(user_reg_oid)
                 if build_conn_entry is None:
                     overall_outcome = oc_onconn_failed
-                    build_conn_outcome = WriteOutcome.X_CACHE_MISSING_ATTEMPTED_INSERT
+                    build_conn_outcome = WriteOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
                 else:
                     overall_outcome = WriteOutcome.O_DATA_EXISTS
                     if on_exist:

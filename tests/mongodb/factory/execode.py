@@ -96,7 +96,7 @@ class TestExecodeManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
     def test_enqueue_unknown_action(self):
         result = ExecodeManager.enqueue_execode(self.CREATOR_OID, Execode.UNKNOWN)
 
-        self.assertEqual(result.outcome, WriteOutcome.X_ACTION_UNKNOWN)
+        self.assertEqual(result.outcome, WriteOutcome.X_UNKNOWN_EXECODE_ACTION)
         self.assertFalse(result.success)
         self.assertIsNone(result.model)
 
@@ -461,7 +461,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         result = ExecodeManager.complete_execode(
             enqueue.execode, {param.AutoReply.PLATFORM: "1"})
 
-        self.assertEqual(result.outcome, OperationOutcome.X_ARGS_LACKING)
+        self.assertEqual(result.outcome, OperationOutcome.X_MISSING_ARGS)
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)

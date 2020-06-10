@@ -65,7 +65,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             data = {}
 
         if execode_type == Execode.UNKNOWN:
-            return EnqueueExecodeResult(WriteOutcome.X_ACTION_UNKNOWN)
+            return EnqueueExecodeResult(WriteOutcome.X_UNKNOWN_EXECODE_ACTION)
 
         model, outcome, ex = self.insert_one_data(
             CreatorOid=root_uid, Execode=execode, ActionType=execode_type, Timestamp=now, Data=data)
@@ -155,7 +155,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
                 if len(lacking_keys) == 0:
                     outcome, cmpl_outcome, ex = self._attempt_complete_complete(execode, tk_model, execode_kwargs)
                 else:
-                    outcome = OperationOutcome.X_ARGS_LACKING
+                    outcome = OperationOutcome.X_MISSING_ARGS
                     cmpl_outcome = ExecodeCompletionOutcome.X_ARGS_LACKING
             except ModelConstructionError as e:
                 outcome = OperationOutcome.X_CONSTRUCTION_ERROR

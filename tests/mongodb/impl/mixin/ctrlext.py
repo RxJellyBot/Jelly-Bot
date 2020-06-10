@@ -106,7 +106,7 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
 
         self.assertIsInstance(exception, InvalidModelFieldError)
         self.assertIsInstance(exception.inner_exception, FieldValueInvalidError)
-        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD)
+        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD_VALUE)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_casting_failed(self):
@@ -131,7 +131,7 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
             TestControlExtensionMixin.ModelTest, BoolF=True, Bool2F=True)
 
         self.assertIsInstance(exception, FieldKeyNotExistError)
-        self.assertEqual(outcome, WriteOutcome.X_FIELD_NOT_EXIST)
+        self.assertEqual(outcome, WriteOutcome.X_MODEL_KEY_NOT_EXIST)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_construct_error(self):

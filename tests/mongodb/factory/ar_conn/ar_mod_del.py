@@ -7,7 +7,7 @@ from flags import Platform
 from models import AutoReplyModuleModel
 from mongodb.factory import ChannelManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
-from mongodb.factory.results import WriteOutcome, UpdateOutcome
+from mongodb.factory.results import UpdateOutcome
 from tests.base import TestModelMixin, TestTimeComparisonMixin
 
 from ._base_ar_mod import TestAutoReplyModuleManagerBase
@@ -43,7 +43,7 @@ class TestAutoReplyModuleManagerDelete(TestModelMixin, TestTimeComparisonMixin,
         self.assertEqual(
             AutoReplyModuleManager.module_mark_inactive(
                 self.get_mdl_5().keyword.content, self.get_mdl_5().channel_oid, self.get_mdl_5().creator_oid),
-            WriteOutcome.O_DATA_UPDATED)
+            UpdateOutcome.O_UPDATED)
 
         self.assertIsNone(
             AutoReplyModuleManager.get_conn(
@@ -56,7 +56,7 @@ class TestAutoReplyModuleManagerDelete(TestModelMixin, TestTimeComparisonMixin,
         self.assertEqual(
             AutoReplyModuleManager.module_mark_inactive(
                 self.get_mdl_5().keyword.content, self.get_mdl_5().channel_oid, self.CREATOR_OID_2),
-            WriteOutcome.X_INSUFFICIENT_PERMISSION)
+            UpdateOutcome.X_INSUFFICIENT_PERMISSION)
 
         mdl = AutoReplyModuleManager.get_conn(
             self.get_mdl_5().keyword.content, self.get_mdl_5().keyword.content_type, self.get_mdl_5().channel_oid)

@@ -45,17 +45,17 @@ class WriteOutcome(BaseOutcome):
 
         103 - (Auto Reply) Pinned module existed
 
-        104 - Registering Channel
+        104 - Channel registration failed
 
-        105 - Registering OnPlatform User ID
+        105 - OnPlatform user registration failed
 
-        106 - Registering API User ID
+        106 - API user registration failed
 
-        107 - Connecting OnPlatform User ID
+        107 - OnPlatform user identity connection failed
 
-        108 - Connecting API User ID
+        108 - API user identity connection failed
 
-        109 - Config Setting Failed
+        109 - Config setting failed
 
         110 - Invalid URL
 
@@ -67,40 +67,36 @@ class WriteOutcome(BaseOutcome):
 
         114 - Empty content
 
-        115 - (Execode) Unknown Action
+        115 - (Execode) Unknown action
 
     2xx - Problems related to the model
-        201 - Not Serializable
+        201 - Not serializable
 
-        202 - Not Acknowledged
+        202 - Not acknowledged
 
-        203 - Not Found
-
-        204 - Not Entry
+        204 - Not entry
 
         205 - Invalid
 
-        206 - Field Key not Exists
+        206 - Field key not exists
 
     3xx - Problems related to the field of an model
-        301 - Field Readonly
+        301 - Field readonly
 
-        302 - Field Type Mismatch
+        302 - Field type mismatch
 
-        303 - Field Invalid
+        303 - Field invalid
 
-        304 - Field Casting Failed
+        304 - Field casting failed
 
-        305 - Required Key not Filled
-
-        306 - Field Key not Exist
+        305 - Required key not filled
 
         399 - Misc
 
     4xx - Problems related to cache
-        401 - Missing in Cache, Attempted Insertion
+        401 - Missing in cache, attempted insertion
 
-        402 - Missing in Cache, Aborted Insertion
+        402 - Missing in cache, aborted insertion
 
     5ss - Problems related to intermediate process
         501 - Channel not found
@@ -108,9 +104,9 @@ class WriteOutcome(BaseOutcome):
         502 - Model class not provided
 
     8xx - Unknown Problems
-        801 - Model Construction Unknown
+        801 - Model construction unknown
 
-        802 - Insertion Unknown
+        802 - Insertion unknown
 
     9xx - Problems related to execution
         901 - Not executed
@@ -126,122 +122,115 @@ class WriteOutcome(BaseOutcome):
         return WriteOutcome.X_NOT_EXECUTED
 
     O_INSERTED = \
-        -201, _("O: Inserted"), _("The system returned OK with data inserted to the database.")
-    O_DATA_UPDATED = \
-        -151, _("O: Updated"), _("The system returned OK with data updated in the database.")
+        -201, _("O: Inserted"), _("Data inserted.")
+    O_UPDATED = \
+        -151, _("O: Updated"), _("Data updated.")
     O_DATA_EXISTS = \
-        -101, _("O: Existed"), _("The system returned OK with data already existed in the database.")
+        -101, _("O: Existed"), _("Data already exists.")
     O_MISC = \
-        -1, _("O: Uncategorized"), _("The system returned OK with uncategorized reason.")
+        -1, _("O: Uncategorized"), _("Uncategorized success reason.")
     X_INSUFFICIENT_PERMISSION = \
-        101, _("X: Insufficient Permission"), \
-        _("The insertion was failed becuase the permission is insufficient.")
+        101, _("X: Insufficient permission"), \
+        _("Insufficient permission to perform the action.")
     X_CHANNEL_TYPE_UNKNOWN = \
-        102, _("X: Channel Type Unidentifiable"), \
+        102, _("X: Channel type unidentifiable"), \
         _("The channel type is unidentifiable using the provided token and platform.")
     X_PINNED_CONTENT_EXISTED = \
-        103, _("X: Pinned Module Existed"), \
-        _("A pinned module has already existed. "
-          "You have to have the permission of accessing the pinned module to overwrite.")
+        103, _("X: Pinned module existed"), \
+        _("A pinned auto-reply module has already existed.")
     X_ON_REG_CHANNEL = \
-        104, _("X: on Registering Channel"), \
-        _("The insertion was failed while registering the identity of channel.")
+        104, _("X: Channel registration failed"), \
+        _("Channel registration failed.")
     X_ON_REG_ONPLAT = \
-        105, _("X: on Registering OnPlatform User"), \
-        _("The insertion was failed while registering the identity of on-platform user.")
+        105, _("X: OnPlatform user registration failed"), \
+        _("OnPlatform user registration failed.")
     X_ON_REG_API = \
-        106, _("X: on Registering API User"), \
-        _("The insertion was failed while registering the identity of API user.")
+        106, _("X: API user registration failed"), \
+        _("API user registration failed.")
     X_ON_CONN_ONPLAT = \
-        107, _("X: on Connecting OnPlatform User"), \
-        _("The insertion was failed while connecting the identity of on-platform user.")
+        107, _("X: OnPlatform user connection failed"), \
+        _("OnPlatform user identity connection failed.")
     X_ON_CONN_API = \
-        108, _("X: on Connecting API User"), \
-        _("The insertion was failed while connecting the identity of API user.")
+        108, _("X: API user connection failed"), \
+        _("API user identity connection failed.")
     X_ON_SET_CONFIG = \
-        109, _("X: on Setting Config"), \
-        _("An error occurred when trying to set the config after the default profile is generated.")
+        109, _("X: Failed to set config"), \
+        _("Failed to set the config value.")
     X_INVALID_URL = \
         110, _("X: Invalid URL"), \
-        _("The URL is invalid. Maybe missing the schema or the URL did not return 200.")
+        _("The URL is invalid.")
     X_AR_INVALID_KEYWORD = \
-        111, _("X: (Auto Reply) Invalid Keyword"), \
+        111, _("X: Invalid Keyword"), \
         _("The keyword contains invalid content.")
     X_AR_INVALID_RESPONSE = \
-        112, _("X: (Auto Reply) Invalid Response"), \
+        112, _("X: Invalid Response"), \
         _("One or more of the responses contains invalid content.")
     X_CNL_DEFAULT_CREATE_FAILED = \
-        113, _("X: (Channel) Default Profile Creation Failed"), \
+        113, _("X: Default profile creation failed"), \
         _("Failed to create a default profile for the channel.")
     X_EMPTY_CONTENT = \
-        114, _("X: Empty Content"), \
+        114, _("X: Empty content"), \
         _("The content to be stored is empty.")
-    X_ACTION_UNKNOWN = \
-        115, _("X: (Execode) Unknown Action"), \
+    X_UNKNOWN_EXECODE_ACTION = \
+        115, _("X: Unknown Execode action"), \
         _("The action type of the Execode is unknown.")
     X_NOT_SERIALIZABLE = \
-        201, _("X: Not Serializable"), \
-        _("The processed data cannot be serialized.")
+        201, _("X: Not serializable"), \
+        _("The data to be stored cannot be serialized.")
     X_NOT_ACKNOWLEDGED = \
-        202, _("X: Not Acknowledged"), \
-        _("The database did not acknowledge the inserted data.")
-    X_NOT_FOUND = \
-        203, _("X: Not Found"), \
-        _("The condition to update/insert does not match any data in the database.")
+        202, _("X: Not acknowledged"), \
+        _("The database did not acknowledge the data to be inserted.")
     X_NOT_MODEL = \
-        204, _("X: Not Model"), \
-        _("The processed data is not in the shape of a data model.")
+        204, _("X: Not model"), \
+        _("The data is not a model.")
     X_INVALID_MODEL = \
-        205, _("X: Invalid Model"), \
+        205, _("X: Invalid model"), \
         _("Some data of the model is invalid.")
     X_MODEL_KEY_NOT_EXIST = \
-        206, _("X: Model not Exist"), \
+        206, _("X: Model not exist"), \
         _("Some model key does not exist.")
     X_READONLY = \
         301, _("X: Readonly"), \
-        _("There are some fields that are being attempted to modify are read-only.")
+        _("Some fields to be written is readonly.")
     X_TYPE_MISMATCH = \
-        302, _("X: Type Mismatch"), \
-        _("The type of the data to update does not match the type of the field to be modified.")
-    X_INVALID_FIELD = \
-        303, _("X: Invalid Data"), \
-        _("The data to be updated is invalid for the field.")
+        302, _("X: Type mismatch"), \
+        _("Some data type of the value is not the expected one.")
+    X_INVALID_FIELD_VALUE = \
+        303, _("X: Invalid field value"), \
+        _("Some model field value is invalid.")
     X_CASTING_FAILED = \
-        304, _("X: Casting Failed"), \
-        _("The data cannot be casted to the desired type. Check the datatype of the provided data.")
+        304, _("X: Casting failed"), \
+        _("Some data cannot be casted to the desired type.")
     X_REQUIRED_NOT_FILLED = \
-        305, _("X: Required not Filled"), \
-        _("Required key of the model not filled.")
-    X_FIELD_NOT_EXIST = \
-        306, _("X: Field Key not Exist"), \
-        _("Field key does not exist in the model.")
+        305, _("X: Required not filled"), \
+        _("Required value(s) of the model not filled.")
     X_INVALID_MODEL_FIELD = \
-        399, _("X: Invalid Model Field"), \
+        399, _("X: Invalid model field"), \
         _("There are fields in the model containing invalid values.")
-    X_CACHE_MISSING_ATTEMPTED_INSERT = \
-        401, _("X: Missing in Cache, Attempted Insertion"), \
-        _("The data was not found and the system has attempted to insert a new data but failed.")
-    X_CACHE_MISSING_ABORT_INSERT = \
-        402, _("X: Missing in Cache, Aborted Insertion"), \
-        _("The data was not found and the system aborted to insert a new data.")
+    X_NOT_FOUND_ATTEMPTED_INSERT = \
+        401, _("X: Not found - attempted insert"), \
+        _("Data not found. Attempted to insert but failed.")
+    X_NOT_FOUND_ABORTED_INSERT = \
+        402, _("X: Not found - aborted insert"), \
+        _("Data not found. Insertion was not attempted.")
     X_CHANNEL_NOT_FOUND = \
-        501, _("X: Channel Not Found"), \
-        _("Channel data not found. Register the channel first.")
+        501, _("X: Channel not found"), \
+        _("Channel not found.")
     X_NO_MODEL_CLASS = \
         502, _("X: No model class"), \
         _("Model class not provided.")
     X_CONSTRUCT_UNKNOWN = \
-        801, _("X: Model Construction Unknown"), \
+        801, _("X: Model construction"), \
         _("An unknown occurred during the construction of a data model.")
     X_INSERT_UNKNOWN = \
-        802, _("X: Insertion Unknown"), \
-        _("An unknown occurred while inserting the data.")
+        802, _("X: Insertion"), \
+        _("An unknown occurred during the insertion of the data.")
     X_NOT_EXECUTED = \
-        901, _("X: Not Executed"), \
-        _("The insertion process had not been executed.")
+        901, _("X: Not executed"), \
+        _("Insertion not executed.")
     X_EXCEPTION_OCCURRED = \
-        902, _("X: Exception Occurred"), \
-        _("An exception occurred during execution.")
+        902, _("X: Exception occurred"), \
+        _("An exception occurred.")
 
     @property
     def is_inserted(self):
@@ -257,6 +246,7 @@ class GetOutcome(BaseOutcome):
     # SUCCESS
 
     -2 - Already exists
+
     -1 - Inserted
 
     ================================
@@ -265,6 +255,7 @@ class GetOutcome(BaseOutcome):
 
     1xx - Problems related to the getting process
         101 - Not Found, attempted insert
+
         102 - Not Found, aborted insert
 
     2xx - Problems related to the given parameters
@@ -273,8 +264,11 @@ class GetOutcome(BaseOutcome):
     3xx - SPECIFIC
         30x - Permission
             301 - Channel not found
+
             302 - Error during config creation
+
             303 - Error during default profile creation
+
         31x - Execode
             311 - Incorrect Execode type
 
@@ -290,81 +284,82 @@ class GetOutcome(BaseOutcome):
         return GetOutcome.X_NOT_EXECUTED
 
     O_CACHE_DB = \
-        -2, _("O: From Cache/DB"), \
-        _("The data was found in either Cache or Database.")
+        -2, _("O: Data found"), \
+        _("The data was found.")
     O_ADDED = \
         -1, _("O: Inserted"), \
-        _("The data was not found yet the data has been inserted to the database.")
+        _("The data was not found but inserted.")
+
     X_NOT_FOUND_ATTEMPTED_INSERT = \
-        101, _("X: Not Found, Attempted Insertion"), \
-        _("The data was not found and the system has attempted to insert a new data but failed.")
+        101, _("X: Not found - attempted insert"), \
+        _("Data not found. Attempted to insert but failed.")
     X_NOT_FOUND_ABORTED_INSERT = \
-        102, _("X: Not Found, Aborted Insertion"), \
-        _("The data was not found and the system aborted to insert a new data.")
+        102, _("X: Not found - aborted insert"), \
+        _("Date not found. Insertion was not attempted.")
     X_NOT_FOUND_FIRST_QUERY = \
         103, _("X: Not found on 1st query"), \
-        _("The data was not found for the 1st query.")
+        _("Data not found at the 1st query.")
     X_NOT_FOUND_SECOND_QUERY = \
         104, _("X: Not found on 2nd query"), \
-        _("The data was not found for the 2nd query.")
+        _("Data not found at the 2nd query.")
     X_NO_CONTENT = \
         201, _("X: Empty Content"), \
-        _("The content in the parameter is empty.")
+        _("The content is empty.")
     X_CHANNEL_NOT_FOUND = \
-        301, _("X: Channel Not Found"), \
-        _("Channel data not found. Use the channel token and platform to register the channel first.")
+        301, _("X: Channel not found"), \
+        _("Channel not found.")
     X_CHANNEL_CONFIG_ERROR = \
-        302, _("X: Config Error"), \
-        _("An error occurred when getting configuration from the channel data.")
+        302, _("X: Config error"), \
+        _("An error occurred during the access of channel config.")
     X_DEFAULT_PROFILE_ERROR = \
-        303, _("X: Default Profile Error"), \
-        _("An error occurred when creating a default profile.")
+        303, _("X: Default profile error"), \
+        _("An error occurred during the creation of the default profile.")
     X_EXECODE_TYPE_MISMATCH = \
-        311, _("X: Execode Type Mismatch"), \
-        _("The type of the given Execode doesn't match the desired one.")
+        311, _("X: Execode type mismatch"), \
+        _("The type of the given Execode does not match the desired one.")
     X_NOT_EXECUTED = \
-        901, _("X: Not Executed"), \
-        _("The acquiring process had not been executed.")
+        901, _("X: Not executed"), \
+        _("Process not executed.")
 
 
 class OperationOutcome(BaseOutcome):
     """
     # SUCCESS
 
-    -1 - Operation Completed
+    -1 - Operation completed
 
     ================================
 
     # FAILED
 
     1xx - Problems related to Execode
-        101 - Execode Not Found
+        101 - Execode not found
 
-        102 - Args Lacking
+        102 - Required arguments missing
 
-        103 - Completion Failed
+        103 - Completion failed
 
-        104 - Completion Process not Implemented
+        104 - Completion process not implemented
 
-        105 - Completion Error
+        105 - Completion error
 
         106 - Empty Execode
 
-        107 - Collation Error
+        107 - Collation error
 
-        108 - Type Mismatch
+        108 - Type mismatch
 
-    2xx - Problems related to Channel
-        201 - Channel Not Found
+    2xx - Problems related to channel
+        201 - Channel not found
 
-    3xx - Problems related to User Data
+    3xx - Problems related to user data
         301 - Source is identical to destination
 
         302 - Source user data not found
 
         303 - Destination user data not found
 
-    4xx - Problems related to Permission Control
+    4xx - Problems related to permission control
         401 - Insufficient permission
 
         402 - Cannot be attached
@@ -377,8 +372,8 @@ class OperationOutcome(BaseOutcome):
 
         406 - Detach failed
 
-    5xx - Problems related to Model
-        501 - Construction Error
+    5xx - Problems related to model
+        501 - Construction error
 
     9xx - Problems related to execution
         901 - Not executed
@@ -403,53 +398,53 @@ class OperationOutcome(BaseOutcome):
         -1, _("O: Completed"), \
         _("The operation was successfully completed.")
     X_EXECODE_NOT_FOUND = \
-        101, _("X: Execode Not Found"), \
+        101, _("X: Execode not found"), \
         _("No enqueued Execode found.")
-    X_ARGS_LACKING = \
-        102, _("X: Args Lacking"), \
+    X_MISSING_ARGS = \
+        102, _("X: Required arguments missing"), \
         _("Missing required arguments to complete the action.")
     X_COMPLETION_FAILED = \
-        103, _("X: Completion Failed"), \
+        103, _("X: Completion failed"), \
         _("The action completion was failed.")
     X_NO_COMPLETE_ACTION = \
-        104, _("X: No Complete Action"), \
-        _("No complete action implemented yet for the provided action type.")
+        104, _("X: No complete action"), \
+        _("Complete action not implemented for the provided action type.")
     X_COMPLETION_ERROR = \
-        105, _("X: Completion Error"), \
-        _("An error occurred during action completion process.")
+        105, _("X: Completion error"), \
+        _("An error occurred during the action completion process.")
     X_EXECODE_EMPTY = \
         106, _("X: Empty Execode"), \
         _("The Execode is empty.")
     X_COLLATION_ERROR = \
-        107, _("X: Collation Error"), \
-        _("An error occurred during parameter collation process.")
+        107, _("X: Collation error"), \
+        _("An error occurred during the parameter collating process.")
     X_EXECODE_TYPE_MISMATCH = \
-        108, _("X: Execode type Mismatch"), \
-        _("The type of the Execode doesn't match the desired one.")
+        108, _("X: Execode type mismatch"), \
+        _("The type of the Execode does not match the desired one.")
     X_CHANNEL_NOT_FOUND = \
-        201, _("X: Channel Not Found"), \
-        _("Channel was not found using the given Channel ID.")
+        201, _("X: Channel not found"), \
+        _("Channel not found.")
     X_SAME_SRC_DEST = \
         301, _("X: Source = Destination"), \
-        _("Source user data is equal to the destination user data.")
+        _("Source user data is identical to the destination user data.")
     X_SRC_DATA_NOT_FOUND = \
-        302, _("X: Source Data Not Found"), \
+        302, _("X: Source data not found"), \
         _("Source user data not found.")
     X_DEST_DATA_NOT_FOUND = \
-        303, _("X: Destination Data Not Found"), \
+        303, _("X: Destination data not found"), \
         _("Destination user data not found.")
     X_INSUFFICIENT_PERMISSION = \
-        401, _("X: Insufficient Permission"), \
+        401, _("X: Insufficient permission"), \
         _("Insufficient permission to execute this operation.")
     X_UNATTACHABLE = \
         402, _("X: Unattachable"), \
-        _("This profile cannot be attached to the target.")
+        _("The profile cannot be attached to the target.")
     X_PROFILE_NOT_FOUND_NAME = \
-        403, _("X: Not found (name)"), \
+        403, _("X: Profile not found (name)"), \
         _("Profile not found with the given name.")
     X_NO_ATTACHABLE_PROFILES = \
         404, _("X: No attachable profiles"), \
-        _("No attachable profiles for the target.")
+        _("No attachable profiles.")
     X_TARGET_NOT_IN_CHANNEL = \
         405, _("X: Target not in channel"), \
         _("The target to be attached the profile is not in the channel.")
@@ -470,10 +465,10 @@ class OperationOutcome(BaseOutcome):
         _("Delete operation not performed.")
     X_INTEGRATION_FAILED = \
         904, _("X: User integration failed"), \
-        _("User integration ID replacement process failed.")
+        _("ID replacement process of user integration failed.")
     X_ERROR = \
         999, _("X: Error"), \
-        _("An error has occurred during the process execution.")
+        _("An error occurred during the execution.")
 
 
 class UpdateOutcome(BaseOutcome):
@@ -501,7 +496,7 @@ class UpdateOutcome(BaseOutcome):
         N/A
 
     3xx - Problems related to the intermediate process
-        301 - Channel not Found
+        301 - Channel not found
 
         302 - Config not exists
 
@@ -535,28 +530,28 @@ class UpdateOutcome(BaseOutcome):
 
     O_UPDATED = \
         -1, _("O: Success"), \
-        _("The updating operation succeed.")
+        _("Successfully updated")
 
     X_NOT_FOUND = \
-        101, _("X: Not Found"), \
-        _("The data for updating is not found.")
+        101, _("X: Not found"), \
+        _("No data to be updated.")
 
     X_CHANNEL_NOT_FOUND = \
-        301, _("X: Channel Not Found"), \
-        _("Channel data not found. Register the channel first.")
+        301, _("X: Channel not found"), \
+        _("Channel not found.")
     X_CONFIG_NOT_EXISTS = \
-        302, _("X: Config Not Exists"), \
+        302, _("X: Config not exists"), \
         _("Specified config field does not exist.")
     X_CONFIG_TYPE_MISMATCH = \
-        303, _("X: Config Type Mismatch"), \
+        303, _("X: Config type mismatch"), \
         _("The type of the new value does not match the expected type(s) of the config.")
     X_CONFIG_VALUE_INVALID = \
-        304, _("X: Config Value Invalid"), \
+        304, _("X: Config value invalid"), \
         _("The new config value is invalid for the corresponding field.")
     X_INSUFFICIENT_PERMISSION = \
-        305, _("X: Insufficient Permission"), \
-        _("The update was failed becuase the permission is insufficient.")
+        305, _("X: Insufficient permission"), \
+        _("Insufficient permission to complete the action.")
 
     X_NOT_EXECUTED = \
-        901, _("X: Not Executed"), \
-        _("The operation had not been executed.")
+        901, _("X: Not executed"), \
+        _("Process not executed.")
