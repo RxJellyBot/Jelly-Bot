@@ -7,7 +7,7 @@ from flags import Platform
 from models import AutoReplyModuleModel
 from mongodb.factory import ChannelManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import WriteOutcome, UpdateOutcome
 from tests.base import TestModelMixin, TestTimeComparisonMixin
 
 from ._base_ar_mod import TestAutoReplyModuleManagerBase
@@ -84,11 +84,11 @@ class TestAutoReplyModuleManagerDelete(TestModelMixin, TestTimeComparisonMixin,
 
         result = AutoReplyModuleManager.module_mark_inactive(
             self.get_mdl_5().keyword.content, ObjectId(), self.CREATOR_OID_2)
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
 
     def test_del_keyword_not_found(self):
         AutoReplyModuleManager.add_conn(**self.get_mdl_5_args())
 
         result = AutoReplyModuleManager.module_mark_inactive(
             self.get_mdl_1().keyword.content, self.get_mdl_5().channel_oid, self.CREATOR_OID_2)
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)

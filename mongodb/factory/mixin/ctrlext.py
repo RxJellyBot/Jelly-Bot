@@ -180,16 +180,16 @@ class ControlExtensionMixin(Collection):
 
         return outcome
 
-    def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> WriteOutcome:
+    def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> UpdateOutcome:
         update_result = self.update_many(filter_, update, upsert=upsert, collation=collation)
 
         if update_result.matched_count > 0:
             if update_result.modified_count > 0:
-                outcome = WriteOutcome.O_DATA_UPDATED
+                outcome = UpdateOutcome.O_UPDATED
             else:
-                outcome = WriteOutcome.O_DATA_EXISTS
+                outcome = UpdateOutcome.O_FOUND
         else:
-            outcome = WriteOutcome.X_NOT_FOUND
+            outcome = UpdateOutcome.X_NOT_FOUND
 
         return outcome
 

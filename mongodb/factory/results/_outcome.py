@@ -3,6 +3,9 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
+# TODO: all sentence (not caps)
+
+
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     @property
     def code_prefix(self) -> str:
@@ -477,9 +480,15 @@ class UpdateOutcome(BaseOutcome):
     """
     # SUCCESS
 
-    -101 - Found (not updated)
+    -1xx - Potentially problematic update
 
-    -1 - Success
+        -101 - Found (not updated)
+
+        -102 - Partial args removed
+
+        -103 - Value invalid
+
+    -1 - Updated
 
     ================================
 
@@ -500,6 +509,8 @@ class UpdateOutcome(BaseOutcome):
 
         304 - Config value invalid
 
+        305 - Insufficient permission
+
     9xx - Problems related to execution
         901 - Not executed
     """
@@ -515,12 +526,21 @@ class UpdateOutcome(BaseOutcome):
     O_FOUND = \
         -101, _("O: Found"), \
         _("The data was found but not updated.")
+    O_PARTIAL_ARGS_REMOVED = \
+        -102, _("O: Partial args removed"), \
+        _("Some arguments are removed.")
+    O_PARTIAL_ARGS_INVALID = \
+        -103, _("O: Partial args invalid"), \
+        _("Some arguments are invalid.")
+
     O_UPDATED = \
         -1, _("O: Success"), \
         _("The updating operation succeed.")
+
     X_NOT_FOUND = \
         101, _("X: Not Found"), \
         _("The data for updating is not found.")
+
     X_CHANNEL_NOT_FOUND = \
         301, _("X: Channel Not Found"), \
         _("Channel data not found. Register the channel first.")
@@ -533,6 +553,10 @@ class UpdateOutcome(BaseOutcome):
     X_CONFIG_VALUE_INVALID = \
         304, _("X: Config Value Invalid"), \
         _("The new config value is invalid for the corresponding field.")
+    X_INSUFFICIENT_PERMISSION = \
+        305, _("X: Insufficient Permission"), \
+        _("The update was failed becuase the permission is insufficient.")
+
     X_NOT_EXECUTED = \
         901, _("X: Not Executed"), \
         _("The operation had not been executed.")

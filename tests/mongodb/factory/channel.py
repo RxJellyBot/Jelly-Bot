@@ -112,10 +112,10 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
             Platform=Platform.LINE, Token="U1234567", Config=ChannelConfigModel(DefaultProfileOid=ObjectId()))
         ChannelManager.insert_one_model(mdl)
 
-        self.assertEqual(ChannelManager.deregister(Platform.LINE, "U1234567"), WriteOutcome.O_DATA_UPDATED)
+        self.assertEqual(ChannelManager.deregister(Platform.LINE, "U1234567"), UpdateOutcome.O_UPDATED)
 
     def test_deregister_not_existed(self):
-        self.assertEqual(ChannelManager.deregister(Platform.LINE, "U1234567"), WriteOutcome.X_CHANNEL_NOT_FOUND)
+        self.assertEqual(ChannelManager.deregister(Platform.LINE, "U1234567"), UpdateOutcome.X_CHANNEL_NOT_FOUND)
 
     def test_mark_accessibility_existed(self):
         doid = ObjectId()
@@ -127,7 +127,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         ChannelManager.insert_one_model(mdl)
 
         self.assertEqual(ChannelManager.mark_accessibility(Platform.LINE, "U1234567", True),
-                         WriteOutcome.O_DATA_UPDATED)
+                         UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
             ChannelManager.find_one_casted(
                 {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
@@ -138,7 +138,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         )
 
         self.assertEqual(ChannelManager.mark_accessibility(Platform.LINE, "U1234567", False),
-                         WriteOutcome.O_DATA_UPDATED)
+                         UpdateOutcome.O_DATA_UPDATED)
         self.assertModelEqual(
             ChannelManager.find_one_casted(
                 {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
@@ -150,9 +150,9 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
 
     def test_mark_accessibility_not_existed(self):
         self.assertEqual(
-            ChannelManager.mark_accessibility(Platform.LINE, "U1234567", True), WriteOutcome.X_CHANNEL_NOT_FOUND)
+            ChannelManager.mark_accessibility(Platform.LINE, "U1234567", True), UpdateOutcome.X_CHANNEL_NOT_FOUND)
         self.assertEqual(
-            ChannelManager.mark_accessibility(Platform.LINE, "U1234567", False), WriteOutcome.X_CHANNEL_NOT_FOUND)
+            ChannelManager.mark_accessibility(Platform.LINE, "U1234567", False), UpdateOutcome.X_CHANNEL_NOT_FOUND)
 
     def test_update_default_name(self):
         doid = ObjectId()
