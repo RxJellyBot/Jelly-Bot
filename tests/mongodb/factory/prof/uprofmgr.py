@@ -201,7 +201,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
             UserProfileManager.get_user_channel_profiles(self.USER_OID, inside_only=False),
             [mdls[3], mdls[1], mdls[0]])
 
-    def test_get_user_channel_no_channel(self):
+    def test_get_user_channel_no_data(self):
         self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(self.USER_OID, inside_only=False),
                                       [])
 
@@ -310,7 +310,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         self.assertDictEqual(UserProfileManager.get_users_exist_channel_dict([ObjectId()]), {})
 
-    def test_user_channel_dict_no_channel(self):
+    def test_user_channel_dict_no_data(self):
         self.assertDictEqual(UserProfileManager.get_users_exist_channel_dict([self.USER_OID]), {})
 
     def test_user_channel_dict_empty_param(self):

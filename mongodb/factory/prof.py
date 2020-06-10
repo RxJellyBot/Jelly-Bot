@@ -4,7 +4,6 @@ from typing import Optional, List, Dict, Set, Union, Iterable
 import pymongo
 from bson import ObjectId
 
-from django.utils.translation import gettext_lazy as _
 from pymongo import UpdateOne
 
 from extutils.color import ColorFactory
@@ -20,7 +19,9 @@ from mongodb.factory.results import (
 from mongodb.utils import ExtendedCursor
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel)
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
+)
+from strnames.mongodb import Profile
 
 from ._base import BaseCollection
 
@@ -247,6 +248,9 @@ class _ProfileDataManager(BaseCollection):
 
         return cmds
 
+    def _create_profile(self, channel_oid: ObjectId, **fk_param):
+        return self.insert_one_data(ChannelOid=channel_oid, **fk_param)
+
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
 
@@ -254,10 +258,13 @@ class _ProfileDataManager(BaseCollection):
         return {model.id: model for model
                 in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
 
-    def get_profile_name(self, name: str) -> Optional[ChannelProfileModel]:
-        return self.find_one_casted({ChannelProfileModel.Name.key: name}, parse_cls=ChannelProfileModel)
+    def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
+        return self.find_one_casted(
+            {ChannelProfileModel.ChannelOid.key: channel_oid, ChannelProfileModel.Name.key: name},
+            parse_cls=ChannelProfileModel)
 
-    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
+    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None) \
+            -> ExtendedCursor[ChannelProfileModel]:
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
 
         if partial_keyword:
@@ -298,41 +305,73 @@ class _ProfileDataManager(BaseCollection):
             ex, create_result.model)
 
     def get_attachable_profiles(
-            self, channel_oid: ObjectId, existing_permissions: Set[ProfilePermission],
-            highest_perm_lv: PermissionLevel) \
+            self, channel_oid: ObjectId, *, existing_permissions: Optional[Set[ProfilePermission]] = None,
+            highest_perm_lv: PermissionLevel = PermissionLevel.NORMAL) \
             -> ExtendedCursor[ChannelProfileModel]:
+        """
+        Get the current attachable profiles in the specific channel.
+
+        The returned result will be filtered by
+
+        - Highest permission level ``highest_perm_lv``
+
+            Every profile that is equal or lower than this permission level be returned
+
+        - Already owned permissions ``existing_permissions``
+
+            Every profile that is granted **ALL** of these permissions will be returned
+
+        If a profile has a higher permission level, but does not contain all of the ``existing_permissions``,
+        it will still being returned.
+
+        :param channel_oid: channel to find the attachable profiles
+        :param existing_permissions: currently already owned permissions
+        :param highest_perm_lv: highest permission level allowed
+        :return: attachable profiles
+        """
+        if not existing_permissions:
+            existing_permissions = set()
+
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
 
-        # noinspection PyTypeChecker
-        limited_permissions = set(ProfilePermission) \
-            .difference(ProfilePermissionDefault.get_overridden_permissions(highest_perm_lv)) \
-            .difference(existing_permissions)
-        for perm in limited_permissions:
+        forbidden_permissions = []
+        overridden_permissions = ProfilePermissionDefault.get_overridden_permissions(highest_perm_lv)
+
+        for perm in ProfilePermission:
+            if perm not in overridden_permissions and perm not in existing_permissions:
+                forbidden_permissions.append(perm)
+
+        for perm in forbidden_permissions:
             filter_[f"{ChannelProfileModel.Permission.key}.{perm.code}"] = False
+
+        filter_[ChannelProfileModel.PermissionLevel.key] = {"$lte": highest_perm_lv}
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
 
-    def create_default_profile(self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> CreateProfileResult:
-        default_profile, outcome, ex = self._create_profile(channel_oid, Name=str(_("Default Profile")))
+    def create_default_profile(self, channel_oid: ObjectId, *,
+                               set_to_channel: bool = True, check_channel: bool = True) -> CreateProfileResult:
+        if check_channel and not ChannelManager.get_channel_oid(channel_oid):
+            return CreateProfileResult(WriteOutcome.X_CHANNEL_NOT_FOUND)
 
-        if set_to_channel and outcome.is_inserted:
+        result = self.create_profile(ChannelOid=channel_oid, Name=str(Profile.DEFAULT_PROFILE_NAME))
+
+        if set_to_channel and result.outcome.is_inserted:
             set_result = ChannelManager.set_config(
-                channel_oid, ChannelConfigModel.DefaultProfileOid.key, default_profile.id)
+                channel_oid, ChannelConfigModel.DefaultProfileOid.key, result.model.id)
 
             if not set_result.is_success:
-                outcome = WriteOutcome.X_ON_SET_CONFIG
+                result.model = None
+                result.outcome = WriteOutcome.X_ON_SET_CONFIG
 
-        return CreateProfileResult(outcome, ex, default_profile)
+        return result
 
-    def create_profile(self, kwargs) -> CreateProfileResult:
+    def create_profile(self, **fkwargs) -> CreateProfileResult:
         """
-        Create a profile.
+        Create a profile using ``fkargs`` where the key to construct the model is field key.
 
-        Uses ``kwargs`` to construct a :class:`ChannelProfileModel` then insert the model into the database.
-
-        :param kwargs: `dict` to construct a `ChannelProfileModel`.
+        :param fkwargs: `dict` to construct the profile
         """
-        model, outcome, ex = self.insert_one_data(**kwargs)
+        model, outcome, ex = self.insert_one_data(**fkwargs)
 
         return CreateProfileResult(outcome, ex, model)
 
@@ -356,17 +395,21 @@ class _ProfileDataManager(BaseCollection):
 
         ``new_jkwargs`` will be validated.
 
-        Keys that are not used in :class:`ChannelProfileModel` will be removed,
-        and the returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` if updated.
+        Returns :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` if
+            Some keys in ``new_jkwargs`` are not assigned in :class:`ChannelProfileModel` and successfully updated.
 
-        If the value in ``new_jkwargs`` is invalid, it will be removed as well.
-        The returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_INVALID` if updated.
+            These keys will be removed along with its values.
+
+        Returns :class:`UpdateOutcome.O_PARTIAL_ARGS_INVALID` if
+            Some values in ``new_jkwargs`` is invalid and successfully updated.
+
+            These values will be removed along with its keys.
+
+        Returns :class:`UpdateOutcome.X_NOT_EXECUTED` if
+            ``new_jkwargs`` is empty after validation.
 
         If there are any additional keys and also some invalid values,
-        the returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` if updated.
-
-        If ``new_jkwargs`` is empty after validation,
-        the returned outcome will be :class:`UpdateOutcome.X_NOT_EXECUTED`.
+        :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` will be returned if successfully updated.
 
         :param profile_oid: OID of the profile to be updated
         :param new_jkwargs: data to be updated
@@ -398,12 +441,11 @@ class _ProfileDataManager(BaseCollection):
     def delete_profile(self, profile_oid: ObjectId):
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
-    def _create_profile(self, channel_oid: ObjectId, **fk_param):
-        return self.insert_one_data(
-            ChannelOid=channel_oid, **fk_param)
-
     @arg_type_ensure
     def is_name_available(self, channel_oid: ObjectId, name: str):
+        if not name:
+            return False
+
         return self.count_documents({ChannelProfileModel.Name.key: name,
                                      ChannelProfileModel.ChannelOid.key: channel_oid}) == 0
 
@@ -429,7 +471,8 @@ class _ProfileManager(ClearableCollectionMixin):
         Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
 
     def create_default_profile(
-            self, channel_oid: ObjectId, *, set_to_channel: bool = True) -> CreateProfileResult:
+            self, channel_oid: ObjectId, *, set_to_channel: bool = True, check_channel: bool = True) \
+            -> CreateProfileResult:
         """
         Create a default profile for ``channel_oid``.
 
@@ -437,9 +480,11 @@ class _ProfileManager(ClearableCollectionMixin):
 
         :param channel_oid: channel to get the default profile
         :param set_to_channel: if the created profile should be set to the channel
+        :param check_channel: check if the channel is registered
         :return: result of creating the default profile
         """
-        return self._prof.create_default_profile(channel_oid, set_to_channel=set_to_channel)
+        return self._prof.create_default_profile(
+            channel_oid, set_to_channel=set_to_channel, check_channel=check_channel)
 
     @arg_type_ensure
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
@@ -451,13 +496,13 @@ class _ProfileManager(ClearableCollectionMixin):
     @arg_type_ensure
     def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
         """
-        Register a new profile with the user's oid and the other args with py key for the model.
+        Register a new profile with the user's oid and the other args with field key for the model.
 
-        :param root_uid: User's OID.
-        :param profile_kwargs: A `dict` with py keys for creating `ChannelProfileModel`.
-        :return: Newly constructed model.
+        :param root_uid: user's OID
+        :param profile_kwargs: arguments to construct a profile
+        :return: newly constructed model
         """
-        create_result = self._prof.create_profile(profile_kwargs)
+        create_result = self._prof.create_profile(**profile_kwargs)
         if create_result.success:
             self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
 
@@ -543,7 +588,7 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return ret
 
-    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
+    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> UpdateOutcome:
         return self._prof.update_profile(profile_oid, update_dict)
 
     def update_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
@@ -662,8 +707,8 @@ class _ProfileManager(ClearableCollectionMixin):
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self._prof.get_profile(profile_oid)
 
-    def get_profile_name(self, name: str) -> Optional[ChannelProfileModel]:
-        return self._prof.get_profile_name(name)
+    def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
+        return self._prof.get_profile_name(channel_oid, name)
 
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         return self._conn.get_users_exist_channel_dict(user_oids)
@@ -700,15 +745,16 @@ class _ProfileManager(ClearableCollectionMixin):
         profiles = self.get_user_profiles(channel_oid, root_uid)
         exist_perm = self.get_permissions(profiles)
         highest_perm = self.get_highest_permission_level(profiles)
-        attachables = {prof.id: prof
-                       for prof in self._prof.get_attachable_profiles(channel_oid, exist_perm, highest_perm)}
 
         # Remove default profile
         channel_data = ChannelManager.get_channel_oid(channel_oid)
-        if channel_data.config.default_profile_oid in attachables:
-            del attachables[channel_data.config.default_profile_oid]
+        attachables = [
+            prof for prof in self._prof.get_attachable_profiles(channel_oid,
+                                                                existing_permissions=exist_perm,
+                                                                highest_perm_lv=highest_perm)
+            if prof.id != channel_data.config.default_profile_oid]
 
-        return list(attachables.values())
+        return attachables
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
         """Get a list containing the user OID who have the profile."""
@@ -746,7 +792,7 @@ class _ProfileManager(ClearableCollectionMixin):
             self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str,
             target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
-        prof = self.get_profile_name(profile_name)
+        prof = self.get_profile_name(channel_oid, profile_name)
         if not prof:
             return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
 
@@ -792,7 +838,7 @@ class _ProfileManager(ClearableCollectionMixin):
             self, channel_oid: ObjectId, profile_name: str,
             user_oid: Optional[ObjectId] = None, target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
-        prof = self.get_profile_name(profile_name)
+        prof = self.get_profile_name(channel_oid, profile_name)
         if not prof:
             return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
 

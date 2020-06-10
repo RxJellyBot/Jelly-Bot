@@ -13,4 +13,5 @@ class GetPermissionProfileResult(ModelResult):
 
 @dataclass
 class CreateProfileResult(ModelResult):
+    exception: Optional[Exception] = None
     model: Optional[ChannelProfileModel] = None

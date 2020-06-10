@@ -43,7 +43,8 @@ class _ChannelManager(BaseCollection):
             from mongodb.factory import ProfileManager
 
             channel_oid = ObjectId()
-            create_result = ProfileManager.create_default_profile(channel_oid, set_to_channel=False)
+            create_result = ProfileManager.create_default_profile(
+                channel_oid, set_to_channel=False, check_channel=False)
 
             if not create_result.success:
                 return ChannelRegistrationResult(WriteOutcome.X_CNL_DEFAULT_CREATE_FAILED)
@@ -51,7 +52,7 @@ class _ChannelManager(BaseCollection):
             config = ChannelConfigModel.generate_default(
                 DefaultName=default_name, DefaultProfileOid=create_result.model.id)
 
-            mdl, outcome, ex = self.insert_one_data(Platform=platform, Token=token, Config=config)
+            mdl, outcome, ex = self.insert_one_data(Id=channel_oid, Platform=platform, Token=token, Config=config)
 
             return ChannelRegistrationResult(outcome, ex, mdl)
 
