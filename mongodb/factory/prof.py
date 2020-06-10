@@ -14,7 +14,8 @@ from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mongodb.factory import ChannelManager
 from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.factory.results import (
-    WriteOutcome, GetOutcome, OperationOutcome, GetPermissionProfileResult, CreateProfileResult
+    WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome,
+    GetPermissionProfileResult, CreateProfileResult
 )
 from mongodb.utils import ExtendedCursor
 from models import (
@@ -186,7 +187,7 @@ class _UserProfileManager(BaseCollection):
             {"$set": {
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
-    def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> WriteOutcome:
+    def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> UpdateOutcome:
         filter_ = {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}
 
         if user_oid:
@@ -348,14 +349,51 @@ class _ProfileDataManager(BaseCollection):
         return CreateProfileResult(outcome, ex, model)
 
     @arg_type_ensure
-    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> WriteOutcome:
+    def update_profile(self, profile_oid: ObjectId, new_jkwargs: dict) -> UpdateOutcome:
         """
-        Update a profile using the data in ``update_dict``.
+        Update a profile using the data in ``new_jkwargs``
+        which the key should be the json key of :class:`ChannelProfileModel`.
+
+        ``new_jkwargs`` will be validated.
+
+        Keys that are not used in :class:`ChannelProfileModel` will be removed,
+        and the returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` if updated.
+
+        If the value in ``new_jkwargs`` is invalid, it will be removed as well.
+        The returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_INVALID` if updated.
+
+        If there are any additional keys and also some invalid values,
+        the returned outcome will be :class:`UpdateOutcome.O_PARTIAL_ARGS_REMOVED` if updated.
+
+        If ``new_jkwargs`` is empty after validation,
+        the returned outcome will be :class:`UpdateOutcome.X_NOT_EXECUTED`.
 
         :param profile_oid: OID of the profile to be updated
-        :param update_dict: `dict` of data to be updated. Key is the field key of `ChannelProfileModel`.
+        :param new_jkwargs: data to be updated
         """
-        return self.update_many_outcome({OID_KEY: profile_oid}, {"$set": update_dict})
+        outcome = None
+
+        d = {}
+
+        for jk, v in new_jkwargs.items():
+            if jk in self.data_model.model_json_keys():
+                fi = self.data_model.get_field_class_instance(self.data_model.json_key_to_field(jk))
+                if fi.is_value_valid(v):
+                    d[jk] = v
+                else:
+                    outcome = UpdateOutcome.O_PARTIAL_ARGS_INVALID
+            else:
+                outcome = UpdateOutcome.O_PARTIAL_ARGS_REMOVED
+
+        if not d:
+            return UpdateOutcome.X_NOT_EXECUTED
+
+        update_outcome = self.update_many_outcome({OID_KEY: profile_oid}, {"$set": d})
+
+        if update_outcome == UpdateOutcome.O_UPDATED:
+            return outcome or update_outcome
+        else:
+            return update_outcome
 
     def delete_profile(self, profile_oid: ObjectId):
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0

@@ -10,7 +10,7 @@ from models import AutoReplyContentModel, AutoReplyModuleModel
 from models.utils import AutoReplyValidator
 from mongodb.utils import ExtendedCursor
 from mongodb.factory import AutoReplyManager, ExecodeManager, ExtraContentManager
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import UpdateOutcome
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
 from JellyBot.systemconfig import HostUrl, Bot
 
@@ -183,10 +183,10 @@ def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
     if outcome.is_success:
         return [HandledMessageEventText(
             content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
-    elif outcome == WriteOutcome.X_INSUFFICIENT_PERMISSION:
+    elif outcome == UpdateOutcome.X_INSUFFICIENT_PERMISSION:
         return [HandledMessageEventText(
             content=_("Insufficient Permission to delete the auto-reply module."))]
-    elif outcome == WriteOutcome.X_NOT_FOUND:
+    elif outcome == UpdateOutcome.X_NOT_FOUND:
         return [HandledMessageEventText(
             content=_("Active auto-reply module of the keyword `{}` not found.").format(keyword))]
     else:

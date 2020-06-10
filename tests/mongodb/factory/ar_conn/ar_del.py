@@ -5,7 +5,7 @@ from bson import ObjectId
 from extutils.dt import now_utc_aware
 from flags import Platform
 from models import AutoReplyModuleModel
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import WriteOutcome, UpdateOutcome
 from mongodb.factory import ChannelManager
 from mongodb.factory.ar_conn import AutoReplyManager, AutoReplyModuleManager
 from tests.base import TestTimeComparisonMixin, TestModelMixin
@@ -96,11 +96,11 @@ class TestAutoReplyManagerDelete(TestAutoReplyManagerBase.TestClass, TestTimeCom
         AutoReplyManager.add_conn(**self.get_mdl_5_args())
 
         result = AutoReplyManager.del_conn(self.get_mdl_5().keyword.content, ObjectId(), self.CREATOR_OID_2)
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
 
     def test_del_keyword_not_found(self):
         AutoReplyManager.add_conn(**self.get_mdl_5_args())
 
         result = AutoReplyManager.del_conn(
             self.get_mdl_1().keyword.content, self.get_mdl_5().channel_oid, self.CREATOR_OID_2)
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)

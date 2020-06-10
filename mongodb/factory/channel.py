@@ -58,22 +58,22 @@ class _ChannelManager(BaseCollection):
         return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
 
     @arg_type_ensure
-    def deregister(self, platform: Platform, token: str) -> WriteOutcome:
+    def deregister(self, platform: Platform, token: str) -> UpdateOutcome:
         return self.mark_accessibility(platform, token, False)
 
     @arg_type_ensure
-    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
+    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> UpdateOutcome:
         result = self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
-        if result == WriteOutcome.X_NOT_FOUND:
-            return WriteOutcome.X_CHANNEL_NOT_FOUND
+        if result == UpdateOutcome.X_NOT_FOUND:
+            return UpdateOutcome.X_CHANNEL_NOT_FOUND
         else:
             return result
 
     @arg_type_ensure
-    def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
+    def update_channel_default_name(self, platform: Platform, token: str, default_name: str) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
@@ -244,13 +244,13 @@ class _ChannelCollectionManager(BaseCollection):
         )
 
     @arg_type_ensure
-    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
 
     @arg_type_ensure
-    def update_default_name(self, platform: Platform, token: str, new_default_name: str):
+    def update_default_name(self, platform: Platform, token: str, new_default_name: str) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})

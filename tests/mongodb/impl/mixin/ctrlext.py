@@ -9,7 +9,7 @@ from models.exceptions import InvalidModelFieldError, RequiredKeyNotFilledError,
 from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultValueExt
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
 from mongodb.factory import ControlExtensionMixin, ClearableCollectionMixin
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import WriteOutcome, UpdateOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestControlExtensionMixin"]
@@ -177,9 +177,9 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
         ])
 
         args_outcome = (
-            (({"a": 7}, {"$unset": {"c": ""}}), WriteOutcome.O_DATA_EXISTS),
-            (({"a": 7}, {"$unset": {"b": ""}}), WriteOutcome.O_DATA_UPDATED),
-            (({"d": 7}, {"$unset": {"b": ""}}), WriteOutcome.X_NOT_FOUND)
+            (({"a": 7}, {"$unset": {"c": ""}}), UpdateOutcome.O_FOUND),
+            (({"a": 7}, {"$unset": {"b": ""}}), UpdateOutcome.O_UPDATED),
+            (({"d": 7}, {"$unset": {"b": ""}}), UpdateOutcome.X_NOT_FOUND)
         )
 
         for args, expected_outcome in args_outcome:

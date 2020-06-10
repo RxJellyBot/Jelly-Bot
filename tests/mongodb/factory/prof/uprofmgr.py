@@ -2,7 +2,7 @@ from bson import ObjectId
 
 from models import ChannelProfileConnectionModel
 from mongodb.factory.prof import UserProfileManager
-from mongodb.factory.results import OperationOutcome, WriteOutcome
+from mongodb.factory.results import OperationOutcome, WriteOutcome, UpdateOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
 
 __all__ = ["TestUserProfileManager"]
@@ -473,7 +473,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         result = UserProfileManager.detach_profile(self.PROF_OID_2, self.USER_OID)
 
-        self.assertEqual(result, WriteOutcome.O_DATA_UPDATED)
+        self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
             UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
             ChannelProfileConnectionModel(
@@ -491,7 +491,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         result = UserProfileManager.detach_profile(self.PROF_OID_1)
 
-        self.assertEqual(result, WriteOutcome.O_DATA_UPDATED)
+        self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
             UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
                                                parse_cls=ChannelProfileConnectionModel),
@@ -516,7 +516,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         result = UserProfileManager.detach_profile(ObjectId(), self.USER_OID)
 
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
         self.assertModelEqual(
             UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
                                                parse_cls=ChannelProfileConnectionModel),
@@ -541,7 +541,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
 
         result = UserProfileManager.detach_profile(self.PROF_OID_1, ObjectId())
 
-        self.assertEqual(result, WriteOutcome.X_NOT_FOUND)
+        self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
         self.assertModelEqual(
             UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
                                                parse_cls=ChannelProfileConnectionModel),

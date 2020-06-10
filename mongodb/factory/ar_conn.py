@@ -18,7 +18,7 @@ from models import (
 from models.exceptions import ModelConstructionError, ModelKeyNotExistError
 from models.utils import AutoReplyValidator
 from mongodb.factory.results import (
-    WriteOutcome, GetOutcome,
+    WriteOutcome, GetOutcome, UpdateOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
 from mongodb.factory.mixin import ClearableCollectionMixin
@@ -190,14 +190,14 @@ class _AutoReplyModuleManager(BaseCollection):
             # Re-enables the module if exactly same module found
             # Check unique indexes of what "same" means
 
-            self.update_many_outcome(
+            self.update_many(
                 {AutoReplyModuleModel.Id.key: mdl.id},
                 {"$set": {AutoReplyModuleModel.Active.key: True}})
 
         if outcome.is_success:
             # Set other module with the same keyword to be inactive
 
-            self.update_many_outcome(
+            self.update_many(
                 {
                     AutoReplyModuleModel.Id.key: {"$ne": mdl.id},
                     AutoReplyModuleModel.Keyword.key: mdl.keyword.to_json(),
@@ -211,7 +211,7 @@ class _AutoReplyModuleManager(BaseCollection):
 
         return AutoReplyModuleAddResult(outcome, ex, mdl)
 
-    def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+    def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> UpdateOutcome:
         q = {
             AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
             AutoReplyModuleModel.ChannelOid.key: channel_oid,
@@ -225,12 +225,12 @@ class _AutoReplyModuleManager(BaseCollection):
 
         if ret.is_success:
             self._delete_recent_module(keyword)
-        elif ret == WriteOutcome.X_NOT_FOUND:
+        elif ret == UpdateOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
             # then it must because of the insufficient permission. Otherwise, it's really not found
             q[AutoReplyModuleModel.Pinned.key] = True
             if self.count_documents(q) > 0:
-                return WriteOutcome.X_INSUFFICIENT_PERMISSION
+                return UpdateOutcome.X_INSUFFICIENT_PERMISSION
 
         return ret
 
@@ -474,7 +474,7 @@ class _AutoReplyManager(ClearableCollectionMixin):
     def add_conn(self, **kwargs) -> AutoReplyModuleAddResult:
         return self._mod.add_conn(**kwargs)
 
-    def del_conn(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> WriteOutcome:
+    def del_conn(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> UpdateOutcome:
         return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)
 
     def get_responses(
