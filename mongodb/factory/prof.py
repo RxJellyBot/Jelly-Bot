@@ -492,7 +492,6 @@ class _ProfileManager(ClearableCollectionMixin):
         if default_prof.success:
             self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
 
-    # noinspection PyTypeChecker
     @arg_type_ensure
     def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
         """
@@ -508,7 +507,6 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return create_result.model
 
-    # noinspection PyTypeChecker
     @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
         """
@@ -524,8 +522,8 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return create_result.model
 
-    # noinspection PyMethodMayBeStatic
-    def process_create_profile_kwargs(self, profile_kwargs: dict):
+    @staticmethod
+    def process_create_profile_kwargs(profile_kwargs: dict):
         """
         Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
 
@@ -567,8 +565,8 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return profile_kwargs
 
-    # noinspection PyMethodMayBeStatic
-    def process_edit_profile_kwargs(self, profile_kwargs: dict):
+    @staticmethod
+    def process_edit_profile_kwargs(profile_kwargs: dict):
         """
         Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
@@ -618,8 +616,8 @@ class _ProfileManager(ClearableCollectionMixin):
         """Get the existing profiles of a channel."""
         return self._prof.get_channel_profiles(channel_oid, partial_keyword)
 
-    # noinspection PyMethodMayBeStatic
-    def get_highest_permission_level(self, profiles: List[ChannelProfileModel]) -> PermissionLevel:
+    @staticmethod
+    def get_highest_permission_level(profiles: List[ChannelProfileModel]) -> PermissionLevel:
         current_max = PermissionLevel.lowest()
 
         for profile in profiles:
@@ -767,13 +765,13 @@ class _ProfileManager(ClearableCollectionMixin):
     def is_name_available(self, channel_oid: ObjectId, name: str):
         return self._prof.is_name_available(channel_oid, name)
 
-    # noinspection PyMethodMayBeStatic
-    def can_ced_profile(self, permissions: Set[ProfilePermission]):
+    @staticmethod
+    def can_ced_profile(permissions: Set[ProfilePermission]):
         """CED Stands for Create / Edit / Delete."""
         return ProfilePermission.PRF_CED in permissions
 
-    # noinspection PyMethodMayBeStatic
-    def can_control_profile_member(self, permissions: Set[ProfilePermission]):
+    @staticmethod
+    def can_control_profile_member(permissions: Set[ProfilePermission]):
         return ProfilePermission.PRF_CONTROL_MEMBER in permissions
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
