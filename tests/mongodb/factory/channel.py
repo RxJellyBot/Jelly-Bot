@@ -138,7 +138,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         )
 
         self.assertEqual(ChannelManager.mark_accessibility(Platform.LINE, "U1234567", False),
-                         UpdateOutcome.O_DATA_UPDATED)
+                         UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
             ChannelManager.find_one_casted(
                 {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
@@ -195,7 +195,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         uid = ObjectId()
 
         result = ChannelManager.update_channel_nickname(cid, uid, "N1")
-        self.assertTrue(result.outcome, WriteOutcome.O_DATA_UPDATED)
+        self.assertTrue(result.outcome, WriteOutcome.O_UPDATED)
         self.assertTrue(result.success)
         self.assertModelEqual(
             result.model,
@@ -222,7 +222,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
 
         # Add the name and ensure it first
         result = ChannelManager.update_channel_nickname(cid, uid, "N1")
-        self.assertTrue(result.outcome, WriteOutcome.O_DATA_UPDATED)
+        self.assertTrue(result.outcome, WriteOutcome.O_UPDATED)
         self.assertTrue(result.success)
         self.assertModelEqual(
             result.model,
@@ -233,7 +233,7 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
 
         # Delete the name and check
         result = ChannelManager.update_channel_nickname(cid, uid, "")
-        self.assertTrue(result.outcome, WriteOutcome.O_DATA_UPDATED)
+        self.assertTrue(result.outcome, WriteOutcome.O_UPDATED)
         self.assertTrue(result.success)
         self.assertModelEqual(
             result.model,

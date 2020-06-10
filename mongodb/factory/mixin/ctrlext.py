@@ -109,7 +109,7 @@ class ControlExtensionMixin(Collection):
         if isinstance(e.inner_exception, FieldCastingFailedError):
             outcome = WriteOutcome.X_CASTING_FAILED
         elif isinstance(e.inner_exception, FieldValueInvalidError):
-            outcome = WriteOutcome.X_INVALID_FIELD
+            outcome = WriteOutcome.X_INVALID_FIELD_VALUE
         elif isinstance(e.inner_exception, FieldTypeMismatchError):
             outcome = WriteOutcome.X_TYPE_MISMATCH
         elif isinstance(e.inner_exception, FieldReadOnlyError):
@@ -153,7 +153,7 @@ class ControlExtensionMixin(Collection):
             outcome = WriteOutcome.X_REQUIRED_NOT_FILLED
             ex = e
         except FieldKeyNotExistError as e:
-            outcome = WriteOutcome.X_FIELD_NOT_EXIST
+            outcome = WriteOutcome.X_MODEL_KEY_NOT_EXIST
             ex = e
         except Exception as e:
             outcome = WriteOutcome.X_CONSTRUCT_UNKNOWN
