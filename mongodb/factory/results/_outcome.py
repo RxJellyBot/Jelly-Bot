@@ -3,9 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
-# TODO: all sentence (not caps)
-
-
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
     @property
     def code_prefix(self) -> str:

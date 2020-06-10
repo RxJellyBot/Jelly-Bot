@@ -363,7 +363,7 @@ cmd_delete = cmd.new_child_node(
 )
 def profile_delete(e: TextMessageEventObject, name: str):
     # --- Check profile name
-    prof = ProfileManager.get_profile_name(name)
+    prof = ProfileManager.get_profile_name(e.channel_oid, name)
     if not prof:
         return [HandledMessageEventText(content=_("Profile with the name `{}` not found.").format(name))]
 
