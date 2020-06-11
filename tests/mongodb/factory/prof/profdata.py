@@ -33,6 +33,31 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
 
         return mdls
 
+    def _insert_profiles(self):
+        mdls = [
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID, Name="A",
+                Permission=ProfilePermissionDefault.get_default_code_str_dict({ProfilePermission.PRF_CED})),
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID, Name="B", PermissionLevel=PermissionLevel.MOD),
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID, Name="C"),
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID, Name="D", PermissionLevel=PermissionLevel.ADMIN),
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID, Name="E",
+                Permission=ProfilePermissionDefault.get_default_code_str_dict(
+                    {ProfilePermission.AR_ACCESS_PINNED_MODULE})),
+            ChannelProfileModel(
+                ChannelOid=self.CHANNEL_OID_2, Name="F",
+                Permission=ProfilePermissionDefault.get_default_code_str_dict(
+                    {ProfilePermission.AR_ACCESS_PINNED_MODULE}))
+        ]
+
+        ProfileDataManager.insert_many(mdls)
+
+        return mdls
+
     def test_add_duplicate(self):
         self.assertEqual(
             ProfileDataManager.insert_one_model(ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A"))[0],
@@ -142,31 +167,6 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertIsNone(result.model)
 
-    def _insert_profiles(self):
-        mdls = [
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID, Name="A",
-                Permission=ProfilePermissionDefault.get_default_code_str_dict({ProfilePermission.PRF_CED})),
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID, Name="B", PermissionLevel=PermissionLevel.MOD),
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID, Name="C"),
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID, Name="D", PermissionLevel=PermissionLevel.ADMIN),
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID, Name="E",
-                Permission=ProfilePermissionDefault.get_default_code_str_dict(
-                    {ProfilePermission.AR_ACCESS_PINNED_MODULE})),
-            ChannelProfileModel(
-                ChannelOid=self.CHANNEL_OID_2, Name="F",
-                Permission=ProfilePermissionDefault.get_default_code_str_dict(
-                    {ProfilePermission.AR_ACCESS_PINNED_MODULE}))
-        ]
-
-        ProfileDataManager.insert_many(mdls)
-
-        return mdls
-
     def test_get_attachable_no_existing_normal(self):
         mdls = self._insert_profiles()
 
@@ -272,7 +272,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         d = ChannelManager.find_one({OID_KEY: self.CHANNEL_OID})
         self.assertIsNone(d)
 
-    def test_create_profile(self):
+    def test_create(self):
         result = ProfileDataManager.create_profile(ChannelOid=self.CHANNEL_OID, Name="A")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
@@ -280,7 +280,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A"))
 
-    def test_create_profile_duplicated(self):
+    def test_create_duplicated(self):
         mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A")
         ProfileDataManager.insert_one_model(mdl)
         result = ProfileDataManager.create_profile(ChannelOid=self.CHANNEL_OID, Name="A")
@@ -291,7 +291,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsInstance(result.exception, DuplicateKeyError)
         self.assertEqual(result.model, mdl)
 
-    def test_create_profile_mdl(self):
+    def test_create_mdl(self):
         mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A")
         result = ProfileDataManager.create_profile_model(mdl)
 
@@ -300,7 +300,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, mdl)
 
-    def test_create_profile_mdl_duplicated(self):
+    def test_create_mdl_duplicated(self):
         mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A")
         ProfileDataManager.insert_one_model(mdl)
         mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="A")

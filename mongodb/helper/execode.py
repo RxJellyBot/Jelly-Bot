@@ -53,13 +53,16 @@ class ExecodeCompletor:
         except Exception:
             return ExecodeCompletionOutcome.X_IDT_CHANNEL_ERROR
 
-        if reg_result.success:
-            try:
-                ProfileManager.register_new_default(reg_result.model.id, action_model.creator_oid)
-            except Exception:
-                return ExecodeCompletionOutcome.X_IDT_REGISTER_DEFAULT_PROFILE
-        else:
+        if not reg_result.success:
             return ExecodeCompletionOutcome.X_IDT_CHANNEL_ENSURE_FAILED
+
+        try:
+            result = ProfileManager.register_new_default(reg_result.model.id, action_model.creator_oid)
+
+            if not result.success:
+                return ExecodeCompletionOutcome.X_IDT_DEFAULT_PROFILE_FAILED
+        except Exception:
+            return ExecodeCompletionOutcome.X_IDT_DEFAULT_PROFILE_ERROR
 
         return ExecodeCompletionOutcome.O_OK
 

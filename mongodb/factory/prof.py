@@ -44,7 +44,8 @@ class _UserProfileManager(BaseCollection):
 
     @arg_type_ensure
     def user_attach_profile(self, channel_oid: ObjectId, root_uid: ObjectId,
-                            profile_oids: Union[ObjectId, List[ObjectId]]) -> OperationOutcome:
+                            profile_oids: Union[ObjectId, List[ObjectId]]) \
+            -> OperationOutcome:
         """
         Attach a profile onto a the user whose uid is ``root_uid`` using the ID of the profile
         and return the update result.
@@ -457,7 +458,6 @@ class _PermissionPromotionRecordHolder(BaseCollection):
 
 
 class _ProfileManager(ClearableCollectionMixin):
-    # TODO: #307 profile modifications to check permissions
     def __init__(self):
         self._conn = _UserProfileManager()
         self._prof = _ProfileDataManager()
@@ -526,25 +526,29 @@ class _ProfileManager(ClearableCollectionMixin):
         prof_result = self._prof.create_profile(**kwargs)
 
         if prof_result.success:
-            self._conn.user_attach_profile(prof_result.model.channel_oid, root_uid, prof_result.model.id)
+            attach_outcome = self._conn.user_attach_profile(
+                prof_result.model.channel_oid, root_uid, prof_result.model.id)
 
         return RegisterProfileResult(
             prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome, parse_arg_outcome)
 
     @arg_type_ensure
-    def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
+    def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> RegisterProfileResult:
         """
         Register a new profile with the user's oid and the constructed :class:`ChannelProfileModel`.
 
-        :param root_uid: User's OID.
-        :param model: Constructed `ChannelProfileModel` to be inserted.
-        :return: Newly constructed model.
+        :param root_uid: OID of the user to attach the profile
+        :param model: profile model to be inserted
+        :return: profile registration result
         """
+        attach_outcome = OperationOutcome.X_NOT_EXECUTED
         create_result = self._prof.create_profile_model(model)
         if create_result.success:
-            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+            attach_outcome = self._conn.user_attach_profile(
+                create_result.model.channel_oid, root_uid, create_result.model.id)
 
-        return create_result.model
+        return RegisterProfileResult(
+            create_result.outcome, create_result.exception, create_result.model, attach_outcome)
 
     @staticmethod
     def process_create_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
@@ -559,6 +563,18 @@ class _ProfileManager(ClearableCollectionMixin):
         """
         ret_kwargs = {}
 
+        # --- Collate `ChannelOid`
+        fk_coid = ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)
+        if fk_coid in profile_fkwargs:
+            try:
+                coid = ObjectId(profile_fkwargs[fk_coid])
+            except Exception as e:
+                return ArgumentParseResult(OperationOutcome.X_INVALID_CHANNEL_OID, e)
+
+            ret_kwargs[fk_coid] = coid
+        else:
+            return ArgumentParseResult(OperationOutcome.X_MISSING_CHANNEL_OID)
+
         # --- Collate `PermissionLevel`
         fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
         if fk_perm_lv in profile_fkwargs:
@@ -571,24 +587,32 @@ class _ProfileManager(ClearableCollectionMixin):
 
         # --- Collate `Permission`
         fk_perm = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Permission.key)
-        if fk_perm in profile_fkwargs:
-            perm_dict = {}
-            # Fill turned-on permissions
-            for k, v in profile_fkwargs.items():
-                perm_k_initial = f"{fk_perm}."
+        perm_dict = {}
+        keys_to_remove = set()
+        # Fill turned-on permissions
+        for fk, v in profile_fkwargs.items():
+            perm_k_initial = f"{fk_perm}."
 
-                if k.startswith(perm_k_initial):
-                    perm_dict[k[len(perm_k_initial):]] = True
+            if fk.startswith(perm_k_initial):
+                perm_dict[fk[len(perm_k_initial):]] = True
+                keys_to_remove.add(fk)
 
-            # Fill default overriden permissions by permission level
+        # Remove `Permission` in `profile_fkwargs` or the program will misjudge the status of the args
+        # and return `OperationOutcome.O_ADDL_ARGS_OMITTED`.
+        for k in keys_to_remove:
+            del profile_fkwargs[k]
+
+        # Fill default overriden permissions by permission level
+        if fk_perm_lv in ret_kwargs:
             for perm in ProfilePermissionDefault.get_overridden_permissions(ret_kwargs[fk_perm_lv]):
                 perm_dict[perm.code_str] = True
 
-            # Fill the rest of the permissions
-            for perm_cat in ProfilePermission:
-                if perm_cat.code_str not in perm_dict:
-                    perm_dict[perm_cat.code_str] = False
+        # Fill the rest of the permissions
+        for perm_cat in ProfilePermission:
+            if perm_cat.code_str not in perm_dict:
+                perm_dict[perm_cat.code_str] = False
 
+        if perm_dict:
             ret_kwargs[fk_perm] = perm_dict
 
         # --- Collate `Color`
@@ -600,6 +624,24 @@ class _ProfileManager(ClearableCollectionMixin):
                 return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, e)
 
             ret_kwargs[fk_color] = color
+
+        args_not_collated = set(profile_fkwargs) - set(ret_kwargs)
+        if args_not_collated:
+            for fk in args_not_collated:
+                if fk not in ChannelProfileModel.model_field_keys():
+                    continue
+
+                fi = ChannelProfileModel.get_field_class_instance(fk)
+                if not fi:
+                    continue
+
+                val = profile_fkwargs[fk]
+                if not fi.is_type_matched(val):
+                    return ArgumentParseResult(OperationOutcome.X_VALUE_TYPE_MISMATCH)
+                if not fi.is_value_valid(val):
+                    return ArgumentParseResult(OperationOutcome.X_VALUE_INVALID)
+
+                ret_kwargs[fk] = fi.cast_to_desired_type(val)
 
         if set(profile_fkwargs) - set(ret_kwargs):
             return ArgumentParseResult(OperationOutcome.O_ADDL_ARGS_OMITTED, parsed_args=ret_kwargs)
@@ -630,6 +672,11 @@ class _ProfileManager(ClearableCollectionMixin):
             if f and f.read_only:
                 contains_readonly = True
             elif jk and f:
+                if not f.is_type_matched(v):
+                    return ArgumentParseResult(OperationOutcome.X_VALUE_TYPE_MISMATCH)
+                if not f.is_value_valid(v):
+                    return ArgumentParseResult(OperationOutcome.X_VALUE_INVALID)
+
                 ret_kwargs[jk] = f.cast_to_desired_type(v)
             else:
                 contains_addl = True
@@ -671,7 +718,7 @@ class _ProfileManager(ClearableCollectionMixin):
         """
         Get the ``list`` of :class:`ChannelProfileModel` of the specified user.
 
-        :return: `None` on not found.
+        :return: list of the profiles attached on the user
         """
         conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
 

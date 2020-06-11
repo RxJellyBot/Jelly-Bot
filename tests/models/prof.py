@@ -26,19 +26,15 @@ class TestChannelProfileModel(TestModel.TestClass):
 
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
-        perm_dict = {
-            ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
-            ProfilePermission.CNL_ADJUST_PRIVACY: True
-        }
-
         return {
             ("n", "Name"): ("-", "ChannelName"),
             ("col", "Color"): (ColorFactory.DEFAULT, ColorFactory.WHITE),
             ("promo", "PromoVote"): (0, 5),
             ("perm", "Permission"):
                 (ProfilePermissionDefault.get_default_code_str_dict(),
-                 {k.code_str: v for k, v in perm_dict.items()}),
-            ("plv", "PermissionLevel"): (PermissionLevel.NORMAL, PermissionLevel.ADMIN),
+                 ProfilePermissionDefault.get_default_code_str_dict({ProfilePermission.AR_ACCESS_PINNED_MODULE,
+                                                                     ProfilePermission.CNL_ADJUST_PRIVACY})),
+            ("plv", "PermissionLevel"): (PermissionLevel.NORMAL, PermissionLevel.NORMAL),
             ("e-kw", "EmailKeyword"): ([], ["A", "B"])
         }
 

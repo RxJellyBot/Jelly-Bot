@@ -380,8 +380,16 @@ class OperationOutcome(BaseOutcome):
 
         409 - Empty args
 
+        410 - Invalid channel OID
+
+        411 - Missing channel OID
+
     5xx - Problems related to model
         501 - Construction error
+
+        502 - Value type mismatch
+
+        503 - Value invalid
 
     9xx - Problems related to execution
         901 - Not executed
@@ -475,9 +483,21 @@ class OperationOutcome(BaseOutcome):
     X_EMPTY_ARGS = \
         409, _("X: Empty arguments"), \
         _("The parsed arguments is empty.")
+    X_INVALID_CHANNEL_OID = \
+        410, _("X: Invalid channel OID"), \
+        _("The value of the channel OID is invalid.")
+    X_MISSING_CHANNEL_OID = \
+        411, _("X: Missing channel OID"), \
+        _("The value of the channel OID is missing.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction error"), \
         _("An error occurred during model construction.")
+    X_VALUE_TYPE_MISMATCH = \
+        502, _("X: Value type mismatch"), \
+        _("Field value type mismatch.")
+    X_VALUE_INVALID = \
+        503, _("X: Value invalid"), \
+        _("Field value invalid.")
     X_NOT_EXECUTED = \
         901, _("X: Not executed"), \
         _("The operation had not been executed.")
