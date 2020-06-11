@@ -82,6 +82,10 @@ class ExecodeCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
 
         207 - Target not found
 
+        208 - Source = Target
+
+        209 - Default profile registration failed
+
     5xx - Related to Model
         501 - Error during model construction
 
@@ -131,6 +135,9 @@ class ExecodeCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     X_IDT_SOURCE_EQ_TARGET = \
         208, _("X: Identity - Source = Target"), \
         _("Source user ID is equal to target user ID.")
+    X_IDT_DEFAULT_PROFILE_FAILED = \
+        209, _("X: Identity - Default profile failed"), \
+        _("Failed to register default profile.")
 
     X_MODEL_CONSTRUCTION = \
         501, _("X: Model - Construction"), \

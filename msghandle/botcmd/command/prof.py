@@ -201,9 +201,9 @@ def profile_create_internal(
 
     mdl = ChannelProfileModel(
         ChannelOid=e.channel_model.id, Name=prof_name, Color=color, Permission=perm_dict, PermissionLevel=perm_lv)
-    mdl = ProfileManager.register_new_model(e.user_model.id, mdl)
+    reg_result = ProfileManager.register_new_model(e.user_model.id, mdl)
 
-    if mdl:
+    if reg_result.success:
         return [HandledMessageEventText(content=_("Profile created and attached."))] + msg_on_hold
     else:
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold

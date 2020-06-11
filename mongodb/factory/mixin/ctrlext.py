@@ -209,7 +209,9 @@ class ControlExtensionMixin(Collection):
         return ExtendedCursor(
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
-    def find_one_casted(self, filter_, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
+    def find_one_casted(self, filter_: Optional[dict] = None, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
+        if not filter_:
+            filter_ = {}
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod

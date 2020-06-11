@@ -26,6 +26,22 @@ class ChannelProfileModel(Model):
 
     EmailKeyword = ArrayField("e-kw", str)
 
+    def __init__(self, *, from_db=False, **kwargs):
+        super().__init__(from_db=from_db, **kwargs)
+        self._complete_permission()
+
+    def _complete_permission(self):
+        d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
+
+        # Deep copy the variable so the original dict used to construct the model will not be modified
+        d_to_set = dict(self.permission)
+
+        for perm_cat in ProfilePermission:
+            k = perm_cat.code_str
+            d_to_set[k] = k in d or self.permission.get(k, False)
+
+        self.permission = d_to_set
+
     @property
     def is_mod(self):
         return self.permission_level >= PermissionLevel.MOD
@@ -47,15 +63,6 @@ class ChannelProfileModel(Model):
         ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
         return list(sorted(ret, key=lambda x: x.code))
-
-    def pre_iter(self):
-        # Will be used when this model is being passed to MongoDB
-        d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
-
-        for perm_cat in ProfilePermission:
-            k = perm_cat.code_str
-            if k not in self.permission:
-                self.permission[k] = k in d
 
 
 @dataclass

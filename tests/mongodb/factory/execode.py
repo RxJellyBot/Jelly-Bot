@@ -116,7 +116,7 @@ class TestExecodeManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
                                     ActionType=Execode.REGISTER_CHANNEL, Timestamp=now_utc_aware(for_mongo=True))
             ExecodeManager.insert_one_model(mdl)
 
-        self.assertModelSetEqual(set(list(ExecodeManager.get_queued_execodes(self.CREATOR_OID))), set(expected))
+        self.assertModelSetEqual(set(ExecodeManager.get_queued_execodes(self.CREATOR_OID)), set(expected))
         self.assertEqual(ExecodeManager.count_documents({}), 8)
         self.assertEqual(ExecodeManager.count_documents({ExecodeEntryModel.CreatorOid.key: self.CREATOR_OID}), 5)
         self.assertEqual(ExecodeManager.count_documents({ExecodeEntryModel.CreatorOid.key: self.CREATOR_OID_2}), 3)
