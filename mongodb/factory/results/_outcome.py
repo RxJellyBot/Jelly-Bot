@@ -323,6 +323,11 @@ class OperationOutcome(BaseOutcome):
     """
     # SUCCESS
 
+    -1xx - Success with some potential problems
+        -101 - Additional args omitted
+
+        -102 - Readonly args omitted
+
     -1 - Operation completed
 
     ================================
@@ -356,7 +361,7 @@ class OperationOutcome(BaseOutcome):
 
         303 - Destination user data not found
 
-    4xx - Problems related to permission control
+    4xx - Problems related to profile control
         401 - Insufficient permission
 
         402 - Cannot be attached
@@ -368,6 +373,12 @@ class OperationOutcome(BaseOutcome):
         405 - Target not in channel
 
         406 - Detach failed
+
+        407 - Invalid permission level
+
+        408 - Invalid color
+
+        409 - Empty args
 
     5xx - Problems related to model
         501 - Construction error
@@ -383,6 +394,7 @@ class OperationOutcome(BaseOutcome):
 
         999 - Error
     """
+
     @property
     def code_prefix(self) -> str:
         return "O"
@@ -391,6 +403,12 @@ class OperationOutcome(BaseOutcome):
     def default(cls):
         return OperationOutcome.X_NOT_EXECUTED
 
+    O_ADDL_ARGS_OMITTED = \
+        -101, _("O: Additional args omitted"), \
+        _("Operation succeed. Some additional arguments were omitted.")
+    O_READONLY_ARGS_OMITTED = \
+        -102, _("O: Readonly args omitted"), \
+        _("Operation succeed. Some arguments are omitted because it is readonly.")
     O_COMPLETED = \
         -1, _("O: Completed"), \
         _("The operation was successfully completed.")
@@ -448,6 +466,15 @@ class OperationOutcome(BaseOutcome):
     X_DETACH_FAILED = \
         406, _("X: Detach failed"), \
         _("Failed to detach the profile from the target.")
+    X_INVALID_PERM_LV = \
+        407, _("X: Invalid permission level"), \
+        _("The value of the permission level is invalid.")
+    X_INVALID_COLOR = \
+        408, _("X: Invalid color"), \
+        _("The value of the color is invalid.")
+    X_EMPTY_ARGS = \
+        409, _("X: Empty arguments"), \
+        _("The parsed arguments is empty.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction error"), \
         _("An error occurred during model construction.")
@@ -488,6 +515,8 @@ class UpdateOutcome(BaseOutcome):
 
     1xx - Problems related to model
         101 - Model not found
+
+        102 - Args parsing failed
 
     2xx - Problems related to model field
         N/A
@@ -532,6 +561,9 @@ class UpdateOutcome(BaseOutcome):
     X_NOT_FOUND = \
         101, _("X: Not found"), \
         _("No data to be updated.")
+    X_ARGS_PARSE_FAILED = \
+        102, _("X: Args parsing failed"), \
+        _("Failed to parse the arguments.")
 
     X_CHANNEL_NOT_FOUND = \
         301, _("X: Channel not found"), \

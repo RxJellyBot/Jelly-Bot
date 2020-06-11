@@ -27,7 +27,7 @@ class TestAutoReplyModuleManagerBase(ABC):
                 self.fail(reg_result.outcome)
 
             prof = ProfileManager.register_new(
-                self.CREATOR_OID, {"ChannelOid": self.channel_oid, "PermissionLevel": PermissionLevel.ADMIN})
+                self.CREATOR_OID, ChannelOid=self.channel_oid, PermissionLevel=PermissionLevel.ADMIN).model
             ProfileManager.attach_profile(self.channel_oid, self.CREATOR_OID, prof.get_oid())
 
             perms = ProfileManager.get_user_permissions(self.channel_oid, self.CREATOR_OID)

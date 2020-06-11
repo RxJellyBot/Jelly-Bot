@@ -317,7 +317,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {ChannelProfileModel.Name.key: "E"})
+        update_result = ProfileDataManager.update_profile(mdl.id, **{ChannelProfileModel.Name.key: "E"})
         self.assertEqual(update_result, UpdateOutcome.O_UPDATED)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "E"}), 1)
@@ -328,7 +328,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {ChannelProfileModel.Name.key: "E", "ABCDEF": "G"})
+        update_result = ProfileDataManager.update_profile(mdl.id, **{ChannelProfileModel.Name.key: "E", "ABCDEF": "G"})
         self.assertEqual(update_result, UpdateOutcome.O_PARTIAL_ARGS_REMOVED)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "E"}), 1)
@@ -339,8 +339,8 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {ChannelProfileModel.Name.key: "E",
-                                                                   ChannelProfileModel.Color.key: "Black"})
+        update_result = ProfileDataManager.update_profile(mdl.id, **{ChannelProfileModel.Name.key: "E",
+                                                                     ChannelProfileModel.Color.key: "Black"})
         self.assertEqual(update_result, UpdateOutcome.O_PARTIAL_ARGS_INVALID)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "E"}), 1)
@@ -351,9 +351,9 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {ChannelProfileModel.Name.key: "E",
-                                                                   ChannelProfileModel.Color.key: "Black",
-                                                                   "ABCDEF": "G"})
+        update_result = ProfileDataManager.update_profile(mdl.id, **{ChannelProfileModel.Name.key: "E",
+                                                                     ChannelProfileModel.Color.key: "Black",
+                                                                     "ABCDEF": "G"})
         self.assertEqual(update_result, UpdateOutcome.O_PARTIAL_ARGS_REMOVED)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "E"}), 1)
@@ -364,8 +364,8 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {ChannelProfileModel.Color.key: "Black",
-                                                                   "ABCDEF": "G"})
+        update_result = ProfileDataManager.update_profile(mdl.id, **{ChannelProfileModel.Color.key: "Black",
+                                                                     "ABCDEF": "G"})
         self.assertEqual(update_result, UpdateOutcome.X_NOT_EXECUTED)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
@@ -375,13 +375,13 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         ProfileDataManager.insert_one_model(mdl)
         mdl.name = "E"
 
-        update_result = ProfileDataManager.update_profile(mdl.id, {})
+        update_result = ProfileDataManager.update_profile(mdl.id)
         self.assertEqual(update_result, UpdateOutcome.X_NOT_EXECUTED)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_update_no_profile(self):
-        update_result = ProfileDataManager.update_profile(ObjectId(), {ChannelProfileModel.Name.key: "A"})
+        update_result = ProfileDataManager.update_profile(ObjectId(), **{ChannelProfileModel.Name.key: "A"})
         self.assertEqual(update_result, UpdateOutcome.X_NOT_FOUND)
 
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 0)
