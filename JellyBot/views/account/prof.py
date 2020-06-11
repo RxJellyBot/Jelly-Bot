@@ -44,14 +44,15 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
         data = get_post_keys(request.POST)
         root_uid = get_root_oid(request)
 
-        model = ProfileManager.register_new(root_uid, ProfileManager.process_create_profile_kwargs(data))
+        reg_result = ProfileManager.register_new(root_uid, ProfileManager.process_create_profile_kwargs(data))
 
-        if model:
+        if reg_result.success:
             messages.info(request, _("Profile successfully created."))
-        else:
-            messages.warning(request, _("Failed to create the profile."))
+            return redirect(reverse("info.profile", kwargs={"profile_oid": reg_result.model.id}))
 
-        return redirect(reverse("info.profile", kwargs={"profile_oid": model.id}))
+        err_msg = _("Failed to create the profile. (%s / %s)") % (reg_result.outcome, reg_result.attach_outcome)
+        messages.warning(request, err_msg)
+        return redirect(reverse("account.profile.create", kwargs={"channel_oid": data["ChannelOid"]}))
 
 
 class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):

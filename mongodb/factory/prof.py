@@ -14,7 +14,7 @@ from mongodb.factory import ChannelManager
 from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome,
-    GetPermissionProfileResult, CreateProfileResult
+    GetPermissionProfileResult, CreateProfileResult, RegisterProfileResult, ArgumentParseResult
 )
 from mongodb.utils import ExtendedCursor
 from models import (
@@ -388,7 +388,7 @@ class _ProfileDataManager(BaseCollection):
         return CreateProfileResult(outcome, ex, model)
 
     @arg_type_ensure
-    def update_profile(self, profile_oid: ObjectId, new_jkwargs: dict) -> UpdateOutcome:
+    def update_profile(self, profile_oid: ObjectId, **new_jkwargs) -> UpdateOutcome:
         """
         Update a profile using the data in ``new_jkwargs``
         which the key should be the json key of :class:`ChannelProfileModel`.
@@ -457,6 +457,7 @@ class _PermissionPromotionRecordHolder(BaseCollection):
 
 
 class _ProfileManager(ClearableCollectionMixin):
+    # TODO: #307 profile modifications to check permissions
     def __init__(self):
         self._conn = _UserProfileManager()
         self._prof = _ProfileDataManager()
@@ -487,25 +488,48 @@ class _ProfileManager(ClearableCollectionMixin):
             channel_oid, set_to_channel=set_to_channel, check_channel=check_channel)
 
     @arg_type_ensure
-    def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId):
-        default_prof = self._prof.get_default_profile(channel_oid)
-        if default_prof.success:
-            self._conn.user_attach_profile(channel_oid, root_uid, default_prof.model.id)
+    def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId) -> RegisterProfileResult:
+        attach_outcome = OperationOutcome.X_NOT_EXECUTED
+        prof_result = self._prof.get_default_profile(channel_oid)
+
+        if prof_result.success:
+            attach_outcome = self._conn.user_attach_profile(channel_oid, root_uid, prof_result.model.id)
+
+        return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
 
     @arg_type_ensure
-    def register_new(self, root_uid: ObjectId, profile_kwargs: dict) -> Optional[ChannelProfileModel]:
+    def register_new(self, root_uid: ObjectId, parsed_args: Optional[ArgumentParseResult] = None, **profile_fkwargs) \
+            -> RegisterProfileResult:
         """
-        Register a new profile with the user's oid and the other args with field key for the model.
+        Register a new profile and attach it to the user if success.
+
+        The keys of ``profile_kwargs`` is field key.
+
+        If both ``parsed_args`` and ``profile_kwargs`` is present, ``profile_kwargs`` will be ignored.
 
         :param root_uid: user's OID
-        :param profile_kwargs: arguments to construct a profile
+        :param parsed_args: parsed argument result body
+        :param profile_fkwargs: arguments to construct a profile
         :return: newly constructed model
         """
-        create_result = self._prof.create_profile(**profile_kwargs)
-        if create_result.success:
-            self._conn.user_attach_profile(create_result.model.channel_oid, root_uid, create_result.model.id)
+        parse_arg_outcome = None
+        if parsed_args:
+            if not parsed_args.success:
+                return RegisterProfileResult(WriteOutcome.X_NOT_EXECUTED, parse_arg_outcome=parsed_args.outcome)
 
-        return create_result.model
+            kwargs = parsed_args.parsed_args
+            parse_arg_outcome = parsed_args.outcome
+        else:
+            kwargs = profile_fkwargs
+
+        attach_outcome = OperationOutcome.X_NOT_EXECUTED
+        prof_result = self._prof.create_profile(**kwargs)
+
+        if prof_result.success:
+            self._conn.user_attach_profile(prof_result.model.channel_oid, root_uid, prof_result.model.id)
+
+        return RegisterProfileResult(
+            prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome, parse_arg_outcome)
 
     @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> Optional[ChannelProfileModel]:
@@ -523,71 +547,122 @@ class _ProfileManager(ClearableCollectionMixin):
         return create_result.model
 
     @staticmethod
-    def process_create_profile_kwargs(profile_kwargs: dict):
+    def process_create_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
         """
         Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
 
         After processing, it returns a ``dict`` with field keys
         which can be used to create a :class:`ChannelProfileModel`.
 
-        :param profile_kwargs: A `dict` to be processed
-        :return: `dict` with field keys which can be used to create a `ChannelProfileModel`
+        :param profile_fkwargs: `dict` to be processed which the key os field key
+        :return: `dict` with field keys to create a `ChannelProfileModel`
         """
+        ret_kwargs = {}
+
         # --- Collate `PermissionLevel`
-        perm_lv = PermissionLevel.cast(profile_kwargs["PermissionLevel"])
-        profile_kwargs["PermissionLevel"] = perm_lv
+        fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
+        if fk_perm_lv in profile_fkwargs:
+            try:
+                perm_lv = PermissionLevel.cast(profile_fkwargs[fk_perm_lv])
+            except (TypeError, ValueError) as e:
+                return ArgumentParseResult(OperationOutcome.X_INVALID_PERM_LV, e)
+
+            ret_kwargs[fk_perm_lv] = perm_lv
 
         # --- Collate `Permission`
-        perm_dict = {}
-        keys_to_remove = set()
-        # Fill turned-on permissions
-        for k, v in profile_kwargs.items():
-            if k.startswith("Permission."):
-                perm_dict[k[len("Permission."):]] = True
-                keys_to_remove.add(k)
+        fk_perm = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Permission.key)
+        if fk_perm in profile_fkwargs:
+            perm_dict = {}
+            # Fill turned-on permissions
+            for k, v in profile_fkwargs.items():
+                perm_k_initial = f"{fk_perm}."
 
-        for k in keys_to_remove:
-            del profile_kwargs[k]
+                if k.startswith(perm_k_initial):
+                    perm_dict[k[len(perm_k_initial):]] = True
 
-        # Fill default overriden permissions by permission level
-        for perm in ProfilePermissionDefault.get_overridden_permissions(perm_lv):
-            perm_dict[perm.code_str] = True
+            # Fill default overriden permissions by permission level
+            for perm in ProfilePermissionDefault.get_overridden_permissions(ret_kwargs[fk_perm_lv]):
+                perm_dict[perm.code_str] = True
 
-        # Fill the rest of the permissions
-        for perm_cat in ProfilePermission:
-            if perm_cat.code_str not in perm_dict:
-                perm_dict[perm_cat.code_str] = False
+            # Fill the rest of the permissions
+            for perm_cat in ProfilePermission:
+                if perm_cat.code_str not in perm_dict:
+                    perm_dict[perm_cat.code_str] = False
 
-        profile_kwargs["Permission"] = perm_dict
+            ret_kwargs[fk_perm] = perm_dict
 
         # --- Collate `Color`
-        profile_kwargs["Color"] = ColorFactory.from_hex(profile_kwargs["Color"])
+        fk_color = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Color.key)
+        if fk_color in profile_fkwargs:
+            try:
+                color = ColorFactory.from_hex(profile_fkwargs[fk_color])
+            except ValueError as e:
+                return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, e)
 
-        return profile_kwargs
+            ret_kwargs[fk_color] = color
+
+        if set(profile_fkwargs) - set(ret_kwargs):
+            return ArgumentParseResult(OperationOutcome.O_ADDL_ARGS_OMITTED, parsed_args=ret_kwargs)
+
+        if not ret_kwargs:
+            return ArgumentParseResult(OperationOutcome.X_EMPTY_ARGS)
+
+        return ArgumentParseResult(OperationOutcome.O_COMPLETED, parsed_args=ret_kwargs)
 
     @staticmethod
-    def process_edit_profile_kwargs(profile_kwargs: dict):
+    def process_edit_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
         """
         Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
-        After processing, it returns a ``dict`` with json keys
-        which can be used as the operand of ``$set`` for updating.
+        Returns a ``dict`` with json keys to be used as the MongoDB operand of ``$set``.
 
-        :param profile_kwargs: A `dict` to be processed.
-        :return: a `dict` with py keys which can be used as the operand of `$set` for updating.
+        :param profile_fkwargs: `dict` to be processed
+        :return: `dict` with json keys to be used as the MongoDB operand of `$set`
         """
-        ret = {}
+        contains_readonly = False
+        contains_addl = False
+        ret_kwargs = {}
 
-        for k, v in profile_kwargs.items():
-            jk = ChannelProfileModel.field_to_json_key(k)
-            f = ChannelProfileModel.get_field_class_instance(k)
-            if jk and f:
-                ret[jk] = f.cast_to_desired_type(v)
+        for fk, v in profile_fkwargs.items():
+            jk = ChannelProfileModel.field_to_json_key(fk)
+            f = ChannelProfileModel.get_field_class_instance(fk)
 
-        return ret
+            if f and f.read_only:
+                contains_readonly = True
+            elif jk and f:
+                ret_kwargs[jk] = f.cast_to_desired_type(v)
+            else:
+                contains_addl = True
 
-    def update_profile(self, profile_oid: ObjectId, update_dict: dict) -> UpdateOutcome:
-        return self._prof.update_profile(profile_oid, update_dict)
+        if contains_readonly:
+            outcome = OperationOutcome.O_READONLY_ARGS_OMITTED
+        elif contains_addl:
+            outcome = OperationOutcome.O_ADDL_ARGS_OMITTED
+        else:
+            outcome = OperationOutcome.O_COMPLETED
+        return ArgumentParseResult(outcome, parsed_args=ret_kwargs)
+
+    def update_profile(self, profile_oid: ObjectId, parsed_args: Optional[ArgumentParseResult] = None, **update_dict) \
+            -> UpdateOutcome:
+        """
+        Update the profile.
+
+        If ``parsed_args`` is provided, and the parsing outcome is success,
+        contents of ``update_dict`` will be omitted.
+
+        :param profile_oid: OID of the profile to be updated
+        :param parsed_args: result body of the parsed update arguments
+        :param update_dict: unparsed kwargs with json key
+        :return: outcome of the update
+        """
+        # TODO: #307 Get user OID and check if the permission in update_dict is changable for the user
+        if parsed_args:
+            if not parsed_args.success:
+                return UpdateOutcome.X_ARGS_PARSE_FAILED
+
+            update_dict = parsed_args.parsed_args
+
+        return self._prof.update_profile(profile_oid, **update_dict)
 
     def update_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
         return self._conn.change_star(channel_oid, root_oid, star)

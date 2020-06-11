@@ -14,11 +14,12 @@ class ChannelProfileModel(Model):
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!! Check `ProfileManager.process_create_profile_kwargs` when changing the variable name of this class. !!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
+    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required, readonly=True)
     Name = TextField("n", default="-", must_have_content=True)
     Color = ColorField("col")
     # 0 means no need to vote, > 0 means # votes needed to get this profile
     PromoVote = IntegerField("promo", positive_only=True)
+    # TODO: #307 change to set field
     Permission = DictionaryField("perm",
                                  default=ProfilePermissionDefault.get_default_code_str_dict(), allow_none=False)
     PermissionLevel = PermissionLevelField("plv")
