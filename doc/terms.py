@@ -48,7 +48,7 @@ terms_collection["Features"] = TermsCollection(
      TermExplanation(_("Execode"),
                      _("The users provide partial required information for an operation, then the system will yield a "
                        "code (Execode) to the users for completing it while holding it for %d hrs.<br>"
-                       "Users will need to use the given Execode with the lacking information for completing the "
+                       "Users will need to use the given Execode with the missing information for completing the "
                        "operation before it expires.") % (Database.ExecodeExpirySeconds // 3600),
                      _("User B created an Auto-Reply module on the website and choose the issue an Execode option. "
                        "Then, he submit the Execode in the channel, so the Auto-Reply module is registered.")),
