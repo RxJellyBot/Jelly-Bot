@@ -233,7 +233,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, mdl)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.O_OK)
 
         self.assertEqual(ChannelManager.count_documents({}), 1)
@@ -253,7 +253,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_AR_REGISTER_MODULE)
 
         self.assertEqual(ChannelManager.count_documents({}), 1)
@@ -271,7 +271,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, mdl)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.O_OK)
 
         self.assertEqual(ChannelManager.count_documents({}), 1)
@@ -290,7 +290,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, mdl)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.O_OK)
 
         self.assertEqual(ChannelManager.count_documents({}), 1)
@@ -306,7 +306,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_CHANNEL_ERROR)
 
         self.assertEqual(ChannelManager.count_documents({}), 0)
@@ -361,7 +361,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
 
         self._user_integrate_post(creator_oid, creator_oid_2, True)
 
@@ -376,7 +376,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_SOURCE_EQ_TARGET)
 
     def test_user_integrate_src_exist_only(self):
@@ -390,7 +390,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_TARGET_NOT_FOUND)
 
         self._user_integrate_post(creator_oid, creator_oid_2, False)
@@ -406,7 +406,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_SOURCE_NOT_FOUND)
 
         self._user_integrate_post(creator_oid, creator_oid_2, False)
@@ -422,7 +422,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_SOURCE_NOT_FOUND)
 
         self._user_integrate_post(creator_oid, creator_oid_2, False)
@@ -437,7 +437,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertIsInstance(result.exception, NoCompleteActionError)
         self.assertEqual(result.exception.action, Execode.SYS_TEST)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_NOT_EXECUTED)
 
     def test_complete_additional_kwargs(self):
@@ -450,7 +450,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, set())
+        self.assertEqual(result.missing_keys, set())
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.O_OK)
 
         self.assertEqual(ChannelManager.count_documents({}), 1)
@@ -465,7 +465,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertFalse(result.success)
         self.assertIsNone(result.exception)
         self.assertModelEqual(result.model, enqueue.model)
-        self.assertEqual(result.lacking_keys, {param.AutoReply.CHANNEL_TOKEN})
-        self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_ARGS_LACKING)
+        self.assertEqual(result.missing_keys, {param.AutoReply.CHANNEL_TOKEN})
+        self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_MISSING_ARGS)
 
         self.assertEqual(ChannelManager.count_documents({}), 0)

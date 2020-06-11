@@ -130,7 +130,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
         :param execode_kwargs: arguments may be needed to complete the Execode action
         :param action: type of the Execode action
         """
-        lacking_keys = set()
+        missing_keys = set()
         ex = None
         tk_model: Optional[ExecodeEntryModel] = None
 
@@ -151,12 +151,12 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             try:
                 required_keys = ExecodeRequiredKeys.get_required_keys(tk_model.action_type)
 
-                lacking_keys = required_keys.difference(execode_kwargs)
-                if len(lacking_keys) == 0:
+                missing_keys = required_keys.difference(execode_kwargs)
+                if len(missing_keys) == 0:
                     outcome, cmpl_outcome, ex = self._attempt_complete_complete(execode, tk_model, execode_kwargs)
                 else:
                     outcome = OperationOutcome.X_MISSING_ARGS
-                    cmpl_outcome = ExecodeCompletionOutcome.X_ARGS_LACKING
+                    cmpl_outcome = ExecodeCompletionOutcome.X_MISSING_ARGS
             except ModelConstructionError as e:
                 outcome = OperationOutcome.X_CONSTRUCTION_ERROR
                 cmpl_outcome = ExecodeCompletionOutcome.X_MODEL_CONSTRUCTION
@@ -171,7 +171,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             else:
                 outcome = OperationOutcome.X_ERROR
 
-        return CompleteExecodeResult(outcome, ex, tk_model, lacking_keys, cmpl_outcome)
+        return CompleteExecodeResult(outcome, ex, tk_model, missing_keys, cmpl_outcome)
 
 
 ExecodeManager = _ExecodeManager()

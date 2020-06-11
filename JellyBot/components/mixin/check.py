@@ -10,7 +10,7 @@ class CheckParameterMixin(View):
         return set()
 
     # noinspection PyAttributeOutsideInit
-    def lacking_keys(self, request):
+    def missing_keys(self, request):
         if hasattr(self, "ret"):
             ret = self.ret
         else:
@@ -30,14 +30,14 @@ class CheckParameterMixin(View):
 
         return ret
 
-    def render_on_lacking_keys(self, lacking_keys: list):
-        self.request.session[Session.APIStatisticsCollection.DICT_RESPONSE] = {result.REQUIRED: lacking_keys}
+    def render_on_missing_keys(self, missing_keys: list):
+        self.request.session[Session.APIStatisticsCollection.DICT_RESPONSE] = {result.REQUIRED: missing_keys}
         return JsonResponse(self.request.session[Session.APIStatisticsCollection.DICT_RESPONSE])
 
     def dispatch(self, request, *args, **kwargs):
-        lack_keys = self.lacking_keys(request)
+        missing_keys = self.missing_keys(request)
 
-        if len(lack_keys) > 0:
-            return self.render_on_lacking_keys(lack_keys)
+        if len(missing_keys) > 0:
+            return self.render_on_missing_keys(missing_keys)
         else:
             return super().dispatch(request, *args, **kwargs)

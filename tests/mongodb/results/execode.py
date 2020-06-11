@@ -82,14 +82,14 @@ class TestCompleteExecodeResult(TestOnModelResult.TestClass):
     @classmethod
     def default_serialized(cls):
         d = super().default_serialized()
-        d.update({result.ExecodeResponse.LACKING_KEYS: set(),
+        d.update({result.ExecodeResponse.MISSING_ARGS: set(),
                   result.ExecodeResponse.COMPLETION_OUTCOME: ExecodeCompletionOutcome.O_OK})
         return d
 
     @classmethod
     def default_serialized_error(cls):
         d = super().default_serialized_error()
-        d.update({result.ExecodeResponse.LACKING_KEYS: {"a", "b"},
+        d.update({result.ExecodeResponse.MISSING_ARGS: {"a", "b"},
                   result.ExecodeResponse.COMPLETION_OUTCOME: ExecodeCompletionOutcome.X_IDT_INTEGRATION_FAILED})
         return d
 

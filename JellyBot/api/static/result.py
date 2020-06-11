@@ -15,14 +15,15 @@ class Common:
     TOKEN = "token"
     PLATFORM = "platform"
 
-    LACKING_KEYS = "keysLack"
+    MISSING_ARGS = "missingArgs"
 
 
 class Results:
     EXCEPTION = "exception"
     OUTCOME = "outcome"
     MODEL = "model"
-    LACKING_KEYS = Common.LACKING_KEYS
+    ARGS = "args"
+    MISSING_ARGS = Common.MISSING_ARGS
 
 
 class SenderIdentity:
@@ -42,7 +43,7 @@ class AutoReplyResponse:
 
 
 class ExecodeResponse:
-    LACKING_KEYS = Common.LACKING_KEYS
+    MISSING_ARGS = Common.MISSING_ARGS
     CREATOR_OID = Common.CREATOR_OID
     COMPLETION_OUTCOME = "cmplOutcome"
 
