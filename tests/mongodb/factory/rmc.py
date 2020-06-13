@@ -15,7 +15,7 @@ __all__ = ["TestRemoteControlHolder"]
 
 EXPIRY_SEC_ORG = Bot.RemoteControl.IdleDeactivateSeconds
 
-EXPIRY_SEC = max(0.3, TestDatabaseMixin.db_ping_ms() / 1000 * 1.5)
+EXPIRY_SEC = max(0.3, TestDatabaseMixin.db_ping_ms() / 500)
 """
 Get the database ping to count in the database communication lag while reducing the test speed
 Cannot be too short because the actual code execution may not be completed before the expiry

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Set
 
 from bson import ObjectId
 
@@ -20,8 +20,8 @@ class ChannelProfileModel(Model):
     # 0 means no need to vote, > 0 means # votes needed to get this profile
     PromoVote = IntegerField("promo", positive_only=True)
     # TODO: #307 change to set field
-    Permission = DictionaryField("perm",
-                                 default=ProfilePermissionDefault.get_default_code_str_dict(), allow_none=False)
+    Permission = DictionaryField("perm", allow_none=False,
+                                 default=ProfilePermissionDefault.get_default_code_str_dict())
     PermissionLevel = PermissionLevelField("plv")
 
     EmailKeyword = ArrayField("e-kw", str)
@@ -52,6 +52,13 @@ class ChannelProfileModel(Model):
 
     @property
     def permission_list(self) -> List[ProfilePermission]:
+        """
+        Return the list of the permissions sorted by the permission code.
+        """
+        return list(sorted(self.permission_set, key=lambda x: x.code))
+
+    @property
+    def permission_set(self) -> Set[ProfilePermission]:
         ret = set()
 
         for cat, permitted in self.permission.items():
@@ -62,7 +69,7 @@ class ChannelProfileModel(Model):
 
         ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
-        return list(sorted(ret, key=lambda x: x.code))
+        return ret
 
 
 @dataclass

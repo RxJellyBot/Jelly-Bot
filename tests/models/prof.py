@@ -52,6 +52,18 @@ class TestChannelProfileModel(TestModel.TestClass):
             with self.subTest(expected_is_admin=is_admin, model=model):
                 self.assertEqual(model.is_admin, is_admin)
 
+    def test_permission_set(self):
+        perm_dict = {
+            ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
+            ProfilePermission.CNL_ADJUST_PRIVACY: True
+        }
+        mdl = self.get_constructed_model(perm=perm_dict)
+
+        expected = {perm for perm, active in ProfilePermissionDefault.get_default_dict().items() if active}
+        expected.update(perm_dict)
+
+        self.assertSetEqual(mdl.permission_set, expected)
+
     def test_permission_list(self):
         perm_dict = {
             ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
@@ -62,7 +74,10 @@ class TestChannelProfileModel(TestModel.TestClass):
         expected = {perm for perm, active in ProfilePermissionDefault.get_default_dict().items() if active}
         expected.update(perm_dict)
 
-        self.assertSetEqual(set(mdl.permission_list), expected)
+        self.assertListEqual(
+            mdl.permission_list,
+            [ProfilePermission.NORMAL, ProfilePermission.AR_ACCESS_PINNED_MODULE, ProfilePermission.CNL_ADJUST_PRIVACY]
+        )
 
 
 class TestChannelProfileConnectionModel(TestModel.TestClass):

@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from extutils.boolext import str_to_bool
+from extutils.boolext import to_bool
 from extutils import safe_cast
 from JellyBot.api.responses import BaseApiResponse
 from JellyBot.api.static import param
@@ -92,7 +92,7 @@ class ChannelStarChangeResponse(
         self._channel_oid = safe_cast(self._channel_oid, ObjectId)
 
     def _handle_star(self):
-        self._star = str_to_bool(self._star).to_bool()
+        self._star = to_bool(self._star).to_bool()
 
     def process_pass(self):
         self._result = ProfileManager.update_channel_star(self._channel_oid, self._root_oid, self._star)

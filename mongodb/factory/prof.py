@@ -6,10 +6,16 @@ from bson import ObjectId
 
 from pymongo import UpdateOne
 
+from extutils.boolext import to_bool
 from extutils.color import ColorFactory
 from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
+from models import (
+    OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
+    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
+)
+from models.exceptions import ModelConstructionError, RequiredKeyNotFilledError, InvalidModelFieldError
 from mongodb.factory import ChannelManager
 from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.factory.results import (
@@ -17,10 +23,6 @@ from mongodb.factory.results import (
     GetPermissionProfileResult, CreateProfileResult, RegisterProfileResult, ArgumentParseResult
 )
 from mongodb.utils import ExtendedCursor
-from models import (
-    OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
-    ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
-)
 from strnames.mongodb import Profile
 
 from ._base import BaseCollection
@@ -199,6 +201,14 @@ class _UserProfileManager(BaseCollection):
             filter_, {"$pull": {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}})
 
     def change_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
+        """
+        Change the star mark of the channel for a user.
+
+        :param channel_oid: channel to be changed the star mark
+        :param root_oid: user of the channel to change the star mark
+        :param star: new star status
+        :return: star changed or not
+        """
         return self.update_one(
             {
                 ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
@@ -305,9 +315,9 @@ class _ProfileDataManager(BaseCollection):
             GetOutcome.O_ADDED if create_result.success else GetOutcome.X_DEFAULT_PROFILE_ERROR,
             ex, create_result.model)
 
-    def get_attachable_profiles(
-            self, channel_oid: ObjectId, *, existing_permissions: Optional[Set[ProfilePermission]] = None,
-            highest_perm_lv: PermissionLevel = PermissionLevel.NORMAL) \
+    def get_attachable_profiles(self, channel_oid: ObjectId, *,
+                                existing_permissions: Optional[Set[ProfilePermission]] = None,
+                                highest_perm_lv: PermissionLevel = PermissionLevel.NORMAL) \
             -> ExtendedCursor[ChannelProfileModel]:
         """
         Get the current attachable profiles in the specific channel.
@@ -420,8 +430,23 @@ class _ProfileDataManager(BaseCollection):
         d = {}
 
         for jk, v in new_jkwargs.items():
+            # Handling permission keys
+            if ChannelProfileModel.Permission.key in jk:
+                jk, code = jk.split(".", 2)
+
+                try:
+                    ProfilePermission.cast(code)
+                except (TypeError, ValueError):
+                    outcome = UpdateOutcome.O_PARTIAL_ARGS_INVALID
+
+                d[f"{jk}.{code}"] = to_bool(v).to_bool()
+                continue
+
             if jk in self.data_model.model_json_keys():
                 fi = self.data_model.get_field_class_instance(self.data_model.json_key_to_field(jk))
+                if fi.read_only:
+                    return UpdateOutcome.X_UNEDITABLE
+
                 if fi.is_value_valid(v):
                     d[jk] = v
                 else:
@@ -458,98 +483,6 @@ class _PermissionPromotionRecordHolder(BaseCollection):
 
 
 class _ProfileManager(ClearableCollectionMixin):
-    def __init__(self):
-        self._conn = _UserProfileManager()
-        self._prof = _ProfileDataManager()
-        self._promo = _PermissionPromotionRecordHolder()
-
-    def clear(self):
-        self._conn.clear()
-        self._prof.clear()
-        self._promo.clear()
-
-    def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
-        Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
-
-    def create_default_profile(
-            self, channel_oid: ObjectId, *, set_to_channel: bool = True, check_channel: bool = True) \
-            -> CreateProfileResult:
-        """
-        Create a default profile for ``channel_oid``.
-
-        Set the default profile to the channel if ``set_to_channel`` is ``True``.
-
-        :param channel_oid: channel to get the default profile
-        :param set_to_channel: if the created profile should be set to the channel
-        :param check_channel: check if the channel is registered
-        :return: result of creating the default profile
-        """
-        return self._prof.create_default_profile(
-            channel_oid, set_to_channel=set_to_channel, check_channel=check_channel)
-
-    @arg_type_ensure
-    def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId) -> RegisterProfileResult:
-        attach_outcome = OperationOutcome.X_NOT_EXECUTED
-        prof_result = self._prof.get_default_profile(channel_oid)
-
-        if prof_result.success:
-            attach_outcome = self._conn.user_attach_profile(channel_oid, root_uid, prof_result.model.id)
-
-        return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
-
-    @arg_type_ensure
-    def register_new(self, root_uid: ObjectId, parsed_args: Optional[ArgumentParseResult] = None, **profile_fkwargs) \
-            -> RegisterProfileResult:
-        """
-        Register a new profile and attach it to the user if success.
-
-        The keys of ``profile_kwargs`` is field key.
-
-        If both ``parsed_args`` and ``profile_kwargs`` is present, ``profile_kwargs`` will be ignored.
-
-        :param root_uid: user's OID
-        :param parsed_args: parsed argument result body
-        :param profile_fkwargs: arguments to construct a profile
-        :return: newly constructed model
-        """
-        parse_arg_outcome = None
-        if parsed_args:
-            if not parsed_args.success:
-                return RegisterProfileResult(WriteOutcome.X_NOT_EXECUTED, parse_arg_outcome=parsed_args.outcome)
-
-            kwargs = parsed_args.parsed_args
-            parse_arg_outcome = parsed_args.outcome
-        else:
-            kwargs = profile_fkwargs
-
-        attach_outcome = OperationOutcome.X_NOT_EXECUTED
-        prof_result = self._prof.create_profile(**kwargs)
-
-        if prof_result.success:
-            attach_outcome = self._conn.user_attach_profile(
-                prof_result.model.channel_oid, root_uid, prof_result.model.id)
-
-        return RegisterProfileResult(
-            prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome, parse_arg_outcome)
-
-    @arg_type_ensure
-    def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> RegisterProfileResult:
-        """
-        Register a new profile with the user's oid and the constructed :class:`ChannelProfileModel`.
-
-        :param root_uid: OID of the user to attach the profile
-        :param model: profile model to be inserted
-        :return: profile registration result
-        """
-        attach_outcome = OperationOutcome.X_NOT_EXECUTED
-        create_result = self._prof.create_profile_model(model)
-        if create_result.success:
-            attach_outcome = self._conn.user_attach_profile(
-                create_result.model.channel_oid, root_uid, create_result.model.id)
-
-        return RegisterProfileResult(
-            create_result.outcome, create_result.exception, create_result.model, attach_outcome)
-
     @staticmethod
     def process_create_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
         """
@@ -587,14 +520,13 @@ class _ProfileManager(ClearableCollectionMixin):
 
         # --- Collate `Permission`
         fk_perm = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Permission.key)
+        fk_perm_initial = f"{fk_perm}."
         perm_dict = {}
         keys_to_remove = set()
         # Fill turned-on permissions
         for fk, v in profile_fkwargs.items():
-            perm_k_initial = f"{fk_perm}."
-
-            if fk.startswith(perm_k_initial):
-                perm_dict[fk[len(perm_k_initial):]] = True
+            if fk.startswith(fk_perm_initial):
+                perm_dict[fk[len(fk_perm_initial):]] = True
                 keys_to_remove.add(fk)
 
         # Remove `Permission` in `profile_fkwargs` or the program will misjudge the status of the args
@@ -665,21 +597,41 @@ class _ProfileManager(ClearableCollectionMixin):
         contains_addl = False
         ret_kwargs = {}
 
+        fk_perm = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Permission.key)
+        fk_perm_initial = f"{fk_perm}."
+
         for fk, v in profile_fkwargs.items():
+            # Handling permission keys
+            if fk.startswith(fk_perm_initial):
+                fk, code = fk.split(".", 2)
+                jk = ChannelProfileModel.field_to_json_key(fk)
+
+                try:
+                    ProfilePermission.cast(code)
+                except (TypeError, ValueError):
+                    contains_addl = True
+
+                ret_kwargs[f"{jk}.{code}"] = to_bool(v).to_bool()
+                continue
+
+            # Handle other parameters
             jk = ChannelProfileModel.field_to_json_key(fk)
             f = ChannelProfileModel.get_field_class_instance(fk)
 
-            if f and f.read_only:
-                contains_readonly = True
-            elif jk and f:
-                if not f.is_type_matched(v):
-                    return ArgumentParseResult(OperationOutcome.X_VALUE_TYPE_MISMATCH)
-                if not f.is_value_valid(v):
-                    return ArgumentParseResult(OperationOutcome.X_VALUE_INVALID)
-
-                ret_kwargs[jk] = f.cast_to_desired_type(v)
-            else:
+            if not jk or not f:
                 contains_addl = True
+                continue
+
+            if f.read_only:
+                contains_readonly = True
+                continue
+
+            if not f.is_type_matched(v):
+                return ArgumentParseResult(OperationOutcome.X_VALUE_TYPE_MISMATCH)
+            if not f.is_value_valid(v):
+                return ArgumentParseResult(OperationOutcome.X_VALUE_INVALID)
+
+            ret_kwargs[jk] = f.cast_to_desired_type(v)
 
         if contains_readonly:
             outcome = OperationOutcome.O_READONLY_ARGS_OMITTED
@@ -689,7 +641,134 @@ class _ProfileManager(ClearableCollectionMixin):
             outcome = OperationOutcome.O_COMPLETED
         return ArgumentParseResult(outcome, parsed_args=ret_kwargs)
 
-    def update_profile(self, profile_oid: ObjectId, parsed_args: Optional[ArgumentParseResult] = None, **update_dict) \
+    def __init__(self):
+        self._conn = _UserProfileManager()
+        self._prof = _ProfileDataManager()
+        self._promo = _PermissionPromotionRecordHolder()
+
+    def clear(self):
+        self._conn.clear()
+        self._prof.clear()
+        self._promo.clear()
+
+    def _profile_modification_allowed(self, channel_oid: ObjectId, user_oid: ObjectId,
+                                      target_oid: Optional[ObjectId]) \
+            -> bool:
+        """
+        Check if the user with ``user_oid`` has the permission to perform profile modification.
+
+        If ``target_oid`` is ``None``, the method will consider that the modification will be performed on others.
+
+        :param channel_oid: channel OID of the profile
+        :param user_oid: user to execute the profile modification
+        :param target_oid: the user to be performed the profile modification
+        :return: if the profile modification is allowed
+        """
+        permissions = self.get_user_permissions(channel_oid, user_oid)
+
+        # No permissions available means the user is not in the channel
+        if not permissions:
+            return False
+
+        if not target_oid or user_oid != target_oid:
+            return ProfilePermission.PRF_CONTROL_MEMBER in permissions
+        else:
+            return ProfilePermission.PRF_CONTROL_SELF in permissions
+
+    def create_default_profile(self, channel_oid: ObjectId, *,
+                               set_to_channel: bool = True, check_channel: bool = True) \
+            -> CreateProfileResult:
+        """
+        Create a default profile for ``channel_oid``.
+
+        Set the default profile to the channel if ``set_to_channel`` is ``True``.
+
+        :param channel_oid: channel to get the default profile
+        :param set_to_channel: if the created profile should be set to the channel
+        :param check_channel: check if the channel is registered
+        :return: result of creating the default profile
+        """
+        return self._prof.create_default_profile(
+            channel_oid, set_to_channel=set_to_channel, check_channel=check_channel)
+
+    @arg_type_ensure
+    def register_new(self, root_uid: ObjectId, parsed_args: Optional[ArgumentParseResult] = None, **profile_fkwargs) \
+            -> RegisterProfileResult:
+        """
+        Register a new profile and attach it to the user if success.
+
+        The keys of ``profile_kwargs`` is field key.
+
+        If both ``parsed_args`` and ``profile_kwargs`` is present, ``profile_kwargs`` will be ignored.
+
+        :param root_uid: user's OID
+        :param parsed_args: parsed argument result body
+        :param profile_fkwargs: arguments to construct a profile
+        :return: newly constructed model
+        """
+        parse_arg_outcome = None
+        if parsed_args:
+            if not parsed_args.success:
+                return RegisterProfileResult(WriteOutcome.X_NOT_EXECUTED, parse_arg_outcome=parsed_args.outcome)
+
+            kwargs = parsed_args.parsed_args
+            parse_arg_outcome = parsed_args.outcome
+        else:
+            kwargs = profile_fkwargs
+
+        try:
+            prof_model = ChannelProfileModel(**kwargs)
+        except RequiredKeyNotFilledError as ex:
+            return RegisterProfileResult(WriteOutcome.X_REQUIRED_NOT_FILLED, ex)
+        except InvalidModelFieldError as ex:
+            return RegisterProfileResult(WriteOutcome.X_TYPE_MISMATCH, ex)
+        except ModelConstructionError as ex:
+            return RegisterProfileResult(WriteOutcome.X_INVALID_MODEL, ex)
+
+        reg_result = self.register_new_model(root_uid, prof_model)
+
+        return RegisterProfileResult(
+            reg_result.outcome, reg_result.exception, reg_result.model, reg_result.attach_outcome, parse_arg_outcome)
+
+    @arg_type_ensure
+    def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId) -> RegisterProfileResult:
+        attach_outcome = OperationOutcome.X_NOT_EXECUTED
+        prof_result = self._prof.get_default_profile(channel_oid)
+
+        if prof_result.success:
+            attach_outcome = self._conn.user_attach_profile(channel_oid, root_uid, prof_result.model.id)
+
+        return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
+
+    def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
+        Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
+
+    @arg_type_ensure
+    def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> RegisterProfileResult:
+        """
+        Register a new profile with the user's oid and the constructed :class:`ChannelProfileModel`.
+
+        :param root_uid: OID of the user to attach the profile
+        :param model: profile model to be inserted
+        :return: profile registration result
+        """
+        attach_outcome = OperationOutcome.X_NOT_EXECUTED
+
+        if model.permission_set \
+                - self.get_user_permissions(model.channel_oid, root_uid) \
+                - ProfilePermissionDefault.get_overridden_permissions(model.permission_level):
+            return RegisterProfileResult(WriteOutcome.X_INSUFFICIENT_PERMISSION)
+
+        create_result = self._prof.create_profile_model(model)
+        if create_result.success:
+            attach_outcome = self._conn.user_attach_profile(
+                create_result.model.channel_oid, root_uid, create_result.model.id)
+
+        return RegisterProfileResult(
+            create_result.outcome, create_result.exception, create_result.model, attach_outcome)
+
+    def update_profile(self, channel_oid: ObjectId, root_oid: ObjectId, profile_oid: ObjectId,
+                       parsed_args: Optional[ArgumentParseResult] = None, **update_dict) \
             -> UpdateOutcome:
         """
         Update the profile.
@@ -697,22 +776,179 @@ class _ProfileManager(ClearableCollectionMixin):
         If ``parsed_args`` is provided, and the parsing outcome is success,
         contents of ``update_dict`` will be omitted.
 
+        :param channel_oid: OID of the channel of the profile
+        :param root_oid: OID of the user performing this update
         :param profile_oid: OID of the profile to be updated
         :param parsed_args: result body of the parsed update arguments
-        :param update_dict: unparsed kwargs with json key
+        :param update_dict: unparsed kwargs with json key to be used with MongoDB operator `$set`
         :return: outcome of the update
         """
-        # TODO: #307 Get user OID and check if the permission in update_dict is changable for the user
         if parsed_args:
             if not parsed_args.success:
                 return UpdateOutcome.X_ARGS_PARSE_FAILED
 
             update_dict = parsed_args.parsed_args
 
+        # Check permissions
+        perms = {ProfilePermission.cast(k.split(".", 2)[1]) for k, v in update_dict.items()
+                 if k.startswith(ChannelProfileModel.Permission.key) and to_bool(v).to_bool()}
+        if perms and perms - self.get_user_permissions(channel_oid, root_oid):
+            return UpdateOutcome.X_INSUFFICIENT_PERMISSION
+
         return self._prof.update_profile(profile_oid, **update_dict)
 
     def update_channel_star(self, channel_oid: ObjectId, root_oid: ObjectId, star: bool) -> bool:
+        """
+        Change the star mark of the channel for a user.
+
+        :param channel_oid: channel to be changed the star mark
+        :param root_oid: user of the channel to change the star mark
+        :param star: new star status
+        :return: star changed or not
+        """
         return self._conn.change_star(channel_oid, root_oid, star)
+
+    @arg_type_ensure
+    def attach_profile_name(self, channel_oid: ObjectId, user_oid: ObjectId, profile_name: str,
+                            target_oid: Optional[ObjectId] = None) \
+            -> OperationOutcome:
+        """
+        Attach profile to the target by providing the exact profile name.
+
+        If ``target_oid`` is ``None``, then the profile will be attached to self (``user_oid``).
+
+        :param channel_oid: channel of the profile
+        :param user_oid: user executing this action
+        :param profile_name: full name of the profile to be attached
+        :param target_oid: profile attaching target
+        """
+        prof = self.get_profile_name(channel_oid, profile_name)
+        if not prof:
+            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
+
+        return self.attach_profile(channel_oid, user_oid, prof.id, target_oid, bypass_existence_check=True)
+
+    @arg_type_ensure
+    def attach_profile(self, channel_oid: ObjectId, user_oid: ObjectId, profile_oid: ObjectId,
+                       target_oid: Optional[ObjectId] = None, *,
+                       bypass_existence_check: bool = False) \
+            -> OperationOutcome:
+        """
+        Attach profile to the target by providing the profile OID.
+
+        If ``target_oid`` is ``None``, then the profile will be attached to self (``user_oid``).
+
+        :param channel_oid: channel of the profile
+        :param user_oid: user executing this action
+        :param profile_oid: OID of the profile to be attached
+        :param target_oid: profile attaching target
+        :param bypass_existence_check: bypass the profile existence check
+        """
+        # --- Check target
+
+        if not target_oid:
+            target_oid = user_oid
+
+        if not self._conn.is_user_in_channel(channel_oid, user_oid):
+            return OperationOutcome.X_EXECUTOR_NOT_IN_CHANNEL
+
+        if not self._conn.is_user_in_channel(channel_oid, target_oid):
+            return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
+
+        # --- Check profile existence
+
+        if not bypass_existence_check and not self.get_profile(profile_oid):
+            return OperationOutcome.X_PROFILE_NOT_FOUND_OID
+
+        # --- Check permissions
+
+        if not self._profile_modification_allowed(channel_oid, user_oid, target_oid):
+            return OperationOutcome.X_INSUFFICIENT_PERMISSION
+
+        # --- Check profile attachable
+
+        attachable_profiles = self.get_attachable_profiles(channel_oid, user_oid)
+        if not attachable_profiles:
+            return OperationOutcome.X_NO_ATTACHABLE_PROFILES
+
+        if not any(prof.id == profile_oid for prof in attachable_profiles):
+            return OperationOutcome.X_UNATTACHABLE
+
+        # --- Attach profile
+
+        return self._conn.user_attach_profile(channel_oid, target_oid, profile_oid)
+
+    @arg_type_ensure
+    def detach_profile_name(self, channel_oid: ObjectId, profile_name: str, user_oid: ObjectId,
+                            target_oid: Optional[ObjectId] = None) \
+            -> OperationOutcome:
+        prof = self.get_profile_name(channel_oid, profile_name)
+        if not prof:
+            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
+
+        return self.detach_profile(channel_oid, prof.id, user_oid, target_oid)
+
+    def detach_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: ObjectId,
+                       target_oid: Optional[ObjectId] = None) \
+            -> OperationOutcome:
+        """
+        Detach the profile.
+
+        ``target_oid`` needs to be specified unless to detach the profile from all users.
+
+        .. note::
+            Permission check will **NOT** be performed when detaching from all of the users.
+
+        :param channel_oid: channel OID of the profile
+        :param profile_oid: OID of the profile
+        :param user_oid: user to detach the profile
+        :param target_oid: target to be detached the profile
+        :return: outcome of the detachment
+        """
+        # --- Check target
+
+        if not self._conn.is_user_in_channel(channel_oid, user_oid):
+            return OperationOutcome.X_EXECUTOR_NOT_IN_CHANNEL
+
+        if target_oid and not self._conn.is_user_in_channel(channel_oid, target_oid):
+            return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
+
+        # --- Check profile existence
+
+        if not self.get_profile(profile_oid):
+            return OperationOutcome.X_PROFILE_NOT_FOUND_OID
+
+        # --- Check permissions
+
+        if not self._profile_modification_allowed(channel_oid, user_oid, target_oid):
+            return OperationOutcome.X_INSUFFICIENT_PERMISSION
+
+        # --- Detach profile
+
+        detach_outcome = self._conn.detach_profile(profile_oid, target_oid)
+        if detach_outcome.is_success:
+            return OperationOutcome.O_COMPLETED
+        else:
+            return OperationOutcome.X_DETACH_FAILED
+
+    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: ObjectId) -> bool:
+        """
+        Detach the profile from all users and delete it.
+
+        If the detachment fails, the deletion won't be performed.
+
+        :param channel_oid: channel of the profile
+        :param profile_oid: OID of the profile
+        :param user_oid: user to perform the profile deletion
+        :return: if the deletion succeed
+        """
+        if not self.detach_profile(channel_oid, profile_oid, user_oid).is_success:
+            return False
+
+        return self._prof.delete_profile(profile_oid)
+
+    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
+        Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
 
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
@@ -868,11 +1104,15 @@ class _ProfileManager(ClearableCollectionMixin):
 
         # Remove default profile
         channel_data = ChannelManager.get_channel_oid(channel_oid)
-        attachables = [
-            prof for prof in self._prof.get_attachable_profiles(channel_oid,
-                                                                existing_permissions=exist_perm,
-                                                                highest_perm_lv=highest_perm)
-            if prof.id != channel_data.config.default_profile_oid]
+        attachables = []
+        for prof in self._prof.get_attachable_profiles(channel_oid,
+                                                       existing_permissions=exist_perm,
+                                                       highest_perm_lv=highest_perm):
+            if channel_data:
+                if prof.id != channel_data.config.default_profile_oid:
+                    attachables.append(prof)
+            else:
+                attachables.append(prof)
 
         return attachables
 
@@ -895,106 +1135,6 @@ class _ProfileManager(ClearableCollectionMixin):
     @staticmethod
     def can_control_profile_member(permissions: Set[ProfilePermission]):
         return ProfilePermission.PRF_CONTROL_MEMBER in permissions
-
-    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
-        Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
-
-    def _attach_detach_permission_check(self, channel_oid: ObjectId, user_oid: ObjectId, target_oid: ObjectId):
-        permissions = self.get_user_permissions(channel_oid, user_oid)
-
-        if target_oid and user_oid != target_oid:
-            return ProfilePermission.PRF_CONTROL_MEMBER in permissions
-        else:
-            return ProfilePermission.PRF_CONTROL_SELF in permissions
-
-    @arg_type_ensure
-    def attach_profile_name(
-            self, user_oid: ObjectId, channel_oid: ObjectId, profile_name: str,
-            target_oid: Optional[ObjectId] = None) \
-            -> OperationOutcome:
-        prof = self.get_profile_name(channel_oid, profile_name)
-        if not prof:
-            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
-
-        return self.attach_profile(channel_oid, user_oid, prof.id, target_oid)
-
-    @arg_type_ensure
-    def attach_profile(
-            self, channel_oid: ObjectId, user_oid: ObjectId, profile_oid: ObjectId,
-            target_oid: Optional[ObjectId] = None) -> OperationOutcome:
-        """
-        Attach profile to the target.
-
-        If ``target_oid`` is ``None``, then the profile will be attached to self.
-        """
-        # --- Check target
-
-        if not target_oid:
-            target_oid = user_oid
-        else:
-            if not self._conn.is_user_in_channel(channel_oid, target_oid):
-                return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
-
-        # --- Check permissions
-
-        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
-            return OperationOutcome.X_INSUFFICIENT_PERMISSION
-
-        # --- Check profile attachable
-
-        attachable_profiles = self.get_attachable_profiles(channel_oid, target_oid)
-        if not attachable_profiles:
-            return OperationOutcome.X_NO_ATTACHABLE_PROFILES
-
-        if profile_oid not in [prof.id for prof in attachable_profiles]:
-            return OperationOutcome.X_UNATTACHABLE
-
-        # --- Attach profile
-
-        return self._conn.user_attach_profile(channel_oid, target_oid, profile_oid)
-
-    @arg_type_ensure
-    def detach_profile_name(
-            self, channel_oid: ObjectId, profile_name: str,
-            user_oid: Optional[ObjectId] = None, target_oid: Optional[ObjectId] = None) \
-            -> OperationOutcome:
-        prof = self.get_profile_name(channel_oid, profile_name)
-        if not prof:
-            return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
-
-        return self.detach_profile(channel_oid, prof.id, user_oid, target_oid)
-
-    def detach_profile(
-            self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId],
-            target_oid: Optional[ObjectId] = None) -> OperationOutcome:
-        """Detach the profile from all users if `user_oid` is `None`."""
-        # --- Check target
-
-        if not target_oid:
-            target_oid = user_oid
-        else:
-            if not self._conn.is_user_in_channel(channel_oid, target_oid):
-                return OperationOutcome.X_TARGET_NOT_IN_CHANNEL
-
-        # --- Check permissions
-
-        if not self._attach_detach_permission_check(channel_oid, user_oid, target_oid):
-            return OperationOutcome.X_INSUFFICIENT_PERMISSION
-
-        # --- Detach profile
-
-        detach_outcome = self._conn.detach_profile(profile_oid, target_oid)
-        if detach_outcome.is_success:
-            return OperationOutcome.O_COMPLETED
-        else:
-            return OperationOutcome.X_DETACH_FAILED
-
-    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: Optional[ObjectId]) -> bool:
-        """Returns if the profile is deleted."""
-        if not self.detach_profile(channel_oid, profile_oid, user_oid):
-            return False
-
-        return self._prof.delete_profile(profile_oid)
 
 
 UserProfileManager = _UserProfileManager()

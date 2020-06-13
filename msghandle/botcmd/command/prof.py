@@ -297,7 +297,7 @@ def _output_attach_outcome(outcome: OperationOutcome):
     arg_help=[_help_name_]
 )
 def profile_attach_self(e: TextMessageEventObject, name: str):
-    return _output_attach_outcome(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
+    return _output_attach_outcome(ProfileManager.attach_profile_name(e.channel_oid, e.user_model.id, name))
 
 
 @cmd_attach.command_function(
@@ -307,7 +307,7 @@ def profile_attach_self(e: TextMessageEventObject, name: str):
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
     return _output_attach_outcome(
-        ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
+        ProfileManager.attach_profile_name(e.channel_oid, e.user_model.id, name, target_oid))
 
 
 # endregion
