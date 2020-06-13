@@ -3,9 +3,10 @@ from datetime import datetime
 
 from bson import ObjectId
 
-from flags import AutoReplyContentType, PermissionLevel, ProfilePermission, Platform
-from models import AutoReplyContentModel, AutoReplyModuleModel
+from flags import AutoReplyContentType, PermissionLevel, Platform
+from models import AutoReplyContentModel, AutoReplyModuleModel, ChannelProfileModel, ChannelProfileConnectionModel
 from mongodb.factory import ProfileManager, ChannelManager
+from mongodb.factory.prof import ProfileDataManager, UserProfileManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
 from tests.base import TestModelMixin
 
@@ -21,7 +22,7 @@ class TestAutoReplyManagerBase(ABC):
 
         @staticmethod
         def collections_to_reset():
-            return [AutoReplyModuleManager]
+            return [AutoReplyModuleManager, ProfileManager, UserProfileManager]
 
         def setUpTestCase(self) -> None:
             self.channel_oid = ObjectId()
@@ -33,14 +34,11 @@ class TestAutoReplyManagerBase(ABC):
             else:
                 self.fail(reg_result.outcome)
 
-            prof = ProfileManager.register_new(
-                self.CREATOR_OID, ChannelOid=self.channel_oid, PermissionLevel=PermissionLevel.ADMIN).model
-            ProfileManager.attach_profile(self.channel_oid, self.CREATOR_OID, prof.get_oid())
-
-            perms = ProfileManager.get_user_permissions(self.channel_oid, self.CREATOR_OID)
-
-            if ProfilePermission.AR_ACCESS_PINNED_MODULE not in perms:
-                self.fail("Permission to access pinned module not granted.")
+            mdl = ChannelProfileModel(ChannelOid=self.channel_oid, PermissionLevel=PermissionLevel.ADMIN)
+            ProfileDataManager.insert_one_model(mdl)
+            UserProfileManager.insert_one_model(
+                ChannelProfileConnectionModel(
+                    ChannelOid=self.channel_oid, UserOid=self.CREATOR_OID, ProfileOids=[mdl.id]))
 
         def _add_call_module_kw_a(self):
             """

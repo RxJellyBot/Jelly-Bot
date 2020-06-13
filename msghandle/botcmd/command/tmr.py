@@ -2,7 +2,7 @@ from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.boolext import str_to_bool, true_word, false_word, StrBoolResult
+from extutils.boolext import to_bool, true_word, false_word, StrBoolResult
 from extutils.dt import parse_to_dt
 from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
@@ -53,7 +53,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
         return [HandledMessageEventText(content=_("Failed to parse the string of datetime. (`{}`)").format(dt))]
 
     # Check `countup` flag
-    ctup = str_to_bool(countup)
+    ctup = to_bool(countup)
 
     if ctup == StrBoolResult.UNKNOWN:
         return [

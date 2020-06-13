@@ -366,23 +366,27 @@ class OperationOutcome(BaseOutcome):
 
         402 - Cannot be attached
 
-        403 - Profile not found with the name
+        403 - No attachable profiles
 
-        404 - No attachable profiles
+        404 - Profile not found with the name
 
-        405 - Target not in channel
+        405 - Profile not found with OID
 
-        406 - Detach failed
+        406 - Executor not in channel
 
-        407 - Invalid permission level
+        407 - Target not in channel
 
-        408 - Invalid color
+        408 - Detach failed
 
-        409 - Empty args
+        409 - Invalid permission level
 
-        410 - Invalid channel OID
+        410 - Invalid color
 
-        411 - Missing channel OID
+        411 - Invalid channel OID
+
+        412 - Empty args
+
+        413 - Missing channel OID
 
     5xx - Problems related to model
         501 - Construction error
@@ -462,32 +466,38 @@ class OperationOutcome(BaseOutcome):
     X_UNATTACHABLE = \
         402, _("X: Unattachable"), \
         _("The profile cannot be attached to the target.")
-    X_PROFILE_NOT_FOUND_NAME = \
-        403, _("X: Profile not found (name)"), \
-        _("Profile not found with the given name.")
     X_NO_ATTACHABLE_PROFILES = \
-        404, _("X: No attachable profiles"), \
+        403, _("X: No attachable profiles"), \
         _("No attachable profiles.")
+    X_PROFILE_NOT_FOUND_NAME = \
+        404, _("X: Profile not found (name)"), \
+        _("Profile not found with the given name.")
+    X_PROFILE_NOT_FOUND_OID = \
+        405, _("X: Profile not found (OID)"), \
+        _("Profile not found with the given OID.")
+    X_EXECUTOR_NOT_IN_CHANNEL = \
+        406, _("X: Executor not in channel"), \
+        _("The profile modification executor is not in the channel.")
     X_TARGET_NOT_IN_CHANNEL = \
-        405, _("X: Target not in channel"), \
+        407, _("X: Target not in channel"), \
         _("The target to be attached the profile is not in the channel.")
     X_DETACH_FAILED = \
-        406, _("X: Detach failed"), \
+        408, _("X: Detach failed"), \
         _("Failed to detach the profile from the target.")
     X_INVALID_PERM_LV = \
-        407, _("X: Invalid permission level"), \
+        409, _("X: Invalid permission level"), \
         _("The value of the permission level is invalid.")
     X_INVALID_COLOR = \
-        408, _("X: Invalid color"), \
+        410, _("X: Invalid color"), \
         _("The value of the color is invalid.")
-    X_EMPTY_ARGS = \
-        409, _("X: Empty arguments"), \
-        _("The parsed arguments is empty.")
     X_INVALID_CHANNEL_OID = \
-        410, _("X: Invalid channel OID"), \
+        411, _("X: Invalid channel OID"), \
         _("The value of the channel OID is invalid.")
+    X_EMPTY_ARGS = \
+        412, _("X: Empty arguments"), \
+        _("The parsed arguments is empty.")
     X_MISSING_CHANNEL_OID = \
-        411, _("X: Missing channel OID"), \
+        413, _("X: Missing channel OID"), \
         _("The value of the channel OID is missing.")
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction error"), \
@@ -538,6 +548,8 @@ class UpdateOutcome(BaseOutcome):
 
         102 - Args parsing failed
 
+        103 - Uneditable
+
     2xx - Problems related to model field
         N/A
 
@@ -584,6 +596,9 @@ class UpdateOutcome(BaseOutcome):
     X_ARGS_PARSE_FAILED = \
         102, _("X: Args parsing failed"), \
         _("Failed to parse the arguments.")
+    X_UNEDITABLE = \
+        103, _("X: Args uneditable"), \
+        _("Arguments contain values that should not be updated/edited.")
 
     X_CHANNEL_NOT_FOUND = \
         301, _("X: Channel not found"), \
