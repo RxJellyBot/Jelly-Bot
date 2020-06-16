@@ -647,16 +647,88 @@ class TestProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
             OperationOutcome.X_PROFILE_NOT_FOUND_OID
         )
 
-    # TEST: Incomplete below
-
     def test_delete(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id]))
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl.id, mdl2.id]))
+
+        result = ProfileManager.delete_profile(self.CHANNEL_OID, mdl2.id, self.USER_OID)
+
+        self.assertEqual(result, OperationOutcome.O_COMPLETED)
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
+                                               parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id])
+        )
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
+                                               parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl.id])
+        )
+        self.assertModelEqual(
+            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}, parse_cls=ChannelProfileModel), mdl
+        )
+        self.assertIsNone(ProfileDataManager.find_one({OID_KEY: mdl2.id}))
 
     def test_delete_insuf_perm(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id]))
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl2.id]))
+
+        result = ProfileManager.delete_profile(self.CHANNEL_OID, mdl2.id, self.USER_OID_2)
+
+        self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
+                                               parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
+                                               parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl2.id])
+        )
+        self.assertModelEqual(
+            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}, parse_cls=ChannelProfileModel), mdl
+        )
+        self.assertModelEqual(
+            ProfileDataManager.find_one_casted({OID_KEY: mdl2.id}, parse_cls=ChannelProfileModel), mdl2
+        )
 
     def test_delete_not_exists(self):
-        pass
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[ObjectId()]))
+
+        result = ProfileManager.delete_profile(self.CHANNEL_OID, ObjectId(), self.USER_OID)
+
+        self.assertEqual(result, OperationOutcome.X_PROFILE_NOT_FOUND_OID)
+
+    # TEST: Incomplete below
 
     def test_get_user_prof(self):
         pass
