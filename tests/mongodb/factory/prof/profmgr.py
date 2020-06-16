@@ -730,6 +730,48 @@ class TestProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
 
     # TEST: Incomplete below
 
+    def test_mark_unavailable_async(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+
+        ProfileManager.mark_unavailable_async(self.CHANNEL_OID, self.USER_OID).join()
+
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted(parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[])
+        )
+
+    def test_mark_unavailable_async_miss(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+
+        ProfileManager.mark_unavailable_async(self.CHANNEL_OID, self.USER_OID_2).join()
+
+        self.assertModelEqual(
+            UserProfileManager.find_one_casted(parse_cls=ChannelProfileConnectionModel),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+
     def test_get_user_prof(self):
         pass
 
