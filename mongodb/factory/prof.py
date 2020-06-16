@@ -464,7 +464,7 @@ class _ProfileDataManager(BaseCollection):
         else:
             return update_outcome
 
-    def delete_profile(self, profile_oid: ObjectId):
+    def delete_profile(self, profile_oid: ObjectId) -> bool:
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
     @arg_type_ensure
@@ -931,7 +931,7 @@ class _ProfileManager(ClearableCollectionMixin):
         else:
             return OperationOutcome.X_DETACH_FAILED
 
-    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: ObjectId) -> bool:
+    def delete_profile(self, channel_oid: ObjectId, profile_oid: ObjectId, user_oid: ObjectId) -> OperationOutcome:
         """
         Detach the profile from all users and delete it.
 
@@ -942,10 +942,14 @@ class _ProfileManager(ClearableCollectionMixin):
         :param user_oid: user to perform the profile deletion
         :return: if the deletion succeed
         """
-        if not self.detach_profile(channel_oid, profile_oid, user_oid).is_success:
-            return False
+        detach_result = self.detach_profile(channel_oid, profile_oid, user_oid)
 
-        return self._prof.delete_profile(profile_oid)
+        if not detach_result.is_success:
+            return detach_result
+
+        return OperationOutcome.O_COMPLETED \
+            if self._prof.delete_profile(profile_oid) \
+            else OperationOutcome.X_DELETE_FAILED
 
     def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
         Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
