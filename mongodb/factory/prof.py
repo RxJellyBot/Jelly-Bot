@@ -951,8 +951,11 @@ class _ProfileManager(ClearableCollectionMixin):
             if self._prof.delete_profile(profile_oid) \
             else OperationOutcome.X_DELETE_FAILED
 
-    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId):
-        Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid)).start()
+    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId) -> Thread:
+        t = Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid))
+        t.start()
+
+        return t
 
     def get_user_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
         """
