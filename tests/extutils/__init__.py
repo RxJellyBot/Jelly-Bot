@@ -1,3 +1,4 @@
+from .arr import TestExtractList
 from .email import TestFakeEmailServer
 from .checker import TestArgTypeEnsure
 from .flags import (
