@@ -728,8 +728,6 @@ class TestProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
 
         self.assertEqual(result, OperationOutcome.X_PROFILE_NOT_FOUND_OID)
 
-    # TEST: Incomplete below
-
     def test_mark_unavailable_async(self):
         mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
                                   Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
@@ -773,34 +771,198 @@ class TestProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
         )
 
     def test_get_user_prof(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl3.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl3.id])
+        )
+
+        self.assertModelSetEqual(
+            set(ProfileManager.get_user_profiles(self.CHANNEL_OID, self.USER_OID)),
+            {mdl, mdl2}
+        )
+        self.assertModelSetEqual(
+            set(ProfileManager.get_user_profiles(self.CHANNEL_OID_2, self.USER_OID)),
+            {mdl3}
+        )
 
     def test_get_user_prof_no_user(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl3.id])
+        )
+
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(self.CHANNEL_OID, self.USER_OID_2)), set())
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(self.CHANNEL_OID_2, self.USER_OID_2)), set())
 
     def test_get_user_prof_user_no_prof(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID,
+                                          ProfileOids=[])
+        )
+
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(self.CHANNEL_OID, self.USER_OID)), set())
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(self.CHANNEL_OID_2, self.USER_OID)), set())
 
     def test_get_user_prof_channel_miss(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(self.CHANNEL_OID, self.USER_OID)), set())
 
     def test_get_user_prof_no_channel(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID,
+                                          ProfileOids=[])
+        )
+
+        self.assertModelSetEqual(set(ProfileManager.get_user_profiles(ObjectId(), self.USER_OID)), set())
 
     def test_get_channel_prof(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(self.CHANNEL_OID)),
+            {mdl, mdl2}
+        )
 
     def test_get_channel_prof_with_keyword(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="BCD")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(self.CHANNEL_OID, "AB")),
+            {mdl}
+        )
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(self.CHANNEL_OID, "BC")),
+            {mdl, mdl2}
+        )
 
     def test_get_channel_prof_channel_miss(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID_2, Name="GHI")
+        ProfileDataManager.insert_one_model(mdl)
+        ProfileDataManager.insert_one_model(mdl2)
+        ProfileDataManager.insert_one_model(mdl3)
+
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(ObjectId(), "AB")),
+            set()
+        )
 
     def test_get_channel_prof_no_data(self):
-        pass
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(self.CHANNEL_OID, "AB")),
+            set()
+        )
+        self.assertModelSetEqual(
+            set(ProfileManager.get_channel_profiles(self.CHANNEL_OID)),
+            set()
+        )
 
     def test_get_highest_perm_lv(self):
-        pass
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",
+                                  Permission={ProfilePermission.AR_ACCESS_PINNED_MODULE.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_SELF.code_str: True,
+                                              ProfilePermission.PRF_CONTROL_MEMBER.code_str: True})
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF", PermissionLevel=PermissionLevel.MOD)
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="GHI", PermissionLevel=PermissionLevel.ADMIN)
+
+        data = (
+            ([mdl, mdl2, mdl3], PermissionLevel.ADMIN),
+            ([mdl, mdl2], PermissionLevel.MOD),
+            ([mdl2, mdl3], PermissionLevel.ADMIN),
+            ([mdl, mdl3], PermissionLevel.ADMIN),
+            ([mdl], PermissionLevel.lowest()),
+            ([mdl2], PermissionLevel.MOD),
+            ([mdl3], PermissionLevel.ADMIN),
+        )
+
+        for mdls, lv in data:
+            with self.subTest(profs=mdls, expected_lv=lv):
+                self.assertEqual(ProfileManager.get_highest_permission_level(mdls), lv)
 
     def test_get_highest_perm_lv_no_prof(self):
-        pass
+        self.assertEqual(ProfileManager.get_highest_permission_level([]), PermissionLevel.lowest())

@@ -19,7 +19,6 @@ class ChannelProfileModel(Model):
     Color = ColorField("col")
     # 0 means no need to vote, > 0 means # votes needed to get this profile
     PromoVote = IntegerField("promo", positive_only=True)
-    # TODO: #307 change to set field
     Permission = DictionaryField("perm", allow_none=False,
                                  default=ProfilePermissionDefault.get_default_code_str_dict())
     PermissionLevel = PermissionLevelField("plv")
