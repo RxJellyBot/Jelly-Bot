@@ -6,7 +6,7 @@ from models import OID_KEY, ChannelProfileModel, ChannelModel, ChannelConfigMode
 from mongodb.factory import ChannelManager
 from mongodb.factory.prof import ProfileDataManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, UpdateOutcome
-from strnames.mongodb import Profile
+from strres.mongodb import Profile
 from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestProfileDataManager"]

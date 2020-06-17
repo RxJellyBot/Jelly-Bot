@@ -180,6 +180,10 @@ jobs:
           python manage.py test tests.bot
           python manage.py test tests.extutils
 
+      - name: Test string resources (`strres`)
+        run: |
+          python manage.py test tests.strres
+
       - name: Test base data structures (`models`)
         run: |
           python manage.py test tests.models

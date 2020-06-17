@@ -5,7 +5,7 @@ from typing import Dict, Tuple, Any, Type
 from bson import ObjectId
 
 from models import Model, ShortUrlRecordModel
-from strnames.models import ShortUrl
+from strres.models import ShortUrl
 
 from ._test_base import TestModel
 

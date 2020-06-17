@@ -17,7 +17,7 @@ from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
-from strnames.models import StatsResults
+from strres.models import StatsResults
 
 
 # region Models

@@ -8,7 +8,7 @@ from models.exceptions import RequiredKeyNotFilledError, InvalidModelFieldError
 from mongodb.factory import ChannelManager
 from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome, WriteOutcome, GetOutcome, UpdateOutcome, ArgumentParseResult
-from strnames.mongodb import Profile
+from strres.mongodb import Profile
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
 
 __all__ = ["TestProfileManager"]

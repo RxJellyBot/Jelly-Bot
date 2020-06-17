@@ -6,7 +6,7 @@ from models import ExtraContentModel
 from mongodb.factory.exctnt import ExtraContentManager
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
-from strnames.msghandle import ToSiteReason
+from strres.msghandle import ToSiteReason
 
 __all__ = ["TestExtraContentManager"]
 
