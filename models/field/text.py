@@ -67,8 +67,7 @@ class TextField(BaseField):
             if self._must_have_content and len(value) == 0:
                 raise FieldEmptyValueNotAllowedError(self.key)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ""
 
     @property
@@ -103,8 +102,7 @@ class UrlField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ""
 
     @property

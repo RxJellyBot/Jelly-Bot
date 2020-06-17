@@ -233,10 +233,9 @@ class BaseField(abc.ABC):
     def stores_uid(self) -> bool:
         return self._stores_uid
 
-    @classmethod
     @abc.abstractmethod
-    def none_obj(cls) -> Any:
-        raise ValueError(f"None object not implemented for {cls}.")
+    def none_obj(self) -> Any:
+        raise ValueError(f"None object not implemented for {self.__class__}.")
 
     def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         """Hook of value type checking when the value is not ``None`` and not a extended default value."""

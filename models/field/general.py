@@ -16,8 +16,7 @@ class GeneralField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return None
 
     @property

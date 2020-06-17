@@ -149,31 +149,31 @@ class TestDataChecker(TestDatabaseMixin, TestCase):
         self.missing_optional("ma")
 
     def test_repair_d(self):
-        self.missing_has_default("d", {"d": DictionaryField.none_obj()})
+        self.missing_has_default("d", {"d": DictionaryField("k").none_obj()})
 
     def test_repair_f(self):
         self.missing_has_default("f", {"f": ModelTest.FFloat.default_value})
 
     def test_repair_b(self):
-        self.missing_has_default("b", {"b": BooleanField.none_obj()})
+        self.missing_has_default("b", {"b": BooleanField("k").none_obj()})
 
     def test_repair_u(self):
         self.missing_optional("u")
 
     def test_repair_t(self):
-        self.missing_has_default("t", {"t": TextField.none_obj()})
+        self.missing_has_default("t", {"t": TextField("k").none_obj()})
 
     def test_repair_o(self):
-        self.missing_has_default("o", {"o": ObjectIDField.none_obj()})
+        self.missing_has_default("o", {"o": ObjectIDField("k").none_obj()})
 
     def test_repair_g(self):
-        self.missing_has_default("g", {"g": GeneralField.none_obj()})
+        self.missing_has_default("g", {"g": GeneralField("k").none_obj()})
 
     def test_repair_dt(self):
-        self.missing_has_default("dt", {"dt": DateTimeField.none_obj()})
+        self.missing_has_default("dt", {"dt": DateTimeField("k").none_obj()})
 
     def test_repair_c(self):
-        self.missing_has_default("c", {"c": ColorField.none_obj()})
+        self.missing_has_default("c", {"c": ColorField("k").none_obj()})
 
     def test_repair_a(self):
         self.missing_has_default("a", {"a": ModelTest.FArray.default_value})
