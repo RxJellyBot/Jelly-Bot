@@ -52,8 +52,7 @@ class ObjectIDField(BaseField):
         else:
             raise FieldValueInvalidError(self.key, value)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ObjectId("000000000000000000000000")
 
     @property

@@ -1,7 +1,7 @@
-from extutils.arr import extract_list_action
+from extutils.arr import extract_list_action, extract_one
 from tests.base import TestCase
 
-__all__ = ["TestExtractList"]
+__all__ = ["TestExtractList", "TestExtractOne"]
 
 
 def action(data):
@@ -20,6 +20,39 @@ def action_set_value(data, value):
 
 def action_not_mutate(_):
     return [7]
+
+
+class TestExtractOne(TestCase):
+    def test_extract_list(self):
+        self.assertEqual(extract_one([1]), 1)
+
+    def test_extract_list_empty(self):
+        self.assertIsNone(extract_one([]))
+
+    def test_extract_list_2d(self):
+        self.assertEqual(extract_one([[1]]), [1])
+
+    def test_extract_list_2d_empty(self):
+        self.assertEqual(extract_one([[]]), [])
+
+    def test_extract_set(self):
+        self.assertEqual(extract_one({1}), 1)
+
+    def test_extract_set_empty(self):
+        self.assertIsNone(extract_one(set()))
+
+    def test_extract_tuple(self):
+        self.assertEqual(extract_one((1,)), 1)
+
+    def test_extract_tuple_empty(self):
+        self.assertIsNone(extract_one(()))
+
+    # noinspection PyTypeChecker
+    def test_extract_type_miss(self):
+        with self.assertRaises(TypeError):
+            extract_one(7)
+        with self.assertRaises(TypeError):
+            extract_one("ABC")
 
 
 class TestExtractList(TestCase):

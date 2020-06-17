@@ -28,8 +28,7 @@ class DateTimeField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return datetime.min.replace(tzinfo=timezone.utc)
 
     def _check_value_valid_not_none(self, value):

@@ -44,8 +44,7 @@ class ModelField(BaseField):
     def expected_types(self):
         return self.model_cls, dict
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return None
 
     def _cast_to_desired_type(self, value):

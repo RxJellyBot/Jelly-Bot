@@ -1,4 +1,4 @@
-from .array import ArrayField, ModelArrayField
+from .array import ArrayField, ModelArrayField, MultiDimensionalArrayField
 from ._base import BaseField
 from ._default import ModelDefaultValueExt
 from .bool import BooleanField

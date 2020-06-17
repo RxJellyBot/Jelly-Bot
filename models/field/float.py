@@ -16,8 +16,7 @@ class FloatField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return 0.0
 
     @property

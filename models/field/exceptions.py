@@ -127,3 +127,9 @@ class FieldInvalidDefaultValueError(FieldError):
 class FieldValueRequiredError(FieldValueInvalidError):
     def __init__(self, key: str):
         super().__init__(key, error_msg=f"Field (key: {key}) requires value.")
+
+
+class FieldDimensionMismtachError(FieldValueInvalidError):
+    def __init__(self, key: str, expected_dimension: int, actual_dimension: int):
+        super().__init__(key, error_msg=f"Field dimension mismatch. "
+                                        f"(Expected: {expected_dimension} / Actual: {actual_dimension})")

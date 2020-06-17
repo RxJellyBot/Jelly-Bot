@@ -1,4 +1,5 @@
 from .array import *  # noqa
+from .arraymult import *  # noqa
 from .bool import *  # noqa
 from .color import *  # noqa
 from .datetime import *  # noqa
