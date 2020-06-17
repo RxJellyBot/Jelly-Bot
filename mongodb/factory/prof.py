@@ -961,6 +961,8 @@ class _ProfileManager(ClearableCollectionMixin):
         """
         Get the ``list`` of :class:`ChannelProfileModel` of the specified user.
 
+        :param channel_oid: channel OID of the user
+        :param root_uid: user OID
         :return: list of the profiles attached on the user
         """
         conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
@@ -977,9 +979,21 @@ class _ProfileManager(ClearableCollectionMixin):
             return []
 
     @arg_type_ensure
-    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None):
-        """Get the existing profiles of a channel."""
-        return self._prof.get_channel_profiles(channel_oid, partial_keyword)
+    def get_channel_profiles(self, channel_oid: ObjectId, prof_name: Optional[str] = None) \
+            -> ExtendedCursor[ChannelProfileModel]:
+        """
+        Get the profiles in a channel.
+
+        If ``prof_name`` is given, the name of the returned profiles must contain (**NOT** equal) it.
+        If not provided, then all of the profiles of the channel will be returned.
+
+        Returned profiles include the profile which is not being attached to anyone.
+
+        :param channel_oid: channel OID of the profiles
+        :param prof_name: name of the profiles
+        :return: profiles of the channel
+        """
+        return self._prof.get_channel_profiles(channel_oid, prof_name)
 
     @staticmethod
     def get_highest_permission_level(profiles: List[ChannelProfileModel]) -> PermissionLevel:
@@ -991,21 +1005,36 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return current_max
 
-    def get_user_channel_profiles(self, root_uid: Optional[ObjectId], *,
+    def get_user_channel_profiles(self, user_oid: ObjectId, *,
                                   inside_only: bool = True, accessbible_only: bool = True) \
             -> List[ChannelProfileListEntry]:
-        if root_uid is None:
+        """
+        Get all profiles of a user and group it by channel.
+
+        The sorting order is:
+
+        - Starred (True -> False)
+
+        - Bot accessible (True -> False)
+
+        - Profile Connection OID (Descending)
+
+        :param user_oid: OID of the user to get the profiles
+        :param inside_only: only get the channel which the user is inside
+        :param accessbible_only: only get the channel which the bot is accessible
+        :return: list of the profiles grouped by channel
+        """
+        if not user_oid:
             return []
 
         ret = []
 
-        not_found_channel = []
-        not_found_prof_oids_dict = {}
+        not_found: Dict[ObjectId, Union[ObjectId, List[ObjectId]]] = {}
 
         channel_oid_list = []
         profile_oid_list = []
         prof_conns = []
-        for d in self._conn.get_user_channel_profiles(root_uid, inside_only=inside_only):
+        for d in self._conn.get_user_channel_profiles(user_oid, inside_only=inside_only):
             channel_oid_list.append(d.channel_oid)
             profile_oid_list.extend(d.profile_oids)
             prof_conns.append(d)
@@ -1021,7 +1050,7 @@ class _ProfileManager(ClearableCollectionMixin):
             cnl = channel_dict.get(cnl_oid)
 
             if cnl is None:
-                not_found_channel.append(cnl_oid)
+                not_found[prof_conn.id] = cnl_oid
                 continue
             elif accessbible_only and not cnl.bot_accessible:
                 continue
@@ -1037,35 +1066,24 @@ class _ProfileManager(ClearableCollectionMixin):
                 else:
                     not_found_prof_oids.append(p)
 
-            if len(not_found_prof_oids) > 0:
+            if not_found_prof_oids:
                 # There's some profile not found in the database while ID is registered
-                not_found_prof_oids_dict[cnl_oid] = not_found_prof_oids
+                not_found[prof_conn.id] = not_found_prof_oids
 
             perms = self.get_permissions(prof)
             can_ced_profile = self.can_ced_profile(perms)
 
             ret.append(
                 ChannelProfileListEntry(
-                    channel_data=cnl, channel_name=cnl.get_channel_name(root_uid), profiles=prof,
+                    channel_data=cnl, channel_name=cnl.get_channel_name(user_oid), profiles=prof,
                     starred=prof_conn.starred, default_profile_oid=default_profile_oid,
                     can_ced_profile=can_ced_profile
                 ))
 
-        if len(not_found_channel) > 0 or len(not_found_prof_oids_dict) > 0:
-            not_found_prof_oids_txt = "\n".join(
-                [f'{cnl_id}: {" / ".join([str(oid) for oid in prof_ids])}'
-                 for cnl_id, prof_ids in not_found_prof_oids_dict.items()])
+        if not_found:
+            MailSender.send_email_async(Profile.dangling_content(not_found), subject=Profile.DANGLING_PROF_CONN_DATA)
 
-            MailSender.send_email_async(
-                f"User ID: <code>{root_uid}</code><hr>"
-                f"Channel IDs not found in DB:<br>"
-                f"<pre>{' & '.join([str(c) for c in not_found_channel])}</pre><hr>"
-                f"Profile IDs not found in DB:<br>"
-                f"<pre>{not_found_prof_oids_txt}</pre>",
-                subject="Possible Data Corruption on Getting User Profile Connection"
-            )
-
-        return sorted(ret, key=lambda item: item.channel_data.bot_accessible, reverse=True)
+        return list(sorted(ret, key=lambda item: item.channel_data.bot_accessible, reverse=True))
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
         return self._prof.get_profile(profile_oid)

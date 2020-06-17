@@ -41,6 +41,10 @@ class EmailServer:
     storage = {}
 
     @classmethod
+    def reset(cls):
+        cls.storage = {}
+
+    @classmethod
     def get_mailbox(cls, owner: str) -> EmailBox:
         if owner not in cls.storage:
             cls.storage[owner] = EmailBox(owner)
