@@ -6,7 +6,7 @@ from extutils.dt import now_utc_aware, t_delta_str, localtime, make_tz_aware
 from models import Model, ModelDefaultValueExt
 from models.field import DateTimeField, BooleanField, IntegerField, TextField, ObjectIDField
 from mongodb.utils import ExtendedCursor
-from strnames.models import Timer
+from strres.models import Timer
 
 
 class TimerModel(Model):

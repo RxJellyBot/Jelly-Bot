@@ -5,7 +5,7 @@ from models import ModelDefaultValueExt, Model
 from models.field import (
     TextField, UrlField, ArrayField, ObjectIDField, BooleanField
 )
-from strnames.models import ShortUrl
+from strres.models import ShortUrl
 
 
 class ShortUrlRecordModel(Model):

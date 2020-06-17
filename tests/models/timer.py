@@ -6,7 +6,7 @@ from bson import ObjectId
 from extutils.dt import now_utc_aware, t_delta_str, localtime
 from extutils.locales import LocaleInfo
 from models import Model, TimerModel, TimerListResult, RootUserModel, RootUserConfigModel
-from strnames.models import Timer
+from strres.models import Timer
 from tests.base import TestCase
 
 from ._test_base import TestModel

@@ -23,7 +23,7 @@ from mongodb.factory.results import (
     GetPermissionProfileResult, CreateProfileResult, RegisterProfileResult, ArgumentParseResult
 )
 from mongodb.utils import ExtendedCursor
-from strnames.mongodb import Profile
+from strres.mongodb import Profile
 
 from ._base import BaseCollection
 

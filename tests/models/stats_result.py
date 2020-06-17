@@ -12,7 +12,7 @@ from models import (
     MeanMessageResultGenerator, MemberDailyMessageResult, CountBeforeTimeResult, MemberMessageCountResult,
     MemberMessageCountEntry, BotFeatureUsageResult, BotFeaturePerUserUsageResult, BotFeatureHourlyAvgResult
 )
-from strnames.models import StatsResults
+from strres.models import StatsResults
 from tests.base import TestCase
 
 __all__ = ["TestDailyResult", "TestHourlyResult", "TestHourlyIntervalAverageMessageResult", "TestDailyMessageResult",

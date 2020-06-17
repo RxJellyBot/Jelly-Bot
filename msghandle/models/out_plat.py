@@ -12,7 +12,7 @@ from extutils.emailutils import MailSender
 from extutils.line_sticker import LineStickerManager
 from JellyBot.systemconfig import PlatformConfig
 from mongodb.factory import ExtraContentManager
-from strnames.msghandle import ToSiteReason
+from strres.msghandle import ToSiteReason
 
 from .pipe_out import HandledMessageCalculateResult, HandledMessageEventsHolder, HandledMessageEvent, \
     HandledMessageEventText
