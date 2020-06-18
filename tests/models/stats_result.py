@@ -1,7 +1,8 @@
-from datetime import datetime, timezone, date, timedelta
+from datetime import datetime, date, timedelta
 from time import gmtime, strftime
 
 from bson import ObjectId
+from django.utils import timezone
 from pymongo.collection import Collection
 
 from extutils.dt import TimeRange

@@ -1,8 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
+from django.utils import timezone
 
+from extutils.dt import now_utc_aware
 from flags import APICommand, MessageType, BotFeature
 from models import Model, APIStatisticModel, MessageRecordModel, BotFeatureUsageModel
 
@@ -12,7 +14,7 @@ __all__ = ["TestAPIStatisticModel"]
 
 
 class TestAPIStatisticModel(TestModel.TestClass):
-    DEFAULT_TIME = datetime.now().replace(tzinfo=timezone.utc)
+    DEFAULT_TIME = now_utc_aware()
     SENDER_OID = ObjectId()
 
     @classmethod
@@ -71,7 +73,7 @@ class TestMessageRecordModel(TestModel.TestClass):
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {
             ("ts", "Timestamp"): (datetime.min.replace(tzinfo=timezone.utc),
-                                  datetime.now().replace(tzinfo=timezone.utc))
+                                  now_utc_aware())
         }
 
 

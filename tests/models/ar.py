@@ -1,7 +1,8 @@
 from typing import Tuple, Dict, Any, Type, List
-from datetime import datetime, timezone
+from datetime import datetime
 
 from bson import ObjectId
+from django.utils import timezone
 
 from extutils.color import ColorFactory
 from flags import AutoReplyContentType, ModelValidityCheckResult

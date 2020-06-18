@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict
 
 from bson import ObjectId
 from django.conf import settings
+from django.utils import timezone
 
 from extutils.emailutils import EmailServer
 from extutils.color import Color

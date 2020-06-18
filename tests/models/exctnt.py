@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from flags import ExtraContentType
 from models import Model, ExtraContentModel
 from JellyBot.systemconfig import Database
@@ -14,7 +15,7 @@ __all__ = ["TestExtraContentModel"]
 
 class TestExtraContentModel(TestModel.TestClass):
     CHANNEL_OID = ObjectId()
-    TIMESTAMP = datetime.utcnow().replace(tzinfo=timezone.utc)
+    TIMESTAMP = now_utc_aware()
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:

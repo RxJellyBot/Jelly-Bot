@@ -1,9 +1,10 @@
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from models import Model, ShortUrlRecordModel
 from strres.models import ShortUrl
 
@@ -14,8 +15,8 @@ __all__ = ["TestShortUrlRecordModel"]
 
 class TestShortUrlRecordModel(TestModel.TestClass):
     CREATOR_OID = ObjectId()
-    USED_TS = [datetime.now().replace(tzinfo=timezone.utc),
-               (datetime.now() + timedelta(days=1)).replace(tzinfo=timezone.utc)]
+    USED_TS = [now_utc_aware(),
+               now_utc_aware() + timedelta(days=1)]
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:

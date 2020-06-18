@@ -2,6 +2,7 @@ import math
 from datetime import datetime, timezone, timedelta, time
 
 import pytz
+from django.utils import timezone as tz
 
 from extutils.dt import (
     is_tz_naive, now_utc_aware, localtime, parse_to_dt, time_to_seconds,
@@ -18,9 +19,9 @@ class TestDatetime(TestCase):
         self.assertFalse(is_tz_naive(make_tz_aware(now_utc_aware())))
         self.assertFalse(is_tz_naive(make_tz_aware(datetime(2020, 5, 7))))
         self.assertFalse(is_tz_naive(make_tz_aware(datetime.min)))
-        self.assertFalse(is_tz_naive(make_tz_aware(datetime.min.replace(tzinfo=timezone.utc))))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.min.replace(tzinfo=tz.utc))))
         self.assertFalse(is_tz_naive(make_tz_aware(datetime.max)))
-        self.assertFalse(is_tz_naive(make_tz_aware(datetime.max.replace(tzinfo=timezone.utc))))
+        self.assertFalse(is_tz_naive(make_tz_aware(datetime.max.replace(tzinfo=tz.utc))))
 
     def test_dt_naive(self):
         self.assertTrue(is_tz_naive(datetime.now()))
@@ -29,9 +30,9 @@ class TestDatetime(TestCase):
         self.assertFalse(is_tz_naive(now_utc_aware()))
         self.assertTrue(is_tz_naive(datetime(2020, 5, 7)))
         self.assertTrue(is_tz_naive(datetime.min))
-        self.assertFalse(is_tz_naive(datetime.min.replace(tzinfo=timezone.utc)))
+        self.assertFalse(is_tz_naive(datetime.min.replace(tzinfo=tz.utc)))
         self.assertTrue(is_tz_naive(datetime.max))
-        self.assertFalse(is_tz_naive(datetime.max.replace(tzinfo=timezone.utc)))
+        self.assertFalse(is_tz_naive(datetime.max.replace(tzinfo=tz.utc)))
 
     def test_parse_to_dt(self):
         dt_parsed = parse_to_dt("2020-04-04 16:00")
@@ -288,19 +289,19 @@ class TestParseTimeRange(TestCase):
     def test_tzinfo(self):
         start_dt = datetime(2020, 2, 14, 12, 1, 1, tzinfo=pytz.UTC)
         end_dt = datetime(2020, 2, 16, 12, 1, 1, tzinfo=pytz.UTC)
-        tz = pytz.timezone("America/New_York")
-        tr = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz)
+        tz_ = pytz.timezone("America/New_York")
+        tr = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz_)
         self.assertAlmostEquals(0, abs((start_dt - tr.start).total_seconds()), 0)
         self.assertAlmostEquals(0, abs((start_dt - tr.start_org).total_seconds()), 0)
         self.assertAlmostEquals(0, abs((tr.end - end_dt).total_seconds()), 0)
-        self.assertEqual(tz.utcoffset(datetime.now()), tr.tzinfo_.utcoffset(datetime.now()))
+        self.assertEqual(tz_.utcoffset(datetime.now()), tr.tzinfo_.utcoffset(datetime.now()))
         self.assertTrue(tr.expandable)
         self.assertFalse(tr.expanded)
         self.assertFalse(tr.is_inf)
         self.assertAlmostEquals(48, tr.hr_length_org, 0)
         self.assertAlmostEquals(48, tr.hr_length, 0)
         self.assertEqual(f"{start_dt.strftime('%m-%d')} ~ {end_dt.strftime('%m-%d')}", tr.expr_period_short)
-        self.assertAlmostEquals(tr.end_time_seconds, time_to_seconds(localtime(end_dt, tz).time()), 0)
+        self.assertAlmostEquals(tr.end_time_seconds, time_to_seconds(localtime(end_dt, tz_).time()), 0)
         prd = tr.get_periods()
         self.assertListEqual([tr], prd)
 
