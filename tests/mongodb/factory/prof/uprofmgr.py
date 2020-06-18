@@ -3,12 +3,12 @@ from bson import ObjectId
 from models import ChannelProfileConnectionModel
 from mongodb.factory.prof import UserProfileManager
 from mongodb.factory.results import OperationOutcome, WriteOutcome, UpdateOutcome
-from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
+from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestUserProfileManager"]
 
 
-class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMixin):
+class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
     CHANNEL_OID = ObjectId()
     CHANNEL_OID_2 = ObjectId()
     USER_OID = ObjectId()
@@ -329,11 +329,11 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
     def test_prof_oids(self):
         self._sample_channels_insert()
 
-        self.assertEqual(set(UserProfileManager.get_profile_user_oids(self.PROF_OID_1)),
+        self.assertEqual(UserProfileManager.get_profile_user_oids(self.PROF_OID_1),
                          {self.USER_OID, self.USER_OID_2})
 
     def test_prof_oids_no_prof(self):
-        self.assertEqual(set(UserProfileManager.get_profile_user_oids(self.PROF_OID_1)), set())
+        self.assertEqual(UserProfileManager.get_profile_user_oids(self.PROF_OID_1), set())
 
     def test_profs_oids(self):
         mdls = [
@@ -375,13 +375,16 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
         ]
         UserProfileManager.insert_many(mdls)
 
+        dummy_poid = ObjectId()
+
         self.assertDictEqual(
-            UserProfileManager.get_profiles_user_oids([self.PROF_OID_1, ObjectId()]),
-            {self.PROF_OID_1: {self.USER_OID, self.USER_OID_2}}
+            UserProfileManager.get_profiles_user_oids([self.PROF_OID_1, dummy_poid]),
+            {self.PROF_OID_1: {self.USER_OID, self.USER_OID_2},
+             dummy_poid: set()}
         )
 
     def test_profs_oids_no_prof(self):
-        self.assertDictEqual(UserProfileManager.get_profiles_user_oids([self.PROF_OID_1]), {})
+        self.assertDictEqual(UserProfileManager.get_profiles_user_oids([self.PROF_OID_1]), {self.PROF_OID_1: set()})
 
     def test_profs_oids_empty_param(self):
         self._sample_channels_insert()

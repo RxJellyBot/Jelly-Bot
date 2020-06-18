@@ -8,12 +8,12 @@ from mongodb.factory import ChannelManager
 from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome, WriteOutcome, GetOutcome, UpdateOutcome, ArgumentParseResult
 from strres.mongodb import Profile
-from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
+from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestProfileManagerCRUD"]
 
 
-class TestProfileManagerCRUD(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMixin):
+class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
     CHANNEL_OID = ObjectId()
     CHANNEL_OID_2 = ObjectId()
     USER_OID = ObjectId()

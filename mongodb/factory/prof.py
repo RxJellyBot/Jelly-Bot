@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, List, Dict, Set, Union, Iterable
+from typing import Optional, List, Dict, Set, Union
 
 import pymongo
 from bson import ObjectId
@@ -164,23 +164,40 @@ class _UserProfileManager(BaseCollection):
             {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
             parse_cls=ChannelProfileConnectionModel)
 
-    def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
-        # Using native MongoDB method to boost the performance
-        k = ChannelProfileConnectionModel.UserOid.key
-        return [mdl[k] for mdl in self.find({ChannelProfileConnectionModel.ProfileOids.key: profile_oid})]
+    def get_profile_user_oids(self, profile_oid: ObjectId) -> Set[ObjectId]:
+        # Using native MongoDB method to increase the performance
+        return {mdl[ChannelProfileConnectionModel.UserOid.key]
+                for mdl in self.find({ChannelProfileConnectionModel.ProfileOids.key: profile_oid})}
 
-    def get_profiles_user_oids(self, profile_oids: Iterable[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
-        ret = {}
-        filter_ = {ChannelProfileConnectionModel.ProfileOids.key: {"$in": profile_oids}}
+    def get_profiles_user_oids(self, profile_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        """
+        Get a dict which
+            key is the profile OID
+            value is the user who have the corresponding profile
 
-        for conn in self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel):
-            user_oid = conn.user_oid
+        This method does **NOT** check if the profile actually exists or not.
 
-            for prof_oid in set(conn.profile_oids).intersection(profile_oids):
-                if prof_oid in ret:
-                    ret[prof_oid].add(user_oid)
-                else:
-                    ret[prof_oid] = {user_oid}
+        If a profile does not have any user having it, the corresponding return value will be an empty set `set()`.
+
+        :param profile_oids: profile OIDs to be checked
+        :return: a dict which the key is profile OIDs and value is user OIDs
+        """
+        k = "u"
+
+        aggr = self.aggregate([
+            {"$match": {ChannelProfileConnectionModel.ProfileOids.key: {"$in": profile_oids}}},
+            {"$unwind": "$" + ChannelProfileConnectionModel.ProfileOids.key},
+            {"$group": {
+                OID_KEY: "$" + ChannelProfileConnectionModel.ProfileOids.key,
+                k: {"$addToSet": "$" + ChannelProfileConnectionModel.UserOid.key}
+            }}
+        ])
+
+        ret = {e[OID_KEY]: set(e[k]) for e in aggr if e[OID_KEY] in profile_oids}
+
+        for poid in profile_oids:
+            if poid not in ret:
+                ret[poid] = set()
 
         return ret
 
@@ -993,7 +1010,7 @@ class _ProfileManager(ClearableCollectionMixin):
         """
         Get the profiles in a channel.
 
-        If ``prof_name`` is given, the name of the returned profiles must contain (**NOT** equal) it.
+        If ``prof_name`` is given, the name of the returned profiles must contain (**NOT necessarily** equal to) it.
         If not provided, then all of the profiles of the channel will be returned.
 
         Returned profiles include the profile which is not being attached to anyone.
@@ -1143,8 +1160,25 @@ class _ProfileManager(ClearableCollectionMixin):
         return self._conn.get_available_connections()
 
     def get_attachable_profiles(self, channel_oid: ObjectId, root_uid: ObjectId) -> List[ChannelProfileModel]:
+        """
+        Get the list of the profiles that the user ``root_uid`` can attach to self or any member
+        excluding the default profile.
+
+        The returned result does **NOT** care if the user has sufficient permission or not.
+
+        The returned result will be empty if the user does not have the permission
+        to control profile on any type of target.
+
+        :param channel_oid: channel OID of the profiles
+        :param root_uid: user OID to get the attachable profiles
+        :return: list of the attachable profiles sorted by name
+        """
         profiles = self.get_user_profiles(channel_oid, root_uid)
         exist_perm = self.get_permissions(profiles)
+
+        if not self.can_control_profile_member(exist_perm) and not self.can_control_profile_self(exist_perm):
+            return []
+
         highest_perm = self.get_highest_permission_level(profiles)
 
         # Remove default profile
@@ -1153,15 +1187,14 @@ class _ProfileManager(ClearableCollectionMixin):
         for prof in self._prof.get_attachable_profiles(channel_oid,
                                                        existing_permissions=exist_perm,
                                                        highest_perm_lv=highest_perm):
-            if channel_data:
-                if prof.id != channel_data.config.default_profile_oid:
-                    attachables.append(prof)
-            else:
-                attachables.append(prof)
+            if channel_data and prof.id == channel_data.config.default_profile_oid:
+                continue
 
-        return attachables
+            attachables.append(prof)
 
-    def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
+        return list(sorted(attachables, key=lambda x: x.name))
+
+    def get_profile_user_oids(self, profile_oid: ObjectId) -> Set[ObjectId]:
         """
         List of user OIDs who have the profile of ``profile_oid``.
 
@@ -1170,7 +1203,7 @@ class _ProfileManager(ClearableCollectionMixin):
         """
         return self._conn.get_profile_user_oids(profile_oid)
 
-    def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+    def get_profiles_user_oids(self, profile_oid: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """
         Get a ``dict`` which
             key is the profile OID provided in ``profile_oid``
@@ -1192,6 +1225,10 @@ class _ProfileManager(ClearableCollectionMixin):
     @staticmethod
     def can_control_profile_member(permissions: Set[ProfilePermission]):
         return ProfilePermission.PRF_CONTROL_MEMBER in permissions
+
+    @staticmethod
+    def can_control_profile_self(permissions: Set[ProfilePermission]):
+        return ProfilePermission.PRF_CONTROL_SELF in permissions
 
 
 UserProfileManager = _UserProfileManager()
