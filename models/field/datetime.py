@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 
+from django.utils import timezone
 from extutils.dt import parse_to_dt, make_tz_aware
 
 from ._base import BaseField, FieldInstance

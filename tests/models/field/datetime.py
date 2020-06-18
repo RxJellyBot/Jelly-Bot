@@ -1,5 +1,7 @@
-from datetime import datetime as dt, timezone as tz
+from datetime import datetime as dt
 from typing import Type, Any, Tuple
+
+from django.utils import timezone as tz
 
 from models.field import DateTimeField, BaseField
 from models.field.exceptions import (

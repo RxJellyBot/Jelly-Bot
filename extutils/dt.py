@@ -3,7 +3,6 @@ from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta, tzinfo, time
 from typing import Optional, Union, List
 
-import pytz
 from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -33,7 +32,7 @@ def now_utc_aware(*, for_mongo: bool = False) -> datetime:
     :param for_mongo: if this timestamp will be used as a data field of a MongoDB entry
     :return: current tz-aware datetime with timezone set to UTC
     """
-    dt = datetime.utcnow().replace(tzinfo=pytz.UTC)
+    dt = datetime.utcnow().replace(tzinfo=timezone.utc)
 
     if for_mongo:
         dt = dt.replace(microsecond=dt.microsecond // 1000 * 1000)
@@ -62,7 +61,7 @@ def is_tz_naive(dt: datetime) -> bool:
         # Checking `is_naive` will call `utcoffset()`
         # This exception will only raise if `utcoffset()` is not `None`
 
-        # This exception could occur if dt = `datetime.min`.
+        # This exception might occur if dt = `datetime.min`.
         return False
 
 
@@ -97,7 +96,7 @@ def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datet
 
     # Attach timezone if needed
     if is_tz_naive(dt):
-        dt = dt.replace(tzinfo=tzinfo_ or pytz.utc)
+        dt = dt.replace(tzinfo=tzinfo_ or timezone.utc)
 
     return dt
 

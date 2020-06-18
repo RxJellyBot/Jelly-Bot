@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from flags import Execode, ModelValidityCheckResult
 from models import Model, ExecodeEntryModel, AutoReplyModuleExecodeModel, AutoReplyContentModel
 from models.exceptions import InvalidModelError
@@ -15,7 +16,7 @@ __all__ = ["TestExecodeEntryModel"]
 
 class TestExecodeEntryModel(TestModel.TestClass):
     CREATOR_OID = ObjectId()
-    TIMESTAMP = datetime.now().replace(tzinfo=timezone.utc)
+    TIMESTAMP = now_utc_aware()
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:
