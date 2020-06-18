@@ -77,7 +77,7 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
             update_async=False
         )
 
-        time.sleep(3.3)  # Cooldown of model #3 is 3 sec
+        time.sleep(1.1)  # Cooldown of model #3 is 1 sec
         resp = AutoReplyManager.get_responses(
             self.get_mdl_3().keyword.content, self.get_mdl_3().keyword.content_type, self.get_mdl_3().channel_oid,
             update_async=False

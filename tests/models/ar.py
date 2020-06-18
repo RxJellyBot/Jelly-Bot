@@ -10,7 +10,7 @@ from models import (
 )
 from models.exceptions import ModelConstructionError, InvalidModelError, InvalidModelFieldError
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestAutoReplyModuleModel", "TestAutoReplyContentModel", "TestAutoReplyModuleExecodeModel",
            "TestAutoReplyModuleTagModel"]

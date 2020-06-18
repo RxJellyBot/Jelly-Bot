@@ -8,7 +8,7 @@ from models import Model, ExecodeEntryModel, AutoReplyModuleExecodeModel, AutoRe
 from models.exceptions import InvalidModelError
 from JellyBot.systemconfig import Database
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestExecodeEntryModel"]
 

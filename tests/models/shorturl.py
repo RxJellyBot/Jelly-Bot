@@ -7,7 +7,7 @@ from bson import ObjectId
 from models import Model, ShortUrlRecordModel
 from strres.models import ShortUrl
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestShortUrlRecordModel"]
 

@@ -6,7 +6,7 @@ from flags import Platform
 from models import Model, ChannelConfigModel, ChannelModel, ChannelCollectionModel
 from JellyBot.systemconfig import ChannelConfig
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestChannelConfigModel", "TestChannelCollectionModel", "TestChannelModel"]
 

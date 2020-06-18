@@ -10,7 +10,8 @@ from models.exceptions import (
     IdUnsupportedError, ModelConstructionError, FieldKeyNotExistError, JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnlyError
-from tests.base import TestCase
+
+from .base import TestCase
 
 __all__ = ["TestModel"]
 
@@ -31,6 +32,16 @@ class TestModel(ABC):
 
     Configure class variable ``KEY_SKIP_CHECK`` and ``KEY_SKIP_CHECK_INVALID``
     to set the keys to bypass the validation.
+
+    Additional method to be overridden when necessary:
+
+    - ``get_optional()``
+
+    - ``get_default()``
+
+    - ``get_required()``
+
+    - ``get_invalid()``
 
     .. seealso::
         https://stackoverflow.com/a/25695512/11571888 to see why there's a class wrapper.

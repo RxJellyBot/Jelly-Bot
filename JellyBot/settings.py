@@ -38,8 +38,6 @@ ALLOWED_HOSTS = [
     '192.168.50.33',
     # URL Domain of the bot
     'bot.raenonx.cc',
-    # Allowed URLs of Heroku's for LINE Bot webhook
-    'newjellybot.herokuapp.com'
 ]
 
 INSTALLED_APPS = [

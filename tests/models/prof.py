@@ -6,7 +6,7 @@ from extutils.color import ColorFactory
 from flags import ProfilePermissionDefault, PermissionLevel, ProfilePermission
 from models import Model, ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestChannelProfileModel", "TestChannelProfileConnectionModel", "TestPermissionPromotionRecordModel"]
 
