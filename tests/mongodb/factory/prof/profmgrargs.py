@@ -5,12 +5,12 @@ from flags import ProfilePermission, PermissionLevel, ProfilePermissionDefault
 from models import ChannelProfileModel, ChannelProfileConnectionModel
 from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome, UpdateOutcome
-from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
+from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestProfileManagerProcessArgs"]
 
 
-class TestProfileManagerProcessArgs(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMixin):
+class TestProfileManagerProcessArgs(TestModelMixin, TestDatabaseMixin):
     CHANNEL_OID = ObjectId()
     CHANNEL_OID_2 = ObjectId()
     USER_OID = ObjectId()
