@@ -1,7 +1,7 @@
 import abc
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Tuple, Type, Any, final, Dict
+from typing import Tuple, Type, Any, final, Dict, TypeVar
 
 from bson import ObjectId
 from pymongo.client_session import ClientSession
@@ -14,6 +14,8 @@ from models.field.exceptions import (
 )
 
 from ._default import ModelDefaultValueExt
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -147,9 +149,9 @@ class BaseField(abc.ABC):
         self._default_is_lazy = isinstance(default, Lazy)
 
         # region Setting default value
-        if default is not None \
-                and not ModelDefaultValueExt.is_default_val_ext(default) \
-                and not self.is_default_lazy:
+        default_val_not_special = not ModelDefaultValueExt.is_default_val_ext(default) and not self.is_default_lazy
+
+        if default is not None and default_val_not_special:
             try:
                 self.check_value_valid(default)
             except Exception as e:
@@ -157,6 +159,8 @@ class BaseField(abc.ABC):
 
         if default is None and not allow_none:
             self._default_value = self.none_obj()
+        elif default_val_not_special:
+            self._default_value = self.get_default_value_not_none(default)
         else:
             self._default_value = default
         # endregion
@@ -316,6 +320,17 @@ class BaseField(abc.ABC):
         and the given value type is not the desired type.
         """
         return self.desired_type(value)
+
+    def get_default_value_not_none(self, default_val: T) -> T:
+        """
+        Method to get the default value on field initialization
+        when the default value:
+
+        - is not a null value
+
+        - is not an extended default value
+        """
+        return self.cast_to_desired_type(default_val)
 
     @final
     def new(self, val=None) -> FieldInstance:
