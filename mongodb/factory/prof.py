@@ -110,7 +110,7 @@ class _UserProfileManager(BaseCollection):
             ]
         ))
 
-    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=True) \
+    def get_channel_prof_conn(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=True) \
             -> List[ChannelProfileConnectionModel]:
         if isinstance(channel_oid, ObjectId):
             channel_oid = [channel_oid]
@@ -138,17 +138,24 @@ class _UserProfileManager(BaseCollection):
 
         pipeline = [
             {"$match": {
-                ChannelProfileConnectionModel.UserOid.key: {"$in": user_oids},
-                ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}
+                ChannelProfileConnectionModel.UserOid.key: {"$in": user_oids}
             }},
             {"$group": {
                 "_id": "$" + ChannelProfileConnectionModel.UserOid.key,
-                k: {"$addToSet": "$" + ChannelProfileConnectionModel.ChannelOid.key}
+                k: {
+                    "$addToSet": {
+                        "$cond": {
+                            "if": {"$gt": [{"$size": "$" + ChannelProfileConnectionModel.ProfileOids.key}, 0]},
+                            "then": "$" + ChannelProfileConnectionModel.ChannelOid.key,
+                            "else": None
+                        }
+                    }
+                }
             }}
         ]
 
         for d in self.aggregate(pipeline):
-            ret[d[OID_KEY]] = set(d[k])
+            ret[d[OID_KEY]] = {oid for oid in d[k] if oid is not None}
 
         return ret
 
@@ -1092,9 +1099,20 @@ class _ProfileManager(ClearableCollectionMixin):
         return self._prof.get_profile_name(channel_oid, name)
 
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
+        """
+        Get a :class:`dict` which for each element:
+
+            key is each user listed in ``user_oids`` and
+
+            value is the OIDs of the channel they are in.
+
+        :param user_oids: list of users to be checked
+        :return: a `dict` containing the information described above
+        """
         return self._conn.get_users_exist_channel_dict(user_oids)
 
-    def get_permissions(self, profiles: List[ChannelProfileModel]) -> Set[ProfilePermission]:
+    @classmethod
+    def get_permissions(cls, profiles: List[ChannelProfileModel]) -> Set[ProfilePermission]:
         ret = set()
 
         for prof in profiles:
@@ -1103,7 +1121,7 @@ class _ProfileManager(ClearableCollectionMixin):
                 if perm_grant and perm:
                     ret.add(perm)
 
-            highest_perm_lv = self.get_highest_permission_level(profiles)
+            highest_perm_lv = cls.get_highest_permission_level(profiles)
             ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(highest_perm_lv))
 
         return ret
@@ -1111,13 +1129,13 @@ class _ProfileManager(ClearableCollectionMixin):
     def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[ProfilePermission]:
         return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
 
-    def get_channel_members(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
+    def get_channel_prof_conn(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
             -> List[ChannelProfileConnectionModel]:
-        return self._conn.get_channel_members(channel_oid, available_only=available_only)
+        return self._conn.get_channel_prof_conn(channel_oid, available_only=available_only)
 
-    def get_channel_member_oids(self, channel_oid: Union[ObjectId, List[ObjectId]], available_only=False) \
-            -> List[ObjectId]:
-        return [mdl.user_oid for mdl in self.get_channel_members(channel_oid, available_only=available_only)]
+    def get_channel_member_oids(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
+            -> Set[ObjectId]:
+        return {mdl.user_oid for mdl in self.get_channel_prof_conn(channel_oid, available_only=available_only)}
 
     def get_available_connections(self) -> ExtendedCursor[ChannelProfileConnectionModel]:
         return self._conn.get_available_connections()
@@ -1142,11 +1160,23 @@ class _ProfileManager(ClearableCollectionMixin):
         return attachables
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> List[ObjectId]:
-        """Get a list containing the user OID who have the profile."""
+        """
+        List of user OIDs who have the profile of ``profile_oid``.
+
+        :param profile_oid: OID of the profile to be checked
+        :return: list of user OIDs
+        """
         return self._conn.get_profile_user_oids(profile_oid)
 
     def get_profiles_user_oids(self, profile_oid: Iterable[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
-        """Get a ``dict`` which key is the profile OID and value is the user OID who have the corresponding profile."""
+        """
+        Get a ``dict`` which
+            key is the profile OID provided in ``profile_oid``
+            value is the set of user OIDs who have the corresonding profile
+
+        :param profile_oid: OID of the profile to be processed
+        :return: a `dict` containing who have the corresopnding profile
+        """
         return self._conn.get_profiles_user_oids(profile_oid)
 
     def is_name_available(self, channel_oid: ObjectId, name: str):

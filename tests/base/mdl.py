@@ -42,7 +42,7 @@ class TestModelMixin(TestCase, abc.ABC):
 
         # For some reason, casting twice yielding correct result
         # https://stackoverflow.com/q/62145686/11571888
-        self.assertSetEqual(set(a), set(b))
+        self.assertSetEqual(set(list(a)), set(list(b)))
 
     def assertModelDictEqual(self, a: Dict[Any, Model], b: Dict[Any, Model], *, ignore_oid: bool = True):
         if ignore_oid:
