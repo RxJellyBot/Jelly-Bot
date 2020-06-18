@@ -278,7 +278,7 @@ class _ProfileDataManager(BaseCollection):
 
     def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
         return self.find_one_casted(
-            {ChannelProfileModel.ChannelOid.key: channel_oid, ChannelProfileModel.Name.key: name},
+            {ChannelProfileModel.ChannelOid.key: channel_oid, ChannelProfileModel.Name.key: name.strip()},
             parse_cls=ChannelProfileModel)
 
     def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None) \
@@ -476,6 +476,8 @@ class _ProfileDataManager(BaseCollection):
 
     @arg_type_ensure
     def is_name_available(self, channel_oid: ObjectId, name: str):
+        name = name.strip()
+
         if not name:
             return False
 

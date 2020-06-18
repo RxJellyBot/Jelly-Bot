@@ -32,6 +32,7 @@ class TestTextFieldProperty(TestFieldProperty.TestClass):
             ("A", "A"),
             ("OXX", "OXX"),
             ("", ""),
+            (" ", ""),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
             ("x" * TextField.DEFAULT_MAX_LENGTH, "x" * TextField.DEFAULT_MAX_LENGTH),
             (True, "True"),
@@ -56,6 +57,7 @@ class TestTextFieldValueDefault(TestFieldValue.TestClass):
         return (
             (None, False),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -74,6 +76,7 @@ class TestTextFieldValueDefault(TestFieldValue.TestClass):
         return (
             (None, False),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -94,6 +97,7 @@ class TestTextFieldValueDefault(TestFieldValue.TestClass):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -105,6 +109,7 @@ class TestTextFieldValueDefault(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -133,6 +138,7 @@ class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
         return (
             (None, True),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -151,6 +157,7 @@ class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
         return (
             (None, True),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -172,6 +179,7 @@ class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
         return (
             (None, None),
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -184,6 +192,7 @@ class TestTextFieldValueAllowNone(TestFieldValue.TestClass):
         return (
             (None, None),
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -211,6 +220,7 @@ class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
         return (
             (None, False),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -229,6 +239,7 @@ class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
         return (
             (None, False),
             ("", True),
+            (" ", True),
             ("A", True),
             ("OXX", True),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), True),
@@ -249,6 +260,7 @@ class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -260,6 +272,7 @@ class TestTextFieldValueNoAutocast(TestFieldValue.TestClass):
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
         return (
             ("", ""),
+            (" ", ""),
             ("A", "A"),
             ("OXX", "OXX"),
             ("x" * (TextField.DEFAULT_MAX_LENGTH - 1), "x" * (TextField.DEFAULT_MAX_LENGTH - 1)),
@@ -287,6 +300,7 @@ class TestTextFieldValueMustHaveContent(TestFieldValue.TestClass):
     def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             ("", True),
+            (" ", True),
             ("X", True),
             ("XY", True),
             ("$&*)(@", True)
@@ -295,6 +309,7 @@ class TestTextFieldValueMustHaveContent(TestFieldValue.TestClass):
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
         return (
             ("", False),
+            (" ", False),
             ("X", True),
             ("XY", True),
             ("$&*)(@", True)
@@ -320,6 +335,7 @@ class TestTextFieldValueMustHaveContent(TestFieldValue.TestClass):
     def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
             ("", FieldEmptyValueNotAllowedError),
+            (" ", FieldEmptyValueNotAllowedError),
         )
 
 
@@ -384,7 +400,8 @@ class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
             ("AAA", True),
             ("A" * 499, True),
             ("A" * 500, True),
-            ("A" * 501, True)
+            ("A" * 501, True),
+            (" " * 501, True)
         )
 
     def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
@@ -394,7 +411,8 @@ class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
             ("AAA", True),
             ("A" * 499, True),
             ("A" * 500, True),
-            ("A" * 501, False)
+            ("A" * 501, False),
+            (" " * 501, True)
         )
 
     def is_auto_cast(self) -> bool:
@@ -405,7 +423,8 @@ class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
             ("A", "A"),
             ("AAA", "AAA"),
             ("A" * 499, "A" * 499),
-            ("A" * 500, "A" * 500)
+            ("A" * 500, "A" * 500),
+            (" " * 501, "")
         )
 
     def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
@@ -413,12 +432,54 @@ class TestTextFieldValueDifferentMaxLength(TestFieldValue.TestClass):
             ("A", "A"),
             ("AAA", "AAA"),
             ("A" * 499, "A" * 499),
-            ("A" * 500, "A" * 500)
+            ("A" * 500, "A" * 500),
+            (" " * 501, "")
         )
 
     def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
         return (
             ("A" * 501, FieldMaxLengthReachedError),
+        )
+
+
+class TestTextFieldValueNoStrip(TestFieldValue.TestClass):
+    def get_field(self) -> BaseField:
+        return TextField("k", maxlen=5, strip=False)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (" " * 4, True),
+            (" " * 5, True),
+            (" " * 6, True)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, False),
+            (" " * 4, True),
+            (" " * 5, True),
+            (" " * 6, False)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (" " * 4, " " * 4),
+            (" " * 5, " " * 5),
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (" " * 4, " " * 4),
+            (" " * 5, " " * 5)
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
+        return (
+            (" " * 6, FieldMaxLengthReachedError),
         )
 
 

@@ -123,6 +123,13 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(ProfileDataManager.get_profile_name(self.CHANNEL_OID, "A"))
         self.assertIsNone(ProfileDataManager.get_profile_name(self.CHANNEL_OID, "AD"))
 
+    def test_get_profile_name_strip(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="AA ")
+        ProfileDataManager.insert_one_model(mdl)
+
+        self.assertEqual(ProfileDataManager.get_profile_name(self.CHANNEL_OID, " AA "), mdl)
+        self.assertEqual(ProfileDataManager.get_profile_name(self.CHANNEL_OID, "AA "), mdl)
+
     def test_get_profile_name_no_data(self):
         self.assertIsNone(ProfileDataManager.get_profile_name(self.CHANNEL_OID, "AA"))
         self.assertIsNone(ProfileDataManager.get_profile_name(self.CHANNEL_OID_2, "AD"))

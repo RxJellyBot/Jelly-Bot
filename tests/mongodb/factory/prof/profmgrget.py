@@ -259,7 +259,14 @@ class TestProfileManagerGetInfo(TestModelMixin, TestTimeComparisonMixin, TestDat
         self.assertModelEqual(ProfileManager.get_profile_name(self.CHANNEL_OID, "DEF"), mdl2, ignore_oid=False)
         self.assertModelEqual(ProfileManager.get_profile_name(self.CHANNEL_OID_2, "GHI"), mdl3, ignore_oid=False)
 
-    def test_get_prof_name_no_data(self):
+    def test_prof_name_strip(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="AA ")
+        ProfileDataManager.insert_one_model(mdl)
+
+        self.assertEqual(ProfileManager.get_profile_name(self.CHANNEL_OID, " AA "), mdl)
+        self.assertEqual(ProfileManager.get_profile_name(self.CHANNEL_OID, "AA "), mdl)
+
+    def test_prof_name_no_data(self):
         self.assertIsNone(ProfileManager.get_profile_name(self.CHANNEL_OID, "ABC"))
 
     def test_get_prof_name_miss(self):

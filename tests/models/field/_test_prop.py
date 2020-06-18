@@ -116,7 +116,7 @@ class TestFieldProperty(ABC):
                     try:
                         f = self.get_initialized_field(auto_cast=False, default=default_val)
                         fi = f.new()
-                        self.assertEqual(default_val, fi.value)
+                        self.assertEqual(expected_autocast, fi.value)
                     except FieldInvalidDefaultValueError:
                         pass
 

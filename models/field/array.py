@@ -224,8 +224,9 @@ class ModelArrayField(ArrayField):
         if not issubclass(model_type, Model):
             raise FieldModelClassInvalidError(key, model_type)
 
-        super().__init__(key, model_type, **kwargs)
         self._model_type = model_type
+
+        super().__init__(key, model_type, **kwargs)
 
     def cast_to_desired_type(self, value):
         self.check_value_valid(value, attempt_cast=self.auto_cast)
