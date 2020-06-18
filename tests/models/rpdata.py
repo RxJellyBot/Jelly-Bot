@@ -2,7 +2,7 @@ from typing import Dict, Tuple, Any, Type
 
 from models import Model, PendingRepairDataModel
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestPendingRepairDataModel"]
 

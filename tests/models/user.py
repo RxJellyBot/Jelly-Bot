@@ -12,7 +12,7 @@ from models import (
 from models.exceptions import InvalidModelError, ModelConstructionError, InvalidModelFieldError
 from tests.base import TestCase
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestRootUserConfigModel", "TestRootUserModelFillApi", "TestRootUserModelFillOnPlat",
            "TestRootUserModelValidity", "TestAPIUserModel", "TestOnPlatformUserModel"]

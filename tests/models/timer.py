@@ -9,7 +9,7 @@ from models import Model, TimerModel, TimerListResult, RootUserModel, RootUserCo
 from strres.models import Timer
 from tests.base import TestCase
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestTimerModel", "TestTimerListResult"]
 

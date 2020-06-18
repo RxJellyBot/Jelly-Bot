@@ -6,7 +6,7 @@ from bson import ObjectId
 from flags import APICommand, MessageType, BotFeature
 from models import Model, APIStatisticModel, MessageRecordModel, BotFeatureUsageModel
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestAPIStatisticModel"]
 

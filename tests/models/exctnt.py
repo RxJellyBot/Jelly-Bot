@@ -7,7 +7,7 @@ from flags import ExtraContentType
 from models import Model, ExtraContentModel
 from JellyBot.systemconfig import Database
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestExtraContentModel"]
 

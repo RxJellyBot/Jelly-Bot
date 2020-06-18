@@ -191,7 +191,7 @@ class TestArModuleSample(ABC):
 
             Tag #: ``2``
 
-            Cooldown: ``3``
+            Cooldown: ``1``
             """
             return AutoReplyModuleModel(**self.get_mdl_3_args())
 

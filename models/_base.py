@@ -312,13 +312,21 @@ class Model(MutableMapping, abc.ABC):
         cls._CacheField = {cls.__qualname__: s}
 
     @classmethod
-    def _valid_model_key(cls, fk):
+    def _valid_model_key(cls, fk: str):
         if fk.lower() == "Id":
             return cls.WITH_OID
         else:
-            return fk[0].isupper() and not fk.isupper() \
-                   and fk in cls.__dict__ \
-                   and isinstance(cls.__dict__[fk], BaseField)  # noqa: E126
+            # Check if the attribute starts with a capitalized letter
+            if not fk[0].isupper():
+                return False
+
+            # Check if the name of the attribute is all caps, excluding single letter attribute
+            # ALL CAPS: class constant, for example: ``WITH_OID``
+            # Single letter: X, Y...etc.
+            if fk.isupper() and len(fk) > 1:
+                return False
+
+            return fk in cls.__dict__ and isinstance(cls.__dict__[fk], BaseField)
 
     @classmethod
     def _json_to_field_kwargs(cls, **kwargs):
@@ -397,7 +405,9 @@ class Model(MutableMapping, abc.ABC):
         d = {}
 
         for v in self._dict_.values():
-            if isinstance(v.base, ModelField):
+            if v.value is None:
+                d[v.base.key] = None
+            elif isinstance(v.base, ModelField):
                 d[v.base.key] = v.value.to_json()
             elif isinstance(v.base, ModelArrayField):
                 d[v.base.key] = [mdl.to_json() for mdl in v.value]

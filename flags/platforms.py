@@ -1,3 +1,9 @@
+"""
+Contains the flag of various platforms.
+
+.. note::
+    The name **MUST** not be ``platform`` as it could potentially creates import problem.
+"""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum

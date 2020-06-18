@@ -8,7 +8,7 @@ from flags import Platform
 from models import Model, RemoteControlEntryModel, ChannelModel, ChannelConfigModel
 from mongodb.factory import ChannelManager
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestRemoteControlEntryModel"]
 
