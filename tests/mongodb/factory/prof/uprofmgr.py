@@ -236,7 +236,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
         UserProfileManager.insert_many(mdls)
 
         self.assertModelSetEqual(
-            set(UserProfileManager.get_channel_members(self.CHANNEL_OID)),
+            set(UserProfileManager.get_channel_prof_conn(self.CHANNEL_OID)),
             {mdls[1], mdls[2]})
 
     def test_get_channel_member_multi(self):
@@ -244,7 +244,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
         UserProfileManager.insert_many(mdls)
 
         self.assertModelSetEqual(
-            set(UserProfileManager.get_channel_members([self.CHANNEL_OID, self.CHANNEL_OID_2])),
+            set(UserProfileManager.get_channel_prof_conn([self.CHANNEL_OID, self.CHANNEL_OID_2])),
             {mdls[1], mdls[2], mdls[3], mdls[4]})
 
     def test_get_channel_member_all(self):
@@ -257,7 +257,7 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
         UserProfileManager.insert_many(mdls)
 
         self.assertModelSetEqual(
-            set(UserProfileManager.get_channel_members(self.CHANNEL_OID, available_only=False)),
+            set(UserProfileManager.get_channel_prof_conn(self.CHANNEL_OID, available_only=False)),
             {mdls[0], mdls[1]})
 
     def test_get_channel_member_all_out(self):
@@ -270,21 +270,21 @@ class TestUserProfileManager(TestModelMixin, TestTimeComparisonMixin, TestDataba
         UserProfileManager.insert_many(mdls)
 
         self.assertModelSetEqual(
-            set(UserProfileManager.get_channel_members(self.CHANNEL_OID)),
+            set(UserProfileManager.get_channel_prof_conn(self.CHANNEL_OID)),
             set())
         self.assertModelSetEqual(
-            set(UserProfileManager.get_channel_members(self.CHANNEL_OID, available_only=False)),
+            set(UserProfileManager.get_channel_prof_conn(self.CHANNEL_OID, available_only=False)),
             set(mdls))
 
     def test_get_channel_member_empty_param(self):
         mdls = self._sample_channels()
         UserProfileManager.insert_many(mdls)
 
-        self.assertEqual(UserProfileManager.get_channel_members([]), [])
+        self.assertEqual(UserProfileManager.get_channel_prof_conn([]), [])
 
     def test_get_channel_member_not_exists(self):
-        self.assertEqual(UserProfileManager.get_channel_members(ObjectId()), [])
-        self.assertEqual(UserProfileManager.get_channel_members(ObjectId(), available_only=False), [])
+        self.assertEqual(UserProfileManager.get_channel_prof_conn(ObjectId()), [])
+        self.assertEqual(UserProfileManager.get_channel_prof_conn(ObjectId(), available_only=False), [])
 
     def test_user_channel_dict(self):
         self._sample_channels_insert()

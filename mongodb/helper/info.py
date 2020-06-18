@@ -68,7 +68,7 @@ class InfoProcessor:
     def get_member_info(channel_model: ChannelModel) -> List[MemberInfoEntry]:
         ret = []
 
-        prof_conns = ProfileManager.get_channel_members(channel_model.id, available_only=True)
+        prof_conns = ProfileManager.get_channel_prof_conn(channel_model.id, available_only=True)
         user_oids = [mdl.user_oid for mdl in prof_conns]
 
         user_name_dict = IdentitySearcher.get_batch_user_name(user_oids, channel_model)
