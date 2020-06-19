@@ -118,11 +118,6 @@ class MapTemplate:
 
     width: int
     height: int
-    """
-    ``int`` of the point corresponds to :class:`MapPointStatus`
-    
-    The reason of using ``int`` instead of :class:`MapPointStatus` is to make the visualization of the map to be easier
-    """
     points: List[List[int]]
 
     def __post_init__(self):

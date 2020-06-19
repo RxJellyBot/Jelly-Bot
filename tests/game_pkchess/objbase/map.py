@@ -39,8 +39,10 @@ class TestMapTemplate(TestCase):
         with self.assertRaises(MapTooFewPointsError):
             MapTemplate(w, h,
                         [[MapPointStatus.EMPTY.code for _ in range(w)] for _ in range(h - 2)]
-                        + [[MapPointStatus.UNAVAILABLE.code for _ in range(w)] + [MapPointStatus.PLAYER.code for _ in
-                                                                                  range(w)]])
+                        + [
+                            [MapPointStatus.UNAVAILABLE.code for _ in range(w)]
+                            + [MapPointStatus.PLAYER.code for _ in range(w)]
+                        ])
 
     def test_parse_file(self):
         mt = MapTemplate.load_from_file("tests/res/game_pkchess/map")

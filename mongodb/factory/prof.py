@@ -510,45 +510,40 @@ class _PermissionPromotionRecordHolder(BaseCollection):
 
 class _ProfileManager(ClearableCollectionMixin):
     @staticmethod
-    def process_create_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
-        """
-        Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
-
-        After processing, it returns a ``dict`` with field keys
-        which can be used to create a :class:`ChannelProfileModel`.
-
-        :param profile_fkwargs: `dict` to be processed which the key os field key
-        :return: `dict` with field keys to create a `ChannelProfileModel`
-        """
-        ret_kwargs = {}
-
-        # --- Collate `ChannelOid`
+    def _create_kwargs_channel_oid(ret_kwargs, profile_fkwargs):
         fk_coid = ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)
-        if fk_coid in profile_fkwargs:
-            try:
-                coid = ObjectId(profile_fkwargs[fk_coid])
-            except Exception as e:
-                return ArgumentParseResult(OperationOutcome.X_INVALID_CHANNEL_OID, e)
-
-            ret_kwargs[fk_coid] = coid
-        else:
+        if fk_coid not in profile_fkwargs:
             return ArgumentParseResult(OperationOutcome.X_MISSING_CHANNEL_OID)
 
-        # --- Collate `PermissionLevel`
+        try:
+            coid = ObjectId(profile_fkwargs[fk_coid])
+        except Exception as e:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_CHANNEL_OID, e)
+
+        ret_kwargs[fk_coid] = coid
+        return None
+
+    @staticmethod
+    def _create_kwargs_perm_lv(ret_kwargs, profile_fkwargs):
         fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
-        if fk_perm_lv in profile_fkwargs:
-            try:
-                perm_lv = PermissionLevel.cast(profile_fkwargs[fk_perm_lv])
-            except (TypeError, ValueError) as e:
-                return ArgumentParseResult(OperationOutcome.X_INVALID_PERM_LV, e)
+        if fk_perm_lv not in profile_fkwargs:
+            return None
 
-            ret_kwargs[fk_perm_lv] = perm_lv
+        try:
+            perm_lv = PermissionLevel.cast(profile_fkwargs[fk_perm_lv])
+        except (TypeError, ValueError) as e:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_PERM_LV, e)
 
-        # --- Collate `Permission`
+        ret_kwargs[fk_perm_lv] = perm_lv
+        return None
+
+    @staticmethod
+    def _create_kwargs_permission(ret_kwargs, profile_fkwargs):
         fk_perm = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Permission.key)
         fk_perm_initial = f"{fk_perm}."
         perm_dict = {}
         keys_to_remove = set()
+
         # Fill turned-on permissions
         for fk, v in profile_fkwargs.items():
             if fk.startswith(fk_perm_initial):
@@ -560,6 +555,7 @@ class _ProfileManager(ClearableCollectionMixin):
         for k in keys_to_remove:
             del profile_fkwargs[k]
 
+        fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
         # Fill default overriden permissions by permission level
         if fk_perm_lv in ret_kwargs:
             for perm in ProfilePermissionDefault.get_overridden_permissions(ret_kwargs[fk_perm_lv]):
@@ -573,16 +569,24 @@ class _ProfileManager(ClearableCollectionMixin):
         if perm_dict:
             ret_kwargs[fk_perm] = perm_dict
 
-        # --- Collate `Color`
+        return None
+
+    @staticmethod
+    def _create_kwargs_color(ret_kwargs, profile_fkwargs):
         fk_color = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Color.key)
-        if fk_color in profile_fkwargs:
-            try:
-                color = ColorFactory.from_hex(profile_fkwargs[fk_color])
-            except ValueError as e:
-                return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, e)
+        if fk_color not in profile_fkwargs:
+            return None
 
-            ret_kwargs[fk_color] = color
+        try:
+            color = ColorFactory.from_hex(profile_fkwargs[fk_color])
+        except ValueError as e:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, e)
 
+        ret_kwargs[fk_color] = color
+        return None
+
+    @staticmethod
+    def _create_kwargs_other(ret_kwargs, profile_fkwargs):
         args_not_collated = set(profile_fkwargs) - set(ret_kwargs)
         if args_not_collated:
             for fk in args_not_collated:
@@ -609,8 +613,51 @@ class _ProfileManager(ClearableCollectionMixin):
 
         return ArgumentParseResult(OperationOutcome.O_COMPLETED, parsed_args=ret_kwargs)
 
+    @classmethod
+    def process_create_profile_kwargs(cls, profile_fkwargs: dict) -> ArgumentParseResult:
+        """
+        Sanitizes and collates the data passed from the profile creation form of its corresponding webpage.
+
+        After processing, it returns a ``dict`` with field keys
+        which can be used to create a :class:`ChannelProfileModel`.
+
+        :param profile_fkwargs: `dict` to be processed which the key os field key
+        :return: `dict` with field keys to create a `ChannelProfileModel`
+        """
+        ret_kwargs = {}
+
+        collate_result = cls._create_kwargs_channel_oid(ret_kwargs, profile_fkwargs)
+        if collate_result:
+            return collate_result
+
+        collate_result = cls._create_kwargs_perm_lv(ret_kwargs, profile_fkwargs)
+        if collate_result:
+            return collate_result
+
+        cls._create_kwargs_permission(ret_kwargs, profile_fkwargs)
+
+        collate_result = cls._create_kwargs_color(ret_kwargs, profile_fkwargs)
+        if collate_result:
+            return collate_result
+
+        return cls._create_kwargs_other(ret_kwargs, profile_fkwargs)
+
     @staticmethod
-    def process_edit_profile_kwargs(profile_fkwargs: dict) -> ArgumentParseResult:
+    def _edit_kwargs_permission_keys(fk, v, ret_kwargs):
+        # Return if the code is accepted
+        fk, code = fk.split(".", 2)
+        jk = ChannelProfileModel.field_to_json_key(fk)
+
+        try:
+            ProfilePermission.cast(code)
+            ret_kwargs[f"{jk}.{code}"] = to_bool(v).to_bool()
+        except (TypeError, ValueError):
+            return False
+
+        return True
+
+    @classmethod
+    def process_edit_profile_kwargs(cls, profile_fkwargs: dict) -> ArgumentParseResult:
         """
         Sanitizes and collates the data passed from the profile edition form of its corresponding webpage.
 
@@ -629,15 +676,7 @@ class _ProfileManager(ClearableCollectionMixin):
         for fk, v in profile_fkwargs.items():
             # Handling permission keys
             if fk.startswith(fk_perm_initial):
-                fk, code = fk.split(".", 2)
-                jk = ChannelProfileModel.field_to_json_key(fk)
-
-                try:
-                    ProfilePermission.cast(code)
-                except (TypeError, ValueError):
-                    contains_addl = True
-
-                ret_kwargs[f"{jk}.{code}"] = to_bool(v).to_bool()
+                contains_addl = cls._edit_kwargs_permission_keys(fk, v, ret_kwargs) or contains_addl
                 continue
 
             # Handle other parameters
