@@ -652,9 +652,9 @@ class _ProfileManager(ClearableCollectionMixin):
             ProfilePermission.cast(code)
             ret_kwargs[f"{jk}.{code}"] = to_bool(v).to_bool()
         except (TypeError, ValueError):
-            return False
+            return True
 
-        return True
+        return False
 
     @classmethod
     def process_edit_profile_kwargs(cls, profile_fkwargs: dict) -> ArgumentParseResult:
