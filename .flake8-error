@@ -1,7 +1,7 @@
 [flake8]
 count = True
 select =
-    # Runtime errors (Syndax, Indentation, IO)
+    # Runtime errors (Syntax, Indentation, IO)
     E9,
     # Dictionary keyt name repeated
     F60,
