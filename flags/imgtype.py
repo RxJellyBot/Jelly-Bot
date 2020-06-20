@@ -1,4 +1,4 @@
-from extutils.flags import FlagSingleEnum
+from rxtoolbox.flags import FlagSingleEnum
 
 
 class ImageContentType(FlagSingleEnum):

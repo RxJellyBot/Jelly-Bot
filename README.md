@@ -38,6 +38,12 @@ Website: http://rnnx.cc/Website
 
 - Because the user count of the stable build is significantly less than beta build.
 
+### Related repositories
+
+- [PK Chess Server App](https://github.com/RaenonX/Jellybot-PKChess)
+
+- [Personal Python developing toolbox](https://github.com/RaenonX/PyToolbox)
+
 ### Miscellaneous information
 
 #### Code linter

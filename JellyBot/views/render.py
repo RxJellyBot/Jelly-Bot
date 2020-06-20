@@ -8,7 +8,7 @@ from JellyBot import keys
 from JellyBot.views.nav import construct_nav
 from JellyBot.api.static import result, param
 from JellyBot.utils import get_root_oid
-from extutils.flags import is_flag_class, is_flag_single, is_flag_double
+from rxtoolbox.flags import is_flag_class, is_flag_single, is_flag_double
 from extutils.serializer import JellyBotSerializer
 
 

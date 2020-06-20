@@ -3,7 +3,7 @@ count = True
 select =
     # Runtime errors (Syntax, Indentation, IO)
     E9,
-    # Dictionary keyt name repeated
+    # Dictionary key name repeated
     F60,
     # Expression-unpacking-related
     F62,

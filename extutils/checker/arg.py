@@ -4,7 +4,7 @@ from inspect import signature, Parameter
 
 from bson import ObjectId
 
-from extutils.flags import is_flag_class
+from rxtoolbox.flags import is_flag_class
 from .logger import logger
 
 

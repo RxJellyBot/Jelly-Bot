@@ -1,6 +1,6 @@
 from abc import ABC
 
-from extutils.flags import FlagCodeEnum
+from rxtoolbox.flags import FlagCodeEnum
 from flags import (
     APICommand, AutoReplyContentType, Execode, Platform, ExtraContentType,
     MessageType, BotFeature, PermissionLevel

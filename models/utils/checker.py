@@ -7,7 +7,7 @@ from pymongo.cursor import Cursor
 from mongodb.utils import BulkWriteDataHolder
 from models.field import ModelField
 from models import ModelDefaultValueExt, OID_KEY
-from extutils.flags import FlagCodeEnum
+from rxtoolbox.flags import FlagCodeEnum
 from extutils.emailutils import MailSender
 from extutils.logger import LoggerSkeleton
 

@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from discord import ChannelType as DiscordChannelType
 
-from extutils.flags import FlagSingleEnum
+from rxtoolbox.flags import FlagSingleEnum
 
 from .platforms import Platform
 

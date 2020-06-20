@@ -2,7 +2,7 @@ from typing import Dict, Generator, Set, Optional
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum, FlagSingleEnum
+from rxtoolbox.flags import FlagDoubleEnum, FlagSingleEnum
 
 
 class ProfilePermission(FlagDoubleEnum):

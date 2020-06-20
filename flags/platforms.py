@@ -6,7 +6,7 @@ Contains the flag of various platforms.
 """
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagSingleEnum
+from rxtoolbox.flags import FlagSingleEnum
 
 
 class Platform(FlagSingleEnum):

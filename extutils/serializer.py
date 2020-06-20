@@ -1,7 +1,7 @@
 from bson import ObjectId
 from django.core.serializers.json import DjangoJSONEncoder
 
-from extutils.flags import is_flag_instance
+from rxtoolbox.flags import is_flag_instance
 from mongodb.factory.results import BaseResult
 from models import Model
 

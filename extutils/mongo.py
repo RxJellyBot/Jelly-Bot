@@ -1,8 +1,9 @@
 from bson import CodecOptions
 from bson.codec_options import TypeRegistry
 
+from rxtoolbox.flags.mongo import type_registry as tr_flags
+
 from .color import ColorMongoEncoder
-from .flags import type_registry as tr_flags
 
 
 def get_codec_options():

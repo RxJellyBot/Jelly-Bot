@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagDoubleEnum
+from rxtoolbox.flags import FlagDoubleEnum
 
 
 class BotFeature(FlagDoubleEnum):

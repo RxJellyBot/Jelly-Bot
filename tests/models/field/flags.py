@@ -5,7 +5,7 @@ from models.field.exceptions import (
     FieldTypeMismatchError, FieldNoneNotAllowedError, FieldFlagDefaultUndefinedError, FieldFlagNotFoundError,
     FieldError
 )
-from extutils.flags import FlagCodeEnum
+from rxtoolbox.flags import FlagCodeEnum
 from tests.base import TestCase
 
 from ._test_val import TestFieldValue

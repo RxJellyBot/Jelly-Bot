@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
+from rxtoolbox.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
