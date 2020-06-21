@@ -11,6 +11,7 @@ from game.pkchess.flags import MapPointStatus
 from game.pkchess.objbase import MapTemplate
 from game.pkchess.map import MapModel, Map, MapPoint
 
+ICON_PLAYER = Image.open("game/pkchess/res/mapobj/player.png")
 ICON_CHEST = Image.open("game/pkchess/res/mapobj/chest.png")
 ICON_MONSTER = Image.open("game/pkchess/res/mapobj/monster.png")
 ICON_BOSS = Image.open("game/pkchess/res/mapobj/boss.png")
@@ -34,7 +35,7 @@ class MapPointUnitDrawer:
         elif map_point.status == MapPointStatus.EMPTY:
             ImageDraw.Draw(img).rectangle(cls.get_coord_on_image(map_point), outline=(50, 50, 50), width=2)
         elif map_point.status == MapPointStatus.PLAYER:
-            ImageDraw.Draw(img).rectangle(cls.get_coord_on_image(map_point), outline=(74, 181, 119), width=5)
+            img.paste(ICON_PLAYER, cls.get_coord_on_image(map_point, with_padding=False)[0])
         elif map_point.status == MapPointStatus.CHEST:
             img.paste(ICON_CHEST, cls.get_coord_on_image(map_point, with_padding=False)[0])
         elif map_point.status == MapPointStatus.MONSTER:
