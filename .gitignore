@@ -1,10 +1,27 @@
+# Project files
 .idea
+
+# Compiled python
 __pycache__/
+
+# Library files
+lib
+
+# Virtual Environment
+venv
+
+# Archived code
 archive/
-/lib/
+
+# Application logs
 logs/
 *.log
-cache.json
+
+# IIS config file
 web.config
+
+# Sandbox files
 sandbox*.py
+
+# Django files
 db.sqlite3
