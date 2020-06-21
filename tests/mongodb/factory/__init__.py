@@ -6,3 +6,4 @@ from .prof import *  # noqa
 from .rmc import *  # noqa
 from .rpdata import *  # noqa
 from .shorturl import *  # noqa
+from .stats import *  # noqa

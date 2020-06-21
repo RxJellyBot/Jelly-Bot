@@ -232,7 +232,6 @@ class _MessageRecordStatisticsManager(BaseCollection):
             DailyMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
         self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
-
         pipeline = [
             {"$match": match_d},
             {"$group": {
