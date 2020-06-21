@@ -1,4 +1,12 @@
-### Map File Specification
+## Map File Specification
+
+### File Naming and Placement
+
+Place the map file **WITHOUT extension** under `game/pkchess/res/map`.
+
+The name of the map file will be used to load the template file.
+
+### File Format
 
 The following specification is listed as its expected order. 
 

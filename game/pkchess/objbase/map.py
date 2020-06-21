@@ -85,7 +85,7 @@ class MapTemplate:
         This parsing method checks logic error, but not the format error.
 
         .. seealso::
-            See `res/map/spec.md` for the specification of the map file.
+            See `doc/spec/map.md` for the specification of the map file.
 
         :param path: path of the file
         :return: a parsed `MapTemplate`
