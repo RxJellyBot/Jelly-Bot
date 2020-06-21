@@ -1,20 +1,66 @@
-cachetools
-dotmap
-markdown2
-requests
-dnspython
-pymongo
+## Framework
+
+# Django
 Django
-webencodings
 django-html_sanitizer
+webencodings  # Will be used for escaping characters
+
+# Static file handling
 whitenoise
-google-api-python-client
-ttldict
-pytz
-heroku3
-python-dateutil
+
+# ---------------------
+
+## Bot
+
+# LINE bot
 line-bot-sdk
-sympy
+
+# Discord bot
 discord.py
+
+# Google identity
+google-api-python-client
+
+# ---------------------
+
+## Data
+
+# MongoDB connection
+dnspython
+
+# User name caching - might be removed after #280
+cachetools
+
+# ---------------------
+
+## Bot Utils
+
+# Datetime processing
+pytz
+python-dateutil
+
+# Bot calculator
+sympy
+
+# ---------------------
+
+## Miscellaneous
+
+# Github API data
+dotmap
+
+# Bot command documentation
+markdown2
+
+# Web requests
+requests
+pymongo
+
+# Recording no user ID handling status
+ttldict
+
+# Message processing
 jieba
-tinydb
+
+# Image processing for PK Chess
+Pillow

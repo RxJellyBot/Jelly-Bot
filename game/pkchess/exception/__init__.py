@@ -1,1 +1,4 @@
-from .objbase import MapException, MapTooFewPointsError, MapDimensionTooSmallError
+from .objbase import (
+    MapError, MapTooFewPointsError, MapDimensionTooSmallError, MapShapeMismatchError,
+    MapPointError, MapPointUnspawnableError, SpawnPointOutOfMapError, UnknownResourceTypeError, NoPlayerSpawnPointError
+)

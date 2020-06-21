@@ -6,4 +6,7 @@ __all__ = ["BattleObject"]
 
 
 class BattleObject(Model, ABC):
+    """
+    Base battle object including character, chest, monsters and field bosses.
+    """
     pass
