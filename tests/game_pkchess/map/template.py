@@ -1,17 +1,13 @@
-from typing import Type, Tuple, Dict, Any
-
 from game.pkchess.exception import (
     MapTooFewPointsError, MapDimensionTooSmallError,
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError
 )
 from game.pkchess.flags import MapPointStatus, MapPointResource
-from game.pkchess.obj import Character
+from game.pkchess.map import Map, MapCoordinate, MapPoint
 from game.pkchess.objbase import MapTemplate
-from game.pkchess.mdls import MapModel, MapPointModel, MapCoordinateModel
-from models import Model
-from tests.base import TestCase, TestModel
+from tests.base import TestCase
 
-__all__ = ["TestMapTemplate", "TestMapCoordianteModel", "TestMapPointModel", "TestMapModel"]
+__all__ = ["TestMapTemplate"]
 
 
 class TestMapTemplate(TestCase):
@@ -46,22 +42,22 @@ class TestMapTemplate(TestCase):
 
         self.assertEqual(mt.points[2][3], MapPointStatus.EMPTY)
 
-    def test_to_model(self):
+    def test_to_map(self):
         w = MapTemplate.MIN_WIDTH + 1
         h = MapTemplate.MIN_HEIGHT + 3
 
-        mdl = MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w)], {}).to_model()
+        mdl = MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w)], {}).to_map()
 
         pt_status = [
             [
-                MapPointModel(Status=MapPointStatus.PLAYER, Coord=MapCoordinateModel(X=x, Y=y))
+                MapPoint(MapPointStatus.PLAYER, MapCoordinate(x, y))
                 for y in range(h)
             ] for x in range(w)
         ]
 
-        self.assertEqual(mdl, MapModel(Width=w, Height=h, Points=pt_status, Resources={}))
+        self.assertEqual(mdl, Map(w, h, pt_status, {}))
 
-    def test_to_model_point_orientation(self):
+    def test_to_map_point_orientation(self):
         w = MapTemplate.MIN_WIDTH + 1
         h = MapTemplate.MIN_HEIGHT + 3
 
@@ -71,21 +67,21 @@ class TestMapTemplate(TestCase):
                 [MapPointStatus.EMPTY if x == 2 and y == 3 else MapPointStatus.PLAYER for y in range(h)]
                 for x in range(w)
             ],
-            {}).to_model()
+            {}).to_map()
 
         pt_status = [
             [
-                MapPointModel(
-                    Status=MapPointStatus.EMPTY if x == 2 and y == 3 else MapPointStatus.PLAYER,
-                    Coord=MapCoordinateModel(X=x, Y=y)
+                MapPoint(
+                    MapPointStatus.EMPTY if x == 2 and y == 3 else MapPointStatus.PLAYER,
+                    MapCoordinate(x, y)
                 )
                 for y in range(h)
             ] for x in range(w)
         ]
 
-        self.assertEqual(mdl, MapModel(Width=w, Height=h, Points=pt_status, Resources={}))
+        self.assertEqual(mdl, Map(w, h, pt_status, {}))
         self.assertEqual(mdl.points[2][3].status, MapPointStatus.EMPTY)
-        self.assertEqual(mdl.points[2][3].coord, MapCoordinateModel(X=2, Y=3))
+        self.assertEqual(mdl.points[2][3].coord, MapCoordinate(2, 3))
 
     def test_insuf_width(self):
         w = MapTemplate.MIN_WIDTH - 1
@@ -122,7 +118,7 @@ class TestMapTemplate(TestCase):
             MapTemplate(w, h,
                         [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w - 1)]
                         + [[MapPointStatus.UNAVAILABLE for _ in range(h)]],
-                        {MapPointResource.CHEST: [MapCoordinateModel(X=w - 1, Y=h - 1)]})
+                        {MapPointResource.CHEST: [MapCoordinate(w - 1, h - 1)]})
 
     def test_res_out_of_map(self):
         w = MapTemplate.MIN_WIDTH
@@ -130,7 +126,7 @@ class TestMapTemplate(TestCase):
 
         with self.assertRaises(SpawnPointOutOfMapError):
             MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w)],
-                        {MapPointResource.CHEST: [MapCoordinateModel(X=w, Y=h)]})
+                        {MapPointResource.CHEST: [MapCoordinate(w, h)]})
 
     def test_no_player(self):
         w = MapTemplate.MIN_WIDTH
@@ -138,7 +134,7 @@ class TestMapTemplate(TestCase):
 
         with self.assertRaises(NoPlayerSpawnPointError):
             MapTemplate(w, h, [[MapPointStatus.EMPTY for _ in range(h)] for _ in range(w)],
-                        {MapPointResource.CHEST: [MapCoordinateModel(X=w, Y=h)]})
+                        {MapPointResource.CHEST: [MapCoordinate(w - 1, h - 1)]})
 
     def test_parse_file(self):
         mt = MapTemplate.load_from_file("tests/game_pkchess/res/map/map")
@@ -158,9 +154,9 @@ class TestMapTemplate(TestCase):
         self.assertEqual(
             mt.resources,
             {
-                MapPointResource.CHEST: [MapCoordinateModel(X=3, Y=y) for y in range(1, 4)],
-                MapPointResource.MONSTER: [MapCoordinateModel(X=4, Y=y) for y in range(1, 4)],
-                MapPointResource.FIELD_BOSS: [MapCoordinateModel(X=5, Y=y) for y in range(1, 4)]
+                MapPointResource.CHEST: [MapCoordinate(3, y) for y in range(1, 4)],
+                MapPointResource.MONSTER: [MapCoordinate(4, y) for y in range(1, 4)],
+                MapPointResource.FIELD_BOSS: [MapCoordinate(5, y) for y in range(1, 4)]
             }
         )
 
@@ -179,57 +175,3 @@ class TestMapTemplate(TestCase):
     def test_parse_file_no_player(self):
         with self.assertRaises(NoPlayerSpawnPointError):
             MapTemplate.load_from_file("tests/game_pkchess/res/map/map_noplayer")
-
-
-class TestMapCoordianteModel(TestModel.TestClass):
-    @classmethod
-    def get_model_class(cls) -> Type[Model]:
-        return MapCoordinateModel
-
-    @classmethod
-    def get_required(cls) -> Dict[Tuple[str, str], Any]:
-        return {
-            ("x", "X"): 1,
-            ("y", "Y"): 10
-        }
-
-
-class TestMapPointModel(TestModel.TestClass):
-    @classmethod
-    def get_model_class(cls) -> Type[Model]:
-        return MapPointModel
-
-    @classmethod
-    def get_required(cls) -> Dict[Tuple[str, str], Any]:
-        return {
-            ("s", "Status"): MapPointStatus.CHEST,
-            ("c", "Coord"): MapCoordinateModel(X=1, Y=7)
-        }
-
-    @classmethod
-    def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
-        return {
-            ("obj", "Obj"): (None, Character())
-        }
-
-
-class TestMapModel(TestModel.TestClass):
-    @classmethod
-    def get_model_class(cls) -> Type[Model]:
-        return MapModel
-
-    @classmethod
-    def get_required(cls) -> Dict[Tuple[str, str], Any]:
-        return {
-            ("w", "Width"): 2,
-            ("h", "Height"): 2,
-            ("pt", "Points"): [
-                [MapPointModel(Status=MapPointStatus.EMPTY, Coord=MapCoordinateModel(X=0, Y=0)),
-                 MapPointModel(Status=MapPointStatus.EMPTY, Coord=MapCoordinateModel(X=0, Y=1))],
-                [MapPointModel(Status=MapPointStatus.EMPTY, Coord=MapCoordinateModel(X=1, Y=0)),
-                 MapPointModel(Status=MapPointStatus.EMPTY, Coord=MapCoordinateModel(X=1, Y=1))]
-            ],
-            ("res", "Resources"): {
-                MapPointResource.CHEST: [MapCoordinateModel(X=0, Y=0), MapCoordinateModel(X=1, Y=1)]
-            }
-        }

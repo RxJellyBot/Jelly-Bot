@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import List, Dict
 
-from game.pkchess.flags import MapPointStatus, MapPointResource
 from game.pkchess.exception import (
     MapTooFewPointsError, MapDimensionTooSmallError, MapShapeMismatchError,
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError
 )
-from game.pkchess.mdls import MapPointModel, MapCoordinateModel, MapModel
+from game.pkchess.flags import MapPointStatus, MapPointResource
+from game.pkchess.map import Map, MapPoint, MapCoordinate
 
 __all__ = ["MapTemplate"]
 
@@ -26,7 +26,7 @@ class MapTemplate:
     width: int
     height: int
     points: List[List[MapPointStatus]]
-    resources: Dict[MapPointResource, List[MapCoordinateModel]]
+    resources: Dict[MapPointResource, List[MapCoordinate]]
 
     def __post_init__(self):
         if self.width < MapTemplate.MIN_WIDTH or self.height < MapTemplate.MIN_HEIGHT:
@@ -42,8 +42,8 @@ class MapTemplate:
         # Check resource points
         for coords in self.resources.values():
             for coord in coords:
-                x = coord.x
-                y = coord.y
+                x = coord.X
+                y = coord.Y
 
                 # Check out of map
                 if x >= self.width or y >= self.height:
@@ -64,18 +64,18 @@ class MapTemplate:
     def respawn(self):
         pass  # TODO TEST
 
-    def to_model(self) -> MapModel:
+    def to_map(self) -> Map:
         pts = []
 
         for x, pts_arr in enumerate(self.points):
             arr = []
 
             for y, pt in enumerate(pts_arr):
-                arr.append(MapPointModel(Status=pt, Coord=MapCoordinateModel(X=x, Y=y)))
+                arr.append(MapPoint(pt, MapCoordinate(x, y)))
 
             pts.append(arr)
 
-        return MapModel(Width=self.width, Height=self.height, Points=pts, Resources=self.resources)
+        return Map(self.width, self.height, pts, self.resources)
 
     @staticmethod
     def load_from_file(path: str) -> 'MapTemplate':
@@ -103,7 +103,7 @@ class MapTemplate:
                 points[x].append(MapPointStatus.cast(elem))
 
         # parse resource spawning location
-        res_dict: Dict[MapPointResource, List[MapCoordinateModel]] = {}
+        res_dict: Dict[MapPointResource, List[MapCoordinate]] = {}
         for line in lines:
             type_int, *coords = line.split(" ")
 
@@ -113,6 +113,6 @@ class MapTemplate:
                 raise UnknownResourceTypeError()
 
             coords = [coord.split(",", 2) for coord in coords]
-            res_dict[res_type] = [MapCoordinateModel(X=int(x), Y=int(y)) for x, y in coords]
+            res_dict[res_type] = [MapCoordinate(int(x), int(y)) for x, y in coords]
 
         return MapTemplate(width, height, points, res_dict)

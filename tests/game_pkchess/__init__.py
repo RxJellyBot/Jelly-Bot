@@ -1,1 +1,1 @@
-from .objbase import *  # noqa
+from .map import *  # noqa

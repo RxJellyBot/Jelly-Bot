@@ -1,5 +1,6 @@
-from game.pkchess.flags import MapPointStatus
+from game.pkchess.flags import MapPointStatus, MapPointResource
 from game.pkchess.objbase import BattleObject
+from game.pkchess.map import Map, MapPoint, MapCoordinate
 from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, MultiDimensionalArrayField, FlagField, ModelField, DictionaryField
 
@@ -36,8 +37,8 @@ class MapPointModel(Model):
     WITH_OID = False
 
     Status = MapPointStatusField("s", default=ModelDefaultValueExt.Required)
-    Obj = BattleObjectField("obj", default=None)
     Coord = ModelField("c", MapCoordinateModel, default=ModelDefaultValueExt.Required)
+    Obj = BattleObjectField("obj", default=None)
 
 
 class MapModel(Model):
@@ -45,3 +46,23 @@ class MapModel(Model):
     Height = IntegerField("h", positive_only=True, default=ModelDefaultValueExt.Required)
     Points = MultiDimensionalArrayField("pt", 2, MapPointModel, default=ModelDefaultValueExt.Required)
     Resources = DictionaryField("res", default=ModelDefaultValueExt.Required)
+
+    def to_map(self) -> Map:
+        pts = []
+
+        # Convert `points`
+        for x, pts_arr in enumerate(self.points):
+            arr = []
+
+            for y, pt in enumerate(pts_arr):
+                arr.append(MapPoint(pt.status, MapCoordinate(pt.coord.x, pt.coord.y)))
+
+            pts.append(arr)
+
+        # Convert `resources`
+        res = dict(self.resources)
+        for k, v in self.resources.items():
+            res[MapPointResource.cast(k)] = [MapCoordinate(coord[MapCoordinateModel.X.key],
+                                                           coord[MapCoordinateModel.Y.key]) for coord in v]
+
+        return Map(self.width, self.height, pts, res)
