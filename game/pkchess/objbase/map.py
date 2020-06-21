@@ -59,10 +59,10 @@ class MapTemplate:
             raise MapShapeMismatchError()
 
     def tighten(self):
-        pass  # TODO TEST
+        pass  # TODO: game tighten map
 
     def respawn(self):
-        pass  # TODO TEST
+        pass  # TODO: game respawn object
 
     def to_map(self) -> Map:
         pts = []

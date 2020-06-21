@@ -40,11 +40,7 @@ class _ShortUrlDataManager(BaseCollection):
         else:
             service_url = f"{service_url}/test"
 
-        return _ShortUrlDataManager.is_valid_url(service_url)
-
-    @staticmethod
-    def is_valid_url(url) -> bool:
-        return is_valid_url(url)
+        return is_valid_url(service_url)
 
     def __init__(self):
         super().__init__()
@@ -76,7 +72,7 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def create_record(self, target: str, creator_oid: ObjectId) -> UrlShortenResult:
-        if not _ShortUrlDataManager.is_valid_url(target):
+        if not is_valid_url(target):
             return UrlShortenResult(WriteOutcome.X_INVALID_URL)
 
         model, outcome, ex = self.insert_one_data(Code=self.generate_code(), Target=target, CreatorOid=creator_oid)
@@ -103,7 +99,7 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:
-        if not _ShortUrlDataManager.is_valid_url(new_target):
+        if not is_valid_url(new_target):
             return False
 
         return self.update_many_outcome(

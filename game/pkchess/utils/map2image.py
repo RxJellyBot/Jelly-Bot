@@ -26,7 +26,8 @@ class MapPointUnitDrawer:
 
     @classmethod
     def draw(cls, img: Image, map_point: MapPoint):
-        # TEST
+        # TEST: draw image
+
         # TODO: Icon for player
         if map_point.status == MapPointStatus.UNAVAILABLE:
             ImageDraw.Draw(img).rectangle(cls.get_coord_on_image(map_point), fill=(0, 0, 0))
@@ -44,7 +45,7 @@ class MapPointUnitDrawer:
     @classmethod
     def get_coord_on_image(cls, map_point: MapPoint, *, with_padding: bool = True) \
             -> [Tuple[int, int], Tuple[int, int]]:
-        # TEST
+        # TEST: get coord of image
         size = cls.SIZE
         padding = cls.PADDING if with_padding else 0
 
