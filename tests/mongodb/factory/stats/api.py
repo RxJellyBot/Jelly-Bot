@@ -13,6 +13,10 @@ __all__ = ["TestAPIStatisticsManager"]
 class TestAPIStatisticsManager(TestTimeComparisonMixin, TestModelMixin, TestDatabaseMixin):
     USER_OID = ObjectId()
 
+    @staticmethod
+    def collections_to_reset():
+        return [APIStatisticsManager]
+
     def test_record_stats(self):
         ts = now_utc_aware()
 

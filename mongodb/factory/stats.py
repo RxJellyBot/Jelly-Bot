@@ -1,6 +1,6 @@
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
-from typing import Any, Optional, Union, List, Dict
+from typing import Any, Optional, Union, List, Dict, Set
 
 import pymongo
 from bson import ObjectId
@@ -17,7 +17,7 @@ from models import (
     HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
     MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult
 )
-from mongodb.factory.results import RecordAPIStatisticsResult
+from mongodb.factory.results import RecordAPIStatisticsResult, WriteOutcome
 from mongodb.utils import ExtendedCursor
 from ._base import BaseCollection
 
@@ -57,12 +57,14 @@ class _MessageRecordStatisticsManager(BaseCollection):
     @arg_type_ensure
     def record_message(
             self, channel_oid: ObjectId, user_root_oid: ObjectId,
-            message_type: MessageType, message_content: Any, proc_time_secs: float):
-        self.insert_one_data(
+            message_type: MessageType, message_content: Any, proc_time_secs: float) -> WriteOutcome:
+        mdl, outcome, ex = self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
             MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
-            ProcessTimeSecs=proc_time_secs, Timestamp=now_utc_aware()
+            ProcessTimeSecs=proc_time_secs
         )
+
+        return outcome
 
     @arg_type_ensure
     def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) \
@@ -72,16 +74,40 @@ class _MessageRecordStatisticsManager(BaseCollection):
         ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
 
     @arg_type_ensure
-    def get_message_frequency(self, channel_oid: ObjectId, within_mins: Union[float, int] = 720) -> float:
-        """Get message frequency in terms of seconds per message."""
-        rct_msg_count = self.count_documents(
-            {MessageRecordModel.ChannelOid.key: channel_oid,
-             OID_KEY: {"$gt": ObjectId.from_datetime(now_utc_aware() - timedelta(minutes=within_mins))}})
+    def get_message_frequency(self, channel_oid: ObjectId, range_mins: Union[float, int, None] = None) -> float:
+        """
+        Get the message frequency in terms of seconds per message.
 
-        if rct_msg_count > 0:
-            return (within_mins * 60) / rct_msg_count
-        else:
+        The calculation is based on the earliest and the latest time of the record.
+
+        If ``within_mins`` is specified, then it will be applied to the filter to get the data,
+        counting backwards from the current datetime.
+
+        :param channel_oid: message of the channel
+        :param range_mins: time range in minutes for the calculation
+        :return: sec / message
+        """
+        filter_ = {MessageRecordModel.ChannelOid.key: channel_oid}
+
+        if range_mins:
+            filter_[OID_KEY] = {"$gt": ObjectId.from_datetime(now_utc_aware() - timedelta(minutes=range_mins))}
+
+        rct_msg_count = self.count_documents(filter_)
+
+        # Early termination if no message
+        if rct_msg_count == 0:
             return 0.0
+
+        # Calculate time range
+        earliest = self.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
+        if not earliest:
+            return 0.0
+
+        latest = self.find_one(filter_, sort=[(OID_KEY, pymongo.DESCENDING)])
+
+        range_mins = (latest[OID_KEY].generation_time - earliest[OID_KEY].generation_time).total_seconds() / 60
+
+        return range_mins / rct_msg_count
 
     def get_user_last_message_ts(self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) \
             -> Dict[ObjectId, datetime]:
@@ -117,7 +143,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
         else:
             raise ValueError("Must be either `ObjectId` or `List[ObjectId]`.")
 
-    def get_messages_distinct_channel(self, message_fragment: str) -> List[ObjectId]:
+    def get_messages_distinct_channel(self, message_fragment: str) -> Set[ObjectId]:
         aggr = list(self.aggregate([
             {"$match": {
                 MessageRecordModel.MessageContent.key: {"$regex": message_fragment, "$options": "i"}
@@ -132,7 +158,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
             }}
         ]))
 
-        return [e["cid"] for e in aggr]
+        return {e["cid"] for e in aggr}
 
     def get_user_messages_total_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,

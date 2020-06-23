@@ -142,7 +142,7 @@ class Bot:
         MessageFrequencyRangeMin = 1440  # 1 Day
 
     class RemoteControl:
-        IdleDeactivateSeconds = 600  # 10 mins
+        IdleDeactivateSeconds = 600  # 10 min
 
 
 class ExtraService:

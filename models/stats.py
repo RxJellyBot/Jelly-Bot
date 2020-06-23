@@ -39,7 +39,6 @@ class MessageRecordModel(Model):
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
     MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
     ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
-    Timestamp = DateTimeField("ts")
 
 
 class BotFeatureUsageModel(Model):
@@ -180,7 +179,7 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
 
         CountDataEntry = namedtuple("CountDataEntry", ["category_name", "data", "color", "hidden"])
 
-        # Create hours label for webpage
+        # Create hours label for web page
         self.label_hr = [i for i in range(24)]
 
         count_data = {}
