@@ -1,1 +1,2 @@
-from .base import Character
+from .base import CharacterTemplate
+from .mdls import Character

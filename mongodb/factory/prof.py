@@ -11,13 +11,13 @@ from extutils.color import ColorFactory
 from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
+from mixin import ClearableMixin
 from models import (
     OID_KEY, ChannelConfigModel, ChannelProfileListEntry,
     ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
 )
 from models.exceptions import ModelConstructionError, RequiredKeyNotFilledError, InvalidModelFieldError
 from mongodb.factory import ChannelManager
-from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.factory.results import (
     WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome,
     GetPermissionProfileResult, CreateProfileResult, RegisterProfileResult, ArgumentParseResult
@@ -508,7 +508,7 @@ class _PermissionPromotionRecordHolder(BaseCollection):
     model_class = PermissionPromotionRecordModel
 
 
-class _ProfileManager(ClearableCollectionMixin):
+class _ProfileManager(ClearableMixin):
     @staticmethod
     def _create_kwargs_channel_oid(ret_kwargs, profile_fkwargs):
         fk_coid = ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)
@@ -556,7 +556,7 @@ class _ProfileManager(ClearableCollectionMixin):
             del profile_fkwargs[k]
 
         fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
-        # Fill default overriden permissions by permission level
+        # Fill default overridden permissions by permission level
         if fk_perm_lv in ret_kwargs:
             for perm in ProfilePermissionDefault.get_overridden_permissions(ret_kwargs[fk_perm_lv]):
                 perm_dict[perm.code_str] = True

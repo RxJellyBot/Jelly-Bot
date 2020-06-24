@@ -21,7 +21,7 @@ class TestAutoReplyManagerBase(ABC):
         CREATOR_OID_2 = ObjectId()
 
         @staticmethod
-        def collections_to_reset():
+        def obj_to_clear():
             return [AutoReplyModuleManager, ProfileManager, UserProfileManager]
 
         def setUpTestCase(self) -> None:

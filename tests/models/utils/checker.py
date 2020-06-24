@@ -54,7 +54,7 @@ ColInst = CollectionTest()
 
 class TestDataChecker(TestDatabaseMixin, TestCase):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ColInst]
 
     def setUpTestCase(self) -> None:

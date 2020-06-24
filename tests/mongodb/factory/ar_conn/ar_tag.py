@@ -12,7 +12,7 @@ __all__ = ["TestAutoReplyManagerTag"]
 
 class TestAutoReplyManagerTag(TestModelMixin, TestDatabaseMixin):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [AutoReplyManager, AutoReplyModuleManager]
 
     @classmethod

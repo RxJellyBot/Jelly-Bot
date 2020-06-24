@@ -14,7 +14,7 @@ from .rmc import RemoteControlManager
 from ._base import BaseCollection
 from ._dbctrl import SINGLE_DB_NAME, is_test_db, get_single_db_name
 
-from .mixin import GenerateTokenMixin, ControlExtensionMixin, ClearableCollectionMixin
+from .mixin import GenerateTokenMixin, ControlExtensionMixin
 
 
 def get_collection_subclasses():

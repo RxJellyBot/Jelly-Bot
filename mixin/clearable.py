@@ -1,7 +1,9 @@
 from abc import abstractmethod, ABC
 
+__all__ = ["ClearableMixin"]
 
-class ClearableCollectionMixin(ABC):
+
+class ClearableMixin(ABC):
     @abstractmethod
     def clear(self):
         """Method to clear all the data of the collection and its related collection(s)."""

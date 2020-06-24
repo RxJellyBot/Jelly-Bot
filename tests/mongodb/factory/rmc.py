@@ -38,7 +38,7 @@ CID_DEST = ObjectId.from_datetime(_now_ + timedelta(days=1))
 
 class TestRemoteControlHolder(TestTimeComparisonMixin, TestDatabaseMixin):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [RemoteControlManager]
 
     @classmethod

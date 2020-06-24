@@ -14,7 +14,7 @@ class TestAPIStatisticsManager(TestTimeComparisonMixin, TestModelMixin, TestData
     USER_OID = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [APIStatisticsManager]
 
     def test_record_stats(self):

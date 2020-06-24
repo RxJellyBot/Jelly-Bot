@@ -35,7 +35,7 @@ class TestProfileManagerUserChannelProfile(TestModelMixin, TestDatabaseMixin):
     CHANNEL_4 = None
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ProfileManager]
 
     def setUpTestCase(self) -> None:
@@ -243,7 +243,7 @@ class TestProfileManagerUserChannelProfile(TestModelMixin, TestDatabaseMixin):
 
 class TestProfileManagerUserChannelProfileEmpty(TestDatabaseMixin):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ProfileManager, ChannelManager]
 
     def test_get_profs_no_data(self):
@@ -275,7 +275,7 @@ class TestProfileManagerUserChannelProfileDangling(TestDatabaseMixin):
     PROFILE_OID_2 = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ProfileManager, ChannelManager]
 
     def test_get_profs_dangling_channel(self):

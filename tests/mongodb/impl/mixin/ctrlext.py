@@ -4,11 +4,12 @@ from bson import InvalidDocument, ObjectId
 from pymongo.errors import DuplicateKeyError
 
 from extutils.mongo import get_codec_options
+from mixin import ClearableMixin
 from models import Model
 from models.exceptions import InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
 from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultValueExt
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
-from mongodb.factory import ControlExtensionMixin, ClearableCollectionMixin
+from mongodb.factory import ControlExtensionMixin
 from mongodb.factory.results import WriteOutcome, UpdateOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 
@@ -18,7 +19,7 @@ __all__ = ["TestControlExtensionMixin"]
 class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
     collection = None
 
-    class CollectionTest(ControlExtensionMixin, ClearableCollectionMixin):
+    class CollectionTest(ControlExtensionMixin, ClearableMixin):
         def clear(self):
             self.delete_many({})
 
@@ -34,7 +35,7 @@ class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
             raise ValueError()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [TestControlExtensionMixin.collection]
 
     @classmethod

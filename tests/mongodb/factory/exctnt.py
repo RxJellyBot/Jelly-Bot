@@ -15,7 +15,7 @@ class TestExtraContentManager(TestModelMixin, TestTimeComparisonMixin, TestDatab
     CHANNEL_OID = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ExtraContentManager]
 
     def test_rec_extra_message(self):

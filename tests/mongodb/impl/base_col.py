@@ -87,7 +87,7 @@ class TestBaseCollection(TestDatabaseMixin):
         collection_name = "col"
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [col]
 
     def test_col_missing_names_mdl_cls(self):

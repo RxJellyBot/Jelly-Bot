@@ -17,7 +17,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
     CHANNEL_OID_2 = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ProfileDataManager]
 
     def _insert_sample_profiles(self):

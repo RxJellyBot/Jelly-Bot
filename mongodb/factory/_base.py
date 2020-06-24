@@ -8,6 +8,7 @@ from pymongo.collection import Collection
 
 from JellyBot.systemconfig import Database
 from extutils.mongo import get_codec_options
+from mixin import ClearableMixin
 from models import Model
 from models.utils import ModelFieldChecker
 from mongodb.utils import backup_collection
@@ -15,12 +16,12 @@ from mongodb.factory import MONGO_CLIENT
 from mongodb.factory.results import WriteOutcome
 
 from ._dbctrl import SINGLE_DB_NAME
-from .mixin import ControlExtensionMixin, ClearableCollectionMixin
+from .mixin import ControlExtensionMixin
 
 __all__ = ["BaseCollection"]
 
 
-class BaseCollection(ControlExtensionMixin, ClearableCollectionMixin, Collection, ABC):
+class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
     database_name: str = None
     collection_name: str = None
     model_class: Type[Model] = None

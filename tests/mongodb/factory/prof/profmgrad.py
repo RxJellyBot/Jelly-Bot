@@ -20,7 +20,7 @@ class TestProfileManagerAttach(ABC):
         USER_OID_2 = ObjectId()
 
         @staticmethod
-        def collections_to_reset():
+        def obj_to_clear():
             return [ProfileManager]
 
         @abstractmethod
@@ -298,7 +298,7 @@ class TestProfileManagerDetach(ABC):
         USER_OID_2 = ObjectId()
 
         @staticmethod
-        def collections_to_reset():
+        def obj_to_clear():
             return [ProfileManager]
 
         @abstractmethod

@@ -3,6 +3,7 @@ from game.pkchess.objbase import BattleObject
 from game.pkchess.map import Map, MapPoint, MapCoordinate
 from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, MultiDimensionalArrayField, FlagField, ModelField, DictionaryField
+from .mixin import ConvertibleMapMixin
 
 __all__ = ["MapPointModel", "MapCoordinateModel", "MapModel"]
 
@@ -41,7 +42,7 @@ class MapPointModel(Model):
     Obj = BattleObjectField("obj", default=None)
 
 
-class MapModel(Model):
+class MapModel(ConvertibleMapMixin, Model):
     Width = IntegerField("w", positive_only=True, default=ModelDefaultValueExt.Required)
     Height = IntegerField("h", positive_only=True, default=ModelDefaultValueExt.Required)
     Points = MultiDimensionalArrayField("pt", 2, MapPointModel, default=ModelDefaultValueExt.Required)

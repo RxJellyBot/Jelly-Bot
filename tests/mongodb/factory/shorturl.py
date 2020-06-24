@@ -15,7 +15,7 @@ class TestShortUrlDataManager(TestModelMixin, TestDatabaseMixin):
     USER_OID_2 = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ShortUrlDataManager]
 
     def test_check_service(self):

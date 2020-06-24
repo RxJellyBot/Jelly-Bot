@@ -11,6 +11,7 @@ from extutils.checker import arg_type_ensure
 from extutils.color import ColorFactory
 from extutils.dt import now_utc_aware
 from flags import ProfilePermission, AutoReplyContentType
+from mixin import ClearableMixin
 from models import (
     AutoReplyModuleModel, AutoReplyModuleTagModel, AutoReplyTagPopularityScore, OID_KEY,
     AutoReplyContentModel, UniqueKeywordCountResult
@@ -21,7 +22,6 @@ from mongodb.factory.results import (
     WriteOutcome, GetOutcome, UpdateOutcome,
     AutoReplyModuleAddResult, AutoReplyModuleTagGetResult
 )
-from mongodb.factory.mixin import ClearableCollectionMixin
 from mongodb.utils import (
     ExtendedCursor, case_insensitive_collation
 )
@@ -387,7 +387,7 @@ class _AutoReplyModuleTagManager(BaseCollection):
         return self.find_one_casted({OID_KEY: tag_oid}, parse_cls=AutoReplyModuleTagModel)
 
 
-class _AutoReplyManager(ClearableCollectionMixin):
+class _AutoReplyManager(ClearableMixin):
     def __init__(self):
         self._mod = _AutoReplyModuleManager()
         self._tag = _AutoReplyModuleTagManager()

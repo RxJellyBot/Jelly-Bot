@@ -18,7 +18,7 @@ class TestExecodeManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
     CREATOR_OID_2 = ObjectId()
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ExecodeManager]
 
     def test_add_duplicate(self):
@@ -216,7 +216,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
     inst = None
 
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ExecodeManager, AutoReplyModuleManager, ChannelManager, RootUserManager]
 
     def test_ar_add_new(self):

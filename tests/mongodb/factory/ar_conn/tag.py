@@ -9,7 +9,7 @@ __all__ = ["TestAutoReplyModuleTagManager"]
 
 class TestAutoReplyModuleTagManager(TestModelMixin, TestDatabaseMixin):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [AutoReplyModuleTagManager]
 
     @classmethod

@@ -3,8 +3,7 @@ from game.pkchess.exception import (
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError
 )
 from game.pkchess.flags import MapPointStatus, MapPointResource
-from game.pkchess.map import Map, MapCoordinate, MapPoint
-from game.pkchess.objbase import MapTemplate
+from game.pkchess.map import Map, MapCoordinate, MapPoint, MapTemplate
 from tests.base import TestCase
 
 __all__ = ["TestMapTemplate"]

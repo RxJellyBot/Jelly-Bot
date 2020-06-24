@@ -8,8 +8,9 @@ from typing import Union, Tuple
 from PIL import Image, ImageDraw
 
 from game.pkchess.flags import MapPointStatus
-from game.pkchess.objbase import MapTemplate
-from game.pkchess.map import MapModel, Map, MapPoint
+from game.pkchess.map import MapTemplate, MapModel, Map, MapPoint
+
+__all__ = ["MapImageGenerator", "MapPointUnitDrawer"]
 
 ICON_PLAYER = Image.open("game/pkchess/res/mapobj/player.png")
 ICON_CHEST = Image.open("game/pkchess/res/mapobj/chest.png")
@@ -29,7 +30,7 @@ class MapPointUnitDrawer:
     def draw(cls, img: Image, map_point: MapPoint):
         # TEST: draw image
 
-        # TODO: Icon for player
+        # TODO: Render icon for player
         if map_point.status == MapPointStatus.UNAVAILABLE:
             ImageDraw.Draw(img).rectangle(cls.get_coord_on_image(map_point), fill=(0, 0, 0))
         elif map_point.status == MapPointStatus.EMPTY:
@@ -78,5 +79,4 @@ class MapImageGenerator:
 if __name__ == '__main__':
     from game.pkchess.map import get_map_template
 
-    game_map = get_map_template("map01")
-    MapImageGenerator.generate_image(game_map).save("D:/UserData/Downloads/img.png")
+    MapImageGenerator.generate_image(get_map_template("map01")).save("D:/UserData/Downloads/img.png")

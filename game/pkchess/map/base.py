@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from typing import List, Dict
 
 from game.pkchess.exception import (
@@ -6,18 +6,23 @@ from game.pkchess.exception import (
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError
 )
 from game.pkchess.flags import MapPointStatus, MapPointResource
-from game.pkchess.map import Map, MapPoint, MapCoordinate
+
+from .obj import Map, MapPoint, MapCoordinate
+from .mixin import ConvertibleMapMixin
 
 __all__ = ["MapTemplate"]
 
 
 @dataclass
-class MapTemplate:
+class MapTemplate(ConvertibleMapMixin):
     """
     Map template.
 
     This could be converted to :class:`MapModel` and
     store to the database (initialize a game) by calling `to_model()`.
+
+    Set ``bypass_map_chack`` to ``True`` to bypass the available map point check and the size check.
+    This should be used only in tests.
     """
     MIN_WIDTH = 9
     MIN_HEIGHT = 9
@@ -28,7 +33,12 @@ class MapTemplate:
     points: List[List[MapPointStatus]]
     resources: Dict[MapPointResource, List[MapCoordinate]]
 
-    def __post_init__(self):
+    bypass_map_chack: InitVar[bool] = False
+
+    def __post_init__(self, bypass_map_chack: bool):
+        if bypass_map_chack:
+            return
+
         if self.width < MapTemplate.MIN_WIDTH or self.height < MapTemplate.MIN_HEIGHT:
             raise MapDimensionTooSmallError()
 

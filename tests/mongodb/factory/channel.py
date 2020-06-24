@@ -13,7 +13,7 @@ __all__ = ["TestChannelManager"]
 
 class TestChannelManager(TestModelMixin, TestDatabaseMixin):
     @staticmethod
-    def collections_to_reset():
+    def obj_to_clear():
         return [ChannelManager]
 
     def test_add_duplicate(self):

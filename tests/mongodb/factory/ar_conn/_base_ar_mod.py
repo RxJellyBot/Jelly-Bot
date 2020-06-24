@@ -17,7 +17,7 @@ __all__ = ["TestAutoReplyModuleManagerBase"]
 class TestAutoReplyModuleManagerBase(ABC):
     class TestClass(TestArModuleSample.TestClass):
         @staticmethod
-        def collections_to_reset():
+        def obj_to_clear():
             return [AutoReplyModuleManager]
 
         def grant_access_pin_permission(self):
