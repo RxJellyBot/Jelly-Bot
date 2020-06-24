@@ -10,6 +10,8 @@ from extutils.dt import (
 )
 from tests.base import TestCase
 
+__all__ = ["TestDatetime", "TestParseTimeRange"]
+
 
 class TestDatetime(TestCase):
     def test_dt_make_aware(self):

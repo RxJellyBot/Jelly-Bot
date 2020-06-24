@@ -3,6 +3,8 @@ from game.pkchess.res import characters
 
 from tests.base import TestCase
 
+__all__ = ["TestCharacterUtils"]
+
 
 class TestCharacterUtils(TestCase):
     def test_character_existence_exists(self):

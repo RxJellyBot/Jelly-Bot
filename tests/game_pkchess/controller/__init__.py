@@ -1,1 +1,1 @@
-from .main import TestGameController
+from .main import *  # noqa

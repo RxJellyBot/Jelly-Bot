@@ -1,6 +1,8 @@
 from extutils.line_sticker import LineStickerManager
 from tests.base import TestCase
 
+__all__ = ["TestLineStickerUtils"]
+
 
 class TestLineStickerUtils(TestCase):
     def test_sticker_exists(self):

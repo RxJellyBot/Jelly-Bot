@@ -1,6 +1,8 @@
 from extutils.boolext import StrBoolResult, to_bool, true_word, false_word, case_insensitive
 from tests.base import TestCase
 
+__all__ = ["TestBooleanExtension"]
+
 
 class TestBooleanExtension(TestCase):
     def test_true(self):

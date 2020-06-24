@@ -1,10 +1,15 @@
 from extutils.emailutils import EmailServer
 from tests.base import TestCase
 
+__all__ = ["TestFakeEmailServer"]
+
+srv = EmailServer()
+
 
 class TestFakeEmailServer(TestCase):
-    def setUp(self) -> None:
-        self.srv = EmailServer()
+    @staticmethod
+    def obj_to_clear():
+        return [srv]
 
     def test_send_email_single_recipients(self):
         sender = "a"
@@ -12,11 +17,11 @@ class TestFakeEmailServer(TestCase):
         subject = "Test subject"
         content = "Test content"
 
-        self.srv.send_email(sender, recipients, subject, content)
+        srv.send_email(sender, recipients, subject, content)
 
         for recipient in recipients:
             with self.subTest(recipient=recipient):
-                mailbox = self.srv.get_mailbox(recipient)
+                mailbox = srv.get_mailbox(recipient)
 
                 mails = mailbox.get_mail_with_content(content, first=True)
                 self.assertGreater(
@@ -34,11 +39,11 @@ class TestFakeEmailServer(TestCase):
         subject = "Test subject"
         content = "Test content"
 
-        self.srv.send_email(sender, recipients, subject, content)
+        srv.send_email(sender, recipients, subject, content)
 
         for recipient in recipients:
             with self.subTest(recipient=recipient):
-                mailbox = self.srv.get_mailbox(recipient)
+                mailbox = srv.get_mailbox(recipient)
 
                 mails = mailbox.get_mail_with_content(content, first=True)
                 self.assertGreater(
@@ -56,11 +61,11 @@ class TestFakeEmailServer(TestCase):
         subject = "Test subject"
         content = "Test content"
 
-        self.srv.send_email(sender, recipients, subject, content)
+        srv.send_email(sender, recipients, subject, content)
 
         for recipient in recipients:
             with self.subTest(recipient=recipient):
-                mailbox = self.srv.get_mailbox(recipient)
+                mailbox = srv.get_mailbox(recipient)
 
                 mails = mailbox.get_mail_with_content(content, first=True)
                 self.assertGreater(

@@ -1,6 +1,8 @@
 from extutils.color import ColorFactory, Color
 from tests.base import TestCase
 
+__all__ = ["TestColorFactory", "TestColor"]
+
 
 class TestColorFactory(TestCase):
     def test_color_factory_from_hex(self):

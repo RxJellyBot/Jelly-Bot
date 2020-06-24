@@ -19,7 +19,7 @@ from tests.base import TestCase
 __all__ = ["TestDailyResult", "TestHourlyResult", "TestHourlyIntervalAverageMessageResult", "TestDailyMessageResult",
            "TestMeanMessageResultGenerator", "TestMemberDailyMessageResult", "TestMemberMessageCountResult",
            "TestMemberMessageByCategoryResult", "TestBotFeatureUsageResult", "TestBotFeaturePerUserUsageResult",
-           "TestBotFeatureHourlyAvgResult"]
+           "TestBotFeatureHourlyAvgResult", "TestCountBeforeTimeResult"]
 
 
 class TestHourlyResult(TestDatabaseMixin):

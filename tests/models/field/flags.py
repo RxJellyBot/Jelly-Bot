@@ -16,6 +16,8 @@ __all__ = ["TestEnumNoDefault", "TestEnumWithDefaultProperty", "TestEnumWithDefa
 
 
 # region No default flags
+
+
 class EnumNoDefault(FlagCodeEnum):
     A = 1
     B = 2
@@ -35,6 +37,8 @@ class TestEnumNoDefault(TestCase):
 
 
 # region Has default flags
+
+
 class EnumWithDefault(FlagCodeEnum):
     @classmethod
     def default(cls):

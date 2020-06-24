@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from mixin import ClearableMixin
+
 
 @dataclass
 class EmailEntry:
@@ -37,11 +39,11 @@ class EmailBox:
         return ret
 
 
-class EmailServer:
+class EmailServer(ClearableMixin):
     storage = {}
 
     @classmethod
-    def reset(cls):
+    def clear(cls):
         cls.storage = {}
 
     @classmethod

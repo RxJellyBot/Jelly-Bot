@@ -4,6 +4,9 @@ from extutils.flags import (
 )
 from tests.base import TestCase
 
+__all__ = ["TestFlagMisc", "TestFlagCodeEnum", "TestFlagSingleEnum", "TestFlagDoubleEnum",
+           "TestFlagPrefixedDoubleEnum"]
+
 
 class CodeEnum(FlagCodeEnum):
     A = 1
@@ -137,7 +140,7 @@ class TestFlagCodeEnum(TestCase):
             CodeEnum.default()
 
 
-class TestFlagSingleCodeEnum(TestCase):
+class TestFlagSingleEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodeSingleEnum.A)
         self.assertEqual("1", CodeSingleEnum.A)
@@ -190,7 +193,7 @@ class TestFlagSingleCodeEnum(TestCase):
             CodeSingleEnum.default()
 
 
-class TestFlagDoubleCodeEnum(TestCase):
+class TestFlagDoubleEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodeDoubleEnum.A)
         self.assertEqual("1", CodeDoubleEnum.A)
@@ -244,7 +247,7 @@ class TestFlagDoubleCodeEnum(TestCase):
         self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.default())
 
 
-class TestFlagPrefixedDoubleCodeEnum(TestCase):
+class TestFlagPrefixedDoubleEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodePrefixedDoubleEnum.A)
         self.assertEqual("1", CodePrefixedDoubleEnum.A)

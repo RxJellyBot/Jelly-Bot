@@ -14,7 +14,7 @@ from ._test_prop import TestFieldProperty
 
 __all__ = ["TestTextFieldExtra", "TestTextFieldProperty", "TestTextFieldValueAllowNone",
            "TestTextFieldValueDefault", "TestTextFieldValueDifferentMaxLength", "TestTextFieldValueMustHaveContent",
-           "TestTextFieldValueNoAutocast", "TestTextFieldValueWithRegex"]
+           "TestTextFieldValueNoAutocast", "TestTextFieldValueWithRegex", "TestTextFieldValueNoStrip"]
 
 
 class TestTextFieldProperty(TestFieldProperty.TestClass):

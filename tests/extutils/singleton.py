@@ -1,6 +1,8 @@
 from extutils.singleton import Singleton, SingletonABC
 from tests.base import TestCase
 
+__all__ = ["TestSingleton"]
+
 
 class SingletonTest(metaclass=Singleton):
     pass

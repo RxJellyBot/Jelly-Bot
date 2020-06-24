@@ -6,6 +6,8 @@ from bson import ObjectId
 from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailedError
 from tests.base import TestCase
 
+__all__ = ["TestArgTypeEnsure"]
+
 
 # noinspection PyTypeChecker
 class TestArgTypeEnsure(TestCase):

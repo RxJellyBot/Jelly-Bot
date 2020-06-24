@@ -1,1 +1,1 @@
-from .calculator import TestBotCalculator
+from .calculator import *  # noqa

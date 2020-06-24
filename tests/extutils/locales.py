@@ -4,6 +4,8 @@ from extutils.dt import now_utc_aware
 from extutils.locales import sec_diff_to_utc_offset, locales, LocaleInfo
 from tests.base import TestCase
 
+__all__ = ["TestLocaleInfo", "TestLocaleFunctions"]
+
 
 class TestLocaleFunctions(TestCase):
     def test_sec_diff_to_utc_offset(self):

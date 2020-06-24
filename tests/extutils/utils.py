@@ -7,6 +7,8 @@ from extutils.utils import (
 )
 from tests.base import TestCase
 
+__all__ = ["TestUtilFunctions"]
+
 
 # noinspection PyTypeChecker
 class TestUtilFunctions(TestCase):
