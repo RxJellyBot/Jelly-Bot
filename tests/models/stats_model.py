@@ -69,13 +69,6 @@ class TestMessageRecordModel(TestModel.TestClass):
             ("pt", "ProcessTimeSecs"): 0.7
         }
 
-    @classmethod
-    def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
-        return {
-            ("ts", "Timestamp"): (datetime.min.replace(tzinfo=timezone.utc),
-                                  now_utc_aware())
-        }
-
 
 class TestBotFeatureUsageModel(TestModel.TestClass):
     CHANNEL_OID = ObjectId()

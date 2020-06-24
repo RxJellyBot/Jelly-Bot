@@ -11,6 +11,7 @@ from bson import ObjectId
 
 from extutils.dt import now_utc_aware, TimeRange, make_tz_aware
 from extutils.utils import enumerate_ranking
+from extutils.dt import localtime
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
 from models.field import (
@@ -39,6 +40,15 @@ class MessageRecordModel(Model):
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
     MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
     ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
+
+    @property
+    def timestamp(self):
+        """
+        Get a tz-aware timestamp of this model using ``_id``.
+
+        :return: tz-aware timestamp of this model
+        """
+        return localtime(self.id.generation_time)
 
 
 class BotFeatureUsageModel(Model):
