@@ -1,8 +1,6 @@
-from datetime import datetime
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
-from django.utils import timezone
 
 from extutils.dt import now_utc_aware
 from flags import APICommand, MessageType, BotFeature
@@ -10,7 +8,7 @@ from models import Model, APIStatisticModel, MessageRecordModel, BotFeatureUsage
 
 from tests.base import TestModel
 
-__all__ = ["TestAPIStatisticModel"]
+__all__ = ["TestAPIStatisticModel", "TestMessageRecordModel", "TestBotFeatureUsageModel"]
 
 
 class TestAPIStatisticModel(TestModel.TestClass):
