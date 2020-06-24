@@ -571,7 +571,7 @@ class TestModel(ABC):
                 # Compare constructed model and dict with required elements and optional elements
                 items.append((
                     "Model vs dict / R + O",
-                    self.get_constructed_model(),
+                    self.get_constructed_model(including_optional=True),
                     dict({k[0]: v for k, v in self.get_required().items()},
                          **{k[0]: v for k, v in self.get_optional().items()})
                 ))
