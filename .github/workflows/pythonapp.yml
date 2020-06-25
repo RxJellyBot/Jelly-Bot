@@ -192,7 +192,11 @@ jobs:
         run: |
           python manage.py test tests.mongodb
 
-      - name: All tests (Double check)
+      - name: Test game - PK Chess (`game_pkchess`)
+        run: |
+          python manage.py test tests.game_pkchess
+
+      - name: All tests
         run: |
           python manage.py test tests
 
