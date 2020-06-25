@@ -32,7 +32,7 @@ class TestPendingRepairDataManager(TestDatabaseMixin):
                 PendingRepairDataModel(Data=data, MissingKeys=missing))
 
         col = MONGO_CLIENT.get_database(SINGLE_DB_NAME).get_collection("pdrp.testdb.testcol")
-        col.delete_many()
+        col.delete_many({})
 
         self.assertEqual(len(holder.complete()), 2)
         self.assertEqual(col.count_documents({}), 2, list(col.find()))
