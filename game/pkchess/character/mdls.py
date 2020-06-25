@@ -1,7 +1,7 @@
-from game.pkchess.objbase import BattleObject
+from game.pkchess.objbase import BattleObjectModel
 
 __all__ = ["CharacterModel"]
 
 
-class CharacterModel(BattleObject):
+class CharacterModel(BattleObjectModel):
     pass

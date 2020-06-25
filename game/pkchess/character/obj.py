@@ -1,12 +1,14 @@
 from dataclasses import dataclass, field
 from typing import List
+
+from game.pkchess.objbase import BattleObject
 from .base import CharacterTemplate
 
 __all__ = ["Character"]
 
 
 @dataclass
-class Character:
+class Character(BattleObject):
     template: CharacterTemplate
 
     name: str = field(init=False)

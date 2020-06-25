@@ -28,26 +28,22 @@ class MapCoordinate:
 
     def apply_offset(self, x_offset: int, y_offset: int) -> ('MapCoordinate', 'MapCoordinate'):
         """
-        Apply the offsets of the coordinate to this coordinate object and return the original and the new coordinates.
+        Return a 2-tuple which
+            the **1st** element is the original coordiate (this object).
 
-        Note that the first coordinate object is a new object and the second coordinate object is the current object.
+            the **2nd** element is the new coordinate with the offsets applied.
 
         :param x_offset: offset for X
         :param y_offset: offset for Y
-        :return: a 2-tuple which the first is the original coordinate and the second is the current coordinate
+        :return: a 2-tuple which the first is the original coordinate and the second is the new coordinate
         :raises CoordinateOutOfBoundError: if the new coordinate will be negative value after applying the offsets
         """
-        original = MapCoordinate(self.X, self.Y)
+        new_obj = MapCoordinate(self.X + x_offset, self.Y + y_offset)
 
-        self.X += x_offset
-        self.Y += y_offset
-
-        if self.X < 0 or self.Y < 0:
-            self.X -= x_offset
-            self.Y -= y_offset
+        if new_obj.X < 0 or new_obj.Y < 0:
             raise CoordinateOutOfBoundError()
 
-        return original, self
+        return self, new_obj
 
     def __hash__(self):
         return hash((self.X, self.Y))
@@ -221,12 +217,17 @@ class Map:
     players: InitVar[Optional[Set[ObjectId]]] = None
 
     def __post_init__(self, players: Dict[ObjectId, Character]):
-        if not self.player_location and players:
+        if not self.player_location:
             self.player_location = {}
+        else:
+            for coord in self.player_location.values():
+                self.points[coord.X][coord.Y].status = MapPointStatus.PLAYER
 
-            player_coords: Set[MapCoordinate] = {pt.coord for pt in self.points_flattened}
+        if not self.player_location and players:
+            player_coords: Set[MapCoordinate] = {pt.coord for pt in self.points_flattened
+                                                 if pt.status == MapPointStatus.PLAYER}
             player_actual_count = len(players)
-            player_deployable_count = sum(map(lambda pt: pt.status == MapPointStatus.PLAYER, self.points_flattened))
+            player_deployable_count = len(player_coords)
 
             if player_actual_count > player_deployable_count:
                 raise MapTooManyPlayersError(player_deployable_count, player_actual_count)
@@ -244,10 +245,16 @@ class Map:
                 self.points[coord.X][coord.Y].status = MapPointStatus.PLAYER
                 self.points[coord.X][coord.Y].obj = player_character
 
-            # Fill the rest of the deployable location to be empty spot
-            if player_coords:
-                for coord in player_coords:
-                    self.points[coord.X][coord.Y].status = MapPointStatus.EMPTY
+        # Fill the rest of the deployable location to be empty spot
+        if self.player_location:
+            occupied_coords: Set[MapCoordinate] = set(self.player_location.values())
+
+            empty_player_coords: Set[MapCoordinate] = {pt.coord for pt in self.points_flattened
+                                                       if pt.status == MapPointStatus.PLAYER}
+            empty_player_coords.difference_update(occupied_coords)
+
+            for coord in empty_player_coords:
+                self.points[coord.X][coord.Y].status = MapPointStatus.EMPTY
 
     def player_move(self, player_oid: ObjectId, x_offset: int, y_offset: int) -> bool:
         """
@@ -268,28 +275,30 @@ class Map:
 
         # Apply the movement offset
         try:
-            original, current = self.player_location[player_oid].apply_offset(x_offset, y_offset)
+            original, new = self.player_location[player_oid].apply_offset(x_offset, y_offset)
         except CoordinateOutOfBoundError:
             raise MoveDestinationOutOfMapError()
 
         # Check if the new coordinate is out of map. Revert if this is true
-        if current.X >= self.width or current.Y >= self.height:
-            current.apply_offset(-x_offset, -y_offset)
+        if new.X >= self.width or new.Y >= self.height:
             raise MoveDestinationOutOfMapError()
 
         original_point = self.points[original.X][original.Y]
-        new_point = self.points[current.X][current.Y]
+        new_point = self.points[new.X][new.Y]
 
         # Check if the new coordinate is not empty. Revert if this is true
         if new_point.status != MapPointStatus.EMPTY:
-            current.apply_offset(-x_offset, -y_offset)
             return False
 
-        # Move the player
+        # Move the player & update related variables
+        self.player_location[player_oid] = new
+
         new_point.obj = original_point.obj
         new_point.status = MapPointStatus.PLAYER
         original_point.obj = None
         original_point.status = self.template.points[original.X][original.Y]
+        if original_point.status == MapPointStatus.PLAYER:
+            original_point.status = MapPointStatus.EMPTY
 
         return True
 

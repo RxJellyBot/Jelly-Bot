@@ -3,7 +3,7 @@ from typing import Set, Dict
 from bson import ObjectId
 
 from game.pkchess.flags import MapPointStatus, MapPointResource
-from game.pkchess.objbase import BattleObjectField
+from game.pkchess.objbase import BattleObjectModelField
 from game.pkchess.map import Map, MapPoint, MapCoordinate
 from game.pkchess.res import get_map_template
 from models import Model, ModelDefaultValueExt
@@ -38,7 +38,7 @@ class MapPointModel(Model):
 
     Status = MapPointStatusField("s", default=ModelDefaultValueExt.Required)
     Coord = ModelField("c", MapCoordinateModel, default=ModelDefaultValueExt.Required)
-    Obj = BattleObjectField("obj", default=None)
+    Obj = BattleObjectModelField("obj", default=None)
 
 
 class MapModel(ConvertibleMapMixin, Model):
