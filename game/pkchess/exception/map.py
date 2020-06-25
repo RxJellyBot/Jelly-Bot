@@ -2,7 +2,8 @@ from abc import ABC
 
 __all__ = ["MapError", "MapTooFewPointsError", "MapDimensionTooSmallError", "MapShapeMismatchError",
            "MapPointError", "MapPointUnspawnableError", "SpawnPointOutOfMapError", "UnknownResourceTypeError",
-           "NoPlayerSpawnPointError"]
+           "NoPlayerSpawnPointError", "MapTooManyPlayersError", "CoordinateOutOfBoundError",
+           "PlayerDeployedOnUndeployableError"]
 
 
 class MapError(ABC, Exception):
@@ -18,6 +19,11 @@ class MapTooFewPointsError(MapError):
         super().__init__(f"{actual} / {expected}")
 
 
+class MapTooManyPlayersError(MapError):
+    def __init__(self, max_player: int, actual_player: int):
+        super().__init__(f"{actual_player} / {max_player}")
+
+
 class MapDimensionTooSmallError(MapError):
     pass
 
@@ -30,6 +36,10 @@ class MapPointUnspawnableError(MapPointError):
     pass
 
 
+class PlayerDeployedOnUndeployableError(MapPointError):
+    pass
+
+
 class SpawnPointOutOfMapError(MapPointError):
     pass
 
@@ -39,4 +49,8 @@ class UnknownResourceTypeError(MapPointError):
 
 
 class NoPlayerSpawnPointError(MapPointError):
+    pass
+
+
+class CoordinateOutOfBoundError(MapPointError):
     pass

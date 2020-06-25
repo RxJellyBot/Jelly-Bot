@@ -1,9 +1,9 @@
 from typing import Optional
 
 from game.pkchess.character import CharacterTemplate
-from game.pkchess.res import characters
+from game.pkchess.res import character_templates
 
-__all__ = ["is_character_exists", "get_character_name", "get_character"]
+__all__ = ["is_character_exists", "get_character_name", "get_character_template"]
 
 
 def is_character_exists(name: str) -> bool:
@@ -15,16 +15,16 @@ def is_character_exists(name: str) -> bool:
     :param name: name of the character to be checked
     :return: if the character exists
     """
-    return name.lower() in characters
+    return name.lower() in character_templates
 
 
 def get_character_name(name: str) -> Optional[str]:
-    chara = get_character(name)
+    chara = get_character_template(name)
     if chara:
         return chara.name
 
     return None
 
 
-def get_character(name: str) -> Optional[CharacterTemplate]:
-    return characters.get(name.lower())
+def get_character_template(name: str) -> Optional[CharacterTemplate]:
+    return character_templates.get(name.lower())

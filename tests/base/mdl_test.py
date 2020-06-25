@@ -290,7 +290,7 @@ class TestModel(ABC):
 
         @staticmethod
         @final
-        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> (Dict[str, Any], Dict[str, Any]):
             """
             Process ``d`` to return a ``dict`` with json key (1st returned element)
             and the other ``dict`` with field key.
@@ -578,4 +578,4 @@ class TestModel(ABC):
 
             for msg, a, b in items:
                 with self.subTest(msg=msg):
-                    self.assertEqual(a, b)
+                    self.assertEqual(a, b, f"{a}\n{b}")

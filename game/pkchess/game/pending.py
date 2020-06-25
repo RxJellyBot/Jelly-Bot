@@ -1,19 +1,16 @@
+import random
 from dataclasses import dataclass, field
 from typing import Optional, Dict
 
 from bson import ObjectId
 
+from game.pkchess.character import Character
+from game.pkchess.exception import GameNotReadyError
 from game.pkchess.map import MapTemplate
-from game.pkchess.utils.character import get_character_name
+from .main import RunningGame
+from .player import PlayerEntry
 
 __all__ = ["PendingGame"]
-
-
-@dataclass
-class PlayerEntry:
-    player_oid: ObjectId
-    character_name: str
-    ready: bool = False
 
 
 @dataclass
@@ -59,7 +56,7 @@ class PendingGame:
 
         return True
 
-    def add_player(self, player_oid: ObjectId, character_name: str) -> bool:
+    def add_player(self, player_oid: ObjectId, character: Character) -> bool:
         """
         Add a player to the game. Existence of the character should be checked **BEFORE** the call of this method.
 
@@ -68,18 +65,13 @@ class PendingGame:
         Returns ``True`` if the player joined the game; ``False`` if the player is already in the game.
 
         :param player_oid: OID of the player
-        :param character_name: name of the character to be used for the player
+        :param character: name of the character to be used for the player
         :return: if the player is added
         """
         if player_oid in self.players:
             return False
 
-        character_name_correct_case = get_character_name(character_name)
-        if not character_name_correct_case:
-            raise ValueError("Character name is `None`. "
-                             f"`character_name` ({character_name}) may not have a corresponding character.")
-
-        self.players[player_oid] = PlayerEntry(player_oid, character_name_correct_case)
+        self.players[player_oid] = PlayerEntry(player_oid, character)
         return True
 
     def player_ready(self, player_oid: ObjectId, *, ready: bool = True):
@@ -92,8 +84,31 @@ class PendingGame:
         :param ready: new ready status. default to `True`
         :return: if the ready status is updated
         """
-        if player_oid in self.players:
+        if player_oid not in self.players:
             return False
 
         self.players[player_oid].ready = ready
         return True
+
+    def start_game(self) -> RunningGame:
+        """
+        Start the current game. Converts this :class:`PendingGame` to :class:`RunningGame`.
+
+        The order of the players of the returned :class:`RunningGame` will be randomized.
+
+        :return: a `RunningGame` for the actual running game.
+        :raises GameNotReadyError: if the game is not yet ready
+        """
+        if not self.ready:
+            raise GameNotReadyError()
+
+        players = list(self.players.values())
+        random.shuffle(players)
+
+        return RunningGame(
+            self.channel_oid,
+            self.map_template.to_map(
+                players={plyr_oid: plyr_entry.character for plyr_oid, plyr_entry in self.players.items()}
+            ),
+            players
+        )

@@ -201,11 +201,11 @@ class Model(MutableMapping, abc.ABC):
         return hash(tuple(hash_list))
 
     def _input_kwargs(self, **kwargs):
-        for k, v in kwargs.items():
-            if k in self.model_field_keys():
-                self._inner_dict_create(k, v)
+        for fk, v in kwargs.items():
+            if fk in self.model_field_keys():
+                self._inner_dict_create(fk, v)
             else:
-                raise FieldKeyNotExistError(k, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
     def _fill_default_vals(self, not_filled):
         filled = set()

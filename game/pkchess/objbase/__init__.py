@@ -1,1 +1,1 @@
-from .battleobj import BattleObject
+from .battleobj import BattleObject, BattleObjectField

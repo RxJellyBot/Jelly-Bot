@@ -127,11 +127,11 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
 
         self.assertAlmostEqual(
             MessageRecordStatisticsManager.get_message_frequency(self.CHANNEL_OID),
-            (3 * 1440) / len(list(filter(lambda item: item.channel_oid == self.CHANNEL_OID, msgs)))
+            (3 * 1440) / sum(map(lambda item: item.channel_oid == self.CHANNEL_OID, msgs))
         )
         self.assertAlmostEqual(
             MessageRecordStatisticsManager.get_message_frequency(self.CHANNEL_OID_2),
-            60 / len(list(filter(lambda item: item.channel_oid == self.CHANNEL_OID_2, msgs)))
+            60 / sum(map(lambda item: item.channel_oid == self.CHANNEL_OID_2, msgs))
         )
 
     def test_get_msg_freq_limited(self):

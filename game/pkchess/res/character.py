@@ -2,9 +2,9 @@ from typing import Dict
 
 from game.pkchess.character import CharacterTemplate
 
-__all__ = ["characters"]
+__all__ = ["character_templates"]
 
-characters: Dict[str, CharacterTemplate] = {
+character_templates: Dict[str, CharacterTemplate] = {
     "nearnox": CharacterTemplate(
         "Nearnox",
         HP=1000, HP_growth=100, MP=750, MP_growth=20,

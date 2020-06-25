@@ -1,5 +1,5 @@
 from game.pkchess.exception import (
-    MapTooFewPointsError, MapDimensionTooSmallError,
+    MapTooFewPointsError, MapDimensionTooSmallError, MapShapeMismatchError,
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError
 )
 from game.pkchess.flags import MapPointStatus, MapPointResource
@@ -44,8 +44,9 @@ class TestMapTemplate(TestCase):
     def test_to_map(self):
         w = MapTemplate.MIN_WIDTH + 1
         h = MapTemplate.MIN_HEIGHT + 3
+        template = MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w)], {})
 
-        mdl = MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w)], {}).to_map()
+        map_obj = template.to_map()
 
         pt_status = [
             [
@@ -54,19 +55,21 @@ class TestMapTemplate(TestCase):
             ] for x in range(w)
         ]
 
-        self.assertEqual(mdl, Map(w, h, pt_status, {}))
+        self.assertEqual(map_obj, Map(w, h, pt_status, {}, template))
 
     def test_to_map_point_orientation(self):
         w = MapTemplate.MIN_WIDTH + 1
         h = MapTemplate.MIN_HEIGHT + 3
-
-        mdl = MapTemplate(
+        template = MapTemplate(
             w, h,
             [
                 [MapPointStatus.EMPTY if x == 2 and y == 3 else MapPointStatus.PLAYER for y in range(h)]
                 for x in range(w)
             ],
-            {}).to_map()
+            {}
+        )
+
+        mdl = template.to_map()
 
         pt_status = [
             [
@@ -78,7 +81,7 @@ class TestMapTemplate(TestCase):
             ] for x in range(w)
         ]
 
-        self.assertEqual(mdl, Map(w, h, pt_status, {}))
+        self.assertEqual(mdl, Map(w, h, pt_status, {}, template))
         self.assertEqual(mdl.points[2][3].status, MapPointStatus.EMPTY)
         self.assertEqual(mdl.points[2][3].coord, MapCoordinate(2, 3))
 
@@ -118,6 +121,16 @@ class TestMapTemplate(TestCase):
                         [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w - 1)]
                         + [[MapPointStatus.UNAVAILABLE for _ in range(h)]],
                         {MapPointResource.CHEST: [MapCoordinate(w - 1, h - 1)]})
+
+    def test_point_shape_mismatch(self):
+        w = MapTemplate.MIN_WIDTH + 2
+        h = MapTemplate.MIN_HEIGHT + 2
+
+        with self.assertRaises(MapShapeMismatchError):
+            MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h)] for _ in range(w - 1)], {})
+
+        with self.assertRaises(MapShapeMismatchError):
+            MapTemplate(w, h, [[MapPointStatus.PLAYER for _ in range(h - 1)] for _ in range(w)], {})
 
     def test_res_out_of_map(self):
         w = MapTemplate.MIN_WIDTH

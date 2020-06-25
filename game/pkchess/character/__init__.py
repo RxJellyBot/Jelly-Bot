@@ -1,2 +1,3 @@
 from .base import CharacterTemplate
-from .mdls import Character
+from .obj import Character
+from .mdls import CharacterModel

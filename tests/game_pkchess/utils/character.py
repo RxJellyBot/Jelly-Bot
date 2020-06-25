@@ -1,5 +1,5 @@
-from game.pkchess.utils.character import is_character_exists, get_character, get_character_name
-from game.pkchess.res import characters
+from game.pkchess.utils.character import is_character_exists, get_character_template, get_character_name
+from game.pkchess.res import character_templates
 
 from tests.base import TestCase
 
@@ -23,16 +23,16 @@ class TestCharacterUtils(TestCase):
         self.assertEqual(get_character_name("NeArNoX"), "Nearnox")
 
     def test_character_name_not_found(self):
-        self.assertEqual(get_character_name("NeArNoX"), "Nearnox")
+        self.assertIsNone(get_character_name("ABCDEF"))
 
     def test_character_correct_case(self):
-        self.assertEqual(get_character("Nearnox"), characters["nearnox"])
+        self.assertEqual(get_character_template("Nearnox"), character_templates["nearnox"])
 
     def test_character_weird_case(self):
-        self.assertEqual(get_character("NearNox"), characters["nearnox"])
+        self.assertEqual(get_character_template("NearNox"), character_templates["nearnox"])
 
     def test_character_not_found(self):
-        self.assertIsNone(get_character("ABCDEF"))
+        self.assertIsNone(get_character_template("ABCDEF"))
 
     def test_character_empty_string(self):
-        self.assertIsNone(get_character(""))
+        self.assertIsNone(get_character_template(""))

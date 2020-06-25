@@ -59,6 +59,9 @@ pymongo
 # Recording no user ID handling status
 ttldict
 
+# Data processing
+numpy
+
 # Message processing
 jieba
 
