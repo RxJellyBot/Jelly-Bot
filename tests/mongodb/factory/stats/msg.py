@@ -4,7 +4,7 @@ import pytz
 from bson import ObjectId
 
 from flags import MessageType
-from models import MessageRecordModel
+from models import MessageRecordModel, MemberMessageCountEntry
 from mongodb.factory import MessageRecordStatisticsManager
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
@@ -262,28 +262,151 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             set()
         )
 
-    # FIXME: Stats - Starts here
+    def test_get_user_total_msg_count_single_channel(self):
+        self._insert_messages()
 
-    def test_get_user_total_msg_count(self):
-        pass
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(self.CHANNEL_OID)
 
-    def test_get_user_total_msg_count_timerange(self):
-        pass
+        self.assertEqual(result.interval, 3)
 
-    def test_get_user_total_msg_count_param(self):
-        pass
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 4]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 2]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
-    def test_get_user_total_msg_count_timerange_start_before_channel(self):
-        pass
+    def test_get_user_total_msg_count_multi_channel(self):
+        self._insert_messages()
 
-    def test_get_user_total_msg_count_param_start_before_channel(self):
-        pass
+        result = MessageRecordStatisticsManager.get_user_messages_total_count([self.CHANNEL_OID, self.CHANNEL_OID_2])
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 5]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 3]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
+
+    def test_get_user_total_msg_count_start_before_first(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            self.CHANNEL_OID, start=datetime(2020, 5, 1))
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 4]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 2]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
+
+    def test_get_user_total_msg_count_start_after_first(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            self.CHANNEL_OID, start=datetime(2020, 6, 2, tzinfo=pytz.utc))
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 1, 3]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 1, 1]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_total_msg_count_with_tz(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            self.CHANNEL_OID, start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 4]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 2]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_total_msg_count_partial_channel_miss(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            [self.CHANNEL_OID, ObjectId()], start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 4]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 2]
+        self.assertIsNotNone(result.data)
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_total_msg_count_channel_miss(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            ObjectId(), start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 0]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 0]
+        self.assertEqual(result.data, {})
+
+    def test_get_user_total_msg_count_no_data(self):
+        result = MessageRecordStatisticsManager.get_user_messages_total_count(
+            self.CHANNEL_OID, start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+
+        self.assertEqual(result.interval, 3)
+
+        u1 = MemberMessageCountEntry(3)
+        u1.count = [0, 0, 0]
+        u2 = MemberMessageCountEntry(3)
+        u2.count = [0, 0, 0]
+        self.assertEqual(result.data, {})
+
+    # FIXME: Starts here
+
+    def test_get_user_msg_by_category(self):
+        pass
+
+    def test_get_user_msg_by_category_single_channel(self):
+        pass
+
+    def test_get_user_msg_by_category_multi_channel(self):
+        pass
+
+    def test_get_user_msg_by_category_start_before_first(self):
+        pass
+
+    def test_get_user_msg_by_category_start_after_first(self):
+        pass
+
+    def test_get_user_msg_by_category_with_tz(self):
+        pass
+
+    def test_get_user_msg_by_category_partial_channel_miss(self):
+        pass
+
+    def test_get_user_msg_by_category_channel_miss(self):
+        pass
+
+    def test_get_user_msg_by_category_no_data(self):
         pass

@@ -166,8 +166,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
             tzinfo_: Optional[tzinfo] = None) \
             -> MemberMessageCountResult:
         match_d = self._channel_oids_filter(channel_oids)
-        trange = TimeRange(
-            range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
+        trange = TimeRange(range_hr=hours_within, start=start, end=end, range_mult=period_count, tzinfo_=tzinfo_)
 
         self.attach_time_range(match_d, trange=trange)
 

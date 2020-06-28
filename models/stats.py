@@ -377,7 +377,7 @@ class MemberMessageCountResult:
         self.trange = trange
 
         self.interval = interval
-        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
+        self.data: Dict[ObjectId, MemberMessageCountEntry] = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
             uid = d[OID_KEY][MemberMessageCountResult.KEY_MEMBER_ID]
