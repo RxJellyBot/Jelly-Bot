@@ -265,7 +265,7 @@ class MessageStatsDataProcessor:
 
                 cat_count = []
                 CategoryEntry = namedtuple("CategoryEntry", ["count", "percentage"])
-                for cat in msg_result.label_category:
+                for cat in msg_result.LABEL_CATEGORY:
                     ct = data_cat.get_count(cat)
                     cat_count.append(CategoryEntry(count=ct, percentage=ct / sum_ * 100 if sum_ > 0 else 0))
 
@@ -276,10 +276,10 @@ class MessageStatsDataProcessor:
                 )
 
             return UserMessageStats(
-                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
+                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.LABEL_CATEGORY)
         else:
             return UserMessageStats(
-                org_stats=[], msg_count=0, label_category=msg_result.label_category)
+                org_stats=[], msg_count=0, label_category=msg_result.LABEL_CATEGORY)
 
     @staticmethod
     def _get_user_msg_ranking(

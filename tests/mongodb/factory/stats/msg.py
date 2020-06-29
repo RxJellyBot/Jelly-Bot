@@ -4,7 +4,10 @@ import pytz
 from bson import ObjectId
 
 from flags import MessageType
-from models import MessageRecordModel, MemberMessageCountEntry
+from models import (
+    MessageRecordModel, MemberMessageCountEntry
+)
+from models.stats import MemberMessageByCategoryEntry
 from mongodb.factory import MessageRecordStatisticsManager
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
@@ -35,22 +38,22 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
                                MessageType=MessageType.TEXT, MessageContent="QRS", ProcessTimeSecs=7.18),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 6, 2, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID, UserRootOid=self.USER_OID,
-                               MessageType=MessageType.TEXT, MessageContent="DEF", ProcessTimeSecs=3.14),
+                               MessageType=MessageType.IMAGE, MessageContent="DEF", ProcessTimeSecs=3.14),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 6, 2, 1, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID, UserRootOid=self.USER_OID_2,
                                MessageType=MessageType.TEXT, MessageContent="QRS", ProcessTimeSecs=7.18),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 6, 3, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID, UserRootOid=self.USER_OID,
-                               MessageType=MessageType.TEXT, MessageContent="GHI", ProcessTimeSecs=4.15),
+                               MessageType=MessageType.IMAGE, MessageContent="GHI", ProcessTimeSecs=4.15),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 6, 4, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID, UserRootOid=self.USER_OID,
-                               MessageType=MessageType.TEXT, MessageContent="JKL", ProcessTimeSecs=5.16),
+                               MessageType=MessageType.LINE_STICKER, MessageContent="JKL", ProcessTimeSecs=5.16),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 4, 1, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID_2, UserRootOid=self.USER_OID,
                                MessageType=MessageType.TEXT, MessageContent="MNO", ProcessTimeSecs=6.17),
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 4, 1, 1, tzinfo=pytz.utc)),
                                ChannelOid=self.CHANNEL_OID_2, UserRootOid=self.USER_OID_2,
-                               MessageType=MessageType.TEXT, MessageContent="QRS", ProcessTimeSecs=7.18)
+                               MessageType=MessageType.IMAGE, MessageContent="QRS", ProcessTimeSecs=7.18)
         ]
 
         MessageRecordStatisticsManager.insert_many(mdls)
@@ -343,8 +346,7 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
     def test_get_user_total_msg_count_partial_channel_miss(self):
         self._insert_messages()
 
-        result = MessageRecordStatisticsManager.get_user_messages_total_count(
-            [self.CHANNEL_OID, ObjectId()], start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+        result = MessageRecordStatisticsManager.get_user_messages_total_count([self.CHANNEL_OID, ObjectId()])
 
         self.assertEqual(result.interval, 3)
 
@@ -382,31 +384,121 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
         u2.count = [0, 0, 0]
         self.assertEqual(result.data, {})
 
-    # FIXME: Starts here
-
-    def test_get_user_msg_by_category(self):
-        pass
-
     def test_get_user_msg_by_category_single_channel(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(self.CHANNEL_OID)
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.TEXT, 1)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 2)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_multi_channel(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category([self.CHANNEL_OID, self.CHANNEL_OID_2])
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.TEXT, 2)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 2)
+        u2.add(MessageType.IMAGE, 1)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_start_before_first(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(
+            self.CHANNEL_OID, start=datetime(2020, 5, 1))
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.TEXT, 1)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 2)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_start_after_first(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(
+            self.CHANNEL_OID, start=datetime(2020, 6, 2))
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 1)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_with_tz(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(
+            self.CHANNEL_OID, start=datetime(2020, 5, 1, tzinfo=pytz.utc), tzinfo_=pytz.utc)
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.TEXT, 1)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 2)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_partial_channel_miss(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category([self.CHANNEL_OID, ObjectId()])
+
+        u1 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u1.add(MessageType.TEXT, 1)
+        u1.add(MessageType.IMAGE, 2)
+        u1.add(MessageType.LINE_STICKER, 1)
+
+        u2 = MemberMessageByCategoryEntry(result.LABEL_CATEGORY)
+        u2.add(MessageType.TEXT, 2)
+
+        self.assertEqual(result.data[self.USER_OID], u1)
+        self.assertEqual(result.data[self.USER_OID_2], u2)
 
     def test_get_user_msg_by_category_channel_miss(self):
-        pass
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(ObjectId())
+
+        self.assertEqual(result.data, {})
 
     def test_get_user_msg_by_category_no_data(self):
+        result = MessageRecordStatisticsManager.get_user_messages_by_category(ObjectId())
+
+        self.assertEqual(result.data, {})
+
+    # FIXME: Starts here
+
+    def _insert_messages_3(self):
+        pass
+
+    def test_get_hr_avg_msg(self):
         pass

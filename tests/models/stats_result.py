@@ -13,6 +13,7 @@ from models import (
     MeanMessageResultGenerator, MemberDailyMessageResult, CountBeforeTimeResult, MemberMessageCountResult,
     MemberMessageCountEntry, BotFeatureUsageResult, BotFeaturePerUserUsageResult, BotFeatureHourlyAvgResult
 )
+from models.stats import MemberMessageByCategoryEntry
 from strres.models import StatsResults
 from tests.base import TestCase
 
@@ -745,18 +746,18 @@ class TestMemberMessageByCategoryResult(TestCase):
     def get_result_empty():
         return MemberMessageByCategoryResult([])
 
-    def test_data(self):
+    def test_data_no_error(self):
         result = self.get_result()
 
-        self.assertEqual(result.label_category, [
+        self.assertEqual(result.LABEL_CATEGORY, [
             MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
         ])
 
-    def test_empty_data(self):
+    def test_empty_data_no_error(self):
         result = self.get_result_empty()
 
-        self.assertEqual(result.label_category, [
+        self.assertEqual(result.LABEL_CATEGORY, [
             MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
             MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
         ])
@@ -789,6 +790,49 @@ class TestMemberMessageByCategoryResult(TestCase):
         self.assertEqual(mbr.get_count(MessageType.TEXT), 300)
         self.assertEqual(mbr.get_count(MessageType.IMAGE), 400)
         self.assertEqual(mbr.get_count(MessageType.LINE_STICKER), 0)
+
+    def test_entry(self):
+        entry = MemberMessageByCategoryEntry(MemberMessageByCategoryResult.LABEL_CATEGORY)
+
+        self.assertEqual(entry.data, {
+            MessageType.TEXT: 0,
+            MessageType.IMAGE: 0,
+            MessageType.FILE: 0,
+            MessageType.VIDEO: 0,
+            MessageType.AUDIO: 0,
+            MessageType.LINE_STICKER: 0,
+            MessageType.LOCATION: 0
+        })
+
+        entry.add(MessageType.TEXT, 50)
+
+        self.assertEqual(entry.data, {
+            MessageType.TEXT: 50,
+            MessageType.IMAGE: 0,
+            MessageType.FILE: 0,
+            MessageType.VIDEO: 0,
+            MessageType.AUDIO: 0,
+            MessageType.LINE_STICKER: 0,
+            MessageType.LOCATION: 0
+        })
+        self.assertEqual(entry.get_count(MessageType.TEXT), 50)
+        self.assertEqual(entry.get_count(MessageType.IMAGE), 0)
+        self.assertEqual(entry.total, 50)
+
+        entry.add(MessageType.IMAGE, 25)
+
+        self.assertEqual(entry.data, {
+            MessageType.TEXT: 50,
+            MessageType.IMAGE: 25,
+            MessageType.FILE: 0,
+            MessageType.VIDEO: 0,
+            MessageType.AUDIO: 0,
+            MessageType.LINE_STICKER: 0,
+            MessageType.LOCATION: 0
+        })
+        self.assertEqual(entry.get_count(MessageType.TEXT), 50)
+        self.assertEqual(entry.get_count(MessageType.IMAGE), 25)
+        self.assertEqual(entry.total, 75)
 
 
 class TestBotFeatureUsageResult(TestCase):

@@ -175,6 +175,8 @@ class DailyResult(abc.ABC):
         """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
+
+
 # endregion
 
 
@@ -424,13 +426,13 @@ class MemberMessageByCategoryResult:
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor):
-        # Manually listing this to create custom order without additional implementations
-        self.label_category = [
-            MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
-            MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
-        ]
+    # Manually listing this to create custom order without additional implementations
+    LABEL_CATEGORY = [
+        MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
+        MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
+    ]
 
+    def __init__(self, cursor):
         self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
@@ -445,7 +447,7 @@ class MemberMessageByCategoryResult:
             self.data[uid].add(cat, count)
 
     def get_default_data_entry(self):
-        return MemberMessageByCategoryEntry(self.label_category)
+        return MemberMessageByCategoryEntry(self.LABEL_CATEGORY)
 
 
 # endregion

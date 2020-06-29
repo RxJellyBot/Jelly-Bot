@@ -207,10 +207,10 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
     def get_user_messages_by_category(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None) \
+            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: Optional[tzinfo] = None) \
             -> MemberMessageByCategoryResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
         aggr_pipeline = [
             {"$match": match_d},

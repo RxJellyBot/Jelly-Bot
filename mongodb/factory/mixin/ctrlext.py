@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, tzinfo
 from threading import Thread
 from typing import Type, Optional, Tuple, Union, TypeVar
 
@@ -217,7 +217,8 @@ class ControlExtensionMixin(Collection):
     @staticmethod
     def attach_time_range(filter_: dict, *, hours_within: Optional[int] = None,
                           start: Optional[datetime] = None, end: Optional[datetime] = None,
-                          range_mult: Union[int, float] = 1.0, trange: Optional[TimeRange] = None):
+                          range_mult: Union[int, float] = 1.0, tzinfo_: Optional[tzinfo] = None,
+                          trange: Optional[TimeRange] = None):
         """
         Attach parsed time range to ``filter_``.
 
@@ -231,7 +232,8 @@ class ControlExtensionMixin(Collection):
 
         if not trange:
             trange = TimeRange(
-                range_hr=hours_within, start=start, end=end, range_mult=range_mult, end_autofill_now=False)
+                range_hr=hours_within, start=start, end=end, range_mult=range_mult, tzinfo_=tzinfo_,
+                end_autofill_now=False)
 
         gt_oid = dt_to_objectid(trange.start)
         if trange.start and gt_oid:
