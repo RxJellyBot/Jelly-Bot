@@ -231,7 +231,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
             start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             HourlyIntervalAverageMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end, tzinfo_=tzinfo_)
 
         pipeline = [
             {"$match": match_d},

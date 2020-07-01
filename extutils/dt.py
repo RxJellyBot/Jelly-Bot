@@ -32,7 +32,7 @@ def now_utc_aware(*, for_mongo: bool = False) -> datetime:
     :param for_mongo: if this timestamp will be used as a data field of a MongoDB entry
     :return: current tz-aware datetime with timezone set to UTC
     """
-    dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+    dt = timezone.utc.localize(datetime.utcnow())
 
     if for_mongo:
         dt = dt.replace(microsecond=dt.microsecond // 1000 * 1000)
@@ -51,7 +51,7 @@ def make_tz_aware(dt: datetime, tz: timezone = None):
     try:
         return timezone.make_aware(dt, tz)
     except OverflowError:
-        return dt.replace(tzinfo=timezone.utc)
+        return timezone.utc.localize(dt)
 
 
 def is_tz_naive(dt: datetime) -> bool:
@@ -96,7 +96,7 @@ def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datet
 
     # Attach timezone if needed
     if is_tz_naive(dt):
-        dt = dt.replace(tzinfo=tzinfo_ or timezone.utc)
+        dt = make_tz_aware(dt, tzinfo_ or timezone.utc)
 
     return dt
 

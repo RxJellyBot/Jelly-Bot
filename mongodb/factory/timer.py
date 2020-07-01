@@ -8,7 +8,7 @@ from models import TimerModel, TimerListResult, OID_KEY
 from mongodb.factory.results import WriteOutcome
 from extutils.checker import arg_type_ensure
 from extutils.locales import UTC
-from extutils.dt import is_tz_naive, now_utc_aware
+from extutils.dt import is_tz_naive, now_utc_aware, make_tz_aware
 from JellyBot.systemconfig import Bot
 
 from ._base import BaseCollection
@@ -34,7 +34,7 @@ class _TimerManager(BaseCollection):
         """`target_time` is recommended to be tz-aware. Tzinfo will be forced to be UTC if tz-naive."""
         # Force target time to be tz-aware in UTC
         if is_tz_naive(target_time):
-            target_time = target_time.replace(tzinfo=UTC.to_tzinfo())
+            target_time = make_tz_aware(target_time, UTC.to_tzinfo())
 
         mdl = TimerModel(
             ChannelOid=ch_oid, Keyword=keyword, Title=title, TargetTime=target_time,
@@ -42,7 +42,7 @@ class _TimerManager(BaseCollection):
 
         if not countup:
             mdl.deletion_time = target_time + timedelta(days=Bot.Timer.AutoDeletionDays)
-            mdl.deletion_time = mdl.deletion_time.replace(tzinfo=target_time.tzinfo)
+            mdl.deletion_time = make_tz_aware(mdl.deletion_time, target_time.tzinfo)
 
         outcome, ex = self.insert_one_model(mdl)
 

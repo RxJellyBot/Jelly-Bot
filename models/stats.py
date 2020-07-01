@@ -195,7 +195,7 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
         self.label_hr = [i for i in range(24)]
 
         count_data = {}
-        count_sum = [0 for __ in range(24)]
+        count_sum = [0 for _ in range(24)]
 
         for d in cursor:
             ctg = MessageType.cast(d[OID_KEY][HourlyIntervalAverageMessageResult.KEY_CATEGORY])
@@ -208,15 +208,6 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
             count_data[ctg][hr] = count
             count_sum[hr] += count
 
-        count_data = [
-            CountDataEntry(
-                category_name=cat.key,
-                data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
-                color="#777777",
-                hidden="true"  # Will be used in JS so string of bool instead
-            )
-            for cat, data in count_data.items()
-        ]
         count_sum = [
             CountDataEntry(
                 category_name=StatsResults.CATEGORY_TOTAL,
@@ -224,6 +215,15 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
                 color="#323232",
                 hidden="false"  # Will be used in JS so string of bool instead
             )
+        ]
+        count_data = [
+            CountDataEntry(
+                category_name=cat.key,
+                data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
+                color="#777777",
+                hidden="true"  # Will be used in JS so string of bool instead
+            )
+            for cat, data in sorted(count_data.items(), key=lambda item: item[0].code)
         ]
 
         self.data = count_sum + count_data
