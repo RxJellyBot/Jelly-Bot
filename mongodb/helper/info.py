@@ -30,7 +30,10 @@ class MemberInfoEntry:
 
     @property
     def last_message_at_str(self):
-        return self.last_message_at.strftime("%Y-%m-%d %H:%M:%S")
+        if self.last_message_at:
+            return self.last_message_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        return "N/A"
 
 
 class InfoProcessor:
