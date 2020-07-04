@@ -42,10 +42,10 @@ def _generate_character_icons(colors: List[Tuple[int, int, int]]) -> (List[Image
 ICON_PLAYER_DEFAULT = Image.open("game/pkchess/res/mapobj/player.png")
 ICON_PLAYER_DEFAULT_COLOR = (128, 128, 128)
 ICON_PLAYER_COLORS = [
-    (0, 38, 255),
-    (224, 163, 0),
-    (255, 106, 0),
-    (76, 255, 0)
+    (0, 38, 255),  # 1P - Blue
+    (224, 163, 0),  # 2P - Golden Yellow
+    (255, 106, 0),  # 3P - Orange
+    (76, 255, 0)  # 4P - Lighter Green
 ]
 ICON_PLAYER_IDX, ICON_PLAYER_IDX_CURRENT = _generate_character_icons(ICON_PLAYER_COLORS)
 ICON_CHEST = Image.open("game/pkchess/res/mapobj/chest.png")
@@ -58,8 +58,37 @@ class MapPointUnitDrawer:
 
     PADDING = 2
 
+    HP_AREA_HEIGHT = 3
+    HP_BAR_COLOR = [
+        (0, 255, 0),  # >60% - Green
+        (255, 255, 0),  # >30% & <= 60% - Yellow
+        (255, 0, 0)  # <= 30% - Red
+    ]
+
     OUTLINE_COLOR = (50, 50, 50)
     OUTLINE_WIDTH = 2
+
+    @classmethod
+    def _get_hp_fill_color(cls, map_point: MapPoint):
+        hp_ratio = map_point.obj.hp_ratio
+
+        if hp_ratio < 0.3:
+            return cls.HP_BAR_COLOR[2]
+
+        if 0.3 < hp_ratio <= 0.6:
+            return cls.HP_BAR_COLOR[1]
+
+        return cls.HP_BAR_COLOR[0]
+
+    @classmethod
+    def draw_hp_bar(cls, img: Image.Image, map_point: MapPoint):
+        bar_lt_x = map_point.coord.X * cls.SIZE + cls.PADDING * 2
+        bar_lt_y = map_point.coord.Y * cls.SIZE + cls.PADDING * 2
+        bar_rb_x = (map_point.coord.X + 1) * cls.SIZE - cls.PADDING * 2
+        bar_rb_y = bar_lt_y + cls.HP_AREA_HEIGHT
+
+        ImageDraw.Draw(img).rectangle([(bar_lt_x, bar_lt_y), (bar_rb_x, bar_rb_y)],
+                                      fill=cls._get_hp_fill_color(map_point))
 
     @classmethod
     def draw_unavailable(cls, img: Image.Image, map_point: MapPoint):
@@ -75,19 +104,21 @@ class MapPointUnitDrawer:
 
     @classmethod
     def draw_monster(cls, img: Image.Image, map_point: MapPoint):
-        # TODO: Game - draw HP
         img.paste(ICON_MONSTER, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
+
+        if map_point.obj is not None:
+            cls.draw_hp_bar(img, map_point)
 
     @classmethod
     def draw_field_boss(cls, img: Image.Image, map_point: MapPoint):
-        # TODO: Game - draw HP
         img.paste(ICON_BOSS, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
+
+        if map_point.obj is not None:
+            cls.draw_hp_bar(img, map_point)
 
     @classmethod
     def draw_player(cls, img: Image.Image, map_point: MapPoint, player_location: Dict[ObjectId, MapCoordinate],
                     player_idx_dict: Dict[ObjectId, int] = None, current_idx: Optional[int] = None):
-        # TODO: Game - draw HP
-
         # Draw default icon if no index information is given
         if player_idx_dict is None or current_idx is None:
             img.paste(ICON_PLAYER_DEFAULT, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
@@ -116,6 +147,9 @@ class MapPointUnitDrawer:
             # Draw normal player icon with index
             img.paste(ICON_PLAYER_IDX[player_idx],
                       cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
+
+        if map_point.obj is not None:
+            cls.draw_hp_bar(img, map_point)
 
     @classmethod
     def get_coord_on_image(cls, point_coord: MapCoordinate, *, with_padding: bool = True) \

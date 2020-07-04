@@ -8,7 +8,7 @@ __all__ = ["TestBattleObject"]
 
 @dataclass
 class MockedBattleObject(BattleObject):
-    def __post_init__(self):
+    def _init(self):
         self.name = "ABC"
 
         self.HP = 999
@@ -62,6 +62,19 @@ class TestBattleObject(TestCase):
 
         self.assertEqual(obj.HP, 0)
         self.assertFalse(obj.is_alive)
+
+    def test_hp_ratio(self):
+        obj = MockedBattleObject()
+
+        self.assertEqual(obj.hp_ratio, 1)
+
+        obj.decrease_hp(500)
+
+        self.assertEqual(obj.hp_ratio, 499 / 999)
+
+        obj.decrease_hp(499)
+
+        self.assertEqual(obj.hp_ratio, 0)
 
     def test_is_alive(self):
         obj = MockedBattleObject()

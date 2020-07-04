@@ -4,6 +4,8 @@ from game.pkchess.controller import GameController
 from game.pkchess.flags import (
     GameCreationResult, GameReadyResult, GameStartResult, GameMapSetResult, PlayerActionResult
 )
+from game.pkchess.game import PendingGame
+from game.pkchess.map import Map
 from game.pkchess.utils.map2image import MapImageGenerator
 from tests.base import TestCase
 
@@ -16,6 +18,9 @@ class TestMainGameFlow(TestCase):
     PLAYER_OID_3 = ObjectId()
 
     def test_expected_flow(self):
+        PendingGame.RANDOM.seed(87)
+        Map.RANDOM.seed(87)  # Stabilize the deployed player location
+
         self.assertEqual(
             GameController.join_pending_game(self.CHANNEL_OID, self.PLAYER_OID_1, "Nearnox"),
             GameCreationResult.O_CREATED
@@ -44,7 +49,7 @@ class TestMainGameFlow(TestCase):
             GameController.player_move(
                 self.CHANNEL_OID,
                 GameController.get_running_game(self.CHANNEL_OID).current_player.player_oid,
-                1, 0
+                -1, 0
             ),
             PlayerActionResult.O_ACTED
         )

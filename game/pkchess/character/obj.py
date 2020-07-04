@@ -15,7 +15,7 @@ class Character(BattleObject):
 
     EXP: int = 0
 
-    def __post_init__(self):
+    def _init(self):
         self.name = self.template.name
 
         self.HP = self.template.HP
