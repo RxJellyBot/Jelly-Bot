@@ -1,4 +1,4 @@
-import random
+from random import Random
 from dataclasses import dataclass, field
 from typing import Optional, Dict
 
@@ -9,12 +9,13 @@ from game.pkchess.exception import GameNotReadyError
 from game.pkchess.map import MapTemplate
 from .main import RunningGame
 from .player import PlayerEntry
+from .base import Game
 
 __all__ = ["PendingGame"]
 
 
 @dataclass
-class PendingGame:
+class PendingGame(Game):
     """
     Object representing a pending game.
 
@@ -23,7 +24,8 @@ class PendingGame:
     For a pending game to be ready to start,
     the game should have 2+ players and decide the map to play.
     """
-    channel_oid: ObjectId
+    RANDOM = Random()
+
     players: Dict[ObjectId, PlayerEntry] = field(default_factory=dict)  # key is the player's OID
     map_template: Optional[MapTemplate] = None
 
@@ -103,7 +105,7 @@ class PendingGame:
             raise GameNotReadyError()
 
         players = list(self.players.values())
-        random.shuffle(players)
+        self.RANDOM.shuffle(players)
 
         return RunningGame(
             self.channel_oid,

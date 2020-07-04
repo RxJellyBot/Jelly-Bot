@@ -75,15 +75,19 @@ class MapPointUnitDrawer:
 
     @classmethod
     def draw_monster(cls, img: Image.Image, map_point: MapPoint):
+        # TODO: Game - draw HP
         img.paste(ICON_MONSTER, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
 
     @classmethod
     def draw_field_boss(cls, img: Image.Image, map_point: MapPoint):
+        # TODO: Game - draw HP
         img.paste(ICON_BOSS, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])
 
     @classmethod
     def draw_player(cls, img: Image.Image, map_point: MapPoint, player_location: Dict[ObjectId, MapCoordinate],
                     player_idx_dict: Dict[ObjectId, int] = None, current_idx: Optional[int] = None):
+        # TODO: Game - draw HP
+
         # Draw default icon if no index information is given
         if player_idx_dict is None or current_idx is None:
             img.paste(ICON_PLAYER_DEFAULT, cls.get_coord_on_image(map_point.coord, with_padding=False)[0])

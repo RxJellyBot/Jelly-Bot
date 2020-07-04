@@ -1,6 +1,6 @@
-import random
+from random import Random
 from dataclasses import dataclass, InitVar
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional, Set, Tuple, Iterable
 
 from bson import ObjectId
 
@@ -8,7 +8,8 @@ from game.pkchess.character import Character
 from game.pkchess.exception import (
     MapTooFewPointsError, MapDimensionTooSmallError, MapShapeMismatchError, MapTooManyPlayersError,
     MapPointUnspawnableError, SpawnPointOutOfMapError, NoPlayerSpawnPointError, UnknownResourceTypeError,
-    CoordinateOutOfBoundError, GamePlayerNotFoundError, MoveDestinationOutOfMapError
+    CoordinateOutOfBoundError, GamePlayerNotFoundError, MoveDestinationOutOfMapError, CenterOutOfMapError,
+    PathNotFoundError, PathSameDestinationError, PathEndOutOfMapError
 )
 from game.pkchess.flags import MapPointStatus, MapPointResource
 from game.pkchess.objbase import BattleObject
@@ -26,24 +27,30 @@ class MapCoordinate:
     X: int
     Y: int
 
-    def apply_offset(self, x_offset: int, y_offset: int) -> ('MapCoordinate', 'MapCoordinate'):
+    def apply_offset(self, x_offset: int, y_offset: int) -> 'MapCoordinate':
         """
-        Return a 2-tuple which
-            the **1st** element is the original coordiate (this object).
+        Return a new coordinate object which the offsets are applied.
 
-            the **2nd** element is the new coordinate with the offsets applied.
+        Note that ``y_offset`` will be reversed to reflect the correct coordinate on the map.
+
+        > Map coordinate starts from left-top side. Right to increase X; **DOWN** to increase Y.
+
+        > However, offset starts from center. Right to increase X; **UP** to increase Y.
 
         :param x_offset: offset for X
         :param y_offset: offset for Y
-        :return: a 2-tuple which the first is the original coordinate and the second is the new coordinate
+        :return: new offset-applied coordinate
         :raises CoordinateOutOfBoundError: if the new coordinate will be negative value after applying the offsets
         """
-        new_obj = MapCoordinate(self.X + x_offset, self.Y + y_offset)
+        new_obj = MapCoordinate(self.X + x_offset, self.Y - y_offset)
 
         if new_obj.X < 0 or new_obj.Y < 0:
             raise CoordinateOutOfBoundError()
 
-        return self, new_obj
+        return new_obj
+
+    def distance(self, other: 'MapCoordinate'):
+        return abs(self.X - other.X) + abs(self.Y - other.Y)
 
     def __hash__(self):
         return hash((self.X, self.Y))
@@ -207,6 +214,8 @@ class Map:
 
     If both ``player_location`` and ``players`` are given, ``players`` will be ignored.
     """
+    RANDOM = Random()
+
     width: int
     height: int
     points: List[List[MapPoint]]
@@ -236,8 +245,8 @@ class Map:
             # --- Cast to list to use `random.shuffle()` because dict and set usually is somehow ordered
             players = list(players.items())
             player_coords: List[MapCoordinate] = list(player_coords)
-            random.shuffle(player_coords)
-            random.shuffle(players)
+            self.RANDOM.shuffle(player_coords)
+            self.RANDOM.shuffle(players)
             while players:
                 player_oid, player_character = players.pop()
                 coord = player_coords.pop()
@@ -256,7 +265,7 @@ class Map:
             for coord in empty_player_coords:
                 self.points[coord.X][coord.Y].status = MapPointStatus.EMPTY
 
-    def player_move(self, player_oid: ObjectId, x_offset: int, y_offset: int) -> bool:
+    def player_move(self, player_oid: ObjectId, x_offset: int, y_offset: int, max_move: int) -> bool:
         """
         Move the player using the given coordinate offset.
 
@@ -265,9 +274,11 @@ class Map:
         :param player_oid: OID of the player
         :param x_offset: offset of X
         :param y_offset: offset of Y
+        :param max_move: maximum count of the moves allowed
         :return: if the movement succeed
         :raises GamePlayerNotFoundError: the player to be moved not found
         :raises MoveDestinationOutOfMapError: movement destination is out of map
+        :raises PathNotFoundError: path from the player's location to the destination not found
         """
         # Check player existence
         if player_oid not in self.player_location:
@@ -275,32 +286,143 @@ class Map:
 
         # Apply the movement offset
         try:
-            original, new = self.player_location[player_oid].apply_offset(x_offset, y_offset)
+            origin = self.player_location[player_oid]
+            destination = self.player_location[player_oid].apply_offset(x_offset, y_offset)
         except CoordinateOutOfBoundError:
             raise MoveDestinationOutOfMapError()
 
-        # Check if the new coordinate is out of map. Revert if this is true
-        if new.X >= self.width or new.Y >= self.height:
+        # Check if the new coordinate is out of map
+        if destination.X >= self.width or destination.Y >= self.height:
             raise MoveDestinationOutOfMapError()
 
-        original_point = self.points[original.X][original.Y]
-        new_point = self.points[new.X][new.Y]
+        original_point = self.points[origin.X][origin.Y]
+        new_point = self.points[destination.X][destination.Y]
 
-        # Check if the new coordinate is not empty. Revert if this is true
+        # Check if the new coordinate is not empty
         if new_point.status != MapPointStatus.EMPTY:
             return False
 
+        # Check if the path is connected and the destination is empty
+        if not self.get_shortest_path(origin, destination, max_move):
+            raise PathNotFoundError(origin, destination)
+
         # Move the player & update related variables
-        self.player_location[player_oid] = new
+        self.player_location[player_oid] = destination
 
         new_point.obj = original_point.obj
         new_point.status = MapPointStatus.PLAYER
         original_point.obj = None
-        original_point.status = self.template.points[original.X][original.Y]
+        original_point.status = self.template.points[origin.X][origin.Y]
         if original_point.status == MapPointStatus.PLAYER:
             original_point.status = MapPointStatus.EMPTY
 
         return True
+
+    def get_shortest_path(self, origin: MapCoordinate, destination: MapCoordinate, max_length: int) \
+            -> Optional[List[MapCoordinate]]:
+        """
+        Get the first-found shortest path from ``origin`` to ``destination``.
+
+        ``max_length`` must be a positive integer. (No runtime check)
+
+        Returns ``None`` if
+
+        - the point status of ``destination`` is not ``MapPointStatus.EMPTY``.
+
+        - the path is not found.
+
+        - the path length is longer than ``max_length`` but not yet reached the ``destination``.
+
+        :param origin: origin of the path
+        :param destination: desired destination
+        :param max_length: max length of the path
+        :return: path from `origin` to `destination` if found. `None` on not found
+        :raises PathSameDestinationError: if `origin` and `destination` are the same
+        """
+        if origin == destination:
+            raise PathSameDestinationError()
+
+        origin_out_of_map = origin.X >= self.width or origin.Y > self.height
+        destination_out_of_map = destination.X >= self.width or destination.Y > self.height
+        if origin_out_of_map or destination_out_of_map:
+            raise PathEndOutOfMapError(origin, destination, self.width, self.height)
+
+        # Check if the destination point is not empty
+        if self.points[destination.X][destination.Y].status != MapPointStatus.EMPTY:
+            return None
+
+        return self._get_shortest_path(origin, destination, max_length, [[origin]])
+
+    def _path_constructible(self, path: List[MapCoordinate], new_path_tail: MapCoordinate, destination: MapCoordinate):
+        if new_path_tail.X >= self.width or new_path_tail.Y >= self.height:
+            return False
+
+        tail = path[-1]
+
+        original_distance = tail.distance(destination)
+        new_distance = new_path_tail.distance(destination)
+
+        not_on_path = new_path_tail not in path
+        distance_le = new_distance <= original_distance
+        point_empty = self.points[new_path_tail.X][new_path_tail.Y].status == MapPointStatus.EMPTY
+
+        return not_on_path and distance_le and point_empty
+
+    def _get_shortest_path(self, origin: MapCoordinate, destination: MapCoordinate, max_length: int,
+                           paths: List[List[MapCoordinate]] = None) -> Optional[List[MapCoordinate]]:
+        """
+        Helper method of ``self.get_shortest_path()``.
+        """
+        new_paths = []
+        for path in paths:
+            # Extend every path to left, right, up, down
+
+            # Terminate if the current path without adding the new point is longer than allowed
+            if len(path) > max_length:
+                return None
+
+            tail = path[-1]
+
+            new_pts = [
+                tail.apply_offset(1, 0),  # right
+                tail.apply_offset(-1, 0),  # left
+                tail.apply_offset(0, 1),  # up
+                tail.apply_offset(0, -1)  # down
+            ]
+
+            for new_pt in new_pts:
+                if self._path_constructible(path, new_pt, destination):
+                    if new_pt == destination:
+                        return path + [new_pt]
+
+                    new_paths.append(path + [new_pt])
+
+        if not new_paths:
+            # Dead-end, returns `None`
+            return None
+        else:
+            # Search deeper
+            return self._get_shortest_path(origin, destination, max_length, new_paths)
+
+    def get_points(self, center: MapCoordinate, offsets: Iterable[Tuple[int, int]]) -> List[MapPoint]:
+        if center.X >= self.width or center.X < 0 or center.Y >= self.height or center.Y < 0:
+            raise CenterOutOfMapError()
+
+        pt_coord = []
+        for offset_x, offset_y in offsets:
+            try:
+                new_coord = center.apply_offset(offset_x, offset_y)
+            except CoordinateOutOfBoundError:
+                continue
+
+            if new_coord.X >= self.width or new_coord.Y >= self.height:
+                continue
+
+            pt_coord.append(new_coord)
+
+        pts = [self.points[coord.X][coord.Y] for coord in pt_coord]
+
+        return pts
 
     @property
     def points_flattened(self) -> List[MapPoint]:

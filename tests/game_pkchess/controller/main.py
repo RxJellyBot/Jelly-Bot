@@ -6,10 +6,10 @@ from game.pkchess.character import Character
 from game.pkchess.controller import GameController
 from game.pkchess.flags import (
     GameCreationResult, GameMapSetResult, GameReadyResult, GameStartResult, PlayerActionResult,
-    MapPointStatus, MapPointResource
+    MapPointStatus, MapPointResource, SkillDirection
 )
 from game.pkchess.game import PlayerEntry, RunningGame
-from game.pkchess.map import MapTemplate, MapCoordinate
+from game.pkchess.map import MapTemplate, MapCoordinate, Map
 from game.pkchess.res import get_map_template
 from game.pkchess.utils.character import get_character_template
 from mixin import ClearableMixin
@@ -23,9 +23,6 @@ class TestGameController(TestCase):
 
     PLAYER_OID_1 = ObjectId()
     PLAYER_OID_2 = ObjectId()
-
-    PLAYER_ENTRY_1 = PlayerEntry(PLAYER_OID_1, Character(get_character_template("Nearnox")), True)
-    PLAYER_ENTRY_2 = PlayerEntry(PLAYER_OID_2, Character(get_character_template("Nearnox")), True)
 
     TEMPLATE = MapTemplate(
         2, 3,
@@ -78,14 +75,19 @@ class TestGameController(TestCase):
             )
 
     def _start_game(self):
+        Map.RANDOM.seed(87)
+
+        entry_1 = PlayerEntry(self.PLAYER_OID_1, Character(get_character_template("Nearnox")), True)
+        entry_2 = PlayerEntry(self.PLAYER_OID_2, Character(get_character_template("Nearnox")), True)
+
         GameController.set_running_game(
             self.CHANNEL_OID,
             RunningGame(
-                self.CHANNEL_OID, self.TEMPLATE.to_map(
-                    player_location={self.PLAYER_OID_1: MapCoordinate(1, 1),
-                                     self.PLAYER_OID_2: MapCoordinate(0, 2)}
+                self.CHANNEL_OID,
+                self.TEMPLATE.to_map(
+                    players={self.PLAYER_OID_1: entry_1.character, self.PLAYER_OID_2: entry_2.character}
                 ),
-                [self.PLAYER_ENTRY_1, self.PLAYER_ENTRY_2]
+                [entry_1, entry_2]
             )
         )
 
@@ -239,6 +241,24 @@ class TestGameController(TestCase):
         )
         self.assertTrue(self.PLAYER_OID_2 not in GameController.get_pending_game(self.CHANNEL_OID).players)
 
+    def test_start_game(self):
+        self._create_game()
+        self.assertEqual(GameController.start_game(self.CHANNEL_OID), GameStartResult.O_STARTED)
+
+        game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertIsNotNone(game)
+        self.assertEqual(game.channel_oid, self.CHANNEL_OID)
+        self.assertEqual(
+            set(game.players),
+            {
+                PlayerEntry(self.PLAYER_OID_1, Character(get_character_template("Nearnox")), True),
+                PlayerEntry(self.PLAYER_OID_2, Character(get_character_template("Nearnox")), True)
+            }
+        )
+        self.assertEqual(game.current_idx, 0)
+        self.assertEqual(len(game.map.player_location), 2)
+        self.assertEqual(sum(map(lambda pt: pt.status == MapPointStatus.PLAYER, game.map.points_flattened)), 2)
+
     def test_start_game_not_ready(self):
         self._create_game(ready=False)
 
@@ -258,35 +278,32 @@ class TestGameController(TestCase):
         self._create_game(map_decided=False)
         self.assertEqual(GameController.start_game(self.CHANNEL_OID), GameStartResult.X_GAME_NOT_READY)
 
-    def test_start_game(self):
-        self._create_game()
-        self.assertEqual(GameController.start_game(self.CHANNEL_OID), GameStartResult.O_STARTED)
+    def test_player_move(self):
+        self._start_game()
 
-        game = GameController.get_running_game(self.CHANNEL_OID)
-        self.assertIsNotNone(game)
-        self.assertEqual(game.channel_oid, self.CHANNEL_OID)
         self.assertEqual(
-            set(game.players),
-            {
-                PlayerEntry(self.PLAYER_OID_1, Character(get_character_template("Nearnox")), True),
-                PlayerEntry(self.PLAYER_OID_2, Character(get_character_template("Nearnox")), True)
-            }
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
+            PlayerActionResult.O_ACTED
         )
-        self.assertEqual(game.current_idx, 0)
-        self.assertEqual(len(game.map.player_location), 2)
-        self.assertEqual(sum(map(lambda pt: pt.status == MapPointStatus.PLAYER, game.map.points_flattened)), 2)
+        self.assertEqual(
+            GameController.get_running_game(self.CHANNEL_OID).map.player_location[self.PLAYER_OID_1],
+            MapCoordinate(1, 2)
+        )
+
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertEqual(current_game.map.points[1][2].obj, current_game.current_player.character)
 
     def test_player_move_pending(self):
         self._create_game()
 
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, 1),
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
             PlayerActionResult.X_GAME_NOT_STARTED
         )
 
     def test_player_move_game_not_found(self):
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, 1),
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
             PlayerActionResult.X_GAME_NOT_FOUND
         )
 
@@ -294,19 +311,19 @@ class TestGameController(TestCase):
         self._start_game()
 
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, 1),
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
             PlayerActionResult.O_ACTED
         )
         self.assertEqual(
             GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
-            PlayerActionResult.X_ALREADY_MOVED
+            PlayerActionResult.X_ALREADY_PERFORMED
         )
 
     def test_player_move_player_not_in_game(self):
         self._start_game()
 
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, ObjectId(), 0, 1),
+            GameController.player_move(self.CHANNEL_OID, ObjectId(), 0, -1),
             PlayerActionResult.X_PLAYER_NOT_EXISTS
         )
 
@@ -314,7 +331,7 @@ class TestGameController(TestCase):
         self._start_game()
 
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_2, 0, 1),
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_2, 0, -1),
             PlayerActionResult.X_PLAYER_NOT_CURRENT
         )
 
@@ -325,14 +342,26 @@ class TestGameController(TestCase):
             GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 99, 99),
             PlayerActionResult.X_TOO_MANY_MOVES
         )
+        self.assertEqual(
+            GameController.get_running_game(self.CHANNEL_OID).map.player_location[self.PLAYER_OID_1],
+            MapCoordinate(1, 1)
+        )
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertEqual(current_game.map.points[1][1].obj, current_game.current_player.character)
 
     def test_player_move_destination_not_empty(self):
         self._start_game()
 
         self.assertEqual(
-            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, -1, 0),
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, 1),
             PlayerActionResult.X_DESTINATION_NOT_EMPTY
         )
+        self.assertEqual(
+            GameController.get_running_game(self.CHANNEL_OID).map.player_location[self.PLAYER_OID_1],
+            MapCoordinate(1, 1)
+        )
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertEqual(current_game.map.points[1][1].obj, current_game.current_player.character)
 
     def test_player_move_out_of_map(self):
         self._start_game()
@@ -345,3 +374,130 @@ class TestGameController(TestCase):
             GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 2, 0),
             PlayerActionResult.X_DESTINATION_OUT_OF_MAP
         )
+        self.assertEqual(
+            GameController.get_running_game(self.CHANNEL_OID).map.player_location[self.PLAYER_OID_1],
+            MapCoordinate(1, 1)
+        )
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertEqual(current_game.map.points[1][1].obj, current_game.current_player.character)
+
+    def test_player_move_path_not_connected(self):
+        self._start_game()
+
+        self.assertEqual(
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, -1, 1),
+            PlayerActionResult.X_MOVE_PATH_NOT_FOUND
+        )
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+        self.assertEqual(current_game.map.points[1][1].obj, current_game.current_player.character)
+
+    def test_player_skill(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_damage(self):
+        self._start_game()
+
+        self.assertEqual(
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
+            PlayerActionResult.O_ACTED
+        )
+
+        current_game = GameController.get_running_game(self.CHANNEL_OID)
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.LEFT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertGreater(len(dmgs), 0)
+        self.assertEqual(dmgs[0].source, current_game.get_player_by_oid(self.PLAYER_OID_1).character)
+        self.assertEqual(dmgs[0].target, current_game.get_player_by_oid(self.PLAYER_OID_2).character)
+        self.assertTrue(dmgs[0].is_dealt)
+        self.assertNotEqual(
+            current_game.get_player_by_oid(self.PLAYER_OID_2).character.HP,
+            get_character_template("Nearnox").HP
+        )
+
+    def test_player_skill_damage_out_of_map(self):
+        self._start_game()
+
+        self.assertEqual(
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, -1),
+            PlayerActionResult.O_ACTED
+        )
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.DOWN)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_twice(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_pending(self):
+        self._create_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_GAME_NOT_STARTED)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_game_not_found(self):
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_GAME_NOT_FOUND)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_already_skilled(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.O_ACTED)
+        self.assertEqual(dmgs, [])
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_ALREADY_PERFORMED)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_player_not_in_game(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, ObjectId(), 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_PLAYER_NOT_EXISTS)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_player_not_current(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_2, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_PLAYER_NOT_CURRENT)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_player_idx_out_of_bound(self):
+        self._start_game()
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 999, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_SKILL_IDX_OUT_OF_BOUND)
+        self.assertEqual(dmgs, [])
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, -1, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_SKILL_IDX_OUT_OF_BOUND)
+        self.assertEqual(dmgs, [])
+
+    def test_player_skill_player_skill_not_found(self):
+        self._start_game()
+
+        GameController.get_running_game(self.CHANNEL_OID).current_player.character.skill_ids.insert(0, 0)
+
+        result, dmgs = GameController.player_skill(self.CHANNEL_OID, self.PLAYER_OID_1, 0, SkillDirection.RIGHT)
+        self.assertEqual(result, PlayerActionResult.X_SKILL_NOT_FOUND)
+        self.assertEqual(dmgs, [])

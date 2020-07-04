@@ -1,5 +1,5 @@
 __all__ = ["GameError", "GamePreparationError", "GameActionError", "GameNotReadyError", "GameActionSubmittedError",
-           "MoveDestinationOutOfMapError", "GamePlayerNotFoundError"]
+           "MoveDestinationOutOfMapError", "GamePlayerNotFoundError", "GamePlayerInsufficientError"]
 
 from abc import ABC
 
@@ -9,6 +9,10 @@ class GameError(ABC, Exception):
 
 
 class GamePlayerNotFoundError(GameError):
+    pass
+
+
+class GamePlayerInsufficientError(GameError):
     pass
 
 

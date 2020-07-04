@@ -1,19 +1,19 @@
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from bson import ObjectId
 
-from game.pkchess.exception import GameActionSubmittedError
+from game.pkchess.exception import GameActionSubmittedError, GamePlayerInsufficientError
 from game.pkchess.flags import PlayerAction
 from game.pkchess.map import Map
 from .player import PlayerEntry
+from .base import Game
 
 __all__ = ["RunningGame"]
 
 
 @dataclass
-class RunningGame:
-    channel_oid: ObjectId
+class RunningGame(Game):
     map: Map
     players: List[PlayerEntry]
 
@@ -22,6 +22,9 @@ class RunningGame:
     current_action_performed: Dict[PlayerAction, bool] = field(init=False)
 
     def __post_init__(self):
+        if len(self.players) < 2:
+            raise GamePlayerInsufficientError()
+
         self.current_action_performed = {action: False for action in PlayerAction}
 
     @property
@@ -46,3 +49,10 @@ class RunningGame:
 
         # Reset action performed status
         self.current_action_performed = {action: False for action in PlayerAction}
+
+    def get_player_by_oid(self, player_oid: ObjectId) -> Optional[PlayerEntry]:
+        for player in self.players:
+            if player.player_oid == player_oid:
+                return player
+
+        return None
