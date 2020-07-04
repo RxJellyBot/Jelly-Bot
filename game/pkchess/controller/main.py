@@ -203,6 +203,8 @@ class GameController(ClearableMixin):
 
         - :class:`PlayerActionResult.X_TOO_MANY_MOVES`
 
+        - :class:`PlayerActionResult.X_NOT_MOVED`
+
         - :class:`PlayerActionResult.X_DESTINATION_NOT_EMPTY`
 
         - :class:`PlayerActionResult.X_DESTINATION_OUT_OF_MAP`
@@ -222,6 +224,9 @@ class GameController(ClearableMixin):
             return pre_check_result
 
         action, game = pre_check_result
+
+        if x_offset == 0 and y_offset == 0:
+            return PlayerActionResult.X_NOT_MOVED
 
         if x_offset + y_offset > game.current_player.character.MOV:
             return PlayerActionResult.X_TOO_MANY_MOVES

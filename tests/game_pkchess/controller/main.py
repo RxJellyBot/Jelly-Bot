@@ -319,6 +319,14 @@ class TestGameController(TestCase):
             PlayerActionResult.X_ALREADY_PERFORMED
         )
 
+    def test_player_move_not_moved(self):
+        self._start_game()
+
+        self.assertEqual(
+            GameController.player_move(self.CHANNEL_OID, self.PLAYER_OID_1, 0, 0),
+            PlayerActionResult.X_NOT_MOVED
+        )
+
     def test_player_move_player_not_in_game(self):
         self._start_game()
 
