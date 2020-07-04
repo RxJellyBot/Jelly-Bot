@@ -249,7 +249,9 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
         return HourlyIntervalAverageMessageResult(
             list(self.aggregate(pipeline)),
-            HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=start, end=end))
+            HourlyResult.data_days_collected(self, match_d, hr_range=hours_within, start=start, end=end),
+            end_time=end
+        )
 
     def daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,

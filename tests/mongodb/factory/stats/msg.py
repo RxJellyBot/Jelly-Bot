@@ -626,12 +626,12 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
         self.assertTrue(result.avg_calculatable)
         self.assertEqual(
             result.data[0],
-            (StatsResults.CATEGORY_TOTAL, [0, 0.5, 1.5, 1.5] + [0] * 20, "#323232", "false")
+            (StatsResults.CATEGORY_TOTAL, [0, 1, 1.5, 1.5] + [0] * 20, "#323232", "false")
         )
         self.assertEqual(
             result.data[1:],
             [
-                (MessageType.TEXT.key, [0, 0.5, 1, 1] + [0] * 20, "#777777", "true"),
+                (MessageType.TEXT.key, [0, 1, 1, 1] + [0] * 20, "#777777", "true"),
                 (MessageType.IMAGE.key, [0, 0, 0.5, 0.5] + [0] * 20, "#777777", "true")
             ]
         )

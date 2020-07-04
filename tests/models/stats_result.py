@@ -1,6 +1,7 @@
 from datetime import datetime, date, timedelta
 from time import gmtime, strftime
 
+import pytz
 from bson import ObjectId
 from django.utils import timezone
 from pymongo.collection import Collection
@@ -39,32 +40,50 @@ class TestHourlyResult(TestDatabaseMixin):
             with self.subTest(method=method, args=args):
                 method(*args)
 
+    def test_denom_start_at_middle(self):
+        result = TestHourlyResult.TestSample1(45 / 24, end_time=datetime(2020, 6, 3, tzinfo=pytz.utc))
+
+        self.assertTrue(result.avg_calculatable)
+        self.assertEqual(result.denom, [1] * 3 + [2] * 21)
+
+    def test_denom_end_at_middle(self):
+        result = TestHourlyResult.TestSample1(45 / 24, end_time=datetime(2020, 6, 2, 21, tzinfo=pytz.utc))
+
+        self.assertTrue(result.avg_calculatable)
+        self.assertEqual(result.denom, [2] * 21 + [1] * 3)
+
+    def test_denom_start_end_at_middle(self):
+        result = TestHourlyResult.TestSample1(45 / 24, end_time=datetime(2020, 6, 2, 22, tzinfo=pytz.utc))
+
+        self.assertTrue(result.avg_calculatable)
+        self.assertEqual(result.denom, [1] * 1 + [2] * 21 + [1] * 2)
+
     def test_has_days_collected(self):
         expected_denoms = {
-            0: [6] * 1 + [5] * 11 + [6] * 12,
-            1: [6] * 2 + [5] * 11 + [6] * 11,
-            2: [6] * 3 + [5] * 11 + [6] * 10,
-            3: [6] * 4 + [5] * 11 + [6] * 9,
-            4: [6] * 5 + [5] * 11 + [6] * 8,
-            5: [6] * 6 + [5] * 11 + [6] * 7,
-            6: [6] * 7 + [5] * 11 + [6] * 6,
-            7: [6] * 8 + [5] * 11 + [6] * 5,
-            8: [6] * 9 + [5] * 11 + [6] * 4,
-            9: [6] * 10 + [5] * 11 + [6] * 3,
-            10: [6] * 11 + [5] * 11 + [6] * 2,
-            11: [6] * 12 + [5] * 11 + [6] * 1,
-            12: [6] * 13 + [5] * 11,
-            13: [5] * 1 + [6] * 13 + [5] * 10,
-            14: [5] * 2 + [6] * 13 + [5] * 9,
-            15: [5] * 3 + [6] * 13 + [5] * 8,
-            16: [5] * 4 + [6] * 13 + [5] * 7,
-            17: [5] * 5 + [6] * 13 + [5] * 6,
-            18: [5] * 6 + [6] * 13 + [5] * 5,
-            19: [5] * 7 + [6] * 13 + [5] * 4,
-            20: [5] * 8 + [6] * 13 + [5] * 3,
-            21: [5] * 9 + [6] * 13 + [5] * 2,
-            22: [5] * 10 + [6] * 13 + [5] * 1,
-            23: [5] * 11 + [6] * 13
+            0: [5] * 12 + [6] * 12,
+            1: [6] * 1 + [5] * 12 + [6] * 11,
+            2: [6] * 2 + [5] * 12 + [6] * 10,
+            3: [6] * 3 + [5] * 12 + [6] * 9,
+            4: [6] * 4 + [5] * 12 + [6] * 8,
+            5: [6] * 5 + [5] * 12 + [6] * 7,
+            6: [6] * 6 + [5] * 12 + [6] * 6,
+            7: [6] * 7 + [5] * 12 + [6] * 5,
+            8: [6] * 8 + [5] * 12 + [6] * 4,
+            9: [6] * 9 + [5] * 12 + [6] * 3,
+            10: [6] * 10 + [5] * 12 + [6] * 2,
+            11: [6] * 11 + [5] * 12 + [6] * 1,
+            12: [6] * 12 + [5] * 12,
+            13: [5] * 1 + [6] * 12 + [5] * 11,
+            14: [5] * 2 + [6] * 12 + [5] * 10,
+            15: [5] * 3 + [6] * 12 + [5] * 9,
+            16: [5] * 4 + [6] * 12 + [5] * 8,
+            17: [5] * 5 + [6] * 12 + [5] * 7,
+            18: [5] * 6 + [6] * 12 + [5] * 6,
+            19: [5] * 7 + [6] * 12 + [5] * 5,
+            20: [5] * 8 + [6] * 12 + [5] * 4,
+            21: [5] * 9 + [6] * 12 + [5] * 3,
+            22: [5] * 10 + [6] * 12 + [5] * 2,
+            23: [5] * 11 + [6] * 12 + [5] * 1
         }
 
         for hr in range(24):
@@ -256,12 +275,12 @@ class TestHourlyIntervalAverageMessageResult(TestCase):
                                            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23])
         self.assertEqual(result.hr_range, 48)
         self.assertEqual(result.data, [
-            (StatsResults.CATEGORY_TOTAL, [0, 0, 0, 125, 13, 0, 0, 0, 0, 0, 0, 0,
+            (StatsResults.CATEGORY_TOTAL, [0, 0, 0, 125, 19.5, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#323232", "false"),
-            (MessageType.TEXT.key, [0, 0, 0, 75, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            (MessageType.TEXT.key, [0, 0, 0, 75, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#777777", "true"),
-            (MessageType.IMAGE.key, [0, 0, 0, 50, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            (MessageType.IMAGE.key, [0, 0, 0, 50, 10.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              "#777777", "true")
         ])
 

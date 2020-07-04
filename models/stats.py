@@ -91,8 +91,11 @@ class HourlyResult(abc.ABC):
             if earliest.hour > end_time.hour:
                 add_one_end += 24
 
+            if days_collected * 24 % 1 > 0:
+                add_one_end += 1
+
             self.denom = [d_collected_int] * 24
-            for hr in range(earliest.hour, add_one_end + 1):
+            for hr in range(earliest.hour, add_one_end):
                 self.denom[hr % 24] += 1
 
     @staticmethod
