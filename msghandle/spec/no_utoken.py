@@ -5,12 +5,16 @@ from ttldict import TTLOrderedDict
 
 from JellyBot.systemconfig import System, HostUrl
 from msghandle.models import MessageEventObject, HandledMessageEvent, HandledMessageEventText
+from strres.msghandle import HandledResult
 
 
 _sent_cache_ = TTLOrderedDict(System.NoUserTokenNotificationSeconds)
 
 
 def handle_no_user_token(e: MessageEventObject) -> List[HandledMessageEvent]:
+    if e.is_test_event:
+        return [HandledMessageEventText(content=HandledResult.TestFailedNoToken)]
+
     if e.channel_oid not in _sent_cache_:
         _sent_cache_[e.channel_oid] = True
 
@@ -20,8 +24,8 @@ def handle_no_user_token(e: MessageEventObject) -> List[HandledMessageEvent]:
                       "Contact the developer via the website ({}) if this issue persists.\n"
                       "\n"
                       "This message will be sent only once in {} seconds per channel when someone without user "
-                      "token attempt to use any bot features.").format(
-                HostUrl, System.NoUserTokenNotificationSeconds, System.NoUserTokenNotificationSeconds),
+                      "token attempt to use any bot features.") % (
+                        HostUrl, System.NoUserTokenNotificationSeconds, System.NoUserTokenNotificationSeconds),
             bypass_multiline_check=True
         )]
 

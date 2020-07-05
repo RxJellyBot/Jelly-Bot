@@ -7,18 +7,24 @@ from bson import ObjectId
 from linebot.models import TextMessage, ImageMessage, StickerMessage, MessageEvent
 from discord import Message, ChannelType
 
+from extutils.emailutils import MailSender
+from flags import Platform, MessageType, ChannelType as SysChannelType, ImageContentType
 from models import ChannelModel, RootUserModel, ChannelCollectionModel
 from mongodb.factory import ChannelManager, RootUserManager, ChannelCollectionManager, RemoteControlManager
-from extutils.emailutils import MailSender
 from msghandle import logger
 from msghandle.models import ImageContent, LineStickerContent
-from flags import Platform, MessageType, ChannelType as SysChannelType, ImageContentType
+from strres.msghandle import Event as EventStr
+
+__all__ = ["Event", "MessageEventObject",
+           "TextMessageEventObject", "ImageMessageEventObject", "LineStickerMessageEventObject",
+           "MessageEventObjectFactory"]
 
 
 class Event(ABC):
     def __init__(
             self, raw: Any, channel_model: ChannelModel = None, sys_ctype: SysChannelType = None,
-            source_channel: ChannelModel = None):
+            source_channel: ChannelModel = None, *,
+            is_test_event: bool = False):
         if not sys_ctype:
             sys_ctype = SysChannelType.identify(channel_model.platform, channel_model.token)
 
@@ -27,7 +33,8 @@ class Event(ABC):
 
         self._construct = time.time()
 
-        self.raw = raw
+        self.is_test_event = is_test_event
+        self.raw = EventStr.TestRaw if is_test_event else raw
         self.channel_model = channel_model
         self.channel_model_source = source_channel
         self.channel_type = sys_ctype
@@ -43,6 +50,9 @@ class Event(ABC):
 
     @property
     def user_token(self) -> Optional[Union[int, str]]:
+        if self.is_test_event:
+            return EventStr.TestUserToken
+
         if self.platform_src == Platform.LINE:
             from extline import LineApiUtils
 
@@ -62,7 +72,8 @@ class MessageEventObject(Event, ABC):
     def __init__(
             self, raw: Any, content: Any, channel_model: ChannelModel = None,
             user_model: Optional[RootUserModel] = None,
-            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None, *,
+            is_test_event: bool = False):
         src_ch = None
 
         rmc = None
@@ -73,7 +84,7 @@ class MessageEventObject(Event, ABC):
             src_ch = channel_model
             channel_model = rmc.target_channel
 
-        super().__init__(raw, channel_model, sys_ctype, source_channel=src_ch)
+        super().__init__(raw, channel_model, sys_ctype, source_channel=src_ch, is_test_event=is_test_event)
         self.content = content
         self.user_model = user_model
         self.chcoll_model = ch_parent_model
@@ -97,10 +108,11 @@ class MessageEventObject(Event, ABC):
 class TextMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, text: str, channel_model: ChannelModel = None, user_model: Optional[RootUserModel] = None,
-            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None):
+            sys_ctype: SysChannelType = None, ch_parent_model: ChannelCollectionModel = None, *,
+            is_test_event: bool = False):
         text = text.strip()
 
-        super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model)
+        super().__init__(raw, text, channel_model, user_model, sys_ctype, ch_parent_model, is_test_event=is_test_event)
 
     @property
     def message_type(self) -> MessageType:
@@ -115,8 +127,10 @@ class ImageMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, image: ImageContent, channel_model: ChannelModel = None,
             user_model: Optional[RootUserModel] = None, sys_ctype: SysChannelType = None,
-            ch_parent_model: ChannelCollectionModel = None):
-        super().__init__(raw, image, channel_model, user_model, sys_ctype, ch_parent_model)
+            ch_parent_model: ChannelCollectionModel = None, *,
+            is_test_event: bool = False):
+        super().__init__(raw, image, channel_model, user_model, sys_ctype, ch_parent_model,
+                         is_test_event=is_test_event)
 
     @property
     def message_type(self) -> MessageType:
@@ -127,8 +141,10 @@ class LineStickerMessageEventObject(MessageEventObject):
     def __init__(
             self, raw: Any, sticker: LineStickerContent, channel_model: ChannelModel = None,
             user_model: Optional[RootUserModel] = None, sys_ctype: SysChannelType = None,
-            ch_parent_model: ChannelCollectionModel = None):
-        super().__init__(raw, sticker, channel_model, user_model, sys_ctype, ch_parent_model)
+            ch_parent_model: ChannelCollectionModel = None, *,
+            is_test_event: bool = False):
+        super().__init__(raw, sticker, channel_model, user_model, sys_ctype, ch_parent_model,
+                         is_test_event=is_test_event)
 
     @property
     def message_type(self) -> MessageType:

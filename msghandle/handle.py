@@ -8,22 +8,42 @@ from .models.pipe_in import (
 from .models.pipe_out import HandledMessageEventsHolder
 from .logger import logger
 
+__all__ = ["load_handling_functions", "unload_handling_functions",
+           "handle_message_main", "HandlingFunctionsNotLoadedError"]
 
 # Creating this because some imports cannot be import before the django framework has been fully loaded
-fn_box = {}
+_fn_box = {}
+
+
+class HandlingFunctionsNotLoadedError(Exception):
+    def __init__(self):
+        super().__init__("Handling functions not yet loaded.")
 
 
 def load_handling_functions():
+    global _fn_box
+
     from .text.main import handle_text_event
     from .img.main import handle_image_event
     from .stk.main import handle_line_sticker_event
 
-    fn_box[TextMessageEventObject] = handle_text_event
-    fn_box[ImageMessageEventObject] = handle_image_event
-    fn_box[LineStickerMessageEventObject] = handle_line_sticker_event
+    _fn_box = {
+        TextMessageEventObject: handle_text_event,
+        ImageMessageEventObject: handle_image_event,
+        LineStickerMessageEventObject: handle_line_sticker_event
+    }
+
+
+def unload_handling_functions():
+    global _fn_box
+
+    _fn_box = {}
 
 
 def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
+    if not _fn_box:
+        raise HandlingFunctionsNotLoadedError()
+
     try:
         if e.user_model:
             # Ensure User existence in channel
@@ -40,8 +60,8 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
 
         # Main handle process
         event_type = type(e)
-        if event_type in fn_box:
-            ret = HandledMessageEventsHolder(e.channel_model, fn_box[event_type](e))
+        if event_type in _fn_box:
+            ret = HandledMessageEventsHolder(e.channel_model, _fn_box[event_type](e))
         else:
             logger.logger.info(f"Message handle object not handled. Raw: {e.raw}")
             ret = HandledMessageEventsHolder(e.channel_model)
