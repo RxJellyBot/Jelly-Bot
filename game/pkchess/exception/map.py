@@ -44,7 +44,7 @@ class PathNotFoundError(MapPathError):
 
 class PathSameDestinationError(MapPathError):
     def __init__(self):
-        super().__init__(f"Origin and the destination are the same")
+        super().__init__("Origin and the destination are the same")
 
 
 class PathEndOutOfMapError(MapPathError):

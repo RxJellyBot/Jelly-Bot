@@ -31,6 +31,7 @@ class TestHandleMessageNotLoaded(TestCase):
 
 class TestHandleMessageMainEntryPoint(TestCase):
     # TEST: message stats record / bot usage record(?)
+
     @classmethod
     def obj_to_clear(cls):
         return [EventFactory]
