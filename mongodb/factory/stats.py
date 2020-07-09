@@ -193,7 +193,15 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
         group_key = {MemberMessageCountResult.KEY_MEMBER_ID: "$" + MessageRecordModel.UserRootOid.key}
         if switch_branches:
-            group_key[MemberMessageCountResult.KEY_INTERVAL_IDX] = {"$switch": {"branches": switch_branches}}
+            group_key[MemberMessageCountResult.KEY_INTERVAL_IDX] = {
+                "$switch": {
+                    "branches": switch_branches,
+
+                    # Set `default` to the highest index to handle the only missed case because of `low <= x < high`
+                    # where `high` is inclusive for the function but not handled
+                    "default": str(len(trange.get_periods()) - 1)
+                }
+            }
 
         aggr_pipeline = [
             {"$match": match_d},
@@ -254,11 +262,12 @@ class _MessageRecordStatisticsManager(BaseCollection):
         )
 
     def daily_message_count(
-            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *,
+            tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             DailyMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
-        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end)
+        self.attach_time_range(match_d, hours_within=hours_within, start=start, end=end, tzinfo_=tzinfo_)
         pipeline = [
             {"$match": match_d},
             {"$group": {
@@ -289,13 +298,15 @@ class _MessageRecordStatisticsManager(BaseCollection):
             start=start, end=end)
 
     def mean_message_count(
-            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo(),
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *,
+            tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None,
             max_mean_days: int = 5) -> \
             MeanMessageResultGenerator:
         match_d = self._channel_oids_filter(channel_oids)
 
         trange = TimeRange(range_hr=hours_within, start=start, end=end, tzinfo_=tzinfo_)
+        # Pushing back the starting time to calculate the mean data at `start`.
         trange.set_start_day_offset(-max_mean_days)
 
         self.attach_time_range(match_d, trange=trange)
@@ -324,8 +335,9 @@ class _MessageRecordStatisticsManager(BaseCollection):
             trange=trange, max_mean_days=max_mean_days)
 
     def message_count_before_time(
-            self, channel_oids: Union[ObjectId, List[ObjectId]], *, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
+            self, channel_oids: Union[ObjectId, List[ObjectId]], *,
+            tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             CountBeforeTimeResult:
         match_d = self._channel_oids_filter(channel_oids)
 
@@ -370,8 +382,8 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
     def member_daily_message_count(
             self, channel_oids: Union[ObjectId, List[ObjectId]], *,
-            hours_within: Optional[int] = None, start: Optional[datetime] = None, end: Optional[datetime] = None,
-            tzinfo_: PytzInfo = UTC.to_tzinfo()) -> \
+            tzinfo_: PytzInfo = UTC.to_tzinfo(), hours_within: Optional[int] = None,
+            start: Optional[datetime] = None, end: Optional[datetime] = None) -> \
             MemberDailyMessageResult:
         match_d = self._channel_oids_filter(channel_oids)
 

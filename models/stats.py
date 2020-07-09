@@ -131,7 +131,8 @@ class HourlyResult(abc.ABC):
 
             return max(
                 ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
-                0)
+                0
+            )
         else:
             return trange.hr_length / 24
 
@@ -286,7 +287,13 @@ class MeanMessageResultGenerator(DailyResult):
 
     def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange, max_mean_days: int):
         self.max_madays = max_mean_days
-        self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+
+        if trange.is_inf:
+            self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+            self.trange.set_start_day_offset(-max_mean_days)
+        else:
+            self.trange = trange
+
         self.dates = self.date_list(days_collected, tzinfo, start=self.trange.start, end=self.trange.end)
         self.data = {date_: 0 for date_ in self.dates}
 

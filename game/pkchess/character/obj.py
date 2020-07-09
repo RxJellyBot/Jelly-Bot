@@ -34,4 +34,4 @@ class Character(BattleObject):
         # so that the skill ID list could be modified for a character and not affecting the template
         self.skill_ids = list(self.template.skill_ids)
 
-    # TODO: Game - function to increase exp and grow the parameter if EXP passing certain threshold
+    # TODO: Game - function to increase exp and grow the parameters if EXP passed the threshold
