@@ -5,6 +5,10 @@ import requests
 
 class ImageContentProcessor:
     @staticmethod
+    def binary_img_to_base64_str(bin_data: bytes) -> str:
+        return base64.b64encode(bin_data).decode("utf-8")
+
+    @staticmethod
     def online_img_to_base64_str(url: str) -> str:
         return base64.b64encode(requests.get(url).content).decode("utf-8")
 
