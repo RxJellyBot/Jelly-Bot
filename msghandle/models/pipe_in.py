@@ -186,7 +186,7 @@ class MessageEventObjectFactory:
                 event, event.message.text, channel_model, user_model)
         elif isinstance(event.message, ImageMessage):
             return ImageMessageEventObject(
-                event, ImageContent(LineApiWrapper.get_image_base64(event.message), ImageContentType.BASE64),
+                event, ImageContent(LineApiWrapper.get_image_base64_str(event.message), ImageContentType.BASE64),
                 channel_model, user_model)
         elif isinstance(event.message, StickerMessage):
             return LineStickerMessageEventObject(

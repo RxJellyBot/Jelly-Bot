@@ -3,7 +3,7 @@ from typing import Any
 
 from JellyBot.systemconfig import AutoReply
 from extutils import safe_cast
-
+from extutils.imgproc import ImageValidator
 from extutils.line_sticker import LineStickerManager
 from flags import AutoReplyContentType
 
@@ -50,7 +50,15 @@ class _BaseValidator:
                 return False
         else:
             try:
-                return content.startswith("http") and (content[len(content) - 4:] in (".png", ".jpg"))
+                # is URL and either HTTP or HTTPS?
+                if not content.startswith("http"):
+                    return False
+
+                # extension is either png, jpg or jpeg?
+                if not ImageValidator.is_valid_image_extension(content):
+                    return False
+
+                return True
             except Exception:
                 return False
 

@@ -5,6 +5,10 @@ import requests
 
 class ImageContentProcessor:
     @staticmethod
+    def binary_img_to_base64_str(bin_data: bytes) -> str:
+        return base64.b64encode(bin_data).decode("utf-8")
+
+    @staticmethod
     def online_img_to_base64_str(url: str) -> str:
         return base64.b64encode(requests.get(url).content).decode("utf-8")
 
@@ -12,3 +16,9 @@ class ImageContentProcessor:
     def local_img_to_base64_str(path: str) -> str:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
+
+
+class ImageValidator:
+    @staticmethod
+    def is_valid_image_extension(name: str) -> bool:
+        return name.endswith(".jpg") or name.endswith(".png") or name.endswith(".jpeg")

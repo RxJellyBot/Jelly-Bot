@@ -9,6 +9,7 @@ from linebot.models import TextSendMessage, SendMessage, Profile, ImageMessage
 
 from flags import ChannelType
 from models import ChannelModel
+from extutils.imgproc import ImageContentProcessor
 from extutils.logger import SYSTEM
 
 __all__ = ["line_api", "_inst", "LineApiUtils"]
@@ -79,8 +80,8 @@ class LineApiWrapper:
         else:
             return None
 
-    def get_image_base64(self, message: ImageMessage) -> str:
-        return self._core.get_message_content(str(message.id)).content
+    def get_image_base64_str(self, message: ImageMessage) -> str:
+        return ImageContentProcessor.binary_img_to_base64_str(self._core.get_message_content(str(message.id)).content)
 
 
 class LineApiUtils:
