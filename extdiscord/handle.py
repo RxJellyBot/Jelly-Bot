@@ -17,7 +17,7 @@ def handle_discord_main(e: Event) -> HandledMessageEventsHolder:
         if isinstance(e, (TextMessageEventObject, ImageMessageEventObject)):
             return handle_message_main(e)
         else:
-            DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw}")
+            DISCORD.logger.info(f"Discord event object not handled. Raw: {e.raw if hasattr(e, 'raw') else e}")
             return HandledMessageEventsHolder(e.channel_model)
     except Exception as ex:
         handle_error(ex)

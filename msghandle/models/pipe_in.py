@@ -196,7 +196,7 @@ class MessageEventObjectFactory:
             logger.logger.warning(f"Unhandled LINE message event. {type(event.message)}")
 
     @staticmethod
-    def from_discord(message: Message) -> MessageEventObject:
+    def from_discord(message: Message) -> Optional[MessageEventObject]:
         from extdiscord.utils import msg_loc_repr
 
         if message.channel.type not in MessageEventObjectFactory.DiscordAcceptedChannelTypes:
@@ -225,6 +225,9 @@ class MessageEventObjectFactory:
                     message, ImageContent(attachment.url, ImageContentType.URL, message.content),
                     channel_model, user_model, SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
                 )
+            else:
+                # Discord message has attachment, no corresponding message event object / not implemented
+                return None
         else:
             return TextMessageEventObject(
                 message, message.content, channel_model, user_model,
