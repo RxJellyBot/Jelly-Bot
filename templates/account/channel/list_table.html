@@ -40,7 +40,7 @@
                                 {% trans "Check ID" %}
                             </a>
                             <a class="btn btn-outline-warning"
-                               href="{% url "info.channel.msgstats" channel_oid=channel_conn.channel_data.id %}">
+                               href="{% url "info.channel.msgstats" channel_oid=channel_conn.channel_data.id %}?hours_within=720">
                                 {% trans "Message Stats" %}
                             </a>
                         </div>

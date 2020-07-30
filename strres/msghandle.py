@@ -13,8 +13,8 @@ class HandledResult:
         "Contact the developer via the website (%s) if this issue persists.\n"
         "\n"
         "This message will be sent only once in %d seconds per channel when someone without user "
-        "token attempt to use any bot features."
-    ) % (HostUrl, System.NoUserTokenNotificationSeconds)
+        "token attempt to use any bot features." % (HostUrl, System.NoUserTokenNotificationSeconds)
+    )
 
     TestFailedNoToken = "No user token handling point reached"
 
