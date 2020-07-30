@@ -1,5 +1,5 @@
 cd ..
 git reset --hard
 git pull
-pip install -r --upgrade requirements.txt
+pip install -r requirements.txt --upgrade
 PAUSE
