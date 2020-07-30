@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
+from extutils.imgproc import ImageValidator
 from extutils.flags import FlagSingleEnum
 
 
@@ -16,7 +17,7 @@ class AutoReplyContentType(FlagSingleEnum):
     @staticmethod
     def determine(content: str):
         # LINE API requires image to be sent in HTTPS protocol
-        image_ext_ok = (content.endswith(".jpg") or content.endswith(".png") or content.endswith(".jpeg"))
+        image_ext_ok = ImageValidator.is_valid_image_extension(content)
 
         if image_ext_ok and content.startswith("https://"):
             return AutoReplyContentType.IMAGE

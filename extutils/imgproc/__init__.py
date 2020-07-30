@@ -1,2 +1,2 @@
-from .utils import ImageContentProcessor
+from .utils import ImageContentProcessor, ImageValidator
 from .imgur import ImgurClient

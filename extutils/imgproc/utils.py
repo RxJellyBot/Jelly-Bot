@@ -16,3 +16,9 @@ class ImageContentProcessor:
     def local_img_to_base64_str(path: str) -> str:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
+
+
+class ImageValidator:
+    @staticmethod
+    def is_valid_image_extension(name: str) -> bool:
+        return name.endswith(".jpg") or name.endswith(".png") or name.endswith(".jpeg")
