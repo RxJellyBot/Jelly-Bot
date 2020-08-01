@@ -18,12 +18,13 @@ __all__ = ["handle_discord_main", "handle_error"]
 def handle_discord_main(event: Event) -> HandledMessageEventsHolder:
     """Main function to handle the message received from the discord bot."""
     try:
-        if isinstance(event, (TextMessageEventObject, ImageMessageEventObject)):
-            return handle_message_main(event)
-        else:
-            DISCORD.logger.info(f"Discord event object not handled. "
-                                f"Raw: {event.raw if hasattr(event, 'raw') else event}")
+        # Early return on not-handled object
+        if not isinstance(event, (TextMessageEventObject, ImageMessageEventObject)):
+            DISCORD.logger.info("Discord event object not handled. "
+                                "Raw: %s" % event.raw if hasattr(event, "raw") else event)
             return HandledMessageEventsHolder(event.channel_model)
+
+        return handle_message_main(event)
     except Exception as ex:  # pylint: disable=W0703
         handle_error(ex)
         return HandledMessageEventsHolder(event.channel_model)
