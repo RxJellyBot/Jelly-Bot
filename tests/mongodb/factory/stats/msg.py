@@ -1741,4 +1741,419 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             }
         )
 
-    # TEST: Stats - message_count_before_time / member_daily_message_count
+    def test_message_count_before_time_single_channel(self):
+        msgs = self._insert_messages_4()
+
+        result = MessageRecordStatisticsManager.message_count_before_time(self.CHANNEL_OID)
+
+        expected_trange = TimeRange(start=datetime(2020, 5, 31, 1, tzinfo=pytz.utc),
+                                    tzinfo_=UTC.to_tzinfo())
+
+        # Only checking if this field returns things because computation lag on GitHub Actions may fail the test
+        self.assertIsNotNone(result.title)
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        addl_dates = [(date(2020, 6, 4) + timedelta(days=i)).strftime("%Y-%m-%d")
+                      for i in range((datetime.utcnow().date() - date(2020, 6, 4)).days + 1)]
+
+        expected_counts = {
+            date(2020, 5, 31): 0,
+            date(2020, 6, 1): 0,
+            date(2020, 6, 2): 0,
+            date(2020, 6, 3): 0
+        }
+        for msg in msgs:
+            if msg.channel_oid != self.CHANNEL_OID:
+                continue
+
+            gen_time = msg.id.generation_time
+
+            if gen_time.date() not in expected_counts:
+                continue
+
+            if gen_time.time() > datetime.utcnow().time():
+                continue
+
+            expected_counts[gen_time.date()] += 1
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+            + addl_dates
+        )
+        self.assertEqual(
+            result.data_count,
+            list(expected_counts.values()) + [0] * len(addl_dates)
+        )
+
+    def test_message_count_before_time_multi_channel(self):
+        msgs = self._insert_messages_4()
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2])
+
+        expected_trange = TimeRange(start=datetime(2020, 5, 31, 1, tzinfo=pytz.utc),
+                                    tzinfo_=UTC.to_tzinfo())
+
+        # Only checking if this field returns things because computation lag on GitHub Actions may fail the test
+        self.assertIsNotNone(result.title)
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        addl_dates = [(date(2020, 6, 4) + timedelta(days=i)).strftime("%Y-%m-%d")
+                      for i in range((datetime.utcnow().date() - date(2020, 6, 4)).days + 1)]
+
+        expected_counts = {
+            date(2020, 5, 31): 0,
+            date(2020, 6, 1): 0,
+            date(2020, 6, 2): 0,
+            date(2020, 6, 3): 0
+        }
+        for msg in msgs:
+            if msg.channel_oid not in (self.CHANNEL_OID, self.CHANNEL_OID_2):
+                continue
+
+            gen_time = msg.id.generation_time
+
+            if gen_time.date() not in expected_counts:
+                continue
+
+            if gen_time.time() > datetime.utcnow().time():
+                continue
+
+            expected_counts[gen_time.date()] += 1
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+            + addl_dates
+        )
+        self.assertEqual(
+            result.data_count,
+            list(expected_counts.values()) + [0] * len(addl_dates)
+        )
+
+    def test_message_count_before_time_start_end_given(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 5, 31, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [2, 3, 4, 0]
+        )
+
+    def test_message_count_before_time_start_before_first(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 5, 26, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-26", "2020-05-27", "2020-05-28", "2020-05-29", "2020-05-30",
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [0, 0, 0, 0, 0,
+             2, 3, 4, 0]
+        )
+
+    def test_message_count_before_time_start_after_first(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [3, 4, 0]
+        )
+
+    def test_message_count_before_time_at_middle(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [3, 4]
+        )
+
+    def test_message_count_before_time_with_tz(self):
+        self._insert_messages_4()
+
+        tz = LocaleInfo.get_tzinfo("Asia/Taipei")
+
+        start_dt = datetime(2020, 6, 1, 8)
+        end_dt = datetime(2020, 6, 2, 10, 30)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt, tzinfo_=tz)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz)
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [3, 4]
+        )
+
+    def test_message_count_before_time_data_covered_not_in_range(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 3, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 5, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-03", "2020-06-04", "2020-06-05"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [0, 0, 0]
+        )
+
+    def test_message_count_before_time_ts_with_tz(self):
+        self._insert_messages_4()
+
+        tz_8 = LocaleInfo.get_tzinfo("Asia/Taipei")
+        tz_9 = LocaleInfo.get_tzinfo("Asia/Seoul")
+
+        start_dt = datetime(2020, 6, 1, 9, tzinfo=tz_9)
+        end_dt = datetime(2020, 6, 2, 11, 30, tzinfo=tz_9)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, self.CHANNEL_OID_2],
+                                                                          start=start_dt, end=end_dt, tzinfo_=tz_8)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz_8)
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.astimezone(tz_8).strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [3, 4]
+        )
+
+    def test_message_count_before_time_partial_channel_miss(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time([self.CHANNEL_OID, ObjectId()],
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [3, 4]
+        )
+
+    def test_message_count_before_time_channel_miss(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time(ObjectId(),
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [0, 0]
+        )
+
+    def test_message_count_before_time_no_data(self):
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.message_count_before_time(ObjectId(),
+                                                                          start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        self.assertEqual(
+            result.title,
+            StatsResults.COUNT_BEFORE.format(end_dt.strftime("%I:%M:%S %p"))
+        )
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            [0, 0]
+        )
+
+    # TEST: Stats - member_daily_message_count

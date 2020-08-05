@@ -358,7 +358,7 @@ class CountBeforeTimeResult(DailyResult):
             _count_ = d[CountBeforeTimeResult.KEY_COUNT]
             self.data_count[_date_] = _count_
 
-        self.data_count = [ct for dt, ct in self.data_count.items()]
+        self.data_count = list(self.data_count.values())
 
     @property
     def title(self):
