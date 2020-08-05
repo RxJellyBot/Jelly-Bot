@@ -1,3 +1,4 @@
+import os
 from threading import Thread
 from typing import Optional, List, Dict, Set, Union
 
@@ -806,7 +807,11 @@ class _ProfileManager(ClearableMixin):
         return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
 
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
-        Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
+        if bool(int(os.environ.get("TEST", 0))):
+            # No async if testing
+            self.register_new_default(channel_oid, root_uid)
+        else:
+            Thread(target=self.register_new_default, args=(channel_oid, root_uid)).start()
 
     @arg_type_ensure
     def register_new_model(self, root_uid: ObjectId, model: ChannelProfileModel) -> RegisterProfileResult:

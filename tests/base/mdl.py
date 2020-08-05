@@ -22,7 +22,7 @@ class TestModelMixin(TestCase, abc.ABC):
             a = _clear_oid(a)
             b = _clear_oid(b)
 
-        self.assertEqual(a, b)
+        self.assertDictEqual(a.to_json(), b.to_json())
 
     def assertModelSequenceEqual(self, a: Sequence[Model], b: Sequence[Model], *, ignore_oid: bool = True):
         if ignore_oid:

@@ -44,8 +44,15 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
     if not _fn_box:
         raise HandlingFunctionsNotLoadedError()
 
+    has_user_model = hasattr(e, "user_model") and e.user_model is not None
+
+    # Record message for stats / User model could be `None` on LINE
+    MessageRecordStatisticsManager.record_message_async(
+        e.channel_model.id, e.user_model.id if has_user_model else None,
+        e.message_type, e.content, e.constructed_time)
+
     try:
-        if e.user_model:
+        if has_user_model:
             # Ensure User existence in channel
             ProfileManager.register_new_default_async(e.channel_model.id, e.user_model.id)
 
@@ -68,11 +75,6 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
 
         # Translation deactivation
         deactivate()
-
-        # Record message for stats / User model could be `None` on LINE
-        if e.user_model:
-            MessageRecordStatisticsManager.record_message_async(
-                e.channel_model.id, e.user_model.id, e.message_type, e.content, e.constructed_time)
 
         return ret
     except Exception as ex:

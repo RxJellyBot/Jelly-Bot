@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List, Dict, Set
@@ -48,20 +49,27 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
     @arg_type_ensure
     def record_message_async(
-            self, channel_oid: ObjectId, user_root_oid: ObjectId,
+            self, channel_oid: ObjectId, user_root_oid: Optional[ObjectId],
             message_type: MessageType, message_content: Any, proc_time_secs: float):
-        Thread(
-            target=self.record_message,
-            args=(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)).start()
+        if bool(int(os.environ.get("TEST", 0))):
+            # No async if testing
+            self.record_message(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)
+        else:
+            Thread(
+                target=self.record_message,
+                args=(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)).start()
 
     @arg_type_ensure
     def record_message(
-            self, channel_oid: ObjectId, user_root_oid: ObjectId,
+            self, channel_oid: ObjectId, user_root_oid: Optional[ObjectId],
             message_type: MessageType, message_content: Any, proc_time_secs: float) -> WriteOutcome:
+        # Avoid casting `None` to `str`
+        message_content = \
+            str(message_content)[:Database.MessageStats.MaxContentCharacter] if message_content is not None else None
+
         mdl, outcome, ex = self.insert_one_data(
             ChannelOid=channel_oid, UserRootOid=user_root_oid, MessageType=message_type,
-            MessageContent=str(message_content)[:Database.MessageStats.MaxContentCharacter],
-            ProcessTimeSecs=proc_time_secs
+            MessageContent=message_content, ProcessTimeSecs=proc_time_secs
         )
 
         return outcome

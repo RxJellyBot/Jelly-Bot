@@ -36,9 +36,9 @@ class APIStatisticModel(Model):
 
 class MessageRecordModel(Model):
     ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
-    UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
+    UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True, allow_none=True)
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
-    MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
+    MessageContent = TextField("ct", default=ModelDefaultValueExt.Required, allow_none=True)
     ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
 
     @property

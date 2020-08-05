@@ -77,13 +77,13 @@ class EventFactory(ClearableMixin):
             ChannelModel(Id=CHANNEL_DISCORD_GPRV_1_OID, Platform=Platform.LINE, Token="Discord_GroupPrivate_1",
                          Config=ChannelConfigModel(DefaultProfileOid=PROF_DISCORD_GPRV_1_OID)),
         CHANNEL_DISCORD_GPRV_2_OID:
-            ChannelModel(Id=PROF_DISCORD_GPRV_2_OID, Platform=Platform.LINE, Token="Discord_GroupPrivate_2",
+            ChannelModel(Id=CHANNEL_DISCORD_GPRV_2_OID, Platform=Platform.LINE, Token="Discord_GroupPrivate_2",
                          Config=ChannelConfigModel(DefaultProfileOid=PROF_DISCORD_GPRV_2_OID)),
         CHANNEL_DISCORD_GPUB_1_OID:
-            ChannelModel(Id=PROF_DISCORD_GPUB_1_OID, Platform=Platform.LINE, Token="Discord_GroupPublic_1",
+            ChannelModel(Id=CHANNEL_DISCORD_GPUB_1_OID, Platform=Platform.LINE, Token="Discord_GroupPublic_1",
                          Config=ChannelConfigModel(DefaultProfileOid=PROF_DISCORD_GPUB_1_OID)),
         CHANNEL_DISCORD_GPUB_2_OID:
-            ChannelModel(Id=PROF_DISCORD_GPUB_2_OID, Platform=Platform.LINE, Token="Discord_GroupPublic_2",
+            ChannelModel(Id=CHANNEL_DISCORD_GPUB_2_OID, Platform=Platform.LINE, Token="Discord_GroupPublic_2",
                          Config=ChannelConfigModel(DefaultProfileOid=PROF_DISCORD_GPUB_2_OID))
     }
 
