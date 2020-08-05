@@ -32,19 +32,26 @@ class FieldInstance:
     """Field instance class. This class actually stores the value."""
     NULL_VAL_SENTINEL = object()
 
-    def __init__(self, base: 'BaseField', value=NULL_VAL_SENTINEL):
+    def __init__(self, base: 'BaseField', value=NULL_VAL_SENTINEL, val_is_specified=False):
         """
         :raises FieldValueRequired: If the default value indicates the field requires value but turns out not
         :raises ValueError: Field extended default value unhandled
         """
         self._base = base
-        self._value = None  # Initialize an empty class field
+        self._value = None  # Initialize an empty field value
+
+        default_value_is_ext = ModelDefaultValueExt.is_default_val_ext(base.default_value)
 
         # Skipping type check on init (may fill `None`)
         if value in (None, FieldInstance.NULL_VAL_SENTINEL) and not base.allow_none:
-            self.force_set(base.none_obj())
+            if default_value_is_ext:
+                self.force_set(base.none_obj())
+            else:
+                self.force_set(base.default_value)
+        elif value is None and val_is_specified:
+            self.force_set(None)
         elif not base.is_default_lazy \
-                and ModelDefaultValueExt.is_default_val_ext(base.default_value) \
+                and default_value_is_ext \
                 and (value == FieldInstance.NULL_VAL_SENTINEL or ModelDefaultValueExt.is_default_val_ext(value)):
             if base.default_value == ModelDefaultValueExt.Required:
                 raise FieldValueRequiredError(self.base.key)
@@ -333,8 +340,20 @@ class BaseField(abc.ABC):
         return self.cast_to_desired_type(default_val)
 
     @final
-    def new(self, val=None) -> FieldInstance:
-        return self.instance_class(self, val if val is not None else self.default_value)
+    def new(self, val=None, val_is_specified=False) -> FieldInstance:
+        """
+        Create and return a new :class:`FieldInstance` corresponding to this field.
+
+        The purpose of ``val_is_specified`` is that if ``val`` is ``None``,
+        that ``None`` could either be the provided one (intentional ``None``),
+        or the default value one (set in the function signature).
+
+        :param val: value of this field
+        :param val_is_specified: if the value is provided or using the default `value`
+        :return: `FieldInstance` corresponding to this field
+        """
+        return self.instance_class(
+            self, val if val_is_specified or val is not None else self.default_value, val_is_specified)
 
     @final
     def is_empty(self, value) -> bool:

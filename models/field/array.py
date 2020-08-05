@@ -245,12 +245,12 @@ class ModelArrayField(ArrayField):
 
 
 class ArrayFieldInstance(FieldInstance):
-    def __init__(self, base, value=None):
+    def __init__(self, base, value=None, val_is_specified=True):
         if not isinstance(base, (ArrayField, MultiDimensionalArrayField)):
             raise ValueError(f"`ArrayFieldInstance` can only be used "
                              f"when the base class is {ArrayField} or {MultiDimensionalArrayField}. ({base})")
 
-        super().__init__(base, value)
+        super().__init__(base, value, val_is_specified)
 
 
 class ModelArrayFieldInstanceFactory:

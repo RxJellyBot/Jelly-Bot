@@ -203,7 +203,7 @@ class Model(MutableMapping, abc.ABC):
     def _input_kwargs(self, **kwargs):
         for fk, v in kwargs.items():
             if fk in self.model_field_keys():
-                self._inner_dict_create(fk, v)
+                self._inner_dict_create(fk, v, val_is_specified=True)
             else:
                 raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
@@ -235,14 +235,14 @@ class Model(MutableMapping, abc.ABC):
         if not result.is_success:
             self.on_invalid(result)
 
-    def _inner_dict_create(self, fk, v):
+    def _inner_dict_create(self, fk, v, *, val_is_specified=False):
         if fk.lower() == "id" and self.WITH_OID:
             self._dict_["id"] = self.Id.new(v)
         else:
             attr = getattr(self, to_camel_case(fk))
 
             if attr:
-                self._dict_[to_snake_case(fk)] = attr.new(v)
+                self._dict_[to_snake_case(fk)] = attr.new(v, val_is_specified=val_is_specified)
             else:
                 raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
@@ -267,7 +267,7 @@ class Model(MutableMapping, abc.ABC):
         elif to_snake_case(fk) in self._dict_:
             self._dict_[to_snake_case(fk)].value = v
         else:
-            self._inner_dict_create(fk, v)
+            self._inner_dict_create(fk, v, val_is_specified=True)
 
     @classmethod
     def _init_cache_to_field(cls):
