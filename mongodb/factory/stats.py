@@ -430,7 +430,10 @@ class _BotFeatureUsageDataManager(BaseCollection):
 
     @arg_type_ensure
     def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
-        Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()
+        if bool(int(os.environ.get("TEST", 0))):
+            self.record_usage(feature_used, channel_oid, root_oid)
+        else:
+            Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()
 
     @arg_type_ensure
     def record_usage(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):

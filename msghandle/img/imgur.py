@@ -11,7 +11,7 @@ from msghandle.models import HandledMessageEvent, HandledMessageEventText, Image
 
 def process_imgur_upload(e: ImageMessageEventObject) -> List[HandledMessageEvent]:
     if e.channel_type == ChannelType.PRIVATE_TEXT:
-        BotFeatureUsageDataManager.record_usage(BotFeature.IMG_IMGUR_UPLOAD, e.channel_oid, e.user_model.id)
+        BotFeatureUsageDataManager.record_usage_async(BotFeature.IMG_IMGUR_UPLOAD, e.channel_oid, e.user_model.id)
 
         # Using the key of `e.content.content_type` because it's a directly-used-parameter to upload the image
         exec_result = exec_timing_result(ImgurClient.upload_image, e.content.content, e.content.content_type.key)

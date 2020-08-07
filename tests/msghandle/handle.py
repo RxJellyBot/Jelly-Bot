@@ -1,15 +1,15 @@
 from django.conf import settings
 
 from extutils.emailutils import EmailServer
-from flags import ChannelType, ImageContentType, MessageType
-from models import MessageRecordModel
-from mongodb.factory import MessageRecordStatisticsManager
+from flags import ChannelType, ImageContentType, MessageType, BotFeature
+from models import MessageRecordModel, BotFeatureUsageModel
+from mongodb.factory import MessageRecordStatisticsManager, BotFeatureUsageDataManager
 from msghandle.handle import (
     handle_message_main, load_handling_functions, unload_handling_functions, HandlingFunctionsNotLoadedError
 )
 from msghandle.models import ImageContent, LineStickerContent, HandledMessageEventsHolder, HandledMessageEventText
-from tests.base import TestCase, TestModelMixin
 from strres.msghandle import HandledResult
+from tests.base import TestCase, TestModelMixin
 from .utils_test import EventFactory
 
 __all__ = ["TestHandleMessageMainEntryPoint", "TestHandleMessageNotLoaded"]
@@ -32,11 +32,9 @@ class TestHandleMessageNotLoaded(TestCase):
 
 
 class TestHandleMessageMainEntryPoint(TestModelMixin):
-    # TEST: bot usage record(?)
-
     @classmethod
     def obj_to_clear(cls):
-        return [EventFactory, MessageRecordStatisticsManager]
+        return [EventFactory, MessageRecordStatisticsManager, BotFeatureUsageDataManager]
 
     @classmethod
     def setUpTestClass(cls):
@@ -475,6 +473,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
@@ -490,12 +489,21 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_line_gprv_error(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
@@ -511,12 +519,21 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_line_gpub_error(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
@@ -529,6 +546,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
                 MessageRecordModel.MessageContent.key: "ERRORTEST"
+            }),
+            1
+        )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
             }),
             1
         )
@@ -969,6 +994,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            ChannelType.PRIVATE_TEXT)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
@@ -984,12 +1010,21 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_line_gprv_error_no_col(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
@@ -1005,12 +1040,21 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_line_gpub_error_no_col(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
@@ -1023,6 +1067,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
                 MessageRecordModel.MessageContent.key: "ERRORTEST"
+            }),
+            1
+        )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
             }),
             1
         )
@@ -1209,6 +1261,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            EventFactory.USER_1_OID, ChannelType.PRIVATE_TEXT)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_PRV_1_OID],
@@ -1224,6 +1277,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_discord_gprv_error(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
@@ -1231,6 +1292,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            EventFactory.CHANNEL_COL_DISCORD_OID)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPRV_1_OID],
@@ -1246,6 +1308,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             }),
             1
         )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
+            }),
+            1
+        )
 
     def test_handle_discord_gpub_error(self):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
@@ -1253,6 +1323,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            EventFactory.CHANNEL_COL_DISCORD_OID)
 
         self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPUB_1_OID],
@@ -1265,6 +1336,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
                 MessageRecordModel.MessageContent.key: "ERRORTEST"
+            }),
+            1
+        )
+        self.assertEqual(
+            BotFeatureUsageDataManager.count({
+                BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
+                BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
+                BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
             }),
             1
         )

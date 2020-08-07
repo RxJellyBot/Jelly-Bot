@@ -448,7 +448,7 @@ class CommandNode:
                     content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
                         cmd_fn.cd_sec_left(e.channel_oid)))]
         else:
-            BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
+            BotFeatureUsageDataManager.record_usage_async(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
             try:
                 ret = arg_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
                 cmd_fn.record_called(e.channel_oid)

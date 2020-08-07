@@ -11,7 +11,7 @@ def process_display_info(e: LineStickerMessageEventObject) -> List[HandledMessag
     if e.channel_type == ChannelType.PRIVATE_TEXT:
         sticker_info = e.content
 
-        BotFeatureUsageDataManager.record_usage(BotFeature.STK_LINE_GET_INFO, e.channel_oid, e.user_model.id)
+        BotFeatureUsageDataManager.record_usage_async(BotFeature.STK_LINE_GET_INFO, e.channel_oid, e.user_model.id)
 
         return [HandledMessageEventText(
             content=_("Sticker ID: `{}`\nPackage ID: `{}`").format(sticker_info.sticker_id, sticker_info.package_id),
