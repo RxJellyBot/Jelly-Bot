@@ -2156,4 +2156,456 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             [0, 0]
         )
 
-    # TEST: Stats - member_daily_message_count
+    def test_member_daily_message_count_single_channel(self):
+        msgs = self._insert_messages_4()
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID)
+
+        expected_trange = TimeRange(start=datetime(2020, 5, 31, 1, tzinfo=pytz.utc),
+                                    tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        addl_dates = [(date(2020, 6, 4) + timedelta(days=i)).strftime("%Y-%m-%d")
+                      for i in range((datetime.utcnow().date() - date(2020, 6, 4)).days + 1)]
+
+        expected_counts = {
+            "2020-05-31": {},
+            "2020-06-01": {},
+            "2020-06-02": {},
+            "2020-06-03": {}
+        }
+        for msg in msgs:
+            if msg.channel_oid != self.CHANNEL_OID:
+                continue
+
+            gen_time = msg.id.generation_time
+            gen_date_str = gen_time.date().strftime("%Y-%m-%d")
+
+            if gen_date_str not in expected_counts:
+                continue
+
+            if gen_time.time() > datetime.utcnow().time():
+                continue
+
+            date_dict = expected_counts[gen_date_str]
+
+            if msg.user_root_oid in date_dict:
+                date_dict[msg.user_root_oid] += 1
+            else:
+                date_dict[msg.user_root_oid] = 1
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+            + addl_dates
+        )
+        self.assertEqual(
+            result.data_count,
+            dict(expected_counts, **{dt: {} for dt in addl_dates})
+        )
+
+    def test_member_daily_message_count_multi_channel(self):
+        msgs = self._insert_messages_4()
+
+        result = MessageRecordStatisticsManager.member_daily_message_count([self.CHANNEL_OID, self.CHANNEL_OID_2])
+
+        expected_trange = TimeRange(start=datetime(2020, 5, 31, 1, tzinfo=pytz.utc),
+                                    tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        addl_dates = [(date(2020, 6, 4) + timedelta(days=i)).strftime("%Y-%m-%d")
+                      for i in range((datetime.utcnow().date() - date(2020, 6, 4)).days + 1)]
+
+        expected_counts = {
+            "2020-05-31": {},
+            "2020-06-01": {},
+            "2020-06-02": {},
+            "2020-06-03": {}
+        }
+        for msg in msgs:
+            gen_time = msg.id.generation_time
+            gen_date_str = gen_time.date().strftime("%Y-%m-%d")
+
+            if gen_date_str not in expected_counts:
+                continue
+
+            if gen_time.time() > datetime.utcnow().time():
+                continue
+
+            date_dict = expected_counts[gen_date_str]
+
+            if msg.user_root_oid in date_dict:
+                date_dict[msg.user_root_oid] += 1
+            else:
+                date_dict[msg.user_root_oid] = 1
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+            + addl_dates
+        )
+        self.assertEqual(
+            result.data_count,
+            dict(expected_counts, **{dt: {} for dt in addl_dates})
+        )
+
+    def test_member_daily_message_count_start_end_given(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 5, 31, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-05-31": {
+                    self.USER_OID: 8
+                },
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 2,
+                    self.USER_OID_2: 3
+                },
+                "2020-06-03": {}
+            }
+        )
+
+    def test_member_daily_message_count_start_before_first(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 5, 26, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-05-26", "2020-05-27", "2020-05-28", "2020-05-29", "2020-05-30",
+                "2020-05-31", "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-05-26": {},
+                "2020-05-27": {},
+                "2020-05-28": {},
+                "2020-05-29": {},
+                "2020-05-30": {},
+                "2020-05-31": {
+                    self.USER_OID: 8
+                },
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 2,
+                    self.USER_OID_2: 3
+                },
+                "2020-06-03": {}
+            }
+        )
+
+    def test_member_daily_message_count_start_after_first(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 3, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02", "2020-06-03"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 2,
+                    self.USER_OID_2: 3
+                },
+                "2020-06-03": {}
+            }
+        )
+
+    def test_member_daily_message_count_at_middle(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 1,
+                    self.USER_OID_2: 3
+                }
+            }
+        )
+
+    def test_member_daily_message_count_with_tz(self):
+        self._insert_messages_4()
+
+        tz = LocaleInfo.get_tzinfo("Asia/Taipei")
+
+        start_dt = datetime(2020, 6, 1, 8)
+        end_dt = datetime(2020, 6, 2, 10, 30)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt, tzinfo_=tz)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz)
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 1,
+                    self.USER_OID_2: 3
+                }
+            }
+        )
+
+    def test_member_daily_message_count_data_covered_not_in_range(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 3, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 5, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-03", "2020-06-04", "2020-06-05"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-03": {},
+                "2020-06-04": {},
+                "2020-06-05": {}
+            }
+        )
+
+    def test_member_daily_message_count_ts_with_tz(self):
+        self._insert_messages_4()
+
+        tz_8 = LocaleInfo.get_tzinfo("Asia/Taipei")
+        tz_9 = LocaleInfo.get_tzinfo("Asia/Seoul")
+
+        start_dt = datetime(2020, 6, 1, 9, tzinfo=tz_9)
+        end_dt = datetime(2020, 6, 2, 11, 30, tzinfo=tz_9)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(self.CHANNEL_OID,
+                                                                           start=start_dt, end=end_dt, tzinfo_=tz_8)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=tz_8)
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 1,
+                    self.USER_OID_2: 3
+                }
+            }
+        )
+
+    def test_member_daily_message_count_partial_channel_miss(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count([self.CHANNEL_OID, ObjectId()],
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {
+                    self.USER_OID: 4,
+                    self.USER_OID_2: 1
+                },
+                "2020-06-02": {
+                    self.USER_OID: 1,
+                    self.USER_OID_2: 3
+                }
+            }
+        )
+
+    def test_member_daily_message_count_channel_miss(self):
+        self._insert_messages_4()
+
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(ObjectId(),
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {},
+                "2020-06-02": {}
+            }
+        )
+
+    def test_member_daily_message_count_no_data(self):
+        start_dt = datetime(2020, 6, 1, tzinfo=pytz.utc)
+        end_dt = datetime(2020, 6, 2, 2, 30, tzinfo=pytz.utc)
+
+        result = MessageRecordStatisticsManager.member_daily_message_count(ObjectId(),
+                                                                           start=start_dt, end=end_dt)
+
+        expected_trange = TimeRange(start=start_dt, end=end_dt, tzinfo_=UTC.to_tzinfo())
+
+        # Possible calculation loss caused by converting days, hours and seconds
+        self.assertTimeDifferenceLessEqual(result.trange.start_org, expected_trange.start_org, 10)
+        self.assertTimeDifferenceLessEqual(result.trange.end, expected_trange.end, 5)
+
+        self.assertEqual(
+            result.dates,
+            [
+                "2020-06-01", "2020-06-02"
+            ]
+        )
+        self.assertEqual(
+            result.data_count,
+            {
+                "2020-06-01": {},
+                "2020-06-02": {}
+            }
+        )
