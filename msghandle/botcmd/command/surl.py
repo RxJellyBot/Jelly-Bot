@@ -16,7 +16,7 @@ cmd = CommandNode(
 # noinspection PyUnusedLocal
 @cmd.command_function(
     arg_count=1, arg_help=[_("URL to be shortened.")],
-    feature_flag=BotFeature.TXT_SURL_CREATE,
+    feature=BotFeature.TXT_SURL_CREATE,
     scope=CommandScopeCollection.PRIVATE_ONLY)
 def replace_newline(e: TextMessageEventObject, original_url: str) -> List[HandledMessageEventText]:
     result = ShortUrlDataManager.create_record(original_url, e.user_model.id)

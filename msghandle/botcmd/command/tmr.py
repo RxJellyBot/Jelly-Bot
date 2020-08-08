@@ -40,7 +40,7 @@ continue_help = _("A word that can indicate if the timer should keep counting up
 
 
 @cmd_add.command_function(
-    feature_flag=BotFeature.TXT_TMR_ADD,
+    feature=BotFeature.TXT_TMR_ADD,
     arg_count=4,
     arg_help=[add_kw_help, title_help, datetime_help, continue_help],
     scope=CommandScopeCollection.GROUP_ONLY
@@ -69,7 +69,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
 
 
 @cmd_add.command_function(
-    feature_flag=BotFeature.TXT_TMR_ADD,
+    feature=BotFeature.TXT_TMR_ADD,
     arg_count=3,
     arg_help=[add_kw_help, title_help, datetime_help],
     scope=CommandScopeCollection.GROUP_ONLY
@@ -80,7 +80,7 @@ def add_timer_smpl(e: TextMessageEventObject, keyword: str, title: str, dt: str)
 
 
 @cmd_list.command_function(
-    feature_flag=BotFeature.TXT_TMR_LIST_ALL,
+    feature=BotFeature.TXT_TMR_LIST_ALL,
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def list_all_timer(e: TextMessageEventObject) \
@@ -92,7 +92,7 @@ def list_all_timer(e: TextMessageEventObject) \
 
 
 @cmd_del.command_function(
-    feature_flag=BotFeature.TXT_TMR_DEL,
+    feature=BotFeature.TXT_TMR_DEL,
     arg_count=2,
     arg_help=[
         _("The keyword of the timer to delete."),

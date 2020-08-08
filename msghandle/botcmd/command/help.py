@@ -11,7 +11,7 @@ cmd = CommandNode(
 
 
 # noinspection PyUnusedLocal
-@cmd.command_function(feature_flag=BotFeature.TXT_BOT_HELP)
+@cmd.command_function(feature=BotFeature.TXT_BOT_HELP)
 def help_text(e: TextMessageEventObject):
     # For some reason, translation needs to be casted to `str` explicitly, or:
     #   - LINE cannot respond anything

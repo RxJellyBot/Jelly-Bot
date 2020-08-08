@@ -51,7 +51,7 @@ cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
 
 # region Add
 @cmd_add.command_function(
-    feature_flag=BotFeature.TXT_AR_ADD_EXECODE,
+    feature=BotFeature.TXT_AR_ADD_EXECODE,
     arg_count=1,
     arg_help=[
         _("The Execode obtained else where to complete the auto-reply module registration.")
@@ -103,7 +103,7 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
 
 
 @cmd_add.command_function(
-    feature_flag=BotFeature.TXT_AR_ADD,
+    feature=BotFeature.TXT_AR_ADD,
     arg_count=2,
     arg_help=[
         _("The message for the auto-reply module to be triggered.\n\n"
@@ -170,7 +170,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
 # region Delete
 @cmd_del.command_function(
-    feature_flag=BotFeature.TXT_AR_DEL,
+    feature=BotFeature.TXT_AR_DEL,
     arg_count=1,
     arg_help=[_("The keyword of the module to delete. Note that this also deletes the keyword which type is NOT text. "
                 "For example, if there is a module which keyword 100(Text) and another module which keyword "
@@ -207,7 +207,7 @@ def get_list_of_keyword_html(conn_list: ExtendedCursor[AutoReplyModuleModel]) ->
 
 
 @cmd_list.command_function(
-    feature_flag=BotFeature.TXT_AR_LIST_USABLE,
+    feature=BotFeature.TXT_AR_LIST_USABLE,
     arg_count=0,
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=10
@@ -225,7 +225,7 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
 
 
 @cmd_list.command_function(
-    feature_flag=BotFeature.TXT_AR_LIST_KEYWORD,
+    feature=BotFeature.TXT_AR_LIST_KEYWORD,
     arg_count=1,
     arg_help=[_("The search keyword to find the Auto-Reply module. "
                 "Auto-Reply module which keyword contains this will be returned.")],
@@ -247,7 +247,7 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
 
 
 @cmd_info.command_function(
-    feature_flag=BotFeature.TXT_AR_INFO,
+    feature=BotFeature.TXT_AR_INFO,
     arg_count=1,
     arg_help=[_("The search keyword to find the Auto-Reply module. "
                 "Auto-Reply module which keyword contains this will be returned.")],
@@ -278,7 +278,7 @@ def auto_reply_module_detail(e: TextMessageEventObject, keyword: str):
 
 
 @cmd_rk.command_function(
-    feature_flag=BotFeature.TXT_AR_RANKING,
+    feature=BotFeature.TXT_AR_RANKING,
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=120
 )

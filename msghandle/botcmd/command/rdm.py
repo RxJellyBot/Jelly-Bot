@@ -46,9 +46,11 @@ class OptionList:
         return self.weights is not None
 
     def pick_one(self):
+        # noinspection PyTypeChecker
         return random.choices(self.elements, self.weights, k=1)[0]
 
     def pick_multi(self, count: int) -> dict:
+        # noinspection PyTypeChecker
         results = random.choices(self.elements, self.weights, k=count)
 
         counter = defaultdict(lambda: 0)
@@ -82,7 +84,7 @@ pick_overlimit_txt = _(
 
 # noinspection PyUnusedLocal
 @cmd.command_function(
-    feature_flag=BotFeature.TXT_RDM_CHOICE_ONE,
+    feature=BotFeature.TXT_RDM_CHOICE_ONE,
     arg_count=1,
     arg_help=[elem_help_txt]
 )
@@ -105,7 +107,7 @@ def random_once(e: TextMessageEventObject, elements: str):
 
 # noinspection PyUnusedLocal
 @cmd.command_function(
-    feature_flag=BotFeature.TXT_RDM_CHOICE_MULTI,
+    feature=BotFeature.TXT_RDM_CHOICE_MULTI,
     arg_count=2,
     arg_help=[elem_help_txt,
               _("Count of how many times to randomly pick an option.\n"
