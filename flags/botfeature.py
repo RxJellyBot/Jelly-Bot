@@ -48,6 +48,8 @@ class BotFeature(FlagDoubleEnum):
                 1143 - Current Status
             115 - Calculator
                 1151 - Calculate
+            119 - Other
+                1191 - Ping
 
         12 - Extra Services
             120 - Short URL
@@ -146,6 +148,9 @@ class BotFeature(FlagDoubleEnum):
 
     TXT_CALCULATOR = \
         1151, _("Text / Calculator"), _("Calculate the given expression string.")
+
+    TXT_PING = \
+        1191, _("Text / Ping"), _("Command to check if the bot is working. Also check message sending time.")
 
     TXT_SURL_CREATE = \
         1201, _("Text / Short URL / Create"), _("Create a shortened URL.")

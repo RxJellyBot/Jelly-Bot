@@ -64,7 +64,9 @@ class Event(ABC):
 
     @property
     def constructed_time(self) -> float:
-        """The unit of this is seconds."""
+        """
+        Returns how long have this event object been created in seconds.
+        """
         return time.time() - self._construct
 
 
