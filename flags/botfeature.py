@@ -9,45 +9,74 @@ class BotFeature(FlagDoubleEnum):
         10 - Main
             100 - Auto Reply
                 1001 - Add
+
                 1002 - Delete
+
                 1003 - Add (Execode)
+
                 1004 - List (Usable)
+
                 1005 - List (Keyword)
+
                 1006 - Ranking
+
                 1009 - Respond
+
             101 - Timer
                 1011 - Add
+
                 1012 - List (All)
+
                 1013 - Delete
+
                 1019 - List (Keyword)
+
             102 - Profile
                 1021 - Create
+
                 1022 - Query
+
                 1023 - List
+
                 1024 - Attach
+
                 1025 - Detach
+
                 1026 - Delete
 
         11 - Sub
             110 - Information
                 1101 - Check channel/self ID
+
                 1102 - Check channel info
+
                 1103 - Check user info
+
                 1104 - Check channel member's info
+
                 1109 - Bot Help
+
             111 - Transform/Replace
                 1111 - Replace newline character
+
             112 - Random
                 1121 - Choice - Once
+
                 1122 - Choice - Multiple
+
             113 - Recent Activities
                 1131 - Message
+
             114 - Remote Control
                 1141 - Activate
+
                 1142 - Deactivate
+
                 1143 - Current Status
+
             115 - Calculator
                 1151 - Calculate
+
             119 - Other
                 1191 - Ping
 
@@ -57,7 +86,9 @@ class BotFeature(FlagDoubleEnum):
 
         19 - Functional
                 1901 - User data integration
+
                 1902 - Calculator
+
                 1999 - Error Test
 
     2 - Image
