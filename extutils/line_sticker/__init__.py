@@ -1,1 +1,1 @@
-from .main import LineStickerManager, LineStickerType
+from .main import LineStickerUtils, LineStickerType

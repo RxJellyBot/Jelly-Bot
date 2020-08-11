@@ -1,11 +1,28 @@
+import atexit
+import os
+import shutil
 import tempfile
-from typing import List
+from dataclasses import dataclass
+from typing import List, Optional
 
 import requests
 
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
+from extutils.imgproc import apng2gif
+
+__all__ = ["LineStickerType", "LineStickerUtils", "LineStickerMetadata", "LineAnimatedStickerDownloadResult"]
+
+_temp_dir = tempfile.mkdtemp()  # Temporary directory for LINE stickers
+atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
+
+
+@dataclass
+class LineAnimatedStickerDownloadResult:
+    available: bool = False
+
+    conversion_result: Optional[apng2gif.ConvertResult] = None
 
 
 class LineStickerType(FlagSingleEnum):
@@ -18,10 +35,7 @@ class LineStickerType(FlagSingleEnum):
     STATIC = 2, _("Static Sticker")
 
 
-class LineStickerManager:
-    def __init__(self):
-        self._tmp_dir = tempfile.TemporaryFile(prefix="LineSticker")
-
+class LineStickerUtils:
     # def _get_content(self, sticker_type, pack_id, list_ids):
     #     """
     #     :param sticker_type: The type of the sticker
@@ -39,7 +53,7 @@ class LineStickerManager:
     #     Errors:
     #         raise `MetaNotFoundException` if status code of getting pack meta is not 200.
     #     """
-    #     act = LineStickerManager.get_download_action(sticker_content_type)
+    #     act = LineStickerUtils.get_download_action(sticker_content_type)
     #     if act is None:
     #         raise ValueError("Url function and file extension of specified sticker type not handled. {}".format(
     #         repr(sticker_content_type)))
@@ -80,7 +94,7 @@ class LineStickerManager:
     #     """
     #     stk_ids = sticker_metadata.stickers
     #     pack_id = sticker_metadata.pack_id
-    #     pack_name = str(pack_id) + (LineStickerManager.DOWNLOAD_SOUND_CODE if download_sound_if_available else "")
+    #     pack_name = str(pack_id) + (LineStickerUtils.DOWNLOAD_SOUND_CODE if download_sound_if_available else "")
     #     comp_file_path = os.path.join(self._file_proc_path, pack_name + ".zip")
     #
     #     if os.path.isfile(comp_file_path):
@@ -125,7 +139,7 @@ class LineStickerManager:
     #     :type pack_id: str
     #     :return: LineStickerMetadata
     #     """
-    #     pack_meta = requests.get(LineStickerManager.get_meta_url(pack_id))
+    #     pack_meta = requests.get(LineStickerUtils.get_meta_url(pack_id))
     #
     #     if pack_meta.status_code == 200:
     #         json_dict = json.loads(pack_meta.text)
@@ -135,7 +149,7 @@ class LineStickerManager:
 
     @staticmethod
     def is_sticker_exists(sticker_id: [int, str]):
-        response = requests.get(LineStickerManager.get_sticker_url(sticker_id))
+        response = requests.get(LineStickerUtils.get_sticker_url(sticker_id))
 
         return response.ok
 
@@ -156,11 +170,42 @@ class LineStickerManager:
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/IOS/sticker_sound.m4a"
 
     @staticmethod
+    def download_apng_as_gif(pack_id: [int, str], sticker_id: [int, str], output_path: str) \
+            -> LineAnimatedStickerDownloadResult:
+        """
+        Download animated sticker as gif.
+
+        :param pack_id: sticker package ID
+        :param sticker_id: sticker ID
+        :param output_path: gif output path
+        :return: result of the download and conversion
+        """
+        # TEST: Sticker not exists / normal downloading progress
+        result = LineAnimatedStickerDownloadResult()
+
+        # Check if the sticker exists
+        response = requests.get(LineStickerUtils.get_apng_url(pack_id, sticker_id))
+        if not response.ok:
+            return result
+
+        result.available = True
+
+        # Download the sticker as apng and store it to a file
+        apng_path = os.path.join(_temp_dir, f"{sticker_id}.png")
+        with open(apng_path, "wb") as apng:
+            apng.write(response.content)
+
+        # Convert apng to gif
+        result.conversion_result = apng2gif.convert(apng_path, output_path)
+
+        return result
+
+    @staticmethod
     def get_dl_info(content_type: LineStickerType) -> (callable, str):
         dl_dict = {
-            LineStickerType.ANIMATED: (LineStickerManager.get_apng_url, ".apng"),
-            LineStickerType.STATIC: (LineStickerManager.get_sticker_url, ".png"),
-            LineStickerType.SOUND: (LineStickerManager.get_sound_url, ".m4a")
+            LineStickerType.ANIMATED: (LineStickerUtils.get_apng_url, ".apng"),
+            LineStickerType.STATIC: (LineStickerUtils.get_sticker_url, ".png"),
+            LineStickerType.SOUND: (LineStickerUtils.get_sound_url, ".m4a")
         }
 
         return dl_dict.get(content_type)

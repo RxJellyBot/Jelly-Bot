@@ -4,7 +4,7 @@ from typing import Any
 from JellyBot.systemconfig import AutoReply
 from extutils import safe_cast
 from extutils.imgproc import ImageValidator
-from extutils.line_sticker import LineStickerManager
+from extutils.line_sticker import LineStickerUtils
 from flags import AutoReplyContentType
 
 __all__ = ["AutoReplyValidator"]
@@ -65,6 +65,6 @@ class _BaseValidator:
     @staticmethod
     def is_content_sticker(content: Any, online_check) -> bool:
         if online_check:
-            return LineStickerManager.is_sticker_exists(content)
+            return LineStickerUtils.is_sticker_exists(content)
         else:
             return safe_cast(content, int) is not None

@@ -5,7 +5,7 @@ from typing import Optional, Union, List
 from bson import ObjectId
 
 from extutils.dt import localtime
-from extutils.line_sticker import LineStickerManager
+from extutils.line_sticker import LineStickerUtils
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
@@ -36,7 +36,7 @@ def _content_to_html(content_type, content):
     elif content_type == AutoReplyContentType.IMAGE:
         return f'<img src="{content}"/>'
     elif content_type == AutoReplyContentType.LINE_STICKER:
-        return f'<img src="{LineStickerManager.get_sticker_url(content)}"/>'
+        return f'<img src="{LineStickerUtils.get_sticker_url(content)}"/>'
     else:
         return content
 
