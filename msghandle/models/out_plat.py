@@ -9,7 +9,7 @@ from flags import MessageType
 from extutils.dt import now_utc_aware
 from extutils.utils import list_insert_in_between
 from extutils.emailutils import MailSender
-from extutils.line_sticker import LineStickerManager
+from extutils.line_sticker import LineStickerUtils
 from JellyBot.systemconfig import PlatformConfig
 from mongodb.factory import ExtraContentManager
 from strres.msghandle import ToSiteReason
@@ -95,27 +95,29 @@ class HandledEventsHolderPlatform:
                 elif msg_type == MessageType.IMAGE:
                     send_list.append(ImageSendMessage(original_content_url=content, preview_image_url=content))
                 elif msg_type == MessageType.LINE_STICKER:
-                    sticker_url = LineStickerManager.get_sticker_url(content)
+                    sticker_url = LineStickerUtils.get_sticker_url(content)
                     send_list.append(ImageSendMessage(original_content_url=sticker_url, preview_image_url=sticker_url))
 
             LineApiWrapper.reply_message(reply_token, send_list)
 
     async def send_discord(self, dc_channel):
-        send_list = []
+        send_list: List[str, Embed] = []
 
         for msg_type, content in self.to_send:
             if msg_type == MessageType.TEXT:
                 send_list.append(content)
             elif msg_type == MessageType.IMAGE:
-                send_list.append(
-                    Embed()
-                    .set_image(url=content)
-                    .set_footer(text=_("Image URL: {}").format(content)))
+                embed = Embed()
+                embed = embed.set_image(url=content)
+                embed = embed.set_footer(text=_("Image URL: {}").format(content))
+
+                send_list.append(embed)
             elif msg_type == MessageType.LINE_STICKER:
-                send_list.append(
-                    Embed()
-                    .set_image(url=LineStickerManager.get_sticker_url(content))
-                    .set_footer(text=_("Sticker ID: {}").format(content)))
+                embed = Embed()
+                embed = embed.set_image(url=LineStickerUtils.get_sticker_url(content))
+                embed = embed.set_footer(text=_("Sticker ID: {}").format(content))
+
+                send_list.append(embed)
 
         # Insert separator between responses
         send_list = list_insert_in_between(send_list, "------------------------------")
