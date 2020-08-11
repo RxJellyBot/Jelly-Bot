@@ -3,14 +3,41 @@ from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta, tzinfo, time
 from typing import Optional, Union, List
 
-import pytz
 from dateutil import parser
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-def now_utc_aware():
-    return datetime.utcnow().replace(tzinfo=pytz.UTC)
+def now_utc_aware(*, for_mongo: bool = False) -> datetime:
+    """
+    Return the current tz-aware :class:`datetime` with its timezone set to :class:`pytz.UTC`.
+
+    -----
+
+    If ``for_mongo`` is ``True``, the precision will be decreased to 1ms. if not, then it will be 1us.
+
+    MongoDB only records time with 1ms precision.
+    Setting ``for_mongo`` appropriately can eliminate the false negative of the tests.
+
+    Step flow that have a great chance to cause false inequality:
+
+    - Create a model with current timestamp
+
+    - Store that model to the database
+
+    - Get that model from the database
+
+    At 1 and 2, the datetime may looks like ``...:52.300125``, but at 3, the acquire model will be ``...:52.300``.
+
+    :param for_mongo: if this timestamp will be used as a data field of a MongoDB entry
+    :return: current tz-aware datetime with timezone set to UTC
+    """
+    dt = timezone.utc.localize(datetime.utcnow())
+
+    if for_mongo:
+        dt = dt.replace(microsecond=dt.microsecond // 1000 * 1000)
+
+    return dt
 
 
 def localtime(dt: datetime = None, tz: timezone = None):
@@ -24,7 +51,7 @@ def make_tz_aware(dt: datetime, tz: timezone = None):
     try:
         return timezone.make_aware(dt, tz)
     except OverflowError:
-        return dt.replace(tzinfo=timezone.utc)
+        return timezone.utc.localize(dt)
 
 
 def is_tz_naive(dt: datetime) -> bool:
@@ -34,7 +61,7 @@ def is_tz_naive(dt: datetime) -> bool:
         # Checking `is_naive` will call `utcoffset()`
         # This exception will only raise if `utcoffset()` is not `None`
 
-        # This exception could occur if dt = `datetime.min`.
+        # This exception might occur if dt = `datetime.min`.
         return False
 
 
@@ -69,7 +96,7 @@ def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datet
 
     # Attach timezone if needed
     if is_tz_naive(dt):
-        dt = dt.replace(tzinfo=tzinfo_ or pytz.utc)
+        dt = make_tz_aware(dt, tzinfo_ or timezone.utc)
 
     return dt
 

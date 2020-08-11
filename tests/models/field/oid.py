@@ -14,7 +14,8 @@ from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
 __all__ = ["TestOidFieldProperty", "TestOidFieldValueAllowNone", "TestOidFieldValueDefault",
-           "TestOidFieldValueNoAutocast", "TestOidFieldValueNoKey", "TestOidFieldValueNotReadonly"]
+           "TestOidFieldValueNoAutocast", "TestOidFieldValueNoKey", "TestOidFieldValueNotReadonly",
+           "TestOidFieldValueAllowNoneNotReadOnly"]
 
 
 class TestOidFieldProperty(TestFieldProperty.TestClass):
@@ -214,6 +215,65 @@ class TestOidFieldValueAllowNone(TestFieldValue.TestClass):
             (True, FieldReadOnlyError),
             (datetime(1920, 1, 1), FieldReadOnlyError),
             (datetime(2107, 1, 1), FieldReadOnlyError)
+        )
+
+
+class TestOidFieldValueAllowNoneNotReadOnly(TestFieldValue.TestClass):
+    def get_field(self) -> BaseField:
+        return ObjectIDField("k", allow_none=True, readonly=False)
+
+    def get_value_type_match_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            ("A", True),
+            (7, False),
+            (True, False),
+            (datetime(1920, 1, 1), True),
+            (datetime(2107, 1, 1), True),
+            (ObjectId("000000000000000000000000"), True),
+            ("5eb5f2800000000000000000", True),
+            (datetime(2020, 5, 9), True)
+        )
+
+    def get_value_validity_test(self) -> Tuple[Tuple[Any, bool], ...]:
+        return (
+            (None, True),
+            ("A", False),
+            (7, False),
+            (True, False),
+            (datetime(1920, 1, 1), False),
+            (datetime(2107, 1, 1), False),
+            (ObjectId("000000000000000000000000"), True),
+            ("5eb5f2800000000000000000", True),
+            (datetime(2020, 5, 9), True)
+        )
+
+    def is_auto_cast(self) -> bool:
+        return True
+
+    def get_values_to_cast(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, None),
+            (ObjectId("000000000000000000000000"), ObjectId("000000000000000000000000")),
+            ("5eb5f2800000000000000000", ObjectId("5eb5f2800000000000000000")),
+            (datetime(2020, 5, 9), ObjectId("5eb5f2800000000000000000"))
+        )
+
+    def get_valid_value_to_set(self) -> Tuple[Tuple[Any, Any], ...]:
+        return (
+            (None, None),
+            (ObjectId("000000000000000000000000"), ObjectId("000000000000000000000000")),
+            ("5eb5f2800000000000000000", ObjectId("5eb5f2800000000000000000")),
+            (datetime(2020, 5, 9), ObjectId("5eb5f2800000000000000000")),
+        )
+
+    def get_invalid_value_to_set(self) -> Tuple[Tuple[Any, Type[FieldError]], ...]:
+        return (
+            ("A", FieldOidStringInvalidError),
+            (7, FieldTypeMismatchError),
+            (True, FieldTypeMismatchError),
+            (datetime(1920, 1, 1), FieldOidDatetimeOutOfRangeError),
+            (datetime(2107, 1, 1), FieldOidDatetimeOutOfRangeError)
         )
 
 

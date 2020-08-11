@@ -1,20 +1,21 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from flags import ExtraContentType
 from models import Model, ExtraContentModel
 from JellyBot.systemconfig import Database
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestExtraContentModel"]
 
 
 class TestExtraContentModel(TestModel.TestClass):
     CHANNEL_OID = ObjectId()
-    TIMESTAMP = datetime.utcnow().replace(tzinfo=timezone.utc)
+    TIMESTAMP = now_utc_aware()
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -30,14 +31,14 @@ class TestExtraContentModel(TestModel.TestClass):
     def get_optional(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("t", "Title"): "Head",
-            ("ch", "ChannelOid"): TestExtraContentModel.CHANNEL_OID,
         }
 
     @classmethod
     def get_required(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("c", "Content"): "ABCD",
-            ("e", "Timestamp"): TestExtraContentModel.TIMESTAMP
+            ("e", "Timestamp"): TestExtraContentModel.TIMESTAMP,
+            ("ch", "ChannelOid"): TestExtraContentModel.CHANNEL_OID
         }
 
     def test_expiry(self):

@@ -14,6 +14,9 @@ from tests.base import TestCase
 from ._test_val import TestFieldValue
 from ._test_prop import TestFieldProperty
 
+__all__ = ["TestModelArrayFieldAllowNone", "TestModelArrayFieldExtra", "TestModelArrayFieldProperty",
+           "TestModelArrayFieldValueDefault", "TestModelArrayFieldValueNoAutocast"]
+
 
 class ModelTest(Model):
     Field1 = IntegerField("f1")
@@ -26,9 +29,6 @@ MODEL3 = ModelTest(Field1=11, Field2=True)
 
 MODEL4_DICT = {OID_KEY: ObjectId.from_datetime(datetime.now()), "f1": 13, "f2": True}
 MODEL4_INST = ModelTest.cast_model(MODEL4_DICT)
-
-__all__ = ["TestModelArrayFieldAllowNone", "TestModelArrayFieldExtra", "TestModelArrayFieldProperty",
-           "TestModelArrayFieldValueDefault", "TestModelArrayFieldValueNoAutocast"]
 
 
 class TestModelArrayFieldProperty(TestFieldProperty.TestClass):

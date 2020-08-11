@@ -58,13 +58,14 @@ def exec_timing_ns(fn):
     return inner
 
 
-def exec_timing_result(fn, *args, **kwargs) -> ExecutionResult:
+def exec_timing_result(fn, *args, log: bool = True, **kwargs) -> ExecutionResult:
     _start_ = time.time_ns()
     ret = fn(*args, **kwargs)
 
     exec_result = ExecutionResult(
         return_=ret, execution_ns=time.time_ns() - _start_, caller_stack=inspect.stack()[1])
 
-    exec_logger.logger.info(exec_result)
+    if log:
+        exec_logger.logger.info(exec_result)
 
     return exec_result

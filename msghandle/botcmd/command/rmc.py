@@ -27,7 +27,7 @@ cmd_status = cmd.new_child_node(codes=["s", "cur", "status", "current"])
 
 
 @cmd_actv.command_function(
-    feature_flag=BotFeature.TXT_RMC_ACTIVATE,
+    feature=BotFeature.TXT_RMC_ACTIVATE,
     description=_("Target channel will be replaced if the system has already been activated."),
     arg_count=1,
     arg_help=[_("The ID of the remote control target channel.")],
@@ -45,7 +45,7 @@ def remote_control_activate(e: TextMessageEventObject, target_channel: ObjectId)
 
 
 @cmd_dctv.command_function(
-    feature_flag=BotFeature.TXT_RMC_DEACTIVATE,
+    feature=BotFeature.TXT_RMC_DEACTIVATE,
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_deactivate(e: TextMessageEventObject):
@@ -59,7 +59,7 @@ def remote_control_deactivate(e: TextMessageEventObject):
 
 
 @cmd_status.command_function(
-    feature_flag=BotFeature.TXT_RMC_STATUS,
+    feature=BotFeature.TXT_RMC_STATUS,
     scope=CommandScopeCollection.PRIVATE_ONLY
 )
 def remote_control_status(e: TextMessageEventObject):

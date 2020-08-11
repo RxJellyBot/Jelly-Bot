@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Set
 
 from bson import ObjectId
 
@@ -14,16 +14,32 @@ class ChannelProfileModel(Model):
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     # !!! Check `ProfileManager.process_create_profile_kwargs` when changing the variable name of this class. !!!
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
+    ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required, readonly=True)
     Name = TextField("n", default="-", must_have_content=True)
     Color = ColorField("col")
     # 0 means no need to vote, > 0 means # votes needed to get this profile
     PromoVote = IntegerField("promo", positive_only=True)
-    Permission = DictionaryField("perm",
-                                 default=ProfilePermissionDefault.get_default_code_str_dict(), allow_none=False)
+    Permission = DictionaryField("perm", allow_none=False,
+                                 default=ProfilePermissionDefault.get_default_code_str_dict())
     PermissionLevel = PermissionLevelField("plv")
 
     EmailKeyword = ArrayField("e-kw", str)
+
+    def __init__(self, *, from_db=False, **kwargs):
+        super().__init__(from_db=from_db, **kwargs)
+        self._complete_permission()
+
+    def _complete_permission(self):
+        d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
+
+        # Deep copy the variable so the original dict used to construct the model will not be modified
+        d_to_set = dict(self.permission)
+
+        for perm_cat in ProfilePermission:
+            k = perm_cat.code_str
+            d_to_set[k] = k in d or self.permission.get(k, False)
+
+        self.permission = d_to_set
 
     @property
     def is_mod(self):
@@ -35,6 +51,13 @@ class ChannelProfileModel(Model):
 
     @property
     def permission_list(self) -> List[ProfilePermission]:
+        """
+        Return the list of the permissions sorted by the permission code.
+        """
+        return list(sorted(self.permission_set, key=lambda x: x.code))
+
+    @property
+    def permission_set(self) -> Set[ProfilePermission]:
         ret = set()
 
         for cat, permitted in self.permission.items():
@@ -45,16 +68,7 @@ class ChannelProfileModel(Model):
 
         ret = ret.union(ProfilePermissionDefault.get_overridden_permissions(self.permission_level))
 
-        return list(sorted(ret, key=lambda x: x.code))
-
-    def pre_iter(self):
-        # Will be used when the data will be passed to MongoDB
-        d = [p.code_str for p in ProfilePermissionDefault.get_overridden_permissions(self.permission_level)]
-
-        for perm_cat in ProfilePermission:
-            k = perm_cat.code_str
-            if k not in self.permission:
-                self.permission[k] = k in d
+        return ret
 
 
 @dataclass

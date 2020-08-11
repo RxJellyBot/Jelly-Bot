@@ -11,7 +11,7 @@ __all__ = ["process_calculator"]
 # Obtained and modified from https://stackoverflow.com/a/14822667
 def process_calculator(e: TextMessageEventObject, output_error: bool = False) -> List[HandledMessageEvent]:
     if e.text and e.text[-1] == "=":
-        BotFeatureUsageDataManager.record_usage(BotFeature.TXT_FN_CALCULATOR, e.channel_oid, e.user_model.id)
+        BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_FN_CALCULATOR, e.channel_oid, e.user_model.id)
 
         expr = e.text[:-1]
 

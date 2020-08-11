@@ -48,9 +48,8 @@ class FlagField(IntegerField, ABC):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
-        return cls.FLAG_TYPE.default()
+    def none_obj(self):
+        return self.FLAG_TYPE.default()
 
     @property
     def expected_types(self):

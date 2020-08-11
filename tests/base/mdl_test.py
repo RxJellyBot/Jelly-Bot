@@ -10,7 +10,8 @@ from models.exceptions import (
     IdUnsupportedError, ModelConstructionError, FieldKeyNotExistError, JsonKeyNotExistedError, ModelUncastableError
 )
 from models.field.exceptions import FieldReadOnlyError
-from tests.base import TestCase
+
+from .base import TestCase
 
 __all__ = ["TestModel"]
 
@@ -32,6 +33,16 @@ class TestModel(ABC):
     Configure class variable ``KEY_SKIP_CHECK`` and ``KEY_SKIP_CHECK_INVALID``
     to set the keys to bypass the validation.
 
+    Additional method to be overridden when necessary:
+
+    - ``get_optional()``
+
+    - ``get_default()``
+
+    - ``get_required()``
+
+    - ``get_invalid()``
+
     .. seealso::
         https://stackoverflow.com/a/25695512/11571888 to see why there's a class wrapper.
     """
@@ -50,9 +61,21 @@ class TestModel(ABC):
             cls.validate_fields()
 
         @classmethod
-        @final
-        def validate_fields(cls):
-            # Validate REQUIRED
+        def _validate_skip_lazy(cls):
+            """Append default lazy fields to the list of keys to skip the checks."""
+            for fk in cls.get_model_class().model_field_keys():
+                fc = cls.get_model_class().get_field_class_instance(fk)
+                if not fc:
+                    raise AttributeError(f"Field with field key `{fk}` not exist.")
+
+                if fc.is_default_lazy:
+                    k = (fc.key, fk)
+
+                    cls.KEY_SKIP_CHECK.add(k)
+                    cls.KEY_SKIP_CHECK_INVALID.add(k)
+
+        @classmethod
+        def _validate_required(cls):
             for k in cls.get_required().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -63,7 +86,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not REQUIRED. @{cls.__qualname__}")
 
-            # Validate INVALID REQUIRED
+        @classmethod
+        def _validate_required_invalid(cls):
             keys = set()
             for comb in cls.get_invalid():
                 init_args, exc = comb
@@ -80,7 +104,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not REQUIRED. @{cls.__qualname__}")
 
-            # Validate OPTIONAL
+        @classmethod
+        def _validate_optional(cls):
             for k in cls.get_optional().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -91,7 +116,8 @@ class TestModel(ABC):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"is not OPTIONAL. @{cls.__qualname__}")
 
-            # Validate DEFAULT
+        @classmethod
+        def _validate_default(cls):
             for k in cls.get_default().keys() - cls.KEY_SKIP_CHECK:
                 jk, fk = k
                 fc = cls.get_model_class().get_field_class_instance(fk)
@@ -101,6 +127,24 @@ class TestModel(ABC):
                 if ModelDefaultValueExt.is_default_val_ext(fc.default_value):
                     raise ValueError(f"The default value of the field with field key `{fk}` "
                                      f"should not be extended default value. @{cls.__qualname__}")
+
+        @classmethod
+        @final
+        def validate_fields(cls):
+            # Append lazy field keys to skip the checks
+            cls._validate_skip_lazy()
+
+            # Validate REQUIRED
+            cls._validate_required()
+
+            # Validate INVALID REQUIRED
+            cls._validate_required_invalid()
+
+            # Validate OPTIONAL
+            cls._validate_optional()
+
+            # Validate DEFAULT
+            cls._validate_default()
 
         @classmethod
         @abstractmethod
@@ -246,7 +290,7 @@ class TestModel(ABC):
 
         @staticmethod
         @final
-        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        def _dict_to_json_field(d: Dict[Tuple[str, str], Any]) -> (Dict[str, Any], Dict[str, Any]):
             """
             Process ``d`` to return a ``dict`` with json key (1st returned element)
             and the other ``dict`` with field key.
@@ -527,11 +571,11 @@ class TestModel(ABC):
                 # Compare constructed model and dict with required elements and optional elements
                 items.append((
                     "Model vs dict / R + O",
-                    self.get_constructed_model(),
+                    self.get_constructed_model(including_optional=True),
                     dict({k[0]: v for k, v in self.get_required().items()},
                          **{k[0]: v for k, v in self.get_optional().items()})
                 ))
 
             for msg, a, b in items:
                 with self.subTest(msg=msg):
-                    self.assertEqual(a, b)
+                    self.assertEqual(a, b, f"{a}\n{b}")

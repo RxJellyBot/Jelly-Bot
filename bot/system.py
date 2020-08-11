@@ -2,13 +2,13 @@
 Functions to access systematic information.
 """
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict
 
 from extutils.dt import now_utc_aware
 
 __all__ = ["get_boot_dt", "record_boot_dt"]
 
-boot_dt_utc = {"dt": None}
+boot_dt_utc: Dict[str, Optional[datetime]] = {"dt": None}
 
 
 def get_boot_dt() -> Optional[datetime]:

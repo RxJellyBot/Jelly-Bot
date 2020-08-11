@@ -6,7 +6,7 @@ from extutils.color import ColorFactory
 from flags import ProfilePermissionDefault, PermissionLevel, ProfilePermission
 from models import Model, ChannelProfileModel, ChannelProfileConnectionModel, PermissionPromotionRecordModel
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestChannelProfileModel", "TestChannelProfileConnectionModel", "TestPermissionPromotionRecordModel"]
 
@@ -26,19 +26,15 @@ class TestChannelProfileModel(TestModel.TestClass):
 
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
-        perm_dict = {
-            ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
-            ProfilePermission.CNL_ADJUST_PRIVACY: True
-        }
-
         return {
             ("n", "Name"): ("-", "ChannelName"),
             ("col", "Color"): (ColorFactory.DEFAULT, ColorFactory.WHITE),
             ("promo", "PromoVote"): (0, 5),
             ("perm", "Permission"):
                 (ProfilePermissionDefault.get_default_code_str_dict(),
-                 {k.code_str: v for k, v in perm_dict.items()}),
-            ("plv", "PermissionLevel"): (PermissionLevel.NORMAL, PermissionLevel.ADMIN),
+                 ProfilePermissionDefault.get_default_code_str_dict({ProfilePermission.AR_ACCESS_PINNED_MODULE,
+                                                                     ProfilePermission.CNL_ADJUST_PRIVACY})),
+            ("plv", "PermissionLevel"): (PermissionLevel.NORMAL, PermissionLevel.NORMAL),
             ("e-kw", "EmailKeyword"): ([], ["A", "B"])
         }
 
@@ -56,6 +52,18 @@ class TestChannelProfileModel(TestModel.TestClass):
             with self.subTest(expected_is_admin=is_admin, model=model):
                 self.assertEqual(model.is_admin, is_admin)
 
+    def test_permission_set(self):
+        perm_dict = {
+            ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
+            ProfilePermission.CNL_ADJUST_PRIVACY: True
+        }
+        mdl = self.get_constructed_model(perm=perm_dict)
+
+        expected = {perm for perm, active in ProfilePermissionDefault.get_default_dict().items() if active}
+        expected.update(perm_dict)
+
+        self.assertSetEqual(mdl.permission_set, expected)
+
     def test_permission_list(self):
         perm_dict = {
             ProfilePermission.AR_ACCESS_PINNED_MODULE: True,
@@ -66,7 +74,10 @@ class TestChannelProfileModel(TestModel.TestClass):
         expected = {perm for perm, active in ProfilePermissionDefault.get_default_dict().items() if active}
         expected.update(perm_dict)
 
-        self.assertSetEqual(set(mdl.permission_list), expected)
+        self.assertListEqual(
+            mdl.permission_list,
+            [ProfilePermission.NORMAL, ProfilePermission.AR_ACCESS_PINNED_MODULE, ProfilePermission.CNL_ADJUST_PRIVACY]
+        )
 
 
 class TestChannelProfileConnectionModel(TestModel.TestClass):

@@ -7,7 +7,7 @@ class JellyBotAppConfig(AppConfig):
 
     def ready(self):
         from bot.event import signal_django_ready
-        from extdiscord import run_server
+        from extdiscord.core import run_server
 
         signal_django_ready()
         if os.environ.get("DISCORD_START"):

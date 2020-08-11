@@ -1,10 +1,12 @@
 import re
 from datetime import datetime
-from typing import List, Tuple, Union, Generator, Any, Optional
+from typing import List, Tuple, Union, Generator, Any, Optional, TypeVar, Type
 import html
 
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
+
+T = TypeVar("T")
 
 
 def cast_keep_none(obj, dest_type: type):
@@ -18,9 +20,9 @@ def cast_keep_none(obj, dest_type: type):
         return None
 
 
-def cast_iterable(iterable: Union[List, Tuple], dest_type):
+def cast_iterable(iterable: Union[List[T], Tuple[T]], dest_type: Type[T]):
     """
-    Cast ``iterable`` to ``List[dest_type]``.
+    Cast ``iterable`` to ``List[dest_type]`` or ``Tuple[dest_type]`` depending on the actual type of ``iterable``.
 
     Can be performed on a nested list.
 
@@ -30,12 +32,12 @@ def cast_iterable(iterable: Union[List, Tuple], dest_type):
         ret = []
 
         for item in iterable:
-            if isinstance(item, (list, tuple)):
-                ret.append(cast_iterable(item, dest_type))
-            else:
-                ret.append(dest_type(item))
+            ret.append(cast_iterable(item, dest_type))
 
-        return ret
+        if isinstance(iterable, tuple):
+            return tuple(ret)
+        else:
+            return ret
     else:
         return dest_type(iterable)
 

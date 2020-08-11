@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import Any
 
 
 # region Configurations
@@ -34,7 +35,12 @@ class StrBoolResult(Enum):
             raise ValueError("The result is `UNKNOWN`.")
 
 
-def str_to_bool(s: str) -> StrBoolResult:
+def to_bool(s: Any) -> StrBoolResult:
+    if isinstance(s, bool):
+        return StrBoolResult.TRUE if s else StrBoolResult.FALSE
+    elif not isinstance(s, str):
+        s = str(s)
+
     if case_insensitive:
         s = s.lower()
 

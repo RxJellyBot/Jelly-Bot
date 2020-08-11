@@ -7,6 +7,8 @@ from extutils.utils import (
 )
 from tests.base import TestCase
 
+__all__ = ["TestUtilFunctions"]
+
 
 # noinspection PyTypeChecker
 class TestUtilFunctions(TestCase):
@@ -20,19 +22,29 @@ class TestUtilFunctions(TestCase):
         self.assertEqual(False, cast_keep_none(0, bool))
 
     def test_cast_iterable(self):
-        self.assertListEqual(
+        self.assertEqual(
             [1, 2, 3],
             cast_iterable(["1", "2", "3"], int))
-        self.assertListEqual(
-            [1, 2, 3],
-            cast_iterable(("1", "2", "3"), int))
-        self.assertListEqual(
+        self.assertEqual(
             [1, 2, 3, 1, 7],
             cast_iterable(["1", "2", "3", True, 7], int))
-        self.assertListEqual(
+        self.assertEqual(
             [1, 2, [1, 2, [1, 2]]],
             cast_iterable(["1", "2", ["1", "2", ["1", "2"]]], int))
+
+    def test_cast_iterable_not_iter(self):
         self.assertEqual(7, cast_iterable("7", int))
+
+    def test_cast_iterable_iter_type(self):
+        self.assertEqual(
+            (1, 2, 3),
+            cast_iterable(("1", "2", "3"), int))
+        self.assertEqual(
+            (1, 2, 3, 1, 7),
+            cast_iterable(("1", "2", "3", True, 7), int))
+        self.assertEqual(
+            [1, 2, (1, 2, [1, 2])],
+            cast_iterable(["1", "2", ("1", "2", ["1", "2"])], int))
 
     def test_safe_cast(self):
         self.assertIsNone(safe_cast(None, int))

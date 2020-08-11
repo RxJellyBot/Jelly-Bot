@@ -1,6 +1,7 @@
 from bson import ObjectId
 
 from tests.base import TestDatabaseMixin
+from mongodb.factory import new_mongo_session
 from models import Model
 from models.field import ObjectIDField, ArrayField
 
@@ -18,11 +19,18 @@ class TestReplaceUid(TestDatabaseMixin):
 
     def setUpTestCase(self) -> None:
         col = self.get_collection("testcol")
+        col.delete_many({})
         col.insert_one({"o": TestReplaceUid.OLD, "a": [TestReplaceUid.OLD]})
 
     def test_replace_oid(self):
         col = self.get_collection("testcol")
-        failed = ModelForTest.replace_uid(col, TestReplaceUid.OLD, TestReplaceUid.NEW)
+
+        with new_mongo_session() as session:
+            session.start_transaction()
+
+            failed = ModelForTest.replace_uid(col, TestReplaceUid.OLD, TestReplaceUid.NEW, session)
+
+            session.commit_transaction()
 
         self.assertEqual([], failed)
 

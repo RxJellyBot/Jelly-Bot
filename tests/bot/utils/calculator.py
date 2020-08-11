@@ -1,6 +1,8 @@
 from bot.utils import calculate_expression
 from tests.base import TestCase
 
+__all__ = ["TestBotCalculator"]
+
 
 class TestBotCalculator(TestCase):
     def test_calculate_simple(self):

@@ -3,11 +3,13 @@ count = True
 ignore =
     # module imported but not used (actually using but somehow not detected)
     F401
+    # As of PEP 8, W503 is yielded in old-style
+    W503
 exclude =
     tests_old/
     archive/
     sandbox*.py
-max-complexity = 15
+max-complexity = 10
 max-line-length = 119
 show-source = True
 statistics = True

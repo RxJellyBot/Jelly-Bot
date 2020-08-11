@@ -34,7 +34,7 @@ class CommandFunction:
     cmd_feature: BotFeature
     description: str
     scope: CommandScope
-    cooldown_sec: int
+    cooldown_sec: Optional[int]
     last_call: Dict[ObjectId, float] = field(init=False)
     prm_keys: List[CommandParameter] = field(init=False)
 
@@ -42,7 +42,15 @@ class CommandFunction:
         # List of parameters for future reference
         self.prm_keys = [CommandParameter(name, prm.annotation.__name__)
                          for name, prm in signature(self.fn).parameters.items()]
-        self.last_call = defaultdict(lambda: -self.cooldown_sec)
+
+        # For command without cooldown, `self.cooldown_sec` will be `None`.
+        # But if the command has cooldown, it needs to be reversed for calculation.
+        if self.cooldown_sec:
+            self.cooldown_sec = -self.cooldown_sec
+        else:
+            self.cooldown_sec = None
+
+        self.last_call = defaultdict(lambda: self.cooldown_sec)
         self._cache = {}
 
     # Dynamically construct `usage` because `cmd_node.splitter` is required. Command structure wasn't ready
@@ -89,14 +97,20 @@ class CommandFunction:
         return id(self.fn)
 
     def can_be_called(self, channel_oid: ObjectId) -> bool:
+        if not self.cooldown_sec:
+            return True
+
         return (monotonic() - self.last_call[channel_oid]) > self.cooldown_sec
 
     def cd_sec_left(self, channel_oid: ObjectId) -> float:
+        if not self.cooldown_sec:
+            return 0
+
         return max(self.cooldown_sec - (monotonic() - self.last_call[channel_oid]), 0)
 
     @property
     def has_cooldown(self) -> int:
-        return self.cooldown_sec > 0
+        return self.cooldown_sec is not None and self.cooldown_sec > 0
 
     def record_called(self, channel_oid: ObjectId):
         self.last_call[channel_oid] = monotonic()
@@ -111,6 +125,8 @@ class CommandFunction:
 class CommandNode:
     NO_DESCRIPTION = _("No description provided.")
     NO_NAME = _("(N/A)")
+
+    QUOTATION_MARKS = ("'", "\"", "“", "”")
 
     def __init__(self, *, codes=None, order_idx=None, name=None, description=None, brief_description=None,
                  is_root=False, splitters=None, prefix=None, parent=None, case_insensitive=True):
@@ -313,27 +329,28 @@ class CommandNode:
             self, fn: Callable = None, *, arg_count: int = 0, arg_help: List[str] = None,
             description: str = NO_DESCRIPTION,
             scope: CommandScope = CommandScopeCollection.NOT_RESTRICTED,
-            feature_flag: BotFeature = BotFeature.UNDEFINED, cooldown_sec: int = 0):
+            feature: BotFeature = BotFeature.UNDEFINED, cooldown_sec: Optional[int] = None):
         """
-        Function used to decorate the function to be ready to execute command.
+        Decorator to mark the command handling function.
 
-        :param fn: No need to specify as the decorator will automatically use it.
-        :param arg_count: The count of the arguments indicating when will the `fn` be executed.
-        :param arg_help: Help of each arguments.
-        :param description: Description of the command function.
-        This will be replaced by the description of `feature_flag` even if specified.
-        :param scope: Usable scope of the command function.
-        :param feature_flag: Feature flag of the command function.
+        ``description`` will be attached after the description imported from ``feature_flag``.
+
+        :param fn: command handling function
+        :param arg_count: count of the arguments of the handling function
+        :param arg_help: help text of the arguments
+        :param description: description of the handling function
+        :param scope: scope of the handling function
+        :param feature: feature of the handling function
         :param cooldown_sec: cooldown of the command in seconds
         """
         if not arg_help:
             arg_help = []
 
-        if feature_flag != BotFeature.UNDEFINED:
+        if feature != BotFeature.UNDEFINED:
             if description and description != CommandNode.NO_DESCRIPTION:
-                description = f"{feature_flag.description}\n\n{description}"
+                description = f"{feature.description}\n\n{description}"
             else:
-                description = feature_flag.description
+                description = feature.description
 
         # Check the length of arg help and fill it with empty string if len(arg_help) is shorter.
         if len(arg_help) < arg_count:
@@ -345,7 +362,7 @@ class CommandNode:
             if len(s.parameters) > arg_count:
                 self._register(
                     arg_count, CommandFunction(
-                        arg_count, arg_help, f, self, feature_flag, description, scope, cooldown_sec))
+                        arg_count, arg_help, f, self, feature, description, scope, cooldown_sec))
             else:
                 logger.logger.warning(
                     f"Function `{f.__qualname__}` not registered because its argument length is insufficient.")
@@ -372,40 +389,51 @@ class CommandNode:
             return []
 
         ret = []
-        in_quote = False
-        proc_s = ""
+        cur_quote_mark = ""
+        proc_s = s[0]
 
         def is_quote(c_):
-            return c_ in ("'", "\"", "“", "”")
+            return c_ in CommandNode.QUOTATION_MARKS and c_ != "”"
 
-        for idx, c in enumerate(s):
-            is_splitter = c == splitter
-            if (not in_quote and is_splitter) or (in_quote and is_quote(c)):
+        def is_quote_end(c__):
+            if not cur_quote_mark:
+                return False
+
+            if cur_quote_mark == "“":
+                return c__ == "”"
+            else:
+                return c__ == cur_quote_mark
+
+        for cur_idx in range(1, len(s)):
+            prv = s[cur_idx - 1]
+            cur = s[cur_idx]
+
+            is_cur_splitter = cur == splitter
+
+            # Breaks on:
+            # - Not in quote / no current quotation mark AND is splitter
+            # - In quote AND end of quote / previous is current quotation mark AND current is splitter
+            if (not cur_quote_mark and is_cur_splitter) \
+                    or (cur_quote_mark and is_quote_end(prv) and is_cur_splitter):
                 ret.append(proc_s)
 
                 if arg_count != -1 and len(ret) >= arg_count:
                     break
 
                 proc_s = ""
-            elif is_quote(c):
-                in_quote = True
-            elif not(not in_quote and is_splitter):
-                """
-                In quote, is splitter, append string
-                0 0 1
-                0 1 0
-                1 0 1
-                1 1 1
-                """
-                proc_s += c
+                cur_quote_mark = ""
+            else:
+                if prv == splitter and is_quote(cur):
+                    cur_quote_mark = cur
 
-        if proc_s:
-            ret.append(proc_s)
+                proc_s += cur
+
+        ret.append(proc_s)
 
         return ret
 
     @staticmethod
-    def _sanitize_args(args_list: List[str]):
+    def _sanitize_args_after_split(args_list: List[str]):
         ret = []
         for arg in args_list:
             # Strip the arg
@@ -430,6 +458,39 @@ class CommandNode:
         else:
             return args_list
 
+    @staticmethod
+    def _sanitize_args_prehandle(args_list: List[str]):
+        ret = []
+        for arg in args_list:
+            ret.append(CommandNode._remove_quotation_marks_wrap(arg))
+
+        return ret
+
+    @staticmethod
+    def _remove_quotation_marks_wrap(s: str):
+        """
+        Removes the quotation mark wrap.
+
+        Only works if:
+        - string length is > 2
+        - both ends are quotation marks
+        - both quotation marks at both ends are the same
+
+        :param s: string to remove the quotation marks
+        :return: processed string which the wrapping quotation marks are removed if exists
+        """
+        if not s or len(s) <= 2:
+            return s
+
+        is_start_qm = s[0] in CommandNode.QUOTATION_MARKS
+        is_end_qm = s[-1] in CommandNode.QUOTATION_MARKS
+        is_start_end_same = s[0] == s[-1] or ((s[0], s[-1]) == ("“", "”"))
+
+        if is_start_qm and is_end_qm and is_start_end_same:
+            s = s[1:-1]
+
+        return s
+
     # noinspection PyMethodMayBeStatic
     def _handle_fn(self, e: TextMessageEventObject, cmd_fn: callable, args: List[str] = None):
         ret: List[HandledMessageEventText]
@@ -448,7 +509,7 @@ class CommandNode:
                     content=_("Command is in cooldown. Call the command again after {:.2f} secs.").format(
                         cmd_fn.cd_sec_left(e.channel_oid)))]
         else:
-            BotFeatureUsageDataManager.record_usage(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
+            BotFeatureUsageDataManager.record_usage_async(cmd_fn.cmd_feature, e.channel_oid, e.user_model.id)
             try:
                 ret = arg_type_ensure(fn=cmd_fn.fn, converter=NonSafeDataTypeConverter)(e, *args)
                 cmd_fn.record_called(e.channel_oid)
@@ -475,16 +536,18 @@ class CommandNode:
 
         if args is None:
             args = self._split_args(command, splitter, max_arg_count)
-            args = self._sanitize_args(args)
+            args = self._sanitize_args_after_split(args)
 
         args = self._merge_overlength_args(args, splitter, max_arg_count)
 
         cmd_fn: Optional[CommandFunction] = self.get_fn_obj(len(args))
         if cmd_fn:
+            args = self._sanitize_args_prehandle(args)
             return self._handle_fn(e, cmd_fn, args)
 
         if args:
             cmd_code, cmd_args = args[0], args[1:]
+            cmd_code = CommandNode._remove_quotation_marks_wrap(cmd_code)
 
             cmd_node: Optional[CommandNode] = self.get_child_node(code=cmd_code)
             if cmd_node:

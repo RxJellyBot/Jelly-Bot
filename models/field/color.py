@@ -23,8 +23,7 @@ class ColorField(BaseField):
     def expected_types(self):
         return Color, int, str
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ColorFactory.DEFAULT
 
     def _check_value_valid_not_none(self, value):

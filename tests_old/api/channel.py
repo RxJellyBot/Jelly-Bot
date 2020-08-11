@@ -35,7 +35,7 @@ class TestChannelRegistration(GetJsonResponseMixin, TestCase):
         else:
             raise ValueError("Fake data registration failed.")
 
-        ChannelManager.register(1, "channel1")
+        ChannelManager.ensure_register(1, "channel1")
 
     def test_main(self):
         self._issue_channel_register_execode()
@@ -79,7 +79,7 @@ class TestChannelDataQuery(GetJsonResponseMixin, TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         MONGO_CLIENT.get_database("channel").get_collection("dict").delete_many({})
-        ChannelManager.register(1, "channel1")
+        ChannelManager.ensure_register(1, "channel1")
 
     def test_get_existed_data(self):
         result = self.print_and_get_json(

@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 
 from ._base import BaseField
@@ -51,8 +52,7 @@ class ObjectIDField(BaseField):
         else:
             raise FieldValueInvalidError(self.key, value)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ObjectId("000000000000000000000000")
 
     @property
@@ -63,5 +63,5 @@ class ObjectIDField(BaseField):
     def replace_uid_implemented(self) -> bool:
         return True
 
-    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
-        return collection_inst.update_many({self.key: old}, {"$set": {self.key: new}}).acknowledged
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId, session: ClientSession) -> bool:
+        return collection_inst.update_many({self.key: old}, {"$set": {self.key: new}}, session=session).acknowledged

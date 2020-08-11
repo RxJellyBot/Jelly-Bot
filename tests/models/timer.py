@@ -1,15 +1,16 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
+from django.utils import timezone
 
 from extutils.dt import now_utc_aware, t_delta_str, localtime
 from extutils.locales import LocaleInfo
 from models import Model, TimerModel, TimerListResult, RootUserModel, RootUserConfigModel
-from strnames.models import Timer
+from strres.models import Timer
 from tests.base import TestCase
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestTimerModel", "TestTimerListResult"]
 
@@ -17,7 +18,7 @@ __all__ = ["TestTimerModel", "TestTimerListResult"]
 class TestTimerModel(TestModel.TestClass):
     CHANNEL_OID = ObjectId()
     TARGET_TIME = datetime(2020, 5, 7, 12).replace(tzinfo=timezone.utc)
-    DELETION_TIME = datetime.utcnow().replace(tzinfo=timezone.utc) + timedelta(days=7)
+    DELETION_TIME = now_utc_aware() + timedelta(days=7)
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:

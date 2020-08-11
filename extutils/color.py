@@ -41,6 +41,9 @@ class Color:
     def __repr__(self):
         return f"Color: {self.color_hex}"
 
+    def __hash__(self):
+        return hash(self.color_int)
+
     def __eq__(self, other):
         if isinstance(other, Color):
             return other.color_int == self.color_int

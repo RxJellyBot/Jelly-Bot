@@ -1,7 +1,6 @@
 from typing import List
 
 from flags import AutoReplyContentType, BotFeature
-from JellyBot.systemconfig import AutoReply
 from mongodb.factory import AutoReplyManager, BotFeatureUsageDataManager
 from msghandle.models import TextMessageEventObject, HandledMessageEvent
 
@@ -9,8 +8,7 @@ from msghandle.models import TextMessageEventObject, HandledMessageEvent
 def process_auto_reply(e: TextMessageEventObject) -> List[HandledMessageEvent]:
     ret = []
 
-    resps = AutoReplyManager.get_responses(
-        e.text, AutoReplyContentType.TEXT, e.channel_oid, case_insensitive=AutoReply.CaseInsensitive)
+    resps = AutoReplyManager.get_responses(e.text, AutoReplyContentType.TEXT, e.channel_oid)
 
     if resps:
         BotFeatureUsageDataManager.record_usage_async(BotFeature.TXT_AR_RESPOND, e.channel_oid, e.user_model.id)

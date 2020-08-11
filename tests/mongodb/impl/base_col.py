@@ -68,14 +68,16 @@ class TestBaseCollectionModel(Model):
     ArrayF = ArrayField("a2", int, default=ModelDefaultValueExt.Optional, auto_cast=True)
 
 
+class TestCollection(BaseCollection):
+    database_name = "db"
+    collection_name = "col"
+    model_class = TestBaseCollectionModel
+
+
+col = TestCollection()
+
+
 class TestBaseCollection(TestDatabaseMixin):
-    collection = None
-
-    class CollectionTest(BaseCollection):
-        database_name = "db"
-        collection_name = "col"
-        model_class = TestBaseCollectionModel
-
     class CollectionTestNoColName(BaseCollection):
         database_name = "db"
         model_class = TestBaseCollectionModel
@@ -84,9 +86,9 @@ class TestBaseCollection(TestDatabaseMixin):
         database_name = "db"
         collection_name = "col"
 
-    @classmethod
-    def setUpTestClass(cls):
-        cls.collection = TestBaseCollection.CollectionTest()
+    @staticmethod
+    def obj_to_clear():
+        return [col]
 
     def test_col_missing_names_mdl_cls(self):
         with self.assertRaises(AttributeError):
@@ -95,8 +97,7 @@ class TestBaseCollection(TestDatabaseMixin):
             TestBaseCollection.CollectionTestNoModelClass()
 
     def test_insert_one_data(self):
-        mdl, outcome, exception = \
-            self.collection.insert_one_data(IntF=5, BoolF=True)
+        mdl, outcome, exception = col.insert_one_data(IntF=5, BoolF=True)
 
         self.assertIsNone(exception)
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
@@ -106,8 +107,7 @@ class TestBaseCollection(TestDatabaseMixin):
         self.assertIsNotNone(mdl.get_oid())
 
     def test_insert_one_data_type_mismatch(self):
-        mdl, outcome, exception = \
-            self.collection.insert_one_data(IntF="X", BoolF=True)
+        mdl, outcome, exception = col.insert_one_data(IntF="X", BoolF=True)
 
         self.assertIsInstance(exception, InvalidModelFieldError)
         self.assertIsInstance(exception.inner_exception, FieldTypeMismatchError)
@@ -115,17 +115,15 @@ class TestBaseCollection(TestDatabaseMixin):
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_invalid(self):
-        mdl, outcome, exception = \
-            self.collection.insert_one_data(IntF=-5, BoolF=True)
+        mdl, outcome, exception = col.insert_one_data(IntF=-5, BoolF=True)
 
         self.assertIsInstance(exception, InvalidModelFieldError)
         self.assertIsInstance(exception.inner_exception, FieldValueInvalidError)
-        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD)
+        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD_VALUE)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_casting_failed(self):
-        mdl, outcome, exception = \
-            self.collection.insert_one_data(IntF=5, BoolF=True, ArrayF=[object()])
+        mdl, outcome, exception = col.insert_one_data(IntF=5, BoolF=True, ArrayF=[object()])
 
         self.assertIsInstance(exception, InvalidModelFieldError)
         self.assertIsInstance(exception.inner_exception, FieldCastingFailedError)
@@ -133,26 +131,25 @@ class TestBaseCollection(TestDatabaseMixin):
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_missing_required(self):
-        mdl, outcome, exception = self.collection.insert_one_data()
+        mdl, outcome, exception = col.insert_one_data()
 
         self.assertIsInstance(exception, RequiredKeyNotFilledError)
         self.assertEqual(outcome, WriteOutcome.X_REQUIRED_NOT_FILLED)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_not_exist(self):
-        mdl, outcome, exception = self.collection.insert_one_data(BoolF=True, Bool2F=True)
+        mdl, outcome, exception = col.insert_one_data(BoolF=True, Bool2F=True)
 
         self.assertIsInstance(exception, FieldKeyNotExistError)
-        self.assertEqual(outcome, WriteOutcome.X_FIELD_NOT_EXIST)
+        self.assertEqual(outcome, WriteOutcome.X_MODEL_KEY_NOT_EXIST)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_duplicated_key(self):
-        self.collection.create_index([("i", 1)], unique=True)
+        col.create_index([("i", 1)], unique=True)
 
-        self.collection.insert_one_model(TestBaseCollectionModel(i=5, b=True, from_db=True))
+        col.insert_one_model(TestBaseCollectionModel(i=5, b=True, from_db=True))
 
-        mdl, outcome, exception = \
-            self.collection.insert_one_data(IntF=5, BoolF=True)
+        mdl, outcome, exception = col.insert_one_data(IntF=5, BoolF=True)
 
         self.assertIsInstance(exception, DuplicateKeyError)
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)

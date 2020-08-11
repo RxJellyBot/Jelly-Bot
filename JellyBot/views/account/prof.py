@@ -13,6 +13,7 @@ from JellyBot.views import render_template, WebsiteErrorView
 from JellyBot.utils import get_post_keys, get_root_oid, get_profile_data
 from JellyBot.components.mixin import PermissionRequiredMixin, LoginRequiredMixin, ChannelOidRequiredMixin
 from flags import ProfilePermissionDefault, ProfilePermission, WebsiteError
+from models import ChannelProfileModel
 from mongodb.factory import ProfileManager
 from mongodb.helper import IdentitySearcher, ProfileHelper
 
@@ -44,14 +45,16 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
         data = get_post_keys(request.POST)
         root_uid = get_root_oid(request)
 
-        model = ProfileManager.register_new(root_uid, ProfileManager.process_create_profile_kwargs(data))
+        reg_result = ProfileManager.register_new(root_uid, ProfileManager.process_create_profile_kwargs(data))
 
-        if model:
+        if reg_result.success:
             messages.info(request, _("Profile successfully created."))
-        else:
-            messages.warning(request, _("Failed to create the profile."))
+            return redirect(reverse("info.profile", kwargs={"profile_oid": reg_result.model.id}))
 
-        return redirect(reverse("info.profile", kwargs={"profile_oid": model.id}))
+        err_msg = _("Failed to create the profile. (%s / %s)") % (reg_result.outcome, reg_result.attach_outcome)
+        messages.warning(request, err_msg)
+        channel_oid = data[ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)]
+        return redirect(reverse("account.profile.create", kwargs={"channel_oid": channel_oid}))
 
 
 class ProfileAttachView(PermissionRequiredMixin, TemplateResponseMixin, View):
@@ -105,22 +108,24 @@ class ProfileEditView(PermissionRequiredMixin, TemplateResponseMixin, View):
 
     # noinspection PyMethodMayBeStatic
     def post(self, request, *args, **kwargs):
+        root_oid = get_root_oid(request)
         profile_result = get_profile_data(kwargs)
 
         if not profile_result.ok:
             return HttpResponse(status=404)
 
         profile_oid = profile_result.model.id
+        channel_oid = profile_result.model.channel_oid
 
         outcome = ProfileManager.update_profile(
-            profile_result.model.id, ProfileManager.process_edit_profile_kwargs(get_post_keys(request.POST)))
+            channel_oid, root_oid, profile_result.model.id,
+            ProfileManager.process_edit_profile_kwargs(get_post_keys(request.POST))
+        )
 
         if outcome.is_success:
             messages.info(request, _("Profile successfully updated."))
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
         else:
-            channel_oid = profile_result.model.channel_oid
-
             messages.warning(request, _("Failed to update the profile."))
             return redirect(reverse("account.profile.edit",
                                     kwargs={"channel_oid": channel_oid, "profile_oid": profile_oid}))

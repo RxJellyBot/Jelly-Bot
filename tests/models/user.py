@@ -5,11 +5,14 @@ from bson import ObjectId
 from extutils import exec_timing_result
 from extutils.locales import default_locale, default_language, LocaleInfo
 from flags import ModelValidityCheckResult, Platform
-from models import RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel
+from models import (
+    RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel,
+    ChannelConfigModel
+)
 from models.exceptions import InvalidModelError, ModelConstructionError, InvalidModelFieldError
 from tests.base import TestCase
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestRootUserConfigModel", "TestRootUserModelFillApi", "TestRootUserModelFillOnPlat",
            "TestRootUserModelValidity", "TestAPIUserModel", "TestOnPlatformUserModel"]
@@ -38,7 +41,7 @@ class TestRootUserConfigModel(TestModel.TestClass):
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
         self.assertEqual("US/Central", mdl.pytz_code)
 
-        mdl = self.get_constructed_model(l="US/Centralll")  # NOQA: E741
+        mdl = self.get_constructed_model(l="US/Centralll")  # noqa: E741
         self.assertIsNone(mdl.tzinfo)
         self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
 
@@ -200,14 +203,16 @@ class TestOnPlatformUserModel(TestModel.TestClass):
         }
 
     def test_get_name(self):
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="U1234567890")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="U1234567890",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model()
         mdl.set_oid(ObjectId())
         self.assertIsNone(mdl.get_name(cmdl))
         self.assertEqual("U1234567890 (LINE)", mdl.get_name_str(cmdl))
 
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model(t="Ubff224fa18b8cf010da6d6bc88da8f55")
         mdl.set_oid(ObjectId())
@@ -215,7 +220,8 @@ class TestOnPlatformUserModel(TestModel.TestClass):
         self.assertNotEqual("Ubff224fa18b8cf010da6d6bc88da8f55 (LINE)", mdl.get_name_str(cmdl))
 
     def test_get_name_cache(self):
-        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55")
+        cmdl = ChannelModel(Platform=Platform.LINE, Token="Ubff224fa18b8cf010da6d6bc88da8f55",
+                            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
 
         mdl = self.get_constructed_model(t="Ubff224fa18b8cf010da6d6bc88da8f55")
         mdl.set_oid(ObjectId())

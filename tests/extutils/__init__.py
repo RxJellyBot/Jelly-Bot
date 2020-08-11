@@ -1,14 +1,13 @@
-from .email import TestFakeEmailServer
-from .checker import TestArgTypeEnsure
-from .flags import (
-    TestFlagCodeEnum, TestFlagSingleCodeEnum, TestFlagDoubleCodeEnum, TestFlagPrefixedDoubleCodeEnum, TestFlagMisc
-)
-from .imgproc import TestImgurClient
-from .linesticker import TestLineStickerUtils
-from .boolext import TestBooleanExtension
-from .color import TestColor, TestColorFactory
-from .dt import TestDatetime, TestParseTimeRange
-from .singleton import TestSingleton
-from .utils import TestUtilFunctions
-from .locales import TestLocaleFunctions, TestLocaleInfo
-from .url import TestValidUrl
+from .arr import *  # noqa
+from .boolext import *  # noqa
+from .checker import *  # noqa
+from .color import *  # noqa
+from .dt import *  # noqa
+from .email import *  # noqa
+from .flags import *  # noqa
+from .imgproc import *  # noqa
+from .linesticker import *  # noqa
+from .locales import *  # noqa
+from .singleton import *  # noqa
+from .url import *  # noqa
+from .utils import *  # noqa

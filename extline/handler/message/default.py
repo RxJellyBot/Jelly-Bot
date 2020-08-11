@@ -1,9 +1,9 @@
-import logging
+"""
+This module contains the function to handle the default/unhandled message type event.
+"""
+from extline.logger import LINE
 
-from extline import LINE, ExtraKey, event_dest_fmt
 
-
-# noinspection PyUnusedLocal
-def handle_msg_default(request, event, destination):
-    LINE.temp_apply_format(event_dest_fmt, logging.INFO, "Unhandled LINE message event.",
-                           extra={ExtraKey.Event: event, ExtraKey.Destination: destination})
+def handle_msg_unhandled(_, event, destination):
+    """Method to be called upon receiving an unhandled message type event."""
+    LINE.log_event("Unhandled LINE message event.", event=event, dest=destination)

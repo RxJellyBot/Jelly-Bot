@@ -10,7 +10,7 @@
             <th scope="col" class="no-line-break">{% trans "Total Messages" %}</th>
             <th scope="col" class="no-line-break">{% trans "Total Ratio %" %}</th>
             {% if not simplified %}
-                {% for entry in message_data.label_category %}
+                {% for entry in message_data.LABEL_CATEGORY %}
                     <th scope="col" class="no-line-break">{{ entry.key }}</th>
                     <th scope="col" class="no-line-break">{{ entry.key }}&nbsp;(%)</th>
                 {% endfor %}

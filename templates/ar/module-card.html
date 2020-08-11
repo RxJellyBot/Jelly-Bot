@@ -27,12 +27,12 @@
                 <h6>{% trans "Channel ID" %}</h6>
                 <div class="mb-2">
                     <code class="h6">
-                        <a href="{% url "info.channel" channel_oid=module.channel_id %}">{{ module.channel_id }}</a>
+                        <a href="{% url "info.channel" channel_oid=module.channel_oid %}">{{ module.channel_oid }}</a>
                     </code>
                 </div>
                 <h6>{% trans "Created at" %}</h6>
                 <div class="mb-2">
-                    {{ module.created_at }}
+                    {{ module.created_at_expr }}
                 </div>
                 <h6>{% trans "Creator" %}</h6>
                 <div class="mb-2">

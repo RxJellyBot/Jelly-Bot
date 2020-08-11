@@ -50,12 +50,20 @@ Website: http://rnnx.cc/Website
 
 `reStructuredText`
 
+#### MongoDB Deployment
+
+Clustered. Replica set enabled.
+
 ### Useful Links used in this repository
 
 <details><summary>Documentations</summary>
 <p>
 
 - [reST syntax cheatsheet](https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html)
+
+- [reST syntax cheatsheet 2](https://docutils.sourceforge.io/docs/user/rst/quickref.html#section-structure)
+
+- [MongoDB Standalone to Replica Set](https://docs.mongodb.com/manual/tutorial/convert-standalone-to-replica-set/)
 
 </p>
 </details> 

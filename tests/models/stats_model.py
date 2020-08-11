@@ -1,18 +1,18 @@
-from datetime import datetime, timezone
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from flags import APICommand, MessageType, BotFeature
 from models import Model, APIStatisticModel, MessageRecordModel, BotFeatureUsageModel
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
-__all__ = ["TestAPIStatisticModel"]
+__all__ = ["TestAPIStatisticModel", "TestMessageRecordModel", "TestBotFeatureUsageModel"]
 
 
 class TestAPIStatisticModel(TestModel.TestClass):
-    DEFAULT_TIME = datetime.now().replace(tzinfo=timezone.utc)
+    DEFAULT_TIME = now_utc_aware()
     SENDER_OID = ObjectId()
 
     @classmethod
@@ -65,13 +65,6 @@ class TestMessageRecordModel(TestModel.TestClass):
     def get_optional(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("pt", "ProcessTimeSecs"): 0.7
-        }
-
-    @classmethod
-    def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
-        return {
-            ("ts", "Timestamp"): (datetime.min.replace(tzinfo=timezone.utc),
-                                  datetime.now().replace(tzinfo=timezone.utc))
         }
 
 

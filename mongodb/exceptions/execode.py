@@ -3,7 +3,12 @@ from flags import Execode, ExecodeCollationFailedReason
 
 class NoCompleteActionError(Exception):
     def __init__(self, action: Execode):
+        self._action = action
         super().__init__(f"No complete action implemented for {action}.")
+
+    @property
+    def action(self) -> Execode:
+        return self._action
 
 
 class ExecodeCollationError(Exception):

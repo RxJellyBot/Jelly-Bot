@@ -1,4 +1,4 @@
-from typing import Dict, Generator, Set
+from typing import Dict, Generator, Set, Optional
 
 from django.utils.translation import gettext_lazy as _
 
@@ -125,9 +125,15 @@ class ProfilePermissionDefault:
         return ProfilePermissionDefault._Cache[highest_perm_lv]
 
     @staticmethod
-    def get_default_dict() -> Dict[ProfilePermission, bool]:
-        return {perm_cat: perm_cat in ProfilePermissionDefault._Default for perm_cat in ProfilePermission}
+    def get_default_dict(addl_perm: Optional[Set[ProfilePermission]] = None) -> Dict[ProfilePermission, bool]:
+        d = {perm_cat: perm_cat in ProfilePermissionDefault._Default for perm_cat in ProfilePermission}
+
+        if addl_perm:
+            for perm in addl_perm:
+                d[perm] = True
+
+        return d
 
     @staticmethod
-    def get_default_code_str_dict() -> Dict[str, bool]:
-        return {k.code_str: v for k, v in ProfilePermissionDefault.get_default_dict().items()}
+    def get_default_code_str_dict(addl_perm: Optional[Set[ProfilePermission]] = None) -> Dict[str, bool]:
+        return {k.code_str: v for k, v in ProfilePermissionDefault.get_default_dict(addl_perm).items()}

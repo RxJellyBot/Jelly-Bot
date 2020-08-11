@@ -14,7 +14,7 @@ cmd = CommandNode(
 
 # noinspection PyUnusedLocal
 @cmd.command_function(
-    feature_flag=BotFeature.TXT_CALCULATOR,
+    feature=BotFeature.TXT_CALCULATOR,
     arg_count=1,
     arg_help=[_("Expression string to be calculated."
                 "<br>Does not need `=` at the end while for automatic calculator, it's required.")]

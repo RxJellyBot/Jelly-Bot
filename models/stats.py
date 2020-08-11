@@ -11,13 +11,14 @@ from bson import ObjectId
 
 from extutils.dt import now_utc_aware, TimeRange, make_tz_aware
 from extutils.utils import enumerate_ranking
+from extutils.dt import localtime
 from flags import BotFeature, MessageType
 from models import Model, ModelDefaultValueExt, OID_KEY
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
 )
-from strnames.models import StatsResults
+from strres.models import StatsResults
 
 
 # region Models
@@ -35,11 +36,19 @@ class APIStatisticModel(Model):
 
 class MessageRecordModel(Model):
     ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
-    UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
+    UserRootOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True, allow_none=True)
     MessageType = MessageTypeField("t", default=ModelDefaultValueExt.Required)
-    MessageContent = TextField("ct", default=ModelDefaultValueExt.Required)
+    MessageContent = TextField("ct", default=ModelDefaultValueExt.Required, allow_none=True)
     ProcessTimeSecs = FloatField("pt", default=ModelDefaultValueExt.Optional)
-    Timestamp = DateTimeField("ts")
+
+    @property
+    def timestamp(self):
+        """
+        Get a tz-aware timestamp of this model using ``_id``.
+
+        :return: tz-aware timestamp of this model
+        """
+        return localtime(self.id.generation_time)
 
 
 class BotFeatureUsageModel(Model):
@@ -82,8 +91,11 @@ class HourlyResult(abc.ABC):
             if earliest.hour > end_time.hour:
                 add_one_end += 24
 
+            if days_collected * 24 % 1 > 0:
+                add_one_end += 1
+
             self.denom = [d_collected_int] * 24
-            for hr in range(earliest.hour, add_one_end + 1):
+            for hr in range(earliest.hour, add_one_end):
                 self.denom[hr % 24] += 1
 
     @staticmethod
@@ -119,7 +131,8 @@ class HourlyResult(abc.ABC):
 
             return max(
                 ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
-                0)
+                0
+            )
         else:
             return trange.hr_length / 24
 
@@ -166,6 +179,8 @@ class DailyResult(abc.ABC):
         """Returns the date list within the time range. Disregards ``start`` and ``end`` if ``trange`` is specified."""
         return [dt.strftime(DailyResult.FMT_DATE) for dt
                 in DailyResult.date_list(days_collected, tzinfo, start=start, end=end, trange=trange)]
+
+
 # endregion
 
 
@@ -180,11 +195,11 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
 
         CountDataEntry = namedtuple("CountDataEntry", ["category_name", "data", "color", "hidden"])
 
-        # Create hours label for webpage
+        # Create hours label for web page
         self.label_hr = [i for i in range(24)]
 
         count_data = {}
-        count_sum = [0 for __ in range(24)]
+        count_sum = [0 for _ in range(24)]
 
         for d in cursor:
             ctg = MessageType.cast(d[OID_KEY][HourlyIntervalAverageMessageResult.KEY_CATEGORY])
@@ -197,15 +212,6 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
             count_data[ctg][hr] = count
             count_sum[hr] += count
 
-        count_data = [
-            CountDataEntry(
-                category_name=cat.key,
-                data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
-                color="#777777",
-                hidden="true"  # Will be used in JS so string of bool instead
-            )
-            for cat, data in count_data.items()
-        ]
         count_sum = [
             CountDataEntry(
                 category_name=StatsResults.CATEGORY_TOTAL,
@@ -213,6 +219,15 @@ class HourlyIntervalAverageMessageResult(HourlyResult):
                 color="#323232",
                 hidden="false"  # Will be used in JS so string of bool instead
             )
+        ]
+        count_data = [
+            CountDataEntry(
+                category_name=cat.key,
+                data=[ct / dm for ct, dm in zip(data, self.denom)] if self.avg_calculatable else data,
+                color="#777777",
+                hidden="true"  # Will be used in JS so string of bool instead
+            )
+            for cat, data in sorted(count_data.items(), key=lambda item: item[0].code)
         ]
 
         self.data = count_sum + count_data
@@ -272,7 +287,13 @@ class MeanMessageResultGenerator(DailyResult):
 
     def __init__(self, cursor, days_collected, tzinfo, *, trange: TimeRange, max_mean_days: int):
         self.max_madays = max_mean_days
-        self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+
+        if trange.is_inf:
+            self.trange = self.trange_ensure_not_inf(days_collected, trange, tzinfo)
+            self.trange.set_start_day_offset(-max_mean_days)
+        else:
+            self.trange = trange
+
         self.dates = self.date_list(days_collected, tzinfo, start=self.trange.start, end=self.trange.end)
         self.data = {date_: 0 for date_ in self.dates}
 
@@ -337,7 +358,7 @@ class CountBeforeTimeResult(DailyResult):
             _count_ = d[CountBeforeTimeResult.KEY_COUNT]
             self.data_count[_date_] = _count_
 
-        self.data_count = [ct for dt, ct in self.data_count.items()]
+        self.data_count = list(self.data_count.values())
 
     @property
     def title(self):
@@ -368,7 +389,7 @@ class MemberMessageCountResult:
         self.trange = trange
 
         self.interval = interval
-        self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
+        self.data: Dict[ObjectId, MemberMessageCountEntry] = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
             uid = d[OID_KEY][MemberMessageCountResult.KEY_MEMBER_ID]
@@ -415,13 +436,13 @@ class MemberMessageByCategoryResult:
 
     KEY_COUNT = "ct"
 
-    def __init__(self, cursor):
-        # Manually listing this to create custom order without additional implementations
-        self.label_category = [
-            MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
-            MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
-        ]
+    # Manually listing this to create custom order without additional implementations
+    LABEL_CATEGORY = [
+        MessageType.TEXT, MessageType.LINE_STICKER, MessageType.IMAGE, MessageType.VIDEO,
+        MessageType.AUDIO, MessageType.LOCATION, MessageType.FILE
+    ]
 
+    def __init__(self, cursor):
         self.data = {}  # {<UID>: <Entry>, <UID>: <Entry>, ...}
 
         for d in cursor:
@@ -436,7 +457,7 @@ class MemberMessageByCategoryResult:
             self.data[uid].add(cat, count)
 
     def get_default_data_entry(self):
-        return MemberMessageByCategoryEntry(self.label_category)
+        return MemberMessageByCategoryEntry(self.LABEL_CATEGORY)
 
 
 # endregion

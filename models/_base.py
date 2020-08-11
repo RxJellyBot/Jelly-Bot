@@ -3,6 +3,7 @@ from collections import MutableMapping
 from typing import Optional, Set, List
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 
 from flags import ModelValidityCheckResult
 from extutils.checker import arg_type_ensure
@@ -176,22 +177,35 @@ class Model(MutableMapping, abc.ABC):
 
     def __eq__(self, other):
         if isinstance(other, Model):
-            # noinspection PyProtectedMember
-            return self._dict_ == other._dict_ and type(self) == type(other)
+            return self.to_json() == other.to_json() and type(self) == type(other)
         elif isinstance(other, MutableMapping):
             return self.to_json() == other
         else:
             return False
 
     def __hash__(self):
-        return super().__hash__()
+        d = self.to_json()
+
+        hash_list = []
+
+        for k, v in d.items():
+            if isinstance(v, list):
+                v = tuple(v)
+            elif isinstance(v, dict):
+                v = tuple(v.items())
+            elif isinstance(v, Model):
+                v = hash(v)
+
+            hash_list.append((k, v))
+
+        return hash(tuple(hash_list))
 
     def _input_kwargs(self, **kwargs):
-        for k, v in kwargs.items():
-            if k in self.model_field_keys():
-                self._inner_dict_create(k, v)
+        for fk, v in kwargs.items():
+            if fk in self.model_field_keys():
+                self._inner_dict_create(fk, v, val_is_specified=True)
             else:
-                raise FieldKeyNotExistError(k, self.__class__.__qualname__)
+                raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
     def _fill_default_vals(self, not_filled):
         filled = set()
@@ -221,14 +235,14 @@ class Model(MutableMapping, abc.ABC):
         if not result.is_success:
             self.on_invalid(result)
 
-    def _inner_dict_create(self, fk, v):
+    def _inner_dict_create(self, fk, v, *, val_is_specified=False):
         if fk.lower() == "id" and self.WITH_OID:
             self._dict_["id"] = self.Id.new(v)
         else:
             attr = getattr(self, to_camel_case(fk))
 
             if attr:
-                self._dict_[to_snake_case(fk)] = attr.new(v)
+                self._dict_[to_snake_case(fk)] = attr.new(v, val_is_specified=val_is_specified)
             else:
                 raise FieldKeyNotExistError(fk, self.__class__.__qualname__)
 
@@ -253,7 +267,7 @@ class Model(MutableMapping, abc.ABC):
         elif to_snake_case(fk) in self._dict_:
             self._dict_[to_snake_case(fk)].value = v
         else:
-            self._inner_dict_create(fk, v)
+            self._inner_dict_create(fk, v, val_is_specified=True)
 
     @classmethod
     def _init_cache_to_field(cls):
@@ -298,13 +312,21 @@ class Model(MutableMapping, abc.ABC):
         cls._CacheField = {cls.__qualname__: s}
 
     @classmethod
-    def _valid_model_key(cls, fk):
+    def _valid_model_key(cls, fk: str):
         if fk.lower() == "Id":
             return cls.WITH_OID
         else:
-            return fk[0].isupper() and not fk.isupper() \
-                   and fk in cls.__dict__ \
-                   and isinstance(cls.__dict__[fk], BaseField)  # NOQA: E126
+            # Check if the attribute starts with a capitalized letter
+            if not fk[0].isupper():
+                return False
+
+            # Check if the name of the attribute is all caps, excluding single letter attribute
+            # ALL CAPS: class constant, for example: ``WITH_OID``
+            # Single letter: X, Y...etc.
+            if fk.isupper() and len(fk) > 1:
+                return False
+
+            return fk in cls.__dict__ and isinstance(cls.__dict__[fk], BaseField)
 
     @classmethod
     def _json_to_field_kwargs(cls, **kwargs):
@@ -383,7 +405,9 @@ class Model(MutableMapping, abc.ABC):
         d = {}
 
         for v in self._dict_.values():
-            if isinstance(v.base, ModelField):
+            if v.value is None:
+                d[v.base.key] = None
+            elif isinstance(v.base, ModelField):
                 d[v.base.key] = v.value.to_json()
             elif isinstance(v.base, ModelArrayField):
                 d[v.base.key] = [mdl.to_json() for mdl in v.value]
@@ -490,13 +514,15 @@ class Model(MutableMapping, abc.ABC):
         return cls(**init_dict, from_db=True)
 
     @classmethod
-    def replace_uid(cls, col, old: ObjectId, new: ObjectId) -> List[str]:
+    def replace_uid(cls, col, old: ObjectId, new: ObjectId, session: ClientSession) -> List[str]:
         """
         Replace the values of the fields which are marked storing the uids.
 
         :param col: collection instance
         :param old: old value to be replaced
         :param new: new value to replace
+        :param session: MongoDB client session
+
         :return: name of the fields that was failed to complete the replacement if any
         """
         failed_names = []
@@ -504,7 +530,7 @@ class Model(MutableMapping, abc.ABC):
         for k in cls.model_field_keys():
             fd: BaseField = getattr(cls, k, None)
             if fd and fd.stores_uid:
-                result = fd.replace_uid(col, old, new)
+                result = fd.replace_uid(col, old, new, session)
                 if not result:
                     failed_names.append(fd.__class__.__qualname__)
 

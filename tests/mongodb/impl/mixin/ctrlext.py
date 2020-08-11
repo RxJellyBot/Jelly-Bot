@@ -4,22 +4,24 @@ from bson import InvalidDocument, ObjectId
 from pymongo.errors import DuplicateKeyError
 
 from extutils.mongo import get_codec_options
-from tests.base import TestDatabaseMixin
+from mixin import ClearableMixin
 from models import Model
 from models.exceptions import InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
 from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultValueExt
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
 from mongodb.factory import ControlExtensionMixin
-from mongodb.factory.results import WriteOutcome
+from mongodb.factory.results import WriteOutcome, UpdateOutcome
+from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestControlExtensionMixin"]
 
 
-class TestControlExtensionMixin(TestDatabaseMixin):
+class TestControlExtensionMixin(TestModelMixin, TestDatabaseMixin):
     collection = None
 
-    class CollectionTest(ControlExtensionMixin):
-        pass
+    class CollectionTest(ControlExtensionMixin, ClearableMixin):
+        def clear(self):
+            self.delete_many({})
 
     class ModelTest(Model):
         IntF = IntegerField("i", positive_only=True)
@@ -31,6 +33,10 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         def __init__(self, from_db=False):
             super().__init__(from_db=from_db)
             raise ValueError()
+
+    @staticmethod
+    def obj_to_clear():
+        return [TestControlExtensionMixin.collection]
 
     @classmethod
     def setUpTestClass(cls):
@@ -101,7 +107,7 @@ class TestControlExtensionMixin(TestDatabaseMixin):
 
         self.assertIsInstance(exception, InvalidModelFieldError)
         self.assertIsInstance(exception.inner_exception, FieldValueInvalidError)
-        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD)
+        self.assertEqual(outcome, WriteOutcome.X_INVALID_FIELD_VALUE)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_field_casting_failed(self):
@@ -126,7 +132,7 @@ class TestControlExtensionMixin(TestDatabaseMixin):
             TestControlExtensionMixin.ModelTest, BoolF=True, Bool2F=True)
 
         self.assertIsInstance(exception, FieldKeyNotExistError)
-        self.assertEqual(outcome, WriteOutcome.X_FIELD_NOT_EXIST)
+        self.assertEqual(outcome, WriteOutcome.X_MODEL_KEY_NOT_EXIST)
         self.assertIsNone(mdl)
 
     def test_insert_one_data_construct_error(self):
@@ -149,6 +155,22 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(mdl.get_oid())
 
+        self.collection.drop_indexes()
+
+    def test_insert_one_data_duplicated_compound_key(self):
+        self.collection.create_index([("i", 1), ("b", 1)], unique=True)
+
+        self.collection.insert_one_model(TestControlExtensionMixin.ModelTest(i=5, b=True, from_db=True))
+
+        mdl, outcome, exception = \
+            self.collection.insert_one_data(TestControlExtensionMixin.ModelTest, IntF=5, BoolF=True)
+
+        self.assertIsInstance(exception, DuplicateKeyError)
+        self.assertEqual(outcome, WriteOutcome.O_DATA_EXISTS)
+        self.assertIsNotNone(mdl.get_oid())
+
+        self.collection.drop_indexes()
+
     def test_update_many_outcome(self):
         self.collection.insert_many([
             {"a": 7, "b": [8]},
@@ -156,9 +178,9 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         ])
 
         args_outcome = (
-            (({"a": 7}, {"$unset": {"c": ""}}), WriteOutcome.O_DATA_EXISTS),
-            (({"a": 7}, {"$unset": {"b": ""}}), WriteOutcome.O_DATA_UPDATED),
-            (({"d": 7}, {"$unset": {"b": ""}}), WriteOutcome.X_NOT_FOUND)
+            (({"a": 7}, {"$unset": {"c": ""}}), UpdateOutcome.O_FOUND),
+            (({"a": 7}, {"$unset": {"b": ""}}), UpdateOutcome.O_UPDATED),
+            (({"d": 7}, {"$unset": {"b": ""}}), UpdateOutcome.X_NOT_FOUND)
         )
 
         for args, expected_outcome in args_outcome:
@@ -183,8 +205,7 @@ class TestControlExtensionMixin(TestDatabaseMixin):
 
         for actual_mdl, expected_mdl in zip(crs, expected_mdls):
             with self.subTest(expected_mdl):
-                actual_mdl.clear_oid()
-                self.assertEqual(actual_mdl, expected_mdl)
+                self.assertModelEqual(actual_mdl, expected_mdl)
 
     def test_find_cursor_with_count_no_cls(self):
         self.collection.insert_many([
@@ -212,9 +233,8 @@ class TestControlExtensionMixin(TestDatabaseMixin):
         ])
 
         actual_mdl = self.collection.find_one_casted({"i": 7}, parse_cls=TestControlExtensionMixin.ModelTest)
-        actual_mdl.clear_oid()
 
-        self.assertEqual(actual_mdl, TestControlExtensionMixin.ModelTest(i=7, b=True, from_db=True))
+        self.assertModelEqual(actual_mdl, TestControlExtensionMixin.ModelTest(i=7, b=True, from_db=True))
 
     def test_attach_time_range(self):
         dt_start = datetime(2020, 5, 6)

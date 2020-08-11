@@ -110,7 +110,7 @@ _help_permission_lv_ = _("Permission level of the profile.<br>"
 
 
 @cmd_create.command_function(
-    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_help_name_]
 )
@@ -120,7 +120,7 @@ def profile_create_name(
 
 
 @cmd_create.command_function(
-    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=2,
     arg_help=[_help_name_, _help_color_]
 )
@@ -130,7 +130,7 @@ def profile_create_name_color(
 
 
 @cmd_create.command_function(
-    feature_flag=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_CREATE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=4,
     arg_help=[_help_name_, _help_color_, _help_permission_, _help_permission_lv_]
 )
@@ -201,9 +201,9 @@ def profile_create_internal(
 
     mdl = ChannelProfileModel(
         ChannelOid=e.channel_model.id, Name=prof_name, Color=color, Permission=perm_dict, PermissionLevel=perm_lv)
-    mdl = ProfileManager.register_new_model(e.user_model.id, mdl)
+    reg_result = ProfileManager.register_new_model(e.user_model.id, mdl)
 
-    if mdl:
+    if reg_result.success:
         return [HandledMessageEventText(content=_("Profile created and attached."))] + msg_on_hold
     else:
         return [HandledMessageEventText(content=_("Profile registration failed."))] + msg_on_hold
@@ -238,7 +238,7 @@ cmd_query = cmd.new_child_node(
 
 
 @cmd_query.command_function(
-    feature_flag=BotFeature.TXT_PF_QUERY, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_QUERY, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_("Keyword to be used to find the profile. Can be a part of the profile name.")]
 )
@@ -261,7 +261,7 @@ cmd_list = cmd.new_child_node(
 
 
 @cmd_list.command_function(
-    feature_flag=BotFeature.TXT_PF_LIST, scope=CommandScopeCollection.GROUP_ONLY
+    feature=BotFeature.TXT_PF_LIST, scope=CommandScopeCollection.GROUP_ONLY
 )
 def profile_list(e: TextMessageEventObject):
     result = ProfileHelper.get_channel_profiles(e.channel_oid)
@@ -292,22 +292,22 @@ def _output_attach_outcome(outcome: OperationOutcome):
 
 
 @cmd_attach.command_function(
-    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_help_name_]
 )
 def profile_attach_self(e: TextMessageEventObject, name: str):
-    return _output_attach_outcome(ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name))
+    return _output_attach_outcome(ProfileManager.attach_profile_name(e.channel_oid, e.user_model.id, name))
 
 
 @cmd_attach.command_function(
-    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=2,
     arg_help=[_help_name_, _("The OID of the target user to be attached to the profile.")]
 )
 def profile_attach_member(e: TextMessageEventObject, name: str, target_oid: ObjectId):
     return _output_attach_outcome(
-        ProfileManager.attach_profile_name(e.user_model.id, e.channel_oid, name, target_oid))
+        ProfileManager.attach_profile_name(e.channel_oid, e.user_model.id, name, target_oid))
 
 
 # endregion
@@ -329,7 +329,7 @@ def _output_detach_outcome(outcome: OperationOutcome):
 
 
 @cmd_detach.command_function(
-    feature_flag=BotFeature.TXT_PF_DETACH, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_DETACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_help_name_]
 )
@@ -338,7 +338,7 @@ def profile_detach_self(e: TextMessageEventObject, name: str):
 
 
 @cmd_detach.command_function(
-    feature_flag=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_ATTACH, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=2,
     arg_help=[_help_name_, _("The OID of the target user to be detached from the profile.")]
 )
@@ -357,13 +357,13 @@ cmd_delete = cmd.new_child_node(
 
 
 @cmd_delete.command_function(
-    feature_flag=BotFeature.TXT_PF_DELETE, scope=CommandScopeCollection.GROUP_ONLY,
+    feature=BotFeature.TXT_PF_DELETE, scope=CommandScopeCollection.GROUP_ONLY,
     arg_count=1,
     arg_help=[_help_name_]
 )
 def profile_delete(e: TextMessageEventObject, name: str):
     # --- Check profile name
-    prof = ProfileManager.get_profile_name(name)
+    prof = ProfileManager.get_profile_name(e.channel_oid, name)
     if not prof:
         return [HandledMessageEventText(content=_("Profile with the name `{}` not found.").format(name))]
 

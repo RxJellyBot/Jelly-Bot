@@ -83,7 +83,7 @@ class OnPlatformUserModel(Model):
     Token = TextField("t", default=ModelDefaultValueExt.Required, allow_none=False, must_have_content=True)
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
 
-    def get_name(self, channel_data=None) -> Optional[str]:
+    def get_name(self, channel_model=None) -> Optional[str]:
         # Checking `get_oid()` because the model might be constructed in the code (no ID) and
         # call `get_name()` afterward without storing it to the database
         if self.get_oid() is not None and self.id not in _user_name_cache_:
@@ -93,16 +93,16 @@ class OnPlatformUserModel(Model):
                 from extline import LineApiWrapper
                 from models import ChannelCollectionModel
 
-                if isinstance(channel_data, ChannelCollectionModel):
+                if isinstance(channel_model, ChannelCollectionModel):
                     raise ValueError("Finding the user name with `ChannelCollectionModel` "
                                      "currently not yet supported. Check issue #38.")
 
-                if channel_data:
-                    n = LineApiWrapper.get_user_name_safe(self.token, channel_data)
+                if channel_model:
+                    n = LineApiWrapper.get_user_name_safe(self.token, channel_model=channel_model)
                 else:
                     n = LineApiWrapper.get_user_name_safe(self.token)
             elif self.platform == Platform.DISCORD:
-                from extdiscord import DiscordClientWrapper
+                from extdiscord.core import DiscordClientWrapper
 
                 n = DiscordClientWrapper.get_user_name_safe(self.token)
 
@@ -114,7 +114,7 @@ class OnPlatformUserModel(Model):
 
                 root_data_result = RootUserManager.get_root_data_onplat(self.platform, self.token, auto_register=False)
                 if root_data_result.success:
-                    ProfileManager.mark_unavailable_async(channel_data.id, root_data_result.model.id)
+                    ProfileManager.mark_unavailable_async(channel_model.id, root_data_result.model.id)
 
         return _user_name_cache_.get(self.id)
 

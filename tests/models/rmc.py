@@ -1,14 +1,15 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Tuple, Any, Type
 
 from bson import ObjectId
 
+from extutils.dt import now_utc_aware
 from extutils.locales import LocaleInfo
 from flags import Platform
-from models import Model, RemoteControlEntryModel, ChannelModel
+from models import Model, RemoteControlEntryModel, ChannelModel, ChannelConfigModel
 from mongodb.factory import ChannelManager
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestRemoteControlEntryModel"]
 
@@ -17,7 +18,7 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
     USER_OID = ObjectId()
     SRC_CID = ObjectId()
     TGT_CID = ObjectId()
-    EXPIRY = datetime.utcnow().replace(tzinfo=timezone.utc)
+    EXPIRY = now_utc_aware()
 
     @classmethod
     def get_model_class(cls) -> Type[Model]:
@@ -51,7 +52,9 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
 
     @staticmethod
     def prepare_channel_data():
-        c_model = ChannelModel(Platform=Platform.LINE, Token="ABC")
+        c_model = ChannelModel(
+            Platform=Platform.LINE, Token="ABC",
+            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
         ChannelManager.insert_one_model(c_model)
 
         return c_model

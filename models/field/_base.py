@@ -1,10 +1,13 @@
 import abc
 from collections.abc import Iterable
-from typing import Tuple, Type, Any, final
+from dataclasses import dataclass, field
+from typing import Tuple, Type, Any, final, Dict, TypeVar
 
 from bson import ObjectId
+from pymongo.client_session import ClientSession
 from pymongo.collection import Collection
 
+from models.exceptions import RequiredKeyNotFilledError
 from models.field.exceptions import (
     FieldReadOnlyError, FieldTypeMismatchError, FieldCastingFailedError, FieldNoneNotAllowedError,
     FieldInstanceClassInvalidError, FieldInvalidDefaultValueError, FieldValueRequiredError
@@ -12,24 +15,44 @@ from models.field.exceptions import (
 
 from ._default import ModelDefaultValueExt
 
+T = TypeVar("T")
+
+
+@dataclass
+class Lazy:
+    fn: callable
+    args: Tuple[Any] = field(default_factory=tuple)
+    kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    def call(self):
+        return self.fn(*self.args, **self.kwargs)
+
 
 class FieldInstance:
     """Field instance class. This class actually stores the value."""
     NULL_VAL_SENTINEL = object()
 
-    def __init__(self, base: 'BaseField', value=NULL_VAL_SENTINEL):
+    def __init__(self, base: 'BaseField', value=NULL_VAL_SENTINEL, val_is_specified=False):
         """
         :raises FieldValueRequired: If the default value indicates the field requires value but turns out not
         :raises ValueError: Field extended default value unhandled
         """
         self._base = base
-        self._value = None  # Initialize an empty class field
+        self._value = None  # Initialize an empty field value
+
+        default_value_is_ext = ModelDefaultValueExt.is_default_val_ext(base.default_value)
 
         # Skipping type check on init (may fill `None`)
         if value in (None, FieldInstance.NULL_VAL_SENTINEL) and not base.allow_none:
-            self.force_set(base.none_obj())
-        elif ModelDefaultValueExt.is_default_val_ext(base.default_value) and \
-                (ModelDefaultValueExt.is_default_val_ext(value) or value == FieldInstance.NULL_VAL_SENTINEL):
+            if default_value_is_ext:
+                self.force_set(base.none_obj())
+            else:
+                self.force_set(base.default_value)
+        elif value is None and val_is_specified:
+            self.force_set(None)
+        elif not base.is_default_lazy \
+                and default_value_is_ext \
+                and (value == FieldInstance.NULL_VAL_SENTINEL or ModelDefaultValueExt.is_default_val_ext(value)):
             if base.default_value == ModelDefaultValueExt.Required:
                 raise FieldValueRequiredError(self.base.key)
             elif base.default_value == ModelDefaultValueExt.Optional:
@@ -130,8 +153,12 @@ class BaseField(abc.ABC):
                                f"Override the property `replace_uid_implemented` if the function is implemented.")
         # endregion
 
+        self._default_is_lazy = isinstance(default, Lazy)
+
         # region Setting default value
-        if default is not None and not ModelDefaultValueExt.is_default_val_ext(default):
+        default_val_not_special = not ModelDefaultValueExt.is_default_val_ext(default) and not self.is_default_lazy
+
+        if default is not None and default_val_not_special:
             try:
                 self.check_value_valid(default)
             except Exception as e:
@@ -139,6 +166,8 @@ class BaseField(abc.ABC):
 
         if default is None and not allow_none:
             self._default_value = self.none_obj()
+        elif default_val_not_special:
+            self._default_value = self.get_default_value_not_none(default)
         else:
             self._default_value = default
         # endregion
@@ -154,9 +183,14 @@ class BaseField(abc.ABC):
         """The value should be overrided if `replace_uid()` is implemented."""
         return False
 
-    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId) -> bool:
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId, session: ClientSession) -> bool:
         """
-        :return: Action has been acknowledges or not.
+        Replace the field content if this field is marked as storing the UID. (``stores_uid`` is ``True``)
+
+        Actions that should be reversed (basically all actions) if the replacement failed
+        should pass ``session`` to the database command so that the reversal is achievable.
+
+        :return: action acknowledged
         """
         raise RuntimeError(f"uid_replace function called but not implemented. ({self.__class__.__qualname__})")
 
@@ -177,7 +211,18 @@ class BaseField(abc.ABC):
 
     @property
     def default_value(self):
-        return self._default_value
+        if self.is_default_lazy:
+            try:
+                return self._default_value.call()
+            except RequiredKeyNotFilledError:
+                return ModelDefaultValueExt.Required
+        else:
+            return self._default_value
+
+    @property
+    @final
+    def is_default_lazy(self) -> bool:
+        return self._default_is_lazy
 
     @property
     def read_only(self) -> bool:
@@ -199,10 +244,9 @@ class BaseField(abc.ABC):
     def stores_uid(self) -> bool:
         return self._stores_uid
 
-    @classmethod
     @abc.abstractmethod
-    def none_obj(cls) -> Any:
-        raise ValueError(f"None object not implemented for {cls}.")
+    def none_obj(self) -> Any:
+        raise ValueError(f"None object not implemented for {self.__class__}.")
 
     def _check_type_matched_not_none(self, value, *, attempt_cast=False):
         """Hook of value type checking when the value is not ``None`` and not a extended default value."""
@@ -284,9 +328,32 @@ class BaseField(abc.ABC):
         """
         return self.desired_type(value)
 
+    def get_default_value_not_none(self, default_val: T) -> T:
+        """
+        Method to get the default value on field initialization
+        when the default value:
+
+        - is not a null value
+
+        - is not an extended default value
+        """
+        return self.cast_to_desired_type(default_val)
+
     @final
-    def new(self, val=None) -> FieldInstance:
-        return self.instance_class(self, val if val is not None else self.default_value)
+    def new(self, val=None, val_is_specified=False) -> FieldInstance:
+        """
+        Create and return a new :class:`FieldInstance` corresponding to this field.
+
+        The purpose of ``val_is_specified`` is that if ``val`` is ``None``,
+        that ``None`` could either be the provided one (intentional ``None``),
+        or the default value one (set in the function signature).
+
+        :param val: value of this field
+        :param val_is_specified: if the value is provided or using the default `value`
+        :return: `FieldInstance` corresponding to this field
+        """
+        return self.instance_class(
+            self, val if val_is_specified or val is not None else self.default_value, val_is_specified)
 
     @final
     def is_empty(self, value) -> bool:

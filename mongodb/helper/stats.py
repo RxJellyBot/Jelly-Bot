@@ -247,7 +247,7 @@ class MessageStatsDataProcessor:
         msg_rec_d = {uid: d for uid, d in msg_result.data.items()}
         msg_rec = {}
         available_dict = {}
-        for member in ProfileManager.get_channel_members(ch_oids, available_only=available_only):
+        for member in ProfileManager.get_channel_prof_conn(ch_oids, available_only=available_only):
             msg_rec[member.user_oid] = msg_rec_d.get(member.user_oid, msg_result.get_default_data_entry())
             available_dict[member.user_oid] = member.available
 
@@ -265,7 +265,7 @@ class MessageStatsDataProcessor:
 
                 cat_count = []
                 CategoryEntry = namedtuple("CategoryEntry", ["count", "percentage"])
-                for cat in msg_result.label_category:
+                for cat in msg_result.LABEL_CATEGORY:
                     ct = data_cat.get_count(cat)
                     cat_count.append(CategoryEntry(count=ct, percentage=ct / sum_ * 100 if sum_ > 0 else 0))
 
@@ -276,10 +276,10 @@ class MessageStatsDataProcessor:
                 )
 
             return UserMessageStats(
-                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.label_category)
+                org_stats=entries, msg_count=sum(individual_msgs), label_category=msg_result.LABEL_CATEGORY)
         else:
             return UserMessageStats(
-                org_stats=[], msg_count=0, label_category=msg_result.label_category)
+                org_stats=[], msg_count=0, label_category=msg_result.LABEL_CATEGORY)
 
     @staticmethod
     def _get_user_msg_ranking(
@@ -303,7 +303,8 @@ class MessageStatsDataProcessor:
             tz: Optional[tzinfo] = None, available_only: Optional[bool] = True) \
             -> UserDailyMessageResult:
         available_dict = {d.user_oid: d.available
-                          for d in ProfileManager.get_channel_members(channel_data.id, available_only=available_only)}
+                          for d in
+                          ProfileManager.get_channel_prof_conn(channel_data.id, available_only=available_only)}
         uname_dict = IdentitySearcher.get_batch_user_name(
             list(available_dict),
             channel_data, on_not_found="(N/A)")
@@ -441,7 +442,7 @@ class BotUsageStatsDataProcessor:
         data = []
         features = [f for f in BotFeature]
 
-        members = ProfileManager.get_channel_members(channel_data.id, available_only=True)
+        members = ProfileManager.get_channel_prof_conn(channel_data.id, available_only=True)
 
         usage_data = BotFeatureUsageDataManager.get_channel_per_user_usage(
             channel_data.id, hours_within=hours_within, member_oid_list=[d.user_oid for d in members]).data

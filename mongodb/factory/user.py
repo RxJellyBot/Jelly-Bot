@@ -23,10 +23,12 @@ from .results import (
     RootUserUpdateResult, GetRootUserDataResult
 )
 
+__all__ = ["APIUserManager", "OnPlatformIdentityManager", "RootUserManager"]
+
 DB_NAME = "user"
 
 
-class APIUserManager(GenerateTokenMixin, BaseCollection):
+class _APIUserManager(GenerateTokenMixin, BaseCollection):
     token_length = APIUserModel.API_TOKEN_LENGTH
     token_key = APIUserModel.Token.key
 
@@ -34,8 +36,7 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
     collection_name = "api"
     model_class = APIUserModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(APIUserModel.GoogleUid.key, unique=True, name="Google Identity Unique ID")
         self.create_index(APIUserModel.Token.key, unique=True, name="Jelly Bot API Token")
 
@@ -61,20 +62,19 @@ class APIUserManager(GenerateTokenMixin, BaseCollection):
                 if ex is not None:
                     outcome = WriteOutcome.X_EXCEPTION_OCCURRED
                 else:
-                    outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
+                    outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
             else:
                 token = entry.token
 
         return OnSiteUserRegistrationResult(outcome, entry, ex, token)
 
 
-class OnPlatformIdentityManager(BaseCollection):
+class _OnPlatformIdentityManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "onplat"
     model_class = OnPlatformUserModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
 
@@ -96,26 +96,29 @@ class OnPlatformIdentityManager(BaseCollection):
         if not outcome.is_inserted:
             entry = self.get_onplat(platform, user_token)
             if entry is None:
-                outcome = WriteOutcome.X_CACHE_MISSING_ABORT_INSERT
+                outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
 
         return OnPlatformUserRegistrationResult(outcome, ex, entry)
 
 
-class RootUserManager(BaseCollection):
+class _RootUserManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "root"
     model_class = RootUserModel
 
-    def __init__(self):
-        super().__init__()
-        self._mgr_api = APIUserManager()
-        self._mgr_onplat = OnPlatformIdentityManager()
+    def build_indexes(self):
         self.create_index(
             RootUserModel.ApiOid.key, unique=True, name="API User OID",
             partialFilterExpression={RootUserModel.ApiOid.key: {"$exists": True}})
         self.create_index(
             RootUserModel.OnPlatOids.key, unique=True, name="On Platform Identity OIDs",
             partialFilterExpression={RootUserModel.OnPlatOids.key: {"$exists": True}})
+
+    def clear(self):
+        super().clear()
+
+        APIUserManager.clear()
+        OnPlatformIdentityManager.clear()
 
     def _register(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
@@ -144,7 +147,7 @@ class RootUserManager(BaseCollection):
                 build_conn_entry = root_from_oid_func(user_reg_oid)
                 if build_conn_entry is None:
                     overall_outcome = oc_onconn_failed
-                    build_conn_outcome = WriteOutcome.X_CACHE_MISSING_ATTEMPTED_INSERT
+                    build_conn_outcome = WriteOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
                 else:
                     overall_outcome = WriteOutcome.O_DATA_EXISTS
                     if on_exist:
@@ -158,18 +161,20 @@ class RootUserManager(BaseCollection):
     def is_user_exists(self, api_token: str) -> bool:
         return self.get_root_data_api_token(api_token).success
 
-    def register_onplat(self, platform, user_token) -> RootUserRegistrationResult:
-        return self._register(self._mgr_onplat.register, self._mgr_onplat.get_onplat, self.get_root_data_onplat_oid,
+    def register_onplat(self, platform: Platform, user_token: str) -> RootUserRegistrationResult:
+        return self._register(OnPlatformIdentityManager.register, OnPlatformIdentityManager.get_onplat,
+                              self.get_root_data_onplat_oid,
                               "OnPlatOids", WriteOutcome.X_ON_CONN_ONPLAT, WriteOutcome.X_ON_REG_ONPLAT,
                               (platform, user_token), hint="OnPlatform", conn_arg_list=True)
 
     def register_google(self, id_data: GoogleIdentityUserData) -> RootUserRegistrationResult:
         def on_exist():
-            self._mgr_api.update_many_async({APIUserModel.GoogleUid.key: id_data.uid,
-                                             APIUserModel.Email.key: {"$ne": id_data.email}},
-                                            {"$set": {APIUserModel.Email.key: id_data.email}})
+            APIUserManager.update_many_async({APIUserModel.GoogleUid.key: id_data.uid,
+                                              APIUserModel.Email.key: {"$ne": id_data.email}},
+                                             {"$set": {APIUserModel.Email.key: id_data.email}})
 
-        return self._register(self._mgr_api.register, self._mgr_api.get_user_data_id_data, self.get_root_data_api_oid,
+        return self._register(APIUserManager.register, APIUserManager.get_user_data_id_data,
+                              self.get_root_data_api_oid,
                               "ApiOid", WriteOutcome.X_ON_CONN_API, WriteOutcome.X_ON_REG_API,
                               (id_data,), hint="APIUser", on_exist=on_exist)
 
@@ -204,7 +209,7 @@ class RootUserManager(BaseCollection):
         # On Platform Identity found?
         if udata.has_onplat_data:
             for onplatoid in udata.on_plat_oids:
-                onplat_data: Optional[OnPlatformUserModel] = self._mgr_onplat.get_onplat_by_oid(onplatoid)
+                onplat_data: Optional[OnPlatformUserModel] = OnPlatformIdentityManager.get_onplat_by_oid(onplatoid)
 
                 if onplat_data:
                     uname = onplat_data.get_name(channel_data)
@@ -223,7 +228,7 @@ class RootUserManager(BaseCollection):
         return str_not_found if str_not_found else None
 
     def get_root_data_api_token(self, token: str, *, skip_on_plat=False) -> GetRootUserDataResult:
-        api_u_data = self._mgr_api.get_user_data_token(token)
+        api_u_data = APIUserManager.get_user_data_token(token)
         entry = None
         onplat_list = []
 
@@ -241,7 +246,7 @@ class RootUserManager(BaseCollection):
             missing = []
 
             for oid in entry.on_plat_oids:
-                onplat_data = self._mgr_onplat.get_onplat_by_oid(oid)
+                onplat_data = OnPlatformIdentityManager.get_onplat_by_oid(oid)
 
                 if onplat_data:
                     onplat_list.append(onplat_data)
@@ -261,7 +266,7 @@ class RootUserManager(BaseCollection):
         rt_user_data = None
 
         if on_plat_data is None and auto_register:
-            on_plat_reg_result = self._mgr_onplat.register(platform, user_token)
+            on_plat_reg_result = OnPlatformIdentityManager.register(platform, user_token)
 
             if on_plat_reg_result.success:
                 on_plat_data = self.get_onplat_data(platform, user_token)
@@ -289,11 +294,12 @@ class RootUserManager(BaseCollection):
 
     @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
-        return self._mgr_onplat.get_onplat(platform, user_token)
+        return OnPlatformIdentityManager.get_onplat(platform, user_token)
 
-    def get_onplat_data_dict(self) -> Dict[ObjectId, OnPlatformUserModel]:
+    @staticmethod
+    def get_onplat_data_dict() -> Dict[ObjectId, OnPlatformUserModel]:
         ret = {}
-        for d in self._mgr_onplat.find_cursor_with_count({}, parse_cls=OnPlatformUserModel):
+        for d in OnPlatformIdentityManager.find_cursor_with_count({}, parse_cls=OnPlatformUserModel):
             ret[d.id] = d
 
         return ret
@@ -397,4 +403,6 @@ class RootUserManager(BaseCollection):
         return RootUserUpdateResult(outcome, None, updated)
 
 
-_inst = RootUserManager()
+APIUserManager = _APIUserManager()
+OnPlatformIdentityManager = _OnPlatformIdentityManager()
+RootUserManager = _RootUserManager()

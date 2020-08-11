@@ -14,7 +14,7 @@ cmd = CommandNode(
 
 
 @cmd.command_function(
-    feature_flag=BotFeature.TXT_FN_UDI_START, scope=CommandScopeCollection.PRIVATE_ONLY)
+    feature=BotFeature.TXT_FN_UDI_START, scope=CommandScopeCollection.PRIVATE_ONLY)
 def issue_execode(e: TextMessageEventObject):
     result = ExecodeManager.enqueue_execode(e.root_oid, Execode.INTEGRATE_USER_DATA)
     if result.success:

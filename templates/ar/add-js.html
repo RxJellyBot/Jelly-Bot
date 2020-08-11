@@ -233,7 +233,7 @@
     function formValidateContentLength() {
         const errmsgs = [];
 
-        $("div.content-check:not(.d-none)").each(() => {
+        $("div.content-check:not(.d-none)").each(function () {
             const progBar = $(this).find("div.progress-bar");
             const valNow = parseInt(progBar.attr("aria-valuenow"));
             const valMax = parseInt(progBar.attr("aria-valuemax"));
@@ -252,7 +252,7 @@
 
                 if (overlimit) {
                     {% blocktrans trimmed %}
-                        const msg = `The content length of <strong>${txtareaFor}</strong> is overlimit. (Limit: ${valMax} / Current: <strong>${valNow})</strong>`;
+                        const msg = `The content length of <strong>${txtareaFor}</strong> is overlimit. (Limit: ${valMax} / Current: <strong>${valNow}</strong>)`;
                     {% endblocktrans %}
                     errmsgs.push(msg);
                 } else if (empty) {

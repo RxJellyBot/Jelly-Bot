@@ -45,7 +45,7 @@ def _link_recent_msgs(e: TextMessageEventObject, limit: int):
 
 
 @cmd_msg.command_function(
-    feature_flag=BotFeature.TXT_RCT_MESSAGE,
+    feature=BotFeature.TXT_RCT_MESSAGE,
     arg_count=1,
     arg_help=[_("Maximum count of the recent messages to see.")],
     cooldown_sec=Bot.RecentActivity.CooldownSeconds
@@ -55,7 +55,7 @@ def get_recent_messages(e: TextMessageEventObject, limit: int):
 
 
 @cmd_msg.command_function(
-    feature_flag=BotFeature.TXT_RCT_MESSAGE,
+    feature=BotFeature.TXT_RCT_MESSAGE,
     cooldown_sec=Bot.RecentActivity.CooldownSeconds
 )
 def get_recent_messages_simple(e: TextMessageEventObject):

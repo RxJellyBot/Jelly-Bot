@@ -6,52 +6,75 @@ from pymongo import ReturnDocument
 from extutils.checker import arg_type_ensure
 from flags import Platform
 from models import ChannelModel, ChannelConfigModel, ChannelCollectionModel, OID_KEY
-from mongodb.utils import CursorWithCount
+from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import (
-    WriteOutcome, GetOutcome, OperationOutcome,
+    WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome,
     ChannelRegistrationResult, ChannelGetResult, ChannelChangeNameResult, ChannelCollectionRegistrationResult
 )
 
 from ._base import BaseCollection
 
+__all__ = ["ChannelManager", "ChannelCollectionManager"]
+
 DB_NAME = "channel"
 
 
-class ChannelManager(BaseCollection):
+class _ChannelManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "dict"
     model_class = ChannelModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelModel.Platform.key, 1), (ChannelModel.Token.key, 1)], name="Channel Identity", unique=True)
 
     @arg_type_ensure
-    def register(self, platform: Platform, token: str, default_name: str = None) -> ChannelRegistrationResult:
-        entry, outcome, ex = self.insert_one_data(
-            Platform=platform, Token=token,
-            Config=ChannelConfigModel.generate_default(
-                DefaultName=default_name))
+    def ensure_register(self, platform: Platform, token: str, *, default_name: str = None) \
+            -> ChannelRegistrationResult:
+        """
+        Register the channel if not yet registered.
 
-        if outcome.data_found:
-            entry = self.get_channel_token(platform, token)
+        Return the existing or registered :class:`ChannelModel`.
+        """
+        mdl = self.get_channel_token(platform, token)
 
-        return ChannelRegistrationResult(outcome, ex, entry)
+        if not mdl:
+            # Inline import because it will create a loop if imported outside
+            from mongodb.factory import ProfileManager
+
+            channel_oid = ObjectId()
+            create_result = ProfileManager.create_default_profile(
+                channel_oid, set_to_channel=False, check_channel=False)
+
+            if not create_result.success:
+                return ChannelRegistrationResult(WriteOutcome.X_CNL_DEFAULT_CREATE_FAILED)
+
+            config = ChannelConfigModel.generate_default(
+                DefaultName=default_name, DefaultProfileOid=create_result.model.id)
+
+            mdl, outcome, ex = self.insert_one_data(Id=channel_oid, Platform=platform, Token=token, Config=config)
+
+            return ChannelRegistrationResult(outcome, ex, mdl)
+
+        return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
 
     @arg_type_ensure
-    def deregister(self, platform: Platform, token: str) -> WriteOutcome:
+    def deregister(self, platform: Platform, token: str) -> UpdateOutcome:
         return self.mark_accessibility(platform, token, False)
 
     @arg_type_ensure
-    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> WriteOutcome:
-        return self.update_many_outcome(
+    def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> UpdateOutcome:
+        result = self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
+        if result == UpdateOutcome.X_NOT_FOUND:
+            return UpdateOutcome.X_CHANNEL_NOT_FOUND
+        else:
+            return result
 
     @arg_type_ensure
-    def update_channel_default_name(self, platform: Platform, token: str, default_name: str):
+    def update_channel_default_name(self, platform: Platform, token: str, default_name: str) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
@@ -88,25 +111,25 @@ class ChannelManager(BaseCollection):
         return ChannelChangeNameResult(outcome, ex, ret)
 
     @arg_type_ensure
-    def get_channel_token(self, platform: Platform, token: str,
+    def get_channel_token(self, platform: Platform, token: str, *,
                           auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
         ret = self.find_one_casted(
             {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
 
         if not ret and auto_register:
-            reg_result = self.register(platform, token, default_name=default_name)
+            reg_result = self.ensure_register(platform, token, default_name=default_name)
             if reg_result.success:
                 ret = reg_result.model
             else:
                 raise ValueError(
-                    f"Channel registration failed in ChannelManager.get_channel_token. "
+                    f"Channel registration failed in `ChannelManager.get_channel_token`. "
                     f"Platform: {platform} / Token: {token}")
 
         return ret
 
     @arg_type_ensure
-    def get_channel_oid(self, channel_oid: ObjectId, hide_private: bool = False) -> Optional[ChannelModel]:
+    def get_channel_oid(self, channel_oid: ObjectId, *, hide_private: bool = False) -> Optional[ChannelModel]:
         filter_ = {ChannelModel.Id.key: channel_oid}
 
         if hide_private:
@@ -114,7 +137,7 @@ class ChannelManager(BaseCollection):
 
         return self.find_one_casted(filter_, parse_cls=ChannelModel)
 
-    def get_channel_dict(self, channel_oid_list: List[ObjectId], accessbible_only: bool = False) \
+    def get_channel_dict(self, channel_oid_list: List[ObjectId], *, accessbible_only: bool = False) \
             -> Dict[ObjectId, ChannelModel]:
         filter_ = {OID_KEY: {"$in": channel_oid_list}}
 
@@ -125,56 +148,68 @@ class ChannelManager(BaseCollection):
                 in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
 
     @arg_type_ensure
-    def get_channel_default_name(self, default_name: str, hide_private: bool = True) -> CursorWithCount:
+    def get_channel_default_name(self, default_name: str, *, hide_private: bool = True) \
+            -> ExtendedCursor[ChannelModel]:
         filter_ = \
-            {
-                f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
-                    {"$regex": default_name, "$options": "i"}
-            }
+            {"$or": [
+                {
+                    f"{ChannelModel.Token.key}": {"$regex": default_name, "$options": "i"}
+                },
+                {
+                    f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
+                        {"$regex": default_name, "$options": "i"}
+                }
+            ]}
 
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
 
-    # noinspection PyArgumentList
-    @arg_type_ensure
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
-        if not isinstance(platform, Platform):
-            platform = Platform(platform)
-
         model = self.get_channel_token(platform, token)
 
         if model is not None:
             outcome = GetOutcome.O_CACHE_DB
         else:
-            outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
+            outcome = GetOutcome.X_CHANNEL_NOT_FOUND
 
         return ChannelGetResult(outcome, model=model)
 
-    def set_config(self, channel_oid: ObjectId, json_key, config_value) -> bool:
+    def set_config(self, channel_oid: ObjectId, json_key, config_value) -> UpdateOutcome:
         if json_key not in ChannelConfigModel.model_json_keys():
-            raise ValueError(f"Attempt to set value to non-existing field in `ChannelModel`. ({json_key})")
+            return UpdateOutcome.X_CONFIG_NOT_EXISTS
 
-        return self.update_one(
+        fk = ChannelConfigModel.json_key_to_field(json_key)
+        if not getattr(ChannelConfigModel, fk).is_type_matched(config_value):
+            return UpdateOutcome.X_CONFIG_TYPE_MISMATCH
+
+        if not getattr(ChannelConfigModel, fk).is_value_valid(config_value):
+            return UpdateOutcome.X_CONFIG_VALUE_INVALID
+
+        result = self.update_one_outcome(
             {ChannelModel.Id.key: channel_oid},
-            {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}}).matched_count > 0
+            {"$set": {f"{ChannelModel.Config.key}.{json_key}": config_value}})
+
+        if result == UpdateOutcome.X_NOT_FOUND:
+            return UpdateOutcome.X_CHANNEL_NOT_FOUND
+        else:
+            return result
 
 
-class ChannelCollectionManager(BaseCollection):
+class _ChannelCollectionManager(BaseCollection):
     database_name = DB_NAME
     collection_name = "collection"
     model_class = ChannelCollectionModel
 
-    def __init__(self):
-        super().__init__()
+    def build_indexes(self):
         self.create_index(
             [(ChannelCollectionModel.Platform.key, 1), (ChannelCollectionModel.Token.key, 1)],
             name="Channel Collection Identity", unique=True)
         self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
 
     @arg_type_ensure
-    def register(
+    def ensure_register(
             self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
             -> ChannelCollectionRegistrationResult:
         if not default_name:
@@ -210,17 +245,17 @@ class ChannelCollectionManager(BaseCollection):
         )
 
     @arg_type_ensure
-    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> WriteOutcome:
+    def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
 
     @arg_type_ensure
-    def update_default_name(self, platform: Platform, token: str, new_default_name: str):
+    def update_default_name(self, platform: Platform, token: str, new_default_name: str) -> UpdateOutcome:
         return self.update_many_outcome(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})
 
 
-_inst = ChannelManager()
-_inst2 = ChannelCollectionManager()
+ChannelManager = _ChannelManager()
+ChannelCollectionManager = _ChannelCollectionManager()

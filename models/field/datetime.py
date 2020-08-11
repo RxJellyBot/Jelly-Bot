@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Union
 
+from django.utils import timezone
 from extutils.dt import parse_to_dt, make_tz_aware
 
 from ._base import BaseField, FieldInstance
@@ -28,9 +29,8 @@ class DateTimeField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
-        return datetime.min.replace(tzinfo=timezone.utc)
+    def none_obj(self):
+        return timezone.utc.localize(datetime.min)
 
     def _check_value_valid_not_none(self, value):
         if isinstance(value, str) and parse_to_dt(value) is None:

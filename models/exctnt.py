@@ -23,7 +23,7 @@ class ExtraContentModel(Model):
     #   - Hard to pass the value to the test
     #   - Reduces the flexibility of setting the expiry of the extra content
     Timestamp = DateTimeField("e", default=ModelDefaultValueExt.Required)
-    ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Optional)
+    ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
 
     @property
     def expires_on(self):

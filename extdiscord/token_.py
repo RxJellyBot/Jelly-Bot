@@ -1,3 +1,8 @@
+"""
+Module which only contains the discord bot token.
+
+Terminates the program if token not specified as ``DISCORD_TOKEN`` in environment variables.
+"""
 import os
 import sys
 

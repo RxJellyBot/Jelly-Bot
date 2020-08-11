@@ -18,7 +18,8 @@ class AutoReplySearchChannelView(LoginRequiredMixin, ChannelOidRequiredMixin, Te
         channel_data = self.get_channel_data(*args, **kwargs)
         channel_name = channel_data.model.get_channel_name(get_root_oid(request))
 
-        module_list = list(AutoReplyManager.get_conn_list(channel_data.model.id, keyword, not include_inactive))
+        module_list = list(AutoReplyManager.get_conn_list(
+            channel_data.model.id, keyword, active_only=not include_inactive))
 
         uids = []
         for module in module_list:

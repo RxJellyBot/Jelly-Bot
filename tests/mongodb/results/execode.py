@@ -10,20 +10,24 @@ from mongodb.factory.results import (
     BaseResult, ModelResult, OperationOutcome,
     EnqueueExecodeResult, GetExecodeEntryResult, CompleteExecodeResult
 )
-from tests.base import TestOnModelResult, TestOnBaseResult
+from tests.base import TestOnModelResult
 
 __all__ = ["TestEnqueueExecodeResult", "TestGetExecodeEntryResult", "TestCompleteExecodeResult"]
 
 mdl = ExecodeEntryModel(Execode="ABCDEFGHIJ", CreatorOid=ObjectId(),
-                        ActionType=Execode.AR_ADD, Timestamp=datetime.utcnow())
+                        ActionType=Execode.INTEGRATE_USER_DATA, Timestamp=datetime.utcnow())
 
 
-class TestEnqueueExecodeResult(TestOnBaseResult.TestClass):
+class TestEnqueueExecodeResult(TestOnModelResult.TestClass):
     EXPIRY = datetime.utcnow()
 
     @classmethod
     def get_result_class(cls) -> Type[BaseResult]:
         return EnqueueExecodeResult
+
+    @classmethod
+    def get_constructed_model(cls) -> Model:
+        return mdl
 
     @classmethod
     def result_args_no_error(cls) -> Tuple[Any, ...]:
@@ -78,14 +82,14 @@ class TestCompleteExecodeResult(TestOnModelResult.TestClass):
     @classmethod
     def default_serialized(cls):
         d = super().default_serialized()
-        d.update({result.ExecodeResponse.LACKING_KEYS: set(),
+        d.update({result.ExecodeResponse.MISSING_ARGS: set(),
                   result.ExecodeResponse.COMPLETION_OUTCOME: ExecodeCompletionOutcome.O_OK})
         return d
 
     @classmethod
     def default_serialized_error(cls):
         d = super().default_serialized_error()
-        d.update({result.ExecodeResponse.LACKING_KEYS: {"a", "b"},
+        d.update({result.ExecodeResponse.MISSING_ARGS: {"a", "b"},
                   result.ExecodeResponse.COMPLETION_OUTCOME: ExecodeCompletionOutcome.X_IDT_INTEGRATION_FAILED})
         return d
 

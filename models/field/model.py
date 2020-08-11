@@ -1,9 +1,8 @@
-from ._base import BaseField
+from ._base import BaseField, Lazy
 from .exceptions import FieldModelClassInvalidError
 
 
 class ModelField(BaseField):
-    # noinspection PyUnresolvedReferences,PyTypeChecker
     def __init__(self, key, model_cls, **kwargs):
         """
         Default Properties Overrided:
@@ -33,7 +32,7 @@ class ModelField(BaseField):
         kwargs["auto_cast"] = True
 
         if "default" not in kwargs:
-            kwargs["default"] = model_cls.generate_default()
+            kwargs["default"] = Lazy(model_cls.generate_default)
 
         super().__init__(key, **kwargs)
 
@@ -45,8 +44,7 @@ class ModelField(BaseField):
     def expected_types(self):
         return self.model_cls, dict
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return None
 
     def _cast_to_desired_type(self, value):

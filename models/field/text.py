@@ -4,16 +4,18 @@ from django.utils.functional import Promise
 
 from extutils.url import is_valid_url
 
-from ._base import BaseField
-from .exceptions import FieldInvalidUrlError, FieldMaxLengthReachedError, FieldRegexNotMatchError, \
-    FieldEmptyValueNotAllowedError
+from ._base import BaseField, FieldInstance
+from .exceptions import (
+    FieldInvalidUrlError, FieldMaxLengthReachedError, FieldRegexNotMatchError, FieldEmptyValueNotAllowedError
+)
 
 
 class TextField(BaseField):
     DEFAULT_MAX_LENGTH = 2000
 
     def __init__(self, key, *, regex: str = None, maxlen: int = DEFAULT_MAX_LENGTH,
-                 must_have_content: int = False, **kwargs):
+                 must_have_content: int = False, strip: bool = True,
+                 **kwargs):
         """
         The max length of the string is determined by ``maxlen``.
 
@@ -46,7 +48,10 @@ class TextField(BaseField):
         """
         if "allow_none" not in kwargs:
             kwargs["allow_none"] = False
+        if "inst_cls" not in kwargs:
+            kwargs["inst_cls"] = TextFieldInstance
 
+        self._strip = strip
         self._regex = regex
         self._maxlen = maxlen
         self._must_have_content = must_have_content
@@ -55,6 +60,9 @@ class TextField(BaseField):
 
     def _check_value_valid_not_none(self, value):
         if isinstance(value, str):
+            if self.strip:
+                value = value.strip()
+
             # Length check
             if len(value) > self._maxlen:
                 raise FieldMaxLengthReachedError(self.key, len(value), self._maxlen)
@@ -64,17 +72,34 @@ class TextField(BaseField):
                 raise FieldRegexNotMatchError(self.key, value, self._regex)
 
             # Empty Value
-            if self._must_have_content and len(value) == 0:
+            if self._must_have_content and not value:
                 raise FieldEmptyValueNotAllowedError(self.key)
 
-    @classmethod
-    def none_obj(cls):
+    def cast_to_desired_type(self, value):
+        ret = super().cast_to_desired_type(value)
+
+        if isinstance(ret, str) and self.strip:
+            ret = ret.strip()
+
+        return ret
+
+    def get_default_value_not_none(self, default_val):
+        if self.strip and isinstance(default_val, str):
+            default_val = default_val.strip()
+
+        return super().get_default_value_not_none(default_val)
+
+    def none_obj(self):
         return ""
 
     @property
     def expected_types(self):
         # `Promise` will include `__proxy__` for i18n strings
         return str, int, bool, Promise
+
+    @property
+    def strip(self) -> bool:
+        return self._strip
 
 
 class UrlField(BaseField):
@@ -103,8 +128,7 @@ class UrlField(BaseField):
 
         super().__init__(key, **kwargs)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return ""
 
     @property
@@ -114,3 +138,11 @@ class UrlField(BaseField):
     def _check_value_valid_not_none(self, value):
         if not self.is_empty(value) and not is_valid_url(value):
             raise FieldInvalidUrlError(self.key, value)
+
+
+class TextFieldInstance(FieldInstance):
+    def force_set(self, value: str):
+        if isinstance(value, str) and value and self.base.strip:
+            value = value.strip()
+
+        super().force_set(value)

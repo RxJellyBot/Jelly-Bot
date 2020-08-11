@@ -17,6 +17,12 @@ class HandledMessageEvent(ABC):
         self.content = content
         self.msg_type = msg_type
 
+    def __eq__(self, other):
+        if not isinstance(other, HandledMessageEvent):
+            return False
+
+        return self.to_json() == other.to_json()
+
     def to_json(self):
         return {"content": str(self.content), "type": self.msg_type}
 
@@ -134,6 +140,15 @@ class HandledMessageEventsHolder:
     def __iter__(self):
         for item in self._core:
             yield item
+
+    def __repr__(self):
+        return f"Channel OID: {self._channel_model.id} / {self.to_json()}"
+
+    def __eq__(self, other):
+        if not isinstance(other, HandledMessageEventsHolder):
+            return False
+
+        return self.channel_model == other.channel_model and self.to_json() == other.to_json()
 
     @property
     def has_item(self) -> bool:

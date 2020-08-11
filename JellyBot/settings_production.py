@@ -1,6 +1,6 @@
-# flake8: NOQA: F405
+# flake8: noqa: F405
 
-from JellyBot.settings import *  # NOQA
+from JellyBot.settings import *  # noqa
 
 # --- SECURITY
 

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from flags import AutoReplyContentType, ProfilePermission, Platform
 
 
-def type_translation(type_: type):
+def type_translation(type_: type):  # noqa: C901
     if issubclass(type_, str):
         return _("String")
     elif issubclass(type_, bool):

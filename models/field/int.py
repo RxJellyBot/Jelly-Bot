@@ -27,8 +27,7 @@ class IntegerField(BaseField):
         if value < 0 and self.positive_only:
             raise FieldValueNegativeError(self.key, value)
 
-    @classmethod
-    def none_obj(cls):
+    def none_obj(self):
         return 0
 
     @property

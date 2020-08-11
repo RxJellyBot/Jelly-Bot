@@ -13,15 +13,19 @@ class ChannelConfigModel(Model):
     WITH_OID = False
 
     # Votes needed to promote a member to be moderator
-    VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod)
+    VotePromoMod = IntegerField("v-m", default=ChannelConfig.VotesToPromoteMod, positive_only=True)
     # Votes needed to promote a member to be admin
-    VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin)
+    VotePromoAdmin = IntegerField("v-a", default=ChannelConfig.VotesToPromoteAdmin, positive_only=True)
+
     EnableAutoReply = BooleanField("e-ar", default=True)
     EnableTimer = BooleanField("e-tmr", default=True)
     EnableCalculator = BooleanField("e-calc", default=True)
     EnableBotCommand = BooleanField("e-bot", default=True)
+
     InfoPrivate = BooleanField("prv", default=False)
-    DefaultProfileOid = ObjectIDField("d-prof", allow_none=True)
+
+    DefaultProfileOid = ObjectIDField("d-prof", default=ModelDefaultValueExt.Required,
+                                      allow_none=False, readonly=False)
     DefaultName = TextField("d-name", allow_none=True)
 
 

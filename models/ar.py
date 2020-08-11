@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from bson import ObjectId
 
@@ -18,6 +18,9 @@ from .field import (
     ObjectIDField, TextField, AutoReplyContentTypeField, ModelField, ModelArrayField,
     BooleanField, IntegerField, ArrayField, DateTimeField, ColorField, ModelDefaultValueExt
 )
+
+__all__ = ["AutoReplyContentModel", "AutoReplyModuleModel", "AutoReplyModuleExecodeModel", "AutoReplyModuleTagModel",
+           "AutoReplyTagPopularityScore", "UniqueKeywordCountEntry", "UniqueKeywordCountResult"]
 
 
 def _content_to_str(content_type, content):
@@ -82,7 +85,7 @@ class AutoReplyModuleModel(Model):
 
     KEY_KW_CONTENT = f"{key_kw}.{AutoReplyContentModel.Content.key}"
     KEY_KW_TYPE = f"{key_kw}.{AutoReplyContentModel.ContentType.key}"
-    ChannelId = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
+    ChannelOid = ObjectIDField("ch", default=ModelDefaultValueExt.Required)
     Active = BooleanField("at", default=True)
 
     # Type
@@ -95,7 +98,7 @@ class AutoReplyModuleModel(Model):
     # Property
     Pinned = BooleanField("p")
     Private = BooleanField("pr")
-    CooldownSec = IntegerField("cd")
+    CooldownSec = IntegerField("cd", positive_only=True)
     ExcludedOids = ArrayField("e", ObjectId, stores_uid=True)
     TagIds = ArrayField("t", ObjectId)
 
@@ -126,7 +129,21 @@ class AutoReplyModuleModel(Model):
         return f"{str(self.keyword)}"
 
     @property
+    def created_at_expr(self) -> str:
+        """
+        Expression of the module creation timestamp.
+
+        Used in module info displaying on the website.
+        """
+        return localtime(self.id.generation_time).strftime("%Y-%m-%d %H:%M:%S")
+
+    @property
     def last_used_expr(self) -> Optional[str]:
+        """
+        Expression of the module last used timestamp.
+
+        Used in module info displaying on the website.
+        """
         if self.last_used:
             return localtime(self.last_used).strftime("%Y-%m-%d %H:%M:%S")
         else:
@@ -134,6 +151,11 @@ class AutoReplyModuleModel(Model):
 
     @property
     def removed_at_expr(self) -> Optional[str]:
+        """
+        Expression of the module removal timestamp.
+
+        Used in module info displaying on the website.
+        """
         if self.removed_at:
             return localtime(self.removed_at).strftime("%Y-%m-%d %H:%M:%S")
         else:
@@ -147,6 +169,8 @@ class AutoReplyModuleModel(Model):
 
 
 class AutoReplyModuleExecodeModel(Model):
+    WITH_OID = False
+
     Keyword = ModelField(AutoReplyModuleModel.key_kw, AutoReplyContentModel,
                          default=ModelDefaultValueExt.Required)
     Responses = ModelArrayField("rp", AutoReplyContentModel, default=ModelDefaultValueExt.Required,
@@ -155,11 +179,6 @@ class AutoReplyModuleExecodeModel(Model):
     Private = BooleanField("pr", readonly=True)
     CooldownSec = IntegerField("cd", readonly=True)
     TagIds = ArrayField("t", ObjectId)
-
-    def to_actual_model(self, channel_id: ObjectId, creator_oid: ObjectId):
-        return AutoReplyModuleModel(
-            **self.to_json(), from_db=True, **{AutoReplyModuleModel.ChannelId.key: channel_id,
-                                               AutoReplyModuleModel.CreatorOid.key: creator_oid})
 
 
 class AutoReplyModuleTagModel(Model):
@@ -197,7 +216,7 @@ class UniqueKeywordCountEntry:
     word_type: Union[int, AutoReplyContentType]
     count_usage: int
     count_module: int
-    rank: int
+    rank: str
 
     def __post_init__(self):
         self.word_type = AutoReplyContentType.cast(self.word_type)
@@ -216,7 +235,7 @@ class UniqueKeywordCountResult:
     KEY_COUNT_MODULE = "cm"
 
     def __init__(self, crs, limit: Optional[int] = None):
-        self.data = []
+        self.data: List[UniqueKeywordCountEntry] = []
 
         usage_key = UniqueKeywordCountResult.KEY_COUNT_USAGE
 

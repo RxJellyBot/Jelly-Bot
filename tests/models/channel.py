@@ -6,7 +6,7 @@ from flags import Platform
 from models import Model, ChannelConfigModel, ChannelModel, ChannelCollectionModel
 from JellyBot.systemconfig import ChannelConfig
 
-from ._test_base import TestModel
+from tests.base import TestModel
 
 __all__ = ["TestChannelConfigModel", "TestChannelCollectionModel", "TestChannelModel"]
 
@@ -28,8 +28,13 @@ class TestChannelConfigModel(TestModel.TestClass):
             ("e-calc", "EnableCalculator"): (True, False),
             ("e-bot", "EnableBotCommand"): (True, False),
             ("prv", "InfoPrivate"): (False, True),
-            ("d-prof", "DefaultProfileOid"): (None, cls.DEFAULT_POID),
             ("d-name", "DefaultName"): (None, "XXX")
+        }
+
+    @classmethod
+    def get_required(cls) -> Dict[Tuple[str, str], Any]:
+        return {
+            ("d-prof", "DefaultProfileOid"): cls.DEFAULT_POID,
         }
 
 
@@ -42,26 +47,27 @@ class TestChannelModel(TestModel.TestClass):
     def get_required(cls) -> Dict[Tuple[str, str], Any]:
         return {
             ("p", "Platform"): Platform.LINE,
-            ("t", "Token"): "XYZ"
+            ("t", "Token"): "XYZ",
+            ("c", "Config"): ChannelConfigModel(DefaultName="DN",
+                                                DefaultProfileOid=TestChannelConfigModel.DEFAULT_POID)
         }
 
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {
             ("n", "Name"): ({}, {"DEF": "NAME"}),
-            ("c", "Config"): (ChannelConfigModel(), ChannelConfigModel(DefaultName="DN")),
             ("acc", "BotAccessible"): (True, False)
         }
 
-    # noinspection PyArgumentEqualDefault
     def test_get_channel_name(self):
         mdl = self.get_constructed_model(manual_default=True)
         self.assertEqual(mdl.get_channel_name("ABC"), "DN")
         self.assertEqual(mdl.get_channel_name("DEF"), "NAME")
 
+        # noinspection PyArgumentEqualDefault
         mdl = self.get_constructed_model(manual_default=False)
-        self.assertEqual(mdl.get_channel_name("ABC"), "XYZ")
-        self.assertEqual(mdl.get_channel_name("DEF"), "XYZ")
+        self.assertEqual(mdl.get_channel_name("ABC"), "DN")
+        self.assertEqual(mdl.get_channel_name("DEF"), "DN")
 
 
 class TestChannelCollectionModel(TestModel.TestClass):

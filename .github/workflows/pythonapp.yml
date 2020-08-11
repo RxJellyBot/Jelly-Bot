@@ -125,12 +125,20 @@ jobs:
         run: |
           pylint doc
 
+      - name: Lint on `extdiscord`
+        run: |
+          pylint extdiscord
+
+      - name: Lint on `extline`
+        run: |
+          pylint extline
+
   django-tests:
     runs-on: windows-latest
 
     needs: [prepare]
 
-    timeout-minutes: 10
+    timeout-minutes: 60
 
     env:
       SECRET_KEY: ${{ secrets.DjangoSecretKey }}
@@ -167,7 +175,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Django tests
+      - name: Test independent utils (`bot` / `extutils`)
+        run: |
+          python manage.py test tests.bot
+          python manage.py test tests.extutils
+
+      - name: Test string resources (`strres`)
+        run: |
+          python manage.py test tests.strres
+
+      - name: Test base data structures (`models`)
+        run: |
+          python manage.py test tests.models
+
+      - name: Test data controller (`mongodb`)
+        run: |
+          python manage.py test tests.mongodb
+
+      - name: Test game - PK Chess (`game_pkchess`)
+        run: |
+          python manage.py test tests.game_pkchess
+
+      - name: All tests
         run: |
           python manage.py test tests
 

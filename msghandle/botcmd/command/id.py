@@ -114,7 +114,7 @@ def _chcoll_msg_count_list_section(e: TextMessageEventObject, limit):
     return ret
 
 
-@cmd_id.command_function(feature_flag=BotFeature.TXT_INFO_ID)
+@cmd_id.command_function(feature=BotFeature.TXT_INFO_ID)
 def check_ids(e: TextMessageEventObject):
     ret = []
 
@@ -125,7 +125,7 @@ def check_ids(e: TextMessageEventObject):
     return "\n".join(ret)
 
 
-@cmd_ch.command_function(feature_flag=BotFeature.TXT_INFO_CHANNEL)
+@cmd_ch.command_function(feature=BotFeature.TXT_INFO_CHANNEL)
 def check_channel_info(e: TextMessageEventObject):
     ret = []
 
@@ -143,7 +143,7 @@ def check_channel_info(e: TextMessageEventObject):
     return "\n".join(ret)
 
 
-@cmd_me.command_function(feature_flag=BotFeature.TXT_INFO_USER)
+@cmd_me.command_function(feature=BotFeature.TXT_INFO_USER)
 def check_sender_identity(e: TextMessageEventObject):
     ret = []
 
@@ -160,7 +160,7 @@ cmd_ch_mem = cmd_ch.new_child_node(
 
 
 @cmd_ch_mem.command_function(
-    feature_flag=BotFeature.TXT_INFO_CHANNEL_MEMBER,
+    feature=BotFeature.TXT_INFO_CHANNEL_MEMBER,
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def check_channel_member(e: TextMessageEventObject):
