@@ -126,7 +126,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     def determine_type(content, error_text):
         type_ = AutoReplyContentType.determine(content)
         # https://github.com/RaenonX/Jelly-Bot/issues/124
-        if not AutoReplyValidator.is_valid_content(kw_type, keyword):
+        if not AutoReplyValidator.is_valid_content(type_, content):
             type_ = AutoReplyContentType.TEXT
             ret.append(HandledMessageEventText(content=error_text))
 
