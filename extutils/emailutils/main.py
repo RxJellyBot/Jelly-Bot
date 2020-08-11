@@ -1,4 +1,3 @@
-import os
 from threading import Thread
 from typing import List, Optional, Tuple
 
@@ -7,6 +6,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.html import strip_tags
 
+from env_var import is_testing
 from JellyBot.systemconfig import Email
 
 from .fake import EmailServer
@@ -45,7 +45,7 @@ class MailSender:
 
             MailSender._cache_[content_html] = None
 
-            if bool(int(os.environ.get("TEST", 0))):
+            if is_testing():
                 print()
                 print("--- SENDING EMAIL ---")
                 print()
@@ -57,7 +57,7 @@ class MailSender:
     def send_email_async(
             content_html: str, recipients: List[str] = None,
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
-        if bool(int(os.environ.get("TEST", 0))):
+        if is_testing():
             MailSender.send_email_to_fake_server(*MailSender.collate_info(content_html, recipients, subject, prefix))
         else:
             Thread(

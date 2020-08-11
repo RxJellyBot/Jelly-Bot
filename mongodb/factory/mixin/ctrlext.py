@@ -9,6 +9,7 @@ from pymongo.errors import DuplicateKeyError
 
 from extutils.dt import TimeRange
 from extutils.utils import dt_to_objectid
+from env_var import is_testing
 from models import Model, OID_KEY
 from models.exceptions import (
     InvalidModelError, InvalidModelFieldError, RequiredKeyNotFilledError, FieldKeyNotExistError
@@ -194,12 +195,24 @@ class ControlExtensionMixin(Collection):
         return outcome
 
     def update_many_async(self, filter_, update, upsert=False, collation=None):
-        Thread(
-            target=self.update_many, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
+        if is_testing():
+            self.update_many(filter_, update, upsert=upsert, collation=collation)
+        else:
+            Thread(
+                target=self.update_many,
+                args=(filter_, update),
+                kwargs={"upsert": upsert, "collation": collation}
+            ).start()
 
     def update_one_async(self, filter_, update, upsert=False, collation=None):
-        Thread(
-            target=self.update_one, args=(filter_, update), kwargs={"upsert": upsert, "collation": collation}).start()
+        if is_testing():
+            self.update_one(filter_, update, upsert=upsert, collation=collation)
+        else:
+            Thread(
+                target=self.update_one,
+                args=(filter_, update),
+                kwargs={"upsert": upsert, "collation": collation}
+            ).start()
 
     def find_cursor_with_count(
             self, filter_, *args, parse_cls: Type[T] = None, hours_within: Optional[int] = None,

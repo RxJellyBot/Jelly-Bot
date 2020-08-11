@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List, Dict, Set
@@ -7,6 +6,7 @@ import pymongo
 from bson import ObjectId
 
 from JellyBot.systemconfig import Database
+from env_var import is_testing
 from extutils import dt_to_objectid
 from extutils.checker import arg_type_ensure
 from extutils.dt import now_utc_aware, localtime, TimeRange
@@ -51,7 +51,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
     def record_message_async(
             self, channel_oid: ObjectId, user_root_oid: Optional[ObjectId],
             message_type: MessageType, message_content: Any, proc_time_secs: float):
-        if bool(int(os.environ.get("TEST", 0))):
+        if is_testing():
             # No async if testing
             self.record_message(channel_oid, user_root_oid, message_type, message_content, proc_time_secs)
         else:
@@ -430,7 +430,7 @@ class _BotFeatureUsageDataManager(BaseCollection):
 
     @arg_type_ensure
     def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
-        if bool(int(os.environ.get("TEST", 0))):
+        if is_testing():
             self.record_usage(feature_used, channel_oid, root_oid)
         else:
             Thread(target=self.record_usage, args=(feature_used, channel_oid, root_oid)).start()

@@ -1,4 +1,3 @@
-import os
 from threading import Thread
 from typing import Optional, List, Dict, Set, Union
 
@@ -7,6 +6,7 @@ from bson import ObjectId
 
 from pymongo import UpdateOne
 
+from env_var import is_testing
 from extutils.boolext import to_bool
 from extutils.color import ColorFactory
 from extutils.checker import arg_type_ensure
@@ -807,7 +807,7 @@ class _ProfileManager(ClearableMixin):
         return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
 
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
-        if bool(int(os.environ.get("TEST", 0))):
+        if is_testing():
             # No async if testing
             self.register_new_default(channel_oid, root_uid)
         else:

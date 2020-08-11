@@ -1,10 +1,11 @@
-import os
 import sys
 from typing import final, List, Union, Type
 
+from django.test import TestCase as DjangoTestCase
+
+from env_var import is_testing
 from mixin import ClearableMixin
 from mongodb.factory import MONGO_CLIENT, is_test_db
-from django.test import TestCase as DjangoTestCase
 
 __all__ = ["TestCase"]
 
@@ -16,7 +17,7 @@ class TestCase(DjangoTestCase):
         print(f"Setup {cls.__qualname__}...")
 
         # Ensure `TEST` flag is set
-        if not bool(int(os.environ.get("TEST", 0))):
+        if not is_testing():
             # protect possible data corruption
             print("Set environment variable `TEST` to 1 to execute the tests.")
             sys.exit(1)
