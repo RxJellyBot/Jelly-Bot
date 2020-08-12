@@ -19,7 +19,7 @@ class AccountLoginView(View):
 
     # noinspection PyMethodMayBeStatic, PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        return render_template(request, _("Login"), "account/login.html")
+        return render_template(request, _("Login"), "account/login.html", {"pass_signal": self.PASS_SIGNAL})
 
     @staticmethod
     def _process_result(result):
@@ -81,7 +81,7 @@ class AccountLoginView(View):
             response.set_cookie(keys.Cookies.USER_TOKEN, token)
 
         if s == AccountLoginView.PASS_SIGNAL and token is None:
-            return simple_json_response(_("User token is null however login succeed. {}").format(s_contact))
+            return simple_json_response(_("User token is null. However login succeed. {}").format(s_contact))
         else:
             return response
 

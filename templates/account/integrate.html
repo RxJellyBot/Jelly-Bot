@@ -23,14 +23,18 @@
                         {% blocktrans trimmed %}
                             <p>
                                 Input the Execode acquired for user data integration below.<br>
-                                Check <a href="{{ cmd_url }}">this page</a> for
-                                how to initiate the user data integration process.<br>
-                                Account related data such as locale configuration on the account where you get the Execode
+                                <br>
+                                Enter <a href="{{ cmd_url }}">this command (<code>{{ cmd_usage }}</code>)</a> using
+                                private channel to the bot to get an Execode.<br>
+                                <br>
+                                Account related data such as locale configuration on the account where you get the
+                                Execode
                                 will be discarded, only the data on the website will be kept.
                             </p>
                         {% endblocktrans %}
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="{% trans "Integration Execode here" %}"
+                            <input type="text" class="form-control"
+                                   placeholder="{% trans "Integration Execode here" %}"
                                    aria-label="{% trans "Integration Execode" %}" id="execode">
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-outline-primary" id="execodeSubmit">

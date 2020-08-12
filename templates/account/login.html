@@ -55,7 +55,7 @@
         }
 
         function onGoogleSignedIn(googleUser) {
-            onSignInHandle(googleUser.getAuthResponse().id_token, "{% url "page.home" %}");
+            onSignInHandle(googleUser.getAuthResponse().id_token, "{{ pass_signal }}", "{% url "page.home" %}");
         }
     </script>
 {% endblock %}

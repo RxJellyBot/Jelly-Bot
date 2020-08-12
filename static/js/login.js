@@ -1,10 +1,10 @@
 $(document).ready(() => $("button#loginGoogle").click(() => googleSignIn()));
 
 // noinspection JSUnusedGlobalSymbols
-function onSignInHandle(idToken, defaultRedirectUrl) {
+function onSignInHandle(idToken, passSignal, defaultRedirectUrl) {
     xhrPostRequest(window.location.href, `idtoken=${idToken}`, xhr => {
         const response = xhr.response["text"];
-        if (response === "PASS") {
+        if (response === passSignal) {
             window.location.replace(getRedirectUrl(defaultRedirectUrl));
         } else {
             generateAlert("danger", response);
