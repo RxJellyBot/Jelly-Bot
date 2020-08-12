@@ -1,6 +1,7 @@
 """
 This module contains various functions to handle various types of member event.
 """
+from django.utils.translation import gettext_lazy as _
 from linebot.models import MemberJoinedEvent, MemberLeftEvent
 
 from flags import Platform
@@ -12,7 +13,7 @@ from ..wrapper import LineApiUtils, LineApiWrapper
 __all__ = ["handle_member_main"]
 
 
-def handle_member_join(_, event, destination):
+def handle_member_join(__, event, destination):
     """Method to be called to handle LINE member join event."""
     cdata = ChannelManager.get_channel_token(Platform.LINE, LineApiUtils.get_channel_id(event), auto_register=True)
     joined_names = []
@@ -34,7 +35,7 @@ def handle_member_join(_, event, destination):
     LineApiWrapper.reply_text(event.reply_token, _("{} joined the group.").format(" & ".join(joined_names)))
 
 
-def handle_member_left(_, event, destination):
+def handle_member_left(__, event, destination):
     """Method to be called to handle LINE member left event."""
     for user in event.left.members:
         uid = user.user_id
