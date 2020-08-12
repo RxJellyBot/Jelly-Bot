@@ -2187,9 +2187,6 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             if gen_date_str not in expected_counts:
                 continue
 
-            if gen_time.time() > datetime.utcnow().time():
-                continue
-
             date_dict = expected_counts[gen_date_str]
 
             if msg.user_root_oid in date_dict:
@@ -2235,9 +2232,6 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             gen_date_str = gen_time.date().strftime("%Y-%m-%d")
 
             if gen_date_str not in expected_counts:
-                continue
-
-            if gen_time.time() > datetime.utcnow().time():
                 continue
 
             date_dict = expected_counts[gen_date_str]
