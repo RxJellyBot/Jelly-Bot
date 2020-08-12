@@ -12,6 +12,7 @@ venv
 
 # Archived code
 archive/
+tests_old/
 
 # Application logs
 logs/

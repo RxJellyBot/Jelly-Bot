@@ -50,10 +50,10 @@ class _ShortUrlDataManager(BaseCollection):
         self.code_length = self._calc_code_length()
 
     def _calc_code_length(self) -> int:
-        doc_count = self.count_documents({})
+        doc_count = self.estimated_document_count()
 
         if doc_count > 0:
-            calc = math.ceil(math.log(self.count_documents({}), len(_ShortUrlDataManager.AVAILABLE_CHARACTERS)))
+            calc = math.ceil(math.log(doc_count, len(_ShortUrlDataManager.AVAILABLE_CHARACTERS)))
         else:
             calc = 0
 

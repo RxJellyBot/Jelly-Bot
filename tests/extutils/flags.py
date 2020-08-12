@@ -65,20 +65,20 @@ class TestFlagMisc(TestCase):
         self.assertTrue(is_flag_double(CodePrefixedDoubleEnum))
 
     def test_enum_cross_equals(self):
-        self.assertNotEquals(CodeEnum.A, CodeSingleEnum.A)
-        self.assertNotEquals(CodeEnum.A, CodeDoubleEnum.A)
-        self.assertNotEquals(CodeEnum.A, CodePrefixedDoubleEnum.A)
-        self.assertNotEquals(CodeSingleEnum.A, CodeDoubleEnum.A)
-        self.assertNotEquals(CodeSingleEnum.A, CodePrefixedDoubleEnum.A)
-        self.assertNotEquals(CodeDoubleEnum.A, CodePrefixedDoubleEnum.A)
+        self.assertNotEqual(CodeEnum.A, CodeSingleEnum.A)
+        self.assertNotEqual(CodeEnum.A, CodeDoubleEnum.A)
+        self.assertNotEqual(CodeEnum.A, CodePrefixedDoubleEnum.A)
+        self.assertNotEqual(CodeSingleEnum.A, CodeDoubleEnum.A)
+        self.assertNotEqual(CodeSingleEnum.A, CodePrefixedDoubleEnum.A)
+        self.assertNotEqual(CodeDoubleEnum.A, CodePrefixedDoubleEnum.A)
 
     def test_enum_cross_cast(self):
-        self.assertNotEquals(CodeEnum.cast("1"), CodeSingleEnum.cast("1"))
-        self.assertNotEquals(CodeEnum.cast("1"), CodeDoubleEnum.cast("1"))
-        self.assertNotEquals(CodeEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
-        self.assertNotEquals(CodeSingleEnum.cast("1"), CodeDoubleEnum.cast("1"))
-        self.assertNotEquals(CodeSingleEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
-        self.assertNotEquals(CodeDoubleEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
+        self.assertNotEqual(CodeEnum.cast("1"), CodeSingleEnum.cast("1"))
+        self.assertNotEqual(CodeEnum.cast("1"), CodeDoubleEnum.cast("1"))
+        self.assertNotEqual(CodeEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
+        self.assertNotEqual(CodeSingleEnum.cast("1"), CodeDoubleEnum.cast("1"))
+        self.assertNotEqual(CodeSingleEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
+        self.assertNotEqual(CodeDoubleEnum.cast("1"), CodePrefixedDoubleEnum.cast("1"))
 
     def test_enum_cross_contains(self):
         self.assertFalse(CodeEnum.contains(CodeSingleEnum.A))
@@ -93,9 +93,9 @@ class TestFlagCodeEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodeEnum.A)
         self.assertEqual("1", CodeEnum.A)
-        self.assertNotEquals(2, CodeEnum.A)
+        self.assertNotEqual(2, CodeEnum.A)
         self.assertEqual(CodeEnum.A, CodeEnum.A)
-        self.assertNotEquals(CodeEnum.A, CodeEnum.B)
+        self.assertNotEqual(CodeEnum.A, CodeEnum.B)
 
     def test_enum_greater(self):
         self.assertFalse(CodeEnum.A > CodeEnum.B)
@@ -144,10 +144,10 @@ class TestFlagSingleEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodeSingleEnum.A)
         self.assertEqual("1", CodeSingleEnum.A)
-        self.assertNotEquals("C", CodeSingleEnum.A)
-        self.assertNotEquals(2, CodeSingleEnum.A)
+        self.assertNotEqual("C", CodeSingleEnum.A)
+        self.assertNotEqual(2, CodeSingleEnum.A)
         self.assertEqual(CodeSingleEnum.A, CodeSingleEnum.A)
-        self.assertNotEquals(CodeSingleEnum.A, CodeSingleEnum.B)
+        self.assertNotEqual(CodeSingleEnum.A, CodeSingleEnum.B)
 
     def test_enum_greater(self):
         self.assertFalse(CodeSingleEnum.A > CodeSingleEnum.B)
@@ -197,11 +197,11 @@ class TestFlagDoubleEnum(TestCase):
     def test_enum_equals(self):
         self.assertEqual(1, CodeDoubleEnum.A)
         self.assertEqual("1", CodeDoubleEnum.A)
-        self.assertNotEquals("C", CodeDoubleEnum.A)
-        self.assertNotEquals("E", CodeDoubleEnum.A)
-        self.assertNotEquals(2, CodeDoubleEnum.A)
+        self.assertNotEqual("C", CodeDoubleEnum.A)
+        self.assertNotEqual("E", CodeDoubleEnum.A)
+        self.assertNotEqual(2, CodeDoubleEnum.A)
         self.assertEqual(CodeDoubleEnum.A, CodeDoubleEnum.A)
-        self.assertNotEquals(CodeDoubleEnum.A, CodeDoubleEnum.B)
+        self.assertNotEqual(CodeDoubleEnum.A, CodeDoubleEnum.B)
 
     def test_enum_greater(self):
         self.assertFalse(CodeDoubleEnum.A > CodeDoubleEnum.B)
@@ -252,11 +252,11 @@ class TestFlagPrefixedDoubleEnum(TestCase):
         self.assertEqual(1, CodePrefixedDoubleEnum.A)
         self.assertEqual("1", CodePrefixedDoubleEnum.A)
         self.assertEqual("P1", CodePrefixedDoubleEnum.A)
-        self.assertNotEquals("C", CodePrefixedDoubleEnum.A)
-        self.assertNotEquals("E", CodePrefixedDoubleEnum.A)
-        self.assertNotEquals(2, CodePrefixedDoubleEnum.A)
+        self.assertNotEqual("C", CodePrefixedDoubleEnum.A)
+        self.assertNotEqual("E", CodePrefixedDoubleEnum.A)
+        self.assertNotEqual(2, CodePrefixedDoubleEnum.A)
         self.assertEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.A)
-        self.assertNotEquals(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.B)
+        self.assertNotEqual(CodePrefixedDoubleEnum.A, CodePrefixedDoubleEnum.B)
 
     def test_enum_greater(self):
         self.assertFalse(CodePrefixedDoubleEnum.A > CodePrefixedDoubleEnum.B)

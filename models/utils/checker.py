@@ -92,7 +92,7 @@ class ModelFieldChecker:
 
             potential_repair_needed = self._col_inst.find(find_query)
 
-            if potential_repair_needed.count() == 0:
+            if not self._col_inst.find_one(find_query):
                 self.post_execute()
                 return
 

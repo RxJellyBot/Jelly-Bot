@@ -13,9 +13,7 @@ from bot.system import record_boot_dt
 from extutils.ddns import activate_ddns_update
 from msghandle import load_handling_functions
 
-
 __all__ = ["signal_discord_ready", "signal_django_ready"]
-
 
 _ready = {
     "Discord": False,

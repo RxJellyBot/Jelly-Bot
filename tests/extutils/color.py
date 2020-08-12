@@ -86,7 +86,7 @@ class TestColor(TestCase):
         self.assertEqual(ColorFactory.BLACK, clr_hex)
         self.assertEqual("#000000", clr_hex)
         self.assertEqual("000000", clr_hex)
-        self.assertNotEquals(Color(1), clr_hex)
+        self.assertNotEqual(Color(1), clr_hex)
 
     def test_color_num_valid(self):
         self.assertTrue(Color.color_num_valid(0))

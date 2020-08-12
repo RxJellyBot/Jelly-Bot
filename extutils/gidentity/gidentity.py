@@ -10,6 +10,7 @@ from google.auth.transport import requests
 
 from extutils.logger import SYSTEM
 
+__all__ = ["IDIssuerIncorrectError", "GoogleIdentityUserData", "get_identity_data"]
 
 CLIENT_ID = os.environ.get("GI_CLIENT_ID")
 if CLIENT_ID is None:
@@ -17,7 +18,7 @@ if CLIENT_ID is None:
     sys.exit(1)
 
 
-class IDIssuerIncorrect(Exception):
+class IDIssuerIncorrectError(Exception):
     def __init__(self, issuer):
         super().__init__(f'ID issuer is not accounts.google.com. ({issuer})')
 
@@ -41,6 +42,6 @@ def get_identity_data(token) -> GoogleIdentityUserData:
     id_data = GoogleIdentityUserData(google_data["aud"], google_data["iss"], google_data["sub"], google_data["email"])
 
     if id_data.issuer not in ['accounts.google.com', 'https://accounts.google.com']:
-        raise IDIssuerIncorrect(id_data.issuer)
+        raise IDIssuerIncorrectError(id_data.issuer)
 
     return id_data

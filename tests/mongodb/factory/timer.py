@@ -33,7 +33,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.ChannelOid.key: TestTimerManager.CHANNEL_OID,
                 TimerModel.Keyword.key: "KEYWORD",
                 TimerModel.Title.key: "TITLE",
@@ -56,7 +56,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.ChannelOid.key: TestTimerManager.CHANNEL_OID,
                 TimerModel.Keyword.key: "KEYWORD",
                 TimerModel.Title.key: "TITLE",
@@ -80,7 +80,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.ChannelOid.key: TestTimerManager.CHANNEL_OID,
                 TimerModel.Keyword.key: "KEYWORD",
                 TimerModel.Title.key: "TITLE",
@@ -100,7 +100,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.ChannelOid.key: TestTimerManager.CHANNEL_OID,
                 TimerModel.Keyword.key: "KEYWORD",
                 TimerModel.Title.key: "TITLE",
@@ -120,7 +120,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.ChannelOid.key: TestTimerManager.CHANNEL_OID,
                 TimerModel.Keyword.key: "KEYWORD",
                 TimerModel.Title.key: "TITLE",
@@ -433,7 +433,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -445,7 +445,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "FUTURE")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -473,7 +473,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -485,7 +485,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "FUTURE")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -522,7 +522,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: {"$in": ["FUTURE", "FUTURE_2", "FUTURE_3"]},
                 TimerModel.Notified.key: True
             }),
@@ -536,7 +536,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(result[1].title, "FUTURE_3")
         self.assertEqual(result[2].title, "FUTURE")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: {"$in": ["FUTURE", "FUTURE_2", "FUTURE_3"]},
                 TimerModel.Notified.key: True
             }),
@@ -555,7 +555,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -567,7 +567,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "FUTURE")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -578,7 +578,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(len(result), 0)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -597,7 +597,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -609,7 +609,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "FUTURE")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -628,7 +628,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -639,7 +639,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(len(result), 0)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "FUTURE",
                 TimerModel.Notified.key: True
             }),
@@ -672,7 +672,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -684,7 +684,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "PAST")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -721,7 +721,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: {"$in": ["PAST", "PAST_3"]},
                 TimerModel.Notified.key: True
             }),
@@ -734,7 +734,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(result[0].title, "PAST_3")
         self.assertEqual(result[1].title, "PAST")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: {"$in": ["PAST", "PAST_3"]},
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -753,7 +753,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -765,7 +765,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].title, "PAST")
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -776,7 +776,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(len(result), 0)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -795,7 +795,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),
@@ -806,7 +806,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
 
         self.assertEqual(len(result), 0)
         self.assertEqual(
-            TimerManager.count({
+            TimerManager.count_documents({
                 TimerModel.Title.key: "PAST",
                 TimerModel.NotifiedExpired.key: True
             }),

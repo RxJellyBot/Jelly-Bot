@@ -527,7 +527,7 @@ class TestModel(ABC):
 
             for item in items:
                 with self.subTest(item=item):
-                    self.assertNotEquals(item, mdl)
+                    self.assertNotEqual(item, mdl)
 
         def test_is_equal(self):
             items = [

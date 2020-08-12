@@ -1,1 +1,1 @@
-from .gidentity import get_identity_data, IDIssuerIncorrect, GoogleIdentityUserData
+from .gidentity import get_identity_data, IDIssuerIncorrectError, GoogleIdentityUserData

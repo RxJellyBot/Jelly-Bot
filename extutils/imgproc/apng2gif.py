@@ -51,7 +51,7 @@ class ConvertResult:
         return self.frame_extraction_duration \
                + self.frame_zipping_time \
                + self.image_data_acquisition_duration \
-               + self.gif_merge_duration  # noqa: E127
+               + self.gif_merge_duration  # noqa: E126,E127
 
 
 def _get_file_name(file_path: str) -> str:

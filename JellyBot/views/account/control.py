@@ -8,7 +8,7 @@ from JellyBot.utils import get_root_oid, get_post_keys
 from JellyBot.views import render_template, simple_str_response, simple_json_response
 from extutils.locales import locales, languages
 from extutils.dt import now_utc_aware, localtime
-from extutils.gidentity import get_identity_data, IDIssuerIncorrect
+from extutils.gidentity import get_identity_data, IDIssuerIncorrectError
 from extutils.emailutils import MailSender
 from mongodb.factory import RootUserManager
 from mongodb.factory.results import WriteOutcome
@@ -65,7 +65,7 @@ class AccountLoginView(View):
 
             if not result.outcome.is_success:
                 self._send_reg_failed_email(result)
-        except IDIssuerIncorrect as ex1:
+        except IDIssuerIncorrectError as ex1:
             s = str(ex1)
         except Exception as ex2:
             # EXNOTE: Insert `raise ex2` when any error occurred during login

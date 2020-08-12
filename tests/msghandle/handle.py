@@ -49,13 +49,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -68,13 +68,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -87,13 +87,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -107,14 +107,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -128,14 +128,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -149,14 +149,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -170,14 +170,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -191,14 +191,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -212,14 +212,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -232,13 +232,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_LINE_PRV_1_OID,
                                                 EventFactory.USER_1_OID, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -251,13 +251,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_LINE_GPRV_1_OID,
                                                 EventFactory.USER_1_OID, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -270,13 +270,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_LINE_GPUB_1_OID,
                                                 EventFactory.USER_1_OID, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -306,7 +306,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -315,14 +315,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                [HandledMessageEventText(content=HandledResult.TestFailedNoToken)])
                 )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -330,7 +330,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -338,7 +338,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -367,7 +367,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -376,14 +376,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                [HandledMessageEventText(content=HandledResult.TestFailedNoToken)])
                 )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -391,7 +391,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -399,7 +399,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -428,7 +428,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -437,14 +437,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                [HandledMessageEventText(content=HandledResult.TestFailedNoToken)])
                 )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -452,7 +452,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -460,7 +460,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -472,8 +472,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
@@ -481,7 +481,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -490,7 +490,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -502,8 +502,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
@@ -511,7 +511,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -520,7 +520,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -532,8 +532,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_LINE_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
@@ -541,7 +541,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -550,7 +550,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -562,13 +562,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -581,13 +581,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -600,13 +600,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -620,14 +620,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -641,14 +641,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PRV_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -662,14 +662,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PUB_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -683,14 +683,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -704,14 +704,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.GROUP_PRV_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -725,14 +725,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                    EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                                    ChannelType.GROUP_PUB_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessLineSticker)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER,
@@ -745,13 +745,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_LINE_PRV_1_OID,
                                                 EventFactory.USER_1_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -764,13 +764,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_LINE_GPRV_1_OID,
                                                 EventFactory.USER_1_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -783,13 +783,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_LINE_GPUB_1_OID,
                                                 EventFactory.USER_1_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -819,7 +819,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -832,14 +832,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -847,7 +847,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -855,7 +855,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -884,7 +884,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -897,14 +897,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -912,7 +912,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -920,7 +920,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -949,7 +949,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             )
         ]
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         for category, event in data:
             with self.subTest(category):
                 self.assertEqual(
@@ -958,14 +958,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                                [HandledMessageEventText(content=HandledResult.TestFailedNoToken)])
                 )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None
             }),
             3
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.TEXT
@@ -973,7 +973,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE
@@ -981,7 +981,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: None,
                 MessageRecordModel.MessageType.key: MessageType.LINE_STICKER
@@ -993,8 +993,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_PRV_1_OID],
@@ -1002,7 +1002,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1011,7 +1011,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_PRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -1023,8 +1023,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPRV_1_OID],
@@ -1032,7 +1032,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1041,7 +1041,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -1053,8 +1053,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_LINE_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_LINE_GPUB_1_OID],
@@ -1062,7 +1062,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1071,7 +1071,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_LINE_GPUB_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -1083,13 +1083,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_DISCORD_PRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1102,13 +1102,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_DISCORD_GPRV_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1121,13 +1121,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_DISCORD_GPUB_1_OID, EventFactory.USER_1_OID,
                                            ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1141,14 +1141,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_DISCORD_PRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_PRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -1162,14 +1162,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_DISCORD_GPRV_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPRV_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -1183,14 +1183,14 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                             EventFactory.CHANNEL_DISCORD_GPUB_1_OID, EventFactory.USER_1_OID,
                                             ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPUB_1_OID],
                                        [HandledMessageEventText(content=HandledResult.TestSuccessImage)])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.IMAGE,
@@ -1203,13 +1203,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.PRIVATE_TEXT, EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                                                 EventFactory.USER_1_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_PRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -1222,13 +1222,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PRV_TEXT, EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                                                 EventFactory.USER_1_OID, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPRV_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -1241,13 +1241,13 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_unhandled(ChannelType.GROUP_PUB_TEXT, EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                                                 EventFactory.USER_1_OID, EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPUB_1_OID])
         )
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.UNKNOWN,
@@ -1260,8 +1260,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         event = EventFactory.generate_text("ERRORTEST", EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                                            EventFactory.USER_1_OID, ChannelType.PRIVATE_TEXT)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_PRV_1_OID],
@@ -1269,7 +1269,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1278,7 +1278,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_PRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -1291,8 +1291,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            EventFactory.USER_1_OID, ChannelType.GROUP_PRV_TEXT,
                                            EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPRV_1_OID],
@@ -1300,7 +1300,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1309,7 +1309,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPRV_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
@@ -1322,8 +1322,8 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
                                            EventFactory.USER_1_OID, ChannelType.GROUP_PUB_TEXT,
                                            EventFactory.CHANNEL_COL_DISCORD_OID)
 
-        self.assertEqual(MessageRecordStatisticsManager.count({}), 0)
-        self.assertEqual(BotFeatureUsageDataManager.count({}), 0)
+        self.assertEqual(MessageRecordStatisticsManager.count_documents({}), 0)
+        self.assertEqual(BotFeatureUsageDataManager.count_documents({}), 0)
         self.assertEqual(
             handle_message_main(event),
             HandledMessageEventsHolder(EventFactory.CHANNEL_MODELS[EventFactory.CHANNEL_DISCORD_GPUB_1_OID],
@@ -1331,7 +1331,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
         )
         self.assertGreater(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 0)
         self.assertEqual(
-            MessageRecordStatisticsManager.count({
+            MessageRecordStatisticsManager.count_documents({
                 MessageRecordModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                 MessageRecordModel.UserRootOid.key: EventFactory.USER_1_OID,
                 MessageRecordModel.MessageType.key: MessageType.TEXT,
@@ -1340,7 +1340,7 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
             1
         )
         self.assertEqual(
-            BotFeatureUsageDataManager.count({
+            BotFeatureUsageDataManager.count_documents({
                 BotFeatureUsageModel.ChannelOid.key: EventFactory.CHANNEL_DISCORD_GPUB_1_OID,
                 BotFeatureUsageModel.SenderRootOid.key: EventFactory.USER_1_OID,
                 BotFeatureUsageModel.Feature.key: BotFeature.TXT_FN_ERROR_TEST
