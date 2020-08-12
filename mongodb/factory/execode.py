@@ -96,7 +96,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
     def remove_execode(self, execode: str):
         self.delete_one({ExecodeEntryModel.Execode.key: execode})
 
-    def _attempt_complete_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: dict) \
+    def _attempt_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: dict) \
             -> Tuple[OperationOutcome, Optional[ExecodeCompletionOutcome], Optional[Exception]]:
         cmpl_outcome = ExecodeCompletionOutcome.X_NOT_EXECUTED
         ex = None
@@ -153,7 +153,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
 
                 missing_keys = required_keys.difference(execode_kwargs)
                 if len(missing_keys) == 0:
-                    outcome, cmpl_outcome, ex = self._attempt_complete_complete(execode, tk_model, execode_kwargs)
+                    outcome, cmpl_outcome, ex = self._attempt_complete(execode, tk_model, execode_kwargs)
                 else:
                     outcome = OperationOutcome.X_MISSING_ARGS
                     cmpl_outcome = ExecodeCompletionOutcome.X_MISSING_ARGS

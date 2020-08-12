@@ -2,6 +2,7 @@ import os
 import time
 
 from extutils.logger import SYSTEM
+from env_var import is_testing
 
 __all__ = ["get_single_db_name", "SINGLE_DB_NAME", "is_test_db"]
 
@@ -13,14 +14,14 @@ def get_single_db_name():
     Should only being called in the tests or when the module is initialized.
     """
     expected_db_name = os.environ.get("MONGO_DB")
-    if not expected_db_name and bool(int(os.environ.get("TEST", 0))):
+    if not expected_db_name and is_testing():
         expected_db_name = f"Test-{time.time_ns() // 1000000}"
 
     return expected_db_name
 
 
 SINGLE_DB_NAME = get_single_db_name()
-if bool(int(os.environ.get("TEST", 0))):
+if is_testing():
     SYSTEM.logger.info("MongoDB single database activated because `TEST` has been set to true.")
     SYSTEM.logger.info(f"MongoDB single database name: {SINGLE_DB_NAME}")
 elif SINGLE_DB_NAME:

@@ -125,6 +125,10 @@ class ExecodeParameterCollator:
         k = param.Execode.USER_OID
 
         try:
+            # This happens if `xparams` is casted to `QueryDict` which every value will stored as a `list`
+            if isinstance(xparams[k], list):
+                xparams[k] = xparams[k][0]
+
             xparams[k] = ObjectId(xparams[k])
         except InvalidId as e:
             raise ExecodeCollationError(action, k, ExecodeCollationFailedReason.OBJECT_ID_INVALID, e)
