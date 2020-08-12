@@ -1,6 +1,10 @@
 # Jelly Bot
 
-![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)
+[![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)](https://github.com/RaenonX/Jelly-Bot/actions)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge)](https://www.codefactor.io/repository/github/raenonx/jelly-bot)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f)](https://www.codacy.com/manual/RaenonX/Jelly-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RaenonX/Jelly-Bot&amp;utm_campaign=Badge_Grade)
 
 Supported on Discord and LINE. Feel free to add it to your group!
 
