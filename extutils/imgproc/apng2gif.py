@@ -6,7 +6,8 @@ import shutil
 import subprocess
 from tempfile import TemporaryDirectory
 import time
-from typing import Any, Tuple, List
+from typing import Any, Tuple, List, Optional
+from zipfile import ZipFile
 
 from PIL import Image
 
@@ -16,9 +17,6 @@ _IDX_CLR_BACKGROUND = 255
 _IDX_CLR_TRANSPARENT = 255
 
 
-# TEST: `ConvertResult`
-
-
 @dataclass
 class ConvertResult:
     """
@@ -26,18 +24,34 @@ class ConvertResult:
 
     Unit of the duration is seconds.
     """
+    input_exists: bool = True
+
     frame_extracted: bool = False
     frame_extraction_duration: float = 0.0
 
+    frame_zipped: bool = False
+    frame_zipping_time: float = 0.0
+    frame_zipping_exception: Optional[Exception] = None
+
     image_data_acquired: bool = False
-    image_data_acquire_duration: float = 0.0
+    image_data_acquisition_duration: float = 0.0
 
     gif_merged: bool = False
     gif_merge_duration: float = 0.0
 
     @property
     def succeed(self):
+        if not self.input_exists:
+            return False
+
         return self.frame_extracted and self.image_data_acquired and self.gif_merged
+
+    @property
+    def time_spent(self):
+        return self.frame_extraction_duration \
+               + self.frame_zipping_time \
+               + self.image_data_acquisition_duration \
+               + self.gif_merge_duration  # noqa: E127
 
 
 def _get_file_name(file_path: str) -> str:
@@ -52,7 +66,7 @@ def _get_file_name(file_path: str) -> str:
 
 def _extract_frames(result: ConvertResult, file_path: str):
     """
-    Extract the frames of the APNG file at ``file_path`` using ``apngdis``.
+    Extract the frames of the APNG file at ``apng_path`` using ``apngdis``.
 
     :param result: conversion result object
     :param file_path: file path of the apng file to be extracted
@@ -66,6 +80,31 @@ def _extract_frames(result: ConvertResult, file_path: str):
     if return_code == 0:
         result.frame_extraction_duration = time.time() - _start
         result.frame_extracted = True
+
+
+def _zip_frames(result: ConvertResult, apng_path: str, output_path: str):
+    """
+    Zip the frames to be a single zip file preceded with the apng file name.
+
+    :param result: conversion result object
+    :param apng_path: path of the source apng
+    :param output_path: output directory of the zip file
+    """
+    _start = time.time()
+
+    apng_name = _get_file_name(apng_path)
+    out_name = _get_file_name(output_path)
+
+    try:
+        with ZipFile(os.path.join(os.path.dirname(output_path), f"{out_name}-frames.zip"), "w") as f:
+            for apng_path in glob.glob(f"{apng_name}-*.png"):
+                f.write(apng_path)
+    except Exception as ex:
+        result.frame_zipping_exception = ex
+        return
+
+    result.frame_zipping_time = time.time() - _start
+    result.frame_zipped = True
 
 
 def _process_frame_transparent(image_path: str):
@@ -122,7 +161,7 @@ def _get_image_data(result: ConvertResult, apng_path: str) -> Tuple[List[Any], L
         images.append(_process_frame_transparent(file_path))
         durations.append(_process_frame_duration(f"{_get_file_name(file_path)}.txt"))
 
-    result.image_data_acquire_duration = time.time() - _start
+    result.image_data_acquisition_duration = time.time() - _start
     result.image_data_acquired = True
 
     return images, durations
@@ -153,23 +192,32 @@ def _make_gif(result: ConvertResult, apng_path: str, output_path: str):
     result.gif_merged = True
 
 
-def convert(apng_path: str, output_path: str) -> ConvertResult:
+def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> ConvertResult:
     """
     Convert the file at ``apng_path`` to gif and store it at ``output_path``.
 
     :param apng_path: path of the apng to be converted
     :param output_path: path for the processed gif
+    :param zip_frames: to zip the extracted frames
     :returns: result of the conversion
     """
     original_dir = os.getcwd()
     result = ConvertResult()
 
+    if not os.path.exists(apng_path):
+        result.input_exists = False
+        return result
+
     with TemporaryDirectory() as temp_dir:
         # Copy `apngdis` to the temp directory
-        shutil.copy("apngdis.exe", os.path.join(temp_dir, "apngdis.exe"))
+        shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "apngdis.exe"),
+                    os.path.join(temp_dir, "apngdis.exe"))
 
-        # Copy the image
-        shutil.copy(apng_path, os.path.join(temp_dir, apng_path))
+        # Copy the image for extraction
+        apng_path_dst = os.path.join(temp_dir, os.path.basename(apng_path))
+
+        shutil.copy(apng_path, apng_path_dst)
+        apng_path = apng_path_dst
 
         # Set the current working directory to the temp directory
         os.chdir(temp_dir)
@@ -179,13 +227,12 @@ def convert(apng_path: str, output_path: str) -> ConvertResult:
 
         _extract_frames(result, apng_path)
         if result.frame_extracted:
+            if zip_frames:
+                _zip_frames(result, apng_path, out_path)
+
             _make_gif(result, apng_path, out_path)
 
         # Restore the working directory (REQUIRED, disabling this causes infinite recursion)
         os.chdir(original_dir)
 
         return result
-
-
-if __name__ == '__main__':
-    print(convert("40513323.png", "40513323.gif"))

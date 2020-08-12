@@ -77,6 +77,9 @@ class BotFeature(FlagDoubleEnum):
             115 - Calculator
                 1151 - Calculate
 
+            116 - LINE Sticker
+                1161 - Download
+
             119 - Other
                 1191 - Ping
 
@@ -179,6 +182,11 @@ class BotFeature(FlagDoubleEnum):
 
     TXT_CALCULATOR = \
         1151, _("Text / Calculator"), _("Calculate the given expression string.")
+
+    TXT_LINE_DL_ANIMATED = \
+        1161, _("Text / LINE Sticker / Download Animated"), _("Download a specific animated sticker.")
+    TXT_LINE_DISP_STATIC = \
+        1162, _("Text / LINE Sticker / Display Static"), _("Display a static sticker.")
 
     TXT_PING = \
         1191, _("Text / Ping"), _("Command to check if the bot is working. Also check message sending time.")

@@ -1,16 +1,24 @@
 import atexit
+import time
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 import os
 import shutil
 import tempfile
-from dataclasses import dataclass
-from typing import List, Optional
+from threading import Thread
+from typing import List, Optional, BinaryIO, Dict, Union
 
 import requests
 
 from django.utils.translation import gettext_lazy as _
 
+from extutils.dt import now_utc_aware
 from extutils.flags import FlagSingleEnum
 from extutils.imgproc import apng2gif
+from extutils.checker import arg_type_ensure
+from JellyBot.systemconfig import ExtraService
+from mixin import ClearableMixin
 
 __all__ = ["LineStickerType", "LineStickerUtils", "LineStickerMetadata", "LineAnimatedStickerDownloadResult"]
 
@@ -21,8 +29,23 @@ atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
 @dataclass
 class LineAnimatedStickerDownloadResult:
     available: bool = False
+    already_exists: bool = False
 
     conversion_result: Optional[apng2gif.ConvertResult] = None
+
+    @property
+    def succeed(self):
+        return self.already_exists or (self.available and self.conversion_result and self.conversion_result.succeed)
+
+    @property
+    def time_spent(self) -> float:
+        if not self.conversion_result:
+            return 0
+
+        return self.conversion_result.frame_extraction_duration \
+               + self.conversion_result.frame_zipping_time \
+               + self.conversion_result.image_data_acquisition_duration \
+               + self.conversion_result.gif_merge_duration  # noqa: E127
 
 
 class LineStickerType(FlagSingleEnum):
@@ -35,106 +58,74 @@ class LineStickerType(FlagSingleEnum):
     STATIC = 2, _("Static Sticker")
 
 
-class LineStickerUtils:
-    # def _get_content(self, sticker_type, pack_id, list_ids):
-    #     """
-    #     :param sticker_type: The type of the sticker
-    #     :type sticker_type: LineStickerType
-    #
-    #     Parameters:
-    #         `sticker_content_type`: The type of content to download. (sticker_content_type)
-    #         `pack_id`: line sticker package ID.
-    #         `pack_name`: line sticker package ID.
-    #         `list_ids`: id list of the content to download.
-    #
-    #     Returns:
-    #         Returns path of the writed contents in list.
-    #
-    #     Errors:
-    #         raise `MetaNotFoundException` if status code of getting pack meta is not 200.
-    #     """
-    #     act = LineStickerUtils.get_download_action(sticker_content_type)
-    #     if act is None:
-    #         raise ValueError("Url function and file extension of specified sticker type not handled. {}".format(
-    #         repr(sticker_content_type)))
-    #
-    #     url_func, file_ext = act
-    #
-    #     stk_dir = os.path.join(self._file_proc_path, str(pack_id))
-    #     files_path = []
-    #
-    #     try:
-    #         os.makedirs(stk_dir)
-    #     except OSError as e:
-    #         if e.errno != errno.EEXIST:
-    #             raise
-    #
-    #     for stk_id in list_ids:
-    #         save_path = os.path.join(stk_dir, str(stk_id) + file_ext)
-    #
-    #         url = url_func(pack_id, stk_id)
-    #         request_result = requests.get(url, stream=True)
-    #
-    #         with open(save_path, "wb") as f:
-    #             for chunk in request_result.iter_content(chunk_size=20480):
-    #                 if chunk:
-    #                     f.write(chunk)
-    #
-    #         files_path.append(save_path)
-    #
-    #     return files_path
+class LineStickerTempStorageManager:
+    """
+    Class to manage the downloaded sticker files stored in the temporary storage.
+    """
+    _PATH_DICT: Dict[str, datetime] = {}
 
-    # def download_stickers(self, sticker_metadata, download_sound_if_available=False):
-    #     """\
-    #     Parameters:
-    #         `sticker_metadata`: metadata of sticker package.
-    #
-    #     Returns:
-    #         Returns path of compressed sticker package(zip).
-    #     """
-    #     stk_ids = sticker_metadata.stickers
-    #     pack_id = sticker_metadata.pack_id
-    #     pack_name = str(pack_id) + (LineStickerUtils.DOWNLOAD_SOUND_CODE if download_sound_if_available else "")
-    #     comp_file_path = os.path.join(self._file_proc_path, pack_name + ".zip")
-    #
-    #     if os.path.isfile(comp_file_path):
-    #         time_consumed_dl = 0.0
-    #         time_consumed_comp = 0.0
-    #     else:
-    #         content_type_to_download = LineStickerType.ANIMATED if sticker_metadata.is_animated_sticker else
-    #         LineStickerType.STATIC
-    #
-    #         _start = time.time()
-    #         path_list = self._get_content_(content_type_to_download, pack_id, stk_ids)
-    #
-    #         if download_sound_if_available and sticker_metadata.is_animated_sticker:
-    #             path_list.extend(self._get_content_(LineStickerType.SOUND, pack_id, stk_ids))
-    #         time_consumed_dl = time.time() - _start
-    #
-    #         _start = time.time()
-    #
-    #         with zipfile.ZipFile(comp_file_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-    #             for path in path_list:
-    #                 try:
-    #                     zipf.write(path, os.path.basename(path))
-    #                 except OSError:
-    #                     return None
-    #
-    #         try:
-    #             shutil.rmtree(os.path.join(self._file_proc_path, pack_name))
-    #         except OSError as exc:
-    #             if exc.errno == errno.ENOENT:
-    #                 pass
-    #             else:
-    #                 raise exc
-    #
-    #         time_consumed_comp = time.time() - _start
-    #
-    #     return LinkStickerDownloadResult(comp_file_path, stk_ids, time_consumed_dl, time_consumed_comp)
-    #
+    _started = False
+
+    @classmethod
+    def start_monitor(cls):
+        """
+        Non-blocking call to let the temporary storage starts monitoring the file.
+
+        Have no effect if the thread is already started.
+        """
+        if not cls._started:
+            # Running the thread in daemon mode to prevent from unterminatable test
+            Thread(target=cls._scan_file, name="LINE Sticker Temp File Manager", daemon=True).start()
+            cls._started = True
+
+    @classmethod
+    def _scan_file(cls):
+        while cls._PATH_DICT:
+            cls._remove_expired_files()
+            time.sleep(60)
+
+        cls._started = False
+
+    @classmethod
+    def _remove_expired_files(cls):
+        now = now_utc_aware()
+
+        for path, last_used in cls._PATH_DICT.items():
+            if (now - last_used).total_seconds() > ExtraService.Sticker.MaxStickerTempFileLifeSeconds:
+                os.remove(path)
+
+    @classmethod
+    @arg_type_ensure
+    def create_file(cls, file_path: str):
+        """
+        Update the last file usage time at ``file_path``.
+
+        The file at ``file_path`` will be removed by calling ``os.remove()`` once
+        :class:`ExtraService.Sticker.MaxStickerTempFileLifeSeconds` seconds has passed
+        since the last call of this method.
+
+        Timeout of the file will be reset upon re-calling this method if not yet expired.
+
+        This call also starts the storage monitor if not yet started.
+
+        :param file_path: actual file path
+        """
+        cls._PATH_DICT[file_path] = now_utc_aware()
+
+        # On-demand monitor to save performance
+
+        # `cls.start_monitor()` should located after the assignment of `cls._PATH_DICT`,
+        # or the monitoring thread cannot start because of the while loop condition.
+        if not cls._started:
+            cls.start_monitor()
+
+        # Trigger the check once
+        cls._remove_expired_files()
+
+
+class LineStickerUtils(ClearableMixin):
     # def get_pack_meta(self, pack_id: str):
     #     """
-    #
     #     :param pack_id: Numeric string of the sticker package ID.
     #     :type pack_id: str
     #     :return: LineStickerMetadata
@@ -147,41 +138,66 @@ class LineStickerUtils:
     #     else:
     #         raise MetaDataNotFoundError(pack_meta.status_code)
 
+    @classmethod
+    def clear(cls):
+        [f.unlink() for f in Path(_temp_dir).iterdir() if f.is_file()]
+
     @staticmethod
-    def is_sticker_exists(sticker_id: [int, str]):
+    def is_sticker_exists(sticker_id: Union[int, str]):
         response = requests.get(LineStickerUtils.get_sticker_url(sticker_id))
 
         return response.ok
 
     @staticmethod
-    def get_meta_url(pack_id: [int, str]) -> str:
+    def get_meta_url(pack_id: Union[int, str]) -> str:
         return f"https://stickershop.line-scdn.net/products/0/0/1/{pack_id}/android/productInfo.meta"
 
     @staticmethod
-    def get_sticker_url(sticker_id: [int, str]) -> str:
+    def get_sticker_url(sticker_id: Union[int, str]) -> str:
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker.png"
 
     @staticmethod
-    def get_apng_url(pack_id: [int, str], sticker_id: [int, str]) -> str:
+    def get_apng_url(pack_id: Union[int, str], sticker_id: Union[int, str]) -> str:
         return f"https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/animation/{sticker_id}.png"
 
     @staticmethod
-    def get_sound_url(sticker_id: [int, str]) -> str:
+    def get_sound_url(sticker_id: Union[int, str]) -> str:
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/IOS/sticker_sound.m4a"
 
     @staticmethod
-    def download_apng_as_gif(pack_id: [int, str], sticker_id: [int, str], output_path: str) \
+    def download_apng_as_gif(pack_id: Union[str, int], sticker_id: Union[str, int],
+                             output_path: Optional[str] = None, *,
+                             with_frames: bool = True) \
             -> LineAnimatedStickerDownloadResult:
         """
         Download animated sticker as gif.
 
+        If ``output_path`` is ``None`` / not specified, the image will be stored to a temporary storage,
+        which path can be acquired via ``get_downloaded_png()``.
+
+        Files in the temporary storage will be automatically removed once it's created for
+        :class:`ExtraService.Sticker.MaxStickerTempFileLifeSeconds` seconds.
+
+        If ``output_path`` is specified, then the file will **NOT** be automatically removed.
+
+        If there's a file already at ``output_path``, then it's considered as the sticker is downloaded.
+
+        The above situation will not occur if the sticker does not exist.
+
+        Returned :class:`LineAnimatedStickerDownloadResult` will indicate this situation if occurred.
+
         :param pack_id: sticker package ID
         :param sticker_id: sticker ID
         :param output_path: gif output path
+        :param with_frames: if the extracted frames should be preserved
         :return: result of the download and conversion
         """
-        # TEST: Sticker not exists / normal downloading progress
         result = LineAnimatedStickerDownloadResult()
+
+        if not output_path:
+            output_path = os.path.join(_temp_dir, f"{sticker_id}.gif")
+
+            LineStickerTempStorageManager.create_file(output_path)
 
         # Check if the sticker exists
         response = requests.get(LineStickerUtils.get_apng_url(pack_id, sticker_id))
@@ -190,13 +206,20 @@ class LineStickerUtils:
 
         result.available = True
 
+        # Check if the file exists
+        frame_zip_path = f"{os.path.splitext(output_path)[0]}-frames.zip"
+
+        if os.path.exists(output_path) and (not with_frames or os.path.exists(frame_zip_path)):
+            result.already_exists = True
+            return result
+
         # Download the sticker as apng and store it to a file
         apng_path = os.path.join(_temp_dir, f"{sticker_id}.png")
         with open(apng_path, "wb") as apng:
             apng.write(response.content)
 
         # Convert apng to gif
-        result.conversion_result = apng2gif.convert(apng_path, output_path)
+        result.conversion_result = apng2gif.convert(apng_path, output_path, zip_frames=with_frames)
 
         return result
 
@@ -209,6 +232,69 @@ class LineStickerUtils:
         }
 
         return dl_dict.get(content_type)
+
+    @staticmethod
+    def get_downloaded_apng(pack_id: Union[str, int], sticker_id: Union[str, int], *,
+                            with_frames: bool = True) \
+            -> Optional[BinaryIO]:
+        """
+        Get the downloaded apng from the temporary storage as a :class:`BinaryIO` stream.
+
+        If the image has not been downloaded, the utils will try to download it.
+
+        If the download mentioned above fails, returns ``None``.
+
+        -------
+
+        Recommended example usage::
+
+            with LineStickerUtils.get_downloaded_apng(1, 1) as f:
+                # code
+
+        :param pack_id: sticker package ID
+        :param sticker_id: sticker ID
+        :param with_frames: if the extracted frames should be preserved if file not ready
+        :return: `BinaryIO` stream if found / downloaded
+        """
+        sticker_path = os.path.join(_temp_dir, f"{sticker_id}.gif")
+
+        if not os.path.exists(sticker_path):
+            result = LineStickerUtils.download_apng_as_gif(pack_id, sticker_id, with_frames=with_frames)
+
+            if not result.available or not result.conversion_result.succeed:
+                return None
+
+        return open(sticker_path, "rb")
+
+    @staticmethod
+    def get_downloaded_apng_frames(pack_id: Union[str, int], sticker_id: Union[str, int]) -> Optional[BinaryIO]:
+        """
+        Get the downloaded apng from the temporary storage as a :class:`BinaryIO` stream.
+
+        If the image has not been downloaded, the utils will try to download it.
+
+        If the download mentioned above fails, returns ``None``.
+
+        -------
+
+        Recommended example usage::
+
+            with LineStickerUtils.get_downloaded_apng(1, 1) as f:
+                # code
+
+        :param pack_id: sticker package ID
+        :param sticker_id: sticker ID
+        :return: `BinaryIO` stream if found / downloaded
+        """
+        zip_path = os.path.join(_temp_dir, f"{sticker_id}-frames.zip")
+
+        if not os.path.exists(zip_path):
+            result = LineStickerUtils.download_apng_as_gif(pack_id, sticker_id)
+
+            if not result.available or not result.conversion_result.succeed:
+                return None
+
+        return open(zip_path, "rb")
 
 
 class LineStickerMetadata:

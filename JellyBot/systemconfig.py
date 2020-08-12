@@ -148,3 +148,6 @@ class Bot:
 class ExtraService:
     class Maskfinder:
         TargetRangeMi = 200
+
+    class Sticker:
+        MaxStickerTempFileLifeSeconds = 86400  # 1 Day

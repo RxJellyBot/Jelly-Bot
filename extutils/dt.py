@@ -27,7 +27,7 @@ def now_utc_aware(*, for_mongo: bool = False) -> datetime:
 
     - Get that model from the database
 
-    At 1 and 2, the datetime may looks like ``...:52.300125``, but at 3, the acquire model will be ``...:52.300``.
+    At 1 and 2, the datetime may looks like ``...:52.300125``, but at 3, the acquired model will be ``...:52.300``.
 
     :param for_mongo: if this timestamp will be used as a data field of a MongoDB entry
     :return: current tz-aware datetime with timezone set to UTC
