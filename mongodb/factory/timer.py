@@ -29,7 +29,7 @@ class _TimerManager(BaseCollection):
 
     @arg_type_ensure
     def add_new_timer(
-            self, ch_oid: ObjectId, keyword: str, title: str, target_time: datetime,
+            self, ch_oid: ObjectId, keyword: str, title: str, target_time: datetime, *,
             countup: bool = False, period_sec: int = 0) -> WriteOutcome:
         """`target_time` is recommended to be tz-aware. Tzinfo will be forced to be UTC if tz-naive."""
         # Force target time to be tz-aware in UTC
@@ -113,7 +113,7 @@ class _TimerManager(BaseCollection):
 
     @staticmethod
     def get_notify_within_secs(message_frequency: float):
-        return message_frequency * 13.5 + 495
+        return min(message_frequency * 20 + 600, Bot.Timer.MaxNotifyRangeSeconds)
 
 
 TimerManager = _TimerManager()

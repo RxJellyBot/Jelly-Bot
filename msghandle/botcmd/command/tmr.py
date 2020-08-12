@@ -60,7 +60,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
             HandledMessageEventText(content=_(
                 "Unknown flag to indicate if the timer will countup once the time is up. (`{}`)").format(countup))]
 
-    outcome = TimerManager.add_new_timer(e.channel_oid, keyword, title, dt, ctup.to_bool())
+    outcome = TimerManager.add_new_timer(e.channel_oid, keyword, title, dt, countup=ctup.to_bool())
 
     if outcome.is_success:
         return [HandledMessageEventText(content=_("Timer added."))]

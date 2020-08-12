@@ -18,7 +18,7 @@ class TestDatabaseMixin(TestCase, ABC):
 
     This class sets a single database at the beginning of the test case and destroy them after each test case.
 
-    This class also provided functionality to get the database ping.
+    This class provides functionality to get the database ping.
     """
 
     @staticmethod

@@ -7,3 +7,4 @@ from .rmc import *  # noqa
 from .rpdata import *  # noqa
 from .shorturl import *  # noqa
 from .stats import *  # noqa
+from .timer import *  # noqa
