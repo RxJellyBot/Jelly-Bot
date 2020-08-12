@@ -77,12 +77,18 @@ class PytzInfo(tzinfo):
     def tzname(self, dt):
         return sec_diff_to_utc_offset(self.utcoffset(dt).total_seconds())
 
+    def localize(self, tz, *, is_dst: bool = False):
+        return self._base.localize(tz, is_dst)
+
     @property
     def tzidentifier(self):
         return self._base.zone
 
     def __eq__(self, other):
         return type(self) == type(other) and self.tzidentifier == other.tzidentifier
+
+    def __repr__(self):
+        return f"<PytzInfo - {self.tzidentifier}>"
 
 
 def is_now_dst(tz):
