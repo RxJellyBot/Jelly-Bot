@@ -7,12 +7,12 @@
 #### Master Branch - `master`
 
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/master)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/master)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f?branch=master)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=master)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
 
 #### Development Branch - `dev`
 
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/dev)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/dev)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f?branch=dev)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
 
 
 Supported on Discord and LINE. Feel free to add it to your group!
