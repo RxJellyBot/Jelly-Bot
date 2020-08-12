@@ -1,10 +1,19 @@
 # Jelly Bot
 
+#### GitHub Actions
+
 [![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)](https://github.com/RaenonX/Jelly-Bot/actions)
 
-[![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge)](https://www.codefactor.io/repository/github/raenonx/jelly-bot)
+#### Master Branch - `master`
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f)](https://www.codacy.com/manual/RaenonX/Jelly-Bot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RaenonX/Jelly-Bot&amp;utm_campaign=Badge_Grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/master)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/master)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f?branch=master)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+
+#### Development Branch - `dev`
+
+[![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/dev)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/dev)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/997bb3e70e8f4dc7b49ffe2c130e215f?branch=dev)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+
 
 Supported on Discord and LINE. Feel free to add it to your group!
 
