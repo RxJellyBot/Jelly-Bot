@@ -9,8 +9,8 @@ flake8 . --config .flake8-style || ECHO ERROR && PAUSE && EXIT /b
 ECHO Checking pylint...
 pylint bot doc extdiscord extline || ECHO ERROR && PAUSE && EXIT /b
 
-ECHO Running tests
-py manage.py test tests || ECHO ERROR && PAUSE && EXIT /b
+ECHO Running tests (pytest)...
+pytest || ECHO ERROR && PAUSE && EXIT /b
 
 ECHO.
 ECHO.
@@ -18,4 +18,6 @@ ECHO.
 ECHO =============================================
 ECHO ============== GREEN TO COMMIT ==============
 ECHO =============================================
+ECHO.
+ECHO.
 ECHO.

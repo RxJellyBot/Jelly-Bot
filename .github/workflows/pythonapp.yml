@@ -174,31 +174,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest-django
 
-      - name: Test independent utils (`bot` / `extutils`)
+      - name: Run pytest
         run: |
-          python manage.py test tests.bot
-          python manage.py test tests.extutils
-
-      - name: Test string resources (`strres`)
-        run: |
-          python manage.py test tests.strres
-
-      - name: Test base data structures (`models`)
-        run: |
-          python manage.py test tests.models
-
-      - name: Test data controller (`mongodb`)
-        run: |
-          python manage.py test tests.mongodb
-
-      - name: Test game - PK Chess (`game_pkchess`)
-        run: |
-          python manage.py test tests.game_pkchess
-
-      - name: All tests
-        run: |
-          python manage.py test tests
+          pytest
 
   cleanup:
     runs-on: windows-latest
