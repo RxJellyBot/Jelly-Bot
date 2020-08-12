@@ -14,27 +14,36 @@
         <p class="card-text">
             {% blocktrans trimmed %}
                 <small>Could be anything, but the <strong>length cannot be over 2000.</strong></small><br>
-                <small>The content <strong>could use markdown syntax</strong>. The outcome depends on the platform.
+                <small><strong>Markdown syntax</strong> is supported. The outcome depends on the platform.
                     For LINE, it's support is very limited, while on Discord, it supports most basic syntax.</small>
             {% endblocktrans %}
         </p>
         <h5 class="card-title">{% trans "Image" %}</h5>
         <p class="card-text">
             {% blocktrans trimmed %}
-                <small>The main MIME type should be <code>image</code>. In the other words, when
-                    you
-                    open then link,
-                    the browser should <strong>just give you an image</strong> not a web page.
+                <small>The main MIME type should be <code>image</code>. In other words, when
+                    you open then link, the browser should <strong>just give you an image</strong> not a web page.
                 </small>
             {% endblocktrans %}
         </p>
         <h5 class="card-title">{% trans "LINE Sticker" %}</h5>
-        <p class="card-text">
+        <div class="card-text">
+            {% url "page.doc.botcmd.cmd" code=bot_cmd_rct_msg_code as rct_msg_url %}
             {% blocktrans trimmed %}
-                <small>Should be a sticker ID. Usually the ID will be a <strong>1~11 digits number</strong>.
-                </small>
+                <small>
+                    Should be a sticker ID. Usually the ID will be a <strong>1~11 digits number</strong>.
+                </small><br>
+                <small>
+                    The sticker ID can be acquired by:
+                </small><br>
+                <ul>
+                    <li><small>Sending sticker to the bot <strong>via private channel</strong> (sending it via group
+                        channel will have no effect)</small></li>
+                    <li><small>Calling <a href="{{ rct_msg_url }}">recent activity</a> command to lookup the sticker ID</small>
+                    </li>
+                </ul>
             {% endblocktrans %}
-        </p>
+        </div>
         <h5 class="card-title">{% trans "Emoji / Sticker" %}</h5>
         <div class="card-text">
             {% blocktrans trimmed %}
@@ -44,14 +53,16 @@
                     Example: <code>&lt;:neut:554302047038734366&gt;</code>
                 </small><br>
                 <ul>
-                    <li><code>EMOJI_NAME</code>: What you normally type in the chat window excluding the wrapping
+                    <li><small>
+                        <code>EMOJI_NAME</code>: What you normally type in the chat window excluding the wrapping
                         colons.
                         If you type :neut: in the window, then "neut" is the name of the emoji.
-                    </li>
-                    <li><code>EMOJI_ID</code>: The number in the URL when you get the link of the emoji.
+                    </small></li>
+                    <li><small>
+                        <code>EMOJI_ID</code>: The number in the URL when you get the link of the emoji.
                         On PC client, you can right click on the emoji and click "Copy Link" or "Open Link" to get the
                         number / ID.
-                    </li>
+                    </small></li>
                 </ul>
             {% endblocktrans %}
         </div>

@@ -20,7 +20,7 @@ from .ping import cmd as cmd_ping
 from .stk import cmd as cmd_stk
 
 # List all main command nodes for some pages to get the command data
-__all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr"]
+__all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr", "cmd_rct"]
 
 
 cmd_root = CommandNode(
