@@ -20,7 +20,9 @@ def issue_execode(e: TextMessageEventObject):
     if result.success:
         return _("User Data Integration process started.\nExecode: `{}`\nExpiry: `{}`\n\n"
                  "Please record the Execode and go to {}{} to complete the integration.").format(
-            result.execode, result.expiry.strftime("%Y-%m-%d %H:%M:%S"), HostUrl, reverse("account.integrate")
+            result.execode,
+            result.expiry.astimezone(e.user_model.config.tzinfo).strftime("%Y-%m-%d %H:%M:%S (UTC%Z)"),
+            HostUrl, reverse("account.integrate")
         )
     else:
         return _("User Data Integration process failed to start.\nResult: {}\nException: {}").format(
