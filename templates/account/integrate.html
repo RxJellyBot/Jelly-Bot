@@ -29,7 +29,18 @@
                                 <br>
                                 Account related data such as locale configuration on the account where you get the
                                 Execode
-                                will be discarded, only the data on the website will be kept.
+                                will be discarded, only the data on the website will be kept.<br>
+                                <br>
+                                <small>
+                                    An account holds only <strong>ONE</strong> website account, but
+                                    <strong>INFINITELY MANY</strong> platform account. (LINE, Discord...etc.)
+                                </small><br>
+                                <br>
+                                <small>
+                                    If you have an account already linked to a website account, and you get the Execode
+                                    from this account, the original website account will be disconnected.<br>
+                                    ID of the original website account will be regenerated upon login.
+                                </small>
                             </p>
                         {% endblocktrans %}
                         <div class="input-group">
@@ -43,11 +54,11 @@
                             </div>
                         </div>
                         <div class="d-none text-primary submit-msg mt-3"
-                           id="submitMsgNoExecode">{% trans "Provide an Execode to complete user data integration." %}</div>
+                             id="submitMsgNoExecode">{% trans "Provide an Execode to complete user data integration." %}</div>
                         <div class="d-none text-success submit-msg mt-3"
-                           id="submitMsgOK">{% trans "User data integration succeed." %}</div>
+                             id="submitMsgOK">{% trans "User data integration succeed." %}</div>
                         <div class="d-none text-danger submit-msg mt-3"
-                           id="submitMsgFailed">{% trans "User data integration failed." %}</div>
+                             id="submitMsgFailed">{% trans "User data integration failed." %}</div>
                     </div>
                 </div>
             </div>

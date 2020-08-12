@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List, Union, Callable
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -51,22 +51,22 @@ class _APIUserManager(GenerateTokenMixin, BaseCollection):
 
     def register(self, id_data: GoogleIdentityUserData) -> OnSiteUserRegistrationResult:
         token = None
-        entry, outcome, ex = \
+        model, outcome, ex = \
             self.insert_one_data(Email=id_data.email, GoogleUid=id_data.uid, Token=self.generate_hex_token())
 
         if outcome.is_inserted:
-            token = entry.token
+            token = model.token
         else:
-            entry = self.get_user_data_google_id(id_data.uid)
-            if entry is None:
+            model = self.get_user_data_google_id(id_data.uid)
+            if model is None:
                 if ex is not None:
                     outcome = WriteOutcome.X_EXCEPTION_OCCURRED
                 else:
                     outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
             else:
-                token = entry.token
+                token = model.token
 
-        return OnSiteUserRegistrationResult(outcome, entry, ex, token)
+        return OnSiteUserRegistrationResult(outcome, ex, model, token)
 
 
 class _OnPlatformIdentityManager(BaseCollection):
@@ -122,7 +122,7 @@ class _RootUserManager(BaseCollection):
 
     def _register(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,
-                  on_exist=None) \
+                  on_exist: Callable[[], None] = None) \
             -> RootUserRegistrationResult:
         user_reg_result = u_reg_func(*args)
         user_reg_oid = None
@@ -360,9 +360,13 @@ class _RootUserManager(BaseCollection):
     @arg_type_ensure
     def merge_onplat_to_api(self, src_root_oid: ObjectId, dest_root_oid: ObjectId) -> OperationOutcome:
         """
-        Merge 2 root user data to be the same. Only the data of `dest_root_oid` will be kept.
+        Merge 2 root user data to be the same
+        with its OID being the oldest OID among ``src_root_oid`` and ``dest_root_oid``.
 
-        :return: True if all actions have been acknowledged and success.
+        The configs and API OID of ``dest_root_oid`` will be kept.
+        Corresponding data from ``src_root_oid`` will be lost.
+
+        :return: `True` if all actions have been acknowledged and success
         """
         if src_root_oid == dest_root_oid:
             return OperationOutcome.X_SAME_SRC_DEST
@@ -374,18 +378,33 @@ class _RootUserManager(BaseCollection):
         if not dest_data:
             return OperationOutcome.X_DEST_DATA_NOT_FOUND
 
-        ack_rm = self.delete_one({RootUserModel.Id.key: src_root_oid}).acknowledged
-        if ack_rm:
-            outcome = self.update_many_outcome(
-                {RootUserModel.Id.key: dest_data[RootUserModel.Id.key]},
-                {"$push": {RootUserModel.OnPlatOids.key: {"$each": src_data[RootUserModel.OnPlatOids.key]}}})
+        # The actual implementation is to get the data from both source and destination,
+        # then calculate the oldest OID as the actual destination,
+        # remove source and destination data,
+        # then re-insert the data with the oldest ID and the configs / API OID on the destination data
+        actual_dst = min(src_root_oid, dest_root_oid)
 
-            if outcome.is_success:
-                return OperationOutcome.O_COMPLETED
-            else:
-                return OperationOutcome.X_NOT_UPDATED
-        else:
+        ack_rm = self.delete_many({RootUserModel.Id.key: {"$in": [src_root_oid, dest_root_oid]}}).acknowledged
+
+        if not ack_rm:
             return OperationOutcome.X_NOT_DELETED
+
+        data = dest_data
+        data[OID_KEY] = actual_dst
+
+        src_op = src_data.get(RootUserModel.OnPlatOids.key, [])
+
+        if RootUserModel.OnPlatOids.key in data:
+            data[RootUserModel.OnPlatOids.key].extend(src_op)
+        else:
+            data[RootUserModel.OnPlatOids.key] = src_op
+
+        model, outcome, ex = self.insert_one_data(from_db=True, **data)
+
+        if outcome.is_success:
+            return OperationOutcome.O_COMPLETED
+        else:
+            return OperationOutcome.X_NOT_UPDATED
 
     @arg_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:

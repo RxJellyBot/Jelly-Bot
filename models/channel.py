@@ -1,4 +1,6 @@
 from bson import ObjectId
+from pymongo.client_session import ClientSession
+from pymongo.collection import Collection
 
 from JellyBot.systemconfig import ChannelConfig
 from models.field import (
@@ -29,10 +31,18 @@ class ChannelConfigModel(Model):
     DefaultName = TextField("d-name", allow_none=True)
 
 
+class ChannelNameField(DictionaryField):
+    def replace_uid_implemented(self) -> bool:
+        return True
+
+    def replace_uid(self, collection_inst: Collection, old: ObjectId, new: ObjectId, session: ClientSession) -> bool:
+        return collection_inst.update_many({}, {"$rename": {f"n.{old}": f"n.{new}"}}, session=session).acknowledged
+
+
 class ChannelModel(Model):
     Platform = PlatformField("p", default=ModelDefaultValueExt.Required)
     Token = TextField("t", default=ModelDefaultValueExt.Required, must_have_content=True)
-    Name = DictionaryField("n", allow_none=False, default={})
+    Name = ChannelNameField("n", allow_none=False, default={}, stores_uid=True)
     Config = ModelField("c", ChannelConfigModel)
     BotAccessible = BooleanField("acc", default=True)
 

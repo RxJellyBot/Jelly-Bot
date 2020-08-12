@@ -1,9 +1,12 @@
 from bson import ObjectId
 
 from extutils.dt import now_utc_aware
+from extutils.gidentity import GoogleIdentityUserData
 from flags import Execode, ExecodeCompletionOutcome, AutoReplyContentType, Platform
 from JellyBot.api.static import param
-from models import ExecodeEntryModel, AutoReplyModuleExecodeModel, AutoReplyContentModel, AutoReplyModuleModel
+from models import (
+    ExecodeEntryModel, AutoReplyModuleExecodeModel, AutoReplyContentModel, AutoReplyModuleModel, RootUserModel
+)
 from mongodb.exceptions import NoCompleteActionError
 from mongodb.factory.ar_conn import AutoReplyModuleManager
 from mongodb.factory import ChannelManager, ExecodeManager, RootUserManager
@@ -19,7 +22,7 @@ class TestExecodeManager(TestModelMixin, TestTimeComparisonMixin, TestDatabaseMi
 
     @staticmethod
     def obj_to_clear():
-        return [ExecodeManager]
+        return [AutoReplyModuleManager, ExecodeManager, RootUserManager]
 
     def test_add_duplicate(self):
         self.assertEqual(
@@ -314,19 +317,19 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
     def _user_integrate_pre(self, reg_1, reg_2):
         channel_oid = ObjectId()
 
-        if reg_1:
-            creator_oid_result = RootUserManager.register_onplat(Platform.LINE, "U123456789")
-            self.assertTrue(creator_oid_result.success)
-            creator_oid = creator_oid_result.model.id
-        else:
-            creator_oid = ObjectId()
-
         if reg_2:
             creator_oid_2_result = RootUserManager.register_onplat(Platform.LINE, "U12345678A")
             self.assertTrue(creator_oid_2_result.success)
             creator_oid_2 = creator_oid_2_result.model.id
         else:
             creator_oid_2 = ObjectId()
+
+        if reg_1:
+            creator_oid_result = RootUserManager.register_onplat(Platform.LINE, "U123456789")
+            self.assertTrue(creator_oid_result.success)
+            creator_oid = creator_oid_result.model.id
+        else:
+            creator_oid = ObjectId()
 
         AutoReplyModuleManager.insert_one_model(
             AutoReplyModuleModel(
@@ -426,6 +429,84 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result.completion_outcome, ExecodeCompletionOutcome.X_IDT_SOURCE_NOT_FOUND)
 
         self._user_integrate_post(creator_oid, creator_oid_2, False)
+
+    def test_user_integrate_preserve_root_oid(self):
+        """
+        See issue #332 <https://github.com/RaenonX/Jelly-Bot/issues/332> for more details on this test case.
+        """
+        # Register users
+        result = RootUserManager.register_onplat(Platform.LINE, "U123456789")
+        self.assertTrue(result.success)
+        onplat_oid_root = result.model.id
+        onplat_oid = result.model.on_plat_oids[0]
+
+        result = RootUserManager.register_google(
+            GoogleIdentityUserData("Fake", "Fake", "Fake", "Fake@email.com", skip_check=True))
+        self.assertTrue(result.success)
+        api_oid_1_root = result.model.id
+        api_oid_1 = result.model.api_oid
+
+        result = RootUserManager.register_google(
+            GoogleIdentityUserData("Fake2", "Fake2", "Fake2", "Fake2@email.com", skip_check=True))
+        self.assertTrue(result.success)
+        api_oid_2_root = result.model.id
+        api_oid_2 = result.model.api_oid
+
+        # Perform action that will add an entry storing UID (add an auto-reply module here)
+        channel_oid = ObjectId()
+
+        AutoReplyModuleManager.insert_one_model(
+            AutoReplyModuleModel(
+                Keyword=AutoReplyContentModel(Content="A"), Responses=[AutoReplyContentModel(Content="B")],
+                CreatorOid=onplat_oid_root, ChannelOid=channel_oid))
+        self.assertEqual(
+            AutoReplyModuleManager.count_documents({AutoReplyModuleModel.CreatorOid.key: onplat_oid_root}),
+            1
+        )
+
+        # Perform user integration - link ONPLAT to API #1
+        enqueue = ExecodeManager.enqueue_execode(onplat_oid_root, Execode.INTEGRATE_USER_DATA)
+        result = ExecodeManager.complete_execode(enqueue.execode, {param.Execode.USER_OID: str(api_oid_1_root)})
+
+        # Check integration result
+        self.assertTrue(result.success)
+
+        # Check root OID integrity
+        root_oid_from_onplat = RootUserManager.get_root_data_onplat_oid(onplat_oid).id
+        root_oid_from_api_1 = RootUserManager.get_root_data_api_oid(api_oid_1).id
+        self.assertEqual(root_oid_from_onplat, root_oid_from_api_1)
+
+        # Check UID field migration
+        self.assertEqual(
+            AutoReplyModuleManager.count_documents({AutoReplyModuleModel.CreatorOid.key: onplat_oid_root}),
+            1
+        )
+
+        # Perform user integration - link ONPLAT to API #2
+        enqueue = ExecodeManager.enqueue_execode(root_oid_from_onplat, Execode.INTEGRATE_USER_DATA)
+        result = ExecodeManager.complete_execode(enqueue.execode, {param.Execode.USER_OID: str(api_oid_2_root)})
+
+        # Check integration result
+        self.assertTrue(result.success)
+
+        # Check root OID integrity
+        root_data = RootUserManager.get_root_data_onplat_oid(onplat_oid)
+
+        root_oid_from_onplat = root_data.id
+        root_oid_from_api_2 = RootUserManager.get_root_data_api_oid(api_oid_2).id
+        self.assertEqual(root_oid_from_onplat, root_oid_from_api_2)
+        self.assertEqual(root_oid_from_onplat, root_oid_from_api_1)
+        self.assertEqual(root_oid_from_api_1, root_oid_from_api_2)
+
+        # Check UID field migration
+        self.assertEqual(
+            AutoReplyModuleManager.count_documents({AutoReplyModuleModel.CreatorOid.key: onplat_oid_root}),
+            1
+        )
+
+        # Check root data content
+        self.assertEqual(root_data[RootUserModel.ApiOid.key], api_oid_2)
+        self.assertEqual(root_data[RootUserModel.OnPlatOids.key], [onplat_oid])
 
     def test_unhandled_action(self):
         enqueue = ExecodeManager.enqueue_execode(ObjectId(), Execode.SYS_TEST)
