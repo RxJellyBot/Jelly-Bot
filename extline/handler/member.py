@@ -32,7 +32,7 @@ def handle_member_join(__, event, destination):
 
     LINE.log_event("A member joined the group.", event=event, dest=destination)
 
-    LineApiWrapper.reply_text(event.reply_token, _("{} joined the group.") % (" & ".join(joined_names)))
+    LineApiWrapper.reply_text(event.reply_token, _("%s joined the group.") % (" & ".join(joined_names)))
 
 
 def handle_member_left(__, event, destination):
