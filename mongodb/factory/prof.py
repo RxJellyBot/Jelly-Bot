@@ -70,6 +70,17 @@ class _UserProfileManager(BaseCollection):
 
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
+
+            # If the channel profile connection is upserted (newly inserted), add the default starred value to it
+            self.update_one(
+                {OID_KEY: id_},
+                {
+                    "$set":
+                        {
+                            ChannelProfileConnectionModel.Starred.key:
+                                ChannelProfileConnectionModel.Starred.default_value}
+                }
+            )
         else:
             model: ChannelProfileConnectionModel = self.find_one_casted(
                 {ChannelProfileConnectionModel.UserOid.key: root_uid},

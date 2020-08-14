@@ -55,7 +55,7 @@ class MailSender:
 
     @staticmethod
     def send_email_async(
-            content_html: str, recipients: List[str] = None,
+            content_html: str, recipients: List[str] = None, *,
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
         if is_testing():
             MailSender.send_email_to_fake_server(*MailSender.collate_info(content_html, recipients, subject, prefix))

@@ -85,7 +85,7 @@ class ChannelProfileConnectionModel(Model):
     ChannelOid = ObjectIDField("c", default=ModelDefaultValueExt.Required)
     Starred = BooleanField("s", default=False)
     UserOid = ObjectIDField("u", default=ModelDefaultValueExt.Required, stores_uid=True)
-    # ProfileOids will be empty list if the user is not in the channel
+    # `ProfileOids` will be empty list if the user is not in the channel
     ProfileOids = ArrayField("p", ObjectId, default=ModelDefaultValueExt.Required)
 
     @property
