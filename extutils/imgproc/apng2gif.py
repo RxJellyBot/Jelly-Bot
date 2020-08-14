@@ -1,15 +1,16 @@
+import io
 from dataclasses import dataclass
 from fractions import Fraction
-import glob
 import os
 import shutil
-import subprocess
 from tempfile import TemporaryDirectory
 import time
 from typing import Any, Tuple, List, Optional
 from zipfile import ZipFile
 
 from PIL import Image
+
+from .apng2png import extract_frames
 
 __all__ = ["convert", "ConvertResult"]
 
@@ -28,6 +29,7 @@ class ConvertResult:
 
     frame_extracted: bool = False
     frame_extraction_duration: float = 0.0
+    frame_extraction_exception: Optional[Exception] = None
 
     frame_zipped: bool = False
     frame_zipping_time: float = 0.0
@@ -41,7 +43,7 @@ class ConvertResult:
 
     @property
     def succeed(self):
-        if not self.input_exists:
+        if not self.input_exists or self.frame_extraction_exception:
             return False
 
         return self.frame_extracted and self.image_data_acquired and self.gif_merged
@@ -64,30 +66,38 @@ def _get_file_name(file_path: str) -> str:
     return os.path.splitext(os.path.basename(file_path))[0]
 
 
-def _extract_frames(result: ConvertResult, file_path: str):
+def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tuple[bytes, Fraction]]]:
     """
-    Extract the frames of the APNG file at ``apng_path`` using ``apngdis``.
+    Extract the frames of the APNG file at ``apng_path``
+    and return it as a list of 2-tuple containing the image byte data and its delay.
+
+    If the extraction failed, returns ``None``
+    and record the exception to ``result.frame_extraction_exception`` instead.
 
     :param result: conversion result object
     :param file_path: file path of the apng file to be extracted
     """
     _start = time.time()
 
-    file_name = _get_file_name(file_path)
+    try:
+        ret = extract_frames(file_path)
+    except Exception as ex:
+        result.frame_extraction_exception = ex
+        return
 
-    return_code = subprocess.call(f"apngdis {file_path} {file_name}-")
+    result.frame_extraction_duration = time.time() - _start
+    result.frame_extracted = True
 
-    if return_code == 0:
-        result.frame_extraction_duration = time.time() - _start
-        result.frame_extracted = True
+    return ret
 
 
-def _zip_frames(result: ConvertResult, apng_path: str, output_path: str):
+def _zip_frames(result: ConvertResult, apng_path: str, frame_data: List[Tuple[bytes, Fraction]], output_path: str):
     """
     Zip the frames to be a single zip file preceded with the apng file name.
 
     :param result: conversion result object
     :param apng_path: path of the source apng
+    :param frame_data: list of 2-tuple containing the image byte data and its delay
     :param output_path: output directory of the zip file
     """
     _start = time.time()
@@ -97,8 +107,9 @@ def _zip_frames(result: ConvertResult, apng_path: str, output_path: str):
 
     try:
         with ZipFile(os.path.join(os.path.dirname(output_path), f"{out_name}-frames.zip"), "w") as f:
-            for apng_path in glob.glob(f"{apng_name}-*.png"):
-                f.write(apng_path)
+            for idx, data in enumerate(frame_data, start=1):
+                frame, _ = data
+                f.writestr(f"{apng_name}-{idx:02d}.png", frame)
     except Exception as ex:
         result.frame_zipping_exception = ex
         return
@@ -107,16 +118,16 @@ def _zip_frames(result: ConvertResult, apng_path: str, output_path: str):
     result.frame_zipped = True
 
 
-def _process_frame_transparent(image_path: str):
+def _process_frame_transparent(image_byte: bytes):
     """
-    Apply color index for transparency ``transparent_index`` to the image
-    at ``image_path`` and return the modified image.
+    Apply color index for transparency ``transparent_index`` to ``image_byte``
+    and return the modified PIL image object.
 
     Copied and modified from ``apng2gif``.
 
-    :param image_path: path of the image
+    :param image_byte: byte data of an image/frame
     """
-    image = Image.open(image_path)
+    image = Image.open(io.BytesIO(image_byte))
     alpha = image.getchannel("A")
     # Convert the image into P mode but only use 255 colors in the palette out of 256
     image = image.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255)
@@ -125,41 +136,27 @@ def _process_frame_transparent(image_path: str):
     return image
 
 
-def _process_frame_duration(file_path: str) -> Fraction:
+def _get_image_data(result: ConvertResult, frame_data: List[Tuple[bytes, Fraction]]) \
+        -> Tuple[List[Any], List[Fraction]]:
     """
-    Get the duration of the frame by extracting the corresponding text file yielded by ``apngdis``.
-
-    :param file_path: path of the info text file
-    :return: duration of the frame
-    """
-    with open(file_path, "r") as f:
-        duration = f.read()
-        duration = duration.split("=", 1)[1]  # Split `delay=X/Y` to 2 parts and only get the right one
-        duration = Fraction(duration)  # Cast the delay fraction to `Fraction`
-
-        return duration
-
-
-def _get_image_data(result: ConvertResult, apng_path: str) -> Tuple[List[Any], List[Fraction]]:
-    """
-    Get the data of the png frames extracted from ``apng_path``.
+    Collate and process the data of ``frame_data``.
 
     Returns a 2-tuple which:
     - 1st element is the processed frames in PIL image objects
     - 2nd element is the duration of each frames
 
     :param result: conversion result object
-    :param apng_path: path of the source apng
-    :return: frame data to be used
+    :param frame_data: list of 2-tuple containing frame byte data and its delay
+    :return: frame data to be used to compose a gif
     """
     _start = time.time()
 
     images = []
     durations = []
 
-    for file_path in sorted(glob.glob(f"{_get_file_name(apng_path)}-*.png")):
-        images.append(_process_frame_transparent(file_path))
-        durations.append(_process_frame_duration(f"{_get_file_name(file_path)}.txt"))
+    for image_byte, delay in frame_data:
+        images.append(_process_frame_transparent(image_byte))
+        durations.append(delay)
 
     result.image_data_acquisition_duration = time.time() - _start
     result.image_data_acquired = True
@@ -167,15 +164,15 @@ def _get_image_data(result: ConvertResult, apng_path: str) -> Tuple[List[Any], L
     return images, durations
 
 
-def _make_gif(result: ConvertResult, apng_path: str, output_path: str):
+def _make_gif(result: ConvertResult, frame_data: List[Tuple[bytes, Fraction]], output_path: str):
     """
-    Mix all png frames extracted from ``apng_path`` to be an single gif and output it to ``output_path``.
+    Use the extracted ``frame_data`` to construct a gif and output it to ``output_path``.
 
     :param result: conversion result object
-    :param apng_path: path of the apng file
+    :param frame_data: list of 2-tuple containing frame byte data and its delay
     :param output_path: path for the completed gif
     """
-    images, durations = _get_image_data(result, apng_path)
+    images, durations = _get_image_data(result, frame_data)
 
     if not result.image_data_acquired:
         return
@@ -209,10 +206,6 @@ def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> Con
         return result
 
     with TemporaryDirectory() as temp_dir:
-        # Copy `apngdis` to the temp directory
-        shutil.copy(os.path.join(os.path.dirname(os.path.abspath(__file__)), "apngdis.exe"),
-                    os.path.join(temp_dir, "apngdis.exe"))
-
         # Copy the image for extraction
         apng_path_dst = os.path.join(temp_dir, os.path.basename(apng_path))
 
@@ -225,12 +218,12 @@ def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> Con
         # Main process
         out_path = output_path if os.path.isabs(output_path) else os.path.join(original_dir, output_path)
 
-        _extract_frames(result, apng_path)
+        frame_data = _extract_frames(result, apng_path)
         if result.frame_extracted:
             if zip_frames:
-                _zip_frames(result, apng_path, out_path)
+                _zip_frames(result, apng_path, frame_data, out_path)
 
-            _make_gif(result, apng_path, out_path)
+            _make_gif(result, frame_data, out_path)
 
         # Restore the working directory (REQUIRED, disabling this causes infinite recursion)
         os.chdir(original_dir)

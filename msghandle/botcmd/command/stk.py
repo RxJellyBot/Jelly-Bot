@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
 
 from extutils.line_sticker import LineStickerUtils
+from extutils.emailutils import MailSender
 from flags import BotFeature
 from JellyBot.systemconfig import HostUrl
 from msghandle.models import TextMessageEventObject, HandledMessageEventText, HandledMessageEventImage
@@ -23,8 +24,11 @@ def _download_animated_failed(result, url_dict):
         content = _("Sticker already exists.\n"
                     "Original sticker link: %(url_apng)s\n") % url_dict
     elif not result.conversion_result.frame_extracted:
+        ex = result.conversion_result.frame_extraction_exception
+
         content = _("Sticker frame extraction failed.\n"
-                    "Original sticker link: %(url_apng)s\n") % url_dict
+                    "Exception: %(ex)s"
+                    "Original sticker link: %(url_apng)s\n") % dict(url_dict, ex=ex)
     elif not result.conversion_result.image_data_acquired:
         content = _("Sticker image data acquisition failed.\n"
                     "Original sticker link: %(url_apng)s\n") % url_dict
@@ -36,6 +40,8 @@ def _download_animated_failed(result, url_dict):
         content = _("Failed to download animated sticker.\n"
                     "Original sticker link: %(url_apng)s\n"
                     "Download result: %s") % result
+
+    MailSender.send_email_async(content, subject="Failed to download animated LINE sticker")
 
     return [HandledMessageEventText(content=content, bypass_multiline_check=True)]
 
