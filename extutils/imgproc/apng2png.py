@@ -6,7 +6,7 @@ Module to extract the frames of APNG **without** constraint violation checking.
     https://github.com/eight04/pyAPNG
     https://github.com/tonix0114/apng-splitter
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 from abc import ABC
 import binascii
@@ -212,7 +212,7 @@ class _DataChunkOther(_DataChunkBase):
 class _DataChunkfcTL(_DataChunkBase):
     """Data class of ``fcTL`` chunk."""
 
-    # pylint: disable=R0902
+    # pylint: disable=too-many-instance-attributes
 
     seq_num: int = field(init=False)
     width: int = field(init=False)
@@ -301,7 +301,7 @@ def extract_frames(apng_path: str) -> List[Tuple[bytes, Fraction]]:
     :param apng_path: path of the apng file to be extracted
     :return: list of 2-tuple containing frame byte data and its delay
     """
-    # pylint: disable=R0914
+    # pylint: disable=too-many-locals
 
     with open(apng_path, "rb") as f:
         data = f.read()

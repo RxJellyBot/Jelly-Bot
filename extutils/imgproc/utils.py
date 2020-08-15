@@ -27,7 +27,7 @@ class ImageContentProcessor:
             return base64.b64encode(f.read()).decode("utf-8")
 
 
-class ImageValidator:  # pylint: disable=R0903
+class ImageValidator:  # pylint: disable=too-few-public-methods
     """Class for validating the image information."""
 
     @staticmethod

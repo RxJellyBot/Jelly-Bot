@@ -113,7 +113,7 @@ def t_delta_str(t_delta: timedelta) -> str:
     :param t_delta: `timedelta` to be converted
     :return: a `str` representing `t_delta`
     """
-    # pylint: disable=C0103
+    # pylint: disable=invalid-name
     h = t_delta.seconds // 3600
     m = (t_delta.seconds - 3600 * h) // 60
     s = t_delta.seconds % 60

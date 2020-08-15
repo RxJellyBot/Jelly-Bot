@@ -3,7 +3,7 @@ Module of the miscellaneous utilities.
 
 Mostly transforming data of built-in basic data types such as :class:`str` and :class:`list`.
 """
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 
 import re
 from datetime import datetime
@@ -13,7 +13,7 @@ import html
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-T = TypeVar("T")  # pylint: disable=C0103
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 def cast_keep_none(obj, dest_type: type):

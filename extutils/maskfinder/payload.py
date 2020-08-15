@@ -1,7 +1,7 @@
 """Payload for the service - US mask finder."""
 
 
-class Payload:  # pylint: disable=R0903
+class Payload:  # pylint: disable=too-few-public-methods
     """Class to generate the payload to be sent for US mask finder."""
 
     @staticmethod

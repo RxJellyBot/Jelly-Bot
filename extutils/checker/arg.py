@@ -44,7 +44,7 @@ class BaseDataTypeConverter(ABC):
     def _convert(cls, data: Any, type_annt):
         # Terminate if the type is already valid
         # type annotation cannot be used with instance checks (generic may be the type annotation)
-        if type(data) == type_annt:  # pylint: disable=C0123
+        if type(data) == type_annt:  # pylint: disable=unidiomatic-typecheck
             return data
 
         alias_origin_union = cls._typing_alias_origin(type_annt) is Union

@@ -15,7 +15,7 @@ def type_translation(type_: type):  # noqa: C901
     :param type_: type to get the description
     :return: description of `type_`
     """
-    # pylint: disable=R0911
+    # pylint: disable=too-many-return-statements
 
     if issubclass(type_, str):
         return _("String")

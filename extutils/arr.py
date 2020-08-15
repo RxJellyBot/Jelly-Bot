@@ -3,7 +3,7 @@ from typing import List, Callable, TypeVar, Any, Union
 
 __all__ = ["extract_list_action", "extract_one"]
 
-T = TypeVar("T")  # pylint: disable=C0103
+T = TypeVar("T")  # pylint: disable=invalid-name
 
 
 def extract_one(obj: Union[list, tuple, set]):

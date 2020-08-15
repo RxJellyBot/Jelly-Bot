@@ -53,7 +53,7 @@ def is_flag_double(obj):
 # TODO: Enum to check if there are any duplicated value  pylint: disable=fixme
 
 
-class FlagMixin:  # pylint: disable=R0903
+class FlagMixin:  # pylint: disable=too-few-public-methods
     """Base class of a ``Flag``."""
 
     @classmethod

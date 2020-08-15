@@ -14,7 +14,7 @@ def sec_diff_to_utc_offset(s_diff: float):
     :param s_diff: utc offset second difference
     :return: translated offset string in either for example, +0500 or -0500
     """
-    # pylint: disable=C0103
+    # pylint: disable=invalid-name
 
     is_pos = s_diff >= 0
     s_diff = int(abs(s_diff))
@@ -129,7 +129,8 @@ class PytzInfo(tzinfo):
         return self._base.zone
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.tzidentifier == other.tzidentifier  # pylint: disable=C0123
+        # pylint: disable=unidiomatic-typecheck
+        return type(self) == type(other) and self.tzidentifier == other.tzidentifier
 
     def __repr__(self):
         return f"<PytzInfo - {self.tzidentifier}>"

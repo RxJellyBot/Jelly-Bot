@@ -39,7 +39,7 @@ class Color:
         return self._col_code
 
     @property
-    def r(self) -> int:  # pylint: disable=C0103
+    def r(self) -> int:  # pylint: disable=invalid-name
         """
         Red value of RGB of the color.
 
@@ -48,7 +48,7 @@ class Color:
         return self.color_int // 65536
 
     @property
-    def g(self) -> int:  # pylint: disable=C0103
+    def g(self) -> int:  # pylint: disable=invalid-name
         """
         Green value of RGB of the color.
 
@@ -57,7 +57,7 @@ class Color:
         return (self.color_int // 256) % 256
 
     @property
-    def b(self) -> int:  # pylint: disable=C0103
+    def b(self) -> int:  # pylint: disable=invalid-name
         """
         Blue value of RGB of the color.
 
