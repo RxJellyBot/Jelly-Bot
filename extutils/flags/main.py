@@ -5,9 +5,17 @@ from typing import Union
 from .mongo import register_encoder
 
 __all__ = [
+    "DuplicatedCodeError",
     "FlagCodeEnum", "FlagSingleEnum", "FlagDoubleEnum", "FlagPrefixedDoubleEnum", "FlagOutcomeMixin",
     "is_flag_class", "is_flag_single", "is_flag_double", "is_flag_instance"
 ]
+
+
+class DuplicatedCodeError(Exception):
+    """Raised if the flag code is duplicated."""
+
+    def __init__(self, code: int):
+        super().__init__(f"Duplicated flag code: {code}")
 
 
 def is_flag_instance(inst):
@@ -50,9 +58,6 @@ def is_flag_double(obj):
     return issubclass(obj, FlagDoubleMixin)
 
 
-# TODO: Enum to check if there are any duplicated value  pylint: disable=fixme
-
-
 class FlagMixin:  # pylint: disable=too-few-public-methods
     """Base class of a ``Flag``."""
 
@@ -86,6 +91,10 @@ class FlagCodeMixin(FlagMixin):
         return obj
 
     def __init__(self, code: int):
+        # noinspection PyTypeChecker
+        if code in [v.code for v in self.__class__]:
+            raise DuplicatedCodeError(code)
+
         self._code = code
 
     def __int__(self):

@@ -1,4 +1,5 @@
 from extutils.flags import (
+    DuplicatedCodeError,
     FlagCodeEnum, FlagSingleEnum, FlagDoubleEnum, FlagPrefixedDoubleEnum,
     is_flag_instance, is_flag_class, is_flag_single, is_flag_double
 )
@@ -87,6 +88,19 @@ class TestFlagMisc(TestCase):
         self.assertFalse(CodeSingleEnum.contains(CodeDoubleEnum.A))
         self.assertFalse(CodeSingleEnum.contains(CodePrefixedDoubleEnum.A))
         self.assertFalse(CodeDoubleEnum.contains(CodePrefixedDoubleEnum.A))
+
+    def test_enum_duplicated_code(self):
+        with self.assertRaises(DuplicatedCodeError):
+            # noinspection PyPep8Naming
+            class _(FlagCodeEnum):
+                A = 1
+                B = 1
+
+    def test_enum_duplicated_key(self):
+        # noinspection PyPep8Naming
+        class _(FlagSingleEnum):
+            A = 1, "A"
+            B = 2, "A"
 
 
 class TestFlagCodeEnum(TestCase):
