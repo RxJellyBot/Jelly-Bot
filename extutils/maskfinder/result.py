@@ -1,8 +1,14 @@
+"""
+Result implementations of the service US mask finder.
+"""
 from dataclasses import dataclass
 
 
 @dataclass
-class Result:
+class MaskFindingResult:
+    """
+    Mask finding result body class.
+    """
     name: str
     product_name: str
     amount: int
@@ -12,7 +18,12 @@ class Result:
 
     @property
     def name_str(self) -> str:
+        """
+        Get the name of the product.
+
+        :return: name of the product.
+        """
         if self.time:
             return f"{self.name} ({self.time})"
-        else:
-            return self.name
+
+        return self.name

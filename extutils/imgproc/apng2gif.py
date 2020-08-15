@@ -1,5 +1,8 @@
+"""
+Module to convert ``apng`` to ``gif``.
+"""
 import io
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from fractions import Fraction
 import os
 import shutil
@@ -12,10 +15,77 @@ from PIL import Image
 
 from .apng2png import extract_frames
 
-__all__ = ["convert", "ConvertResult"]
+__all__ = ["convert", "ConvertResult", "ConvertOpResult"]
 
 _IDX_CLR_BACKGROUND = 255
 _IDX_CLR_TRANSPARENT = 255
+
+
+class ConvertOpResult:
+    """
+    Result of an operation during the conversion.
+    """
+
+    def __init__(self):
+        self._success = False
+        self._duration = 0.0
+        self._exception = None
+        self._locked = False
+
+    def _check_lock(self):
+        if self._locked:
+            raise ValueError(f"The operation is completed. (success={self._success})")
+
+    def set_success(self, duration: float):
+        """
+        Set the convert operation as success. Also set the operation execution duration.
+
+        :param duration: duration of the operation
+        """
+        self._check_lock()
+
+        self._success = True
+        self._duration = duration
+        self._locked = True
+
+    def set_failure(self, exception: Optional[Exception] = None):
+        """
+        Set the convert operation as failed. Also set the exception raised if any.
+
+        :param exception: exception raised causing the failure
+        """
+        self._check_lock()
+
+        self._success = False
+        self._exception = exception
+        self._locked = True
+
+    @property
+    def success(self) -> bool:
+        """
+        Check if the operation succeed.
+
+        :return: if the operation succeed
+        """
+        return self._success
+
+    @property
+    def duration(self) -> float:
+        """
+        Get the time spent on operation in seconds.
+
+        :return: time spent on operation in seconds
+        """
+        return self._duration
+
+    @property
+    def exception(self) -> Optional[Exception]:
+        """
+        Get the raised exception (if any).
+
+        :return: raised exception (if any)
+        """
+        return self._exception
 
 
 @dataclass
@@ -27,33 +97,34 @@ class ConvertResult:
     """
     input_exists: bool = True
 
-    frame_extracted: bool = False
-    frame_extraction_duration: float = 0.0
-    frame_extraction_exception: Optional[Exception] = None
-
-    frame_zipped: bool = False
-    frame_zipping_time: float = 0.0
-    frame_zipping_exception: Optional[Exception] = None
-
-    image_data_acquired: bool = False
-    image_data_acquisition_duration: float = 0.0
-
-    gif_merged: bool = False
-    gif_merge_duration: float = 0.0
+    frame_extraction: ConvertOpResult = field(default_factory=ConvertOpResult)
+    frame_zipping: ConvertOpResult = field(default_factory=ConvertOpResult)
+    image_data_collation: ConvertOpResult = field(default_factory=ConvertOpResult)
+    gif_merging: ConvertOpResult = field(default_factory=ConvertOpResult)
 
     @property
-    def succeed(self):
-        if not self.input_exists or self.frame_extraction_exception:
+    def succeed(self) -> bool:
+        """
+        Check if the conversion succeed.
+
+        :return: if the conversion succeed
+        """
+        if not self.input_exists or self.frame_extraction.exception:
             return False
 
-        return self.frame_extracted and self.image_data_acquired and self.gif_merged
+        return self.frame_extraction.success and self.image_data_collation.success and self.gif_merging.success
 
     @property
     def time_spent(self):
-        return self.frame_extraction_duration \
-               + self.frame_zipping_time \
-               + self.image_data_acquisition_duration \
-               + self.gif_merge_duration  # noqa: E126,E127
+        """
+        Get the total time spent on converting the image.
+
+        :return: conversion total time spent
+        """
+        return self.frame_extraction.duration \
+               + self.frame_zipping.duration \
+               + self.image_data_collation.duration \
+               + self.gif_merging.duration  # noqa: E126,E127
 
 
 def _get_file_name(file_path: str) -> str:
@@ -82,11 +153,10 @@ def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tupl
     try:
         ret = extract_frames(file_path)
     except Exception as ex:
-        result.frame_extraction_exception = ex
-        return
+        result.frame_extraction.set_failure(ex)
+        return None
 
-    result.frame_extraction_duration = time.time() - _start
-    result.frame_extracted = True
+    result.frame_extraction.set_success(time.time() - _start)
 
     return ret
 
@@ -106,16 +176,15 @@ def _zip_frames(result: ConvertResult, apng_path: str, frame_data: List[Tuple[by
     out_name = _get_file_name(output_path)
 
     try:
-        with ZipFile(os.path.join(os.path.dirname(output_path), f"{out_name}-frames.zip"), "w") as f:
+        with ZipFile(os.path.join(os.path.dirname(output_path), f"{out_name}-frames.zip"), "w") as zip_file:
             for idx, data in enumerate(frame_data, start=1):
                 frame, _ = data
-                f.writestr(f"{apng_name}-{idx:02d}.png", frame)
+                zip_file.writestr(f"{apng_name}-{idx:02d}.png", frame)
     except Exception as ex:
-        result.frame_zipping_exception = ex
+        result.frame_zipping.set_failure(ex)
         return
 
-    result.frame_zipping_time = time.time() - _start
-    result.frame_zipped = True
+    result.frame_zipping.set_success(time.time() - _start)
 
 
 def _process_frame_transparent(image_byte: bytes):
@@ -154,12 +223,15 @@ def _get_image_data(result: ConvertResult, frame_data: List[Tuple[bytes, Fractio
     images = []
     durations = []
 
-    for image_byte, delay in frame_data:
-        images.append(_process_frame_transparent(image_byte))
-        durations.append(delay)
+    try:
+        for image_byte, delay in frame_data:
+            images.append(_process_frame_transparent(image_byte))
+            durations.append(delay)
+    except Exception as ex:
+        result.image_data_collation.set_failure(ex)
+        return [], []
 
-    result.image_data_acquisition_duration = time.time() - _start
-    result.image_data_acquired = True
+    result.image_data_collation.set_success(time.time() - _start)
 
     return images, durations
 
@@ -174,19 +246,22 @@ def _make_gif(result: ConvertResult, frame_data: List[Tuple[bytes, Fraction]], o
     """
     images, durations = _get_image_data(result, frame_data)
 
-    if not result.image_data_acquired:
+    if not result.image_data_collation.success:
         return
 
     _start = time.time()
 
     image, *images = images  # Take out the first image as the base image
 
-    image.save(output_path, format="GIF", save_all=True, append_images=images, loop=0, disposal=2,
-               transparency=_IDX_CLR_TRANSPARENT, background=_IDX_CLR_BACKGROUND,
-               optimize=True, duration=durations)
+    try:
+        image.save(output_path, format="GIF", save_all=True, append_images=images, loop=0, disposal=2,
+                   transparency=_IDX_CLR_TRANSPARENT, background=_IDX_CLR_BACKGROUND,
+                   optimize=True, duration=durations)
+    except Exception as ex:
+        result.gif_merging.set_failure(ex)
+        return
 
-    result.gif_merge_duration = time.time() - _start
-    result.gif_merged = True
+    result.gif_merging.set_success(time.time() - _start)
 
 
 def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> ConvertResult:
@@ -196,7 +271,7 @@ def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> Con
     :param apng_path: path of the apng to be converted
     :param output_path: path for the processed gif
     :param zip_frames: to zip the extracted frames
-    :returns: result of the conversion
+    :return: result of the conversion
     """
     original_dir = os.getcwd()
     result = ConvertResult()
@@ -219,7 +294,7 @@ def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> Con
         out_path = output_path if os.path.isabs(output_path) else os.path.join(original_dir, output_path)
 
         frame_data = _extract_frames(result, apng_path)
-        if result.frame_extracted:
+        if result.frame_extraction.success:
             if zip_frames:
                 _zip_frames(result, apng_path, frame_data, out_path)
 

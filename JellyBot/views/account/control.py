@@ -6,7 +6,7 @@ from JellyBot import keys
 from JellyBot.components.mixin import LoginRequiredMixin
 from JellyBot.utils import get_root_oid, get_post_keys
 from JellyBot.views import render_template, simple_str_response, simple_json_response
-from extutils.locales import locales, languages
+from extutils.locales import get_locales, get_languages
 from extutils.dt import now_utc_aware, localtime
 from extutils.gidentity import get_identity_data, IDIssuerIncorrectError
 from extutils.emailutils import MailSender
@@ -107,8 +107,8 @@ class AccountSettingsPageView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         return render_template(
             self.request, _("Account Settings"), "account/settings.html",
-            {"locale_list": sorted(locales, key=lambda item: item.description),
-             "lang_list": sorted(languages, key=lambda item: item.code),
+            {"locale_list": sorted(get_locales(), key=lambda item: item.description),
+             "lang_list": sorted(get_languages(), key=lambda item: item.code),
              "current_config": config})
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal

@@ -3,7 +3,7 @@ from typing import Dict, Tuple, Any, Type, List
 from bson import ObjectId
 
 from extutils import exec_timing_result
-from extutils.locales import default_locale, default_language, LocaleInfo
+from extutils.locales import DEFAULT_LOCALE, DEFAULT_LANGUAGE, LocaleInfo
 from flags import ModelValidityCheckResult, Platform
 from models import (
     RootUserConfigModel, Model, RootUserModel, APIUserModel, OnPlatformUserModel, ChannelModel,
@@ -26,16 +26,16 @@ class TestRootUserConfigModel(TestModel.TestClass):
     @classmethod
     def get_default(cls) -> Dict[Tuple[str, str], Tuple[Any, Any]]:
         return {
-            ("l", "Locale"): (default_locale.pytz_code, "US/Central"),
-            ("lg", "Language"): (default_language.code, "en_US"),
+            ("l", "Locale"): (DEFAULT_LOCALE.pytz_code, "US/Central"),
+            ("lg", "Language"): (DEFAULT_LANGUAGE.code, "en_US"),
             ("n", "Name"): ("", "ABCD")
         }
 
     def test_get_tzinfo(self):
         # noinspection PyArgumentEqualDefault
         mdl = self.get_constructed_model(manual_default=False)
-        self.assertEqual(LocaleInfo.get_tzinfo(default_locale.pytz_code), mdl.tzinfo)
-        self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
+        self.assertEqual(LocaleInfo.get_tzinfo(DEFAULT_LOCALE.pytz_code), mdl.tzinfo)
+        self.assertEqual(DEFAULT_LOCALE.pytz_code, mdl.pytz_code)
 
         mdl = self.get_constructed_model(manual_default=True)
         self.assertEqual(LocaleInfo.get_tzinfo("US/Central"), mdl.tzinfo)
@@ -43,7 +43,7 @@ class TestRootUserConfigModel(TestModel.TestClass):
 
         mdl = self.get_constructed_model(l="US/Centralll")  # noqa: E741
         self.assertIsNone(mdl.tzinfo)
-        self.assertEqual(default_locale.pytz_code, mdl.pytz_code)
+        self.assertEqual(DEFAULT_LOCALE.pytz_code, mdl.pytz_code)
 
 
 class TestRootUserModelFillApi(TestModel.TestClass):

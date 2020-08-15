@@ -1,8 +1,10 @@
+"""
+Main ``Flag`` implementations.
+"""
 from enum import Enum
 from typing import Union
 
 from .mongo import register_encoder
-
 
 __all__ = [
     "FlagCodeEnum", "FlagSingleEnum", "FlagDoubleEnum", "FlagPrefixedDoubleEnum", "FlagOutcomeMixin",
@@ -11,32 +13,77 @@ __all__ = [
 
 
 def is_flag_instance(inst):
+    """
+    Check if the instance ``inst`` is a ``Flag``.
+
+    :param inst: instance to be checked
+    :return: if `inst` is a `Flag`
+    """
     return isinstance(inst, FlagCodeMixin)
 
 
-def is_flag_class(cls):
-    return issubclass(cls, FlagCodeMixin)
+def is_flag_class(obj):
+    """
+    Check if the object ``obj`` is a class of :class:`FlagCodeMixin`.
+
+    :param obj: object to be checked
+    :return: if `obj` is a `FlagCodeMixin`
+    """
+    return issubclass(obj, FlagCodeMixin)
 
 
-def is_flag_single(cls):
-    return issubclass(cls, FlagSingleMixin)
+def is_flag_single(obj):
+    """
+    Check if the object ``obj`` is a class of :class:`FlagSingleMixin`.
+
+    :param obj: object to be checked
+    :return: if `obj` is a `FlagSingleMixin`
+    """
+    return issubclass(obj, FlagSingleMixin)
 
 
-def is_flag_double(cls):
-    return issubclass(cls, FlagDoubleMixin)
+def is_flag_double(obj):
+    """
+    Check if the object ``obj`` is a class of :class:`FlagDoubleMixin`.
+
+    :param obj: object to be checked
+    :return: if `obj` is a `FlagDoubleMixin`
+    """
+    return issubclass(obj, FlagDoubleMixin)
 
 
-class FlagMixin:
+# TODO: Enum to check if there are any duplicated value  pylint: disable=fixme
+
+
+class FlagMixin:  # pylint: disable=R0903
+    """
+    Base class of a ``Flag``.
+    """
+
     @classmethod
     def default(cls):
         """
-        :raises ValueError: if not defined
+        Default value of the ``Flag``.
+
+        :raises ValueError: if not defined but used
         """
         raise ValueError(f"Default in {cls.__qualname__} not implemented.")
 
 
 class FlagCodeMixin(FlagMixin):
-    def __new__(cls, *args, **kwargs):
+    """
+    Implementation of the ``Flag`` with a ``code`` (:class:`int`) only.
+
+    Example:
+
+    >>> class FlagCodeSample(FlagCodeMixin):
+    >>>     A = 1
+    >>>     B = 2
+
+    where ``1`` and ``2`` are the ``code``.
+    """
+
+    def __new__(cls, *args):
         register_encoder(cls)
         obj = object.__new__(cls)
         obj._value_ = args[0]
@@ -63,13 +110,15 @@ class FlagCodeMixin(FlagMixin):
     def __eq__(self, other):
         if isinstance(other, int):
             return self.code == other
-        elif isinstance(other, str):
+
+        if isinstance(other, str):
             if other.isnumeric():
                 return self.code == int(other)
-            elif hasattr(self, "name"):
+
+            if hasattr(self, "name"):
                 return self.name == other
-            else:
-                return self.code_str == other
+
+            return self.code_str == other
 
         return super().__eq__(other)
 
@@ -78,18 +127,29 @@ class FlagCodeMixin(FlagMixin):
 
     def _cmp(self, other) -> int:
         if isinstance(other, self.__class__):
-            return self._code - other._code
-        elif isinstance(other, int):
+            return self._code - other.code
+
+        if isinstance(other, int):
             return self._code - other
-        else:
-            raise TypeError(f"Not comparable. ({type(self).__qualname__} & {type(other).__qualname__})")
+
+        raise TypeError(f"Not comparable. ({type(self).__qualname__} & {type(other).__qualname__})")
 
     @property
     def code(self) -> int:
+        """
+        Get the code of the flag member.
+
+        :return: code of the flag member
+        """
         return self._code
 
     @property
     def code_str(self) -> str:
+        """
+        Get the code of the flag member as a :class:`str`.
+
+        :return: code of the enum memebr as a string
+        """
         return f"{self._code}"
 
     # noinspection PyUnresolvedReferences
@@ -101,12 +161,29 @@ class FlagCodeMixin(FlagMixin):
 
 
 class FlagSingleMixin(FlagCodeMixin):
+    """
+    Implementation of the ``Flag`` with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
+
+    Example:
+
+    >>> class FlagSingleSample(FlagSingleMixin):
+    >>>     A = 1, "ONE"
+    >>>     B = 2, "TWO"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``.
+    """
+
     def __init__(self, code: int, key: str):
         super().__init__(code)
         self._key = key
 
     @property
     def key(self):
+        """
+        Get the key of the flag member.
+
+        :return: key of the flag member
+        """
         return self._key
 
     # noinspection PyUnresolvedReferences
@@ -115,23 +192,38 @@ class FlagSingleMixin(FlagCodeMixin):
 
 
 class FlagDoubleMixin(FlagSingleMixin):
+    """
+    Implementation of the ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
+    and a ``description`` (:class:`str`).
+
+    Example:
+
+    >>> class FlagDoubleSample(FlagDoubleMixin):
+    >>>     A = 1, "ONE", "11"
+    >>>     B = 2, "TWO", "22"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``
+    and ``"11"``, ``"22"`` are the ``description``.
+    """
+
     def __init__(self, code: int, key: str, description: str):
         super().__init__(code, key)
         self._desc = description
 
     @property
     def description(self):
-        return self._desc
+        """
+        Get the description of the flag member.
 
-    @property
-    def code_str(self) -> str:
-        return f"{self._code}"
+        :return: description of the flag member
+        """
+        return self._desc
 
     def __eq__(self, other):
         if isinstance(other, str):
-            eq = self.code_str == other
-            if eq:
-                return eq
+            code_str_same = self.code_str == other
+            if code_str_same:
+                return True
 
             if other.isnumeric():
                 return self.code == int(other)
@@ -143,17 +235,48 @@ class FlagDoubleMixin(FlagSingleMixin):
 
 
 class FlagPrefixedDoubleMixin(FlagDoubleMixin):
+    # noinspection PyAbstractClass,PyUnresolvedReferences
+    """
+    Implementation of the ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
+    and a ``description`` (:class:`str`).
+
+    The ``code`` is prefixed by implementing the property ``code_prefix``.
+
+    Example:
+
+    >>> class FlagPrefixedDoubleSample(FlagPrefixedDoubleMixin):
+    >>>     A = 1, "ONE", "11"
+    >>>     B = 2, "TWO", "22"
+    >>>
+    >>> @property
+    >>> def code_prefix(self) -> str:
+    >>>     return "P-"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``
+    and ``"11"``, ``"22"`` are the ``description``.
+
+    The result of ``code`` and ``code_str`` will be different:
+
+    >>> > FlagPrefixedDoubleSample.A.code
+    >>> 1
+    >>> > FlagPrefixedDoubleSample.A.code_str
+    >>> "P-1"
+    """
+
     def __init__(self, code: int, key: str, description: str):
         super().__init__(code, key, description)
         self._desc = description
 
     @property
     def code_prefix(self) -> str:
-        raise NotImplementedError()
+        """
+        Code prefix of this :class:`FlagPrefixedDoubleMixin`.
 
-    @property
-    def description(self) -> str:
-        return self._desc
+        This will be prefixed to code if getting the code by calling ``code``.
+
+        :return: code prefix of this class
+        """
+        raise NotImplementedError()
 
     @property
     def code_str(self) -> str:
@@ -162,22 +285,24 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
     def __hash__(self):
         return hash((self.__class__, self._code))
 
-    def __eq__(self, other):
-        return super().__eq__(other)
-
 
 class FlagEnumMixin:
+    """
+    Mixin for some extend enum functionality.
+    """
+
     @classmethod
     def cast(cls, item: Union[str, int], *, silent_fail=False):
         """
         Cast ``item`` to the corresponding :class:`FlagEnumMixin`.
-        ``item`` can only be either :class:`str` or :class:`int`.
 
-        :param item: The item to be casted. Can be the name or the code of the enum.
-        :param silent_fail: Indicate if this function should throw an error if casting failed.
-        :return: Casted enum.
-        :exception TypeError: The type of the `item` does not match the type which can be casted.
-        :exception ValueError: The value does not match any of the element in the enum.
+        ``item`` can only be either ``code`` (:class:`str`) or ``name`` (:class:`int`).
+
+        :param item: item to be casted
+        :param silent_fail: if this function should fail silently
+        :return: casted enum/flag
+        :exception TypeError: invalid type of the `item`
+        :exception ValueError: ``item`` does not match any element of this enum/flag
         """
         if isinstance(item, cls):
             return item
@@ -192,11 +317,17 @@ class FlagEnumMixin:
 
         if silent_fail:
             return None
-        else:
-            raise ValueError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
+
+        raise ValueError(f"`{cls.__qualname__}` casting failed. Item: {item} Type: {type(item)}")
 
     @classmethod
     def contains(cls, item):
+        """
+        Check if ``item`` is a member of this :class:`FlagEnumMixin`.
+
+        :param item: item to check the membership
+        :return: if `item` is the member of this `FlagEnumMixin`
+        """
         if not type(item) in (str, int, cls):
             return False
 
@@ -209,24 +340,99 @@ class FlagEnumMixin:
 
 
 class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):
-    pass
+    """
+    Actual class to be used to implement a flag with a ``code`` only.
+
+    Example:
+
+    >>> class FlagCodeSample(FlagCodeEnum):
+    >>>     A = 1
+    >>>     B = 2
+
+    where ``1`` and ``2`` are the ``code``.
+    """
 
 
 class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
-    pass
+    """
+    Actual class to be used to implement a flag with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
+
+    Example:
+
+    >>> class FlagSingleSample(FlagSingleEnum):
+    >>>     A = 1, "ONE"
+    >>>     B = 2, "TWO"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``.
+    """
 
 
 class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
-    pass
+    """
+    Actual class to be used to implement a flag with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
+    and a ``description`` (:class:`str`).
+
+    Example:
+
+    >>> class FlagDoubleSample(FlagDoubleEnum):
+    >>>     A = 1, "ONE", "11"
+    >>>     B = 2, "TWO", "22"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``
+    and ``"11"``, ``"22"`` are the ``description``.
+    """
 
 
 class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
+    # noinspection PyAbstractClass
+    """
+    Actual class to be used to implement a flag with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
+    and a ``description`` (:class:`str`).
+
+    The ``code`` is prefixed by implementing the property ``code_prefix``.
+
+    Example:
+
+    >>> class FlagPrefixedDoubleSample(FlagPrefixedDoubleEnum):
+    >>>     A = 1, "ONE", "11"
+    >>>     B = 2, "TWO", "22"
+    >>>
+    >>> @property
+    >>> def code_prefix(self) -> str:
+    >>>     return "P-"
+
+    where ``1`` and ``2`` are the ``code`` and ``"ONE"``, ``"TWO"`` are the ``key``
+    and ``"11"``, ``"22"`` are the ``description``.
+
+    The result of ``code`` and ``code_str`` will be different:
+
+    >>> > FlagPrefixedDoubleSample.A.code
+    >>> 1
+    >>> > FlagPrefixedDoubleSample.A.code_str
+    >>> "P-1"
+    """
+
     @property
     def code_prefix(self) -> str:
         raise NotImplementedError()
 
 
 class FlagOutcomeMixin(FlagCodeMixin):
+    """
+    A special implementation which have the same functionality as :class:`FlagCodeEnum`,
+    but with an additional property ``is_success``.
+
+    Successive outcome code should have a positive value as ``code``.
+    In contrast, the failing outcome code should have a negative value as ``code``.
+
+    ``0`` is considered successive.
+    """
+
     @property
     def is_success(self):
+        """
+        Check if the outcome is success.
+
+        :return: if the outcome is success
+        """
         return self._code < 0

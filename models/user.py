@@ -4,7 +4,7 @@ from bson import ObjectId
 from cachetools import TTLCache
 
 from models.exceptions import FieldKeyNotExistError
-from extutils.locales import default_locale, default_language, LocaleInfo
+from extutils.locales import DEFAULT_LOCALE, DEFAULT_LANGUAGE, LocaleInfo
 from JellyBot.systemconfig import DataQuery
 from flags import ModelValidityCheckResult, Platform
 
@@ -15,8 +15,8 @@ from .field import PlatformField, TextField, ArrayField, ObjectIDField, ModelFie
 class RootUserConfigModel(Model):
     WITH_OID = False
 
-    Locale = TextField("l", default=default_locale.pytz_code, allow_none=False)
-    Language = TextField("lg", default=default_language.code, allow_none=False)
+    Locale = TextField("l", default=DEFAULT_LOCALE.pytz_code, allow_none=False)
+    Language = TextField("lg", default=DEFAULT_LANGUAGE.code, allow_none=False)
     Name = TextField("n", allow_none=False)
 
     @property
@@ -26,7 +26,7 @@ class RootUserConfigModel(Model):
         if tzinfo:
             return tzinfo.tzidentifier
         else:
-            return default_locale.pytz_code
+            return DEFAULT_LOCALE.pytz_code
 
     @property
     def tzinfo(self):

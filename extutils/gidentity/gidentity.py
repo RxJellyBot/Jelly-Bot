@@ -1,3 +1,6 @@
+"""
+Module containing various operations related to Google Identity.
+"""
 import os
 import sys
 
@@ -19,12 +22,19 @@ if CLIENT_ID is None:
 
 
 class IDIssuerIncorrectError(Exception):
+    """
+    Raised if the ID issuer of the google identity data is not accounts.google.com.
+    """
+
     def __init__(self, issuer):
         super().__init__(f'ID issuer is not accounts.google.com. ({issuer})')
 
 
 @dataclass
 class GoogleIdentityUserData:
+    """
+    Class for a Google Identity user data.
+    """
     aud: str
     issuer: str
     uid: str
@@ -37,6 +47,12 @@ class GoogleIdentityUserData:
 
 
 def get_identity_data(token) -> GoogleIdentityUserData:
+    """
+    Get the google user idendity data.
+
+    :param token: token acquired from Google login
+    :return: a parsed `GoogleIdentityUserData`
+    """
     google_data = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
 
     id_data = GoogleIdentityUserData(google_data["aud"], google_data["iss"], google_data["sub"], google_data["email"])

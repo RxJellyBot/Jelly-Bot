@@ -7,6 +7,8 @@ Module to extract the frames of APNG **without** constraint violation checking.
     https://github.com/tonix0114/apng-splitter
 """
 
+# pylint: disable=C0103
+
 from abc import ABC
 import binascii
 from fractions import Fraction
@@ -20,7 +22,7 @@ from PIL import Image
 
 __all__ = ["extract_frames"]
 
-png_signature = b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"
+SIGNATURE_PNG = b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"
 
 
 class _Dispose(Enum):
@@ -55,6 +57,12 @@ class _BaseChunk:
 
     @staticmethod
     def from_bytes(data: bytes) -> '_BaseChunk':
+        """
+        Make a :class:`_BaseChunk` from :class:`bytes`.
+
+        :param data: data to construct the chunk
+        :return: constructed `_BaseChunk`
+        """
         chunk_length: int = struct.unpack('>I', data[:4])[0]
         chunk_data = data[:4]
         data = data[4:]
@@ -84,26 +92,49 @@ class _BaseChunk:
         """
         return self.data[8:-4]
 
-    def to_chunk_class(self) -> Union['_DataChunkIHDR', '_DataChunkacTL', '_DataChunkIDAT', '_DataChunkIEND',
-                                      '_DataChunkfcTL', '_DataChunkfdAT', '_DataChunkOther']:
-        if self.type_raw == "IHDR":
-            return _DataChunkIHDR(self)
-        elif self.type_raw == "acTL":
-            return _DataChunkacTL(self)
-        elif self.type_raw == "IDAT":
-            return _DataChunkIDAT(self)
-        elif self.type_raw == "IEND":
-            return _DataChunkIEND(self)
-        elif self.type_raw == "fcTL":
-            return _DataChunkfcTL(self)
-        elif self.type_raw == "fdAT":
-            return _DataChunkfdAT(self)
-        else:
-            return _DataChunkOther(self)
+    def to_chunk_class(self) -> Union['_DataChunkIHDR', '_DataChunkacTL', '_DataChunkIDAT', '_DataChunkfcTL',
+                                      '_DataChunkfdAT', '_DataChunkIEND', '_DataChunkOther']:
+        """
+        Convert this :class:`_BaseChunk` to its corresponding chunk class.
+
+        Currently supported chunk types:
+        - ``IHDR`` - :class`_DataChunkIHDR`
+
+        - ``acTL`` - :class`_DataChunkacTL`
+
+        - ``IDAT`` - :class`_DataChunkIDAT`
+
+        - ``fcTL`` - :class`_DataChunkfcTL`
+
+        - ``fdAT`` - :class`_DataChunkfdAT`
+
+        - ``IEND`` - :class`_DataChunkIEND`
+
+        Types which are not yet supported will be converted to :class:`_DataChunkOther`.
+
+        :return: data chunk class corresponding to its type
+        """
+        convert_dict = {
+            "IHDR": _DataChunkIHDR,
+            "acTL": _DataChunkacTL,
+            "IDAT": _DataChunkIDAT,
+            "fcTL": _DataChunkfcTL,
+            "fdAT": _DataChunkfdAT,
+            "IEND": _DataChunkIEND,
+        }
+
+        chuck_cls: type = convert_dict.get(self.type_raw, _DataChunkOther)
+
+        return chuck_cls(self)
 
 
 @dataclass
 class _DataChunkBase(ABC):
+    """
+    Base data chunk class.
+
+    Inherit this class for specific type of data chunk for extended utility.
+    """
     base_chunk: _BaseChunk
 
     length: int = field(init=False)
@@ -127,6 +158,9 @@ class _DataChunkBase(ABC):
 
 @dataclass
 class _DataChunkIHDR(_DataChunkBase):
+    """
+    Data class of ``IHDR`` chunk.
+    """
     width: int = field(init=False)
     height: int = field(init=False)
 
@@ -136,6 +170,13 @@ class _DataChunkIHDR(_DataChunkBase):
         self.width, self.height = struct.unpack(">II", self.pure_data[0:8])
 
     def replace_resolution(self, new_width: int, new_height: int) -> '_DataChunkIHDR':
+        """
+        Replace the resolution of ``IHDR`` chunk, then generate a new ``IHDR`` chunk and return it.
+
+        :param new_width: new width of the image
+        :param new_height: new height of the image
+        :return: newly generated `IHDR` chunk with the new resolutions
+        """
         new_data = struct.pack(">II", new_width, new_height) + self.pure_data[8:]
 
         return _DataChunkIHDR(_BaseChunk.make_chunk("IHDR", new_data))
@@ -143,6 +184,9 @@ class _DataChunkIHDR(_DataChunkBase):
 
 @dataclass
 class _DataChunkacTL(_DataChunkBase):
+    """
+    Data class of ``acTL`` chunk.
+    """
     frame_count: int = field(init=False)
 
     def __post_init__(self):
@@ -153,21 +197,32 @@ class _DataChunkacTL(_DataChunkBase):
 
 @dataclass
 class _DataChunkIDAT(_DataChunkBase):
-    pass
+    """
+    Data class of ``IDAT`` chunk.
+    """
 
 
 @dataclass
 class _DataChunkIEND(_DataChunkBase):
-    pass
+    """
+    Data class of ``IEND`` chunk.
+    """
 
 
 @dataclass
 class _DataChunkOther(_DataChunkBase):
-    pass
+    """
+    Data class for not-yet-supported data chunk.
+    """
 
 
 @dataclass
 class _DataChunkfcTL(_DataChunkBase):
+    """
+    Data class of ``fcTL`` chunk.
+    """
+    # pylint: disable=R0902
+
     seq_num: int = field(init=False)
     width: int = field(init=False)
     height: int = field(init=False)
@@ -190,13 +245,28 @@ class _DataChunkfcTL(_DataChunkBase):
 
     # noinspection PyPep8Naming
     def generate_IHDR(self, IHDR: _DataChunkIHDR) -> _DataChunkIHDR:
+        """
+        Generate a new ``IHDR`` chunk using the resolutions encoded in this chunk.
+
+        :param IHDR: Original `_DataChunkIHDR` to be used to generate a new `IHDR` chunk
+        :return: new `IHDR` chunk with the resolutions defined in this chunk
+        """
         return IHDR.replace_resolution(self.width, self.height)
 
 
 @dataclass
 class _DataChunkfdAT(_DataChunkBase):
+    """
+    Data class of ``fdAT`` chunk.
+    """
+
     # noinspection PyPep8Naming
-    def to_IDAT(self):
+    def to_IDAT(self) -> _DataChunkIDAT:
+        """
+        Convert this chunk to be an ``IDAT` chunk.
+
+        :return: a converted `_DataChunkIDAT` instance
+        """
         # Skipping 4 B because it's frame number
         return _DataChunkIDAT(_BaseChunk.make_chunk("IDAT", self.base_chunk.pure_data[4:]))
 
@@ -215,7 +285,7 @@ def _parse_chunks(data) -> Generator[_BaseChunk, None, None]:
 def _create_image_bytes(IHDR: _DataChunkIHDR, fcTL: _DataChunkfcTL,
                         fdAT_IDAT: Union[_DataChunkfdAT, _DataChunkIDAT], IEND: _DataChunkIEND):
     # Append signature
-    image_data = png_signature
+    image_data = SIGNATURE_PNG
 
     # Append new header by size info from fcTC
     image_data += fcTL.generate_IHDR(IHDR).data
@@ -240,8 +310,10 @@ def extract_frames(apng_path: str) -> List[Tuple[bytes, Fraction]]:
     Returns a 2-tuple containing the byte data of a frame and its delay.
 
     :param apng_path: path of the apng file to be extracted
-    :returns: list of 2-tuple containing frame byte data and its delay
+    :return: list of 2-tuple containing frame byte data and its delay
     """
+    # pylint: disable=R0914
+
     with open(apng_path, "rb") as f:
         data = f.read()
 
@@ -255,7 +327,7 @@ def extract_frames(apng_path: str) -> List[Tuple[bytes, Fraction]]:
 
     image_data_prev = None
 
-    for count, idx in enumerate(range(2, 2 + (acTL.frame_count * 2), 2), start=1):
+    for idx in range(2, 2 + (acTL.frame_count * 2), 2):
         if image_data_prev:
             fcTL = chunk[idx - 4]
             fdAT_IDAT = chunk[idx - 3]

@@ -1,3 +1,6 @@
+"""
+Module containing various operations related to :class:`datetime`.
+"""
 import math
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta, tzinfo, time
@@ -10,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 def now_utc_aware(*, for_mongo: bool = False) -> datetime:
     """
-    Return the current tz-aware :class:`datetime` with its timezone set to :class:`pytz.UTC`.
+    Returns current tz-aware :class:`datetime` with its timezone set to :class:`pytz.UTC`.
 
     -----
 
@@ -41,10 +44,40 @@ def now_utc_aware(*, for_mongo: bool = False) -> datetime:
 
 
 def localtime(dt: datetime = None, tz: timezone = None):
+    """
+    Localize datetime ``dt`` with timezome ``tz``.
+
+    Note that ``dt`` **NEEDS** to be tz-aware first.
+
+    If ``dt`` is ``None``, the time when this method is being called will be used.
+
+    If ``tz`` is ``None``, the timezone of the current session (fallback: UTC) will be used.
+
+    This method calls the ``django.utils.timezone.localtime()``.
+
+    :param dt: `datetime` to be localized
+    :param tz: timezone to be used to localize `tz`
+    :return: localized (tz-aware) `datetime`
+    """
     return timezone.localtime(dt, tz)
 
 
-def make_tz_aware(dt: datetime, tz: timezone = None):
+def make_tz_aware(dt: datetime, tz: timezone = None) -> datetime:
+    """
+    Make a tz-naive datetime ``dt`` to be tz-aware using the timezone ``tz``.
+
+    If ``dt`` is already tz-aware, ``dt`` will be directly returned without any modifications.
+    That is, even if ``tz`` is not as same as the timezone on ``dt``,
+    the returnd ``dt`` will still has its original timezone.
+
+    If ``tz`` is ``None``, the timezone of the current session (fallback: UTC) will be used.
+
+    This method calls the ``django.utils.timezone.make_aware()``.
+
+    :param dt: `datetime` to be tz-aware
+    :param tz: timezone to be used on `dt`
+    :return: a tz-aware datetime localized by `tz`
+    """
     if not is_tz_naive(dt):
         return dt
 
@@ -55,6 +88,14 @@ def make_tz_aware(dt: datetime, tz: timezone = None):
 
 
 def is_tz_naive(dt: datetime) -> bool:
+    """
+    Check if ``dt`` is tz-naive.
+
+    This method calls the ``django.utils.timezone.is_naive()``.
+
+    :param dt: `datetime` to be checked
+    :return: if `dt` is tz-naive
+    """
     try:
         return timezone.is_naive(dt)
     except OverflowError:
@@ -65,25 +106,38 @@ def is_tz_naive(dt: datetime) -> bool:
         return False
 
 
-def t_delta_str(t_delta: timedelta):
+def t_delta_str(t_delta: timedelta) -> str:
+    """
+    Convert a :class:`timedelta` ``t_delta`` to :class:`str`.
+
+    Will display days separately if the length of ``t_delta`` is > 3 days.
+
+    :param t_delta: `timedelta` to be converted
+    :return: a `str` representing `t_delta`
+    """
+    # pylint: disable=C0103
     h = t_delta.seconds // 3600
     m = (t_delta.seconds - 3600 * h) // 60
     s = t_delta.seconds % 60
 
     if t_delta.days > 3:
-        return _("{} Days {} H {:02} M {:02} S").format(t_delta.days, h, m, s)
-    else:
-        h += t_delta.days * 24
-        return _("{} H {:02} M {:02} S").format(h, m, s)
+        return _("%d Days %d H %02d M %02d S") % (t_delta.days, h, m, s)
+
+    h += t_delta.days * 24
+    return _("%d H %02d M %02d S") % (h, m, s)
 
 
 def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:
     """
     Parse ``dt_str`` to a tz-aware :class:`datetime`.
 
-    :param dt_str: `str` to be parsed.
-    :param tzinfo_: tzinfo to be applied to the datetime. Uses UTC if not provided.
-    :return: `None` if the parsing failed. Otherwise, timezone-aware `datetime`.
+    If ``tzinfo_`` is not specified, defaults to :class:`timezone.utc` instead.
+
+    Returns ``None`` if the parsing failed.
+
+    :param dt_str: a datetime string to be parsed
+    :param tzinfo_: tzinfo to be applied to the datetime
+    :return: parsed tz-aware `datetime`
     """
     if not dt_str:
         return None
@@ -101,13 +155,20 @@ def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datet
     return dt
 
 
-def time_to_seconds(t: time) -> float:
-    """Convert `t` to second past in a day."""
-    return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond * 1E-6
+def time_to_seconds(time_: time) -> float:
+    """
+    Convert :class:`time` ``t_`` to seconds past from 00:00:00.
+
+    :param time_: `time` to be converted
+    :return: seconds past from 00:00:00
+    """
+    return time_.hour * 3600 + time_.minute * 60 + time_.second + time_.microsecond * 1E-6
 
 
 class TimeRangeEndBeforeStart(Exception):
-    pass
+    """
+    Raised if the ending time of :class:`TimeRange` happens before the starting time.
+    """
 
 
 @dataclass
@@ -134,11 +195,11 @@ class TimeRange:
     tzinfo_: Optional[tzinfo] = None
     end_autofill_now: InitVar[bool] = True
 
-    def _localize(self, dt: Optional[datetime]):
-        if dt:
-            return localtime(make_tz_aware(dt, self.tzinfo_), self.tzinfo_)
-        else:
+    def _localize(self, dt: Optional[datetime]) -> Optional[datetime]:
+        if not dt:
             return None
+
+        return localtime(make_tz_aware(dt, self.tzinfo_), self.tzinfo_)
 
     def _fill_start_end(self, now: datetime, range_hr: int, end_autofill_now: bool):
         if self.start and self.end:
@@ -178,40 +239,65 @@ class TimeRange:
     @property
     def hr_length_org(self) -> float:
         """
-        Time range length BEFORE applying range multiplier(`range_mult`).
+        Length of this :class:`TimeRange` in hours **BEFORE** applying range multiplier (``range_mult``).
 
-        If `end` not set, uses now as the `end`.
+        If ``end`` not set for this :class:`TimeRange`, uses the method calling time as the ``end``.
+
+        :return: time length of this `TimeRange` before applying range multiplier (`range_mult`)
         """
         if self.start_org and self.end:
             return (self.end - self.start_org).total_seconds() / 3600
-        elif self.start_org:
+
+        if self.start_org:
             return (now_utc_aware() - self.start_org).total_seconds() / 3600
-        else:
-            return math.inf
+
+        return math.inf
 
     @property
     def hr_length(self) -> float:
         """
-        Time range length AFTER applying range multiplier(`range_mult`).
+        Length of this :class:`TimeRange` in hours **AFTER** applying range multiplier (``range_mult``).
 
-        If `end` not set, uses now as the `end`.
+        If ``end`` not set for this :class:`TimeRange`, uses the method calling time as the ``end``.
+
+        :return: time length of this `TimeRange` after applying range multiplier (`range_mult`)
         """
         if self.start and self.end:
             return (self.end - self.start).total_seconds() / 3600
-        elif self.start:
+
+        if self.start:
             return (now_utc_aware() - self.start).total_seconds() / 3600
-        else:
-            return math.inf
+
+        return math.inf
 
     @property
     def expandable(self) -> bool:
+        """
+        Check if this :class:`TimeRange` is expandable.
+
+        :return: if this `TimeRange` is expandable
+        """
         return self.start is not None and self.end is not None
 
     @property
     def expanded(self) -> bool:
+        """
+        Check if this :class:`TimeRange` is expanded.
+
+        :return: if this `TimeRange` is expanded
+        """
         return self.expandable and self.start != self.start_org
 
     def get_periods(self) -> List['TimeRange']:
+        """
+        Get the periods in terms of :class:`TimeRange`
+        using the time length before applying range multiplier (``range_mult``).
+
+        If the length is infinitely long,
+        returns a list containing this :class:`TimeRange` only (the instance itself).
+
+        :return: list of `TimeRange` with the same length
+        """
         if self.hr_length_org <= 0 or self.is_inf:
             return [self]
 
@@ -231,29 +317,42 @@ class TimeRange:
         return ret
 
     def set_start_day_offset(self, offset_days: int):
-        """Offset `start` by `offset_days` days. Overwrites `start_org` to be the `start` before offsetting."""
+        """
+        Offset ``start`` by ``offset_days`` days.
+
+        Overwrites ``start_org`` to be the ``start`` before offsetting.
+
+        :param offset_days: days length to offset `start`
+        """
         if self.start:
             self.start_org = self.start
             self.start = self.start + timedelta(days=offset_days)
 
     @property
-    def is_inf(self):
-        """Indicate if this time range is infinity (either one side of the range or both are not set)."""
+    def is_inf(self) -> bool:
+        """
+        Check if the length of this time range is infinity (either one side of the range or both are not set).
+
+        :return: if this time range is infinitely long
+        """
         return self.start is None or self.end is None
 
     @property
-    def expr_period_short(self):
+    def expr_period_short(self) -> str:
         """
-        Returns the short expression of the time period.
+        Returns the short expression of the range of this :class:`TimeRange`.
 
-        Start = 01-01 and End = 01-07:
-            01-01 ~ 01-07
-        Start = 01-01 and End = None:
-            01-01 ~ -
-        Start = None and End = 01-07:
-            - ~ 01-07
-        Start = 01-01 and End = 01-07:
-            - ~ -
+        Example:
+            Start = 01-01 and End = 01-07:
+                **01-01 ~ 01-07**
+            Start = 01-01 and End = None:
+                **01-01 ~ -**
+            Start = None and End = 01-07:
+                **- ~ 01-07**
+            Start = 01-01 and End = 01-07:
+                **- ~ -**
+
+        :return: short period expression of this `TimeRange`
         """
         if self.start:
             start_str = self.start.strftime('%m-%d')
@@ -268,19 +367,22 @@ class TimeRange:
         return f"{start_str} ~ {end_str}"
 
     @property
-    def end_time_seconds(self):
+    def end_time_seconds(self) -> float:
         """
-        Get the timeseconds of the ending timestamp.
+        Get seconds past of ``end`` of this :class:`TimeRange`.
 
-        If `end` does not exist, use the current time with `tzinfo`.
+        If ``end`` does not exist, use the current time with ``tzinfo``.
 
         Example:
             17:00:00 -> 61200
+
             06:54:27 -> 24867
+
+        :return: seconds past of the ending time of this `TimeRange`
         """
         if self.end:
-            t = self.end.time()
+            time_ = self.end.time()
         else:
-            t = localtime(now_utc_aware(), tz=self.tzinfo_).time()
+            time_ = localtime(now_utc_aware(), tz=self.tzinfo_).time()
 
-        return time_to_seconds(t)
+        return time_to_seconds(time_)

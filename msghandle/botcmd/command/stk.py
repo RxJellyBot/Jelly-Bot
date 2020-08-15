@@ -23,16 +23,16 @@ def _download_animated_failed(result, url_dict):
     elif result.already_exists:
         content = _("Sticker already exists.\n"
                     "Original sticker link: %(url_apng)s\n") % url_dict
-    elif not result.conversion_result.frame_extracted:
-        ex = result.conversion_result.frame_extraction_exception
+    elif not result.conversion_result.frame_extraction.success:
+        ex = result.conversion_result.frame_extraction.exception
 
         content = _("Sticker frame extraction failed.\n"
                     "Exception: %(ex)s"
                     "Original sticker link: %(url_apng)s\n") % dict(url_dict, ex=ex)
-    elif not result.conversion_result.image_data_acquired:
+    elif not result.conversion_result.image_data_collation.success:
         content = _("Sticker image data acquisition failed.\n"
                     "Original sticker link: %(url_apng)s\n") % url_dict
-    elif not result.conversion_result.gif_merged:
+    elif not result.conversion_result.gif_merging.success:
         content = _("Sticker frame merger failed.\n"
                     "Original sticker link: %(url_apng)s\n") % url_dict
 

@@ -44,7 +44,7 @@
                                             {% with current_config.locale as current_pytz %}
                                                 <option value="{{ locale.pytz_code }}"
                                                         {% if current_pytz == locale.pytz_code %}selected{% endif %}>
-                                                    {{ locale.description }}&nbsp;({{ locale.current_utc_hr_offset }})
+                                                    {{ locale.description }}&nbsp;({{ locale.utc_offset_str }})
                                                 </option>
                                             {% endwith %}
                                         {% endfor %}

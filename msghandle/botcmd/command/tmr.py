@@ -2,7 +2,7 @@ from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
-from extutils.boolext import to_bool, true_word, false_word, StrBoolResult
+from extutils.boolext import to_bool, WORD_TRUE, WORD_FALSE, StrBoolResult
 from extutils.dt import parse_to_dt
 from flags import BotFeature, CommandScopeCollection
 from msghandle.models import TextMessageEventObject, HandledMessageEventText
@@ -36,7 +36,7 @@ datetime_help = _("String of the target datetime of the timer.\n\n"
                   "automatically permanently deleted after {} days.").format(Bot.Timer.AutoDeletionDays)
 continue_help = _("A word that can indicate if the timer should keep counting up or not.\n\n"
                   "- Words that means POSITIVE: {}\n\n"
-                  "- Words that means NEGATIVE: {}").format(" / ".join(true_word), " / ".join(false_word))
+                  "- Words that means NEGATIVE: {}").format(" / ".join(WORD_TRUE), " / ".join(WORD_FALSE))
 
 
 @cmd_add.command_function(
@@ -76,7 +76,7 @@ def add_timer(e: TextMessageEventObject, keyword: str, title: str, dt: str, coun
 )
 def add_timer_smpl(e: TextMessageEventObject, keyword: str, title: str, dt: str) \
         -> List[HandledMessageEventText]:
-    return add_timer(e, keyword, title, dt, false_word[0])
+    return add_timer(e, keyword, title, dt, WORD_FALSE[0])
 
 
 @cmd_list.command_function(

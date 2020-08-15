@@ -205,4 +205,4 @@ class BotFeature(FlagDoubleEnum):
         2001, _("Image / imgur upload"), _("Upload image to imgur.com.")
 
     STK_LINE_GET_INFO = \
-        2001, _("Sticker / LINE / Get Info"), _("Get the info of the sticker (mostly IDs).")
+        3001, _("Sticker / LINE / Get Info"), _("Get the info of the sticker (mostly IDs).")

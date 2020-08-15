@@ -1,3 +1,10 @@
+"""
+Module of the miscellaneous utilities.
+
+Mostly transforming data of built-in basic data types such as :class:`str` and :class:`list`.
+"""
+# pylint: disable=C0103
+
 import re
 from datetime import datetime
 from typing import List, Tuple, Union, Generator, Any, Optional, TypeVar, Type
@@ -6,18 +13,26 @@ import html
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=C0103
 
 
 def cast_keep_none(obj, dest_type: type):
-    """Cast ``obj`` to ``dest_type``. If ``obj`` is ``None``, let it be ``None``."""
-    if obj is not None:
-        if issubclass(dest_type, bool):
-            return dest_type(int(obj))
-        else:
-            return dest_type(obj)
-    else:
+    """
+    Cast ``obj`` to ``dest_type``.
+
+    If ``obj`` is ``None``, returns ``None``.
+
+    :param obj: object to be casted
+    :param dest_type: target type to cast `obj`
+    :return: casted `obj`
+    """
+    if obj is None:
         return None
+
+    if issubclass(dest_type, bool):
+        return dest_type(int(obj))
+
+    return dest_type(obj)
 
 
 def cast_iterable(iterable: Union[List[T], Tuple[T]], dest_type: Type[T]):
@@ -26,20 +41,24 @@ def cast_iterable(iterable: Union[List[T], Tuple[T]], dest_type: Type[T]):
 
     Can be performed on a nested list.
 
-    If ``iterable`` is not :class:`list` or :class:`tuple`, then directly cast ``iterable`` to ``dest_type``.
+    If ``iterable`` is not :class:`list` or :class:`tuple`, directly cast ``iterable`` to ``dest_type``.
+
+    :param iterable: iterable to be casted
+    :param dest_type: target type for the non-list non-tuple elements inside `iterable`
+    :return: casted `iterable`
     """
-    if isinstance(iterable, (list, tuple)):
-        ret = []
-
-        for item in iterable:
-            ret.append(cast_iterable(item, dest_type))
-
-        if isinstance(iterable, tuple):
-            return tuple(ret)
-        else:
-            return ret
-    else:
+    if not isinstance(iterable, (list, tuple)):
         return dest_type(iterable)
+
+    ret = []
+
+    for item in iterable:
+        ret.append(cast_iterable(item, dest_type))
+
+    if isinstance(iterable, tuple):
+        return tuple(ret)
+
+    return ret
 
 
 def safe_cast(obj, dest_type: type):
@@ -56,9 +75,11 @@ def safe_cast(obj, dest_type: type):
         return None
 
 
-def all_lower(o: [str, tuple, list, set, dict]):
+def all_lower(o: Union[str, tuple, list, set, dict]) -> Union[str, tuple, list, set, dict]:
     """
-    Will NOT modify the ``o`` itself.
+    Lower the letter cases of all elements in ``obj``.
+
+    Will **NOT** modify the ``o`` itself.
 
     Do the following corresponding to its type:
 
@@ -71,10 +92,14 @@ def all_lower(o: [str, tuple, list, set, dict]):
         > return lowered case of data which is the value of a pair.
     (Not matching the above)
         > return the original ``o``
+
+    :param o: object to lower the letter case
+    :returns: an object with the same shape of `obj` but the letter case of the string elements are lowered
     """
     if isinstance(o, str):
         return o.lower()
-    elif isinstance(o, (tuple, list, set)):
+
+    if isinstance(o, (tuple, list, set)):
         org_type = type(o)
         tmp = list(o)
 
@@ -82,35 +107,38 @@ def all_lower(o: [str, tuple, list, set, dict]):
             tmp[idx] = all_lower(oo)
 
         return org_type(tmp)
-    elif isinstance(o, dict):
+
+    if isinstance(o, dict):
         tmp = o.copy()
         for k, v in tmp.items():
             tmp[k] = all_lower(v)
 
         return tmp
-    else:
-        return o
+
+    return o
 
 
-def to_snake_case(s: str):
+def to_snake_case(s: str) -> str:
     """
-    Convert camel case ``s`` to snake case.
+    Convert camel-cased ``s`` to snake case.
 
     :param s: string to be converted
+    :returns: `s` in snake case
     """
     return re.sub(r"(?!^)([A-Z]+)", r"_\1", s).lower()
 
 
-def to_camel_case(s: str):
+def to_camel_case(s: str) -> str:
     """
-    Convert snake case ``s`` to camel case.
+    Convert snake-cased ``s`` to camel case.
 
     :param s: string to be converted
+    :returns: `s` in camel case
     """
     return ''.join(x[0].upper() + x[1:] for x in s.split('_') if x)
 
 
-def split_fill(s: str, n: int, *, delim="", fill=None):
+def split_fill(s: str, n: int, *, delim="", fill=None) -> List[str]:
     """
     Split the string ``s`` with delimeter ``delim`` into pieces which minimum is ``n``.
 
@@ -118,16 +146,28 @@ def split_fill(s: str, n: int, *, delim="", fill=None):
         > Fill the rest of the count with ``fill``
     If splitted element count is > ``n``.
         > Truncate the splitted element list to ``n`` elements.
+
+    :param s: string to be splitted
+    :param n: minimum number of the elements to be splitted
+    :param delim: delimeter of the string
+    :param fill: object to fill if necessary
+    :return: list of `str` elements
     """
     return ((s.split(delim) if s else []) + [fill] * n)[:n]
 
 
-def str_reduce_length(s: str, max_: int, *, escape_html=False, suffix: str = "..."):
+def str_reduce_length(s: str, max_: int, *, escape_html=False, suffix: str = "...") -> str:
     """
     Reduce the length of ``s`` to ``max_`` including the length of ``suffix``.
 
     HTML escape performed after the length reduction.
-    :exception ValueError: suffix length > max content length
+
+    :param s: string to be reduced the length
+    :param max_: max length of the string including the length of `suffix`
+    :param escape_html: if the HTML characters should be escaped
+    :param suffix: suffix of the string to be attached
+    :return: truncated string
+    :raises ValueError: suffix length > max content length
     """
     if len(suffix) > max_:
         raise ValueError("Suffix length > max content length is invalid.")
@@ -141,8 +181,19 @@ def str_reduce_length(s: str, max_: int, *, escape_html=False, suffix: str = "..
     return s
 
 
-def list_insert_in_between(lst: list, insert_obj):
-    """Insert ``insert_obj`` as an element between every elements of the ``lst``."""
+def list_insert_in_between(lst: list, insert_obj: Any) -> list:
+    """
+    Insert ``insert_obj`` as an element between every elements of the ``lst``.
+
+    Example:
+
+    >>> > list_insert_in_between([1, 2, 3], 0)
+    >>> [1, 0, 2, 0, 3]
+
+    :param lst: list to be inserted `insert_obj`
+    :param insert_obj: object to be insert in between the elements of `lst`
+    :return: list with `insert_obj` inserted in between the elements
+    """
     ret = lst.copy()
 
     for i in range(1, len(ret) * 2 - 2, 2):
@@ -151,13 +202,26 @@ def list_insert_in_between(lst: list, insert_obj):
     return ret
 
 
-def char_description(c: str):
+def char_description(c: str) -> str:
+    """
+    Get the character description of ``c``. If no matching description for ``c``, returns ``c``.
+
+    Currently, there are only 2 special charcters have special description:
+
+    - Newline (``\\n``)
+
+    - Space (``\\x20``)
+
+    :param c: character to get the description
+    :return: description of the character `c`
+    """
     if c == "\n":
         return _("(Newline)")
-    elif c == " ":
+
+    if c == " ":
         return _("(Space)")
-    else:
-        return c
+
+    return c
 
 
 def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable = lambda cur, prv: cur == prv) -> \
@@ -184,6 +248,7 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
     :param start: starting index
     :param t_prefix: attach "T" in front of the ranking
     :param is_tie: lambda expression to check if the current and the previous item are the same
+    :return: a generator yielding the current rank and the the current object
     """
     _null = object()
 
@@ -218,8 +283,13 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
         temp = []
 
 
-def dt_to_objectid(dt: Optional[datetime]):
-    """Parse ``dt`` to :class:`ObjectId`. ``None`` if failed to convert."""
+def dt_to_objectid(dt: Optional[datetime]) -> Optional[ObjectId]:
+    """
+    Parse ``dt`` to :class:`ObjectId`. Returns ``None`` if failed to convert.
+
+    :param dt: datetime to be parsed into `ObjectId`
+    :return: `ObjectId` for the speicific `dt`
+    """
     try:
         return ObjectId.from_datetime(dt)
     except Exception:

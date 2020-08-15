@@ -17,7 +17,6 @@ from extutils.logger import SYSTEM
 
 __all__ = ["LineApiUtils", "LineApiWrapper"]
 
-
 line_token = os.environ.get("LINE_TOKEN")
 if not line_token:
     SYSTEM.logger.critical("Specify Line webhook access token as LINE_TOKEN in environment variables.")
@@ -81,7 +80,7 @@ class _LineApiWrapper:
 
         :param uid: LINE UID of the user
         :param channel_model: `ChannelModel` to be used to get the info
-        :returns: LINE profile object if exists
+        :return: LINE profile object if exists
         """
         ctype = ChannelType.UNKNOWN
 

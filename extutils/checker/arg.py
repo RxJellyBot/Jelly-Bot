@@ -1,3 +1,6 @@
+"""
+Module containing utilities to check and ensure the argument types.
+"""
 from abc import ABC, abstractmethod
 from typing import Any, Type, List, Union, Optional
 from inspect import signature, Parameter
@@ -5,8 +8,7 @@ from inspect import signature, Parameter
 from bson import ObjectId
 
 from extutils.flags import is_flag_class
-from .logger import logger
-
+from .logger import LOGGER
 
 __all__ = [
     "arg_type_ensure", "TypeCastingFailedError",
@@ -15,6 +17,10 @@ __all__ = [
 
 
 class TypeCastingFailedError(Exception):
+    """
+    Raised if the type casting failed.
+    """
+
     def __init__(self, data: Any, dtype: type, exception: Exception):
         self.data = data
         self.expected_type = dtype
@@ -27,6 +33,11 @@ class TypeCastingFailedError(Exception):
 
 
 class BaseDataTypeConverter(ABC):
+    """
+    Base of the data converter.
+
+    Inherit this class for more customizations.
+    """
     _ignore = [Any]
     valid_data_types: List[type] = []
 
@@ -39,7 +50,7 @@ class BaseDataTypeConverter(ABC):
     def _convert(cls, data: Any, type_annt):
         # Terminate if the type is already valid
         # type annotation cannot be used with instance checks (generic may be the type annotation)
-        if type(data) == type_annt:
+        if type(data) == type_annt:  # pylint: disable=C0123
             return data
 
         alias_origin_union = cls._typing_alias_origin(type_annt) is Union
@@ -54,14 +65,16 @@ class BaseDataTypeConverter(ABC):
             # [origin is Union] before [not in _ignore] so if type_annt is Union, then it won't go to `type_annt(data)`
             if alias_origin_union:
                 return cls._cast_union(data, type_annt)
+
             if alias_origin_list:
                 return cls._cast_list(data, type_annt)
-            elif type_annt not in cls._ignore:
+
+            if type_annt not in cls._ignore:
                 return type_annt(data)
-            else:
-                return data
-        except Exception as e:
-            return cls.on_cast_fail(data, type_annt, e)
+
+            return data
+        except Exception as ex:
+            return cls.on_cast_fail(data, type_annt, ex)
 
     @classmethod
     def _cast_union(cls, data: Any, type_annt):
@@ -75,12 +88,13 @@ class BaseDataTypeConverter(ABC):
             try:
                 if allowed_type is None:
                     return None
-                elif cls._data_is_allowed_type(data, allowed_type):
+
+                if cls._data_is_allowed_type(data, allowed_type):
                     return data
-                else:
-                    return allowed_type(data)
-            except Exception as e:
-                last_e = e
+
+                return allowed_type(data)
+            except Exception as ex:
+                last_e = ex
 
         return cls.on_cast_fail(data, type_annt, last_e)
 
@@ -107,30 +121,77 @@ class BaseDataTypeConverter(ABC):
 
     @classmethod
     def _data_is_allowed_type(cls, data, allowed_type):
-        t = type(data)
-        return t == allowed_type or cls._typing_alias_origin(allowed_type) is t
+        data_type = type(data)
+        return data_type == allowed_type or cls._typing_alias_origin(allowed_type) is data_type
 
     @classmethod
     def convert(cls, data: Any, type_annt):
+        """
+        Attempt to convert ``data`` to type ``type_annt``.
+
+        Executes ``cls.on_type_invalid`` if the type is invalid.
+
+        If all conditions below meet, then it is considered invalid:
+
+        - ``type_annt`` is not ``Parameter.empty``
+
+        - ``type_annt`` is not in ``cls.valid_data_types``
+
+        - ``type_annt`` is not a ignored type (in ``cls._ignore``)
+
+        - The origin of the alias (if it is a ``typing`` hint) of ``type_annt`` is not :class:`Union` or :class:`list`
+
+        Executes ``cls.on_cast_fail`` if the type casting failed.
+
+        :param data: data to be casted
+        :param type_annt: target type to cast the data
+        :return: casted data
+        """
         if type_annt is Parameter.empty:
             return data
-        else:
-            return cls._convert(data, type_annt)
+
+        return cls._convert(data, type_annt)
 
     @classmethod
     @abstractmethod
     def on_type_invalid(cls, data: Any, dtype: type):
+        """
+        Method to be executed if the target type to cast the data is invalid.
+
+        The behavior defaults to:
+
+        - If the destination type ``dtype`` is a flag class, then cast it to :class:`int`, then cast it to be a flag
+
+        - Otherwise, returns the original data without casting
+
+        :param data: data to be casted
+        :param dtype: target type
+        :return: post-processed data
+        """
         if is_flag_class(dtype):
             return dtype(int(data))
-        else:
-            return data
+
+        return data
 
     @staticmethod
-    def on_cast_fail(data: Any, dtype: type, e: Exception):
+    def on_cast_fail(data: Any, dtype: type, ex: Exception):
+        """
+        Method to be executed if failed to cast ``data`` to be the type of ``dtype``.
+
+        :param data: data to be casted
+        :param dtype: target type
+        :param ex: raised exception during the cast
+        :raises NotImplementedError: if the behavior is not defined
+        """
         raise NotImplementedError()
 
 
 class GeneralDataTypeConverter(BaseDataTypeConverter):
+    """
+    A general data type converter which can handle most argument type checking cases.
+
+    Returns the original ``data`` if failed to cast.
+    """
     valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
@@ -142,14 +203,18 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
         return super().on_type_invalid(data, dtype)
 
     @staticmethod
-    def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
-        logger.logger.warning(f"Type casting failed. Data: {data} / Target Type: {dtype} / Exception: {e}")
+    def on_cast_fail(data: Any, dtype: type, ex: Exception) -> Any:
+        LOGGER.logger.warning("Type casting failed. Data: %s / Target Type: %s / Exception: %s", data, dtype, ex)
 
         return data
 
 
 class NonSafeDataTypeConverter(GeneralDataTypeConverter):
-    """Raises :class:`TypeCastingFailed` on exception occurred during casting."""
+    """
+    Non-safe data converter.
+
+    Raises :class:`TypeCastingFailed` and log a warning if any exception raised during casting.
+    """
     valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
@@ -161,31 +226,58 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
         return super().on_type_invalid(data, dtype)
 
     @staticmethod
-    def on_cast_fail(data: Any, dtype: type, e: Exception) -> Any:
-        logger.logger.warning(f"Type casting failed. Data: {data} / Target Type: {dtype} / Exception: {e}")
+    def on_cast_fail(data: Any, dtype: type, ex: Exception) -> Any:
+        LOGGER.logger.warning("Type casting failed. Data: %s / Target Type: %s / Exception: %s", data, dtype, ex)
 
-        raise TypeCastingFailedError(data, dtype, e)
+        raise TypeCastingFailedError(data, dtype, ex)
 
 
 def arg_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
+    """
+    Decorator to ensure the parameter is the desired data type real time.
+
+    This will inspect the signature of the function, and extract the type notation if available.
+    Then the extracted notation will be used to cast the data by ``converter``.
+
+    This function is expensive, it is recommended to use only when the argument type needs to be ensured.
+
+    The behavior on invalid type or casting failed will depend on ``converter``.
+
+    Example:
+
+    >>> # Normal use
+    >>> @arg_type_ensure
+    >>> def a_function(num: int):
+    >>>     pass  # `num` will be `int`
+    >>>
+    >>> # To raise an exception upon casting failed
+    >>> @arg_type_ensure(converter=NonSafeDataTypeConverter)
+    >>> def b_function(num: int):
+    >>>     pass  # `num` will be `int`
+
+    :param fn: function to check the parameter
+    :param converter: converter to be used to cast the data
+    """
     if fn:
-        def wrapper_in(*args_cast, **kwargs_cast):
+        # Used when as decorator and with parentheses
+        def _wrapper_in(*args_cast, **kwargs_cast):
             return _type_ensure(fn, converter, *args_cast, **kwargs_cast)
 
-        return wrapper_in
-    else:
-        def fn_wrap(fn_in):
-            def wrapper_in_2(*args_cast, **kwargs_cast):
-                return _type_ensure(
-                    fn_in, converter, *args_cast, **kwargs_cast)
+        return _wrapper_in
 
-            return wrapper_in_2
-        return fn_wrap
+    # Used when as decorator and without parentheses
+    def _fn_wrap(fn_in):
+        def _wrapper_in_2(*args_cast, **kwargs_cast):
+            return _type_ensure(fn_in, converter, *args_cast, **kwargs_cast)
+
+        return _wrapper_in_2
+
+    return _fn_wrap
 
 
 def _type_ensure(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwargs_cast):
-    sg = signature(fn)
-    prms = sg.parameters
+    sig = signature(fn)
+    prms = sig.parameters
     prms_vars = filter(
         lambda _: prms[_].kind in (prms[_].POSITIONAL_OR_KEYWORD, prms[_].POSITIONAL_ONLY), prms)
     prms_kw = filter(
@@ -193,23 +285,23 @@ def _type_ensure(fn, converter: Type[BaseDataTypeConverter], *args_cast, **kwarg
 
     new_args = []
     for old_arg, prm in zip(args_cast, prms_vars):
-        p = prms[prm]
+        prm_ = prms[prm]
 
-        if p is p.empty:
+        if prm_ is prm_.empty:
             new_args.append(old_arg)
         else:
-            new_args.append(converter.convert(old_arg, p.annotation))
+            new_args.append(converter.convert(old_arg, prm_.annotation))
 
     new_kwargs = {}
     for prm_name in prms_kw:
-        p = prms[prm_name]
+        prm_ = prms[prm_name]
 
         try:
             old = kwargs_cast.pop(prm_name)
-            if p is p.empty:
+            if prm_ is prm_.empty:
                 new_kwargs[prm_name] = old
             else:
-                new_kwargs[prm_name] = converter.convert(old, p.annotation)
+                new_kwargs[prm_name] = converter.convert(old, prm_.annotation)
         except KeyError:
             pass
 

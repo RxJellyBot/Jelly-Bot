@@ -1,3 +1,6 @@
+"""
+Translate :class:`type` to :class:`str`.
+"""
 from datetime import datetime
 from typing import Iterable
 
@@ -8,25 +11,42 @@ from flags import AutoReplyContentType, ProfilePermission, Platform
 
 
 def type_translation(type_: type):  # noqa: C901
+    """
+    Gets the description of type ``type_``.
+
+    :param type_: type to get the description
+    :return: description of `type_`
+    """
+    # pylint: disable=R0911
+
     if issubclass(type_, str):
         return _("String")
-    elif issubclass(type_, bool):
+
+    if issubclass(type_, bool):
         return _("Boolean")
-    elif issubclass(type_, int):
+
+    if issubclass(type_, int):
         return _("Integer")
-    elif issubclass(type_, AutoReplyContentType):
+
+    if issubclass(type_, AutoReplyContentType):
         return _("Auto Reply Content Type")
-    elif issubclass(type_, ProfilePermission):
+
+    if issubclass(type_, ProfilePermission):
         return _("Permission Category")
-    elif issubclass(type_, Platform):
+
+    if issubclass(type_, Platform):
         return _("Platform")
-    elif issubclass(type_, datetime):
+
+    if issubclass(type_, datetime):
         return _("Datetime")
-    elif issubclass(type_, ObjectId):
+
+    if issubclass(type_, ObjectId):
         return _("ObjectId")
-    elif issubclass(type_, Iterable):
+
+    if issubclass(type_, Iterable):
         return _("Iterable (e.g. List, Array, Dictionary...)")
-    elif issubclass(type_, type(None)):
+
+    if issubclass(type_, type(None)):
         return _("(Null)")
-    else:
-        return type_.__qualname__
+
+    return type_.__qualname__

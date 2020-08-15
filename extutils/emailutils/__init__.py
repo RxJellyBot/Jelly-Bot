@@ -1,2 +1,5 @@
+"""
+Module of various operations related to email.
+"""
 from .main import MailSender
-from .fake import EmailServer
+from .mock import EmailServer

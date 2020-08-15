@@ -8,7 +8,7 @@ from pymongo import ReturnDocument
 
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.emailutils import MailSender
-from extutils.locales import default_locale
+from extutils.locales import DEFAULT_LOCALE
 from extutils.checker import arg_type_ensure
 from flags import Platform
 from models import APIUserModel, OnPlatformUserModel, RootUserModel, RootUserConfigModel, OID_KEY, ChannelModel, \
@@ -337,7 +337,7 @@ class _RootUserManager(BaseCollection):
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
         if u_data is None:
-            return default_locale.to_tzinfo()
+            return DEFAULT_LOCALE.to_tzinfo()
         else:
             return u_data.config.tzinfo
 

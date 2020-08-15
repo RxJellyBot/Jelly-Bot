@@ -1,3 +1,6 @@
+"""
+Customized JSON serializer for Django.
+"""
 from bson import ObjectId
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -7,16 +10,24 @@ from models import Model
 
 
 class JellyBotSerializer(DjangoJSONEncoder):
+    """
+    Customized JSON serializer for Django.
+    """
+
     def default(self, o):
         if isinstance(o, Model):
             return o.to_json()
-        elif isinstance(o, BaseResult):
+
+        if isinstance(o, BaseResult):
             return o.serialize()
-        elif isinstance(o, ObjectId):
+
+        if isinstance(o, ObjectId):
             return repr(o)
-        elif is_flag_instance(o):
+
+        if is_flag_instance(o):
             return int(o)
-        elif isinstance(o, set):
+
+        if isinstance(o, set):
             return list(o)
-        else:
-            return super().default(o)
+
+        return super().default(o)

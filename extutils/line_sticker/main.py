@@ -1,3 +1,6 @@
+"""
+Module of the LINE sticker utilities.
+"""
 import atexit
 import time
 from dataclasses import dataclass
@@ -7,7 +10,7 @@ import os
 import shutil
 import tempfile
 from threading import Thread
-from typing import List, Optional, BinaryIO, Dict, Union
+from typing import Optional, BinaryIO, Dict, Union
 
 import requests
 
@@ -20,7 +23,7 @@ from extutils.checker import arg_type_ensure
 from JellyBot.systemconfig import ExtraService
 from mixin import ClearableMixin
 
-__all__ = ["LineStickerType", "LineStickerUtils", "LineStickerMetadata", "LineAnimatedStickerDownloadResult"]
+__all__ = ["LineStickerType", "LineStickerUtils", "LineAnimatedStickerDownloadResult"]
 
 _temp_dir = tempfile.mkdtemp()  # Temporary directory for LINE stickers
 atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
@@ -28,6 +31,9 @@ atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
 
 @dataclass
 class LineAnimatedStickerDownloadResult:
+    """
+    Download result of the animated sticker.
+    """
     available: bool = False
     already_exists: bool = False
 
@@ -35,20 +41,40 @@ class LineAnimatedStickerDownloadResult:
 
     @property
     def succeed(self):
+        """
+        If the download succeed.
+
+        :return: download succeed
+        """
         return self.already_exists or (self.available and self.conversion_result and self.conversion_result.succeed)
 
     @property
     def time_spent(self) -> float:
+        """
+        Total time spent on the download.
+
+        If the image is already downloaded (highly possibly because that it was being requested previously),
+        ``self.conversion_result`` will be ``None`` (not converted), hence returning ``0``.
+
+        Otherwise, it's the sum of durations of frame extraction + frame zipping (if requested)
+        + image data collation + gif merging.
+
+        :return: time spent on downloading in seconds
+        """
         if not self.conversion_result:
             return 0
 
-        return self.conversion_result.frame_extraction_duration \
-               + self.conversion_result.frame_zipping_time \
-               + self.conversion_result.image_data_acquisition_duration \
-               + self.conversion_result.gif_merge_duration  # noqa: E127
+        return self.conversion_result.frame_extraction.duration \
+               + self.conversion_result.frame_zipping.duration \
+               + self.conversion_result.image_data_collation.duration \
+               + self.conversion_result.gif_merging.duration  # noqa: E127
 
 
 class LineStickerType(FlagSingleEnum):
+    """
+    :class:`FlagSingleEnum` indicating the type of the LINE sticker.
+    """
+
     @classmethod
     def default(cls):
         return LineStickerType.STATIC
@@ -124,6 +150,10 @@ class LineStickerTempStorageManager:
 
 
 class LineStickerUtils(ClearableMixin):
+    """
+    Main LINE sticker utilities.
+    """
+
     # def get_pack_meta(self, pack_id: str):
     #     """
     #     :param pack_id: Numeric string of the sticker package ID.
@@ -138,30 +168,73 @@ class LineStickerUtils(ClearableMixin):
     #     else:
     #         raise MetaDataNotFoundError(pack_meta.status_code)
 
+    # pylint: disable=fixme
+
+    # https://github.com/RaenonX/Jelly-Bot/issues/55
+
+    # TODO: download sticker package as a whole
+    #   and a command for it
+
+    # TODO: A website page for downloading stickers
+    #  (may need to use LINE sticker searching API by inspecting official page)
+
     @classmethod
     def clear(cls):
-        [f.unlink() for f in Path(_temp_dir).iterdir() if f.is_file()]
+        for file_path in Path(_temp_dir).iterdir():
+            if file_path.is_file():
+                file_path.unlink()
 
     @staticmethod
-    def is_sticker_exists(sticker_id: Union[int, str]):
+    def is_sticker_exists(sticker_id: Union[int, str]) -> bool:
+        """
+        Check if the sticker with ``sticker_id`` exists by checking if the static URL of the sticker returns 200.
+
+        :param sticker_id: ID of the sticker to be checked
+        :return: if the sticker exists
+        """
         response = requests.get(LineStickerUtils.get_sticker_url(sticker_id))
 
         return response.ok
 
     @staticmethod
     def get_meta_url(pack_id: Union[int, str]) -> str:
+        """
+        Get the sticker package metadata URL.
+
+        :param pack_id: sticker package ID
+        :return: sticker package metadata URL
+        """
         return f"https://stickershop.line-scdn.net/products/0/0/1/{pack_id}/android/productInfo.meta"
 
     @staticmethod
     def get_sticker_url(sticker_id: Union[int, str]) -> str:
+        """
+        Get the sticker URL. This URL only returns the static image of the sticker, regardless its actual type.
+
+        :param sticker_id: sticker ID
+        :return: static sticker URL
+        """
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker.png"
 
     @staticmethod
     def get_apng_url(pack_id: Union[int, str], sticker_id: Union[int, str]) -> str:
+        """
+        Get the animated sticker URL.
+
+        :param pack_id: sticker package ID
+        :param sticker_id: sticker ID
+        :return: sticker URL
+        """
         return f"https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/animation/{sticker_id}.png"
 
     @staticmethod
     def get_sound_url(sticker_id: Union[int, str]) -> str:
+        """
+        Get the sticker sound URL.
+
+        :param sticker_id: sticker ID
+        :return: sticker sound URL
+        """
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/IOS/sticker_sound.m4a"
 
     @staticmethod
@@ -222,16 +295,6 @@ class LineStickerUtils(ClearableMixin):
         result.conversion_result = apng2gif.convert(apng_path, output_path, zip_frames=with_frames)
 
         return result
-
-    @staticmethod
-    def get_dl_info(content_type: LineStickerType) -> (callable, str):
-        dl_dict = {
-            LineStickerType.ANIMATED: (LineStickerUtils.get_apng_url, ".apng"),
-            LineStickerType.STATIC: (LineStickerUtils.get_sticker_url, ".png"),
-            LineStickerType.SOUND: (LineStickerUtils.get_sound_url, ".m4a")
-        }
-
-        return dl_dict.get(content_type)
 
     @staticmethod
     def get_downloaded_apng(pack_id: Union[str, int], sticker_id: Union[str, int], *,
@@ -296,52 +359,51 @@ class LineStickerUtils(ClearableMixin):
 
         return open(zip_path, "rb")
 
-
-class LineStickerMetadata:
-    DEFAULT_LOCALE = "en"
-
-    def __init__(self, meta_dict):
-        self._dict = meta_dict
-
-    @property
-    def pack_id(self) -> int:
-        return int(self._dict["packageId"])
-
-    def get_title(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object("title", locale)
-
-    def get_author(self, locale=DEFAULT_LOCALE):
-        return self._get_localized_object("author", locale)
-
-    @property
-    def stickers(self) -> List[int]:
-        stk_obj = self._dict.get("stickers", [])
-        if len(stk_obj) > 0:
-            return [int(stk["id"]) for stk in stk_obj]
-        else:
-            return stk_obj
-
-    @property
-    def is_animated_sticker(self):
-        return self._dict.get("hasAnimation", False)
-
-    @property
-    def has_se(self):
-        return self._dict.get("hasSound", False)
-
-    def _get_localized_object(self, key, locale):
-        localized_object = self._dict.get(key)
-        if localized_object is not None:
-            localized_str_ret = localized_object.get(locale)
-
-            if localized_str_ret is None:
-                return localized_object.get(LineStickerMetadata.DEFAULT_LOCALE)
-            else:
-                return localized_str_ret
-        else:
-            return None
-
-
+# class LineStickerMetadata:
+#     DEFAULT_LOCALE = "en"
+#
+#     def __init__(self, meta_dict):
+#         self._dict = meta_dict
+#
+#     @property
+#     def pack_id(self) -> int:
+#         return int(self._dict["packageId"])
+#
+#     def get_title(self, locale=DEFAULT_LOCALE):
+#         return self._get_localized_object("title", locale)
+#
+#     def get_author(self, locale=DEFAULT_LOCALE):
+#         return self._get_localized_object("author", locale)
+#
+#     @property
+#     def stickers(self) -> List[int]:
+#         stk_obj = self._dict.get("stickers", [])
+#         if len(stk_obj) > 0:
+#             return [int(stk["id"]) for stk in stk_obj]
+#         else:
+#             return stk_obj
+#
+#     @property
+#     def is_animated_sticker(self):
+#         return self._dict.get("hasAnimation", False)
+#
+#     @property
+#     def has_se(self):
+#         return self._dict.get("hasSound", False)
+#
+#     def _get_localized_object(self, key, locale):
+#         localized_object = self._dict.get(key)
+#         if localized_object is not None:
+#             localized_str_ret = localized_object.get(locale)
+#
+#             if localized_str_ret is None:
+#                 return localized_object.get(LineStickerMetadata.DEFAULT_LOCALE)
+#             else:
+#                 return localized_str_ret
+#         else:
+#             return None
+#
+#
 # class LinkStickerDownloadResult:
 #     def __init__(self, compressed_file_path, sticker_ids, downloading_consumed_time, compression_consumed_time):
 #         self._compressed_file_path = compressed_file_path
@@ -388,7 +450,7 @@ class LineStickerMetadata:
 #             Returns time used in compression (sec in float).
 #         """
 #         return self._compression_consumed_time
-
-class MetaDataNotFoundError(Exception):
-    def __init__(self, sticker_id: [int, str]):
-        super().__init__(f"Sticker metadata not found for ID #{sticker_id}")
+#
+# class MetaDataNotFoundError(Exception):
+#     def __init__(self, sticker_id: [int, str]):
+#         super().__init__(f"Sticker metadata not found for ID #{sticker_id}")

@@ -1,7 +1,7 @@
 from pytz.exceptions import UnknownTimeZoneError
 
 from extutils.dt import now_utc_aware
-from extutils.locales import sec_diff_to_utc_offset, locales, LocaleInfo
+from extutils.locales import sec_diff_to_utc_offset, get_locales, LocaleInfo
 from tests.base import TestCase
 
 __all__ = ["TestLocaleInfo", "TestLocaleFunctions"]
@@ -18,9 +18,9 @@ class TestLocaleFunctions(TestCase):
 class TestLocaleInfo(TestCase):
     def test_locale_info(self):
         """Only testing if the info can be acquired without any exceptions. Not testing the correctness."""
-        for locale in locales:
+        for locale in get_locales():
             with self.subTest(locale=locale):
-                self.assertIsNotNone(locale.current_utc_hr_offset)
+                self.assertIsNotNone(locale.utc_offset_str)
 
                 pytzinfo = locale.to_tzinfo()
                 now = now_utc_aware()

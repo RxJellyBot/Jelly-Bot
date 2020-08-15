@@ -45,7 +45,7 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(result.available)
             self.assertFalse(result.already_exists)
             self.assertTrue(result.conversion_result.succeed)
-            self.assertTrue(result.conversion_result.frame_zipped)
+            self.assertTrue(result.conversion_result.frame_zipping.success)
             self.assertTrue(result.succeed)
             self.assertTrue(os.path.exists(out_path))
 
@@ -65,7 +65,7 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(result.available)
             self.assertFalse(result.already_exists)
             self.assertTrue(result.conversion_result.succeed)
-            self.assertFalse(result.conversion_result.frame_zipped)
+            self.assertFalse(result.conversion_result.frame_zipping.success)
             self.assertTrue(result.succeed)
             self.assertTrue(os.path.exists(out_path))
             self.assertFalse(os.path.exists(out_path_frames))
@@ -83,7 +83,7 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(result.available)
             self.assertFalse(result.already_exists)
             self.assertTrue(result.conversion_result.succeed)
-            self.assertTrue(result.conversion_result.frame_zipped)
+            self.assertTrue(result.conversion_result.frame_zipping.success)
             self.assertTrue(result.succeed)
             self.assertTrue(os.path.exists(out_path))
 
@@ -111,7 +111,7 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(result.available)
             self.assertFalse(result.already_exists)
             self.assertTrue(result.conversion_result.succeed)
-            self.assertFalse(result.conversion_result.frame_zipped)
+            self.assertFalse(result.conversion_result.frame_zipping.success)
             self.assertTrue(result.succeed)
             self.assertTrue(os.path.exists(out_path))
 
@@ -120,7 +120,7 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(result.available)
             self.assertFalse(result.already_exists)
             self.assertTrue(result.conversion_result.succeed)
-            self.assertTrue(result.conversion_result.frame_zipped)
+            self.assertTrue(result.conversion_result.frame_zipping.success)
             self.assertTrue(result.succeed)
             self.assertTrue(os.path.exists(out_path))
 
@@ -192,7 +192,7 @@ class TestLineStickerUtils(TestCase):
         result = LineStickerUtils.download_apng_as_gif("15769", "248521690")
 
         self.assertTrue(result.available)
-        self.assertTrue(result.conversion_result.frame_zipped)
+        self.assertTrue(result.conversion_result.frame_zipping.success)
         self.assertTrue(result.conversion_result.succeed)
 
         with LineStickerUtils.get_downloaded_apng("15769", "248521690") as f:
@@ -210,7 +210,7 @@ class TestLineStickerUtils(TestCase):
 
         self.assertTrue(result.available)
         self.assertTrue(result.conversion_result.succeed)
-        self.assertTrue(result.conversion_result.frame_zipped)
+        self.assertTrue(result.conversion_result.frame_zipping.success)
 
         with LineStickerUtils.get_downloaded_apng_frames("15769", "248521690") as f:
             self.assertTrue(is_zipfile(f))

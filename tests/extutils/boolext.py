@@ -1,4 +1,4 @@
-from extutils.boolext import StrBoolResult, to_bool, true_word, false_word, case_insensitive
+from extutils.boolext import StrBoolResult, to_bool, WORD_TRUE, WORD_FALSE, CASE_INSENSITIVE
 from tests.base import TestCase
 
 __all__ = ["TestBooleanExtension"]
@@ -6,11 +6,11 @@ __all__ = ["TestBooleanExtension"]
 
 class TestBooleanExtension(TestCase):
     def test_true(self):
-        for w in true_word:
+        for w in WORD_TRUE:
             w_lower = w.lower()
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
-                if case_insensitive:
+                if CASE_INSENSITIVE:
                     self.assertEqual(StrBoolResult.TRUE, to_bool(w))
                     self.assertEqual(StrBoolResult.TRUE, to_bool(w_lower))
                     self.assertEqual(StrBoolResult.TRUE, to_bool(w_upper))
@@ -33,11 +33,11 @@ class TestBooleanExtension(TestCase):
                 self.assertNotEqual(StrBoolResult.UNKNOWN, to_bool(w_upper))
 
     def test_false(self):
-        for w in false_word:
+        for w in WORD_FALSE:
             w_lower = w.lower()
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
-                if case_insensitive:
+                if CASE_INSENSITIVE:
                     self.assertEqual(StrBoolResult.FALSE, to_bool(w))
                     self.assertEqual(StrBoolResult.FALSE, to_bool(w_lower))
                     self.assertEqual(StrBoolResult.FALSE, to_bool(w_upper))
@@ -63,13 +63,13 @@ class TestBooleanExtension(TestCase):
         unknown_words = ("A", "B", "C")
 
         for w in unknown_words:
-            self.assertFalse(w in true_word, f"`{w}` exists in `true_word`")
-            self.assertFalse(w in false_word, f"`{w}` exists in `false_word`")
+            self.assertFalse(w in WORD_TRUE, f"`{w}` exists in `WORD_TRUE`")
+            self.assertFalse(w in WORD_FALSE, f"`{w}` exists in `WORD_FALSE`")
 
             w_lower = w.lower()
             w_upper = w.upper()
             with self.subTest(w_lower=w_lower, w_upper=w_upper, w=w):
-                if case_insensitive:
+                if CASE_INSENSITIVE:
                     self.assertEqual(StrBoolResult.UNKNOWN, to_bool(w))
                     self.assertEqual(StrBoolResult.UNKNOWN, to_bool(w_lower))
                     self.assertEqual(StrBoolResult.UNKNOWN, to_bool(w_upper))

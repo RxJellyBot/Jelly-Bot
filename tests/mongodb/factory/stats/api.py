@@ -29,4 +29,4 @@ class TestAPIStatisticsManager(TestTimeComparisonMixin, TestModelMixin, TestData
             ApiAction=APICommand.AR_ADD, SenderOid=self.USER_OID, Parameter={"A": "B"},
             Response={"C": "D"}, Success=True, Timestamp=result.model.timestamp,
             PathParameter={"E": "F"}, PathInfo="/p", PathInfoFull="/p/s"))
-        self.assertTimeDifferenceLessEqual(result.model.timestamp, ts, self.db_ping_ms() * 2)
+        self.assertTimeDifferenceLessEqual(result.model.timestamp, ts, self.db_ping_ms() * 5)

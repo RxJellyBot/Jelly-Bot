@@ -1,52 +1,68 @@
+"""
+Module of extensions on :class:`bool`.
+"""
 from enum import Enum, auto
 from typing import Any
 
-
 # region Configurations
 
-case_insensitive = True
+CASE_INSENSITIVE = True
 
-true_word = ("true", "t", "yes", "y")
-false_word = ("false", "f", "no", "n")
+WORD_TRUE = ("true", "t", "yes", "y")
+WORD_FALSE = ("false", "f", "no", "n")
 
 # endregion
 
-if case_insensitive:
-    true_word = tuple(map(str.lower, true_word))
-    false_word = tuple(map(str.lower, false_word))
+if CASE_INSENSITIVE:
+    WORD_TRUE = tuple(map(str.lower, WORD_TRUE))
+    WORD_FALSE = tuple(map(str.lower, WORD_FALSE))
 
 
 class StrBoolResult(Enum):
+    """
+    Result :class:`Enum` to indicate the parsing result.
+    """
     TRUE = auto()
     FALSE = auto()
     UNKNOWN = auto()
 
     def to_bool(self) -> bool:
         """
-        Cast this enum to :class:`bool`.
+        Cast this :class:`Enum` to :class:`bool`.
 
         :exception ValueError: the value is unknown.
         """
         if self == self.TRUE:
             return True
-        elif self == self.FALSE:
+
+        if self == self.FALSE:
             return False
-        else:
-            raise ValueError("The result is `UNKNOWN`.")
+
+        raise ValueError("The result is `UNKNOWN`.")
 
 
-def to_bool(s: Any) -> StrBoolResult:
-    if isinstance(s, bool):
-        return StrBoolResult.TRUE if s else StrBoolResult.FALSE
-    elif not isinstance(s, str):
-        s = str(s)
+def to_bool(str_: Any) -> StrBoolResult:
+    """
+    Attempt to parse ``str_`` to :class:`bool`. Result is stored as :class:`StrBoolResult`.
 
-    if case_insensitive:
-        s = s.lower()
+    If ``str_`` is not a :class:`str`, it will be force-casted to :class:`str` by calling ``str(str_)``.
 
-    if s in true_word:
+    :param str_: item to be parsed
+    :return: a `StrBoolResult` indicating the parsing result
+    """
+    if isinstance(str_, bool):
+        return StrBoolResult.TRUE if str_ else StrBoolResult.FALSE
+
+    if not isinstance(str_, str):
+        str_ = str(str_)
+
+    if CASE_INSENSITIVE:
+        str_ = str_.lower()
+
+    if str_ in WORD_TRUE:
         return StrBoolResult.TRUE
-    elif s in false_word:
+
+    if str_ in WORD_FALSE:
         return StrBoolResult.FALSE
-    else:
-        return StrBoolResult.UNKNOWN
+
+    return StrBoolResult.UNKNOWN

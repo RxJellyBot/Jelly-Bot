@@ -1,3 +1,6 @@
+"""
+Base class for implementing singleton classes.
+"""
 # Obtained from https://stackoverflow.com/a/6798042/11571888
 from abc import ABC
 

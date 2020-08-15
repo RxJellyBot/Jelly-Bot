@@ -1,8 +1,11 @@
+"""
+Module to perform various operations on array.
+"""
 from typing import List, Callable, TypeVar, Any, Union
 
 __all__ = ["extract_list_action", "extract_one"]
 
-T = TypeVar("T")
+T = TypeVar("T")  # pylint: disable=C0103
 
 
 def extract_one(obj: Union[list, tuple, set]):
@@ -11,14 +14,15 @@ def extract_one(obj: Union[list, tuple, set]):
 
     :param obj: iterable to be extracted an element
     :return: an element extracted from `obj`
-    :raise TypeError: obj type mismatch
+    :raises TypeError: obj type mismatch
     """
     if isinstance(obj, (list, tuple)):
         return obj[0] if len(obj) > 0 else None
-    elif isinstance(obj, set):
+
+    if isinstance(obj, set):
         return obj.pop() if len(obj) > 0 else None
-    else:
-        raise TypeError(f"Type of `obj` must be one of `list`, `set` or `tuple`. (Actual: {type(obj)})")
+
+    raise TypeError(f"Type of `obj` must be one of `list`, `set` or `tuple`. (Actual: {type(obj)})")
 
 
 def extract_list_action(data: T, fn: Callable[[List[T], Any], Any], *fn_args):
@@ -36,12 +40,12 @@ def extract_list_action(data: T, fn: Callable[[List[T], Any], Any], *fn_args):
     def is_iterable(obj):
         return isinstance(obj, (list, tuple, set))
 
-    if data and is_iterable(data) and is_iterable(extract_one(data)):
-        data_new = []
-
-        for d in data:
-            data_new.append(extract_list_action(d, fn, *fn_args))
-
-        return data_new
-    else:
+    if not data or not is_iterable(data) or not is_iterable(extract_one(data)):
         return fn(data, *fn_args)
+
+    data_new = []
+
+    for data_ in data:
+        data_new.append(extract_list_action(data_, fn, *fn_args))
+
+    return data_new

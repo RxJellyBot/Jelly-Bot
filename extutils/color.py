@@ -1,11 +1,26 @@
+"""
+Module of various operations related to :class:`Color`.
+"""
 import re
 
 from bson.codec_options import TypeEncoder
 
 
 class Color:
+    """
+    Class representing a color.
+
+    During constuction, if ``color_sum`` is invalid, :class:`ValueError` will be raised.
+    """
+
     @staticmethod
-    def color_num_valid(num: int):
+    def color_num_valid(num: int) -> bool:
+        """
+        Check if the color number ``num`` is within the valid range.
+
+        :param num: color number to be checked
+        :return: if `num` is valid
+        """
         return 0 <= num <= 16777215
 
     def __init__(self, color_sum: int):
@@ -19,23 +34,47 @@ class Color:
 
     @property
     def color_int(self) -> int:
+        """
+        The sum of the color (R * 65536 + G * 256 + B).
+
+        :return: the color code sum
+        """
         return self._col_code
 
     @property
-    def r(self) -> int:
+    def r(self) -> int:  # pylint: disable=C0103
+        """
+        Red value of RGB of the color.
+
+        :return: red value
+        """
         return self.color_int // 65536
 
     @property
-    def g(self) -> int:
+    def g(self) -> int:  # pylint: disable=C0103
+        """
+        Green value of RGB of the color.
+
+        :return: green value
+        """
         return (self.color_int // 256) % 256
 
     @property
-    def b(self) -> int:
+    def b(self) -> int:  # pylint: disable=C0103
+        """
+        Blue value of RGB of the color.
+
+        :return: blue value
+        """
         return self.color_int % 256
 
     @property
     def color_hex(self) -> str:
-        """Return the color in the format of #FFFFFF."""
+        """
+        Return the color in the format of #FFFFFF.
+
+        :return: hex color code with # prefixed
+        """
         return f"#{self.color_int // 65536:02x}{(self.color_int // 256) % 256:02x}{self.color_int % 256:02x}"
 
     def __repr__(self):
@@ -47,24 +86,33 @@ class Color:
     def __eq__(self, other):
         if isinstance(other, Color):
             return other.color_int == self.color_int
-        elif isinstance(other, int):
+
+        if isinstance(other, int):
             return other == self.color_int
-        elif isinstance(other, str):
+
+        if isinstance(other, str):
             return other.replace("#", "") == self.color_hex.replace("#", "")
-        else:
-            return False
+
+        return False
 
 
 class ColorFactory:
+    """
+    Factory class to generate :class:`Color`.
+    """
+
     BLACK = Color(0)
     WHITE = Color(16777215)
 
     DEFAULT = BLACK
 
     @staticmethod
-    def from_rgb(red: int, green: int, blue: int):
+    def from_rgb(red: int, green: int, blue: int) -> Color:
         """
-        :exception ValueError: if any or `red`, `green` or `blue` is invalid.
+        Generate a :class:`Color` from RGB.
+
+        :return: a `Color` with using the provided RGB values
+        :exception ValueError: any of `red`, `green` or `blue` is invalid
         """
 
         def _val_check(val, name):
@@ -78,10 +126,14 @@ class ColorFactory:
         return Color(red * 65536 + green * 256 + blue)
 
     @staticmethod
-    def from_hex(hex_str: str):
+    def from_hex(hex_str: str) -> Color:
         """
-        :param hex_str: Allowed formats are: #FFFFFF or FFFFFF.
-        :exception ValueError: if the hex string is in a invalid format.
+        Generate a :class:`Color` from hex color string ``hex_str``.
+
+        Allowed formats for ``hex_str`` are: #FFFFFF or FFFFFF.
+
+        :param hex_str: hex color string to be used to generate a color
+        :exception ValueError: hex string is in a invalid format
         """
         if not re.match(r"#?[0-9A-Fa-f]{6}", hex_str):
             raise ValueError(f"Invalid color string. Should be in the format of #FFFFFF or FFFFFF. ({hex_str})")
@@ -92,6 +144,9 @@ class ColorFactory:
 
 
 class ColorMongoEncoder(TypeEncoder):
+    """
+    :class:`TypeEncoder` for MongoDB to handle the type of :class:`ColorMongoEncoder`.
+    """
     python_type = Color
 
     def transform_python(self, value):

@@ -1,7 +1,37 @@
 # Template .pylintrc file https://raw.githubusercontent.com/datawire/quark/master/.pylintrc
 
-[FORMAT]
-max-line-length=119
+[BASIC]
+
+# Reason of the good names:
+# - i, j, k
+#   often used in for loops
+# - f
+#   often used as a file stream name
+# - ex
+#   often used as the var name of exception caught by try..except
+# - fn
+#   often used to represent a function address
+# - _
+#   often used as dummy variable during unpacking
+# - dt, tz
+#   often used in datetime handling (dt for datetime, tz for timezone)
+
+good-names=f,i,j,k,ex,fn,_,dt,tz
+
+include-naming-hint=yes
 
 [DESIGN]
+
 max-parents=15
+
+max-args=5
+
+max-returns=7
+
+[FORMAT]
+
+max-line-length=119
+
+[MESSAGES CONTROL]
+
+disable=broad-except
