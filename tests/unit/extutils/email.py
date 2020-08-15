@@ -1,7 +1,7 @@
-from extutils.emailutils import EmailServer
+from extutils.emailutils import EmailServer, MailSender
 from tests.base import TestCase
 
-__all__ = ["TestMockEmailServer"]
+__all__ = ["TestMockEmailServer", "TestMailSender"]
 
 srv = EmailServer()
 
@@ -79,20 +79,64 @@ class TestMockEmailServer(TestCase):
 
 
 class TestMailSender(TestCase):
+    @classmethod
+    def obj_to_clear(cls):
+        return [MailSender]
+
     def test_no_duplicate(self):
-        pass  # TEST: todo no duplicate
+        MailSender.send_email("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+
+        MailSender.send_email("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+
+    def test_no_duplicate_multiple_recipients(self):
+        MailSender.send_email("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+        self.assertEqual(len(srv.get_mailbox("recipient2").mails), 0)
+
+        MailSender.send_email("Test content", ["recipient", "recipient2"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+        self.assertEqual(len(srv.get_mailbox("recipient2").mails), 1)
+
+    def test_no_duplicate_send_async(self):
+        MailSender.send_email_async("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+
+        MailSender.send_email_async("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
 
     def test_no_duplicate_dfferent_recipient(self):
-        pass
+        MailSender.send_email("Test content", ["recipient"])
 
-    def test_no_duplicate_dfferent_sender_recipient(self):
-        pass
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+        self.assertEqual(len(srv.get_mailbox("recipient2").mails), 0)
+
+        MailSender.send_email("Test content", ["recipient2"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+        self.assertEqual(len(srv.get_mailbox("recipient2").mails), 1)
 
     def test_no_duplicate_dfferent_content(self):
-        pass
+        MailSender.send_email("Test content", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+
+        MailSender.send_email("Test content 2", ["recipient"])
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 2)
 
     def test_no_duplicate_dfferent_subject(self):
-        pass
+        MailSender.send_email("Test content", ["recipient"], subject="Subject")
 
-    def test_no_duplicate_after_expiry(self):
-        pass
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 1)
+
+        MailSender.send_email("Test content", ["recipient"], subject="Subject 2")
+
+        self.assertEqual(len(srv.get_mailbox("recipient").mails), 2)

@@ -9,11 +9,12 @@ from django.utils.html import strip_tags
 
 from env_var import is_testing
 from JellyBot.systemconfig import Email
+from mixin import ClearableMixin
 
 from .mock import EmailServer
 
 
-class MailSender:
+class MailSender(ClearableMixin):
     """
     Mail sending class.
 
@@ -25,6 +26,24 @@ class MailSender:
     """
 
     _cache_ = ttldict.TTLOrderedDict(Email.EmailCacheExpirySeconds)
+
+    @classmethod
+    def clear(cls):
+        cls._cache_ = ttldict.TTLOrderedDict(Email.EmailCacheExpirySeconds)
+
+        EmailServer.clear()
+
+    @staticmethod
+    def _send_email_to_mock_server(sender: str, recipients: List[str], subject: str, content: str):
+        print()
+        print("--- SENDING EMAIL TO MOCK SERVER ---")
+        print(f"Sender: {sender}")
+        print(f"Recipient(s): {recipients}")
+        print(f"Subject: {subject}")
+        print(f"Content:\n{content}")
+        print("---------------------")
+        print()
+        EmailServer.send_email(sender, recipients, subject, content)
 
     @staticmethod
     def collate_info(
@@ -77,21 +96,25 @@ class MailSender:
         :param subject: email subject
         :param prefix: email subject prefix
         """
-        # TEST: Mail duplication preventing service
+        sender, recipients, subject, content_html = \
+            MailSender.collate_info(content_html, recipients, subject, prefix)
 
-        if content_html not in MailSender._cache_:
-            sender, recipients, subject, content_html = \
-                MailSender.collate_info(content_html, recipients, subject, prefix)
+        # Filter out already-sent recipients
+        recipients_actual = []
 
-            MailSender._cache_[content_html] = None
+        for recipient in recipients:
+            cache_key = (recipient, subject, content_html)
 
-            if is_testing():
-                print()
-                print("--- SENDING EMAIL TO MOCK SERVER ---")
-                print()
-                MailSender.send_email_to_mock_server(sender, recipients, subject, content_html)
-            else:
-                send_mail(subject, strip_tags(content_html), sender, recipients, html_message=content_html)
+            if cache_key not in MailSender._cache_:
+                MailSender._cache_[cache_key] = None
+                recipients_actual.append(recipient)
+
+        recipients = recipients_actual
+
+        if is_testing():
+            MailSender._send_email_to_mock_server(sender, recipients, subject, content_html)
+        else:
+            send_mail(subject, strip_tags(content_html), sender, recipients, html_message=content_html)
 
     @staticmethod
     def send_email_async(
@@ -99,28 +122,6 @@ class MailSender:
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
         """Same as ``EmailSender.send_email()``. The only difference is that this sends the email asynchronously."""
         if is_testing():
-            MailSender.send_email_to_mock_server(*MailSender.collate_info(content_html, recipients, subject, prefix))
+            MailSender.send_email(content_html, recipients, subject, prefix)
         else:
-            Thread(
-                target=MailSender.send_email, args=(content_html,),
-                kwargs={"recipients": recipients, "subject": subject, "prefix": prefix}).start()
-
-    @staticmethod
-    def send_email_to_mock_server(sender: str, recipients: List[str], subject: str, content: str):
-        """
-        Send an email to the mock server.
-
-        :param sender: email sender
-        :param recipients: email recipient(s)
-        :param subject: email subject
-        :param content: email content
-        """
-        print()
-        print("--- SENDING EMAIL TO MOCK SERVER ---")
-        print(f"Sender: {sender}")
-        print(f"Recipient(s): {recipients}")
-        print(f"Subject: {subject}")
-        print(f"Content:\n{content}")
-        print("---------------------")
-        print()
-        EmailServer.send_email(sender, recipients, subject, content)
+            Thread(target=MailSender.send_email, args=(content_html, recipients, subject, prefix)).start()
