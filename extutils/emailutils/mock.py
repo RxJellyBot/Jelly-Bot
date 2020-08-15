@@ -1,6 +1,4 @@
-"""
-Module containing all required components of a mocking email server.
-"""
+"""Module containing all required components of a mocking email server."""
 from dataclasses import dataclass, field
 from typing import List
 
@@ -9,9 +7,8 @@ from mixin import ClearableMixin
 
 @dataclass
 class EmailEntry:
-    """
-    Class representing a single email.
-    """
+    """Class representing a single email."""
+
     sender: str
     subject: str
     content: str
@@ -19,9 +16,8 @@ class EmailEntry:
 
 @dataclass
 class EmailBox:
-    """
-    Class representing a mocking email box.
-    """
+    """Class representing a mocking email box."""
+
     owner: str
     mails: List[EmailEntry] = field(default_factory=list)
 
@@ -66,16 +62,13 @@ class EmailBox:
 
 
 class EmailServer(ClearableMixin):
-    """
-    Class representing a mocking email server.
-    """
+    """Class representing a mocking email server."""
+
     storage = {}
 
     @classmethod
     def clear(cls):
-        """
-        Clear the storage of the mocking email server.
-        """
+        """Clear the storage of the mocking email server."""
         cls.storage = {}
 
     @classmethod

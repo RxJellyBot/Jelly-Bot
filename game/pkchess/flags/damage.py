@@ -1,12 +1,10 @@
 from extutils.flags import FlagCodeEnum
 
-__all__ = ["DamageType"]
+__all__ = ("DamageType",)
 
 
 class DamageType(FlagCodeEnum):
-    """
-    Flags of the damage type.
-    """
+    """Flags of the damage type."""
     MISSED = -2
     BLOCKED = -1
 

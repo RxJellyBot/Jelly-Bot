@@ -9,7 +9,7 @@ from game.pkchess.map import Map
 from .player import PlayerEntry
 from .base import Game
 
-__all__ = ["RunningGame"]
+__all__ = ("RunningGame",)
 
 
 @dataclass

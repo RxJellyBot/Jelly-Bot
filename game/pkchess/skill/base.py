@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Set, Tuple
 
-__all__ = ["Skill"]
+__all__ = ("Skill",)
 
 
 @dataclass

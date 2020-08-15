@@ -15,7 +15,7 @@ from mongodb.utils import ExtendedCursor
 
 from ._base import BaseCollection
 
-__all__ = ["ShortUrlDataManager"]
+__all__ = ("ShortUrlDataManager",)
 
 DB_NAME = "surl"
 

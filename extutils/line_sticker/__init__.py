@@ -1,4 +1,2 @@
-"""
-Module for various operations on LINE stickers.
-"""
+"""Module for various operations on LINE stickers."""
 from .main import LineStickerUtils, LineStickerType

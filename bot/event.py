@@ -1,5 +1,5 @@
 """
-This module contains events for the bot to trigger after certain conditions are met.
+Events for the bot to trigger after certain conditions are met.
 
 Methods prefixed with ``signal_`` should be called when the certain event occurs.
 
@@ -22,13 +22,13 @@ _ready = {
 
 
 def signal_django_ready():
-    """Method to be called when the Django application is ready."""
+    """Signal that Django application is ready."""
     _ready["Discord"] = True
     _check_all_ready()
 
 
 def signal_discord_ready():
-    """Method to be called when the Discord bot is ready."""
+    """Signal that called when the Discord bot is ready."""
     _ready["Django"] = True
     _check_all_ready()
 
@@ -39,7 +39,7 @@ def _check_all_ready():
 
 
 def on_system_fully_ready():
-    """Code to execute when the system is fully prepared. (Discord bot and Django application ready)"""
+    """Code to execute when the system is fully prepared (Discord bot and Django application ready)."""
     load_handling_functions()
     record_boot_dt()
 

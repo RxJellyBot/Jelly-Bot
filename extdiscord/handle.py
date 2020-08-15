@@ -1,6 +1,4 @@
-"""
-Functions related to the main event handling.
-"""
+"""Functions related to the main event handling."""
 import traceback
 
 from extutils.emailutils import MailSender
@@ -12,7 +10,7 @@ from msghandle.models import (
 
 from .logger import DISCORD
 
-__all__ = ["handle_discord_main", "handle_error"]
+__all__ = ("handle_discord_main", "handle_error",)
 
 
 def handle_discord_main(event: Event) -> HandledMessageEventsHolder:
@@ -25,7 +23,7 @@ def handle_discord_main(event: Event) -> HandledMessageEventsHolder:
             return HandledMessageEventsHolder(event.channel_model)
 
         return handle_message_main(event)
-    except Exception as ex:  # pylint: disable=W0703
+    except Exception as ex:  # pylint: disable=broad-except
         handle_error(ex)
         return HandledMessageEventsHolder(event.channel_model)
 

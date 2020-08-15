@@ -1,6 +1,4 @@
-"""
-Module containing various operations related to Google Identity.
-"""
+"""Module containing various operations related to Google Identity."""
 import os
 import sys
 
@@ -13,7 +11,7 @@ from google.auth.transport import requests
 
 from extutils.logger import SYSTEM
 
-__all__ = ["IDIssuerIncorrectError", "GoogleIdentityUserData", "get_identity_data"]
+__all__ = ("IDIssuerIncorrectError", "GoogleIdentityUserData", "get_identity_data",)
 
 CLIENT_ID = os.environ.get("GI_CLIENT_ID")
 if CLIENT_ID is None:
@@ -22,9 +20,7 @@ if CLIENT_ID is None:
 
 
 class IDIssuerIncorrectError(Exception):
-    """
-    Raised if the ID issuer of the google identity data is not accounts.google.com.
-    """
+    """Raised if the ID issuer of the google identity data is not accounts.google.com."""
 
     def __init__(self, issuer):
         super().__init__(f'ID issuer is not accounts.google.com. ({issuer})')
@@ -32,9 +28,8 @@ class IDIssuerIncorrectError(Exception):
 
 @dataclass
 class GoogleIdentityUserData:
-    """
-    Class for a Google Identity user data.
-    """
+    """Class for a Google Identity user data."""
+
     aud: str
     issuer: str
     uid: str

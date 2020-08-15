@@ -1,3 +1,1 @@
-"""
-This module contains various utils of the game.
-"""
+"""This module contains various utils of the game."""

@@ -1,8 +1,11 @@
+from typing import Type
+
 from ._base import BaseField, Lazy
 from .exceptions import FieldModelClassInvalidError
 
 
 class ModelField(BaseField):
+    # noinspection PyTypeChecker,PyUnresolvedReferences
     def __init__(self, key, model_cls, **kwargs):
         """
         Default Properties Overrided:
@@ -24,7 +27,7 @@ class ModelField(BaseField):
         elif not isinstance(model_cls, type) or not issubclass(model_cls, Model):
             raise FieldModelClassInvalidError(key, model_cls)
 
-        self._model_cls: Model = model_cls
+        self._model_cls: Type[Model] = model_cls
 
         if not kwargs.get("auto_cast", True):
             from mongodb.utils.logger import logger

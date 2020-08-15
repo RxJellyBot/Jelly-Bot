@@ -3,13 +3,11 @@ from typing import Tuple, Set
 from extutils.flags import FlagSingleEnum
 from game.pkchess.exception import UnhandledSkillDirectionError
 
-__all__ = ["SkillDirection"]
+__all__ = ("SkillDirection",)
 
 
 class SkillDirection(FlagSingleEnum):
-    """
-    Direction to use the skill.
-    """
+    """Direction to use the skill."""
     UP = 1, "U"
     RIGHT = 2, "R"
     DOWN = 3, "D"

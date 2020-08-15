@@ -1,4 +1,4 @@
-__all__ = ["UnhandledSkillDirectionError"]
+__all__ = ("UnhandledSkillDirectionError",)
 
 
 class UnhandledSkillDirectionError(ValueError):

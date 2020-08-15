@@ -1,6 +1,4 @@
-"""
-Calculator using ``sympy.sympify`` to perform calculation by passing ``str``.
-"""
+"""Calculator using ``sympy.sympify`` to perform calculation by passing ``str``."""
 from typing import List
 
 from django.utils.translation import gettext_lazy as _

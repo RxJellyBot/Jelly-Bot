@@ -1,6 +1,4 @@
-"""
-Logger for all types of the checkers.
-"""
+"""Logger for all types of the checkers."""
 
 from extutils.logger import LoggerSkeleton
 

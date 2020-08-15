@@ -1,6 +1,4 @@
-"""
-This module contains various functions to handle various types of member event.
-"""
+"""This module contains various functions to handle various types of member event."""
 from django.utils.translation import gettext_lazy as _
 from linebot.models import MemberJoinedEvent, MemberLeftEvent
 
@@ -10,7 +8,7 @@ from mongodb.factory import RootUserManager, ChannelManager, ProfileManager
 from ..logger import LINE
 from ..wrapper import LineApiUtils, LineApiWrapper
 
-__all__ = ["handle_member_main"]
+__all__ = ("handle_member_main",)
 
 
 def handle_member_join(__, event, destination):

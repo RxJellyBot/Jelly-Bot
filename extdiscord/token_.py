@@ -9,7 +9,7 @@ import sys
 from extutils.logger import SYSTEM
 
 
-__all__ = ["discord_token"]
+__all__ = ("discord_token",)
 
 discord_token = os.environ.get("DISCORD_TOKEN")
 if not discord_token:

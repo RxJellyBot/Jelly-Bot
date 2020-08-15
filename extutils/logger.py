@@ -1,6 +1,4 @@
-"""
-Module of the customized logger implementations.
-"""
+"""Module of the customized logger implementations."""
 import abc
 import os
 import sys
@@ -10,7 +8,7 @@ from pathlib import Path
 
 from django.conf import settings
 
-__all__ = ["LoggerSkeleton", "SYSTEM", "ENV_VAR_NAME_LOGGER", "ENV_VAR_NAME_LOG_LEVEL"]
+__all__ = ("LoggerSkeleton", "SYSTEM", "ENV_VAR_NAME_LOGGER", "ENV_VAR_NAME_LOG_LEVEL",)
 
 LOGGER_SPLITTER = ","
 LOGGER_LVSPLIT = "|"
@@ -33,13 +31,12 @@ class LogFormatter(logging.Formatter):
 
     ``default_msec_format`` is the format for timestamp seconds of the entry.
     """
+
     default_msec_format = "%s.%03d"
 
 
 class LogStreamHandler(logging.StreamHandler):
-    """
-    Log output stream handler. Default to ``sys.stdout``.
-    """
+    """Log output stream handler. Default to ``sys.stdout``."""
 
     def __init__(self):
         super().__init__(sys.stdout)
@@ -66,27 +63,21 @@ def get_log_file_path(root, name_logger=None):
 
 
 class LogTimedRotatingFileHandlerBase(logging.handlers.TimedRotatingFileHandler, abc.ABC):
-    """
-    Base class for the timed rotating file handler.
-    """
+    """Base class for the timed rotating file handler."""
 
     def __init__(self, root, name=None):
         super().__init__(get_log_file_path(root, name), when="midnight", backupCount=10, encoding="utf-8")
 
 
 class LogRotatingFileHandlerBase(logging.handlers.RotatingFileHandler, abc.ABC):
-    """
-    Base class for the rotating file handler.
-    """
+    """Base class for the rotating file handler."""
 
     def __init__(self, root, name=None):
         super().__init__(get_log_file_path(root, name), backupCount=10, encoding="utf-8")
 
 
 class LogFileHandler(LogTimedRotatingFileHandlerBase):
-    """
-    Log file handler.
-    """
+    """Log file handler."""
 
     def __init__(self, name):
         if hasattr(settings, "LOGGING_FILE_ROOT"):
@@ -96,9 +87,7 @@ class LogFileHandler(LogTimedRotatingFileHandlerBase):
 
 
 class LogSevereFileHandler(LogRotatingFileHandlerBase):
-    """
-    Severe log file handler.
-    """
+    """Severe log file handler."""
 
     def __init__(self):
         if hasattr(settings, "LOGGING_FILE_ERROR"):
@@ -123,6 +112,7 @@ class LoggerSkeleton:
 
     If none of the above matches. then the default level will be set to ``logging.WARNING``.
     """
+
     DEFAULT_FMT = "%(asctime)s %(levelname)s [%(name)s] - %(message)s"
 
     def __init__(self, name: str, fmt: str = None, level: int = None, logger_name_env: str = None):
@@ -188,7 +178,7 @@ class LoggerSkeleton:
     @property
     def formatter(self):
         """
-        Get the log formatter
+        Get the log formatter.
 
         :return: log formatter
         """

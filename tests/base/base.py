@@ -47,9 +47,7 @@ class TestCase(DjangoTestCase):
 
     @staticmethod
     def obj_to_clear() -> List[Union[Type[ClearableMixin], ClearableMixin]]:
-        """
-        Objects to be cleared (by calling ``clear()``)  on the start of each test cases.
-        """
+        """Objects to be cleared (by calling ``clear()``)  on the start of each test cases."""
         return []
 
     def setUpTestCase(self) -> None:

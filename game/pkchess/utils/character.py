@@ -3,7 +3,7 @@ from typing import Optional
 from game.pkchess.character import CharacterTemplate
 from game.pkchess.res import character_templates
 
-__all__ = ["is_character_exists", "get_character_name", "get_character_template"]
+__all__ = ("is_character_exists", "get_character_name", "get_character_template",)
 
 
 def is_character_exists(name: str) -> bool:

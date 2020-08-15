@@ -1,21 +1,17 @@
 from extutils.flags import FlagCodeEnum
 
-__all__ = ["PlayerAction", "PlayerActionResult"]
+__all__ = ("PlayerAction", "PlayerActionResult",)
 
 
 class PlayerAction(FlagCodeEnum):
-    """
-    Type of player actions in a single turn.
-    """
+    """Type of player actions in a single turn."""
     MOVE = 1
     SKILL_1 = 11
     SKILL_2 = 12
 
 
 class PlayerActionResult(FlagCodeEnum):
-    """
-    Type of player actions in a single turn.
-    """
+    """Type of player actions in a single turn."""
     O_ACTED = -1
 
     X_GAME_NOT_STARTED = 101

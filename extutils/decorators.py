@@ -1,6 +1,4 @@
-"""
-Module of various utility decorators.
-"""
+"""Module of various utility decorators."""
 from abc import abstractmethod
 
 

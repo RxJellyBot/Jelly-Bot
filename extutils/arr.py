@@ -1,6 +1,4 @@
-"""
-Module to perform various operations on array.
-"""
+"""Module to perform various operations on array."""
 from typing import List, Callable, TypeVar, Any, Union
 
 __all__ = ["extract_list_action", "extract_one"]

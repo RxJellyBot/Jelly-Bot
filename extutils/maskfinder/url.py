@@ -1,12 +1,8 @@
-"""
-URLs for the US mask finder to get.
-"""
+"""URLs for the US mask finder to get."""
 
 
 class URL:
-    """
-    API URL of various vendors.
-    """
+    """API URL of various vendors."""
 
     @staticmethod
     def get_target(zip_code, product_id, range_mi):

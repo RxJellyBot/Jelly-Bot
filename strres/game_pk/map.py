@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["MapPoint"]
+__all__ = ("MapPoint",)
 
 
 class MapPoint:

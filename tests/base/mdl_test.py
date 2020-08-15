@@ -149,9 +149,7 @@ class TestModel(ABC):
         @classmethod
         @abstractmethod
         def get_model_class(cls) -> Type[Model]:
-            """
-            Model class to be tested.
-            """
+            """Model class to be tested."""
             raise NotImplementedError()
 
         @classmethod

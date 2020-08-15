@@ -1,6 +1,4 @@
-"""
-Module of utilities to update the IP address of an URL via DDNS.
-"""
+"""Module of utilities to update the IP address of an URL via DDNS."""
 import os
 import time
 from threading import Thread
@@ -9,7 +7,7 @@ import requests
 
 from extutils.logger import LoggerSkeleton
 
-__all__ = ["activate_ddns_update"]
+__all__ = ("activate_ddns_update",)
 
 LOGGER = LoggerSkeleton("sys.ddnsupdate", logger_name_env="DDNS_UPDATE")
 

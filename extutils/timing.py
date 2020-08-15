@@ -1,6 +1,4 @@
-"""
-Utilities to time the function execution.
-"""
+"""Utilities to time the function execution."""
 import time
 import inspect
 from dataclasses import dataclass
@@ -8,16 +6,15 @@ from typing import Any
 
 from extutils.logger import LoggerSkeleton
 
-__all__ = ["exec_timing", "exec_timing_ns", "exec_timing_result"]
+__all__ = ("exec_timing", "exec_timing_ns", "exec_timing_result",)
 
 exec_logger = LoggerSkeleton("utils.exectimer", logger_name_env="TIME_EXEC")
 
 
 @dataclass
 class ExecutionResult:
-    """
-    Function execution result wrapper class.
-    """
+    """Function execution result wrapper class."""
+
     return_: Any
     execution_ns: int
     caller_stack: inspect.FrameInfo
@@ -107,8 +104,7 @@ def exec_timing_ns(fn):
 
 def exec_timing_result(fn, *args, log: bool = True, **kwargs) -> ExecutionResult:
     """
-    Time the function execution and
-    returns a result body :class:`ExecutionResult` of the function execution timing test instead.
+    Time the function execution and returns a result body :class:`ExecutionResult`.
 
     If ``log`` is ``True``, also log it to ``utils.exectimer`` (level: ``logging.INFO``).
 

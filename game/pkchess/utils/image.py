@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 
-__all__ = ["replace_color"]
+__all__ = ("replace_color",)
 
 
 # noinspection PyUnresolvedReferences

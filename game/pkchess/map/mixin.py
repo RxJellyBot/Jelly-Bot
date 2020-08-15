@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-__all__ = ["ConvertibleMapMixin"]
+__all__ = ("ConvertibleMapMixin",)
 
 
 class ConvertibleMapMixin(ABC):

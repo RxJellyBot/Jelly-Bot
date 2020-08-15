@@ -41,9 +41,7 @@ class _TestResult(ABC, TestCase):
 
     @classmethod
     def result_args_no_error(cls) -> Tuple[Any, ...]:
-        """
-        Additional arguments to construct a success result instance excluding ``outcome`` and ``exception``.
-        """
+        """Additional arguments to construct a success result instance excluding ``outcome`` and ``exception``."""
         return ()
 
     @classmethod
@@ -57,9 +55,7 @@ class _TestResult(ABC, TestCase):
 
     @classmethod
     def result_args_has_error(cls) -> Tuple[Any, ...]:
-        """
-        Additional arguments to construct a failed result instance excluding ``outcome`` and ``exception``.
-        """
+        """Additional arguments to construct a failed result instance excluding ``outcome`` and ``exception``."""
         return ()
 
     @classmethod

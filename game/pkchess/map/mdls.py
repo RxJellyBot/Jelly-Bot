@@ -10,7 +10,7 @@ from models import Model, ModelDefaultValueExt
 from models.field import IntegerField, MultiDimensionalArrayField, FlagField, ModelField, DictionaryField, TextField
 from .mixin import ConvertibleMapMixin
 
-__all__ = ["MapPointModel", "MapCoordinateModel", "MapModel"]
+__all__ = ("MapPointModel", "MapCoordinateModel", "MapModel",)
 
 
 class MapPointStatusField(FlagField):
@@ -18,9 +18,7 @@ class MapPointStatusField(FlagField):
 
 
 class MapCoordinateModel(Model):
-    """
-    Map point coordinate to be stored in the database under ``MapPointModel.Coord``.
-    """
+    """Map point coordinate to be stored in the database under ``MapPointModel.Coord``."""
     WITH_OID = False
 
     X = IntegerField("x", default=ModelDefaultValueExt.Required)
@@ -31,9 +29,7 @@ class MapCoordinateModel(Model):
 
 
 class MapPointModel(Model):
-    """
-    Map point to be stored in the database under ``MapModel.PointStatus``.
-    """
+    """Map point to be stored in the database under ``MapModel.PointStatus``."""
     WITH_OID = False
 
     Status = MapPointStatusField("s", default=ModelDefaultValueExt.Required)
@@ -42,9 +38,7 @@ class MapPointModel(Model):
 
 
 class MapModel(ConvertibleMapMixin, Model):
-    """
-    A data model represents a game map.
-    """
+    """A data model represents a game map."""
     Width = IntegerField("w", positive_only=True, default=ModelDefaultValueExt.Required)
     Height = IntegerField("h", positive_only=True, default=ModelDefaultValueExt.Required)
     Points = MultiDimensionalArrayField("pt", 2, MapPointModel, default=ModelDefaultValueExt.Required)

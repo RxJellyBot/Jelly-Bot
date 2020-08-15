@@ -1,6 +1,4 @@
-"""
-This module contains the function to handle the default/unhandled type event.
-"""
+"""This module contains the function to handle the default/unhandled type event."""
 from extline.logger import LINE
 
 

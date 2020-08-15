@@ -1,6 +1,4 @@
-"""
-Utils to get various information related to Discord channel.
-"""
+"""Utils to get various information related to Discord channel."""
 from typing import Union
 
 from discord import Message, TextChannel, VoiceChannel, CategoryChannel
@@ -8,8 +6,9 @@ from discord import Message, TextChannel, VoiceChannel, CategoryChannel
 
 def msg_loc_repr(message: Message):
     """
-    Get the channel location representation of
-    where the message was sent in the format of ``<GUILD_NAME>/<CHANNEL_NAME>``.
+    Get the channel location representation of where the message was sent.
+
+    The representation format will be ``<GUILD_NAME>/<CHANNEL_NAME>``.
 
     If the channel is not being sent in a server, return ``<CHANNEL_NAME>`` instead.
 

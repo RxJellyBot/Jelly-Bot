@@ -1,6 +1,6 @@
 import os
 
-__all__ = ["is_testing"]
+__all__ = ("is_testing",)
 
 
 def is_testing() -> bool:

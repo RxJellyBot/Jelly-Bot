@@ -1,6 +1,4 @@
-"""
-This module contains the function to handle all types of the mesage event from the LINE bot webhook.
-"""
+"""This module contains the function to handle all types of the mesage event from the LINE bot webhook."""
 from linebot.models import (
     TextMessage, ImageMessage, VideoMessage, AudioMessage, LocationMessage, StickerMessage, FileMessage
 )
@@ -54,6 +52,6 @@ def handle_msg_main(request, event, destination):
             handle_fn(request, event, destination)
         else:
             handle_msg_unhandled(request, event, destination)
-    except Exception as ex:  # pylint: disable=W0703
+    except Exception as ex:  # pylint: disable=broad-except
         handle_error(ex, f"Error occurred in handle_msg_main. Handle function: {handle_fn.__qualname__}",
                      event, destination)

@@ -18,7 +18,7 @@ from mongodb.factory.results import WriteOutcome
 from ._dbctrl import SINGLE_DB_NAME
 from .mixin import ControlExtensionMixin
 
-__all__ = ["BaseCollection"]
+__all__ = ("BaseCollection",)
 
 
 class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
@@ -79,9 +79,7 @@ class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
         pass
 
     def build_indexes(self):
-        """
-        Method to be called when building the indexes of this collection.
-        """
+        """Method to be called when building the indexes of this collection."""
         pass
 
     def clear(self):

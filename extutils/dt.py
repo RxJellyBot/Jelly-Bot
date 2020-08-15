@@ -1,6 +1,4 @@
-"""
-Module containing various operations related to :class:`datetime`.
-"""
+"""Module containing various operations related to :class:`datetime`."""
 import math
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime, timedelta, tzinfo, time
@@ -166,9 +164,7 @@ def time_to_seconds(time_: time) -> float:
 
 
 class TimeRangeEndBeforeStart(Exception):
-    """
-    Raised if the ending time of :class:`TimeRange` happens before the starting time.
-    """
+    """Raised if the ending time of :class:`TimeRange` happens before the starting time."""
 
 
 @dataclass
@@ -187,6 +183,7 @@ class TimeRange:
         > If both not specified
             - `start` will be the current time - `range_hr` hrs
     """
+
     start: Optional[datetime] = None
     start_org: Optional[datetime] = field(init=False)
     end: Optional[datetime] = None
@@ -290,8 +287,7 @@ class TimeRange:
 
     def get_periods(self) -> List['TimeRange']:
         """
-        Get the periods in terms of :class:`TimeRange`
-        using the time length before applying range multiplier (``range_mult``).
+        Get the periods in terms of :class:`TimeRange` using the time length before applying range multiplier.
 
         If the length is infinitely long,
         returns a list containing this :class:`TimeRange` only (the instance itself).

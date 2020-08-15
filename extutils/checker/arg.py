@@ -1,6 +1,4 @@
-"""
-Module containing utilities to check and ensure the argument types.
-"""
+"""Module containing utilities to check and ensure the argument types."""
 from abc import ABC, abstractmethod
 from typing import Any, Type, List, Union, Optional
 from inspect import signature, Parameter
@@ -10,16 +8,11 @@ from bson import ObjectId
 from extutils.flags import is_flag_class
 from .logger import LOGGER
 
-__all__ = [
-    "arg_type_ensure", "TypeCastingFailedError",
-    "BaseDataTypeConverter", "NonSafeDataTypeConverter"
-]
+__all__ = ("arg_type_ensure", "TypeCastingFailedError", "BaseDataTypeConverter", "NonSafeDataTypeConverter",)
 
 
 class TypeCastingFailedError(Exception):
-    """
-    Raised if the type casting failed.
-    """
+    """Raised if the type casting failed."""
 
     def __init__(self, data: Any, dtype: type, exception: Exception):
         self.data = data
@@ -38,6 +31,7 @@ class BaseDataTypeConverter(ABC):
 
     Inherit this class for more customizations.
     """
+
     _ignore = [Any]
     valid_data_types: List[type] = []
 
@@ -192,6 +186,7 @@ class GeneralDataTypeConverter(BaseDataTypeConverter):
 
     Returns the original ``data`` if failed to cast.
     """
+
     valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
@@ -215,6 +210,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
 
     Raises :class:`TypeCastingFailed` and log a warning if any exception raised during casting.
     """
+
     valid_data_types = [int, str, bool, type, list, tuple, dict, ObjectId]
 
     @classmethod
@@ -234,7 +230,7 @@ class NonSafeDataTypeConverter(GeneralDataTypeConverter):
 
 def arg_type_ensure(fn=None, *, converter: Optional[Type[BaseDataTypeConverter]] = GeneralDataTypeConverter):
     """
-    Decorator to ensure the parameter is the desired data type real time.
+    A Decorator to ensure the parameter is the desired data type real time.
 
     This will inspect the signature of the function, and extract the type notation if available.
     Then the extracted notation will be used to cast the data by ``converter``.

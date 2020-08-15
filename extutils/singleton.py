@@ -1,16 +1,17 @@
-"""
-Base class for implementing singleton classes.
-"""
+"""Base class for implementing singleton classes."""
 # Obtained from https://stackoverflow.com/a/6798042/11571888
 from abc import ABC
 
 
 class Singleton(type):
     """
+    Singleton metaclass.
+
     Usage:
     >>> class SampleSingletonClass(metaclass=Singleton):
     >>>     pass
     """
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -21,10 +22,13 @@ class Singleton(type):
 
 class SingletonABC(ABC, type):
     """
+    Singleton metaclass with ``ABC``.
+
     Usage:
     >>> class SampleSingletonClass(metaclass=SingletonABC):
     >>>     pass
     """
+
     _instances = {}
 
     def __call__(cls, *args, **kwargs):

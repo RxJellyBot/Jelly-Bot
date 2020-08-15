@@ -1,6 +1,4 @@
-"""
-Main implementations to interact with imgur API.
-"""
+"""Main implementations to interact with imgur API."""
 import os
 import sys
 
@@ -19,9 +17,7 @@ if not IMGUR_CLIENT_ID:
 
 
 class ImgurClient:
-    """
-    Imgur API wrapper.
-    """
+    """Imgur API wrapper."""
 
     @staticmethod
     def upload_image(content: str, type_: str, title: str = None, description: str = None) -> ImgurUploadResponse:
@@ -58,8 +54,7 @@ class ImgurClient:
     @staticmethod
     def delete_image(delete_hash: str) -> bool:
         """
-        Delete an image with ``delete_hash`` which is given when an image is upload
-        and return if the deletion succeed.
+        Delete an image with ``delete_hash`` which is given when an image is upload and return if the deletion succeed.
 
         API Reference: https://apidocs.imgur.com/?version=latest#949d6cb0-5e55-45f7-8853-8c44a108399c
 

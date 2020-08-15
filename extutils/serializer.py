@@ -1,6 +1,4 @@
-"""
-Customized JSON serializer for Django.
-"""
+"""Customized JSON serializer for Django."""
 from bson import ObjectId
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -10,9 +8,7 @@ from models import Model
 
 
 class JellyBotSerializer(DjangoJSONEncoder):
-    """
-    Customized JSON serializer for Django.
-    """
+    """Customized JSON serializer for Django."""
 
     def default(self, o):
         if isinstance(o, Model):

@@ -1,12 +1,8 @@
-"""
-Module to get the endpoint URLs of imgur API.
-"""
+"""Module to get the endpoint URLs of imgur API."""
 
 
 class ImgurEndpoints:
-    """
-    Class to get the endpoint URLs of imgur API.
-    """
+    """Class to get the endpoint URLs of imgur API."""
 
     URL = "https://api.imgur.com/3/"
 

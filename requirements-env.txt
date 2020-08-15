@@ -6,3 +6,9 @@ pytest-django
 # Code linting
 pylint
 flake8
+pydocstyle
+
+# `flake8` plugins
+mccabe
+pycodestyle
+pyflakes

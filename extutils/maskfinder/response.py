@@ -1,6 +1,4 @@
-"""
-Response wrapper for US mask finder.
-"""
+"""Response wrapper for US mask finder."""
 from typing import List
 
 import requests
@@ -11,9 +9,7 @@ from .result import MaskFindingResult
 
 
 class Response:
-    """
-    Class to get the responses from various mask vendors.
-    """
+    """Class to get the responses from various mask vendors."""
 
     @staticmethod
     def get_target(zip_code, product_body, range_mi, silent_fail) -> List[MaskFindingResult]:

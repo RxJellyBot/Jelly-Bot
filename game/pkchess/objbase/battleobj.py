@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from models import Model
 from models.field import ModelField
 
-__all__ = ["BattleObject", "BattleObjectModel", "BattleObjectModelField"]
+__all__ = ("BattleObject", "BattleObjectModel", "BattleObjectModelField",)
 
 
 @dataclass
@@ -79,7 +79,5 @@ class BattleObjectModelField(ModelField):
 
 
 class BattleObjectModel(Model, ABC):
-    """
-    Base battle object including character, chest, monsters and field bosses.
-    """
+    """Base battle object including character, chest, monsters and field bosses."""
     pass

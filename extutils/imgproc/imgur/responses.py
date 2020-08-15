@@ -1,14 +1,10 @@
-"""
-Imgur API response wrappers.
-"""
+"""Imgur API response wrappers."""
 from abc import ABC
 from typing import Optional
 
 
 class ImgurResponse(ABC):
-    """
-    Base response wrapper for imgur API.
-    """
+    """Base response wrapper for imgur API."""
 
     def __init__(self, response: dict):
         self._dict = response
@@ -27,15 +23,13 @@ class ImgurResponse(ABC):
         """
         Get the status code of the API request.
 
-        :return: status code of the APi request.
+        :return: status code of the API request.
         """
         return self._dict["status"]
 
 
 class ImgurUploadResponse(ImgurResponse):
-    """
-    Image upload response wrapper for imgur API.
-    """
+    """Image upload response wrapper for imgur API."""
 
     @property
     def delete_hash(self) -> Optional[str]:
@@ -52,7 +46,7 @@ class ImgurUploadResponse(ImgurResponse):
     @property
     def link(self) -> Optional[str]:
         """
-        Get the link of the uploaded image
+        Get the link of the uploaded image.
 
         :return: link of the uploaded image
         """

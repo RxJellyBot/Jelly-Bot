@@ -1,6 +1,4 @@
-"""
-This module contains the loggers for the module ``extline``.
-"""
+"""Loggers for the module ``extline``."""
 import logging
 
 from extutils.logger import LoggerSkeleton
@@ -10,6 +8,7 @@ __all__ = ["LINE"]
 
 class LineLoggerSkeleton(LoggerSkeleton):
     """Logger skeleton for LINE bot webhook."""
+
     KEY_EVENT = "event"
     KEY_DEST = "dest"
 

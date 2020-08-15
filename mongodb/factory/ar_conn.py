@@ -29,7 +29,7 @@ from mongodb.factory import ProfileManager
 
 from ._base import BaseCollection
 
-__all__ = ["AutoReplyManager", "AutoReplyModuleManager", "AutoReplyModuleTagManager"]
+__all__ = ("AutoReplyManager", "AutoReplyModuleManager", "AutoReplyModuleTagManager",)
 
 DB_NAME = "ar"
 

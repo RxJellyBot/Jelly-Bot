@@ -8,7 +8,7 @@ from pymongo import errors
 
 from extutils.logger import LoggerSkeleton
 
-__all__ = ["backup_collection"]
+__all__ = ("backup_collection",)
 
 logger = LoggerSkeleton("mongo.backup", logger_name_env="MONGO_BACKUP")
 

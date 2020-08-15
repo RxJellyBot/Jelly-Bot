@@ -1,6 +1,4 @@
-"""
-Implementations to enable these ``Flag`` can be directly used on ``pymongo``.
-"""
+"""Implementations to enable these ``Flag`` can be directly used on ``pymongo``."""
 
 from bson import CodecOptions
 from bson.codec_options import TypeRegistry, TypeEncoder

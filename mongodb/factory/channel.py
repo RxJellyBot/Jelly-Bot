@@ -14,7 +14,7 @@ from mongodb.factory.results import (
 
 from ._base import BaseCollection
 
-__all__ = ["ChannelManager", "ChannelCollectionManager"]
+__all__ = ("ChannelManager", "ChannelCollectionManager",)
 
 DB_NAME = "channel"
 
@@ -84,7 +84,14 @@ class _ChannelManager(BaseCollection):
     def update_channel_nickname(self, channel_oid: ObjectId, root_oid: ObjectId, new_name: str) \
             -> ChannelChangeNameResult:
         """
-        Update the channel name for the user. If ``new_name`` is falsy, then the user-specific name will be removed.
+        Update the channel name for the user.
+
+        If ``new_name`` is falsy, then the user-specific name will be removed.
+
+        :param channel_oid: channel of the user to update the nickname
+        :param root_oid: user to update the nickname
+        :param new_name: new channel nick name
+        :return: result of the channel nickname change
         """
         ex = None
         if new_name:

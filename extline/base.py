@@ -1,6 +1,4 @@
-"""
-Contains the main objects necessary for the LINE bot webhook to operate.
-"""
+"""Contains the main objects necessary for the LINE bot webhook to operate."""
 import os
 import sys
 
@@ -11,7 +9,7 @@ from extutils.logger import SYSTEM
 
 from .handler import handle_main, handle_msg_main
 
-__all__ = ["line_handle_event", "line_parser"]
+__all__ = ("line_handle_event", "line_parser",)
 
 
 line_secret = os.environ.get("LINE_SECRET")

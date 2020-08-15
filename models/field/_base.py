@@ -357,9 +357,7 @@ class BaseField(abc.ABC):
 
     @final
     def is_empty(self, value) -> bool:
-        """
-        Check if the value is an empty value (either is ``None`` or ``none_obj``.
-        """
+        """Check if the value is an empty value (either is ``None`` or ``none_obj``."""
         return value is None or value == self.none_obj()
 
     def __repr__(self):

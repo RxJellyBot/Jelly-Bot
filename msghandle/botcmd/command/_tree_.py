@@ -20,7 +20,7 @@ from .ping import cmd as cmd_ping
 from .stk import cmd as cmd_stk
 
 # List all main command nodes for some pages to get the command data
-__all__ = ["cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr", "cmd_rct"]
+__all__ = ("cmd_root", "cmd_trfm", "cmd_id", "cmd_uintg", "cmd_help", "cmd_tmr", "cmd_rct",)
 
 
 cmd_root = CommandNode(
@@ -73,7 +73,7 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
 
 
 # noinspection PyUnusedLocal
-@cmd_ar_old.command_function(arg_count=0)
+@cmd_ar_old.command_function()
 def old_arg_0(e):
     return [HandledMessageEventText(content=txt)]
 

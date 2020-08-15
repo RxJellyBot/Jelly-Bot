@@ -1,9 +1,7 @@
-"""
-Logger of the Discord bot.
-"""
+"""Logger of the Discord bot."""
 from extutils.logger import LoggerSkeleton
 
-__all__ = ["DISCORD", "DISCORD_INTERNAL"]
+__all__ = ("DISCORD", "DISCORD_INTERNAL",)
 
 
 DISCORD = LoggerSkeleton("sys.discord", logger_name_env="DISCORD")

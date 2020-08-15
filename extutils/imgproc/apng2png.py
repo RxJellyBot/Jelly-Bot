@@ -6,7 +6,6 @@ Module to extract the frames of APNG **without** constraint violation checking.
     https://github.com/eight04/pyAPNG
     https://github.com/tonix0114/apng-splitter
 """
-
 # pylint: disable=C0103
 
 from abc import ABC
@@ -20,7 +19,7 @@ from typing import Union, Generator, List, Tuple
 
 from PIL import Image
 
-__all__ = ["extract_frames"]
+__all__ = ("extract_frames",)
 
 SIGNATURE_PNG = b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"
 
@@ -135,6 +134,7 @@ class _DataChunkBase(ABC):
 
     Inherit this class for specific type of data chunk for extended utility.
     """
+
     base_chunk: _BaseChunk
 
     length: int = field(init=False)
@@ -158,9 +158,8 @@ class _DataChunkBase(ABC):
 
 @dataclass
 class _DataChunkIHDR(_DataChunkBase):
-    """
-    Data class of ``IHDR`` chunk.
-    """
+    """Data class of ``IHDR`` chunk."""
+
     width: int = field(init=False)
     height: int = field(init=False)
 
@@ -184,9 +183,8 @@ class _DataChunkIHDR(_DataChunkBase):
 
 @dataclass
 class _DataChunkacTL(_DataChunkBase):
-    """
-    Data class of ``acTL`` chunk.
-    """
+    """Data class of ``acTL`` chunk."""
+
     frame_count: int = field(init=False)
 
     def __post_init__(self):
@@ -197,30 +195,23 @@ class _DataChunkacTL(_DataChunkBase):
 
 @dataclass
 class _DataChunkIDAT(_DataChunkBase):
-    """
-    Data class of ``IDAT`` chunk.
-    """
+    """Data class of ``IDAT`` chunk."""
 
 
 @dataclass
 class _DataChunkIEND(_DataChunkBase):
-    """
-    Data class of ``IEND`` chunk.
-    """
+    """Data class of ``IEND`` chunk."""
 
 
 @dataclass
 class _DataChunkOther(_DataChunkBase):
-    """
-    Data class for not-yet-supported data chunk.
-    """
+    """Data class for not-yet-supported data chunk."""
 
 
 @dataclass
 class _DataChunkfcTL(_DataChunkBase):
-    """
-    Data class of ``fcTL`` chunk.
-    """
+    """Data class of ``fcTL`` chunk."""
+
     # pylint: disable=R0902
 
     seq_num: int = field(init=False)
@@ -256,9 +247,7 @@ class _DataChunkfcTL(_DataChunkBase):
 
 @dataclass
 class _DataChunkfdAT(_DataChunkBase):
-    """
-    Data class of ``fdAT`` chunk.
-    """
+    """Data class of ``fdAT`` chunk."""
 
     # noinspection PyPep8Naming
     def to_IDAT(self) -> _DataChunkIDAT:

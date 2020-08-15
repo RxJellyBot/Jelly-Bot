@@ -4,7 +4,7 @@ import time
 from extutils.logger import SYSTEM
 from env_var import is_testing
 
-__all__ = ["get_single_db_name", "SINGLE_DB_NAME", "is_test_db"]
+__all__ = ("get_single_db_name", "SINGLE_DB_NAME", "is_test_db",)
 
 
 def get_single_db_name():

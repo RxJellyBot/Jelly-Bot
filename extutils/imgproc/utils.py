@@ -1,13 +1,9 @@
-"""
-Utilies for image processing.
-"""
+"""Utilies for image processing."""
 import base64
 
 
 class ImageContentProcessor:
-    """
-    Class for processing the image content.
-    """
+    """Class for processing the image content."""
 
     @staticmethod
     def binary_img_to_base64_str(bin_data: bytes) -> str:
@@ -32,9 +28,7 @@ class ImageContentProcessor:
 
 
 class ImageValidator:  # pylint: disable=R0903
-    """
-    Class for validating the image information.
-    """
+    """Class for validating the image information."""
 
     @staticmethod
     def is_valid_image_extension(name: str) -> bool:

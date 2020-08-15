@@ -1,6 +1,4 @@
-"""
-Implementations to bridge the utilities and MongoDB.
-"""
+"""Implementations to bridge the utilities and MongoDB."""
 from bson import CodecOptions
 from bson.codec_options import TypeRegistry
 

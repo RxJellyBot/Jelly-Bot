@@ -10,7 +10,7 @@ from extutils.dt import now_utc_aware
 from JellyBot.systemconfig import Website, HostUrl
 from msghandle.botcmd.command import cmd_uintg
 
-__all__ = ["msg_for_newly_created_account"]
+__all__ = ("msg_for_newly_created_account",)
 
 _KEY_NEW_ACCOUNT = "new-account"
 

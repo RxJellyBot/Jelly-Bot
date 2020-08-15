@@ -1,6 +1,6 @@
 from abc import ABC
 
-__all__ = ["MapImageError", "PlayerIconNotExistsError"]
+__all__ = ("MapImageError", "PlayerIconNotExistsError",)
 
 
 class MapImageError(ABC, Exception):

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from bson import ObjectId
 from game.pkchess.character import Character
 
-__all__ = ["PlayerEntry"]
+__all__ = ("PlayerEntry",)
 
 
 @dataclass

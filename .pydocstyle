@@ -1,0 +1,30 @@
+[pydocstyle]
+ignore =
+    # Public method missing docstring - `pylint` will check if there's really missing the docstring
+    D102,
+    # Magic method missing docstring - no need for it
+    D105,
+    # __init__ missing docstring - optional. add details to class docstring
+    D107,
+    # Blank line required before docstring - mutually exclusive to D204
+    D203,
+    # Multi-line docstring summary should start at the first line - mutually exclusive to D213
+    D212,
+    # Section underline is over-indented
+    D215,
+    # First line should be in imperative mood
+    D401,
+    # First word of the docstring should not be This
+    D404,
+    # Section name should end with a newline
+    D406,
+    # Missing dashed underline after section
+    D407,
+    # Section underline should be in the line following the section’s name
+    D408,
+    # Section underline should match the length of its name
+    D409,
+    # No blank lines allowed between a section header and its content
+    D412,
+    # Missing blank line after last section
+    D413

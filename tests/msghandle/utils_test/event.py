@@ -12,7 +12,7 @@ from msghandle.models import (
     MessageEventObject
 )
 
-__all__ = ["EventFactory"]
+__all__ = ("EventFactory",)
 
 
 class TestUnhandledEventObject(MessageEventObject):

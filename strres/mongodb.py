@@ -3,7 +3,7 @@ from typing import List, Union, Dict
 from bson import ObjectId
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ["Profile"]
+__all__ = ("Profile",)
 
 
 class Profile:

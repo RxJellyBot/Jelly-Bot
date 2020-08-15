@@ -1,6 +1,4 @@
-"""
-Module of various operations related to :class:`Color`.
-"""
+"""Module of various operations related to :class:`Color`."""
 import re
 
 from bson.codec_options import TypeEncoder
@@ -11,6 +9,8 @@ class Color:
     Class representing a color.
 
     During constuction, if ``color_sum`` is invalid, :class:`ValueError` will be raised.
+
+    :raises ValueError: `color_sum` is invalid
     """
 
     @staticmethod
@@ -24,9 +24,6 @@ class Color:
         return 0 <= num <= 16777215
 
     def __init__(self, color_sum: int):
-        """
-        :exception ValueError: `color_sum` is invalid.
-        """
         if Color.color_num_valid(color_sum):
             self._col_code = color_sum
         else:
@@ -97,9 +94,7 @@ class Color:
 
 
 class ColorFactory:
-    """
-    Factory class to generate :class:`Color`.
-    """
+    """Factory class to generate :class:`Color`."""
 
     BLACK = Color(0)
     WHITE = Color(16777215)
@@ -112,7 +107,7 @@ class ColorFactory:
         Generate a :class:`Color` from RGB.
 
         :return: a `Color` with using the provided RGB values
-        :exception ValueError: any of `red`, `green` or `blue` is invalid
+        :raises ValueError: any of `red`, `green` or `blue` is invalid
         """
 
         def _val_check(val, name):
@@ -133,7 +128,7 @@ class ColorFactory:
         Allowed formats for ``hex_str`` are: #FFFFFF or FFFFFF.
 
         :param hex_str: hex color string to be used to generate a color
-        :exception ValueError: hex string is in a invalid format
+        :raises ValueError: hex string is in a invalid format
         """
         if not re.match(r"#?[0-9A-Fa-f]{6}", hex_str):
             raise ValueError(f"Invalid color string. Should be in the format of #FFFFFF or FFFFFF. ({hex_str})")
@@ -144,9 +139,8 @@ class ColorFactory:
 
 
 class ColorMongoEncoder(TypeEncoder):
-    """
-    :class:`TypeEncoder` for MongoDB to handle the type of :class:`ColorMongoEncoder`.
-    """
+    """:class:`TypeEncoder` for MongoDB to handle the type of :class:`ColorMongoEncoder`."""
+
     python_type = Color
 
     def transform_python(self, value):

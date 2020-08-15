@@ -1,6 +1,4 @@
-"""
-This module contains various wrappers of the required objects for the LINE bot webhook.
-"""
+"""This module contains various wrappers of the required objects for the LINE bot webhook."""
 import os
 import sys
 from typing import List, Union, Optional
@@ -15,7 +13,7 @@ from models import ChannelModel
 from extutils.imgproc import ImageContentProcessor
 from extutils.logger import SYSTEM
 
-__all__ = ["LineApiUtils", "LineApiWrapper"]
+__all__ = ("LineApiUtils", "LineApiWrapper",)
 
 line_token = os.environ.get("LINE_TOKEN")
 if not line_token:

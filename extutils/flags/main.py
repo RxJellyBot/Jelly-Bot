@@ -1,6 +1,4 @@
-"""
-Main ``Flag`` implementations.
-"""
+"""Main ``Flag`` implementations."""
 from enum import Enum
 from typing import Union
 
@@ -56,9 +54,7 @@ def is_flag_double(obj):
 
 
 class FlagMixin:  # pylint: disable=R0903
-    """
-    Base class of a ``Flag``.
-    """
+    """Base class of a ``Flag``."""
 
     @classmethod
     def default(cls):
@@ -72,7 +68,7 @@ class FlagMixin:  # pylint: disable=R0903
 
 class FlagCodeMixin(FlagMixin):
     """
-    Implementation of the ``Flag`` with a ``code`` (:class:`int`) only.
+    ``Flag`` with a ``code`` (:class:`int`) only.
 
     Example:
 
@@ -162,7 +158,7 @@ class FlagCodeMixin(FlagMixin):
 
 class FlagSingleMixin(FlagCodeMixin):
     """
-    Implementation of the ``Flag`` with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
+    ``Flag`` with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
 
     Example:
 
@@ -193,8 +189,7 @@ class FlagSingleMixin(FlagCodeMixin):
 
 class FlagDoubleMixin(FlagSingleMixin):
     """
-    Implementation of the ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
-    and a ``description`` (:class:`str`).
+    ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`) and a ``description`` (:class:`str`).
 
     Example:
 
@@ -237,8 +232,7 @@ class FlagDoubleMixin(FlagSingleMixin):
 class FlagPrefixedDoubleMixin(FlagDoubleMixin):
     # noinspection PyAbstractClass,PyUnresolvedReferences
     """
-    Implementation of the ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
-    and a ``description`` (:class:`str`).
+    ``Flag`` with a ``code`` (:class:`int`), a ``key`` (:class:`str`) and a ``description`` (:class:`str`).
 
     The ``code`` is prefixed by implementing the property ``code_prefix``.
 
@@ -287,9 +281,7 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 
 
 class FlagEnumMixin:
-    """
-    Mixin for some extend enum functionality.
-    """
+    """Mixin for some extend enum functionality."""
 
     @classmethod
     def cast(cls, item: Union[str, int], *, silent_fail=False):
@@ -301,8 +293,8 @@ class FlagEnumMixin:
         :param item: item to be casted
         :param silent_fail: if this function should fail silently
         :return: casted enum/flag
-        :exception TypeError: invalid type of the `item`
-        :exception ValueError: ``item`` does not match any element of this enum/flag
+        :raises TypeError: invalid type of the `item`
+        :raises ValueError: ``item`` does not match any element of this enum/flag
         """
         if isinstance(item, cls):
             return item
@@ -341,7 +333,7 @@ class FlagEnumMixin:
 
 class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):
     """
-    Actual class to be used to implement a flag with a ``code`` only.
+    Actual flag class with a ``code`` only.
 
     Example:
 
@@ -355,7 +347,7 @@ class FlagCodeEnum(FlagCodeMixin, FlagEnumMixin, Enum):
 
 class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
     """
-    Actual class to be used to implement a flag with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
+    Actual flag class with a ``code`` (:class:`int`) and a ``key`` (:class:`str`).
 
     Example:
 
@@ -369,8 +361,7 @@ class FlagSingleEnum(FlagSingleMixin, FlagEnumMixin, Enum):
 
 class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
     """
-    Actual class to be used to implement a flag with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
-    and a ``description`` (:class:`str`).
+    Actual flag class with a ``code`` (:class:`int`), a ``key`` (:class:`str`) and a ``description`` (:class:`str`).
 
     Example:
 
@@ -386,8 +377,7 @@ class FlagDoubleEnum(FlagDoubleMixin, FlagEnumMixin, Enum):
 class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
     # noinspection PyAbstractClass
     """
-    Actual class to be used to implement a flag with a ``code`` (:class:`int`), a ``key`` (:class:`str`)
-    and a ``description`` (:class:`str`).
+    Actual flag class with a ``code`` (:class:`int`), a ``key`` (:class:`str`) and a ``description`` (:class:`str`).
 
     The ``code`` is prefixed by implementing the property ``code_prefix``.
 
@@ -419,8 +409,7 @@ class FlagPrefixedDoubleEnum(FlagPrefixedDoubleMixin, FlagEnumMixin, Enum):
 
 class FlagOutcomeMixin(FlagCodeMixin):
     """
-    A special implementation which have the same functionality as :class:`FlagCodeEnum`,
-    but with an additional property ``is_success``.
+    Same as :class:`FlagCodeEnum`, but with an additional property ``is_success``.
 
     Successive outcome code should have a positive value as ``code``.
     In contrast, the failing outcome code should have a negative value as ``code``.

@@ -1,6 +1,4 @@
-"""
-This module contains the method to be called if any error occurred during event handling.
-"""
+"""This module contains the method to be called if any error occurred during event handling."""
 import traceback
 
 from linebot import exceptions

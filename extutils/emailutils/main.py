@@ -1,6 +1,4 @@
-"""
-Main utilities related to email.
-"""
+"""Main utilities related to email."""
 from threading import Thread
 from typing import List, Optional, Tuple
 
@@ -25,6 +23,7 @@ class MailSender:
     Sends email to mock server and will not send the email asynchronously
     if ``TEST`` in environment variables is set to ``1``.
     """
+
     _cache_ = ttldict.TTLOrderedDict(Email.EmailCacheExpirySeconds)
 
     @staticmethod
@@ -98,9 +97,7 @@ class MailSender:
     def send_email_async(
             content_html: str, recipients: List[str] = None, *,
             subject: str = Email.DefaultSubject, prefix: str = Email.DefaultPrefix):
-        """
-        Same as ``EmailSender.send_email()``. The only difference is that this sends the email asynchronously.
-        """
+        """Same as ``EmailSender.send_email()``. The only difference is that this sends the email asynchronously."""
         if is_testing():
             MailSender.send_email_to_mock_server(*MailSender.collate_info(content_html, recipients, subject, prefix))
         else:

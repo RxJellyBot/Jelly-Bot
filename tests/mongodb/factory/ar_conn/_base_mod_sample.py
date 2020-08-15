@@ -659,9 +659,7 @@ class TestArModuleSample(ABC):
 
         @lru_cache(maxsize=None)
         def get_mdl_14_args(self):
-            """
-            Additional not-in-use parameter.
-            """
+            """Additional not-in-use parameter."""
             keyword = AutoReplyContentModel(Content="1", ContentType=AutoReplyContentType.LINE_STICKER)
             responses = [AutoReplyContentModel(Content="A", ContentType=AutoReplyContentType.TEXT)]
             creator_oid = self.CREATOR_OID

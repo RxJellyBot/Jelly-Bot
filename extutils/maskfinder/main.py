@@ -1,12 +1,10 @@
-"""
-Main implementations for the US mask finder service.
-"""
+"""Main implementations for the US mask finder service."""
 from typing import List
 
 from .response import Response
 from .result import MaskFindingResult
 
-__all__ = ["get_results"]
+__all__ = ("get_results",)
 
 PRODUCT_TARGET = ("53134238", "Anti-Viral Face Mask - 10ct - Up&Up™")
 PRODUCT_WALGREENS1 = ("40000153109", "Walgreens Face Mask, Cone Style")

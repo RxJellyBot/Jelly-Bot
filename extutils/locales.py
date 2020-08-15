@@ -1,6 +1,4 @@
-"""
-Module containing the operations related to locale.
-"""
+"""Module containing the operations related to locale."""
 from dataclasses import dataclass
 from datetime import datetime, tzinfo, timedelta
 from typing import Optional, List
@@ -28,9 +26,8 @@ def sec_diff_to_utc_offset(s_diff: float):
 
 @dataclass
 class LocaleInfo:
-    """
-    Class representing a locale info.
-    """
+    """Class representing a locale info."""
+
     description: str
     pytz_code: str
 
@@ -78,17 +75,14 @@ class LocaleInfo:
 
 @dataclass
 class LanguageInfo:
-    """
-    Class representing a language info.
-    """
+    """Class representing a language info."""
+
     name: str
     code: str
 
 
 class PytzInfo(tzinfo):
-    """
-    A customized :class:`tzinfo` based on the :class:`tzinfo` from ``pytz``.
-    """
+    """A customized :class:`tzinfo` based on the :class:`tzinfo` from ``pytz``."""
 
     def __init__(self, tz):
         self._base = tz

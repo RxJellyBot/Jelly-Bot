@@ -23,7 +23,7 @@ from .results import (
     RootUserUpdateResult, GetRootUserDataResult
 )
 
-__all__ = ["APIUserManager", "OnPlatformIdentityManager", "RootUserManager"]
+__all__ = ("APIUserManager", "OnPlatformIdentityManager", "RootUserManager",)
 
 DB_NAME = "user"
 

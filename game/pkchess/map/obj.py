@@ -16,14 +16,12 @@ from game.pkchess.objbase import BattleObject
 
 from .mixin import ConvertibleMapMixin
 
-__all__ = ["MapPoint", "MapCoordinate", "MapTemplate", "Map"]
+__all__ = ("MapPoint", "MapCoordinate", "MapTemplate", "Map",)
 
 
 @dataclass
 class MapCoordinate:
-    """
-    Represents the coordinate of a map point.
-    """
+    """Represents the coordinate of a map point."""
     X: int
     Y: int
 
@@ -64,9 +62,7 @@ class MapCoordinate:
 
 @dataclass
 class MapPoint:
-    """
-    Represents a map point.
-    """
+    """Represents a map point."""
     status: MapPointStatus
     coord: MapCoordinate
     obj: Optional[BattleObject] = None
@@ -265,11 +261,13 @@ class Map:
             for coord in empty_player_coords:
                 self.points[coord.X][coord.Y].status = MapPointStatus.EMPTY
 
-    def player_move(self, player_oid: ObjectId, x_offset: int, y_offset: int, max_move: int) -> bool:
+    def player_move(self, player_oid: ObjectId, x_offset: int, y_offset: int, max_move: float) -> bool:
         """
         Move the player using the given coordinate offset.
 
         Returns ``False`` if the destination is not an empty spot. Otherwise, move the player and return ``True``.
+
+        ``max_move`` will be rounded.
 
         :param player_oid: OID of the player
         :param x_offset: offset of X
@@ -303,7 +301,7 @@ class Map:
             return False
 
         # Check if the path is connected and the destination is empty
-        if not self.get_shortest_path(origin, destination, max_move):
+        if not self.get_shortest_path(origin, destination, round(max_move)):
             raise PathNotFoundError(origin, destination)
 
         # Move the player & update related variables
@@ -370,9 +368,7 @@ class Map:
 
     def _get_shortest_path(self, origin: MapCoordinate, destination: MapCoordinate, max_length: int,
                            paths: List[List[MapCoordinate]] = None) -> Optional[List[MapCoordinate]]:
-        """
-        Helper method of ``self.get_shortest_path()``.
-        """
+        """Helper method of ``self.get_shortest_path()``."""
         new_paths = []
         for path in paths:
             # Extend every path to left, right, up, down

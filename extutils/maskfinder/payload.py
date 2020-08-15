@@ -1,12 +1,8 @@
-"""
-Payload for the service - US mask finder.
-"""
+"""Payload for the service - US mask finder."""
 
 
 class Payload:  # pylint: disable=R0903
-    """
-    Class to generate the payload to be sent for US mask finder.
-    """
+    """Class to generate the payload to be sent for US mask finder."""
 
     @staticmethod
     def get_walgreens(addr, product_id):

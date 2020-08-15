@@ -1,6 +1,4 @@
-"""
-Functions to perform actions related to user identity.
-"""
+"""Functions to perform actions related to user identity."""
 from concurrent.futures.thread import ThreadPoolExecutor
 from threading import Thread
 from typing import Dict, List

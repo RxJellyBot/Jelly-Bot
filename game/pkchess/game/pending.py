@@ -11,7 +11,7 @@ from .main import RunningGame
 from .player import PlayerEntry
 from .base import Game
 
-__all__ = ["PendingGame"]
+__all__ = ("PendingGame",)
 
 
 @dataclass

@@ -1,6 +1,4 @@
-"""
-Core objects for direct control on the Discord bot.
-"""
+"""Core objects for direct control on the Discord bot."""
 import asyncio
 from typing import Optional, Union
 import threading
@@ -25,7 +23,7 @@ from msghandle.models import MessageEventObjectFactory
 from .token_ import discord_token
 from .utils.cnflprvt import BotConflictionPreventer
 
-__all__ = ["run_server", "DiscordClientWrapper"]
+__all__ = ("run_server", "DiscordClientWrapper",)
 
 
 class DiscordClient(Client):
@@ -39,7 +37,7 @@ class DiscordClient(Client):
     async def on_ready(self):
         """Contains the code to be executed when the bot is ready."""
         # Not importing at the top level because the app will not be ready yet (translation unavailable)
-        from msghandle.botcmd.command import cmd_help  # pylint: disable=C0415
+        from msghandle.botcmd.command import cmd_help  # pylint: disable=import-outside-toplevel
 
         DISCORD.logger.info("Logged in as %s.", self.user)
 
@@ -194,7 +192,7 @@ class _DiscordClientWrapper:
 
     async def start(self, token):
         """
-        Non-blocking call to run the discord client. (using ``async`` and ``await``)
+        Non-blocking call to run the discord client using ``async`` and ``await``.
 
         Returns a coroutine.
 

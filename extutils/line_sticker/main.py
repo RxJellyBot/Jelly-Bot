@@ -1,6 +1,4 @@
-"""
-Module of the LINE sticker utilities.
-"""
+"""Module of the LINE sticker utilities."""
 import atexit
 import time
 from dataclasses import dataclass
@@ -23,7 +21,7 @@ from extutils.checker import arg_type_ensure
 from JellyBot.systemconfig import ExtraService
 from mixin import ClearableMixin
 
-__all__ = ["LineStickerType", "LineStickerUtils", "LineAnimatedStickerDownloadResult"]
+__all__ = ("LineStickerType", "LineStickerUtils", "LineAnimatedStickerDownloadResult",)
 
 _temp_dir = tempfile.mkdtemp()  # Temporary directory for LINE stickers
 atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
@@ -31,9 +29,8 @@ atexit.register(shutil.rmtree, _temp_dir)  # Clear temporary directory on exit
 
 @dataclass
 class LineAnimatedStickerDownloadResult:
-    """
-    Download result of the animated sticker.
-    """
+    """Download result of the animated sticker."""
+
     available: bool = False
     already_exists: bool = False
 
@@ -71,9 +68,7 @@ class LineAnimatedStickerDownloadResult:
 
 
 class LineStickerType(FlagSingleEnum):
-    """
-    :class:`FlagSingleEnum` indicating the type of the LINE sticker.
-    """
+    """A :class:`FlagSingleEnum` indicating the type of the LINE sticker."""
 
     @classmethod
     def default(cls):
@@ -85,9 +80,8 @@ class LineStickerType(FlagSingleEnum):
 
 
 class LineStickerTempStorageManager:
-    """
-    Class to manage the downloaded sticker files stored in the temporary storage.
-    """
+    """Class to manage the downloaded sticker files stored in the temporary storage."""
+
     _PATH_DICT: Dict[str, datetime] = {}
 
     _started = False
@@ -150,9 +144,7 @@ class LineStickerTempStorageManager:
 
 
 class LineStickerUtils(ClearableMixin):
-    """
-    Main LINE sticker utilities.
-    """
+    """Main LINE sticker utilities."""
 
     # def get_pack_meta(self, pack_id: str):
     #     """

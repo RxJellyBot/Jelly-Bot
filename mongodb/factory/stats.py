@@ -22,7 +22,7 @@ from mongodb.factory.results import RecordAPIStatisticsResult, WriteOutcome
 from mongodb.utils import ExtendedCursor
 from ._base import BaseCollection
 
-__all__ = ["APIStatisticsManager", "MessageRecordStatisticsManager", "BotFeatureUsageDataManager"]
+__all__ = ("APIStatisticsManager", "MessageRecordStatisticsManager", "BotFeatureUsageDataManager",)
 
 DB_NAME = "stats"
 
@@ -120,7 +120,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
     def get_user_last_message_ts(self, channel_oid: ObjectId, user_oids: List[ObjectId], tzinfo_: tzinfo = None) \
             -> Dict[ObjectId, datetime]:
         ret = {}
-        KEY_TS = "msgts"
+        key_ts = "msgts"
 
         pipeline = [
             {"$match": {
@@ -132,11 +132,11 @@ class _MessageRecordStatisticsManager(BaseCollection):
             }},
             {"$group": {
                 "_id": "$" + MessageRecordModel.UserRootOid.key,
-                KEY_TS: {"$first": "$" + OID_KEY}
+                key_ts: {"$first": "$" + OID_KEY}
             }}
         ]
         for data in self.aggregate(pipeline):
-            ret[data[OID_KEY]] = localtime(data[KEY_TS].generation_time, tzinfo_)
+            ret[data[OID_KEY]] = localtime(data[key_ts].generation_time, tzinfo_)
 
         return ret
 

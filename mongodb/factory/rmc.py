@@ -9,7 +9,7 @@ from models import RemoteControlEntryModel
 
 from ._base import BaseCollection
 
-__all__ = ["RemoteControlManager"]
+__all__ = ("RemoteControlManager",)
 
 DB_NAME = "rmc"
 

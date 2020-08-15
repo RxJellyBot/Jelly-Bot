@@ -20,7 +20,7 @@ from JellyBot.systemconfig import Database
 from ._base import BaseCollection
 from .mixin import GenerateTokenMixin
 
-__all__ = ["ExecodeManager"]
+__all__ = ("ExecodeManager",)
 
 DB_NAME = "execode"
 

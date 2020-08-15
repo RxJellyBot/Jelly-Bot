@@ -2,7 +2,7 @@ from django.utils.translation import gettext_lazy as _
 
 from JellyBot.systemconfig import System, HostUrl
 
-__all__ = ["ToSiteReason", "Event", "HandledResult"]
+__all__ = ("ToSiteReason", "Event", "HandledResult",)
 
 
 class HandledResult:

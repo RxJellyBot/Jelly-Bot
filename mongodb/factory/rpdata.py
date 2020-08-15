@@ -6,7 +6,7 @@ from ._dbctrl import SINGLE_DB_NAME
 from .factory import MONGO_CLIENT
 from ..utils import BulkWriteDataHolder
 
-__all__ = ["PendingRepairDataManager"]
+__all__ = ("PendingRepairDataManager",)
 
 DB_NAME = "pdrp"
 

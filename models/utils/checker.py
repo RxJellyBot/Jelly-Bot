@@ -13,7 +13,7 @@ from extutils.logger import LoggerSkeleton
 
 from ..rpdata import PendingRepairDataModel
 
-__all__ = ["ModelFieldChecker"]
+__all__ = ("ModelFieldChecker",)
 
 logger = LoggerSkeleton("mongo.modelcheck", logger_name_env="MODEL_CHECK")
 

@@ -1,12 +1,12 @@
 from extutils.emailutils import EmailServer
 from tests.base import TestCase
 
-__all__ = ["TestFakeEmailServer"]
+__all__ = ["TestMockEmailServer"]
 
 srv = EmailServer()
 
 
-class TestFakeEmailServer(TestCase):
+class TestMockEmailServer(TestCase):
     @staticmethod
     def obj_to_clear():
         return [srv]
@@ -76,3 +76,23 @@ class TestFakeEmailServer(TestCase):
                 self.assertEqual(subject, mail.subject, "Mail subject not match.")
                 self.assertEqual(content, mail.content, "Mail content not match.")
                 self.assertEqual(sender, mail.sender, "Mail sender not match.")
+
+
+class TestMailSender(TestCase):
+    def test_no_duplicate(self):
+        pass  # TEST: todo no duplicate
+
+    def test_no_duplicate_dfferent_recipient(self):
+        pass
+
+    def test_no_duplicate_dfferent_sender_recipient(self):
+        pass
+
+    def test_no_duplicate_dfferent_content(self):
+        pass
+
+    def test_no_duplicate_dfferent_subject(self):
+        pass
+
+    def test_no_duplicate_after_expiry(self):
+        pass

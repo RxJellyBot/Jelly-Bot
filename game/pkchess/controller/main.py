@@ -14,7 +14,7 @@ from game.pkchess.game import PendingGame, RunningGame
 from game.pkchess.res import get_map_template, skills
 from game.pkchess.utils.character import get_character_template
 
-__all__ = ["GameController"]
+__all__ = ("GameController",)
 
 
 class GameController(ClearableMixin):

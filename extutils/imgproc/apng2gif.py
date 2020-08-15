@@ -1,6 +1,4 @@
-"""
-Module to convert ``apng`` to ``gif``.
-"""
+"""Module to convert ``apng`` to ``gif``."""
 import io
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -15,16 +13,14 @@ from PIL import Image
 
 from .apng2png import extract_frames
 
-__all__ = ["convert", "ConvertResult", "ConvertOpResult"]
+__all__ = ("convert", "ConvertResult", "ConvertOpResult",)
 
 _IDX_CLR_BACKGROUND = 255
 _IDX_CLR_TRANSPARENT = 255
 
 
 class ConvertOpResult:
-    """
-    Result of an operation during the conversion.
-    """
+    """Result of an operation during the conversion."""
 
     def __init__(self):
         self._success = False
@@ -81,9 +77,9 @@ class ConvertOpResult:
     @property
     def exception(self) -> Optional[Exception]:
         """
-        Get the raised exception (if any).
+        Get the raised exception during execution (if any).
 
-        :return: raised exception (if any)
+        :return: raised exception during execution (if any)
         """
         return self._exception
 
@@ -95,6 +91,7 @@ class ConvertResult:
 
     Unit of the duration is seconds.
     """
+
     input_exists: bool = True
 
     frame_extraction: ConvertOpResult = field(default_factory=ConvertOpResult)
@@ -139,8 +136,7 @@ def _get_file_name(file_path: str) -> str:
 
 def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tuple[bytes, Fraction]]]:
     """
-    Extract the frames of the APNG file at ``apng_path``
-    and return it as a list of 2-tuple containing the image byte data and its delay.
+    Extract the frames of the APNG file and return it as 2-tuples containing the image byte data and its delay.
 
     If the extraction failed, returns ``None``
     and record the exception to ``result.frame_extraction_exception`` instead.
@@ -189,8 +185,9 @@ def _zip_frames(result: ConvertResult, apng_path: str, frame_data: List[Tuple[by
 
 def _process_frame_transparent(image_byte: bytes):
     """
-    Apply color index for transparency ``transparent_index`` to ``image_byte``
-    and return the modified PIL image object.
+    Apply color index for transparency to ``image_byte`` and return the modified PIL image object.
+
+    The color index for transparency is ``_IDX_CLR_TRANSPARENT``.
 
     Copied and modified from ``apng2gif``.
 

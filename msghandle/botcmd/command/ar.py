@@ -16,7 +16,7 @@ from JellyBot.systemconfig import HostUrl, Bot
 
 from ._base import CommandNode
 
-__all__ = ["cmd_main"]
+__all__ = ("cmd_main",)
 
 # region Command Nodes
 cmd_main = CommandNode(
@@ -208,7 +208,6 @@ def get_list_of_keyword_html(conn_list: ExtendedCursor[AutoReplyModuleModel]) ->
 
 @cmd_list.command_function(
     feature=BotFeature.TXT_AR_LIST_USABLE,
-    arg_count=0,
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=10
 )

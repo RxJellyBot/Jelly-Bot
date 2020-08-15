@@ -16,7 +16,7 @@ from discord import Guild, Status
 
 from extutils.logger import SYSTEM
 
-__all__ = ["BotConflictionPreventer"]
+__all__ = ("BotConflictionPreventer",)
 
 SYSTEM.logger.info("Discord Bot Conflict Preventer is active.\n"
                    "Disable this by deleting the usage of `log_bot_presence` and `prioritized_bot_exists` "
@@ -27,9 +27,8 @@ STABLE_BOT_ID = 621537611026137118
 
 
 class BotConflictionPreventer:
-    """
-    Class to prevent message handling confliction/duplication.
-    """
+    """Class to prevent message handling confliction/duplication."""
+
     id_list_checked = False
     id_to_check = [LOCAL_BOT_ID, STABLE_BOT_ID]
     """

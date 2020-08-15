@@ -17,12 +17,12 @@ jobs:
         run: |
           echo %GITHUB_REF%
 
-  flake8-checks:
+  checks:
     runs-on: windows-latest
 
     needs: [prepare]
 
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     env:
       SECRET_KEY: ${{ secrets.DjangoSecretKey }}
@@ -58,89 +58,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install flake8
-        run: |
-          pip install flake8
+          pip install -r requirements-env.txt
 
       - name: flake8 - error check
         run: |
-          flake8 . --config .flake8-error
+          flake8 . --config .flake8-error --benchmark
 
       - name: flake8 - style check
         run: |
-          flake8 . --config .flake8-style
+          flake8 . --config .flake8-style --benchmark
 
-  pylint-checks:
-    runs-on: windows-latest
-
-    needs: [prepare]
-
-    timeout-minutes: 10
-
-    env:
-      SECRET_KEY: ${{ secrets.DjangoSecretKey }}
-      DJANGO_SETTINGS_MODULE: JellyBot.settings
-      MONGO_URL: ${{ secrets.MongoDBURL }}
-      MONGO_DB: 'GitHubActionTest#${{ github.run_number }}'
-      LINE_SECRET: ${{ secrets.LINESecret }}
-      LINE_TOKEN: ${{ secrets.LINEToken }}
-      DISCORD_TOKEN: ${{ secrets.DiscordToken }}
-      PRODUCTION: 0
-      DEBUG: 1
-      TEST: 1
-      LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
-      NO_FIELD_CHECK: 1
-      GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}
-      EMAIL_ACCOUNT: ${{ secrets.EmailAccount }}
-      EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
-      SERVICE_SHORT_URL: http://rnnx.cc
-      DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
-      IMGUR_CLIENT_ID: ${{ secrets.ImgurClientID }}
-      DDNS_HOST: bot
-      DDNS_DOMAIN: raenonx.cc
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: Install dependencies
+      - name: pydocstyle
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pydocstyle bot doc extdiscord extline extutils --count
 
-      - name: Install pylint
+      - name: pylint
         run: |
-          pip install pylint
-
-      - name: Lint on `bot`
-        run: |
-          pylint bot
-
-      - name: Lint on `doc`
-        run: |
-          pylint doc
-
-      - name: Lint on `extdiscord`
-        run: |
-          pylint extdiscord
-
-      - name: Lint on `extline`
-        run: |
-          pylint extline
-
-      - name: Lint on `extutils`
-        run: |
-          pylint extutils
+          pylint bot doc extdiscord extline extutils
 
   django-tests:
     runs-on: windows-latest
 
-    needs: [prepare]
+    needs: [prepare, checks]
 
     timeout-minutes: 60
 
@@ -178,7 +117,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest-django
+          pip install -r requirements-env.txt
 
       - name: Run pytest
         run: |
@@ -187,7 +126,7 @@ jobs:
   cleanup:
     runs-on: windows-latest
 
-    needs: [prepare, django-tests]
+    needs: [django-tests]
 
     env:
       MONGO_URL: ${{ secrets.MongoDBURL }}

@@ -8,7 +8,7 @@ from game.pkchess.exception import (
 from game.pkchess.flags import DamageType
 from game.pkchess.objbase import BattleObject
 
-__all__ = ["DamageCalculator", "Damage"]
+__all__ = ("DamageCalculator", "Damage",)
 
 
 @dataclass

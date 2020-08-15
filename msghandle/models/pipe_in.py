@@ -15,9 +15,9 @@ from msghandle import logger
 from msghandle.models import ImageContent, LineStickerContent
 from strres.msghandle import Event as EventStr
 
-__all__ = ["Event", "MessageEventObject",
+__all__ = ("Event", "MessageEventObject",
            "TextMessageEventObject", "ImageMessageEventObject", "LineStickerMessageEventObject",
-           "MessageEventObjectFactory"]
+           "MessageEventObjectFactory")
 
 
 class Event(ABC):
@@ -64,9 +64,7 @@ class Event(ABC):
 
     @property
     def constructed_time(self) -> float:
-        """
-        Returns how long have this event object been created in seconds.
-        """
+        """Returns how long have this event object been created in seconds."""
         return time.time() - self._construct
 
 

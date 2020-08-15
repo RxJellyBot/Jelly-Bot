@@ -1,10 +1,8 @@
-"""
-Utilities related to URL strings.
-"""
+"""Utilities related to URL strings."""
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 
-__all__ = ["is_valid_url"]
+__all__ = ("is_valid_url",)
 
 
 def is_valid_url(url: str) -> bool:

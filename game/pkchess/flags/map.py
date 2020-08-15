@@ -1,6 +1,6 @@
 from extutils.flags import FlagCodeEnum
 
-__all__ = ["MapPointStatus", "MapPointResource"]
+__all__ = ("MapPointStatus", "MapPointResource",)
 
 
 class MapPointStatus(FlagCodeEnum):

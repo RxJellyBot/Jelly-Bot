@@ -28,7 +28,7 @@ from strres.mongodb import Profile
 
 from ._base import BaseCollection
 
-__all__ = ["ProfileManager", "ProfileDataManager", "UserProfileManager", "PermissionPromotionRecordHolder"]
+__all__ = ("ProfileManager", "ProfileDataManager", "UserProfileManager", "PermissionPromotionRecordHolder",)
 
 DB_NAME = "channel"
 

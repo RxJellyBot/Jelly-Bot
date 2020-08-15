@@ -1,6 +1,4 @@
-"""
-Translate :class:`type` to :class:`str`.
-"""
+"""Translate :class:`type` to :class:`str`."""
 from datetime import datetime
 from typing import Iterable
 
@@ -12,7 +10,7 @@ from flags import AutoReplyContentType, ProfilePermission, Platform
 
 def type_translation(type_: type):  # noqa: C901
     """
-    Gets the description of type ``type_``.
+    Get the description of type ``type_``.
 
     :param type_: type to get the description
     :return: description of `type_`

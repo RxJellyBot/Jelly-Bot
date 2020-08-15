@@ -1,6 +1,4 @@
-"""
-Module of various utilities to interact with GitHub API.
-"""
+"""Module of various utilities to interact with GitHub API."""
 from typing import Optional
 
 import requests
@@ -8,9 +6,7 @@ from dotmap import DotMap
 
 
 class GitHubWrapper:
-    """
-    A wrapper to interact with GitHub API.
-    """
+    """A wrapper to interact with GitHub API."""
 
     API_URL = "https://api.github.com"
 

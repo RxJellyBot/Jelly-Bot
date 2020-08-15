@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-__all__ = ["ClearableMixin"]
+__all__ = ("ClearableMixin",)
 
 
 class ClearableMixin(ABC):

@@ -51,9 +51,7 @@ class ChannelProfileModel(Model):
 
     @property
     def permission_list(self) -> List[ProfilePermission]:
-        """
-        Return the list of the permissions sorted by the permission code.
-        """
+        """Return the list of the permissions sorted by the permission code."""
         return list(sorted(self.permission_set, key=lambda x: x.code))
 
     @property

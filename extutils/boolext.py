@@ -1,6 +1,4 @@
-"""
-Module of extensions on :class:`bool`.
-"""
+"""Module of extensions on :class:`bool`."""
 from enum import Enum, auto
 from typing import Any
 
@@ -19,9 +17,8 @@ if CASE_INSENSITIVE:
 
 
 class StrBoolResult(Enum):
-    """
-    Result :class:`Enum` to indicate the parsing result.
-    """
+    """Result :class:`Enum` to indicate the parsing result."""
+
     TRUE = auto()
     FALSE = auto()
     UNKNOWN = auto()
@@ -30,7 +27,7 @@ class StrBoolResult(Enum):
         """
         Cast this :class:`Enum` to :class:`bool`.
 
-        :exception ValueError: the value is unknown.
+        :raises ValueError: the value is unknown.
         """
         if self == self.TRUE:
             return True

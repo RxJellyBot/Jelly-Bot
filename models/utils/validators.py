@@ -7,7 +7,7 @@ from extutils.imgproc import ImageValidator
 from extutils.line_sticker import LineStickerUtils
 from flags import AutoReplyContentType
 
-__all__ = ["AutoReplyValidator"]
+__all__ = ("AutoReplyValidator",)
 
 
 class AutoReplyValidator:

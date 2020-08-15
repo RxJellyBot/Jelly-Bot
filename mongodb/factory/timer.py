@@ -13,7 +13,7 @@ from JellyBot.systemconfig import Bot
 
 from ._base import BaseCollection
 
-__all__ = ["TimerManager"]
+__all__ = ("TimerManager",)
 
 DB_NAME = "timer"
 

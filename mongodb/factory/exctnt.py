@@ -12,7 +12,7 @@ from extutils.utils import cast_iterable
 
 from ._base import BaseCollection
 
-__all__ = ["ExtraContentManager"]
+__all__ = ("ExtraContentManager",)
 
 DB_NAME = "ex"
 

@@ -5,7 +5,7 @@ from mongodb.factory import BotFeatureUsageDataManager
 from msghandle.models import TextMessageEventObject, HandledMessageEvent
 from bot.utils import calculate_expression
 
-__all__ = ["process_calculator"]
+__all__ = ("process_calculator",)
 
 
 # Obtained and modified from https://stackoverflow.com/a/14822667

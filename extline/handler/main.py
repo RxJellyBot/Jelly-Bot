@@ -1,6 +1,4 @@
-"""
-This module contains the main function to handle various types of the webhook event.
-"""
+"""This module contains the main function to handle various types of the webhook event."""
 from linebot.models import (
     MessageEvent, FollowEvent, UnfollowEvent, JoinEvent, LeaveEvent,
     MemberJoinedEvent, MemberLeftEvent
@@ -25,5 +23,5 @@ def handle_main(request, event, destination):
             handle_member_main(request, event, destination)
         else:
             LINE.log_event("Unhandled LINE event.", event=event, dest=destination)
-    except Exception as ex:  # pylint: disable=W0703
+    except Exception as ex:  # pylint: disable=broad-except
         handle_error(ex, "Error occurred when handling LINE event.", event, destination)

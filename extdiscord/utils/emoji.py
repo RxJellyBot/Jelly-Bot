@@ -1,6 +1,4 @@
-"""
-Control related to the emoji on Discord.
-"""
+"""Control related to the emoji on Discord."""
 
 
 def get_emoji_url(emoji_id):

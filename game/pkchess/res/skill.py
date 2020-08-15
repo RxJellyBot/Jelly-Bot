@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from game.pkchess.skill import Skill
 
-__all__ = ["skills"]
+__all__ = ("skills",)
 
 skills: Dict[int, Skill] = {
     110001: Skill(110001, _("Normal Attack #1"), 0, 100, 0, {(0, 1)}),

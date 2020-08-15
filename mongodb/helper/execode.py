@@ -9,7 +9,7 @@ from mongodb.factory import ChannelManager, AutoReplyManager, ProfileManager
 from mongodb.factory.results import OperationOutcome
 from mongodb.helper import UserDataIntegrationHelper
 
-__all__ = ["ExecodeCompletor", "ExecodeParameterCollator", "ExecodeRequiredKeys"]
+__all__ = ("ExecodeCompletor", "ExecodeParameterCollator", "ExecodeRequiredKeys",)
 
 
 class ExecodeCompletor:

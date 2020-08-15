@@ -1,6 +1,4 @@
-"""
-Terms used in the bot.
-"""
+"""Terms used in the bot."""
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List
@@ -12,9 +10,8 @@ from JellyBot.systemconfig import Database
 
 @dataclass
 class TermExplanation:
-    """
-    An entry for a term and its explanation.
-    """
+    """An entry for a term and its explanation."""
+
     term: str
     description: str
     example: str
@@ -22,9 +19,8 @@ class TermExplanation:
 
 @dataclass
 class TermsCollection:
-    """
-    A holder containing multiple terms.
-    """
+    """A holder containing multiple terms."""
+
     name: str
     terms: List[TermExplanation]
 

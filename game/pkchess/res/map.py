@@ -1,4 +1,4 @@
-__all__ = ["get_map_template"]
+__all__ = ("get_map_template",)
 
 _cache = {}
 

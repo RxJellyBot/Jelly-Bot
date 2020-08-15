@@ -203,14 +203,14 @@ def list_insert_in_between(lst: list, insert_obj: Any) -> list:
 
 
 def char_description(c: str) -> str:
-    """
+    r"""
     Get the character description of ``c``. If no matching description for ``c``, returns ``c``.
 
     Currently, there are only 2 special charcters have special description:
 
-    - Newline (``\\n``)
+    - Newline (``\n``)
 
-    - Space (``\\x20``)
+    - Space (``\x20``)
 
     :param c: character to get the description
     :return: description of the character `c`
@@ -226,7 +226,7 @@ def char_description(c: str) -> str:
 
 def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable = lambda cur, prv: cur == prv) -> \
         Generator[Tuple[Union[int, str], Any], None, None]:
-    # noinspection PyUnresolvedReferences
+    # noinspection PyUnresolvedReferences,PyShadowingNames
     """
     Generates the ranking and the corresponding data in ``iterable_sorted``.
 

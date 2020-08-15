@@ -1,14 +1,11 @@
-"""
-Result implementations of the service US mask finder.
-"""
+"""Result implementations of the service US mask finder."""
 from dataclasses import dataclass
 
 
 @dataclass
 class MaskFindingResult:
-    """
-    Mask finding result body class.
-    """
+    """Mask finding result body class."""
+
     name: str
     product_name: str
     amount: int

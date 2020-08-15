@@ -1,6 +1,4 @@
-"""
-This module contains the function to handle text message event.
-"""
+"""This module contains the function to handle text message event."""
 from flags import Platform
 from msghandle import handle_message_main
 from msghandle.models import MessageEventObjectFactory

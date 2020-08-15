@@ -1,6 +1,4 @@
-"""
-This module contains various functions to handle event related to the LINE bot.
-"""
+"""This module contains various functions to handle event related to the LINE bot."""
 from linebot.models import (
     FollowEvent, UnfollowEvent, JoinEvent, LeaveEvent
 )
@@ -11,7 +9,7 @@ from mongodb.factory import ChannelManager
 from ..logger import LINE
 from ..wrapper import LineApiUtils
 
-__all__ = ["handle_self_main"]
+__all__ = ("handle_self_main",)
 
 
 def handle_follow(_, event, destination):
