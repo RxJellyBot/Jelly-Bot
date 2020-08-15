@@ -2,18 +2,55 @@ name: Jelly Bot - CI Test
 
 on: [push]
 
+defaults:
+  run:
+    shell: cmd
+
+env:
+  SECRET_KEY: ${{ secrets.DjangoSecretKey }}
+
+  DJANGO_SETTINGS_MODULE: JellyBot.settings
+
+  PRODUCTION: 0
+  DEBUG: 1
+  TEST: 1
+
+  LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
+  NO_FIELD_CHECK: 1
+
+  MONGO_URL: ${{ secrets.MongoDBURL }}
+  MONGO_DB: 'GitHubActionTest#${{ github.run_number }}'
+
+  LINE_SECRET: ${{ secrets.LINESecret }}
+  LINE_TOKEN: ${{ secrets.LINEToken }}
+  DISCORD_TOKEN: ${{ secrets.DiscordToken }}
+
+  GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}
+  IMGUR_CLIENT_ID: ${{ secrets.ImgurClientID }}
+
+  EMAIL_ACCOUNT: ${{ secrets.EmailAccount }}
+  EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
+
+  SERVICE_SHORT_URL: http://rnnx.cc
+
+  DDNS_HOST: bot
+  DDNS_DOMAIN: raenonx.cc
+  DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
+
+  LINTED: bot doc extdiscord extline extutils
+
 jobs:
   prepare:
     runs-on: windows-latest
 
+    continue-on-error: true
+
     steps:
       - name: Print SHA
-        shell: cmd
         run: |
           echo %GITHUB_SHA%
 
       - name: Print REF
-        shell: cmd
         run: |
           echo %GITHUB_REF%
 
@@ -24,27 +61,7 @@ jobs:
 
     timeout-minutes: 20
 
-    env:
-      SECRET_KEY: ${{ secrets.DjangoSecretKey }}
-      DJANGO_SETTINGS_MODULE: JellyBot.settings
-      MONGO_URL: ${{ secrets.MongoDBURL }}
-      MONGO_DB: 'GitHubActionTest#${{ github.run_number }}'
-      LINE_SECRET: ${{ secrets.LINESecret }}
-      LINE_TOKEN: ${{ secrets.LINEToken }}
-      DISCORD_TOKEN: ${{ secrets.DiscordToken }}
-      PRODUCTION: 0
-      DEBUG: 1
-      TEST: 1
-      LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
-      NO_FIELD_CHECK: 1
-      GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}
-      EMAIL_ACCOUNT: ${{ secrets.EmailAccount }}
-      EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
-      SERVICE_SHORT_URL: http://rnnx.cc
-      DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
-      IMGUR_CLIENT_ID: ${{ secrets.ImgurClientID }}
-      DDNS_HOST: bot
-      DDNS_DOMAIN: raenonx.cc
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v2
@@ -60,21 +77,25 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-env.txt
 
-      - name: flake8 - error check
+      - name: '`flake8` - error check'
         run: |
           flake8 . --config .flake8-error --benchmark
 
-      - name: flake8 - style check
+      - name: '`flake8` - style check'
         run: |
           flake8 . --config .flake8-style --benchmark
 
-      - name: pydocstyle
+      - name: Print out linted modules
         run: |
-          pydocstyle bot doc extdiscord extline extutils --count
+          echo %LINTED%
 
-      - name: pylint
+      - name: '`pydocstyle`'
         run: |
-          pylint bot doc extdiscord extline extutils
+          pydocstyle %LINTED% --count
+
+      - name: '`pylint`'
+        run: |
+          pylint %LINTED%
 
   django-tests:
     runs-on: windows-latest
@@ -83,28 +104,6 @@ jobs:
 
     timeout-minutes: 60
 
-    env:
-      SECRET_KEY: ${{ secrets.DjangoSecretKey }}
-      DJANGO_SETTINGS_MODULE: JellyBot.settings
-      MONGO_URL: ${{ secrets.MongoDBURL }}
-      MONGO_DB: 'GitHubActionTest#${{ github.run_number }}'
-      LINE_SECRET: ${{ secrets.LINESecret }}
-      LINE_TOKEN: ${{ secrets.LINEToken }}
-      DISCORD_TOKEN: ${{ secrets.DiscordToken }}
-      PRODUCTION: 0
-      DEBUG: 1
-      TEST: 1
-      LOGGER: DISCORD_INTERNAL|40,MODEL_CHECK|30,PING_SPAM|10
-      NO_FIELD_CHECK: 1
-      GI_CLIENT_ID: ${{ secrets.GoogleIdentityClientID }}
-      EMAIL_ACCOUNT: ${{ secrets.EmailAccount }}
-      EMAIL_PASSWORD: ${{ secrets.EmailPassword }}
-      SERVICE_SHORT_URL: http://rnnx.cc
-      DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
-      IMGUR_CLIENT_ID: ${{ secrets.ImgurClientID }}
-      DDNS_HOST: bot
-      DDNS_DOMAIN: raenonx.cc
-
     steps:
       - uses: actions/checkout@v2
 
@@ -119,18 +118,22 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-env.txt
 
-      - name: Run pytest
+      - name: Unit tests
         run: |
-          pytest
+          py manage.py test tests.unit
+
+      - name: Integration tests
+        run: |
+          py manage.py test tests.integration
+
+      - name: System tests
+        run: |
+          py manage.py test tests.system
 
   cleanup:
     runs-on: windows-latest
 
     needs: [django-tests]
-
-    env:
-      MONGO_URL: ${{ secrets.MongoDBURL }}
-      DB_DROP: 'GitHubActionTest#${{ github.run_number }}'
 
     steps:
       - uses: actions/checkout@v2
@@ -140,6 +143,5 @@ jobs:
           pip install pymongo dnspython
 
       - name: Drop MongoDB database
-        shell: cmd
         run: |
-          python mongodb/cli/drop_db.py %DB_DROP%
+          python mongodb/cli/drop_db.py %MONGO_DB%

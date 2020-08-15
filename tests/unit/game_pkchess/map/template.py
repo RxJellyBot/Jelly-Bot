@@ -149,7 +149,7 @@ class TestMapTemplate(TestCase):
                         {MapPointResource.CHEST: [MapCoordinate(w - 1, h - 1)]})
 
     def test_parse_file(self):
-        mt = MapTemplate.load_from_file("tests/game_pkchess/res/map/map")
+        mt = MapTemplate.load_from_file("tests/unit/game_pkchess/res/map/map")
 
         self.assertEqual(mt.width, 9)
         self.assertEqual(mt.height, 9)
@@ -174,16 +174,16 @@ class TestMapTemplate(TestCase):
 
     def test_parse_file_unspawnable(self):
         with self.assertRaises(MapPointUnspawnableError):
-            MapTemplate.load_from_file("tests/game_pkchess/res/map/map_unspawnable")
+            MapTemplate.load_from_file("tests/unit/game_pkchess/res/map/map_unspawnable")
 
     def test_parse_file_res_out_of_map(self):
         with self.assertRaises(SpawnPointOutOfMapError):
-            MapTemplate.load_from_file("tests/game_pkchess/res/map/map_outofmap")
+            MapTemplate.load_from_file("tests/unit/game_pkchess/res/map/map_outofmap")
 
     def test_parse_file_unknown_resource(self):
         with self.assertRaises(UnknownResourceTypeError):
-            MapTemplate.load_from_file("tests/game_pkchess/res/map/map_resource")
+            MapTemplate.load_from_file("tests/unit/game_pkchess/res/map/map_resource")
 
     def test_parse_file_no_player(self):
         with self.assertRaises(NoPlayerSpawnPointError):
-            MapTemplate.load_from_file("tests/game_pkchess/res/map/map_noplayer")
+            MapTemplate.load_from_file("tests/unit/game_pkchess/res/map/map_noplayer")

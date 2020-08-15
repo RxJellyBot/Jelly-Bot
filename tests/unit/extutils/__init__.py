@@ -2,12 +2,8 @@ from .arr import *  # noqa
 from .boolext import *  # noqa
 from .checker import *  # noqa
 from .color import *  # noqa
-from .dt import *  # noqa
 from .email import *  # noqa
 from .flags import *  # noqa
 from .imgproc import *  # noqa
-from .linesticker import *  # noqa
-from .locales import *  # noqa
 from .singleton import *  # noqa
-from .url import *  # noqa
 from .utils import *  # noqa

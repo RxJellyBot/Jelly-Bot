@@ -1,19 +1,38 @@
 @ECHO OFF
 
-ECHO Checking Flake8 error...
-flake8 . --config .flake8-error --benchmark || ECHO ERROR && PAUSE && EXIT /b
+SET LINTED=bot doc extdiscord extline extutils
 
-ECHO Checking Flake8 style...
-flake8 . --config .flake8-style --benchmark || ECHO ERROR && PAUSE && EXIT /b
+:main
 
-ECHO Checking pydocstyle...
-pydocstyle bot doc extdiscord extline extutils --count || ECHO ERROR && PAUSE && EXIT /b
+SET MSG=Checking Flake8 error...
+ECHO %MSG%
+flake8 . --config .flake8-error --benchmark || GOTO error
 
-ECHO Checking pylint...
-pylint bot doc extdiscord extline extutils || ECHO ERROR && PAUSE && EXIT /b
+SET MSG=Checking Flake8 style...
+ECHO %MSG%
+flake8 . --config .flake8-style --benchmark || GOTO error
 
-ECHO Running tests (pytest)...
-pytest || ECHO ERROR && PAUSE && EXIT /b
+SET MSG=Checking pydocstyle...
+ECHO %MSG%
+pydocstyle %LINTED% --count || GOTO error
+
+SET MSG=Checking pylint...
+ECHO %MSG%
+pylint %LINTED% || GOTO error
+
+SET MSG=Running tests (unit)...
+ECHO %MSG%
+py manage.py test tests.unit || GOTO error
+
+SET MSG=Running tests (integration)...
+ECHO %MSG%
+py manage.py test tests.integration || GOTO error
+
+SET MSG=Running tests (system)...
+ECHO %MSG%
+py manage.py test tests.system || GOTO error
+
+:pass
 
 ECHO.
 ECHO.
@@ -24,3 +43,13 @@ ECHO =============================================
 ECHO.
 ECHO.
 ECHO.
+
+GOTO end
+
+:error
+
+ECHO ERROR @ %MSG%
+PAUSE
+EXIT /b
+
+:end

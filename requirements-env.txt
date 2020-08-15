@@ -1,8 +1,5 @@
 ## This file should be ran only if creating a new venv
 
-# Code testing
-pytest-django
-
 # Code linting
 pylint
 flake8
