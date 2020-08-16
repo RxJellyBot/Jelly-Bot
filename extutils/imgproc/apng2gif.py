@@ -3,7 +3,6 @@ import io
 from dataclasses import dataclass, field
 from fractions import Fraction
 import os
-import shutil
 from tempfile import TemporaryDirectory
 import time
 from typing import Any, Tuple, List, Optional
@@ -92,8 +91,6 @@ class ConvertResult:
     Unit of the duration is seconds.
     """
 
-    input_exists: bool = True
-
     frame_extraction: ConvertOpResult = field(default_factory=ConvertOpResult)
     frame_zipping: ConvertOpResult = field(default_factory=ConvertOpResult)
     image_data_collation: ConvertOpResult = field(default_factory=ConvertOpResult)
@@ -106,7 +103,7 @@ class ConvertResult:
 
         :return: if the conversion succeed
         """
-        if not self.input_exists or self.frame_extraction.exception:
+        if self.frame_extraction.exception:
             return False
 
         return self.frame_extraction.success and self.image_data_collation.success and self.gif_merging.success
@@ -134,7 +131,7 @@ def _get_file_name(file_path: str) -> str:
     return os.path.splitext(os.path.basename(file_path))[0]
 
 
-def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tuple[bytes, Fraction]]]:
+def _extract_frames(result: ConvertResult, apng_bin: bytes) -> Optional[List[Tuple[bytes, Fraction]]]:
     """
     Extract the frames of the APNG file and return it as 2-tuples containing the image byte data and its delay.
 
@@ -142,12 +139,12 @@ def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tupl
     and record the exception to ``result.frame_extraction_exception`` instead.
 
     :param result: conversion result object
-    :param file_path: file path of the apng file to be extracted
+    :param apng_bin: binary of an apng to extract the frames
     """
     _start = time.time()
 
     try:
-        ret = extract_frames(file_path)
+        ret = extract_frames(apng_bin)
     except Exception as ex:
         result.frame_extraction.set_failure(ex)
         return None
@@ -157,25 +154,23 @@ def _extract_frames(result: ConvertResult, file_path: str) -> Optional[List[Tupl
     return ret
 
 
-def _zip_frames(result: ConvertResult, apng_path: str, frame_data: List[Tuple[bytes, Fraction]], output_path: str):
+def _zip_frames(result: ConvertResult, frame_data: List[Tuple[bytes, Fraction]], output_path: str):
     """
     Zip the frames to be a single zip file preceded with the apng file name.
 
     :param result: conversion result object
-    :param apng_path: path of the source apng
     :param frame_data: list of 2-tuple containing the image byte data and its delay
     :param output_path: output directory of the zip file
     """
     _start = time.time()
 
-    apng_name = _get_file_name(apng_path)
     out_name = _get_file_name(output_path)
 
     try:
         with ZipFile(os.path.join(os.path.dirname(output_path), f"{out_name}-frames.zip"), "w") as zip_file:
             for idx, data in enumerate(frame_data, start=1):
                 frame, _ = data
-                zip_file.writestr(f"{apng_name}-{idx:02d}.png", frame)
+                zip_file.writestr(f"{out_name}-{idx:02d}.png", frame)
     except Exception as ex:
         result.frame_zipping.set_failure(ex)
         return
@@ -261,11 +256,11 @@ def _make_gif(result: ConvertResult, frame_data: List[Tuple[bytes, Fraction]], o
     result.gif_merging.set_success(time.time() - _start)
 
 
-def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> ConvertResult:
+def convert(apng_bin: bytes, output_path: str, *, zip_frames: bool = True) -> ConvertResult:
     """
-    Convert the file at ``apng_path`` to gif and store it at ``output_path``.
+    Convert the apng binary data ``apng_bin`` to gif and store it at ``output_path``.
 
-    :param apng_path: path of the apng to be converted
+    :param apng_bin: binary data of an apng
     :param output_path: path for the processed gif
     :param zip_frames: to zip the extracted frames
     :return: result of the conversion
@@ -273,27 +268,17 @@ def convert(apng_path: str, output_path: str, *, zip_frames: bool = True) -> Con
     original_dir = os.getcwd()
     result = ConvertResult()
 
-    if not os.path.exists(apng_path):
-        result.input_exists = False
-        return result
-
-    with TemporaryDirectory() as temp_dir:
-        # Copy the image for extraction
-        apng_path_dst = os.path.join(temp_dir, os.path.basename(apng_path))
-
-        shutil.copy(apng_path, apng_path_dst)
-        apng_path = apng_path_dst
-
+    with TemporaryDirectory(prefix="jellybot-apng2gif-") as temp_dir:
         # Set the current working directory to the temp directory
         os.chdir(temp_dir)
 
         # Main process
         out_path = output_path if os.path.isabs(output_path) else os.path.join(original_dir, output_path)
 
-        frame_data = _extract_frames(result, apng_path)
+        frame_data = _extract_frames(result, apng_bin)
         if result.frame_extraction.success:
             if zip_frames:
-                _zip_frames(result, apng_path, frame_data, out_path)
+                _zip_frames(result, frame_data, out_path)
 
             _make_gif(result, frame_data, out_path)
 

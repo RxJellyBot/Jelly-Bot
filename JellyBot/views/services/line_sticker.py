@@ -15,7 +15,7 @@ class LineStickerAnimatedPngDownloadView(TemplateResponseMixin, View):
 class LineStickerAnimatedGifDownloadView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, pack_id, sticker_id, *args, **kwargs):
-        binary_io = LineStickerUtils.get_downloaded_apng(pack_id, sticker_id)
+        binary_io = LineStickerUtils.get_downloaded_animated(pack_id, sticker_id)
 
         if not binary_io:
             return HttpResponse(status=404)

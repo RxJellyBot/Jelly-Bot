@@ -292,21 +292,18 @@ def _create_image_bytes(IHDR: _DataChunkIHDR, fcTL: _DataChunkfcTL,
     return image_data
 
 
-def extract_frames(apng_path: str) -> List[Tuple[bytes, Fraction]]:
+def extract_frames(apng_bin: bytes) -> List[Tuple[bytes, Fraction]]:
     """
-    Extract the frames of apng file at ``apng_path``.
+    Extract the frames of an apng from its binary ``apng_bin``.
 
     Returns a 2-tuple containing the byte data of a frame and its delay.
 
-    :param apng_path: path of the apng file to be extracted
+    :param apng_bin: binary of an apng
     :return: list of 2-tuple containing frame byte data and its delay
     """
     # pylint: disable=too-many-locals
 
-    with open(apng_path, "rb") as f:
-        data = f.read()
-
-    chunk = [c.to_chunk_class() for c in _parse_chunks(data)]
+    chunk = [c.to_chunk_class() for c in _parse_chunks(apng_bin)]
 
     ret: List[Tuple[bytes, Fraction]] = []
 

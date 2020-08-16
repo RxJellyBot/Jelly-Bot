@@ -14,9 +14,9 @@ class TestApng2Gif(TestCase):
             out_path = os.path.join(temp_dir, "out.gif")
             out_path_frames = os.path.join(temp_dir, "out-frames.zip")
 
-            result = convert("tests/res/line_sticker.apng", out_path, zip_frames=False)
+            with open("tests/res/line_sticker.apng", "rb") as f:
+                result = convert(f.read(), out_path, zip_frames=False)
 
-            self.assertTrue(result.input_exists)
             self.assertTrue(result.frame_extraction.success)
             self.assertGreaterEqual(result.frame_extraction.duration, 0)
             self.assertFalse(result.frame_zipping.success)
@@ -38,9 +38,9 @@ class TestApng2Gif(TestCase):
             out_path = os.path.join(temp_dir, "out.gif")
             out_path_frames = os.path.join(temp_dir, "out-frames.zip")
 
-            result = convert("tests/res/line_sticker.apng", out_path)
+            with open("tests/res/line_sticker.apng", "rb") as f:
+                result = convert(f.read(), out_path)
 
-            self.assertTrue(result.input_exists)
             self.assertTrue(result.frame_extraction.success)
             self.assertGreaterEqual(result.frame_extraction.duration, 0)
             self.assertIsNone(result.frame_zipping.exception)
@@ -59,21 +59,6 @@ class TestApng2Gif(TestCase):
 
             self.assertTrue(is_zipfile(out_path_frames))
             self.assertGreaterEqual(len(ZipFile(out_path_frames).namelist()), 0)
-
-    def test_convert_no_apng(self):
-        with TemporaryDirectory() as temp_dir:
-            out_path = os.path.join(temp_dir, "out.gif")
-
-            result = convert("tests/res/oops", out_path)
-
-            self.assertFalse(result.input_exists)
-            self.assertFalse(result.frame_extraction.success)
-            self.assertFalse(result.frame_zipping.success)
-            self.assertFalse(result.image_data_collation.success)
-            self.assertFalse(result.gif_merging.success)
-            self.assertFalse(result.succeed)
-            self.assertFalse(os.path.exists(out_path))
-            self.assertFalse(os.path.exists(os.path.join(out_path, "out-frames.zip")))
 
 
 class TestApng2GifConvertResult(TestCase):

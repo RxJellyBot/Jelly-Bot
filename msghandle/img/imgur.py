@@ -36,7 +36,7 @@ def process_imgur_upload(e: ImageMessageEventObject) -> List[HandledMessageEvent
         else:
             return [
                 HandledMessageEventText(
-                    content=_("Image upload failed. Status: `{}`\nType: `{}`\nContent: {}").format(
+                    content=_("Image upload failed. Status Code: `{}`\nType: `{}`\nContent: {}").format(
                         upload_result.status, type(e.content.content), e.content.content
                     ),
                     bypass_multiline_check=True)
