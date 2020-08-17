@@ -6,12 +6,12 @@
     {% csrf_token %}
     <div class="container">
         <div class="row">
-            <div class="jumbotron">
-                <p class="display-4">
+            <div class="jumbotron w-100">
+                <h1 class="pb-3">
                     {% blocktrans trimmed %}
                         To use the features on the website, we will collect some data from your account.
                     {% endblocktrans %}
-                </p>
+                </h1>
                 <h4>{% trans "The data we will collect are:" %}</h4>
                 <ul>
                     <li>{% trans "Your email (if applicable)" %}</li>
@@ -27,6 +27,23 @@
                 <div class="row">
                     <div class="col">
                         <button type="button" class="btn btn-outline-primary" id="loginGoogle">Google</button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col text-danger">
+                        <p>
+                            {% blocktrans trimmed %}
+                                If you are not being redirected after logging in, please check that you are not
+                                browsing in incognito mode, and third-party cookies are enabled.
+                            {% endblocktrans %}
+                        </p>
+                        <p><small>
+                            {% blocktrans trimmed %}
+                                The third-party here means Google. We need the data being sent and stored from them,
+                                hence we need you to enable them.
+                            {% endblocktrans %}
+                        </small></p>
                     </div>
                 </div>
             </div>
