@@ -458,13 +458,22 @@ class LineStickerPackDownloadResult:
         return self._zip_succeed
 
     @property
-    def missed_sticker_id(self) -> List[int]:
+    def missed_sticker_ids(self) -> List[int]:
         """
         Get the ID of the list stickers that failed to download.
 
         :return: sticker IDs not downloaded
         """
         return self._not_downloaded_id
+
+    @property
+    def not_zipped_ids(self) -> List[int]:
+        """
+        Get the ID of the list stickers that failed to be zipped.
+
+        :return: sticker IDs not zipped
+        """
+        return self._not_zipped_id
 
     @property
     def succeed(self) -> bool:
@@ -549,10 +558,12 @@ class LineStickerPackDownloader:
                       sticker_to_zip: List[Tuple[BinaryIO, int]], zip_path: str):
         _start = time.time()
 
+        extension = "gif" if pack_dl_result.pack_meta.is_animated_sticker else "png"
+
         with ZipFile(zip_path, "w") as zip_file:
             for sio, sid in sticker_to_zip:
                 with sio:
-                    zip_file.writestr(f"{sid}.png", sio.read())
+                    zip_file.writestr(f"{sid}.{extension}", sio.read())
                     pack_dl_result.set_sticker_zipped(sid)
 
         pack_dl_result.set_zip_completed(time.time() - _start)
@@ -615,8 +626,6 @@ class LineStickerUtils(ClearableMixin):
 
     # https://github.com/RaenonX/Jelly-Bot/issues/55
 
-    # TODO: command for download sticker package
-
     # TODO: A website page for downloading stickers
     #  (may need to use LINE sticker searching API by inspecting official page)
 
@@ -678,6 +687,16 @@ class LineStickerUtils(ClearableMixin):
         :return: sticker sound URL
         """
         return f"https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/IOS/sticker_sound.m4a"
+
+    @staticmethod
+    def get_pack_store_url(pack_id: Union[int, str]) -> str:
+        """
+        Get the URL of the sticker package at LINE STORE.
+
+        :param pack_id: sticker package ID
+        :return: LINE STORE URL for the sticker package
+        """
+        return f"https://store.line.me/stickershop/product/{pack_id}"
 
     @staticmethod
     def get_pack_meta(pack_id: Union[str, int]) -> LineStickerMetadata:

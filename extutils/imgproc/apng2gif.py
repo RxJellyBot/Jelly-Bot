@@ -3,7 +3,6 @@ import io
 from dataclasses import dataclass, field
 from fractions import Fraction
 import os
-from tempfile import TemporaryDirectory
 import time
 from typing import Any, Tuple, List, Optional
 from zipfile import ZipFile
@@ -265,24 +264,15 @@ def convert(apng_bin: bytes, output_path: str, *, zip_frames: bool = True) -> Co
     :param zip_frames: to zip the extracted frames
     :return: result of the conversion
     """
-    original_dir = os.getcwd()
     result = ConvertResult()
 
-    with TemporaryDirectory(prefix="jellybot-apng2gif-") as temp_dir:
-        # Set the current working directory to the temp directory
-        os.chdir(temp_dir)
+    out_path = output_path if os.path.isabs(output_path) else os.path.join(os.getcwd(), output_path)
 
-        # Main process
-        out_path = output_path if os.path.isabs(output_path) else os.path.join(original_dir, output_path)
+    frame_data = _extract_frames(result, apng_bin)
+    if result.frame_extraction.success:
+        if zip_frames:
+            _zip_frames(result, frame_data, out_path)
 
-        frame_data = _extract_frames(result, apng_bin)
-        if result.frame_extraction.success:
-            if zip_frames:
-                _zip_frames(result, frame_data, out_path)
+        _make_gif(result, frame_data, out_path)
 
-            _make_gif(result, frame_data, out_path)
-
-        # Restore the working directory (REQUIRED, disabling this causes infinite recursion)
-        os.chdir(original_dir)
-
-        return result
+    return result

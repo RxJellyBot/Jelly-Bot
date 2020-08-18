@@ -260,7 +260,7 @@ class _DataChunkfdAT(_DataChunkBase):
         return _DataChunkIDAT(_BaseChunk.make_chunk("IDAT", self.base_chunk.pure_data[4:]))
 
 
-def _parse_chunks(data) -> Generator[_BaseChunk, None, None]:
+def _parse_chunks(data: bytes) -> Generator[_BaseChunk, None, None]:
     data = data[8:]
 
     while data:
@@ -272,24 +272,57 @@ def _parse_chunks(data) -> Generator[_BaseChunk, None, None]:
 
 # noinspection PyPep8Naming
 def _create_image_bytes(IHDR: _DataChunkIHDR, fcTL: _DataChunkfcTL,
-                        fdAT_IDAT: Union[_DataChunkfdAT, _DataChunkIDAT], IEND: _DataChunkIEND):
+                        fdAT_IDAT_list: List[Union[_DataChunkfdAT, _DataChunkIDAT]], IEND: _DataChunkIEND):
     # Append signature
     image_data = SIGNATURE_PNG
 
     # Append new header by size info from fcTC
     image_data += fcTL.generate_IHDR(IHDR).data
 
-    if hasattr(fdAT_IDAT, "to_IDAT"):
-        # fdAT
-        image_data += fdAT_IDAT.to_IDAT().data
-    else:
-        # IDAT
-        image_data += fdAT_IDAT.data
+    for fdAT_IDAT in fdAT_IDAT_list:
+        if isinstance(fdAT_IDAT, _DataChunkfdAT):
+            # fdAT
+            image_data += fdAT_IDAT.to_IDAT().data
+        else:
+            # IDAT
+            image_data += fdAT_IDAT.data
 
     # Append IEND
     image_data += IEND.data
 
     return image_data
+
+
+def _group_chunks(chuck_classes: List[_DataChunkBase]) \
+        -> List[Tuple[_DataChunkfcTL, List[Union[_DataChunkfdAT, _DataChunkIDAT]]]]:
+    # Get the starting index to group
+    start_idx = 0
+
+    for chunk_cls in chuck_classes:
+        if isinstance(chunk_cls, _DataChunkfcTL):
+            break
+
+        start_idx += 1
+
+    # Main grouping implementation
+    ret = []
+    buffer = [chuck_classes[start_idx]]
+
+    for chunk_cls in chuck_classes[start_idx + 1:]:
+        if not isinstance(chunk_cls, (_DataChunkfcTL, _DataChunkIDAT, _DataChunkfdAT)):
+            break
+
+        # New group separator
+        if isinstance(chunk_cls, _DataChunkfcTL):
+            ret.append((buffer[0], buffer[1:]))
+            buffer = []
+
+        buffer.append(chunk_cls)
+
+    # Flush the rest of the data in `buffer`
+    ret.append((buffer[0], buffer[1:]))
+
+    return ret
 
 
 def extract_frames(apng_bin: bytes) -> List[Tuple[bytes, Fraction]]:
@@ -308,22 +341,21 @@ def extract_frames(apng_bin: bytes) -> List[Tuple[bytes, Fraction]]:
     ret: List[Tuple[bytes, Fraction]] = []
 
     IHDR = chunk[0]
-    acTL = chunk[1]
     IEND = chunk[-1]
 
     image_data_prev = None
 
-    for idx in range(2, 2 + (acTL.frame_count * 2), 2):
+    main_data_chunks = _group_chunks(chunk)
+
+    for idx in range(len(main_data_chunks)):
         if image_data_prev:
-            fcTL = chunk[idx - 4]
-            fdAT_IDAT = chunk[idx - 3]
+            fcTL, fdAT_IDAT_list = main_data_chunks[idx - 2]
             image_data_prev = False
         else:
-            fcTL = chunk[idx]
-            fdAT_IDAT = chunk[idx + 1]
+            fcTL, fdAT_IDAT_list = main_data_chunks[idx]
 
         # Create image byte data
-        image_data = _create_image_bytes(IHDR, fcTL, fdAT_IDAT, IEND)
+        image_data = _create_image_bytes(IHDR, fcTL, fdAT_IDAT_list, IEND)
 
         # Check and set flag to handle `_Dispose.APNG_DISPOSE_OP_PREVIOUS`
         if fcTL.dispose == _Dispose.APNG_DISPOSE_OP_PREVIOUS:

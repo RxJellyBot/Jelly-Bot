@@ -6,6 +6,17 @@ from django.views.generic.base import TemplateResponseMixin
 from extutils.line_sticker import LineStickerUtils
 
 
+class LineStickerPackageDownloadView(TemplateResponseMixin, View):
+    # noinspection PyUnusedLocal, PyMethodMayBeStatic
+    def get(self, request, pack_id, *args, **kwargs):
+        binary_io = LineStickerUtils.get_downloaded_sticker_pack(pack_id)
+
+        if not binary_io:
+            return HttpResponse(status=404)
+
+        return FileResponse(binary_io, as_attachment=True)
+
+
 class LineStickerAnimatedPngDownloadView(TemplateResponseMixin, View):
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
     def get(self, request, pack_id, sticker_id, *args, **kwargs):

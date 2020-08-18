@@ -65,6 +65,27 @@ class TestLineStickerUtils(TestCase):
             self.assertTrue(is_zipfile(out_path_frames))
             self.assertGreaterEqual(len(ZipFile(out_path_frames).namelist()), 0)
 
+    def test_download_animated_2(self):
+        with TemporaryDirectory() as temp_dir:
+            out_path = os.path.join(temp_dir, "out.gif")
+            out_path_frames = os.path.join(temp_dir, "out-frames.zip")
+
+            result = LineStickerUtils.download_apng_as_gif("15563", "238476641", out_path)
+
+            self.assertEqual(result.sticker_id, 238476641)
+            self.assertTrue(result.available)
+            self.assertFalse(result.already_exists)
+            self.assertTrue(result.conversion_result.succeed)
+            self.assertTrue(result.conversion_result.frame_zipping.success)
+            self.assertTrue(result.succeed)
+            self.assertTrue(os.path.exists(out_path))
+
+            with open(out_path, "rb") as f:
+                self.assertTrue(f.read(6) in (b"GIF87a", b"GIF89a"))
+
+            self.assertTrue(is_zipfile(out_path_frames))
+            self.assertGreaterEqual(len(ZipFile(out_path_frames).namelist()), 0)
+
     def test_download_animated_no_frames(self):
         with TemporaryDirectory() as temp_dir:
             out_path = os.path.join(temp_dir, "out.gif")
@@ -416,7 +437,12 @@ class TestLineStickerUtils(TestCase):
         with LineStickerUtils.get_downloaded_sticker_pack(11952172) as f:
             self.assertTrue(f.read(4) == b"\x50\x4b\x03\x04")
 
-    def test_download_pack(self):
+        with ZipFile(LineStickerUtils.get_downloaded_sticker_pack(11952172)) as zip_file:
+            name_list = zip_file.namelist()
+            self.assertGreater(len(name_list), 0)
+            self.assertTrue(all(f_name.endswith(".png") for f_name in name_list))
+
+    def test_download_pack_static(self):
         result = LineStickerUtils.download_sticker_pack("11952172")
 
         self.assertEqual(result.pack_meta.pack_id, 11952172)
@@ -428,6 +454,29 @@ class TestLineStickerUtils(TestCase):
 
         with LineStickerUtils.get_downloaded_sticker_pack("11952172") as f:
             self.assertTrue(f.read(4) == b"\x50\x4b\x03\x04")
+
+        with ZipFile(LineStickerUtils.get_downloaded_sticker_pack("11952172")) as zip_file:
+            name_list = zip_file.namelist()
+            self.assertGreater(len(name_list), 0)
+            self.assertTrue(all(f_name.endswith(".png") for f_name in name_list))
+
+    def test_download_pack_animated(self):
+        result = LineStickerUtils.download_sticker_pack("15769")
+
+        self.assertEqual(result.pack_meta.pack_id, 15769)
+        self.assertTrue(result.available)
+        self.assertFalse(result.already_exists)
+        self.assertTrue(result.download_succeed, result.missed_sticker_ids)
+        self.assertTrue(result.zip_succeed, result.not_zipped_ids)
+        self.assertTrue(result.succeed)
+
+        with LineStickerUtils.get_downloaded_sticker_pack("15769") as f:
+            self.assertTrue(f.read(4) == b"\x50\x4b\x03\x04")
+
+        with ZipFile(LineStickerUtils.get_downloaded_sticker_pack("15769")) as zip_file:
+            name_list = zip_file.namelist()
+            self.assertGreater(len(name_list), 0)
+            self.assertTrue(all(f_name.endswith(".gif") for f_name in name_list), name_list)
 
     def test_download_pack_already_downloaded(self):
         result = LineStickerUtils.download_sticker_pack("11952172")
@@ -445,6 +494,11 @@ class TestLineStickerUtils(TestCase):
 
         with LineStickerUtils.get_downloaded_sticker_pack("11952172") as f:
             self.assertTrue(f.read(4) == b"\x50\x4b\x03\x04")
+
+        with ZipFile(LineStickerUtils.get_downloaded_sticker_pack("11952172")) as zip_file:
+            name_list = zip_file.namelist()
+            self.assertGreater(len(name_list), 0)
+            self.assertTrue(all(f_name.endswith(".png") for f_name in name_list))
 
     def test_download_pack_not_exists(self):
         result = LineStickerUtils.download_sticker_pack("1")
