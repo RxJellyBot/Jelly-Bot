@@ -9,3 +9,6 @@ pydocstyle
 mccabe
 pycodestyle
 pyflakes
+
+# `pylint` plugins
+pylint-django

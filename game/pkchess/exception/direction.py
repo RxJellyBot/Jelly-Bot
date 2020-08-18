@@ -1,3 +1,4 @@
+"""Error about the skill direction."""
 __all__ = ("UnhandledSkillDirectionError",)
 
 

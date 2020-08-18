@@ -1,5 +1,9 @@
 # Template .pylintrc file https://raw.githubusercontent.com/datawire/quark/master/.pylintrc
 
+[MASTER]
+
+load-plugins=pylint_django
+
 [BASIC]
 
 # Reason of the good names:

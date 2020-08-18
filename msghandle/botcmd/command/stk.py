@@ -58,6 +58,7 @@ def _download_package_failed(result, url_dict):
     ]
 )
 def download_package(__: TextMessageEventObject, package_id: int):
+    """Function for bot command to download a sticker package."""
     package_id = str(package_id)
 
     kwargs = {"pack_id": package_id}

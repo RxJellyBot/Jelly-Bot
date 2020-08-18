@@ -1,3 +1,4 @@
+"""Implementation of a data field containing a :class:`Model`."""
 from typing import Type
 
 from ._base import BaseField, Lazy
