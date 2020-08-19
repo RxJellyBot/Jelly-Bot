@@ -1,3 +1,4 @@
+"""Module for website error flags."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
@@ -5,22 +6,25 @@ from extutils.flags import FlagSingleEnum
 
 class WebsiteError(FlagSingleEnum):
     """
-    0 - System
-        0 - Unknown
-        1 - Extra Content not found
-        2 - Not in the channel
+    Defined website error types.
 
-    100 - Identity Data
-        100 - Profile link not found
-        101 - Channel data not found
-        102 - Profile data not found
-        103 - Channel collection not found
+    Currently defined error types are:
+        0 - System
+            0 - Unknown
+            1 - Extra Content not found
+            2 - Not in the channel
 
-    200 - Bot
-        200 - Command not found
+        100 - Identity Data
+            100 - Profile link not found
+            101 - Channel data not found
+            102 - Profile data not found
+            103 - Channel collection not found
 
-    300 - Permission
-        300 - Insufficient Permission
+        200 - Bot
+            200 - Command not found
+
+        300 - Permission
+            300 - Insufficient Permission
     """
 
     @classmethod

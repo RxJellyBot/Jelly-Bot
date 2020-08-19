@@ -240,7 +240,8 @@ class MessageEventObjectFactory:
             if attachment.height and attachment.width:
                 return ImageMessageEventObject(
                     message, ImageContent(attachment.url, ImageContentType.URL, message.content),
-                    channel_model, user_model, SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
+                    channel_model, user_model, SysChannelType.convert_from_discord(message.channel.type),
+                    ch_parent_model
                 )
             else:
                 # Discord message has attachment, no corresponding message event object / not implemented
@@ -248,5 +249,5 @@ class MessageEventObjectFactory:
         else:
             return TextMessageEventObject(
                 message, message.content, channel_model, user_model,
-                SysChannelType.trans_from_discord(message.channel.type), ch_parent_model
+                SysChannelType.convert_from_discord(message.channel.type), ch_parent_model
             )

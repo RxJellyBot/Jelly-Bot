@@ -1,8 +1,8 @@
 """
-Contains the flag of various platforms.
+Flags for various platforms.
 
 .. note::
-    The name **MUST** not be ``platform`` as it could potentially creates import problem.
+    The module name **MUST** not be ``platform`` as it could potentially creates import problem.
 """
 from django.utils.translation import gettext_lazy as _
 
@@ -10,6 +10,8 @@ from extutils.flags import FlagSingleEnum
 
 
 class Platform(FlagSingleEnum):
+    """Supported platforms."""
+
     @classmethod
     def default(cls):
         return Platform.UNKNOWN

@@ -4,7 +4,7 @@ from linebot.models import (
     MemberJoinedEvent, MemberLeftEvent
 )
 
-from ..logger import LINE
+from extline.logger import LINE
 
 from .message import handle_msg_main
 from .self import handle_self_main

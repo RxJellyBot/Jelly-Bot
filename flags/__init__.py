@@ -1,3 +1,4 @@
+"""Main module for various defined flags."""
 # noinspection PyUnresolvedReferences
 from .artype import AutoReplyContentType
 # noinspection PyUnresolvedReferences

@@ -37,7 +37,7 @@ env:
   DDNS_DOMAIN: raenonx.cc
   DDNS_PASSWORD: ${{ secrets.DDNSPassword }}
 
-  LINTED: bot doc extdiscord extline extutils
+  LINTED: bot doc extdiscord extline extutils flags
 
 jobs:
   prepare:

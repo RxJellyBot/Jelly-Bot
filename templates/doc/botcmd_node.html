@@ -80,11 +80,12 @@
                                         <hr>
                                     {% endif %}
                                     {% if fn_entry.has_cooldown %}
-                                        {% trans "Command Cooldown: " %}<code class="h5">{{ fn_entry.cooldown_sec }}</code> {% trans "seconds" %}
+                                        {% trans "Command Cooldown: " %}
+                                        <code class="h5">{{ fn_entry.cooldown_sec }}</code> {% trans "seconds" %}
                                         <hr>
                                     {% endif %}
                                     {% trans "Available Scope" %}: {{ fn_entry.scope.name }}
-                                    <sub class="font-weight-bolder">{{ fn_entry.scope.list_channel_str }}</sub>
+                                    <sub class="font-weight-bolder">{{ fn_entry.scope.channel_type_repr }}</sub>
                                 </td>
                             </tr>
                         {% endfor %}

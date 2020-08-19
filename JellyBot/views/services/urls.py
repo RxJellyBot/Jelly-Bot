@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .linesticker import (
-    LineStickerAnimatedGifDownloadView, LineStickerAnimatedFramesDownloadView, LineStickerAnimatedPngDownloadView,
+    LineStickerAnimatedGifDownloadView, LineStickerAnimatedFramesDownloadView, LineStickerAnimatedPngRedirectView,
     LineStickerPackageDownloadView, LineStickerDownloadView
 )
 from .shorturl import ShortUrlMainView
@@ -29,7 +29,7 @@ urlpatterns = [
     ),
     path(
         'linesticker/<int:pack_id>/<int:sticker_id>/sticker.png',
-        LineStickerAnimatedPngDownloadView.as_view(),
+        LineStickerAnimatedPngRedirectView.as_view(),
         name="service.linesticker.animated.apng"
     ),
     path('shorturl/', ShortUrlMainView.as_view(), name="service.shorturl"),

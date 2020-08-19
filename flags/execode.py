@@ -1,3 +1,4 @@
+"""Define flags related to Execode."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
@@ -5,19 +6,23 @@ from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 
 class Execode(FlagDoubleEnum):
     """
-    1xx - Identity Management:
-        10x - Register identity:
-            101: Channel membership
+    Defined Execode action types.
 
-        19x - Integrates identity:
-            191: Integrate user data
+    Currently defined flags are:
+        1xx - Identity Management:
+            10x - Register identity:
+                101: Channel membership
 
-    2xx - Auto Reply:
-            201: Add
+            19x - Integrates identity:
+                191: Integrate user data
 
-    9xx - System
-            901 - Test
+        2xx - Auto Reply:
+                201: Add
+
+        9xx - System
+                901 - Test
     """
+
     @classmethod
     def default(cls):
         return Execode.UNKNOWN
@@ -39,6 +44,8 @@ class Execode(FlagDoubleEnum):
 
 
 class ExecodeCollationFailedReason(FlagDoubleEnum):
+    """Defined Execode parameter collation failure reason."""
+
     @classmethod
     def default(cls):
         return ExecodeCollationFailedReason.MISC
@@ -52,50 +59,52 @@ class ExecodeCollationFailedReason(FlagDoubleEnum):
 
 class ExecodeCompletionOutcome(FlagOutcomeMixin, FlagDoubleEnum):
     """
-    # SUCCESS
+    Defined Execode completion outcomes.
 
-    < 0 - OK
-        -1 - OK
+    Currently defined completion outcomes are:
+        **# SUCCESS**
 
-    ================================
+        < 0 - OK
+            -1 - OK
 
-    # FAILED
+        **# FAILED**
 
-    1xx - Related to Auto Reply
-        101 - Error during channel registration
+        1xx - Related to Auto Reply
+            101 - Error during channel registration
 
-        102 - Error during module registration
+            102 - Error during module registration
 
 
-    2xx - Related to Identity
-        201 - Default profile registration error
+        2xx - Related to Identity
+            201 - Default profile registration error
 
-        202 - Channel ensure failed
+            202 - Channel ensure failed
 
-        203 - Channel error
+            203 - Channel error
 
-        204 - Integration error
+            204 - Integration error
 
-        205 - Integration failed
+            205 - Integration failed
 
-        206 - Source not found
+            206 - Source not found
 
-        207 - Target not found
+            207 - Target not found
 
-        208 - Source = Target
+            208 - Source = Target
 
-        209 - Default profile registration failed
+            209 - Default profile registration failed
 
-    5xx - Related to Model
-        501 - Error during model construction
+        5xx - Related to Model
+            501 - Error during model construction
 
-    9xx - Related to Process
-        901 - Not executed
+        9xx - Related to Process
+            901 - Not executed
 
-        902 - Execode not found
+            902 - Execode not found
 
-        903 - Missing arguments
+            903 - Missing arguments
     """
+
     @classmethod
     def default(cls):
         return ExecodeCompletionOutcome.X_NOT_EXECUTED

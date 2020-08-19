@@ -1,6 +1,6 @@
 @ECHO OFF
 
-SET LINTED=bot doc extdiscord extline extutils
+SET LINTED=bot doc extdiscord extline extutils flags
 
 :main
 

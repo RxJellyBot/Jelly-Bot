@@ -1,3 +1,4 @@
+"""Module for bot feature flags."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagDoubleEnum
@@ -5,107 +6,111 @@ from extutils.flags import FlagDoubleEnum
 
 class BotFeature(FlagDoubleEnum):
     """
-    1 - Text
-        10 - Main
-            100 - Auto Reply
-                1001 - Add
+    Defined bot feature codes.
 
-                1002 - Delete
+        Currently defined bot feature codes are:
+        1 - Text
+            10 - Main
+                100 - Auto Reply
+                    1001 - Add
 
-                1003 - Add (Execode)
+                    1002 - Delete
 
-                1004 - List (Usable)
+                    1003 - Add (Execode)
 
-                1005 - List (Keyword)
+                    1004 - List (Usable)
 
-                1006 - Ranking
+                    1005 - List (Keyword)
 
-                1009 - Respond
+                    1006 - Ranking
 
-            101 - Timer
-                1011 - Add
+                    1009 - Respond
 
-                1012 - List (All)
+                101 - Timer
+                    1011 - Add
 
-                1013 - Delete
+                    1012 - List (All)
 
-                1019 - List (Keyword)
+                    1013 - Delete
 
-            102 - Profile
-                1021 - Create
+                    1019 - List (Keyword)
 
-                1022 - Query
+                102 - Profile
+                    1021 - Create
 
-                1023 - List
+                    1022 - Query
 
-                1024 - Attach
+                    1023 - List
 
-                1025 - Detach
+                    1024 - Attach
 
-                1026 - Delete
+                    1025 - Detach
 
-        11 - Sub
-            110 - Information
-                1101 - Check channel/self ID
+                    1026 - Delete
 
-                1102 - Check channel info
+            11 - Sub
+                110 - Information
+                    1101 - Check channel/self ID
 
-                1103 - Check user info
+                    1102 - Check channel info
 
-                1104 - Check channel member's info
+                    1103 - Check user info
 
-                1109 - Bot Help
+                    1104 - Check channel member's info
 
-            111 - Transform/Replace
-                1111 - Replace newline character
+                    1109 - Bot Help
 
-            112 - Random
-                1121 - Choice - Once
+                111 - Transform/Replace
+                    1111 - Replace newline character
 
-                1122 - Choice - Multiple
+                112 - Random
+                    1121 - Choice - Once
 
-            113 - Recent Activities
-                1131 - Message
+                    1122 - Choice - Multiple
 
-            114 - Remote Control
-                1141 - Activate
+                113 - Recent Activities
+                    1131 - Message
 
-                1142 - Deactivate
+                114 - Remote Control
+                    1141 - Activate
 
-                1143 - Current Status
+                    1142 - Deactivate
 
-            115 - Calculator
-                1151 - Calculate
+                    1143 - Current Status
 
-            116 - LINE Sticker
-                1161 - Download Animated
+                115 - Calculator
+                    1151 - Calculate
 
-                1162 - Display Static
+                116 - LINE Sticker
+                    1161 - Download Animated
 
-                1163 - Download Package
+                    1162 - Display Static
 
-            119 - Other
-                1191 - Ping
+                    1163 - Download Package
 
-        12 - Extra Services
-            120 - Short URL
-                1201 - Create
+                119 - Other
+                    1191 - Ping
 
-        19 - Functional
-                1901 - User data integration
+            12 - Extra Services
+                120 - Short URL
+                    1201 - Create
 
-                1902 - Calculator
+            19 - Functional
+                    1901 - User data integration
 
-                1999 - Error Test
+                    1902 - Calculator
 
-    2 - Image
-        200 - imgur
-            2001 - imgur image upload
+                    1999 - Error Test
 
-    3 - Sticker
-        300 - LINE Sticker
-            3001 - Get info
+        2 - Image
+            200 - imgur
+                2001 - imgur image upload
+
+        3 - Sticker
+            300 - LINE Sticker
+                3001 - Get info
     """
+
     @classmethod
     def default(cls):
         return BotFeature.UNDEFINED

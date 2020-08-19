@@ -1,3 +1,4 @@
+"""Module for model validity check flags."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
@@ -5,36 +6,40 @@ from extutils.flags import FlagDoubleEnum, FlagOutcomeMixin
 
 class ModelValidityCheckResult(FlagOutcomeMixin, FlagDoubleEnum):
     """
-    # SUCCESS
+    Result of checking the validaity of a model.
 
-    -1 - OK
+    Currently defined results are:
+        **# SUCCESS**
 
-    ================================
+        -1 - OK
 
-    # FAILED
+        -----
 
-    1xx - Auto Reply
-        10x - Content Validations
-            101 - Empty content
+        **# FAILED**
 
-            102 - Image validation dailed
+        1xx - Auto Reply
+            10x - Content Validations
+                101 - Empty content
 
-            103 - LINE sticker validation failed
+                102 - Image validation dailed
 
-    2xx - Identity Managements
-        20x - Root User
-            201 - No related identity data
+                103 - LINE sticker validation failed
 
-    3xx - Execode
-        301 - Action type unknown
+        2xx - Identity Managements
+            20x - Root User
+                201 - No related identity data
 
-        302 - Data error
+        3xx - Execode
+            301 - Action type unknown
 
-    9xx - Miscellaneous
-        901 - Uncategorized
+            302 - Data error
 
-        902 - Error
+        9xx - Miscellaneous
+            901 - Uncategorized
+
+            902 - Error
     """
+
     @classmethod
     def default(cls):
         return ModelValidityCheckResult.O_OK

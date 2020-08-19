@@ -1,9 +1,12 @@
+"""Module for extra content type flags."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
 
 
 class ExtraContentType(FlagSingleEnum):
+    """Defined extra content types."""
+
     @classmethod
     def default(cls):
         return ExtraContentType.PURE_TEXT

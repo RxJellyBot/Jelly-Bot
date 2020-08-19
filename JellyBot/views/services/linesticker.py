@@ -1,3 +1,4 @@
+"""Views for LINE sticker downloader."""
 from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
@@ -10,7 +11,10 @@ from JellyBot.views import render_template
 
 
 class LineStickerDownloadView(TemplateResponseMixin, View):
-    def get(self, request, *args, **kwargs):
+    """View of LINE sticker downloader UI."""
+
+    def get(self, request):
+        """Render the webpage for LINE sticker downloader UI."""
         context = {}
         context["pack_url"] = pack_url = request.GET.get("url", "")
         context["pack_meta"] = pack_meta = LineStickerUtils.get_pack_meta_from_url(pack_url)
@@ -23,8 +27,11 @@ class LineStickerDownloadView(TemplateResponseMixin, View):
 
 
 class LineStickerPackageDownloadView(TemplateResponseMixin, View):
+    """View to download a LINE sticker package."""
+
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def get(self, request, pack_id, *args, **kwargs):
+    def get(self, request, pack_id):
+        """Download the LINE sticker package file to the user's end."""
         binary_io = LineStickerUtils.get_downloaded_sticker_pack(pack_id)
 
         if not binary_io:
@@ -33,15 +40,21 @@ class LineStickerPackageDownloadView(TemplateResponseMixin, View):
         return FileResponse(binary_io, as_attachment=True)
 
 
-class LineStickerAnimatedPngDownloadView(TemplateResponseMixin, View):
+class LineStickerAnimatedPngRedirectView(TemplateResponseMixin, View):
+    """View to see the apng of an animated sticker."""
+
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def get(self, request, pack_id, sticker_id, *args, **kwargs):
+    def get(self, request, pack_id, sticker_id):
+        """Redirect the user to the apng page of an animated sticker."""
         return redirect(LineStickerUtils.get_apng_url(pack_id, sticker_id), permanent=True)
 
 
 class LineStickerAnimatedGifDownloadView(TemplateResponseMixin, View):
+    """View to download an animated sticker as gif."""
+
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def get(self, request, pack_id, sticker_id, *args, **kwargs):
+    def get(self, request, pack_id, sticker_id):
+        """Download the gif file of an animated sticker to the user's end."""
         binary_io = LineStickerUtils.get_downloaded_animated(pack_id, sticker_id)
 
         if not binary_io:
@@ -51,8 +64,11 @@ class LineStickerAnimatedGifDownloadView(TemplateResponseMixin, View):
 
 
 class LineStickerAnimatedFramesDownloadView(TemplateResponseMixin, View):
+    """View to download the frames of an animated sitcker."""
+
     # noinspection PyUnusedLocal, PyMethodMayBeStatic
-    def get(self, request, pack_id, sticker_id, *args, **kwargs):
+    def get(self, request, pack_id, sticker_id):
+        """Download the frames of an animated sticker as a zip file to the user's end."""
         binary_io = LineStickerUtils.get_downloaded_apng_frames(pack_id, sticker_id)
 
         if not binary_io:

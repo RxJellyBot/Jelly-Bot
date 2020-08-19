@@ -1,3 +1,4 @@
+"""Module for API action flag."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagSingleEnum
@@ -5,53 +6,57 @@ from extutils.flags import FlagSingleEnum
 
 class APICommand(FlagSingleEnum):
     """
-    1xx - Auto Reply:
-        10x - Main Functions:
-            101: Add
+    Defined API command actions.
 
-        11x - Side Functions:
-            111: Content Vaidation
+    Currently defined actions are:
+        1xx - Auto Reply:
+            10x - Main Functions:
+                101: Add
 
-        12x - Tag controls:
-            121: Query Tag Popularity
+            11x - Side Functions:
+                111: Content Vaidation
 
-    2xx - Execode:
-        20x - Auto reply:
-            201: Complete Addition
+            12x - Tag controls:
+                121: Query Tag Popularity
 
-        29x - Miscellaneous
-            291: List all Execode
+        2xx - Execode:
+            20x - Auto reply:
+                201: Complete Addition
 
-            299: Complete Action
+            29x - Miscellaneous
+                291: List all Execode
 
-    3xx - Data Query:
-        30x - Identity:
-            301: Channel Data
+                299: Complete Action
 
-            302: Permission
+        3xx - Data Query:
+            30x - Identity:
+                301: Channel Data
 
-    4xx - Management
-        40x - Channel
-            401: Issue Channel Registration Execode
+                302: Permission
 
-            402: Change Channel Star
+        4xx - Management
+            40x - Channel
+                401: Issue Channel Registration Execode
 
-            403: Change Channel Name
-        41x - Profile
-            411: Detach
+                402: Change Channel Star
 
-            412: Check Name
+                403: Change Channel Name
+            41x - Profile
+                411: Detach
 
-            413: Attach
+                412: Check Name
 
-    5xx - Special Services
-        50x - Short URL
-            501: Shorten URL
+                413: Attach
 
-            502: Update Target
+        5xx - Special Services
+            50x - Short URL
+                501: Shorten URL
 
-            503: Sticker Package ID Extraction
+                502: Update Target
+
+                503: Sticker Package ID Extraction
     """
+
     @classmethod
     def default(cls):
         return APICommand.UNKNOWN
