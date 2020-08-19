@@ -18,7 +18,7 @@ class TestLineStickerUtils(TestCase):
             ("From phone (http)", "http://line.me/S/sticker/12542626/?lang=en&ref=gnsh_stickerDetail", 12542626),
             ("From PC", "https://store.line.me/stickershop/product/17811/?ref=Desktop", 17811),
             ("From PC (http)", "http://store.line.me/stickershop/product/17811/?ref=Desktop", 17811),
-            ("Unavailable", "https://line.me/S/sticker/0/?lang=en&ref=gnsh_stickerDetail", None),
+            ("Unavailable", "https://line.me/S/sticker/0/?lang=en&ref=gnsh_stickerDetail", 0),
             ("Unparsable", "https://google.com", None)
         ]
 

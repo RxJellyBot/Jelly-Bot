@@ -680,7 +680,9 @@ class LineStickerUtils(ClearableMixin):
         """
         Get the sticker package ID based on the sticker package URL.
 
-        Returns ``None`` if the sticker package URL is unparsable or the sticker package is unavailable.
+        Returns ``None`` if the sticker package URL is unparsable.
+
+        Will **NOT** check if the sticker package is available or not.
 
         :param url: URL of the sticker package
         :return: sticker package ID if found
@@ -693,7 +695,7 @@ class LineStickerUtils(ClearableMixin):
         ]
 
         for regex in regexes:
-            if (re_match := re.match(regex, url)) and requests.get(url).ok:
+            if re_match := re.match(regex, url):
                 try:
                     return LineStickerUtils.get_pack_meta(re_match.group(1))
                 except MetadataNotFoundError:
