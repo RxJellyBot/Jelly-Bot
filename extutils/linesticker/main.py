@@ -1,27 +1,24 @@
 """Module of the LINE sticker utilities."""
 import atexit
+import re
 from abc import ABC
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 from pathlib import Path
 import os
 import shutil
 import tempfile
-from threading import Thread
 import time
-from typing import Optional, BinaryIO, Dict, Union, List, Tuple
+from typing import Optional, BinaryIO, Union, List, Tuple
 from zipfile import ZipFile
 
 import requests
 
-from extutils.dt import now_utc_aware
 from extutils.imgproc import apng2gif
-from extutils.checker import arg_type_ensure
-from JellyBot.systemconfig import ExtraService
 from mixin import ClearableMixin
 
 from .flag import LineStickerLanguage, LineStickerType
 from .exception import MetadataNotFoundError
+from .tempfile import LineStickerTempStorageManager
 
 __all__ = ("LineStickerUtils", "LineAnimatedStickerDownloadResult",
            "LineStickerMetadata")
@@ -180,70 +177,6 @@ class LineAnimatedStickerDownloadResult(LineStickerDownloadResultBase):
         return duration
 
 
-class LineStickerTempStorageManager:
-    """Class to manage the downloaded sticker files stored in the temporary storage."""
-
-    _PATH_DICT: Dict[str, datetime] = {}
-
-    _started = False
-
-    @classmethod
-    def start_monitor(cls):
-        """
-        Non-blocking call to let the temporary storage starts monitoring the file.
-
-        Have no effect if the thread is already started.
-        """
-        if not cls._started:
-            # Running the thread in daemon mode to prevent from unterminatable test
-            Thread(target=cls._scan_file, name="LINE Sticker Temp File Manager", daemon=True).start()
-            cls._started = True
-
-    @classmethod
-    def _scan_file(cls):
-        while cls._PATH_DICT:
-            cls._remove_expired_files()
-            time.sleep(60)
-
-        cls._started = False
-
-    @classmethod
-    def _remove_expired_files(cls):
-        now = now_utc_aware()
-
-        for path, last_used in cls._PATH_DICT.items():
-            if (now - last_used).total_seconds() > ExtraService.Sticker.MaxStickerTempFileLifeSeconds:
-                os.remove(path)
-
-    @classmethod
-    @arg_type_ensure
-    def create_file(cls, file_path: str):
-        """
-        Update the last file usage time at ``file_path``.
-
-        The file at ``file_path`` will be removed by calling ``os.remove()`` once
-        :class:`ExtraService.Sticker.MaxStickerTempFileLifeSeconds` seconds has passed
-        since the last call of this method.
-
-        Timeout of the file will be reset upon re-calling this method if not yet expired.
-
-        This call also starts the storage monitor if not yet started.
-
-        :param file_path: actual file path
-        """
-        cls._PATH_DICT[file_path] = now_utc_aware()
-
-        # On-demand monitor to save performance
-
-        # `cls.start_monitor()` should located after the assignment of `cls._PATH_DICT`,
-        # or the monitoring thread cannot start because of the while loop condition.
-        if not cls._started:
-            cls.start_monitor()
-
-        # Trigger the check once
-        cls._remove_expired_files()
-
-
 # endregion
 
 
@@ -295,6 +228,41 @@ class LineStickerMetadata:
             return stk_obj
 
         return [stk["id"] for stk in stk_obj]
+
+    @property
+    def dl_link_store(self) -> str:
+        """
+        Get the link of the sticker package on LINE store.
+
+        :return: link of the sticker package on LINE store
+        """
+        return LineStickerUtils.get_pack_store_url(self.pack_id)
+
+    @property
+    def dl_link_server(self) -> str:
+        """
+        Get the link to download the sticker package.
+
+        This property calls Django's ``reverse()`` to get the URL to download the sticker package.
+
+        :return: link to download the sticker package
+        """
+        # pylint: disable=import-outside-toplevel
+        # Inline on-demand import
+        from django.urls import reverse
+
+        from JellyBot.systemconfig import HostUrl
+
+        return f"{HostUrl}{reverse('service.linesticker.pack', kwargs={'pack_id': self.pack_id})}"
+
+    @property
+    def icon_url(self) -> str:
+        """
+        Get the sticker set icon URL.
+
+        :return: sticker set icon URL
+        """
+        return f"https://stickershop.line-scdn.net/stickershop/v1/product/{self.pack_id}/LINEStorePC/main.png"
 
     @property
     def is_animated_sticker(self):
@@ -622,13 +590,6 @@ class LineStickerPackDownloader:
 class LineStickerUtils(ClearableMixin):
     """Main LINE sticker utilities."""
 
-    # pylint: disable=fixme
-
-    # https://github.com/RaenonX/Jelly-Bot/issues/55
-
-    # TODO: A website page for downloading stickers
-    #  (may need to use LINE sticker searching API by inspecting official page)
-
     @classmethod
     def clear(cls):
         for file_path in Path(_temp_dir).iterdir():
@@ -713,6 +674,32 @@ class LineStickerUtils(ClearableMixin):
             raise MetadataNotFoundError(pack_id)
 
         return LineStickerMetadata(pack_meta.json())
+
+    @staticmethod
+    def get_pack_meta_from_url(url: str) -> Optional[LineStickerMetadata]:
+        """
+        Get the sticker package ID based on the sticker package URL.
+
+        Returns ``None`` if the sticker package URL is unparsable or the sticker package is unavailable.
+
+        :param url: URL of the sticker package
+        :return: sticker package ID if found
+        """
+        regexes = [
+            r"^https://line.me/S/sticker/([0-9]+)/.*$",
+            r"^https://store.line.me/stickershop/product/([0-9]+)/.*$",
+            r"^http://line.me/S/sticker/([0-9]+)/.*$",
+            r"^http://store.line.me/stickershop/product/([0-9]+)/.*$"
+        ]
+
+        for regex in regexes:
+            if (re_match := re.match(regex, url)) and requests.get(url).ok:
+                try:
+                    return LineStickerUtils.get_pack_meta(re_match.group(1))
+                except MetadataNotFoundError:
+                    pass
+
+        return None
 
     @staticmethod
     def _prepare_output(output_path: str, sticker_id: int, sticker_type: LineStickerType):

@@ -3,13 +3,16 @@ import os
 from tempfile import TemporaryDirectory
 from zipfile import is_zipfile, ZipFile
 
+from django.urls import reverse
+
 from extutils.linesticker import LineStickerUtils, LineStickerMetadata, MetadataNotFoundError, LineStickerLanguage
+from JellyBot.systemconfig import HostUrl
 from tests.base import TestCase
 
-__all__ = ["TestLineStickerUtils", "TestLineStickerMetadata"]
+__all__ = ["TestLineStickerUtilsDownload", "TestLineStickerMetadata"]
 
 
-class TestLineStickerUtils(TestCase):
+class TestLineStickerUtilsDownload(TestCase):
     """
     .. note::
 
@@ -20,13 +23,6 @@ class TestLineStickerUtils(TestCase):
     @staticmethod
     def obj_to_clear():
         return [LineStickerUtils]
-
-    def test_sticker_exists(self):
-        self.assertTrue(LineStickerUtils.is_sticker_exists("16663260"))
-        self.assertTrue(LineStickerUtils.is_sticker_exists(16663260))
-        self.assertFalse(LineStickerUtils.is_sticker_exists("88"))
-        self.assertFalse(LineStickerUtils.is_sticker_exists(88))
-        self.assertFalse(LineStickerUtils.is_sticker_exists(True))
 
     def test_download_animated_get_integer_id(self):
         result = LineStickerUtils.download_apng_as_gif(15769, 248521690)
@@ -407,6 +403,9 @@ class TestLineStickerUtils(TestCase):
         self.assertFalse(metadata.is_animated_sticker)
         self.assertFalse(metadata.has_sound)
         self.assertEqual(metadata.sticker_ids, list(range(317509814, 317509854)))
+        self.assertEqual(metadata.dl_link_store, LineStickerUtils.get_pack_store_url(11952172))
+        self.assertEqual(metadata.dl_link_server,
+                         f"{HostUrl}{reverse('service.linesticker.pack', kwargs={'pack_id': 11952172})}")
         self.assertEqual(metadata.get_author(LineStickerLanguage.EN), "A-way")
         self.assertEqual(metadata.get_title(LineStickerLanguage.EN), "LV.14 Meow meow Monster")
 
@@ -417,6 +416,9 @@ class TestLineStickerUtils(TestCase):
         self.assertFalse(metadata.is_animated_sticker)
         self.assertFalse(metadata.has_sound)
         self.assertEqual(metadata.sticker_ids, list(range(317509814, 317509854)))
+        self.assertEqual(metadata.dl_link_store, LineStickerUtils.get_pack_store_url(11952172))
+        self.assertEqual(metadata.dl_link_server,
+                         f"{HostUrl}{reverse('service.linesticker.pack', kwargs={'pack_id': 11952172})}")
         self.assertEqual(metadata.get_author(LineStickerLanguage.EN), "A-way")
         self.assertEqual(metadata.get_title(LineStickerLanguage.EN), "LV.14 Meow meow Monster")
 

@@ -1,9 +1,25 @@
+from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
 from extutils.linesticker import LineStickerUtils
+from JellyBot.views import render_template
+
+
+class LineStickerDownloadView(TemplateResponseMixin, View):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        context["pack_url"] = pack_url = request.GET.get("url", "")
+        context["pack_meta"] = pack_meta = LineStickerUtils.get_pack_meta_from_url(pack_url)
+
+        if pack_url and not pack_meta:
+            messages.warning(request, "Unable to get the LINE sticker package ID. "
+                                      "Check the format of the URL to be parsed.")
+
+        return render_template(self.request, _("LINE Sticker Downloader"), "services/linesticker.html", context)
 
 
 class LineStickerPackageDownloadView(TemplateResponseMixin, View):

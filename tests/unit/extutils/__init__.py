@@ -5,5 +5,6 @@ from .color import *  # noqa
 from .email import *  # noqa
 from .flags import *  # noqa
 from .imgproc import *  # noqa
+from .linesticker import *  # noqa
 from .singleton import *  # noqa
 from .utils import *  # noqa

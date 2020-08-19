@@ -1,0 +1,68 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    <div class="jumbotron">
+        <div class="container">
+            <div class="display-4 text-center"
+                 style="word-break: break-word;">{% trans "LINE Sticker Downloader" %}</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg">
+                <div class="card border-primary mb-3">
+                    <div class="card-header text-center text-primary">
+                        <span class="h5">{% trans "LINE Sticker Package URL" %}</span>
+                    </div>
+                    <div class="card-body">
+                        {% url "page.doc.botcmd.cmd" code=cmd_code as cmd_url %}
+                        {% blocktrans trimmed %}
+                            <div>
+                                Input the URL of the sticker package to be downloaded below.<br>
+                                <br>
+                                The following format of the URL can be parsed:<br>
+                                <ul>
+                                    <li>https://line.me/S/sticker/10000/</li>
+                                    <li>https://store.line.me/stickershop/product/10000/</li>
+                                </ul>
+                            </div>
+                        {% endblocktrans %}
+                        <form>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{ pack_url }}" name="url"
+                                       placeholder="{% trans "Input sticker package URL here" %}"
+                                       aria-label="{% trans "Sticker Package URL" %}" id="stkpkgurl">
+                                <div class="input-group-append">
+                                    <button type="submit" id="urlSubmit" class="btn btn-outline-primary">
+                                        {% trans "Submit" %}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if pack_meta %}
+            <div class="row">
+                <div class="col-lg-2">
+                    <img src="{{ pack_meta.icon_url }}" alt="Icon of LINE Sticker Package #{{ pack_meta.pack_id }}"
+                         class="w-100">
+                </div>
+                <div class="col-lg-10">
+                    <p class="h4">{{ pack_meta.get_title }}</p>
+                    <p class="h6">{{ pack_meta.get_author }}</p>
+                    <p>
+                        <a class="btn btn-outline-secondary" href="{{ pack_meta.dl_link_store }}"
+                           target="_blank">{% trans "LINE STORE Link" %}</a>
+                        <a class="btn btn-outline-secondary"
+                           href="{{ pack_meta.dl_link_server }}">{% trans "Download image package" %}</a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -2,12 +2,17 @@ from django.urls import path
 
 from .linesticker import (
     LineStickerAnimatedGifDownloadView, LineStickerAnimatedFramesDownloadView, LineStickerAnimatedPngDownloadView,
-    LineStickerPackageDownloadView
+    LineStickerPackageDownloadView, LineStickerDownloadView
 )
 from .shorturl import ShortUrlMainView
 from .maskfinder import MaskFinderMainView
 
 urlpatterns = [
+    path(
+        'linesticker/download',
+        LineStickerDownloadView.as_view(),
+        name="service.linesticker.ui"
+    ),
     path(
         'linesticker/<int:pack_id>/stickers.zip',
         LineStickerPackageDownloadView.as_view(),
