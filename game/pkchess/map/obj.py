@@ -133,7 +133,7 @@ class MapTemplate(ConvertibleMapMixin):
         self._check_dimension_point_matrix()
 
     def respawn(self):
-        pass  # TODO: Game - game respawn object
+        pass  # DRAFT: Game - game respawn object
 
     def to_map(self, *,
                players: Dict[ObjectId, Character] = None,

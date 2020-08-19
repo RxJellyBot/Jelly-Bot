@@ -303,4 +303,4 @@ class GameController(ClearableMixin):
 
     @classmethod
     def on_turn_completed(cls):
-        pass  # TODO: Game - on turn completed - call the checking method for every turn (respawn) (implement & test)
+        pass  # DRAFT: Game - on turn completed - call the checking method for every turn (respawn) (implement & test)
