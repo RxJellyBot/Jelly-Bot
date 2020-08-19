@@ -218,9 +218,6 @@ def _construct_services(current_path, parent):
         NavEntry, current_path, label=_("Short URL"), link=reverse("service.shorturl"),
         parent=service_parent))
     service_parent.add_item(nav_items_factory(
-        NavEntry, current_path, label=_("Maskfinder (US Only)"), link=reverse("service.maskfinder"),
-        parent=service_parent))
-    service_parent.add_item(nav_items_factory(
         NavEntry, current_path, label=_("LINE Sticker Downloader"), link=reverse("service.linesticker.ui"),
         parent=service_parent))
 

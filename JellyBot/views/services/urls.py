@@ -5,7 +5,6 @@ from .linesticker import (
     LineStickerPackageDownloadView, LineStickerDownloadView
 )
 from .shorturl import ShortUrlMainView
-from .maskfinder import MaskFinderMainView
 
 urlpatterns = [
     path(
@@ -34,5 +33,4 @@ urlpatterns = [
         name="service.linesticker.animated.apng"
     ),
     path('shorturl/', ShortUrlMainView.as_view(), name="service.shorturl"),
-    path('maskfinder/', MaskFinderMainView.as_view(), name="service.maskfinder"),
 ]
