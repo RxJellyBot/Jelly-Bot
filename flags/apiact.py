@@ -8,8 +8,10 @@ class APICommand(FlagSingleEnum):
     1xx - Auto Reply:
         10x - Main Functions:
             101: Add
+
         11x - Side Functions:
             111: Content Vaidation
+
         12x - Tag controls:
             121: Query Tag Popularity
 
@@ -19,27 +21,36 @@ class APICommand(FlagSingleEnum):
 
         29x - Miscellaneous
             291: List all Execode
+
             299: Complete Action
 
     3xx - Data Query:
         30x - Identity:
             301: Channel Data
+
             302: Permission
 
     4xx - Management
         40x - Channel
             401: Issue Channel Registration Execode
+
             402: Change Channel Star
+
             403: Change Channel Name
         41x - Profile
             411: Detach
+
             412: Check Name
+
             413: Attach
 
     5xx - Special Services
         50x - Short URL
             501: Shorten URL
+
             502: Update Target
+
+            503: Sticker Package ID Extraction
     """
     @classmethod
     def default(cls):

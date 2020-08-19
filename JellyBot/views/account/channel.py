@@ -67,8 +67,7 @@ class AccountChannelManagingView(LoginRequiredMixin, TemplateResponseMixin, View
             if c_prof:
                 messages.info(
                     request, _("You are redirected to the channel info page "
-                               "because you don't have any connections linked to the channel."),
-                    extra_tags="info"
+                               "because you don't have any connections linked to the channel.")
                 )
 
                 return redirect(reverse("info.channel", kwargs={"channel_oid": channel_oid}))

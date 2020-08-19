@@ -60,7 +60,6 @@ class Response:
             response = requests.post(
                 URL.post_walgreens(),
                 data=Payload.get_walgreens(zip_code, product_id)).json()
-            print(response["summary"])
             for location in response["results"]:
                 store = location["store"]
                 address_body = store["address"]
