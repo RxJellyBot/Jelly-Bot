@@ -62,7 +62,7 @@ class GitHubWrapper:
 
         response = requests.get(f"{GitHubWrapper.API_URL}/repos/{repo_id_name}/commits/{branch}").json()
 
-        if response:
+        if not response:
             return None
 
         self._cache_commit[branch] = response
