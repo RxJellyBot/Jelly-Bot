@@ -9,12 +9,12 @@ from flags import Platform
 from models import Model, RemoteControlEntryModel, ChannelModel, ChannelConfigModel
 from mongodb.factory import ChannelManager
 
-from tests.base import TestModel
+from tests.base import TestModel, TestModelMixin
 
 __all__ = ["TestRemoteControlEntryModel"]
 
 
-class TestRemoteControlEntryModel(TestModel.TestClass):
+class TestRemoteControlEntryModel(TestModel.TestClass, TestModelMixin):
     USER_OID = ObjectId()
     SRC_CID = ObjectId()
     TGT_CID = ObjectId()
@@ -63,4 +63,4 @@ class TestRemoteControlEntryModel(TestModel.TestClass):
         expected_channel_mdl = self.prepare_channel_data()
         mdl = self.get_constructed_model(dst=expected_channel_mdl.id)
 
-        self.assertEqual(mdl.target_channel, expected_channel_mdl)
+        self.assertModelEqual(mdl.target_channel, expected_channel_mdl, ignore_oid=False)

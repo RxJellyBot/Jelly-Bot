@@ -46,6 +46,8 @@ jobs:
     continue-on-error: true
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Print SHA
         run: |
           echo %GITHUB_SHA%
@@ -53,6 +55,14 @@ jobs:
       - name: Print REF
         run: |
           echo %GITHUB_REF%
+
+      - name: Install pymongo
+        run: |
+          pip install pymongo dnspython
+
+      - name: Drop current MongoDB database for re-running the tests
+        run: |
+          python mongodb/cli/drop_db.py %MONGO_DB%
 
   checks:
     runs-on: windows-latest
