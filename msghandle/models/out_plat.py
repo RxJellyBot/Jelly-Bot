@@ -9,7 +9,7 @@ from flags import MessageType
 from extutils.dt import now_utc_aware
 from extutils.utils import list_insert_in_between
 from extutils.emailutils import MailSender
-from extutils.line_sticker import LineStickerUtils
+from extutils.linesticker import LineStickerUtils
 from JellyBot.systemconfig import PlatformConfig
 from mongodb.factory import ExtraContentManager
 from strres.msghandle import ToSiteReason

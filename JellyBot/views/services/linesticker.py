@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 
-from extutils.line_sticker import LineStickerUtils
+from extutils.linesticker import LineStickerUtils
 
 
 class LineStickerPackageDownloadView(TemplateResponseMixin, View):

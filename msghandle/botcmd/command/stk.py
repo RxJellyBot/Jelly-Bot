@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import reverse
 
-from extutils.line_sticker import LineStickerUtils
+from extutils.linesticker import LineStickerUtils
 from extutils.emailutils import MailSender
 from flags import BotFeature
 from JellyBot.systemconfig import HostUrl

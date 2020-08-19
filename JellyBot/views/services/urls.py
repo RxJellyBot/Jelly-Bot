@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .line_sticker import (
+from .linesticker import (
     LineStickerAnimatedGifDownloadView, LineStickerAnimatedFramesDownloadView, LineStickerAnimatedPngDownloadView,
     LineStickerPackageDownloadView
 )

@@ -14,7 +14,7 @@ class TestApng2Gif(TestCase):
             out_path = os.path.join(temp_dir, "out.gif")
             out_path_frames = os.path.join(temp_dir, "out-frames.zip")
 
-            with open("tests/res/line_sticker.apng", "rb") as f:
+            with open("tests/res/linesticker.apng", "rb") as f:
                 result = convert(f.read(), out_path, zip_frames=False)
 
             self.assertTrue(result.frame_extraction.success)
@@ -38,7 +38,7 @@ class TestApng2Gif(TestCase):
             out_path = os.path.join(temp_dir, "out.gif")
             out_path_frames = os.path.join(temp_dir, "out-frames.zip")
 
-            with open("tests/res/line_sticker.apng", "rb") as f:
+            with open("tests/res/linesticker.apng", "rb") as f:
                 result = convert(f.read(), out_path)
 
             self.assertTrue(result.frame_extraction.success)

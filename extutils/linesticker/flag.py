@@ -66,7 +66,7 @@ class LineStickerLanguage(FlagSingleEnum):
 
             if get_language() == "zh-tw":
                 return LineStickerLanguage.CHT
-        except Exception:
-            pass
 
-        return LineStickerLanguage.CHT
+            return LineStickerLanguage.CHT
+        except ImportError:
+            return LineStickerLanguage.CHT

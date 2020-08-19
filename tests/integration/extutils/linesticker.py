@@ -3,7 +3,7 @@ import os
 from tempfile import TemporaryDirectory
 from zipfile import is_zipfile, ZipFile
 
-from extutils.line_sticker import LineStickerUtils, LineStickerMetadata, MetadataNotFoundError, LineStickerLanguage
+from extutils.linesticker import LineStickerUtils, LineStickerMetadata, MetadataNotFoundError, LineStickerLanguage
 from tests.base import TestCase
 
 __all__ = ["TestLineStickerUtils", "TestLineStickerMetadata"]

@@ -4,7 +4,7 @@ from typing import Any
 from JellyBot.systemconfig import AutoReply
 from extutils import safe_cast
 from extutils.imgproc import ImageValidator
-from extutils.line_sticker import LineStickerUtils
+from extutils.linesticker import LineStickerUtils
 from flags import AutoReplyContentType
 
 __all__ = ("AutoReplyValidator",)

@@ -5,7 +5,7 @@ from typing import Optional, Union, List
 from bson import ObjectId
 
 from extutils.dt import localtime
-from extutils.line_sticker import LineStickerUtils
+from extutils.linesticker import LineStickerUtils
 from JellyBot import systemconfig
 from flags import AutoReplyContentType, ModelValidityCheckResult
 from models import OID_KEY
