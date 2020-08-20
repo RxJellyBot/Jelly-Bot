@@ -69,7 +69,7 @@ txt = _("Please add 'AR' which means 'Auto-Reply' between JC and the command cod
         "Additionally, you can now use **single space** as the command splitter.\n"
         "For parameters that contains any spaces, "
         "use double quotation mark (`\"`) to wrap it. Example using the above command: `JC AA AR \"A B\" C`.\n"
-        "For more command usage, visit {}.").format(HostUrl)
+        "For more command usage, visit {}").format(HostUrl)
 
 
 # noinspection PyUnusedLocal
