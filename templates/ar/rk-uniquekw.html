@@ -17,8 +17,9 @@
                 <td class="align-middle text-center">{{ entry.rank }}</td>
                 <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_usage }}</code></td>
                 <td class="align-middle text-center no-line-break">{{ entry.word_type.key }}</td>
-                <td class="align-middle text-left no-line-break ar-content">{{ entry.word|safe }}</td>
-                <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_module }}</code></td>
+                <td class="align-middle text-left no-line-break ar-content">{{ entry.word_html|safe }}</td>
+                <td class="align-middle text-center no-line-break"><code class="h5">{{ entry.count_module }}</code>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

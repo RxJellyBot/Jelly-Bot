@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
+from functools import lru_cache
 from typing import Optional, Union, List
 
 from bson import ObjectId
@@ -23,22 +24,26 @@ __all__ = ["AutoReplyContentModel", "AutoReplyModuleModel", "AutoReplyModuleExec
            "AutoReplyTagPopularityScore", "UniqueKeywordCountEntry", "UniqueKeywordCountResult"]
 
 
+@lru_cache(maxsize=1000)
 def _content_to_str(content_type, content):
     if content_type == AutoReplyContentType.TEXT:
         return content
-    else:
-        return f"({content_type.key} / {content})"
+
+    return f"({content_type.key} / {content})"
 
 
+@lru_cache(maxsize=1000)
 def _content_to_html(content_type, content):
     if content_type == AutoReplyContentType.TEXT:
         return content.replace("\n", "<br>").replace(" ", "&nbsp;")
-    elif content_type == AutoReplyContentType.IMAGE:
+
+    if content_type == AutoReplyContentType.IMAGE:
         return f'<img src="{content}"/>'
-    elif content_type == AutoReplyContentType.LINE_STICKER:
+
+    if content_type == AutoReplyContentType.LINE_STICKER:
         return f'<img src="{LineStickerUtils.get_sticker_url(content)}"/>'
-    else:
-        return content
+
+    return content
 
 
 class AutoReplyContentModel(Model):
@@ -220,11 +225,14 @@ class UniqueKeywordCountEntry:
 
     def __post_init__(self):
         self.word_type = AutoReplyContentType.cast(self.word_type)
-        self.word = _content_to_html(self.word_type, self.word)
 
     @property
     def word_str(self):
         return _content_to_str(self.word_type, self.word)
+
+    @property
+    def word_html(self):
+        return _content_to_html(self.word_type, self.word)
 
 
 class UniqueKeywordCountResult:
