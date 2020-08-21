@@ -12,7 +12,8 @@ from mongodb.factory import RootUserManager, ExecodeManager
 class AccountMainPageView(LoginRequiredMixin, TemplateResponseMixin, View):
     # noinspection PyUnusedLocal
     def get(self, request, *args, **kwargs):
-        u_data = RootUserManager.get_root_data_api_token(self.request.COOKIES[keys.Cookies.USER_TOKEN])
+        u_data = RootUserManager.get_root_data_api_token(self.request.COOKIES[keys.Cookies.USER_TOKEN],
+                                                         skip_on_plat=False)
         excde_list = ExecodeManager.get_queued_execodes(u_data.model.id)
 
         return render_template(

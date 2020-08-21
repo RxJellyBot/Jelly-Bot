@@ -232,6 +232,11 @@ class UniqueKeywordCountEntry:
 
     @property
     def word_html(self):
+        """
+        Get the keyword representation in HTML.
+
+        :return: keyword representation in HTML
+        """
         return _content_to_html(self.word_type, self.word)
 
 

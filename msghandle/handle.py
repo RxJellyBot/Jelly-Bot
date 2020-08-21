@@ -70,7 +70,7 @@ def handle_message_main(e: MessageEventObject) -> HandledMessageEventsHolder:
         if event_type in _fn_box:
             ret = HandledMessageEventsHolder(e.channel_model, _fn_box[event_type](e))
         else:
-            logger.logger.warning(f"Message handle object not handled. Raw: {e.raw}")
+            logger.logger.warning("Message handle object not handled. Raw: %s", e.raw)
             ret = HandledMessageEventsHolder(e.channel_model)
 
         # Translation deactivation

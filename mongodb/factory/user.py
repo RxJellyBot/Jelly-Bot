@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Optional, Dict, List, Union, Callable
+from typing import Optional, Dict, List, Union, Callable, NamedTuple
 
 from bson import ObjectId
 from datetime import tzinfo
@@ -27,6 +27,8 @@ __all__ = ("APIUserManager", "OnPlatformIdentityManager", "RootUserManager",)
 
 DB_NAME = "user"
 
+UserNameEntryType = NamedTuple("UserNameEntry", [("user_id", ObjectId), ("user_name", str)])
+
 
 class _APIUserManager(GenerateTokenMixin, BaseCollection):
     token_length = APIUserModel.API_TOKEN_LENGTH
@@ -39,15 +41,6 @@ class _APIUserManager(GenerateTokenMixin, BaseCollection):
     def build_indexes(self):
         self.create_index(APIUserModel.GoogleUid.key, unique=True, name="Google Identity Unique ID")
         self.create_index(APIUserModel.Token.key, unique=True, name="Jelly Bot API Token")
-
-    def get_user_data_id_data(self, id_data: GoogleIdentityUserData) -> Optional[APIUserModel]:
-        return self.get_user_data_google_id(id_data.uid)
-
-    def get_user_data_token(self, token: str) -> Optional[APIUserModel]:
-        return self.find_one_casted({APIUserModel.Token.key: token}, parse_cls=APIUserModel)
-
-    def get_user_data_google_id(self, goo_uid: str) -> Optional[APIUserModel]:
-        return self.find_one_casted({APIUserModel.GoogleUid.key: goo_uid}, parse_cls=APIUserModel)
 
     def register(self, id_data: GoogleIdentityUserData) -> OnSiteUserRegistrationResult:
         token = None
@@ -68,6 +61,15 @@ class _APIUserManager(GenerateTokenMixin, BaseCollection):
 
         return OnSiteUserRegistrationResult(outcome, ex, model, token)
 
+    def get_user_data_id_data(self, id_data: GoogleIdentityUserData) -> Optional[APIUserModel]:
+        return self.get_user_data_google_id(id_data.uid)
+
+    def get_user_data_token(self, token: str) -> Optional[APIUserModel]:
+        return self.find_one_casted({APIUserModel.Token.key: token}, parse_cls=APIUserModel)
+
+    def get_user_data_google_id(self, goo_uid: str) -> Optional[APIUserModel]:
+        return self.find_one_casted({APIUserModel.GoogleUid.key: goo_uid}, parse_cls=APIUserModel)
+
 
 class _OnPlatformIdentityManager(BaseCollection):
     database_name = DB_NAME
@@ -77,16 +79,6 @@ class _OnPlatformIdentityManager(BaseCollection):
     def build_indexes(self):
         self.create_index([(OnPlatformUserModel.Platform.key, 1), (OnPlatformUserModel.Token.key, 1)],
                           unique=True, name="Compound - Identity")
-
-    @arg_type_ensure
-    def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
-        return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
-
-    @arg_type_ensure
-    def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
-        return self.find_one_casted(
-            {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
-            parse_cls=OnPlatformUserModel)
 
     @arg_type_ensure
     def register(self, platform: Platform, user_token) -> OnPlatformUserRegistrationResult:
@@ -99,6 +91,16 @@ class _OnPlatformIdentityManager(BaseCollection):
                 outcome = WriteOutcome.X_NOT_FOUND_ABORTED_INSERT
 
         return OnPlatformUserRegistrationResult(outcome, ex, entry)
+
+    @arg_type_ensure
+    def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
+        return self.find_one_casted(
+            {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
+            parse_cls=OnPlatformUserModel)
+
+    @arg_type_ensure
+    def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
+        return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
 
 
 class _RootUserManager(BaseCollection):
@@ -158,9 +160,6 @@ class _RootUserManager(BaseCollection):
         return RootUserRegistrationResult(overall_outcome, build_conn_ex, build_conn_entry,
                                           build_conn_outcome, user_reg_result, hint)
 
-    def is_user_exists(self, api_token: str) -> bool:
-        return self.get_root_data_api_token(api_token).success
-
     def register_onplat(self, platform: Platform, user_token: str) -> RootUserRegistrationResult:
         return self._register(OnPlatformIdentityManager.register, OnPlatformIdentityManager.get_onplat,
                               self.get_root_data_onplat_oid,
@@ -185,49 +184,102 @@ class _RootUserManager(BaseCollection):
     @arg_type_ensure
     def get_root_data_uname(
             self, root_oid: ObjectId, channel_data: Union[ChannelModel, ChannelCollectionModel, None] = None,
-            str_not_found: Optional[str] = None) -> Optional[namedtuple]:
+            on_not_found: Optional[str] = None) -> Optional[UserNameEntryType]:
         """
-        Get the name of the user with UID = `root_oid`.
+        Get the user name.
 
-        Returns `None` if no corresponding user data found.
-        Returns the root oid if no On Platform Identity found.
+        The steps of getting the user name below:
 
-        :return: namedtuple(user_oid, user_name)
+        1. Check if the user data exists.
+
+            - If not, returns ``None``
+
+            - If exists, go to the next step
+
+        2. Check if the user defined their name on the bot.
+
+            - If defined, return it as the ``user_name`` of :class:`UserNameEntryType`
+
+            - If not, go to the next step
+
+        3. Check if the user has linked on-platform identity.
+
+            - If not, return ``on_not_found`` of ``None`` (if the previous is not defined)
+              as the ``user_name`` of :class:`UserNameEntryType`
+
+            - If exists, go to the next step
+
+        4. Iterate through all on-platform identities, call ``getname()`` on all of it.
+
+            - If there's a name found, return it as the ``user_name`` of :class:`UserNameEntryType`
+
+            - If no name was found, go to the next step
+
+        5. Return the default name of the last iterated on-platform data.
+
+        .. note::
+
+            It is better to specify ``channel_data`` whenever it is possible
+            because it enables LINE to get the user name in a channel without them adding the bot as friend.
+
+            This methods sends an email report if there is any on-platform OID linked to the root user data found
+            but the actual data was not found.
+
+        :param root_oid: oid of the user
+        :param channel_data: channel to get the user name
+        :param on_not_found: user name to be used if not found
+        :return: a `namedtuple` containing the user oid and the user name
         """
         udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
 
-        # No user data found? Return None
-        if not udata:
-            return str_not_found if str_not_found else None
-
+        # Define a `namedtuple` as return type
         UserNameEntry = namedtuple("UserNameEntry", ["user_id", "user_name"])
 
-        # Name has been set?
+        # Step 1 - Return `None` if no user data found
+        if not udata:
+            return None
+
+        # Step 2 - Check if the user name has been set
         if udata.config.name:
             return UserNameEntry(user_id=root_oid, user_name=udata.config.name)
 
-        # On Platform Identity found?
-        if udata.has_onplat_data:
-            for onplatoid in udata.on_plat_oids:
-                onplat_data: Optional[OnPlatformUserModel] = OnPlatformIdentityManager.get_onplat_by_oid(onplatoid)
+        # Step 3 - Check if there's connected on platform identity
+        if not udata.has_onplat_data:
+            return UserNameEntry(user_id=root_oid, user_name=on_not_found if on_not_found else f"UID - {root_oid}")
 
-                if onplat_data:
-                    uname = onplat_data.get_name(channel_data)
-                    if not uname:
-                        if str_not_found:
-                            uname = str_not_found
-                        else:
-                            uname = onplat_data.get_name_str(channel_data)
+        # Step 4 - Iterate through all on-platform IDs and call `get_name()`
+        onplat_data: Optional[OnPlatformUserModel] = None
+        for onplatoid in udata.on_plat_oids:
+            onplat_data = OnPlatformIdentityManager.get_onplat_by_oid(onplatoid)
 
-                    return UserNameEntry(user_id=root_oid, user_name=uname)
-                else:
-                    MailSender.send_email(
-                        f"OnPlatOid {onplatoid} was found to bind with the root data of {root_oid}, but no "
-                        f"corresponding On-Platform data found.")
+            if not onplat_data:
+                MailSender.send_email_async(
+                    f"On-platform data ID {onplatoid} bound to the root data of ID {root_oid}, but no "
+                    f"corresponding on-platform data found.",
+                    subject="Data corruption on the link from root user data to onplat"
+                )
+                continue
 
-        return str_not_found if str_not_found else None
+            uname = onplat_data.get_name(channel_data)
+            if uname:
+                return UserNameEntry(user_id=root_oid, user_name=uname)
 
-    def get_root_data_api_token(self, token: str, *, skip_on_plat=False) -> GetRootUserDataResult:
+        # Step 5 - Return the name for last iterated data
+        return UserNameEntry(user_id=root_oid, user_name=on_not_found or onplat_data.get_name_str(channel_data))
+
+    def get_root_data_api_token(self, token: str, *, skip_on_plat=True) -> GetRootUserDataResult:
+        """
+        Get the via API token.
+
+        If ``skip_on_plat`` is ``True``, the returned :class:`GetRootUserDataResult` will contain the on-platform
+        identity model if found (cost some performance). Otherwise, the on-platform identity will not be included.
+
+        Sends an email report if on-platform ID was found but the actual data is not found.
+
+        :param token: API token to get the root user data
+        :param skip_on_plat: if to skip the process to get the on-platform identity acquiring process
+        :return: result of getting the root user data
+        """
         api_u_data = APIUserManager.get_user_data_token(token)
         entry = None
         onplat_list = []
@@ -262,35 +314,51 @@ class _RootUserManager(BaseCollection):
         return GetRootUserDataResult(outcome, None, entry, api_u_data, onplat_list)
 
     def get_root_data_onplat(self, platform: Platform, user_token: str, auto_register=True) -> GetRootUserDataResult:
+        """
+        Get the root user data by providing the credentials of on-platform identity.
+
+        If ``auto_register`` is set to ``True``, the user will be registered when they either missed the data
+        for root or on-platform identity.
+
+        ``model_api`` and ``model_onplat_list`` of the returned :class:`GetRootUserDataResult` will be ``None``
+        regardless if the result is succeed.
+
+        :param platform: platform of the on-platform identity
+        :param user_token: token of the on-platform identity
+        :param auto_register: if to register the user automatically
+        :return: result of getting theroot user data
+        """
         on_plat_data = self.get_onplat_data(platform, user_token)
         rt_user_data = None
 
-        if on_plat_data is None and auto_register:
-            on_plat_reg_result = OnPlatformIdentityManager.register(platform, user_token)
+        # Check if the on-platform identity exists
+        # If not exists and `auto_register`, attempt to register it
+        if not on_plat_data and auto_register:
+            reg_result = OnPlatformIdentityManager.register(platform, user_token)
 
-            if on_plat_reg_result.success:
-                on_plat_data = self.get_onplat_data(platform, user_token)
+            if not reg_result.success:
+                return GetRootUserDataResult(GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT, None, rt_user_data)
 
-        if on_plat_data is None:
-            outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-        else:
+            on_plat_data = reg_result.model
+
+        if on_plat_data:
             rt_user_data = self.get_root_data_onplat_oid(on_plat_data.id)
 
-            if rt_user_data is None:
-                if auto_register:
-                    reg_result = self.register_onplat(platform, user_token)
+        # Early terminate if the root user data was found
+        if rt_user_data:
+            return GetRootUserDataResult(GetOutcome.O_CACHE_DB, None, rt_user_data)
 
-                    if reg_result.success:
-                        rt_user_data = reg_result.model
-                        outcome = GetOutcome.O_ADDED
-                    else:
-                        outcome = GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT
-                else:
-                    outcome = GetOutcome.X_NOT_FOUND_ABORTED_INSERT
-            else:
-                outcome = GetOutcome.O_CACHE_DB
+        # Early terminate if the root user data was not found but not to auto-register
+        if not auto_register:
+            return GetRootUserDataResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT, None, rt_user_data)
 
-        return GetRootUserDataResult(outcome, None, rt_user_data)
+        reg_result = self.register_onplat(platform, user_token)
+
+        # Early terminate if failed to register on-platform identity
+        if not reg_result.success:
+            return GetRootUserDataResult(GetOutcome.X_NOT_FOUND_ATTEMPTED_INSERT, None, None)
+
+        return GetRootUserDataResult(GetOutcome.O_ADDED, None, reg_result.model)
 
     @arg_type_ensure
     def get_onplat_data(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
@@ -336,10 +404,10 @@ class _RootUserManager(BaseCollection):
     @arg_type_ensure
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:
         u_data = self.get_root_data_oid(root_oid)
-        if u_data is None:
+        if not u_data:
             return DEFAULT_LOCALE.to_tzinfo()
-        else:
-            return u_data.config.tzinfo
+
+        return u_data.config.tzinfo
 
     @arg_type_ensure
     def get_lang_code_root_oid(self, root_oid: ObjectId) -> Optional[str]:
@@ -352,10 +420,10 @@ class _RootUserManager(BaseCollection):
     @arg_type_ensure
     def get_config_root_oid(self, root_oid: ObjectId) -> RootUserConfigModel:
         u_data = self.get_root_data_oid(root_oid)
-        if u_data is None:
+        if not u_data:
             return RootUserConfigModel.generate_default()
-        else:
-            return u_data.config
+
+        return u_data.config
 
     @arg_type_ensure
     def merge_onplat_to_api(self, src_root_oid: ObjectId, dest_root_oid: ObjectId) -> OperationOutcome:
@@ -401,16 +469,19 @@ class _RootUserManager(BaseCollection):
 
         model, outcome, ex = self.insert_one_data(from_db=True, **data)
 
-        if outcome.is_success:
-            return OperationOutcome.O_COMPLETED
-        else:
+        if not outcome.is_success:
             return OperationOutcome.X_NOT_UPDATED
+
+        return OperationOutcome.O_COMPLETED
 
     @arg_type_ensure
     def update_config(self, root_oid: ObjectId, **cfg_vars) -> RootUserUpdateResult:
+        # Filter keys not belong to `RootUserConfigModel`
+        update_vars = {fk: fv for fk, fv in cfg_vars.items() if fk in RootUserConfigModel.model_field_keys()}
+
         updated = self.find_one_and_update(
             {OID_KEY: root_oid},
-            {"$set": {RootUserModel.Config.key: RootUserConfigModel(**cfg_vars)}},
+            {"$set": {RootUserModel.Config.key: RootUserConfigModel(**update_vars)}},
             return_document=ReturnDocument.AFTER)
 
         if updated:

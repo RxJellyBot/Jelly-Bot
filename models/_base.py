@@ -416,6 +416,8 @@ class Model(MutableMapping, abc.ABC):
 
         return d
 
+    # caching tools may be used for these
+
     @classmethod
     def model_fields(cls) -> Set[BaseField]:
         """Get the set of all available fields."""

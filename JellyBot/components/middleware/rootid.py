@@ -35,7 +35,7 @@ class RootUserIDInsertMiddleware(MiddlewareMixin):
             api_token = request.COOKIES.get(Cookies.USER_TOKEN) or qd.get(param.Common.API_TOKEN)
 
             if api_token is not None:
-                rt_result = RootUserManager.get_root_data_api_token(api_token, skip_on_plat=True)
+                rt_result = RootUserManager.get_root_data_api_token(api_token)
                 if rt_result.success:
                     request.session[Session.USER_ROOT_ID] = str(rt_result.model.id)
                     return

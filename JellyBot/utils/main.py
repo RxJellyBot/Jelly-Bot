@@ -29,7 +29,7 @@ def get_root_oid(request) -> Optional[ObjectId]:
 
     api_token = request.GET.get(Common.API_TOKEN)
     if api_token:
-        result = RootUserManager.get_root_data_api_token(api_token, skip_on_plat=True)
+        result = RootUserManager.get_root_data_api_token(api_token)
 
         if result.success:
             return result.model.id

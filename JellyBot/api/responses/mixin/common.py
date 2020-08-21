@@ -118,7 +118,7 @@ class RequireSenderAutoRegisterMixin(RequireSenderMixin, ABC):
     def _handle_api_token(self, param_dict):
         api_token = param_dict.get(param.Common.API_TOKEN)
         if api_token is not None:
-            rt_result = RootUserManager.get_root_data_api_token(api_token, skip_on_plat=True)
+            rt_result = RootUserManager.get_root_data_api_token(api_token)
             if rt_result.success:
                 self._sender_oid = rt_result.model.id
             else:

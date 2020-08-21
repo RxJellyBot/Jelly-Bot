@@ -8,3 +8,4 @@ from .rpdata import *  # noqa
 from .shorturl import *  # noqa
 from .stats import *  # noqa
 from .timer import *  # noqa
+from .user import *  # noqa
