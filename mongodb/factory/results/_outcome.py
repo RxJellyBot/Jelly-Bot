@@ -184,7 +184,7 @@ class WriteOutcome(BaseOutcome):
         205, _("X: Invalid model"), \
         _("Some data of the model is invalid.")
     X_MODEL_KEY_NOT_EXIST = \
-        206, _("X: Model not exist"), \
+        206, _("X: Model key not exists"), \
         _("Some model key does not exist.")
     X_READONLY = \
         301, _("X: Readonly"), \
@@ -292,7 +292,7 @@ class GetOutcome(BaseOutcome):
         _("Data not found. Attempted to insert but failed.")
     X_NOT_FOUND_ABORTED_INSERT = \
         102, _("X: Not found - aborted insert"), \
-        _("Date not found. Insertion was not attempted.")
+        _("Data not found. Insertion was not attempted.")
     X_NOT_FOUND_FIRST_QUERY = \
         103, _("X: Not found on 1st query"), \
         _("Data not found at the 1st query.")
@@ -588,7 +588,7 @@ class UpdateOutcome(BaseOutcome):
 
     O_UPDATED = \
         -1, _("O: Success"), \
-        _("Successfully updated")
+        _("Successfully updated.")
 
     X_NOT_FOUND = \
         101, _("X: Not found"), \

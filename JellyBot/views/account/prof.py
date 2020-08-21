@@ -51,7 +51,11 @@ class ProfileCreateView(PermissionRequiredMixin, TemplateResponseMixin, View):
             messages.info(request, _("Profile successfully created."))
             return redirect(reverse("info.profile", kwargs={"profile_oid": reg_result.model.id}))
 
-        err_msg = _("Failed to create the profile. (%s / %s)") % (reg_result.outcome, reg_result.attach_outcome)
+        outcome_dict = {
+            "outcome": reg_result.outcome,
+            "attach_outcome": reg_result.attach_outcome
+        }
+        err_msg = _("Failed to create the profile. (%(outcome)s / %(attach_outcome)s)") % outcome_dict
         messages.warning(request, err_msg)
         channel_oid = data[ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)]
         return redirect(reverse("account.profile.create", kwargs={"channel_oid": channel_oid}))

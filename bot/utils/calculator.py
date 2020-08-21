@@ -36,9 +36,14 @@ def calculate_expression(expr: str, output_error: bool = False) -> List[HandledM
             "Exception occurred for text message calculator. Expr: %s / Base Exception: %s", ex.expr, ex.base_exc)
 
         if output_error:
+            str_dict = {
+                "expr": ex.expr,
+                "exc": ex.base_exc
+            }
+
             ret = [HandledMessageCalculateResult(
                 expr_before=expr,
-                expr_after=_("I have difficulty understanding you.\n%s (%s)") % (ex.expr, ex.base_exc))]
+                expr_after=_("I have difficulty understanding you.\n%(expr)s (%(exc)s)") % str_dict)]
         else:
             ret = []
     except NameError as ex:

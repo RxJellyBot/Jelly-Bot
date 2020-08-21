@@ -452,6 +452,13 @@ class LineStickerPackDownloadResult:
         """
         return self._already_exists or (self._available and self._download_succeed and self._zip_succeed)
 
+    def __repr__(self):
+        if not self.pack_meta:
+            return "<StickerPackageDLResult NoMeta>"
+
+        return f"<StickerPackageDLResult pack_id={self.pack_meta.pack_id} already_exists={self.already_exists} " \
+               f"available={self.available} downloaded={self.download_succeed} zipped={self.zip_succeed}>"
+
     @property
     def time_spent(self) -> float:
         """

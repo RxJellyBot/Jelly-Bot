@@ -118,11 +118,18 @@ def t_delta_str(t_delta: timedelta) -> str:
     m = (t_delta.seconds - 3600 * h) // 60
     s = t_delta.seconds % 60
 
+    str_dict = {
+        "d": t_delta.days,
+        "h": h,
+        "m": m,
+        "s": s
+    }
+
     if t_delta.days > 3:
-        return _("%d Days %d H %02d M %02d S") % (t_delta.days, h, m, s)
+        return _("%(d)d Days %(h)d H %(m)02d M %(s)02d S") % str_dict
 
     h += t_delta.days * 24
-    return _("%d H %02d M %02d S") % (h, m, s)
+    return _("%(h)d H %(m)02d M %(s)02d S") % str_dict
 
 
 def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:

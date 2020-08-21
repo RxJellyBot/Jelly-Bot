@@ -220,7 +220,7 @@
                 if (!valid) {
                     const name = $(`label[for='${$(this).find("textarea").attr("id")}']`).text();
                     {% blocktrans trimmed %}
-                        const msg = `The content of <strong>${name}</strong> is invalid.</b>`;
+                        const msg = `The content of <strong>${name}</strong> is invalid.`;
                     {% endblocktrans %}
                     errMsg.push(msg);
                 }

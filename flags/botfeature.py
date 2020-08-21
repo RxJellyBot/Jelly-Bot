@@ -200,7 +200,7 @@ class BotFeature(FlagDoubleEnum):
         1163, _("Text / LINE Sticker / Download Package"), _("Download a sticker package.")
 
     TXT_PING = \
-        1191, _("Text / Ping"), _("Command to check if the bot is working. Also check message sending time.")
+        1191, _("Text / Ping"), _("Command to check if the bot is working.")
 
     TXT_SURL_CREATE = \
         1201, _("Text / Short URL / Create"), _("Create a shortened URL.")

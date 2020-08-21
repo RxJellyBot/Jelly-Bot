@@ -31,8 +31,8 @@ def ping_bot_text_1(e: TextMessageEventObject, txt: str):
     feature=BotFeature.TXT_PING,
     arg_count=2,
     arg_help=[
-        _("1st Additional text to be attached to the returned message."),
-        _("2nd Additional text to be attached to the returned message.")
+        _("1st additional text to be attached to the returned message."),
+        _("2nd additional text to be attached to the returned message.")
     ]
 )
 def ping_bot_text_2(e: TextMessageEventObject, txt_1: str, txt_2: str):
