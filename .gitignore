@@ -1,14 +1,17 @@
 # Project files
 .idea
 
-# Compiled python
+# Compiled Python files
 __pycache__/
 
 # Library files
 lib
 
-# Virtual Environment
+# Virtual environment
 venv
+
+# Development assisting tools
+.tools/
 
 # Archived code
 archive/
