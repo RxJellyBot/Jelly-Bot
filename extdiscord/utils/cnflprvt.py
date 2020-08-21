@@ -71,7 +71,7 @@ class BotConflictionPreventer:
         :param id_: ID to be checked if  it is in the ID list
         """
         try:
-            # Cut the list to not to perform status check on the bot which have a lower priority
+            # Truncate the list to not to perform status check on the bot which have a lower priority
             cls.id_to_check = cls.id_to_check[:cls.id_to_check.index(id_)]
         except ValueError:
             SYSTEM.logger.warning("ID <%s> is not in the bot ID list.", id_)

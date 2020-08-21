@@ -27,7 +27,7 @@ class UserDataIntegrationHelper:
         :param dst_oid: destination root user OID
         :return: outcome of the integration
         """
-        # In function import to prevent circular import
+        # Inline import to prevent cyclic import
         from mongodb.factory import new_mongo_session, get_collection_subclasses, BaseCollection, RootUserManager
 
         merge_result = RootUserManager.merge_onplat_to_api(src_oid, dst_oid)
