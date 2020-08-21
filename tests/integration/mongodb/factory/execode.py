@@ -539,8 +539,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
     def test_complete_missing_kwargs(self):
         enqueue = ExecodeManager.enqueue_execode(ObjectId(), Execode.REGISTER_CHANNEL)
 
-        result = ExecodeManager.complete_execode(
-            enqueue.execode, {param.AutoReply.PLATFORM: "1"})
+        result = ExecodeManager.complete_execode(enqueue.execode, {param.AutoReply.PLATFORM: "1"})
 
         self.assertEqual(result.outcome, OperationOutcome.X_MISSING_ARGS)
         self.assertFalse(result.success)

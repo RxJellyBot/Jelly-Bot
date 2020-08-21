@@ -34,29 +34,34 @@ class _ChannelManager(BaseCollection):
         """
         Register the channel if not yet registered.
 
-        Return the existing or registered :class:`ChannelModel`.
+        Returning result contains the existing or registered :class:`ChannelModel`.
+
+        :param platform: platform of the channel
+        :param token: token of the channel
+        :param default_name: default name to be used if channel not yet registered
+        :return: channel registration result
         """
         mdl = self.get_channel_token(platform, token)
 
-        if not mdl:
-            # Inline import because it will create a loop if imported outside
-            from mongodb.factory import ProfileManager
+        if mdl:
+            return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
 
-            channel_oid = ObjectId()
-            create_result = ProfileManager.create_default_profile(
-                channel_oid, set_to_channel=False, check_channel=False)
+        # Inline import to avoid cyclic import
+        from mongodb.factory import ProfileManager
 
-            if not create_result.success:
-                return ChannelRegistrationResult(WriteOutcome.X_CNL_DEFAULT_CREATE_FAILED)
+        channel_oid = ObjectId()
+        create_result = ProfileManager.create_default_profile(
+            channel_oid, set_to_channel=False, check_channel=False)
 
-            config = ChannelConfigModel.generate_default(
-                DefaultName=default_name, DefaultProfileOid=create_result.model.id)
+        if not create_result.success:
+            return ChannelRegistrationResult(WriteOutcome.X_CNL_DEFAULT_CREATE_FAILED)
 
-            mdl, outcome, ex = self.insert_one_data(Id=channel_oid, Platform=platform, Token=token, Config=config)
+        config = ChannelConfigModel.generate_default(
+            DefaultName=default_name, DefaultProfileOid=create_result.model.id)
 
-            return ChannelRegistrationResult(outcome, ex, mdl)
+        mdl, outcome, ex = self.insert_one_data(Id=channel_oid, Platform=platform, Token=token, Config=config)
 
-        return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
+        return ChannelRegistrationResult(outcome, ex, mdl)
 
     @arg_type_ensure
     def deregister(self, platform: Platform, token: str) -> UpdateOutcome:

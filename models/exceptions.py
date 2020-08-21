@@ -17,12 +17,19 @@ class ModelKeyNotExistError(AttributeError, ABC):
 
 
 class InvalidModelError(ModelConstructionError):
+    """Raised if the model is invalid."""
+
     def __init__(self, model_name: str, reason: ModelValidityCheckResult):
         self._reason = reason
-        super().__init__(f"Invalid model `{model_name}`. Reason: {reason.code}")
+        super().__init__(f"Invalid model `{model_name}`. Reason: {repr(reason)}")
 
     @property
     def reason(self) -> ModelValidityCheckResult:
+        """
+        Get the invalid reason.
+
+        :return: invalid reason
+        """
         return self._reason
 
 

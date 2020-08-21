@@ -1,10 +1,12 @@
+"""Execode-related data controllers."""
 from datetime import timedelta
 from typing import Type, Optional, Tuple
 
 from bson import ObjectId
+from django.http import QueryDict  # pylint: disable=wrong-import-order
 
 from extutils.dt import now_utc_aware
-from flags import Execode, ExecodeCompletionOutcome
+from flags import Execode, ExecodeCompletionOutcome, ExecodeCollationFailedReason
 from mongodb.factory.results import (
     EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult,
     OperationOutcome, GetOutcome
@@ -12,7 +14,7 @@ from mongodb.factory.results import (
 from models import ExecodeEntryModel, Model
 from models.exceptions import ModelConstructionError
 from mongodb.utils import ExtendedCursor
-from mongodb.helper import ExecodeRequiredKeys, ExecodeCompletor
+from mongodb.helper import ExecodeCompletor, ExecodeRequiredKeys
 from mongodb.factory.results import WriteOutcome
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
 from JellyBot.systemconfig import Database
@@ -96,7 +98,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
     def remove_execode(self, execode: str):
         self.delete_one({ExecodeEntryModel.Execode.key: execode})
 
-    def _attempt_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: dict) \
+    def _attempt_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: QueryDict) \
             -> Tuple[OperationOutcome, Optional[ExecodeCompletionOutcome], Optional[Exception]]:
         cmpl_outcome = ExecodeCompletionOutcome.X_NOT_EXECUTED
         ex = None
@@ -113,7 +115,11 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             outcome = OperationOutcome.X_NO_COMPLETE_ACTION
             ex = e
         except ExecodeCollationError as e:
-            outcome = OperationOutcome.X_COLLATION_ERROR
+            if e.err_code == ExecodeCollationFailedReason.MISSING_KEY:
+                outcome = OperationOutcome.X_MISSING_ARGS
+            else:
+                outcome = OperationOutcome.X_COLLATION_ERROR
+
             ex = e
         except Exception as e:
             outcome = OperationOutcome.X_COMPLETION_ERROR
@@ -130,13 +136,12 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
         :param execode_kwargs: arguments may be needed to complete the Execode action
         :param action: type of the Execode action
         """
-        missing_keys = set()
         ex = None
         tk_model: Optional[ExecodeEntryModel] = None
 
         # Force type to be dict because the type of `execode_kwargs` might be django QueryDict
-        if type(execode_kwargs) != dict:
-            execode_kwargs = dict(execode_kwargs)
+        if isinstance(execode_kwargs, QueryDict):
+            execode_kwargs = execode_kwargs.dict()
 
         if not execode:
             outcome = OperationOutcome.X_EXECODE_EMPTY
@@ -148,15 +153,13 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
         if get_execode.success:
             tk_model = get_execode.model
 
-            try:
-                required_keys = ExecodeRequiredKeys.get_required_keys(tk_model.action_type)
+            # Check for missing keys
+            if missing_keys := ExecodeRequiredKeys.get_required_keys(tk_model.action_type).difference(execode_kwargs):
+                return CompleteExecodeResult(OperationOutcome.X_MISSING_ARGS, None, tk_model, missing_keys,
+                                             ExecodeCompletionOutcome.X_MISSING_ARGS)
 
-                missing_keys = required_keys.difference(execode_kwargs)
-                if len(missing_keys) == 0:
-                    outcome, cmpl_outcome, ex = self._attempt_complete(execode, tk_model, execode_kwargs)
-                else:
-                    outcome = OperationOutcome.X_MISSING_ARGS
-                    cmpl_outcome = ExecodeCompletionOutcome.X_MISSING_ARGS
+            try:
+                outcome, cmpl_outcome, ex = self._attempt_complete(execode, tk_model, execode_kwargs)
             except ModelConstructionError as e:
                 outcome = OperationOutcome.X_CONSTRUCTION_ERROR
                 cmpl_outcome = ExecodeCompletionOutcome.X_MODEL_CONSTRUCTION
@@ -171,7 +174,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             else:
                 outcome = OperationOutcome.X_ERROR
 
-        return CompleteExecodeResult(outcome, ex, tk_model, missing_keys, cmpl_outcome)
+        return CompleteExecodeResult(outcome, ex, tk_model, set(), cmpl_outcome)
 
 
 ExecodeManager = _ExecodeManager()

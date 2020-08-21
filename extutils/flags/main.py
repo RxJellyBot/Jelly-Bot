@@ -237,6 +237,10 @@ class FlagDoubleMixin(FlagSingleMixin):
     def __hash__(self):
         return hash((self.__class__, self._code))
 
+    # noinspection PyUnresolvedReferences
+    def __str__(self):
+        return f"<{self.__class__.__name__}.{self.name}: {self._code} ({self._key} - {self._desc})>"
+
 
 class FlagPrefixedDoubleMixin(FlagDoubleMixin):
     # noinspection PyAbstractClass,PyUnresolvedReferences
@@ -287,6 +291,10 @@ class FlagPrefixedDoubleMixin(FlagDoubleMixin):
 
     def __hash__(self):
         return hash((self.__class__, self._code))
+
+    # noinspection PyUnresolvedReferences
+    def __str__(self):
+        return f"<{self.__class__.__name__}.{self.name}: {self.code_str} ({self._key} - {self._desc})>"
 
 
 class FlagEnumMixin:
