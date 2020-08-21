@@ -112,7 +112,7 @@ class WriteOutcome(BaseOutcome):
     """
     @property
     def code_prefix(self) -> str:
-        return "I"
+        return "W"
 
     @classmethod
     def default(cls):
