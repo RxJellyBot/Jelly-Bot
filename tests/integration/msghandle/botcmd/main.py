@@ -1,7 +1,6 @@
 from flags import ChannelType
 from msghandle.botcmd.command import cmd_handler
-from tests.base import TestCase
-from ..utils_test import EventFactory
+from tests.base import TestCase, EventFactory
 
 __all__ = ["TestBotCommandHandlerParse"]
 

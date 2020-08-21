@@ -9,8 +9,7 @@ from msghandle.handle import (
 )
 from msghandle.models import ImageContent, LineStickerContent, HandledMessageEventsHolder, HandledMessageEventText
 from strres.msghandle import HandledResult
-from tests.base import TestCase, TestModelMixin
-from .utils_test import EventFactory
+from tests.base import TestCase, TestModelMixin, EventFactory
 
 __all__ = ["TestHandleMessageMainEntryPoint", "TestHandleMessageNotLoaded"]
 

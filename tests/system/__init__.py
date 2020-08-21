@@ -1,0 +1,1 @@
+# TEST: Bot commands
