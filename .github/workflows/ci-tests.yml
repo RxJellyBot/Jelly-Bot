@@ -41,6 +41,7 @@ env:
 
 jobs:
   prepare:
+    name: Preparations
     runs-on: windows-latest
 
     continue-on-error: true
@@ -65,6 +66,7 @@ jobs:
           python mongodb/cli/drop_db.py %MONGO_DB%
 
   checks:
+    name: Code Linting
     runs-on: windows-latest
 
     needs: [prepare]
@@ -108,6 +110,7 @@ jobs:
           pylint %LINTED%
 
   django-tests:
+    name: Tests
     runs-on: windows-latest
 
     needs: [prepare, checks]
@@ -141,6 +144,7 @@ jobs:
           py manage.py test tests.system
 
   cleanup:
+    name: Cleanup
     runs-on: windows-latest
 
     needs: [django-tests]
