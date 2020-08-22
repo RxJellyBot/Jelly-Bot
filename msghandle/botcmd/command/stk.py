@@ -106,10 +106,13 @@ def download_package(__: TextMessageEventObject, package_id: int):
 def _download_animated_failed(result, url_dict):
     content = None
 
+    # Early termination on unavailable. Does **NOT** send email report
     if not result.available:
-        content = _("Sticker download failed.\n"
-                    "Original sticker link: %(url_apng)s") % url_dict
-    elif not result.conversion_result.frame_extraction.success:
+        return [HandledMessageEventText(
+            content=_("Sticker not exists.\n"
+                      "Original sticker link: %(url_apng)s") % url_dict)]
+
+    if not result.conversion_result.frame_extraction.success:
         ex = result.conversion_result.frame_extraction.exception
 
         content = _("Sticker frame extraction failed.\n"
