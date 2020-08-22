@@ -1,7 +1,7 @@
 from .factory import MONGO_CLIENT, new_mongo_session
 from .rpdata import PendingRepairDataManager
 from .channel import ChannelManager, ChannelCollectionManager
-from .prof import ProfileManager
+from .prof_main import ProfileManager
 from .ar_conn import AutoReplyManager
 from .user import RootUserManager
 from .stats import APIStatisticsManager, MessageRecordStatisticsManager, BotFeatureUsageDataManager

@@ -4,7 +4,7 @@ from pymongo.errors import DuplicateKeyError
 from flags import Platform, ProfilePermissionDefault, ProfilePermission, PermissionLevel
 from models import OID_KEY, ChannelProfileModel, ChannelModel, ChannelConfigModel
 from mongodb.factory import ChannelManager
-from mongodb.factory.prof import ProfileDataManager
+from mongodb.factory.prof_base import ProfileDataManager
 from mongodb.factory.results import WriteOutcome, GetOutcome, UpdateOutcome
 from strres.mongodb import Profile
 from tests.base import TestDatabaseMixin, TestModelMixin

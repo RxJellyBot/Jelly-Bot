@@ -4,8 +4,8 @@ from pymongo.errors import DuplicateKeyError
 from flags import Platform, ProfilePermission, ProfilePermissionDefault
 from models import OID_KEY, ChannelModel, ChannelProfileModel, ChannelConfigModel, ChannelProfileConnectionModel
 from models.exceptions import RequiredKeyNotFilledError, InvalidModelFieldError
-from mongodb.factory import ChannelManager
-from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
+from mongodb.factory import ChannelManager, ProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome, WriteOutcome, GetOutcome, UpdateOutcome, ArgumentParseResult
 from strres.mongodb import Profile
 from tests.base import TestDatabaseMixin, TestModelMixin

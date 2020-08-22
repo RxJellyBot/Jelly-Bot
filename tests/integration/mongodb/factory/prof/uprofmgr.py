@@ -1,7 +1,7 @@
 from bson import ObjectId
 
 from models import ChannelProfileConnectionModel
-from mongodb.factory.prof import UserProfileManager
+from mongodb.factory.prof_base import UserProfileManager
 from mongodb.factory.results import OperationOutcome, WriteOutcome, UpdateOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 

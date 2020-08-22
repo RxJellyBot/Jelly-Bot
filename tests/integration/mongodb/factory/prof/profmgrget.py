@@ -2,8 +2,8 @@ from bson import ObjectId
 
 from flags import ProfilePermission, PermissionLevel, ProfilePermissionDefault, Platform
 from models import ChannelProfileModel, ChannelProfileConnectionModel, ChannelModel, ChannelConfigModel
-from mongodb.factory import ChannelManager
-from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
+from mongodb.factory import ChannelManager, ProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from tests.base import TestDatabaseMixin, TestModelMixin
 
 __all__ = ["TestProfileManagerGetInfo"]

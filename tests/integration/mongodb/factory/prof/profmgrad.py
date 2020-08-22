@@ -4,7 +4,8 @@ from bson import ObjectId
 
 from flags import ProfilePermission
 from models import ChannelProfileModel, ChannelProfileConnectionModel
-from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
+from mongodb.factory import ProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 

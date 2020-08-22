@@ -6,7 +6,7 @@ from bson import ObjectId
 from flags import AutoReplyContentType, PermissionLevel, Platform
 from models import AutoReplyContentModel, AutoReplyModuleModel, ChannelProfileModel, ChannelProfileConnectionModel
 from mongodb.factory import ProfileManager, ChannelManager
-from mongodb.factory.prof import ProfileDataManager, UserProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from mongodb.factory.ar_conn import AutoReplyModuleManager
 from tests.base import TestModelMixin
 

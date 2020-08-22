@@ -7,7 +7,7 @@ from extutils.emailutils import EmailServer
 from flags import Platform, MessageType
 from models import ChannelModel, ChannelConfigModel, MessageRecordModel, ChannelProfileConnectionModel
 from mongodb.factory import ChannelManager, ProfileManager, RootUserManager, MessageRecordStatisticsManager
-from mongodb.factory.prof import UserProfileManager
+from mongodb.factory.prof_base import UserProfileManager
 from mongodb.helper import InfoProcessor
 from tests.base import TestCase
 

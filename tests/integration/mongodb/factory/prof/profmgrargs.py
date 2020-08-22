@@ -3,7 +3,8 @@ from bson import ObjectId
 from extutils.color import Color
 from flags import ProfilePermission, PermissionLevel, ProfilePermissionDefault
 from models import ChannelProfileModel, ChannelProfileConnectionModel
-from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
+from mongodb.factory import ProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from mongodb.factory.results import OperationOutcome, UpdateOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin
 

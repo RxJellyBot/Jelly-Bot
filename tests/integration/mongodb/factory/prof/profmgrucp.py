@@ -4,8 +4,8 @@ from django.conf import settings
 from extutils.emailutils import EmailServer
 from flags import Platform, ProfilePermission
 from models import ChannelModel, ChannelProfileModel, ChannelConfigModel, ChannelProfileConnectionModel
-from mongodb.factory import ChannelManager
-from mongodb.factory.prof import ProfileManager, ProfileDataManager, UserProfileManager
+from mongodb.factory import ChannelManager, ProfileManager
+from mongodb.factory.prof_base import ProfileDataManager, UserProfileManager
 from strres.mongodb import Profile
 from tests.base import TestDatabaseMixin, TestModelMixin
 
