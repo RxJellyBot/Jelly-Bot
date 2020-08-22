@@ -1,3 +1,4 @@
+"""Wrapper for the controls on a MongoDB collection as a mixin."""
 from datetime import datetime, tzinfo
 from threading import Thread
 from typing import Type, Optional, Tuple, Union, TypeVar
@@ -223,6 +224,17 @@ class ControlExtensionMixin(Collection):
             self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
 
     def find_one_casted(self, filter_: Optional[dict] = None, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
+        """
+        Same functionality as ``find_one()``.
+        Except that this function will attempt to cast the return to ``parse_cls``.
+
+        :param filter_: filter to get the data
+        :param args: args for `find_one()`
+        :param parse_cls: class to cast the return if available
+        :param kwargs: kwargs for `find_one()`
+        :return: casted data in `parse_cls` or `None` if not found
+        """
+        # TODO: Set ``parse_cls`` to default model class
         if not filter_:
             filter_ = {}
         return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))

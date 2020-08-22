@@ -51,7 +51,7 @@ def localtime(dt: datetime = None, tz: timezone = None):
 
     If ``tz`` is ``None``, the timezone of the current session (fallback: UTC) will be used.
 
-    This method calls the ``django.utils.timezone.localtime()``.
+    This method calls ``django.utils.timezone.localtime()``.
 
     :param dt: `datetime` to be localized
     :param tz: timezone to be used to localize `tz`

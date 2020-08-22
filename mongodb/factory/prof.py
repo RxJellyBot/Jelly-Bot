@@ -1,3 +1,22 @@
+"""
+Profile-related data controllers.
+
+:class:`ProfileManager` is the main class to control profiles.
+
+    - Any controls besides tests should use this class to manipulate the profile data.
+
+:class:`ProfileDataManager` controls the profile data itself.
+
+    - This class does not care about who has the profile.
+
+    - This class cares the properties of a profile, such as name and color.
+
+:class:`UserProfileManager` controls the connection between the profile data and the user.
+
+    - This class does not care about the properties of a profile.
+
+    - This class cares who has certain profile(s).
+"""
 from threading import Thread
 from typing import Optional, List, Dict, Set, Union
 
@@ -50,8 +69,12 @@ class _UserProfileManager(BaseCollection):
                             profile_oids: Union[ObjectId, List[ObjectId]]) \
             -> OperationOutcome:
         """
-        Attach a profile onto a the user whose uid is ``root_uid`` using the ID of the profile
-        and return the update result.
+        Attach a profile to a the user ``root_uid`` using the ID of the profile and return the update result.
+
+        :param channel_oid: channel of the profile
+        :param root_uid: user to be attached
+        :param profile_oids: profile(s) to attach
+        :return: attachment result
         """
         id_ = self.update_one(
             {
@@ -756,9 +779,10 @@ class _ProfileManager(ClearableMixin):
                                set_to_channel: bool = True, check_channel: bool = True) \
             -> CreateProfileResult:
         """
-        Create a default profile for ``channel_oid``.
+        Create a default profile for ``channel_oid`` and set it to the channel if ``set_to_channel`` is ``True``.
 
-        Set the default profile to the channel if ``set_to_channel`` is ``True``.
+        Note that if ``set_to_channel`` is ``True``, ``check_channel`` is ``False`` and the channel does not exist,
+        :class:`WriteOutcome.X_ON_SET_CONFIG` will be the outcome in the result.
 
         :param channel_oid: channel to get the default profile
         :param set_to_channel: if the created profile should be set to the channel

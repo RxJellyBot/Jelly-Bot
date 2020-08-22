@@ -266,6 +266,19 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
         self.assertIsNotNone(d)
         self.assertEqual(d[ChannelModel.Config.key].get(ChannelConfigModel.DefaultProfileOid.key), result.model.id)
 
+    def test_create_default_to_set_no_check_no_channel(self):
+        ChannelManager.clear()
+
+        result = ProfileDataManager.create_default_profile(self.CHANNEL_OID, check_channel=False)
+
+        self.assertEqual(result.outcome, WriteOutcome.X_ON_SET_CONFIG)
+        self.assertFalse(result.success)
+        self.assertIsNone(result.exception)
+        self.assertIsNone(result.model)
+
+        d = ChannelManager.find_one({OID_KEY: self.CHANNEL_OID})
+        self.assertIsNone(d)
+
     def test_create_default_not_to_set_no_channel(self):
         ChannelManager.clear()
 
