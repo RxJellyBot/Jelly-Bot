@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-21 02:11-0500\n"
-"PO-Revision-Date: 2020-08-21 02:12-0500\n"
+"POT-Creation-Date: 2020-08-22 00:13-0500\n"
+"PO-Revision-Date: 2020-08-22 00:15-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -3367,7 +3367,7 @@ msgid ""
 "Author: %(stk_author)s\n"
 "\n"
 "LINE Store URL: %(url_store)s\n"
-"Sticker zip file URL: %(url_zip)s\n"
+"Sticker zip file URL: (Check below)\n"
 "\n"
 "Time spent: %(time_spent).3f secs"
 msgstr ""
@@ -3378,11 +3378,11 @@ msgstr ""
 "作者: %(stk_author)s\n"
 "\n"
 "LINE商店連結: %(url_store)s\n"
-"貼圖包下載連結: %(url_zip)s\n"
+"貼圖包下載連結: (請見下方連結)\n"
 "\n"
 "花費時間: %(time_spent).3f 秒"
 
-#: .\msghandle\botcmd\command\stk.py:106
+#: .\msghandle\botcmd\command\stk.py:110
 #, python-format
 msgid ""
 "Sticker download failed.\n"
@@ -3391,7 +3391,7 @@ msgstr ""
 "貼圖下載失敗。\n"
 "原始貼圖圖片連結: %(url_apng)s"
 
-#: .\msghandle\botcmd\command\stk.py:111
+#: .\msghandle\botcmd\command\stk.py:115
 #, python-format
 msgid ""
 "Sticker frame extraction failed.\n"
@@ -3402,7 +3402,7 @@ msgstr ""
 "錯誤: %(ex)s\n"
 "原始貼圖圖片連結: %(url_apng)s"
 
-#: .\msghandle\botcmd\command\stk.py:115
+#: .\msghandle\botcmd\command\stk.py:119
 #, python-format
 msgid ""
 "Sticker image data acquisition failed.\n"
@@ -3411,7 +3411,7 @@ msgstr ""
 "貼圖圖片資訊獲取失敗。\n"
 "原始貼圖圖片連結: %(url_apng)s"
 
-#: .\msghandle\botcmd\command\stk.py:118
+#: .\msghandle\botcmd\command\stk.py:122
 #, python-format
 msgid ""
 "Sticker frame merger failed.\n"
@@ -3420,7 +3420,7 @@ msgstr ""
 "貼圖圖片合成失敗。\n"
 "原始貼圖圖片連結: %(url_apng)s"
 
-#: .\msghandle\botcmd\command\stk.py:122
+#: .\msghandle\botcmd\command\stk.py:126
 #, python-format
 msgid ""
 "Failed to download animated sticker.\n"
@@ -3431,37 +3431,39 @@ msgstr ""
 "原始貼圖圖片連結: %(url_apng)s\n"
 "貼圖下載結果: %(result)s"
 
-#: .\msghandle\botcmd\command\stk.py:156
+#: .\msghandle\botcmd\command\stk.py:160
 #, python-format
 msgid ""
-"GIF: %(url_gif)s\n"
-"%(frame_str)sAPNG: %(url_apng)s\n"
-"\n"
+"Image download complete.\n"
+"Check 1st URL for GIF.\n"
+"Check 2nd URL for APNG.\n"
+"%(frame_str)s\n"
 "Time spent: %(time_spent).3f secs"
 msgstr ""
-"GIF: %(url_gif)s\n"
-"%(frame_str)sAPNG: %(url_apng)s\n"
-"\n"
+"圖片下載完成。\n"
+"GIF 請見下方第一條網址。\n"
+"APNG 請見下方第二條網址。\n"
+"%(frame_str)s\n"
 "花費時間: %(time_spent).3f 秒"
 
-#: .\msghandle\botcmd\command\stk.py:177 .\msghandle\botcmd\command\stk.py:196
-#: .\msghandle\botcmd\command\stk.py:209
+#: .\msghandle\botcmd\command\stk.py:188 .\msghandle\botcmd\command\stk.py:210
+#: .\msghandle\botcmd\command\stk.py:223
 msgid "ID of the **sticker**."
 msgstr "**貼圖**的ID。"
 
-#: .\msghandle\botcmd\command\stk.py:192
+#: .\msghandle\botcmd\command\stk.py:206
 msgid "This command **does not** download apng frames."
 msgstr "這個指令**不會**下載圖幀。"
 
-#: .\msghandle\botcmd\command\stk.py:195 .\msghandle\botcmd\command\stk.py:208
+#: .\msghandle\botcmd\command\stk.py:209 .\msghandle\botcmd\command\stk.py:222
 msgid "ID of the sticker **package**."
 msgstr "貼圖**圖包**ID。"
 
-#: .\msghandle\botcmd\command\stk.py:205
+#: .\msghandle\botcmd\command\stk.py:219
 msgid "This command **downloads** apng frames."
 msgstr "這個指令**會**下載圖幀。"
 
-#: .\msghandle\botcmd\command\stk.py:210
+#: .\msghandle\botcmd\command\stk.py:224
 msgid ""
 "Dummy argument. Input of this argument have no difference on the command "
 "outcome."
@@ -3871,6 +3873,10 @@ msgstr "GitHub Repo"
 #: .\templates\about.html:55
 msgid "Deployed on"
 msgstr "部署於"
+
+#: .\templates\about.html:55
+msgid "Private Server (Windows Server 2019)"
+msgstr "私人伺服器 (Windows Server 2019)"
 
 #: .\templates\about.html:57 .\templates\account\settings.html:57
 msgid "Language"
@@ -5691,6 +5697,17 @@ msgstr "未完成"
 #: .\templates\services\shorturl\main.html:102
 msgid "The update and delete function has not been implemented yet."
 msgstr "更新目標網址 及 刪除 的功能尚未實作。"
+
+#~ msgid ""
+#~ "GIF: %(url_gif)s\n"
+#~ "%(frame_str)sAPNG: %(url_apng)s\n"
+#~ "\n"
+#~ "Time spent: %(time_spent).3f secs"
+#~ msgstr ""
+#~ "GIF: %(url_gif)s\n"
+#~ "%(frame_str)sAPNG: %(url_apng)s\n"
+#~ "\n"
+#~ "花費時間: %(time_spent).3f 秒"
 
 #~ msgid "US Mask Finder"
 #~ msgstr "美國口罩尋找工具"

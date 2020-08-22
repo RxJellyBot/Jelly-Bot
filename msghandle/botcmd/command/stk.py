@@ -91,9 +91,13 @@ def download_package(__: TextMessageEventObject, package_id: int):
                 "Author: %(stk_author)s\n"
                 "\n"
                 "LINE Store URL: %(url_store)s\n"
-                "Sticker zip file URL: %(url_zip)s\n"
+                "Sticker zip file URL: (Check below)\n"
                 "\n"
                 "Time spent: %(time_spent).3f secs") % str_dict,
+            bypass_multiline_check=True
+        ),
+        HandledMessageEventText(
+            content=str_dict["url_zip"],
             bypass_multiline_check=True
         )
     ]
@@ -148,20 +152,27 @@ def _download_animated(package_id: int, sticker_id: int, *, with_frames: bool = 
 
     str_dict = {"time_spent": result.time_spent}
     str_dict.update(**url_dict)
-    str_dict["frame_str"] = f"Frames: {url_dict['url_frames']}\n" if with_frames else ""
+    str_dict["frame_str"] = "Check 3rd URL for zipped frames.\n" if with_frames else ""
 
-    return [
+    ret = [
         HandledMessageEventText(
             content=_(
-                "GIF: %(url_gif)s\n"
-                "%(frame_str)s"
-                "APNG: %(url_apng)s\n"
-                "\n"
+                "Image download complete.\n"
+                "Check 1st URL for GIF.\n"
+                "Check 2nd URL for APNG.\n"
+                "%(frame_str)s\n"
                 "Time spent: %(time_spent).3f secs") % str_dict,
             bypass_multiline_check=True
         ),
-        HandledMessageEventImage(LineStickerUtils.get_sticker_url(sticker_id))
+        HandledMessageEventImage(LineStickerUtils.get_sticker_url(sticker_id)),
+        HandledMessageEventText(content=url_dict["url_gif"]),
+        HandledMessageEventText(content=url_dict["url_apng"])
     ]
+
+    if with_frames:
+        ret.append(HandledMessageEventText(content=url_dict["url_frames"]))
+
+    return ret
 
 
 # endregion
@@ -178,7 +189,10 @@ def _download_animated(package_id: int, sticker_id: int, *, with_frames: bool = 
     ]
 )
 def display_static(__: TextMessageEventObject, sticker_id: int):
-    return [HandledMessageEventImage(LineStickerUtils.get_sticker_url(sticker_id))]
+    return [
+        HandledMessageEventText(LineStickerUtils.get_sticker_url(sticker_id)),
+        HandledMessageEventImage(LineStickerUtils.get_sticker_url(sticker_id))
+    ]
 
 
 # endregion
