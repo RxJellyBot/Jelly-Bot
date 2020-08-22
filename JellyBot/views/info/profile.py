@@ -100,13 +100,13 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
 
         channel_model = ChannelManager.get_channel_oid(profile_model.channel_oid)
         permissions = ProfileManager.get_user_permissions(channel_model.id, root_oid)
+        profile_ctrl = ProfileHelper.get_user_profile_controls(channel_model, profile_model.id, root_oid, permissions)
 
         # noinspection PyTypeChecker
         return render_template(
             request, _("Profile Info - {}").format(profile_model.name), "info/profile.html", {
                 "profile_data": profile_model,
-                "profile_controls":
-                    ProfileHelper.get_user_profile_controls(channel_model, profile_model.id, root_oid, permissions),
+                "profile_controls": profile_ctrl,
                 "perm_cats": list(ProfilePermission),
                 "is_default": profile_model.id == channel_model.config.default_profile_oid
             }, nav_param=kwargs)

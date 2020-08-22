@@ -406,6 +406,58 @@ class TestProfileManagerGetInfo(TestModelMixin, TestDatabaseMixin):
             {self.USER_OID: {self.CHANNEL_OID_2}}
         )
 
+    def test_user_permission_lv_dict(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC", PermissionLevel=PermissionLevel.MOD)
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="GHI", PermissionLevel=PermissionLevel.ADMIN)
+
+        ProfileDataManager.insert_many([mdl, mdl2, mdl3])
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_3,
+                                          ProfileOids=[mdl2.id, mdl3.id])
+        )
+
+        self.assertEqual(
+            ProfileManager.get_user_permission_lv_dict(self.CHANNEL_OID),
+            {
+                self.USER_OID: PermissionLevel.MOD,
+                self.USER_OID_2: PermissionLevel.NORMAL,
+                self.USER_OID_3: PermissionLevel.ADMIN
+            }
+        )
+
+    def test_user_permission_lv_dict_channel_missed(self):
+        mdl = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC", PermissionLevel=PermissionLevel.MOD)
+        mdl2 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="DEF")
+        mdl3 = ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="GHI", PermissionLevel=PermissionLevel.ADMIN)
+
+        ProfileDataManager.insert_many([mdl, mdl2, mdl3])
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
+                                          ProfileOids=[mdl.id, mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
+                                          ProfileOids=[mdl2.id])
+        )
+        UserProfileManager.insert_one_model(
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_3,
+                                          ProfileOids=[mdl2.id, mdl3.id])
+        )
+
+        self.assertEqual(ProfileManager.get_user_permission_lv_dict(ObjectId()), {})
+
+    def test_user_permission_lv_dict_channel_no_prof(self):
+        self.assertEqual(ProfileManager.get_user_permission_lv_dict(self.CHANNEL_OID), {})
+
     def test_perms(self):
         mdls = [
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC",

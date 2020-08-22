@@ -229,6 +229,25 @@ class _UserProfileManager(BaseCollection):
 
         return ret
 
+    def get_user_profile_dict(self, channel_oid: ObjectId) -> Dict[ObjectId, Set[ObjectId]]:
+        """
+        Get a :class:`dict` which key is the user OID in the channel and value is the OIDs of the profile they have.
+
+        :param channel_oid: channel to get the `dict`
+        :return: a dict containing the channel member OIDs as the key and their profile OIDs as the value
+        """
+        uk = ChannelProfileConnectionModel.UserOid.key
+        pk = ChannelProfileConnectionModel.ProfileOids.key
+
+        crs = self.find({ChannelProfileConnectionModel.ChannelOid.key: channel_oid}, projection={uk: 1, pk: 1})
+
+        ret = {}
+
+        for entry in crs:
+            ret[entry[uk]] = set(entry[pk])
+
+        return ret
+
     @arg_type_ensure
     def is_user_in_channel(self, channel_oid: ObjectId, root_oid: ObjectId) -> bool:
         return self.count_documents(

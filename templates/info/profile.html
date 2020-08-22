@@ -135,7 +135,7 @@
                             <tr>
                                 <td class="align-middle text-center">{{ entry.name }}</td>
                                 <td class="align-middle text-center">
-                                    {% if entry.removable %}
+                                    {% if entry.controllable %}
                                         <form class="profile-detach" method="POST">
                                             {% csrf_token %}
                                             <input type="hidden" value="{{ entry.root_oid }}" name="uid">
