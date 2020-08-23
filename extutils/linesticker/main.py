@@ -611,9 +611,7 @@ class LineStickerUtils(ClearableMixin):
         :param sticker_id: ID of the sticker to be checked
         :return: if the sticker exists
         """
-        response = requests.get(LineStickerUtils.get_sticker_url(sticker_id))
-
-        return response.ok
+        return requests.head(LineStickerUtils.get_sticker_url(sticker_id)).ok
 
     @staticmethod
     def get_meta_url(pack_id: Union[int, str]) -> str:
