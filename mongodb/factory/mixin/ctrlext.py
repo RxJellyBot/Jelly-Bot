@@ -1,7 +1,7 @@
 """Wrapper for the controls on a MongoDB collection as a mixin."""
 from datetime import datetime, tzinfo
 from threading import Thread
-from typing import Type, Optional, Tuple, Union, TypeVar
+from typing import Optional, Tuple, Union, TypeVar
 
 from bson.errors import InvalidDocument
 from django.conf import settings
@@ -21,10 +21,18 @@ from models.field.exceptions import (
 from mongodb.utils import ExtendedCursor
 from mongodb.factory.results import WriteOutcome, UpdateOutcome
 
+from .prop import CollectionPropertiesMixin
+
 T = TypeVar('T', bound=Model)
 
 
-class ControlExtensionMixin(Collection):
+class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
+    """
+    A wrapper class for :class:`Collection`.
+
+    Wraps various database manipulating functions to provide additional functionality.
+    """
+
     @staticmethod
     def _dup_doc_id_handle_compound_idx(filter_: dict, model_dict: dict, unique_key):
         for key, order in unique_key:
@@ -77,7 +85,7 @@ class ControlExtensionMixin(Collection):
         :param model: model to be inserted into the database
         :return: outcome, exception (if any)
         """
-        ex = None
+        exc = None
 
         try:
             insert_result = self.insert_one(model)
@@ -86,45 +94,45 @@ class ControlExtensionMixin(Collection):
                 outcome = WriteOutcome.O_INSERTED
             else:
                 outcome = WriteOutcome.X_NOT_ACKNOWLEDGED
-        except (AttributeError, InvalidDocument) as e:
+        except (AttributeError, InvalidDocument) as ex:
             outcome = WriteOutcome.X_NOT_SERIALIZABLE
-            ex = e
-        except DuplicateKeyError as e:
-            # A whole new model ID will be set when calling `self.insert_one()`.
+            exc = ex
+        except DuplicateKeyError as ex:
+            # A new model ID will be set when calling `self.insert_one()`.
             # However, that is not the desired if a conflicting data is already in the database.
             # `self._get_duplicated_doc_id()` will get the OID of the conflicting data.
             model.set_oid(self._get_duplicated_doc_id(model.to_json()))
 
             outcome = WriteOutcome.O_DATA_EXISTS
-            ex = e
-        except InvalidModelError as e:
+            exc = ex
+        except InvalidModelError as ex:
             outcome = WriteOutcome.X_INVALID_MODEL
-            ex = e
-        except Exception as e:
+            exc = ex
+        except Exception as ex:
             outcome = WriteOutcome.X_INSERT_UNKNOWN
-            ex = e
+            exc = ex
 
-        return outcome, ex
+        return outcome, exc
 
     @staticmethod
-    def _field_error_to_outcome(e: InvalidModelFieldError) -> WriteOutcome:
-        if isinstance(e.inner_exception, FieldCastingFailedError):
+    def _field_error_to_outcome(ex: InvalidModelFieldError) -> WriteOutcome:
+        if isinstance(ex.inner_exception, FieldCastingFailedError):
             outcome = WriteOutcome.X_CASTING_FAILED
-        elif isinstance(e.inner_exception, FieldValueInvalidError):
+        elif isinstance(ex.inner_exception, FieldValueInvalidError):
             outcome = WriteOutcome.X_INVALID_FIELD_VALUE
-        elif isinstance(e.inner_exception, FieldTypeMismatchError):
+        elif isinstance(ex.inner_exception, FieldTypeMismatchError):
             outcome = WriteOutcome.X_TYPE_MISMATCH
-        elif isinstance(e.inner_exception, FieldReadOnlyError):
+        elif isinstance(ex.inner_exception, FieldReadOnlyError):
             outcome = WriteOutcome.X_READONLY
         else:
             outcome = WriteOutcome.X_INVALID_MODEL_FIELD
 
         return outcome
 
-    def insert_one_data(self, model_cls: Type[Type[T]], *, from_db: bool = False, **model_args) \
+    def insert_one_data(self, *, from_db: bool = False, **model_args) \
             -> Tuple[Optional[T], WriteOutcome, Optional[Exception]]:
         """
-        Insert an object into the database by providing its model class and the arguments to construct the model.
+        Insert an object into the database using the provided the arguments of the model.
 
         This function constructs the model and if the construction succeed, executes ``insert_one_model()``.
 
@@ -133,13 +141,13 @@ class ControlExtensionMixin(Collection):
         .. seealso::
             Documentation of ``ControlExtensionMixin.insert_one_model()``
 
-        :param model_cls: class for the data to be constructed
         :param from_db: if the values in `model_args` comes from the database
         :param model_args: arguments for the `Model` construction
 
         :return: model, outcome, exception (if any)
         """
         model = None
+        model_cls = self.get_model_cls()
         outcome: WriteOutcome = WriteOutcome.X_NOT_EXECUTED
         ex = None
 
@@ -215,29 +223,47 @@ class ControlExtensionMixin(Collection):
                 kwargs={"upsert": upsert, "collation": collation}
             ).start()
 
-    def find_cursor_with_count(
-            self, filter_, *args, parse_cls: Type[T] = None, hours_within: Optional[int] = None,
-            start: Optional[datetime] = None, end: Optional[datetime] = None, **kwargs) -> ExtendedCursor[T]:
+    def find_cursor_with_count(self, filter_: Optional[dict] = None, /,  # pylint: disable=keyword-arg-before-vararg
+                               *args,
+                               hours_within: Optional[int] = None, start: Optional[datetime] = None,
+                               end: Optional[datetime] = None, **kwargs) \
+            -> ExtendedCursor[T]:
+        """
+        Find the data matching the condition ``filter_`` and return it as an :class:`ExtendedCursor`.
+
+        ``*args`` can be any args for ``db.col.find()``.
+
+        ``**kwargs`` can be any args for ``db.col.find()``.
+
+        ``start``, ``end`` and ``hours_within`` will be used as the time range parameters for ``filter_``.
+
+        :param filter_: condition to filter the returned data
+        :param args: args for `find()`
+        :param hours_within: hour range for the time range filtering
+        :param start: start time for the time range filtering
+        :param end: end time for the time range filtering
+        :param kwargs: keyword-args for `find()`
+        :return: an `ExtendedCursor` yielding the filtered data
+        """
+        if not filter_:
+            filter_ = {}
+
         self.attach_time_range(filter_, hours_within=hours_within, start=start, end=end)
 
-        return ExtendedCursor(
-            self.find(filter_, *args, **kwargs), self.count_documents(filter_), parse_cls=parse_cls)
+        return ExtendedCursor(self.find(filter_, *args, **kwargs), self.count_documents(filter_),
+                              parse_cls=self.get_model_cls())
 
-    def find_one_casted(self, filter_: Optional[dict] = None, *args, parse_cls: Type[T], **kwargs) -> Optional[T]:
+    def find_one_casted(self, filter_: Optional[dict] = None, /, *args,  # pylint: disable=keyword-arg-before-vararg
+                        **kwargs) -> Optional[T]:
         """
-        Same functionality as ``find_one()``.
-        Except that this function will attempt to cast the return to ``parse_cls``.
+        Same functionality as ``find_one()`` except that this function will cast the returned :class:`dict` to model.
 
         :param filter_: filter to get the data
         :param args: args for `find_one()`
-        :param parse_cls: class to cast the return if available
         :param kwargs: kwargs for `find_one()`
         :return: casted data in `parse_cls` or `None` if not found
         """
-        # TODO: Set ``parse_cls`` to default model class
-        if not filter_:
-            filter_ = {}
-        return parse_cls.cast_model(self.find_one(filter_, *args, **kwargs))
+        return self.get_model_cls().cast_model(self.find_one(filter_, *args, **kwargs))
 
     @staticmethod
     def attach_time_range(filter_: dict, *, hours_within: Optional[int] = None,
@@ -250,6 +276,14 @@ class ControlExtensionMixin(Collection):
         Both start and end time are inclusive.
 
         If ``trange`` is specified, ``hours_within``, ``start``, ``end``, ``range_mult`` will be ignored.
+
+        :param filter_: filter to be attached the time range
+        :param hours_within: hour range for the time range
+        :param start: start time for the time range
+        :param end: end time for the time range
+        :param range_mult: range length multiplier for the time range
+        :param tzinfo_: timezone info for the time range
+        :param trange: time range to be used
         """
         id_filter = {}
 

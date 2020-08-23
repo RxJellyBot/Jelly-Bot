@@ -55,8 +55,7 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.O_COMPLETED)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id, mdl2.id])
             )
@@ -80,14 +79,12 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.O_COMPLETED)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id, mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id, mdl.id])
             )
@@ -106,8 +103,7 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
@@ -129,14 +125,12 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id])
             )
@@ -171,14 +165,12 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_EXECUTOR_NOT_IN_CHANNEL)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl.id])
             )
@@ -199,14 +191,12 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_TARGET_NOT_IN_CHANNEL)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[])
             )
@@ -227,8 +217,7 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
@@ -252,14 +241,12 @@ class TestProfileManagerAttach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id])
             )
@@ -338,8 +325,7 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.O_COMPLETED)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id])
             )
@@ -363,14 +349,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.O_COMPLETED)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id, mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl.id])
             )
@@ -389,8 +373,7 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
@@ -412,14 +395,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id])
             )
@@ -454,14 +435,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_EXECUTOR_NOT_IN_CHANNEL)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl.id])
             )
@@ -481,14 +460,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_TARGET_NOT_IN_CHANNEL)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[])
             )
@@ -509,8 +486,7 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
@@ -534,14 +510,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id])
             )
@@ -565,14 +539,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.O_COMPLETED)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[])
             )
@@ -596,14 +568,12 @@ class TestProfileManagerDetach(ABC):
 
             self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                               ProfileOids=[mdl2.id])
             )
             self.assertModelEqual(
-                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                                   parse_cls=ChannelProfileConnectionModel),
+                UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
                 ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                               ProfileOids=[mdl2.id])
             )

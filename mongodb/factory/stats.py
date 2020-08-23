@@ -77,9 +77,8 @@ class _MessageRecordStatisticsManager(BaseCollection):
     @arg_type_ensure
     def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> ExtendedCursor[MessageRecordModel]:
-        return self.find_cursor_with_count(
-            {MessageRecordModel.ChannelOid.key: channel_oid}, parse_cls=MessageRecordModel
-        ).sort([(OID_KEY, pymongo.DESCENDING)]).limit(limit)
+        return self.find_cursor_with_count({MessageRecordModel.ChannelOid.key: channel_oid},
+                                           sort=[(OID_KEY, pymongo.DESCENDING)], limit=limit if limit else 0)
 
     @arg_type_ensure
     def get_message_frequency(self, channel_oid: ObjectId, range_mins: Union[float, int, None] = None) -> float:

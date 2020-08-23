@@ -70,7 +70,7 @@ class _RemoteControlManager(BaseCollection):
         }
         now = now_utc_aware()
 
-        ret = self.find_one_casted(filter_, parse_cls=RemoteControlEntryModel)
+        ret = self.find_one_casted(filter_)
 
         # Entry not found
         if not ret:

@@ -39,7 +39,7 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
         )
 
         self.assertModelEqual(
-            MessageRecordStatisticsManager.find_one_casted(parse_cls=MessageRecordModel),
+            MessageRecordStatisticsManager.find_one_casted(),
             MessageRecordModel(ChannelOid=self.CHANNEL_OID, UserRootOid=self.USER_OID, MessageType=MessageType.TEXT,
                                MessageContent="ABC", ProcessTimeSecs=2.13)
         )

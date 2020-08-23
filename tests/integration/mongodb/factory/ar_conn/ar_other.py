@@ -25,7 +25,7 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
             mdl = AutoReplyModuleManager.find_one_casted({
                 AutoReplyModuleModel.KEY_KW_CONTENT: self.get_mdl_1().keyword.content,
                 AutoReplyModuleModel.KEY_KW_TYPE: self.get_mdl_1().keyword.content_type
-            }, parse_cls=AutoReplyModuleModel)
+            })
             self.assertEqual(mdl.called_count, i)
 
     def test_get_after_add_multi(self):
@@ -66,7 +66,7 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
         mdl = AutoReplyModuleManager.find_one_casted({
             AutoReplyModuleModel.KEY_KW_CONTENT: self.get_mdl_3().keyword.content,
             AutoReplyModuleModel.KEY_KW_TYPE: self.get_mdl_3().keyword.content_type
-        }, parse_cls=AutoReplyModuleModel)
+        })
         self.assertEqual(mdl.called_count, 1)
 
     def test_get_after_cooldown(self):
@@ -87,7 +87,7 @@ class TestAutoReplyManagerOther(TestAutoReplyManagerBase.TestClass, TestModelMix
         mdl = AutoReplyModuleManager.find_one_casted({
             AutoReplyModuleModel.KEY_KW_CONTENT: self.get_mdl_3().keyword.content,
             AutoReplyModuleModel.KEY_KW_TYPE: self.get_mdl_3().keyword.content_type
-        }, parse_cls=AutoReplyModuleModel)
+        })
         self.assertEqual(mdl.called_count, 2)
 
     def test_get_list_by_keyword_including_inactive(self):

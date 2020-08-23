@@ -109,11 +109,11 @@ class TestInfoProcessor(TestCase):
         join_time_1 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_1_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
         join_time_2 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_2_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
 
         MessageRecordStatisticsManager.insert_one_model(
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 8, 20)),
@@ -152,11 +152,11 @@ class TestInfoProcessor(TestCase):
         join_time_1 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_1_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
         join_time_2 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_2_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
 
         MessageRecordStatisticsManager.insert_one_model(
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 8, 19)),
@@ -190,11 +190,11 @@ class TestInfoProcessor(TestCase):
         join_time_1 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_1_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
         join_time_2 = UserProfileManager.find_one_casted({
             ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_1_OID,
             ChannelProfileConnectionModel.UserOid.key: root_2_mdl.id
-        }, parse_cls=ChannelProfileConnectionModel).id.generation_time
+        }).id.generation_time
 
         result = InfoProcessor.get_member_info(self.CHANNEL_1)
 

@@ -25,7 +25,7 @@ class TestAutoReplyManagerDelete(TestAutoReplyManagerBase.TestClass, TestTimeCom
             AutoReplyModuleManager.find_one_casted({
                 AutoReplyModuleModel.KEY_KW_CONTENT: kw,
                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type
-            }, parse_cls=AutoReplyModuleModel))
+            }))
 
     def _check_model_not_exists(self, model_args: dict):
         kw = model_args["Keyword"].content
@@ -35,7 +35,7 @@ class TestAutoReplyManagerDelete(TestAutoReplyManagerBase.TestClass, TestTimeCom
             AutoReplyModuleManager.find_one_casted({
                 AutoReplyModuleModel.KEY_KW_CONTENT: kw,
                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type
-            }, parse_cls=AutoReplyModuleModel))
+            }))
 
     def test_del_short_time_overwrite_perma_remove(self):
         AutoReplyManager.add_conn(**self.get_mdl_1_args())

@@ -794,7 +794,7 @@ class TestRootUserManager(TestModelMixin):
             OperationOutcome.O_COMPLETED
         )
         self.assertEqual(
-            RootUserManager.find_one_casted(parse_cls=RootUserModel),
+            RootUserManager.find_one_casted(),
             RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID_3, self.ONPLAT_OID, self.ONPLAT_OID_2])
         )
 
@@ -810,7 +810,7 @@ class TestRootUserManager(TestModelMixin):
             OperationOutcome.O_COMPLETED
         )
         self.assertEqual(
-            RootUserManager.find_one_casted(parse_cls=RootUserModel),
+            RootUserManager.find_one_casted(),
             RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID, self.ONPLAT_OID_2, self.ONPLAT_OID_3])
         )
 
@@ -837,7 +837,7 @@ class TestRootUserManager(TestModelMixin):
             OperationOutcome.O_COMPLETED
         )
         self.assertEqual(
-            RootUserManager.find_one_casted(parse_cls=RootUserModel),
+            RootUserManager.find_one_casted(),
             RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID, self.ONPLAT_OID_3], ApiOid=self.API_OID,
                           Config=RootUserConfigModel.generate_default())
         )
@@ -854,7 +854,7 @@ class TestRootUserManager(TestModelMixin):
             OperationOutcome.O_COMPLETED
         )
         self.assertEqual(
-            RootUserManager.find_one_casted(parse_cls=RootUserModel),
+            RootUserManager.find_one_casted(),
             RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID_3, self.ONPLAT_OID, self.ONPLAT_OID_2],
                           Config=RootUserConfigModel.generate_default())
         )

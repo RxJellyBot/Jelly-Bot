@@ -126,8 +126,7 @@ class _ChannelManager(BaseCollection):
     def get_channel_token(self, platform: Platform, token: str, *,
                           auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
-        ret = self.find_one_casted(
-            {ChannelModel.Token.key: token, ChannelModel.Platform.key: platform}, parse_cls=ChannelModel)
+        ret = self.find_one_casted({ChannelModel.Token.key: token, ChannelModel.Platform.key: platform})
 
         if not ret and auto_register:
             reg_result = self.ensure_register(platform, token, default_name=default_name)
@@ -147,7 +146,7 @@ class _ChannelManager(BaseCollection):
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
-        return self.find_one_casted(filter_, parse_cls=ChannelModel)
+        return self.find_one_casted(filter_)
 
     def get_channel_dict(self, channel_oid_list: List[ObjectId], *, accessbible_only: bool = False) \
             -> Dict[ObjectId, ChannelModel]:
@@ -156,8 +155,7 @@ class _ChannelManager(BaseCollection):
         if accessbible_only:
             filter_[ChannelModel.BotAccessible.key] = True
 
-        return {model.id: model for model
-                in self.find_cursor_with_count(filter_, parse_cls=ChannelModel)}
+        return {model.id: model for model in self.find_cursor_with_count(filter_)}
 
     @arg_type_ensure
     def get_channel_default_name(self, default_name: str, *, hide_private: bool = True) \
@@ -176,7 +174,7 @@ class _ChannelManager(BaseCollection):
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
-        return self.find_cursor_with_count(filter_, parse_cls=ChannelModel)
+        return self.find_cursor_with_count(filter_)
 
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         model = self.get_channel_token(platform, token)
@@ -239,21 +237,19 @@ class _ChannelCollectionManager(BaseCollection):
     @arg_type_ensure
     def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
         return self.find_one_casted(
-            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
-            parse_cls=ChannelCollectionModel)
+            {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform}
+        )
 
     @arg_type_ensure
     def get_chcoll_oid(self, chcoll_oid: ObjectId) -> Optional[ChannelCollectionModel]:
         return self.find_one_casted(
-            {ChannelCollectionModel.Id.key: chcoll_oid},
-            parse_cls=ChannelCollectionModel
+            {ChannelCollectionModel.Id.key: chcoll_oid}
         )
 
     @arg_type_ensure
     def get_chcoll_child_channel(self, child_channel_oid: ObjectId):
         return self.find_one_casted(
-            {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid},
-            parse_cls=ChannelCollectionModel
+            {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid}
         )
 
     @arg_type_ensure

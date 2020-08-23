@@ -260,7 +260,6 @@ class _AutoReplyModuleManager(BaseCollection):
                     AutoReplyModuleModel.ChannelOid.key: channel_oid,
                     AutoReplyModuleModel.Active.key: True
                 },
-                parse_cls=AutoReplyModuleModel,
                 collation=case_insensitive_collation if AutoReply.CaseInsensitive else None)
 
         if not ret:
@@ -300,20 +299,16 @@ class _AutoReplyModuleManager(BaseCollection):
         if active_only:
             filter_[AutoReplyModuleModel.Active.key] = True
 
-        return self.find_cursor_with_count(
-            filter_, parse_cls=AutoReplyModuleModel).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+        return self.find_cursor_with_count(filter_, sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> ExtendedCursor[AutoReplyModuleModel]:
-        return self \
-            .find_cursor_with_count({OID_KEY: {"$in": conn_oids}}, parse_cls=AutoReplyModuleModel) \
-            .sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+        return self.find_cursor_with_count({OID_KEY: {"$in": conn_oids}},
+                                           sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> ExtendedCursor[AutoReplyModuleModel]:
-        ret = self.find_cursor_with_count(
-            {AutoReplyModuleModel.ChannelOid.key: channel_oid},
-            parse_cls=AutoReplyModuleModel
-        ).sort([(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+        ret = self.find_cursor_with_count({AutoReplyModuleModel.ChannelOid.key: channel_oid},
+                                          sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
         if limit:
             ret = ret.limit(limit)
@@ -356,7 +351,6 @@ class _AutoReplyModuleTagManager(BaseCollection):
         ex = None
         tag_data: Optional[AutoReplyModuleTagModel] = self.find_one_casted(
             {AutoReplyModuleTagModel.Name.key: name},
-            parse_cls=AutoReplyModuleTagModel,
             collation=case_insensitive_collation)
 
         if tag_data:
@@ -380,11 +374,11 @@ class _AutoReplyModuleTagManager(BaseCollection):
         """
         return self.find_cursor_with_count(
             {AutoReplyModuleTagModel.Name.key: {"$regex": tag_keyword, "$options": "i"}},
-            sort=[(OID_KEY, pymongo.DESCENDING)],
-            parse_cls=AutoReplyModuleTagModel)
+            sort=[(OID_KEY, pymongo.DESCENDING)]
+        )
 
     def get_tag_data(self, tag_oid: ObjectId) -> Optional[AutoReplyModuleTagModel]:
-        return self.find_one_casted({OID_KEY: tag_oid}, parse_cls=AutoReplyModuleTagModel)
+        return self.find_one_casted({OID_KEY: tag_oid})
 
 
 class _AutoReplyManager(ClearableMixin):

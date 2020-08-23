@@ -81,8 +81,7 @@ class _UserProfileManager(BaseCollection):
             upsert=True).upserted_id
 
         if id_:
-            model: ChannelProfileConnectionModel = self.find_one_casted(
-                {OID_KEY: id_}, parse_cls=ChannelProfileConnectionModel)
+            model: ChannelProfileConnectionModel = self.find_one_casted({OID_KEY: id_})
 
             if not model:
                 raise ValueError("`upserted_id` exists but no corresponding model found.")
@@ -99,8 +98,8 @@ class _UserProfileManager(BaseCollection):
             )
         else:
             model: ChannelProfileConnectionModel = self.find_one_casted(
-                {ChannelProfileConnectionModel.UserOid.key: root_uid},
-                parse_cls=ChannelProfileConnectionModel)
+                {ChannelProfileConnectionModel.UserOid.key: root_uid}
+            )
 
             if not model:
                 raise ValueError("`Model` should exists because `upserted_id` not exists, "
@@ -118,8 +117,8 @@ class _UserProfileManager(BaseCollection):
         """
         return self.find_one_casted(
             {ChannelProfileConnectionModel.UserOid.key: root_uid,
-             ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
-            parse_cls=ChannelProfileConnectionModel)
+             ChannelProfileConnectionModel.ChannelOid.key: channel_oid}
+        )
 
     def get_user_channel_prof_conns(self, root_uid: ObjectId, *, inside_only: bool = True) \
             -> List[ChannelProfileConnectionModel]:
@@ -137,9 +136,7 @@ class _UserProfileManager(BaseCollection):
 
         return list(self.find_cursor_with_count(
             filter_,
-            parse_cls=ChannelProfileConnectionModel
-        ).sort(
-            [
+            sort=[
                 (ChannelProfileConnectionModel.Starred.key, pymongo.DESCENDING),
                 (ChannelProfileConnectionModel.Id.key, pymongo.DESCENDING)
             ]
@@ -164,7 +161,7 @@ class _UserProfileManager(BaseCollection):
         if available_only:
             filter_[f"{ChannelProfileConnectionModel.ProfileOids.key}.0"] = {"$exists": True}
 
-        return list(self.find_cursor_with_count(filter_, parse_cls=ChannelProfileConnectionModel))
+        return list(self.find_cursor_with_count(filter_))
 
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """
@@ -209,9 +206,7 @@ class _UserProfileManager(BaseCollection):
 
         :return: cursor of the connections to the available users
         """
-        return self.find_cursor_with_count(
-            {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
-            parse_cls=ChannelProfileConnectionModel)
+        return self.find_cursor_with_count({ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}})
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> Set[ObjectId]:
         """
@@ -368,7 +363,7 @@ class _ProfileDataManager(BaseCollection):
         for perm_cat in ProfilePermission:
             perm_key = f"{ChannelProfileModel.Permission.key}.{perm_cat.code}"
 
-            for data in self.find_cursor_with_count({perm_key: {"$exists": False}}, parse_cls=ChannelProfileModel):
+            for data in self.find_cursor_with_count({perm_key: {"$exists": False}}):
                 cmds.append(
                     UpdateOne(
                         {OID_KEY: data.id},
@@ -393,7 +388,7 @@ class _ProfileDataManager(BaseCollection):
         :param profile_oid: OID of the profile to get
         :return: `ChannelProfileModel` if the profile is found. `None` otherwise
         """
-        return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
+        return self.find_one_casted({OID_KEY: profile_oid})
 
     def get_profile_dict(self, profile_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelProfileModel]:
         """
@@ -402,8 +397,7 @@ class _ProfileDataManager(BaseCollection):
         :param profile_oid_list: list of the profile OIDs to get the data
         :return: a dict which key is the profile OID and value is the profile model
         """
-        return {model.id: model for model
-                in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
+        return {model.id: model for model in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}})}
 
     def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
         """
@@ -417,7 +411,7 @@ class _ProfileDataManager(BaseCollection):
         """
         return self.find_one_casted(
             {ChannelProfileModel.ChannelOid.key: channel_oid, ChannelProfileModel.Name.key: name.strip()},
-            parse_cls=ChannelProfileModel)
+        )
 
     def get_channel_profiles(self, channel_oid: ObjectId, name_keyword: Optional[str] = None) \
             -> ExtendedCursor[ChannelProfileModel]:
@@ -435,7 +429,7 @@ class _ProfileDataManager(BaseCollection):
         if name_keyword:
             filter_[ChannelProfileModel.Name.key] = {"$regex": name_keyword, "$options": "i"}
 
-        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel).sort([(OID_KEY, pymongo.ASCENDING)])
+        return self.find_cursor_with_count(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
 
     def get_default_profile(self, channel_oid: ObjectId) -> GetPermissionProfileResult:
         """
@@ -458,7 +452,7 @@ class _ProfileDataManager(BaseCollection):
             return GetPermissionProfileResult(GetOutcome.X_CHANNEL_CONFIG_ERROR, ex)
 
         if not cnl.config.is_field_none("DefaultProfileOid"):
-            perm_prof: ChannelProfileModel = self.find_one_casted({OID_KEY: prof_oid}, parse_cls=ChannelProfileModel)
+            perm_prof: ChannelProfileModel = self.find_one_casted({OID_KEY: prof_oid})
 
             if perm_prof:
                 return GetPermissionProfileResult(GetOutcome.O_CACHE_DB, ex, perm_prof)
@@ -511,7 +505,7 @@ class _ProfileDataManager(BaseCollection):
 
         filter_[ChannelProfileModel.PermissionLevel.key] = {"$lte": highest_perm_lv}
 
-        return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel)
+        return self.find_cursor_with_count(filter_)
 
     def create_default_profile(self, channel_oid: ObjectId, *,
                                set_to_channel: bool = True, check_channel: bool = True) -> CreateProfileResult:
@@ -608,12 +602,12 @@ class _ProfileDataManager(BaseCollection):
                 continue
 
             # Remove args that are not in the data model
-            if jk not in self.data_model.model_json_keys():
+            if jk not in self.get_model_cls().model_json_keys():
                 outcome = UpdateOutcome.O_PARTIAL_ARGS_REMOVED
                 continue
 
             # Check if the field is read only
-            field_instance = self.data_model.get_field_class_instance(self.data_model.json_key_to_field(jk))
+            field_instance = self.get_model_cls().get_field_class_instance(self.get_model_cls().json_key_to_field(jk))
             if field_instance.read_only:
                 return UpdateOutcome.X_UNEDITABLE
 

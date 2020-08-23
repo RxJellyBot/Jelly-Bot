@@ -55,15 +55,19 @@ class _TimerManager(BaseCollection):
     @arg_type_ensure
     def list_all_timer(self, channel_oid: ObjectId) -> TimerListResult:
         return TimerListResult(
-            self.find_cursor_with_count({TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
-                .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
+            self.find_cursor_with_count(
+                {TimerModel.ChannelOid.key: channel_oid},
+                sort=[(TimerModel.TargetTime.key, pymongo.ASCENDING)]
+            )
+        )
 
     @arg_type_ensure
     def get_timers(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
         return TimerListResult(
-            self.find_cursor_with_count({TimerModel.Keyword.key: keyword,
-                                         TimerModel.ChannelOid.key: channel_oid}, parse_cls=TimerModel)
-                .sort([(TimerModel.TargetTime.key, pymongo.ASCENDING)])
+            self.find_cursor_with_count(
+                {TimerModel.Keyword.key: keyword, TimerModel.ChannelOid.key: channel_oid},
+                sort=[(TimerModel.TargetTime.key, pymongo.ASCENDING)]
+            )
         )
 
     @arg_type_ensure
@@ -79,12 +83,7 @@ class _TimerManager(BaseCollection):
             TimerModel.Notified.key: False
         }
 
-        ret = list(
-            self.find_cursor_with_count(
-                filter_, parse_cls=TimerModel
-            ).sort(
-                [(TimerModel.TargetTime.key, pymongo.ASCENDING)]
-            ))
+        ret = list(self.find_cursor_with_count(filter_, sort=[(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
         self.update_many_async(filter_, {"$set": {TimerModel.Notified.key: True}})
 
@@ -100,12 +99,7 @@ class _TimerManager(BaseCollection):
             TimerModel.NotifiedExpired.key: False
         }
 
-        ret = list(
-            self.find_cursor_with_count(
-                filter_, parse_cls=TimerModel
-            ).sort(
-                [(TimerModel.TargetTime.key, pymongo.ASCENDING)]
-            ))
+        ret = list(self.find_cursor_with_count(filter_, sort=[(TimerModel.TargetTime.key, pymongo.ASCENDING)]))
 
         self.update_many_async(filter_, {"$set": {TimerModel.NotifiedExpired.key: True}})
 

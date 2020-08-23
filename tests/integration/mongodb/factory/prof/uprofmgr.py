@@ -68,9 +68,11 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 1)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]))
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]
+            )
+        )
 
     def test_attach_new_multi(self):
         result = UserProfileManager.user_attach_profile(
@@ -79,10 +81,11 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 1)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]))
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
+        )
 
     def test_attach_existed(self):
         mdl = ChannelProfileConnectionModel(
@@ -94,10 +97,11 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 1)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]))
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
+        )
 
     def test_attach_diff_user(self):
         UserProfileManager.insert_one_model(ChannelProfileConnectionModel(
@@ -110,17 +114,19 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 2)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(
                 ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]))
+                ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
+        )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(
                 ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
-                ProfileOids=[self.PROF_OID_1]))
+                ProfileOids=[self.PROF_OID_1]
+            )
+        )
 
     def test_attach_diff_channel(self):
         UserProfileManager.insert_one_model(ChannelProfileConnectionModel(
@@ -133,17 +139,17 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 2)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_OID}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]))
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
+        )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.ChannelOid.key: self.CHANNEL_OID_2}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1]))
+                ChannelOid=self.CHANNEL_OID_2, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]
+            )
+        )
 
     def test_attach_duplicated(self):
         UserProfileManager.insert_one_model(ChannelProfileConnectionModel(
@@ -154,10 +160,11 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertEqual(UserProfileManager.count_documents({}), 1)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                ProfileOids=[self.PROF_OID_1]))
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]
+            )
+        )
 
     def test_get_user_conn(self):
         expected_mdl = ChannelProfileConnectionModel(
@@ -423,7 +430,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         UserProfileManager.mark_unavailable(self.CHANNEL_OID, self.USER_OID)
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[])
         )
 
@@ -435,7 +442,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         UserProfileManager.mark_unavailable(self.CHANNEL_OID, self.USER_OID)
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[])
         )
 
@@ -447,9 +454,10 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         UserProfileManager.mark_unavailable(self.CHANNEL_OID, self.USER_OID_2)
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
         )
 
     def test_mark_unavailable_channel_not_match(self):
@@ -460,9 +468,10 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         UserProfileManager.mark_unavailable(self.CHANNEL_OID_2, self.USER_OID)
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
         )
 
     def test_mark_unavailable_no_channel(self):
@@ -479,9 +488,10 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1]
+            )
         )
 
     def test_detach_from_all(self):
@@ -497,16 +507,16 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_2])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_2]
+            )
         )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[]
+            )
         )
 
     def test_detach_profile_not_exists(self):
@@ -522,16 +532,16 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
         )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1]
+            )
         )
 
     def test_detach_user_not_exists(self):
@@ -547,16 +557,16 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_NOT_FOUND)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
+            )
         )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(
-                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1])
+                ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2, ProfileOids=[self.PROF_OID_1]
+            )
         )
 
     def test_change_star(self):
@@ -568,7 +578,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertTrue(changed)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
                 ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2],
                 Starred=True
@@ -579,7 +589,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertFalse(changed)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
                 ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2],
                 Starred=True
@@ -590,7 +600,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertTrue(changed)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({}, parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(
                 ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[self.PROF_OID_1, self.PROF_OID_2]
             )

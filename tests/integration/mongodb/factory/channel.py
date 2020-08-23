@@ -129,23 +129,25 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(ChannelManager.mark_accessibility(Platform.LINE, "U1234567", True),
                          UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            ChannelManager.find_one_casted(
-                {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-                parse_cls=ChannelModel),
+            ChannelManager.find_one_casted({
+                ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"
+            }),
             ChannelModel(
                 Platform=Platform.LINE, Token="U1234567", BotAccessible=True,
-                Config=ChannelConfigModel(DefaultProfileOid=doid))
+                Config=ChannelConfigModel(DefaultProfileOid=doid)
+            )
         )
 
         self.assertEqual(ChannelManager.mark_accessibility(Platform.LINE, "U1234567", False),
                          UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            ChannelManager.find_one_casted(
-                {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-                parse_cls=ChannelModel),
+            ChannelManager.find_one_casted({
+                ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"
+            }),
             ChannelModel(
                 Platform=Platform.LINE, Token="U1234567", BotAccessible=False,
-                Config=ChannelConfigModel(DefaultProfileOid=doid))
+                Config=ChannelConfigModel(DefaultProfileOid=doid)
+            )
         )
 
     def test_mark_accessibility_not_existed(self):
@@ -165,23 +167,25 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(ChannelManager.update_channel_default_name(Platform.LINE, "U1234567", "O").is_success)
 
         self.assertModelEqual(
-            ChannelManager.find_one_casted(
-                {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-                parse_cls=ChannelModel),
+            ChannelManager.find_one_casted({
+                ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"
+            }),
             ChannelModel(
                 Platform=Platform.LINE, Token="U1234567",
-                Config=ChannelConfigModel(DefaultProfileOid=doid, DefaultName="O"))
+                Config=ChannelConfigModel(DefaultProfileOid=doid, DefaultName="O")
+            )
         )
 
         self.assertTrue(ChannelManager.update_channel_default_name(Platform.LINE, "U1234567", "N").is_success)
 
         self.assertModelEqual(
-            ChannelManager.find_one_casted(
-                {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-                parse_cls=ChannelModel),
+            ChannelManager.find_one_casted({
+                ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"
+            }),
             ChannelModel(
                 Platform=Platform.LINE, Token="U1234567",
-                Config=ChannelConfigModel(DefaultProfileOid=doid, DefaultName="N"))
+                Config=ChannelConfigModel(DefaultProfileOid=doid, DefaultName="N")
+            )
         )
 
     def test_update_nickname_add(self):
@@ -204,9 +208,10 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
                 Config=ChannelConfigModel(DefaultProfileOid=doid))
         )
 
-        cnl = ChannelManager.find_one_casted(
-            {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-            parse_cls=ChannelModel)
+        cnl = ChannelManager.find_one_casted({
+            ChannelModel.Platform.key: Platform.LINE,
+            ChannelModel.Token.key: "U1234567"
+        })
         self.assertEqual(cnl.get_channel_name(uid), "N1")
 
     def test_update_nickname_delete(self):
@@ -242,9 +247,10 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
                 Config=ChannelConfigModel(DefaultProfileOid=doid, DefaultName="O"))
         )
 
-        cnl = ChannelManager.find_one_casted(
-            {ChannelModel.Platform.key: Platform.LINE, ChannelModel.Token.key: "U1234567"},
-            parse_cls=ChannelModel)
+        cnl = ChannelManager.find_one_casted({
+            ChannelModel.Platform.key: Platform.LINE,
+            ChannelModel.Token.key: "U1234567"
+        })
         self.assertEqual(cnl.get_channel_name(uid), "O")
 
     def test_update_nickname_not_exists(self):

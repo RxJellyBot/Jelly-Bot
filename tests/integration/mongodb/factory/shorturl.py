@@ -137,7 +137,7 @@ class TestShortUrlDataManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertTrue(ShortUrlDataManager.update_target(self.USER_OID, code, "https://facebook.com"))
         self.assertModelEqual(
-            ShortUrlDataManager.find_one_casted(parse_cls=ShortUrlRecordModel),
+            ShortUrlDataManager.find_one_casted(),
             ShortUrlRecordModel(Code=code, Target="https://facebook.com", CreatorOid=self.USER_OID)
         )
 
@@ -155,4 +155,4 @@ class TestShortUrlDataManager(TestModelMixin, TestDatabaseMixin):
         ShortUrlDataManager.insert_one_model(mdl)
 
         self.assertFalse(ShortUrlDataManager.update_target(self.USER_OID, code, "abc"))
-        self.assertEqual(ShortUrlDataManager.find_one_casted(parse_cls=ShortUrlRecordModel), mdl)
+        self.assertEqual(ShortUrlDataManager.find_one_casted(), mdl)

@@ -27,7 +27,7 @@ class DataRepairResult(FlagCodeEnum):
 class FieldCheckerBase(ABC):
     def __init__(self, col_inst):
         self._col_inst = col_inst
-        self._model_cls = col_inst.data_model
+        self._model_cls = col_inst.get_model_cls()
 
     def perform_check(self):
         """Method to be called to perform the check."""
@@ -192,9 +192,9 @@ class ModelFieldChecker:
                         else:
                             data[json_key] = default_val
                             changed = True
-                    except KeyError:
+                    except KeyError as ex:
                         raise ValueError(f"Default value rule not set "
-                                         f"for json key `{json_key}` in `{self._model_cls.__qualname__}`.")
+                                         f"for json key `{json_key}` in `{self._model_cls.__qualname__}`.") from ex
 
             return changed
 

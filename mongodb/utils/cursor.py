@@ -21,10 +21,6 @@ class ExtendedCursor(Generic[T]):
     def __len__(self):
         return self._count
 
-    def sort(self, key_or_list, direction=None):
-        self._cursor = self._cursor.sort(key_or_list, direction)
-        return self
-
     def limit(self, limit):
         if limit:
             self._cursor = self._cursor.limit(limit)

@@ -91,9 +91,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
-        self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model)
+        self.assertModelEqual(ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}), result.model)
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_register_new_missing_args(self):
@@ -128,13 +126,8 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertEqual(
             ProfileDataManager.count_documents({ChannelProfileModel.Name.key: str(Profile.DEFAULT_PROFILE_NAME)}), 1
         )
-        self.assertEqual(
-            ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1
-        )
-        self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model
-        )
+        self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
+        self.assertModelEqual(ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}), result.model)
 
     def test_register_new_name_conflict(self):
         ChannelManager.clear()
@@ -148,9 +141,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertIsNotNone(result.exception)
         self.assertIsInstance(result.exception, DuplicateKeyError)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
-        self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model)
+        self.assertModelEqual(ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}), result.model)
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_register_new_insuf_perm(self):
@@ -186,9 +177,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
         self.assertEqual(result.parse_arg_outcome, OperationOutcome.O_COMPLETED)
-        self.assertModelEqual(ProfileDataManager.find_one_casted(
-            {ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model)
+        self.assertModelEqual(ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}), result.model)
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_register_new_parsed_args_failed(self):
@@ -222,7 +211,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
-        self.assertModelEqual(ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel), result.model)
+        self.assertModelEqual(ProfileDataManager.find_one_casted(), result.model)
 
     def test_register_new_default_channel_not_found(self):
         ChannelManager.clear()
@@ -244,7 +233,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(result.success)
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
-        self.assertModelEqual(ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel), result.model)
+        self.assertModelEqual(ProfileDataManager.find_one_casted(), result.model)
 
     def test_register_new_model(self):
         ChannelManager.clear()
@@ -259,8 +248,9 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model)
+            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}),
+            result.model
+        )
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_register_new_model_user_not_found(self):
@@ -275,7 +265,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertIsNone(result.exception)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}),
             result.model
         )
         self.assertEqual(ProfileDataManager.count_documents({}), 2)
@@ -302,8 +292,9 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         self.assertIsInstance(result.exception, DuplicateKeyError)
         self.assertEqual(result.attach_outcome, OperationOutcome.O_COMPLETED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}, parse_cls=ChannelProfileModel),
-            result.model)
+            ProfileDataManager.find_one_casted({ChannelProfileModel.Name.key: "A"}),
+            result.model
+        )
         self.assertEqual(ProfileDataManager.count_documents({ChannelProfileModel.Name.key: "A"}), 1)
 
     def test_register_new_model_insuf_perm(self):
@@ -332,7 +323,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -346,7 +337,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_PARTIAL_ARGS_REMOVED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -360,7 +351,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_PARTIAL_ARGS_INVALID)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -377,7 +368,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_INSUFFICIENT_PERMISSION)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC")
         )
 
@@ -393,7 +384,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_UNEDITABLE)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC")
         )
 
@@ -407,7 +398,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -421,7 +412,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_ARGS_PARSE_FAILED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC")
         )
 
@@ -440,7 +431,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, UpdateOutcome.X_INSUFFICIENT_PERMISSION)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC")
         )
 
@@ -492,19 +483,17 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, OperationOutcome.O_COMPLETED)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                           ProfileOids=[mdl.id])
         )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                           ProfileOids=[mdl.id])
         )
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}, parse_cls=ChannelProfileModel), mdl
+            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}), mdl
         )
         self.assertIsNone(ProfileDataManager.find_one({OID_KEY: mdl2.id}))
 
@@ -527,22 +516,20 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
 
         self.assertEqual(result, OperationOutcome.X_INSUFFICIENT_PERMISSION)
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID}),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                           ProfileOids=[mdl.id, mdl2.id])
         )
         self.assertModelEqual(
-            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2},
-                                               parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted({ChannelProfileConnectionModel.UserOid.key: self.USER_OID_2}),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID_2,
                                           ProfileOids=[mdl2.id])
         )
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}, parse_cls=ChannelProfileModel), mdl
+            ProfileDataManager.find_one_casted({OID_KEY: mdl.id}), mdl
         )
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted({OID_KEY: mdl2.id}, parse_cls=ChannelProfileModel), mdl2
+            ProfileDataManager.find_one_casted({OID_KEY: mdl2.id}), mdl2
         )
 
     def test_delete_not_exists(self):
@@ -570,9 +557,8 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         ProfileManager.mark_unavailable_async(self.CHANNEL_OID, self.USER_OID).join()
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted(parse_cls=ChannelProfileConnectionModel),
-            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
-                                          ProfileOids=[])
+            UserProfileManager.find_one_casted(),
+            ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID, ProfileOids=[])
         )
 
     def test_mark_unavailable_async_miss(self):
@@ -591,7 +577,7 @@ class TestProfileManagerCRUD(TestModelMixin, TestDatabaseMixin):
         ProfileManager.mark_unavailable_async(self.CHANNEL_OID, self.USER_OID_2).join()
 
         self.assertModelEqual(
-            UserProfileManager.find_one_casted(parse_cls=ChannelProfileConnectionModel),
+            UserProfileManager.find_one_casted(),
             ChannelProfileConnectionModel(ChannelOid=self.CHANNEL_OID, UserOid=self.USER_OID,
                                           ProfileOids=[mdl.id, mdl2.id])
         )

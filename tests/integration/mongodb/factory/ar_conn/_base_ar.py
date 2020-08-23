@@ -135,7 +135,7 @@ class TestAutoReplyManagerBase(ABC):
             mdl_actual = AutoReplyModuleManager.find_one_casted({
                 AutoReplyModuleModel.KEY_KW_CONTENT: kw,
                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type
-            }, parse_cls=AutoReplyModuleModel)
+            })
 
             self.assertModelEqual(model, mdl_actual)
 
@@ -149,4 +149,4 @@ class TestAutoReplyManagerBase(ABC):
                 AutoReplyModuleManager.find_one_casted({
                     AutoReplyModuleModel.KEY_KW_CONTENT: kw,
                     AutoReplyModuleModel.KEY_KW_TYPE: kw_type
-                }, parse_cls=AutoReplyModuleModel))
+                }))

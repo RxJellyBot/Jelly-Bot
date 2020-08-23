@@ -82,20 +82,19 @@ class _ShortUrlDataManager(BaseCollection):
     def get_target(self, code: str) -> Optional[str]:
         ret = self.get_record(code)
 
-        if ret:
-            return ret.target
-        else:
+        if not ret:
             return None
+
+        return ret.target
 
     @arg_type_ensure
     def get_record(self, code: str) -> Optional[ShortUrlRecordModel]:
-        return self.find_one_casted({ShortUrlRecordModel.Code.key: code}, parse_cls=ShortUrlRecordModel)
+        return self.find_one_casted({ShortUrlRecordModel.Code.key: code})
 
     @arg_type_ensure
     def get_user_record(self, creator_oid: ObjectId) -> ExtendedCursor[ShortUrlRecordModel]:
-        filter_ = {ShortUrlRecordModel.CreatorOid.key: creator_oid}
-        crs = ExtendedCursor(self.find(filter_), self.count_documents(filter_), parse_cls=ShortUrlRecordModel)
-        return crs.sort([(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
+        return self.find_cursor_with_count({ShortUrlRecordModel.CreatorOid.key: creator_oid},
+                                           sort=[(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 
     @arg_type_ensure
     def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:

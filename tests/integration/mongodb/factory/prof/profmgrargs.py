@@ -130,7 +130,7 @@ class TestProfileManagerProcessArgs(TestModelMixin, TestDatabaseMixin):
             UpdateOutcome.O_UPDATED
         )
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -167,7 +167,7 @@ class TestProfileManagerProcessArgs(TestModelMixin, TestDatabaseMixin):
             ProfileManager.update_profile(self.CHANNEL_OID, self.USER_OID, mdl.id, args_parse_result),
             UpdateOutcome.O_UPDATED)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="B")
         )
 
@@ -192,6 +192,6 @@ class TestProfileManagerProcessArgs(TestModelMixin, TestDatabaseMixin):
         self.assertTrue(
             ProfileManager.update_profile(self.CHANNEL_OID, self.USER_OID, mdl.id, args_parse_result).is_success)
         self.assertModelEqual(
-            ProfileDataManager.find_one_casted(parse_cls=ChannelProfileModel),
+            ProfileDataManager.find_one_casted(),
             ChannelProfileModel(ChannelOid=self.CHANNEL_OID, Name="ABC", PermissionLevel=PermissionLevel.ADMIN)
         )

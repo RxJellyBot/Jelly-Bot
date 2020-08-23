@@ -63,7 +63,7 @@ class _ExtraContentManager(BaseCollection):
 
     @arg_type_ensure
     def get_content(self, content_id: ObjectId) -> Optional[ExtraContentModel]:
-        return self.find_one_casted({OID_KEY: content_id}, parse_cls=ExtraContentModel)
+        return self.find_one_casted({OID_KEY: content_id})
 
 
 ExtraContentManager = _ExtraContentManager()

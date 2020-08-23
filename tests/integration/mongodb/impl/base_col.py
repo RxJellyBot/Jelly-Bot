@@ -1,6 +1,5 @@
 import os
 
-from django.test import TestCase
 from pymongo.errors import DuplicateKeyError
 
 from tests.base import TestDatabaseMixin
@@ -10,6 +9,7 @@ from models.field import IntegerField, BooleanField, ArrayField, ModelDefaultVal
 from models.field.exceptions import FieldCastingFailedError, FieldValueInvalidError, FieldTypeMismatchError
 from mongodb.factory import get_single_db_name, is_test_db, BaseCollection
 from mongodb.factory.results import WriteOutcome
+from tests.base import TestCase
 
 __all__ = ["TestDbControl", "TestBaseCollection"]
 
@@ -19,18 +19,18 @@ class TestDbControl(TestCase):
     ORG_TEST = None
 
     @classmethod
-    def setUpClass(cls):
+    def setUpTestClass(cls):
         cls.ORG_MONGO_DB = os.environ.get("MONGO_DB")
         cls.ORG_TEST = os.environ.get("TEST")
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownTestClass(cls):
         if cls.ORG_MONGO_DB:
             os.environ["MONGO_DB"] = cls.ORG_MONGO_DB
         if cls.ORG_TEST:
             os.environ["TEST"] = cls.ORG_TEST
 
-    def tearDown(self) -> None:
+    def setUpTestCase(self) -> None:
         if "MONGO_DB" in os.environ:
             del os.environ["MONGO_DB"]
         if "TEST" in os.environ:
@@ -47,7 +47,7 @@ class TestDbControl(TestCase):
     def test_single_db_name_test(self):
         os.environ["TEST"] = "1"
 
-        self.assertTrue(get_single_db_name().startswith("Test-"))
+        self.assertTrue(get_single_db_name().startswith("Test-"), get_single_db_name())
 
     def test_single_db_name_comb(self):
         os.environ["MONGO_DB"] = "singledb"
@@ -90,7 +90,7 @@ class TestBaseCollection(TestDatabaseMixin):
     def obj_to_clear():
         return [col]
 
-    def test_col_missing_names_mdl_cls(self):
+    def test_col_missing_props(self):
         with self.assertRaises(AttributeError):
             TestBaseCollection.CollectionTestNoColName()
         with self.assertRaises(AttributeError):

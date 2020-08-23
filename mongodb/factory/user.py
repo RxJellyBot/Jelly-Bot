@@ -65,10 +65,10 @@ class _APIUserManager(GenerateTokenMixin, BaseCollection):
         return self.get_user_data_google_id(id_data.uid)
 
     def get_user_data_token(self, token: str) -> Optional[APIUserModel]:
-        return self.find_one_casted({APIUserModel.Token.key: token}, parse_cls=APIUserModel)
+        return self.find_one_casted({APIUserModel.Token.key: token})
 
     def get_user_data_google_id(self, goo_uid: str) -> Optional[APIUserModel]:
-        return self.find_one_casted({APIUserModel.GoogleUid.key: goo_uid}, parse_cls=APIUserModel)
+        return self.find_one_casted({APIUserModel.GoogleUid.key: goo_uid})
 
 
 class _OnPlatformIdentityManager(BaseCollection):
@@ -94,13 +94,13 @@ class _OnPlatformIdentityManager(BaseCollection):
 
     @arg_type_ensure
     def get_onplat(self, platform: Platform, user_token: str) -> Optional[OnPlatformUserModel]:
-        return self.find_one_casted(
-            {OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token},
-            parse_cls=OnPlatformUserModel)
+        return self.find_one_casted({
+            OnPlatformUserModel.Platform.key: platform, OnPlatformUserModel.Token.key: user_token
+        })
 
     @arg_type_ensure
     def get_onplat_by_oid(self, oid: ObjectId) -> Optional[OnPlatformUserModel]:
-        return self.find_one_casted({OnPlatformUserModel.Id.key: oid}, parse_cls=OnPlatformUserModel)
+        return self.find_one_casted({OnPlatformUserModel.Id.key: oid})
 
 
 class _RootUserManager(BaseCollection):
@@ -179,7 +179,7 @@ class _RootUserManager(BaseCollection):
 
     @arg_type_ensure
     def get_root_data_oid(self, root_oid: ObjectId) -> Optional[RootUserModel]:
-        return self.find_one_casted({OID_KEY: root_oid}, parse_cls=RootUserModel)
+        return self.find_one_casted({OID_KEY: root_oid})
 
     @arg_type_ensure
     def get_root_data_uname(
@@ -230,7 +230,7 @@ class _RootUserManager(BaseCollection):
         :param on_not_found: user name to be used if not found
         :return: a `namedtuple` containing the user oid and the user name
         """
-        udata = self.find_one_casted({RootUserModel.Id.key: root_oid}, parse_cls=RootUserModel)
+        udata = self.find_one_casted({RootUserModel.Id.key: root_oid})
 
         # Define a `namedtuple` as return type
         UserNameEntry = namedtuple("UserNameEntry", ["user_id", "user_name"])
@@ -367,17 +367,19 @@ class _RootUserManager(BaseCollection):
     @staticmethod
     def get_onplat_data_dict() -> Dict[ObjectId, OnPlatformUserModel]:
         ret = {}
-        for d in OnPlatformIdentityManager.find_cursor_with_count({}, parse_cls=OnPlatformUserModel):
-            ret[d.id] = d
+        for onplat_data in OnPlatformIdentityManager.find_cursor_with_count():
+            ret[onplat_data.id] = onplat_data
 
         return ret
 
     def get_onplat_to_root_dict(self) -> Dict[ObjectId, ObjectId]:
         ret = {}
-        for d in self.find_cursor_with_count({}, parse_cls=RootUserModel):
-            if d.has_onplat_data:
-                for onplat_oid in d.on_plat_oids:
-                    ret[onplat_oid] = d.id
+        for root_data in self.find_cursor_with_count():
+            if not root_data.has_onplat_data:
+                continue
+
+            for onplat_oid in root_data.on_plat_oids:
+                ret[onplat_oid] = root_data.id
 
         return ret
 
@@ -388,18 +390,18 @@ class _RootUserManager(BaseCollection):
         if root_oids:
             filter_[OID_KEY] = {"$in": root_oids}
 
-        for d in self.find_cursor_with_count(filter_, parse_cls=RootUserModel):
-            ret[d.id] = d.on_plat_oids
+        for root_data in self.find_cursor_with_count(filter_):
+            ret[root_data.id] = root_data.on_plat_oids
 
         return ret
 
     @arg_type_ensure
     def get_root_data_api_oid(self, api_oid: ObjectId) -> Optional[RootUserModel]:
-        return self.find_one_casted({RootUserModel.ApiOid.key: api_oid}, parse_cls=RootUserModel)
+        return self.find_one_casted({RootUserModel.ApiOid.key: api_oid})
 
     @arg_type_ensure
     def get_root_data_onplat_oid(self, onplat_oid: ObjectId) -> Optional[RootUserModel]:
-        return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid}, parse_cls=RootUserModel)
+        return self.find_one_casted({RootUserModel.OnPlatOids.key: onplat_oid})
 
     @arg_type_ensure
     def get_tzinfo_root_oid(self, root_oid: ObjectId) -> tzinfo:

@@ -27,7 +27,7 @@ class TestAutoReplyManagerAdd(TestAutoReplyManagerBase.TestClass, TestModelMixin
 
         self.assertModelEqual(
             model,
-            AutoReplyModuleManager.find_one_casted(filter_, parse_cls=AutoReplyModuleModel))
+            AutoReplyModuleManager.find_one_casted(filter_))
 
     def _check_model_not_exists(self, model_args: dict):
         kw = model_args["Keyword"].content
@@ -37,7 +37,7 @@ class TestAutoReplyManagerAdd(TestAutoReplyManagerBase.TestClass, TestModelMixin
             AutoReplyModuleManager.find_one_casted({
                 AutoReplyModuleModel.KEY_KW_CONTENT: kw,
                 AutoReplyModuleModel.KEY_KW_TYPE: kw_type
-            }, parse_cls=AutoReplyModuleModel))
+            }))
 
     def test_add_single_not_pinned(self):
         result = AutoReplyManager.add_conn(**self.get_mdl_1_args())

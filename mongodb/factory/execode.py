@@ -85,7 +85,7 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
         if action:
             cond[ExecodeEntryModel.ActionType.key] = action
 
-        ret: ExecodeEntryModel = self.find_one_casted(cond, parse_cls=ExecodeEntryModel)
+        ret: ExecodeEntryModel = self.find_one_casted(cond)
 
         if ret:
             return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, model=ret)

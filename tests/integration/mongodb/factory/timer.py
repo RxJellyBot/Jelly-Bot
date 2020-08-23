@@ -142,7 +142,7 @@ class TestTimerManager(TestModelMixin, TestTimeComparisonMixin):
         )
         self.assertEqual(outcome, WriteOutcome.O_INSERTED)
 
-        oid = TimerManager.find_one_casted(parse_cls=TimerModel).id
+        oid = TimerManager.find_one_casted().id
         TimerManager.del_timer(oid)
 
     def test_del_timer_missed(self):
