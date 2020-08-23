@@ -83,9 +83,6 @@ def get_msg_stats_data_package(
                    executor.submit(_channel_user_msg, channel_data, available_only,
                                    hours_within=hours_within, start=start, end=end)]
 
-        # Non-lock call & Free resources when execution is done
-        executor.shutdown(False)
-
         for completed in futures:
             key, result = completed.result()
 

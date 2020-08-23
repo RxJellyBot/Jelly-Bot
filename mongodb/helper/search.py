@@ -69,9 +69,6 @@ class IdentitySearcher:
             for uid in user_oids:
                 futures.append(executor.submit(RootUserManager.get_root_data_uname, uid, channel_data, on_not_found))
 
-            # Non-lock call & Free resources when execution is done
-            executor.shutdown(False)
-
             for completed in futures:
                 result = completed.result()
                 ret[result.user_id] = result.user_name

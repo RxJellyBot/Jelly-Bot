@@ -29,9 +29,6 @@ def _perform_existence_check(set_name_to_cache: bool):
                 for d in list_prof_conn
             ]
 
-            # Non-lock call & Free resources when execution is done
-            executor.shutdown(False)
-
             for completed in futures:
                 ret = completed.result()
                 if ret:

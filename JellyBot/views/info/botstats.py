@@ -40,9 +40,6 @@ def get_bot_stats_data_package(channel_data, hours_within, tzinfo):
                    executor.submit(_total_usage, channel_data.id, hours_within),
                    executor.submit(_member_usage, channel_data, hours_within)]
 
-        # Non-lock call & Free resources when execution is done
-        executor.shutdown(False)
-
         for completed in futures:
             key, result = completed.result()
 
