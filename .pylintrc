@@ -11,6 +11,8 @@ load-plugins=pylint_django
 #   often used in for loops
 # - f
 #   often used as a file stream name
+# - v
+#   often used to represent "value"
 # - ex
 #   often used as the var name of exception caught by try..except
 # - fn
@@ -19,8 +21,12 @@ load-plugins=pylint_django
 #   often used as dummy variable during unpacking
 # - dt, tz
 #   often used in datetime handling (dt for datetime, tz for timezone)
+# - fk, jk
+#   often used to represent MongoDB field key and json key
+# - fi
+#   often used as field instance for MongoDB
 
-good-names=f,i,j,k,ex,fn,_,dt,tz
+good-names=f,i,j,k,v,ex,fn,dt,tz,fk,jk,fi,_
 
 include-naming-hint=yes
 

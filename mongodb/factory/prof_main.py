@@ -18,7 +18,7 @@ from extutils.checker import arg_type_ensure
 from extutils.emailutils import MailSender
 from flags import ProfilePermission, ProfilePermissionDefault, PermissionLevel
 from mixin import ClearableMixin
-from models import ChannelProfileListEntry, ChannelProfileModel, ChannelProfileConnectionModel
+from models import ChannelProfileListEntry, ChannelProfileModel, ChannelProfileConnectionModel, ChannelModel
 from models.exceptions import ModelConstructionError, RequiredKeyNotFilledError, InvalidModelFieldError
 from mongodb.factory import ChannelManager
 from mongodb.factory.results import (
@@ -34,30 +34,32 @@ __all__ = ("ProfileManager",)
 
 
 class _ProfileManager(ClearableMixin):
+    # pylint: disable=too-many-public-methods
+
     @staticmethod
-    def _create_kwargs_channel_oid(ret_kwargs, profile_fkwargs):
+    def _create_kwargs_channel_oid(ret_kwargs, profile_fkwargs) -> Optional[ArgumentParseResult]:
         fk_coid = ChannelProfileModel.json_key_to_field(ChannelProfileModel.ChannelOid.key)
         if fk_coid not in profile_fkwargs:
             return ArgumentParseResult(OperationOutcome.X_MISSING_CHANNEL_OID)
 
         try:
             coid = ObjectId(profile_fkwargs[fk_coid])
-        except Exception as e:
-            return ArgumentParseResult(OperationOutcome.X_INVALID_CHANNEL_OID, e)
+        except Exception as ex:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_CHANNEL_OID, ex)
 
         ret_kwargs[fk_coid] = coid
         return None
 
     @staticmethod
-    def _create_kwargs_perm_lv(ret_kwargs, profile_fkwargs):
+    def _create_kwargs_perm_lv(ret_kwargs, profile_fkwargs) -> Optional[ArgumentParseResult]:
         fk_perm_lv = ChannelProfileModel.json_key_to_field(ChannelProfileModel.PermissionLevel.key)
         if fk_perm_lv not in profile_fkwargs:
             return None
 
         try:
             perm_lv = PermissionLevel.cast(profile_fkwargs[fk_perm_lv])
-        except (TypeError, ValueError) as e:
-            return ArgumentParseResult(OperationOutcome.X_INVALID_PERM_LV, e)
+        except (TypeError, ValueError) as ex:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_PERM_LV, ex)
 
         ret_kwargs[fk_perm_lv] = perm_lv
         return None
@@ -70,7 +72,7 @@ class _ProfileManager(ClearableMixin):
         keys_to_remove = set()
 
         # Fill turned-on permissions
-        for fk, v in profile_fkwargs.items():
+        for fk in profile_fkwargs:
             if fk.startswith(fk_perm_initial):
                 perm_dict[fk[len(fk_perm_initial):]] = True
                 keys_to_remove.add(fk)
@@ -94,8 +96,6 @@ class _ProfileManager(ClearableMixin):
         if perm_dict:
             ret_kwargs[fk_perm] = perm_dict
 
-        return None
-
     @staticmethod
     def _create_kwargs_color(ret_kwargs, profile_fkwargs):
         fk_color = ChannelProfileModel.json_key_to_field(ChannelProfileModel.Color.key)
@@ -104,8 +104,8 @@ class _ProfileManager(ClearableMixin):
 
         try:
             color = ColorFactory.from_hex(profile_fkwargs[fk_color])
-        except ValueError as e:
-            return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, e)
+        except ValueError as ex:
+            return ArgumentParseResult(OperationOutcome.X_INVALID_COLOR, ex)
 
         ret_kwargs[fk_color] = color
         return None
@@ -262,10 +262,11 @@ class _ProfileManager(ClearableMixin):
         if not permissions:
             return False
 
-        if not target_oid or user_oid != target_oid:
-            return ProfilePermission.PRF_CONTROL_MEMBER in permissions
-        else:
+        # Controlling self
+        if target_oid and user_oid == target_oid:
             return ProfilePermission.PRF_CONTROL_SELF in permissions
+
+        return ProfilePermission.PRF_CONTROL_MEMBER in permissions
 
     def create_default_profile(self, channel_oid: ObjectId, *,
                                set_to_channel: bool = True, check_channel: bool = True) \
@@ -325,6 +326,13 @@ class _ProfileManager(ClearableMixin):
 
     @arg_type_ensure
     def register_new_default(self, channel_oid: ObjectId, root_uid: ObjectId) -> RegisterProfileResult:
+        """
+        Register a user with the default profile of that channel.
+
+        :param channel_oid: channel of the user
+        :param root_uid: OID of the user
+        :return: result of the profile registration
+        """
         attach_outcome = OperationOutcome.X_NOT_EXECUTED
         prof_result = self._prof.get_default_profile(channel_oid)
 
@@ -334,6 +342,14 @@ class _ProfileManager(ClearableMixin):
         return RegisterProfileResult(prof_result.outcome, prof_result.exception, prof_result.model, attach_outcome)
 
     def register_new_default_async(self, channel_oid: ObjectId, root_uid: ObjectId):
+        """
+        Same functionality as ``register_new_default`` but execute the method asynchronously.
+
+        The method will be executed synchronously if ``TEST`` in environment variable is true.
+
+        :param channel_oid: channel of the user
+        :param root_uid: OID of the user
+        """
         if is_testing():
             # No async if testing
             self.register_new_default(channel_oid, root_uid)
@@ -483,6 +499,18 @@ class _ProfileManager(ClearableMixin):
     def detach_profile_name(self, channel_oid: ObjectId, profile_name: str, user_oid: ObjectId,
                             target_oid: Optional[ObjectId] = None) \
             -> OperationOutcome:
+        """
+        Detach the profile which name is ``profile_name`` from ``target_oid`` in ``channel_oid`` as ``user_oid``.
+
+        If ``target_oid`` is ``None``, the method will consider that the executor wants to detach the profile from
+        themselves.
+
+        :param channel_oid: channel of the profile to be detached
+        :param profile_name: name of the profile to be detached
+        :param user_oid: OID of the action executor
+        :param target_oid: target to be detached the profile
+        :return: outcome of the profile detachment
+        """
         prof = self.get_profile_name(channel_oid, profile_name)
         if not prof:
             return OperationOutcome.X_PROFILE_NOT_FOUND_NAME
@@ -527,16 +555,25 @@ class _ProfileManager(ClearableMixin):
         # --- Detach profile
 
         detach_outcome = self._conn.detach_profile(profile_oid, target_oid)
-        if detach_outcome.is_success:
-            return OperationOutcome.O_COMPLETED
-        else:
+        if not detach_outcome.is_success:
             return OperationOutcome.X_DETACH_FAILED
 
-    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId) -> Thread:
-        t = Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid))
-        t.start()
+        return OperationOutcome.O_COMPLETED
 
-        return t
+    def mark_unavailable_async(self, channel_oid: ObjectId, root_oid: ObjectId) -> Thread:
+        """
+        Mark the user ``root_oid`` in the channel ``channel_oid`` unavailable asynchronously.
+
+        This method returns the :class:`Thread` of marking the user unavailable which is started already.
+
+        :param channel_oid: channel of the user to be marked
+        :param root_oid: user to be marked unavailable
+        :return: started thread which marks the user unavailable
+        """
+        thread = Thread(target=self._conn.mark_unavailable, args=(channel_oid, root_oid))
+        thread.start()
+
+        return thread
 
     # endregion
 
@@ -576,16 +613,67 @@ class _ProfileManager(ClearableMixin):
         """
         conn = self._conn.get_user_profile_conn(channel_oid, root_uid)
 
-        if conn:
-            ret = []
-            for poid in conn.profile_oids:
-                prof = self._prof.get_profile(poid)
-                if prof:
-                    ret.append(prof)
-
-            return ret
-        else:
+        if not conn:
             return []
+
+        ret = []
+        for poid in conn.profile_oids:
+            prof = self._prof.get_profile(poid)
+            if prof:
+                ret.append(prof)
+
+        return ret
+
+    def _get_user_channel_profiles_prep_data(self, user_oid: ObjectId, inside_only: bool):
+        channel_oid_list = []
+        profile_oid_list = []
+        prof_conns = []
+        for prof_conn in self._conn.get_user_channel_prof_conns(user_oid, inside_only=inside_only):
+            channel_oid_list.append(prof_conn.channel_oid)
+            profile_oid_list.extend(prof_conn.profile_oids)
+            prof_conns.append(prof_conn)
+
+        channel_dict = ChannelManager.get_channel_dict(channel_oid_list, accessbible_only=False)
+        profile_dict = self._prof.get_profile_dict(profile_oid_list)
+
+        return channel_dict, profile_dict, prof_conns
+
+    @classmethod
+    def _get_user_channel_profiles_get_channel_model(cls, prof_conn: ChannelProfileConnectionModel,
+                                                     channel_dict: Dict[ObjectId, ChannelModel],
+                                                     not_found_dict: Dict[ObjectId, Union[ObjectId, List[ObjectId]]],
+                                                     accessbible_only: bool):
+        cnl_oid = prof_conn.channel_oid
+        cnl = channel_dict.get(cnl_oid)
+
+        if not cnl:
+            not_found_dict[prof_conn.id] = cnl_oid
+            return None
+
+        if accessbible_only and not cnl.bot_accessible:
+            return None
+
+        return cnl
+
+    @classmethod
+    def _get_user_channel_profiles_get_profile_models(cls, prof_conn: ChannelProfileConnectionModel,
+                                                      profile_dict: Dict[ObjectId, ChannelProfileModel],
+                                                      not_found_dict: Dict[ObjectId, Union[ObjectId, List[ObjectId]]]):
+        profs = []
+        not_found_prof_oids = []
+
+        for prof_oid in prof_conn.profile_oids:
+            prof_mdl = profile_dict.get(prof_oid)
+            if prof_mdl:
+                profs.append(prof_mdl)
+            else:
+                not_found_prof_oids.append(prof_oid)
+
+        if not_found_prof_oids:
+            # There's some profile not found in the database while ID is registered
+            not_found_dict[prof_conn.id] = not_found_prof_oids
+
+        return profs
 
     def get_user_channel_profiles(self, user_oid: ObjectId, *,
                                   inside_only: bool = True, accessbible_only: bool = True) \
@@ -613,53 +701,25 @@ class _ProfileManager(ClearableMixin):
 
         not_found: Dict[ObjectId, Union[ObjectId, List[ObjectId]]] = {}
 
-        channel_oid_list = []
-        profile_oid_list = []
-        prof_conns = []
-        for d in self._conn.get_user_channel_profiles(user_oid, inside_only=inside_only):
-            channel_oid_list.append(d.channel_oid)
-            profile_oid_list.extend(d.profile_oids)
-            prof_conns.append(d)
-
-        channel_dict = ChannelManager.get_channel_dict(channel_oid_list, accessbible_only=False)
-        profile_dict = self._prof.get_profile_dict(profile_oid_list)
+        channel_dict, profile_dict, prof_conns = self._get_user_channel_profiles_prep_data(user_oid, inside_only)
 
         for prof_conn in prof_conns:
-            not_found_prof_oids = []
-
             # Get Channel Model
-            cnl_oid = prof_conn.channel_oid
-            cnl = channel_dict.get(cnl_oid)
-
-            if cnl is None:
-                not_found[prof_conn.id] = cnl_oid
-                continue
-            elif accessbible_only and not cnl.bot_accessible:
+            cnl = self._get_user_channel_profiles_get_channel_model(prof_conn, channel_dict,
+                                                                    not_found, accessbible_only)
+            if not cnl:
                 continue
 
             default_profile_oid = cnl.config.default_profile_oid
 
             # Get Profile Model
-            prof = []
-            for p in prof_conn.profile_oids:
-                pm = profile_dict.get(p)
-                if pm:
-                    prof.append(pm)
-                else:
-                    not_found_prof_oids.append(p)
-
-            if not_found_prof_oids:
-                # There's some profile not found in the database while ID is registered
-                not_found[prof_conn.id] = not_found_prof_oids
-
-            perms = self.get_permissions(prof)
-            can_ced_profile = self.can_ced_profile(perms)
+            profs = self._get_user_channel_profiles_get_profile_models(prof_conn, profile_dict, not_found)
 
             ret.append(
                 ChannelProfileListEntry(
-                    channel_data=cnl, channel_name=cnl.get_channel_name(user_oid), profiles=prof,
+                    channel_data=cnl, channel_name=cnl.get_channel_name(user_oid), profiles=profs,
                     starred=prof_conn.starred, default_profile_oid=default_profile_oid,
-                    can_ced_profile=can_ced_profile
+                    can_ced_profile=self.can_ced_profile(self.get_permissions(profs))
                 ))
 
         if not_found:
@@ -685,9 +745,24 @@ class _ProfileManager(ClearableMixin):
         return self._prof.get_channel_profiles(channel_oid, prof_name)
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
+        """
+        Get the profile of OID ``profile_oid``
+
+        :param profile_oid: OID of the profile to get
+        :return: `ChannelProfileModel` if found, `None` otherwise
+        """
         return self._prof.get_profile(profile_oid)
 
     def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
+        """
+        Get a profile in ``channel_oid`` which name is exactly ``name``.
+
+        ``name`` will be stripped before the query.
+
+        :param channel_oid: channel of the profile
+        :param name: exact name of the profile to get
+        :return: `ChannelProfileModel` if found, `None` otherwise
+        """
         return self._prof.get_profile_name(channel_oid, name)
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> Set[ObjectId]:
@@ -740,10 +815,24 @@ class _ProfileManager(ClearableMixin):
 
     @staticmethod
     def get_highest_permission_level(profiles: Iterable[ChannelProfileModel]) -> PermissionLevel:
+        """
+        Get the highest permission level of ``profiles``.
+
+        This method only check the permission level of the profiles. It ignores the permission field.
+
+        :param profiles: profiles to get the highest permission level
+        :return: highest permission level among the profiles
+        """
         return max({prof.permission_level for prof in profiles}, default=PermissionLevel.lowest())
 
     @classmethod
     def get_permissions(cls, profiles: List[ChannelProfileModel]) -> Set[ProfilePermission]:
+        """
+        Get a set of allowed permissions in ``profiles``.
+
+        :param profiles: profiles to get the allowed permissions
+        :return: a set of allowed permissions
+        """
         ret = set()
 
         for prof in profiles:
@@ -758,17 +847,50 @@ class _ProfileManager(ClearableMixin):
         return ret
 
     def get_user_permissions(self, channel_oid: ObjectId, root_uid: ObjectId) -> Set[ProfilePermission]:
+        """
+        Get the permissions of the user ``root_uid`` in channel ``channel_oid``.
+
+        :param channel_oid: channel of the user to get the permissions
+        :param root_uid: user to get the permissions
+        :return: a set of permissions that the user has
+        """
         return self.get_permissions(self.get_user_profiles(channel_oid, root_uid))
 
     def get_channel_prof_conn(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
             -> List[ChannelProfileConnectionModel]:
+        """
+        Get all profile connections in the selected channel(s).
+
+        ``channel_oid`` can be either a single :class:`ObjectId` or a :class:`list` of :class:`ObjectId`.
+
+        :param channel_oid: channel to get the profile connections
+        :param available_only: if to only get the connections attached to the available user
+        :return: list of `ChannelProfileConnectionModel`
+        """
         return self._conn.get_channel_prof_conn(channel_oid, available_only=available_only)
 
     def get_channel_member_oids(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=False) \
             -> Set[ObjectId]:
+        """
+        Get a set of user OIDs that are the member of ``channel_oid``.
+
+        ``channel_oid`` can be either a single channel (one OID) or a list of channels (list of OIDs).
+
+        If ``channel_oid`` is a list, then each returned UID means that they are a member of one of the channels in
+        ``channel_oid``.
+
+        :param channel_oid: channel(s) to check the member
+        :param available_only: if to only return the available members
+        :return: set of user OIDs that are the member of the given channel(s)
+        """
         return {mdl.user_oid for mdl in self.get_channel_prof_conn(channel_oid, available_only=available_only)}
 
     def get_available_connections(self) -> ExtendedCursor[ChannelProfileConnectionModel]:
+        """
+        Get the cursor which yields only the connections to the available users.
+
+        :return: cursor of the connections to the available users
+        """
         return self._conn.get_available_connections()
 
     # endregion
@@ -789,6 +911,12 @@ class _ProfileManager(ClearableMixin):
         return self._conn.get_users_exist_channel_dict(user_oids)
 
     def get_user_permission_lv_dict(self, channel_oid: ObjectId) -> Dict[ObjectId, PermissionLevel]:
+        """
+        Get a ``dict`` which key is the user OID and value is their highest permission level.
+
+        :param channel_oid: OID of the channel to check the highest permission level of the members
+        :return: a `dict` containing the user OIDs pointing to their highest permission level
+        """
         user_prof_dict = self._conn.get_user_profile_dict(channel_oid)
         prof_oids = set()
         for prof_oids_user in user_prof_dict.values():
@@ -805,9 +933,7 @@ class _ProfileManager(ClearableMixin):
 
     def get_profiles_user_oids(self, profile_oid: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """
-        Get a ``dict`` which
-            key is the profile OID provided in ``profile_oid``
-            value is the set of user OIDs who have the corresonding profile
+        Get a :class:`dict` where key is the profile OID and the value is a set of user OIDs who have th profile.
 
         :param profile_oid: OID of the profile to be processed
         :return: a `dict` containing who have the corresopnding profile
@@ -819,19 +945,45 @@ class _ProfileManager(ClearableMixin):
     # region Check info from profiles/permissions
 
     def is_name_available(self, channel_oid: ObjectId, name: str):
+        """
+        Check if the profile name ``name`` is available in the channel ``channel_oid``.
+
+        ``name`` will be stipped before the check.
+
+        :param channel_oid: channel for the profile to check the availablility
+        :param name: name of the profile to be checked
+        :return: if the profile name is available
+        """
         return self._prof.is_name_available(channel_oid, name)
 
     @staticmethod
-    def can_ced_profile(permissions: Set[ProfilePermission]):
-        """CED Stands for Create / Edit / Delete."""
+    def can_ced_profile(permissions: Set[ProfilePermission]) -> bool:
+        """
+        Check if the user can Control/Edit/Delete the profile by checking the given ``permissions``.
+
+        :param permissions: permissions to be checked
+        :return: if `ProfilePermission.PRF_CED` is in `permissions`
+        """
         return ProfilePermission.PRF_CED in permissions
 
     @staticmethod
     def can_control_profile_member(permissions: Set[ProfilePermission]):
+        """
+        Check if the user can control profiles on channel members by checking the given ``permissions``.
+
+        :param permissions: permissions to be checked
+        :return: if `ProfilePermission.PRF_CONTROL_MEMBER` is in `permissions`
+        """
         return ProfilePermission.PRF_CONTROL_MEMBER in permissions
 
     @staticmethod
     def can_control_profile_self(permissions: Set[ProfilePermission]):
+        """
+        Check if the user can control profiles on themselves by checking the given ``permissions``.
+
+        :param permissions: permissions to be checked
+        :return: if `ProfilePermission.PRF_CONTROL_SELF` is in `permissions`
+        """
         return ProfilePermission.PRF_CONTROL_SELF in permissions
 
     # endregion

@@ -107,7 +107,7 @@ class TestProfileDataManager(TestModelMixin, TestDatabaseMixin):
             {mdls[0].id: mdls[0]}
         )
 
-    def test_get_profile_dict_no_channel(self):
+    def test_get_profile_dict_no_profile(self):
         self.assertEqual(ProfileDataManager.get_profile_dict([ObjectId(), ObjectId()]), {})
 
     def test_get_profile_dict_empty_param(self):

@@ -121,8 +121,15 @@ class _UserProfileManager(BaseCollection):
              ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
             parse_cls=ChannelProfileConnectionModel)
 
-    def get_user_channel_profiles(self, root_uid: ObjectId, *, inside_only: bool = True) \
+    def get_user_channel_prof_conns(self, root_uid: ObjectId, *, inside_only: bool = True) \
             -> List[ChannelProfileConnectionModel]:
+        """
+        Get the list of the profile connections of a user sorted by the star mark (ASC) and the connection ID (ASC).
+
+        :param root_uid: user to get the profile connections
+        :param inside_only: if to only get the connection where the user is inside
+        :return: list of `ChannelProfileConnectionModel`
+        """
         filter_ = {ChannelProfileConnectionModel.UserOid.key: root_uid}
 
         if inside_only:
@@ -140,6 +147,15 @@ class _UserProfileManager(BaseCollection):
 
     def get_channel_prof_conn(self, channel_oid: Union[ObjectId, List[ObjectId]], *, available_only=True) \
             -> List[ChannelProfileConnectionModel]:
+        """
+        Get all profile connections in the selected channel(s).
+
+        ``channel_oid`` can be either a single :class:`ObjectId` or a :class:`list` of :class:`ObjectId`.
+
+        :param channel_oid: channel to get the profile connections
+        :param available_only: if to only get the connections attached to the available user
+        :return: list of `ChannelProfileConnectionModel`
+        """
         if isinstance(channel_oid, ObjectId):
             channel_oid = [channel_oid]
 
@@ -182,18 +198,30 @@ class _UserProfileManager(BaseCollection):
             }}
         ]
 
-        for d in self.aggregate(pipeline):
-            ret[d[OID_KEY]] = {oid for oid in d[k] if oid is not None}
+        for entry in self.aggregate(pipeline):
+            ret[entry[OID_KEY]] = {oid for oid in entry[k] if oid is not None}
 
         return ret
 
     def get_available_connections(self) -> ExtendedCursor[ChannelProfileConnectionModel]:
+        """
+        Get the cursor which yields only the connections to the available users.
+
+        :return: cursor of the connections to the available users
+        """
         return self.find_cursor_with_count(
             {ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}},
             parse_cls=ChannelProfileConnectionModel)
 
     def get_profile_user_oids(self, profile_oid: ObjectId) -> Set[ObjectId]:
-        # Using native MongoDB method to increase the performance
+        """
+        Get a set of user OIDs who have the profile ``profile_oid``.
+
+        This method only uses native ``pymongo`` methods to increase the performance.
+
+        :param profile_oid: OID of the profile to check the ownership
+        :return: set of user OIDs who have the profile
+        """
         return {mdl[ChannelProfileConnectionModel.UserOid.key]
                 for mdl in self.find({ChannelProfileConnectionModel.ProfileOids.key: profile_oid})}
 
@@ -236,26 +264,40 @@ class _UserProfileManager(BaseCollection):
         :param channel_oid: channel to get the `dict`
         :return: a dict containing the channel member OIDs as the key and their profile OIDs as the value
         """
-        uk = ChannelProfileConnectionModel.UserOid.key
-        pk = ChannelProfileConnectionModel.ProfileOids.key
+        key_uid = ChannelProfileConnectionModel.UserOid.key
+        key_prof = ChannelProfileConnectionModel.ProfileOids.key
 
-        crs = self.find({ChannelProfileConnectionModel.ChannelOid.key: channel_oid}, projection={uk: 1, pk: 1})
+        crs = self.find({ChannelProfileConnectionModel.ChannelOid.key: channel_oid},
+                        projection={key_uid: 1, key_prof: 1})
 
         ret = {}
 
         for entry in crs:
-            ret[entry[uk]] = set(entry[pk])
+            ret[entry[key_uid]] = set(entry[key_prof])
 
         return ret
 
     @arg_type_ensure
     def is_user_in_channel(self, channel_oid: ObjectId, root_oid: ObjectId) -> bool:
+        """
+        Check if the user ``root_oid`` is in the channel ``channel_oid``.
+
+        :param channel_oid: channel to check if the user is inside
+        :param root_oid: OID of the user to be checked
+        :return: if the user is inside the given channel
+        """
         return self.count_documents(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
              ChannelProfileConnectionModel.UserOid.key: root_oid,
              ChannelProfileConnectionModel.ProfileOids.key + ".0": {"$exists": True}}) > 0
 
     def mark_unavailable(self, channel_oid: ObjectId, root_oid: ObjectId):
+        """
+        Mark the user ``root_oid`` in ``channel_oid`` as unavailable by removing all profiles connected to them.
+
+        :param channel_oid: OID of the channel to remove the connection
+        :param root_oid: OID of the user to be removed the profiles connected to them
+        """
         self.update_one(
             {ChannelProfileConnectionModel.ChannelOid.key: channel_oid,
              ChannelProfileConnectionModel.UserOid.key: root_oid},
@@ -263,6 +305,15 @@ class _UserProfileManager(BaseCollection):
                 ChannelProfileConnectionModel.ProfileOids.key: ChannelProfileConnectionModel.ProfileOids.none_obj()}})
 
     def detach_profile(self, profile_oid: ObjectId, user_oid: Optional[ObjectId] = None) -> UpdateOutcome:
+        """
+        Detach profile ``profile_oid`` from user ``user_oid``.
+
+        If ``user_oid`` is ``None``, remove the profile from all the users.
+
+        :param profile_oid: OID of the profile to detach
+        :param user_oid: OID of the user for the profile to detach from
+        :return: outcome of the detachment
+        """
         filter_ = {ChannelProfileConnectionModel.ProfileOids.key: profile_oid}
 
         if user_oid:
@@ -334,23 +385,55 @@ class _ProfileDataManager(BaseCollection):
         return self.insert_one_data(ChannelOid=channel_oid, **fk_param)
 
     def get_profile(self, profile_oid: ObjectId) -> Optional[ChannelProfileModel]:
+        """
+        Get the profile of ID ``profile_oid``.
+
+        If there are a lot this call will be made in a short time, consider using ``get_profile_dict()`` instead.
+
+        :param profile_oid: OID of the profile to get
+        :return: `ChannelProfileModel` if the profile is found. `None` otherwise
+        """
         return self.find_one_casted({OID_KEY: profile_oid}, parse_cls=ChannelProfileModel)
 
     def get_profile_dict(self, profile_oid_list: List[ObjectId]) -> Dict[ObjectId, ChannelProfileModel]:
+        """
+        Get a dict which key is the profile OID and value is the profile model if found.
+
+        :param profile_oid_list: list of the profile OIDs to get the data
+        :return: a dict which key is the profile OID and value is the profile model
+        """
         return {model.id: model for model
                 in self.find_cursor_with_count({OID_KEY: {"$in": profile_oid_list}}, parse_cls=ChannelProfileModel)}
 
     def get_profile_name(self, channel_oid: ObjectId, name: str) -> Optional[ChannelProfileModel]:
+        """
+        Get a profile in ``channel_oid`` which name is exactly ``name``.
+
+        ``name`` will be stripped before the query.
+
+        :param channel_oid: channel of the profile
+        :param name: exact name of the profile to get
+        :return: `ChannelProfileModel` if found, `None` otherwise
+        """
         return self.find_one_casted(
             {ChannelProfileModel.ChannelOid.key: channel_oid, ChannelProfileModel.Name.key: name.strip()},
             parse_cls=ChannelProfileModel)
 
-    def get_channel_profiles(self, channel_oid: ObjectId, partial_keyword: Optional[str] = None) \
+    def get_channel_profiles(self, channel_oid: ObjectId, name_keyword: Optional[str] = None) \
             -> ExtendedCursor[ChannelProfileModel]:
+        """
+        Get a cursor yielding profiles that are in ``channel_oid`` and the name contains ``partial_keyword``.
+
+        If ``name_keyword`` is ``None``, the cursor will yield all profiles in ``channel_oid``.
+
+        :param channel_oid: channel of the profiles
+        :param name_keyword: partial or exact name of the profiles to get
+        :return: cursor yielding profiles according to the given conditions
+        """
         filter_ = {ChannelProfileModel.ChannelOid.key: channel_oid}
 
-        if partial_keyword:
-            filter_[ChannelProfileModel.Name.key] = {"$regex": partial_keyword, "$options": "i"}
+        if name_keyword:
+            filter_[ChannelProfileModel.Name.key] = {"$regex": name_keyword, "$options": "i"}
 
         return self.find_cursor_with_count(filter_, parse_cls=ChannelProfileModel).sort([(OID_KEY, pymongo.ASCENDING)])
 
@@ -432,6 +515,17 @@ class _ProfileDataManager(BaseCollection):
 
     def create_default_profile(self, channel_oid: ObjectId, *,
                                set_to_channel: bool = True, check_channel: bool = True) -> CreateProfileResult:
+        """
+        Create a default profile for ``channel_oid`` and set it to the channel if ``set_to_channel`` is ``True``.
+
+        Note that if ``set_to_channel`` is ``True``, ``check_channel`` is ``False`` and the channel does not exist,
+        :class:`WriteOutcome.X_ON_SET_CONFIG` will be the outcome in the result.
+
+        :param channel_oid: channel to get the default profile
+        :param set_to_channel: if the created profile should be set to the channel
+        :param check_channel: check if the channel is registered
+        :return: result of creating the default profile
+        """
         if check_channel and not ChannelManager.get_channel_oid(channel_oid):
             return CreateProfileResult(WriteOutcome.X_CHANNEL_NOT_FOUND)
 
@@ -498,10 +592,10 @@ class _ProfileDataManager(BaseCollection):
         """
         outcome = None
 
-        d = {}
+        op_set = {}
 
         for jk, v in new_jkwargs.items():
-            # Handling permission keys
+            # Handle permission keys if it is
             if ChannelProfileModel.Permission.key in jk:
                 jk, code = jk.split(".", 2)
 
@@ -510,36 +604,59 @@ class _ProfileDataManager(BaseCollection):
                 except (TypeError, ValueError):
                     outcome = UpdateOutcome.O_PARTIAL_ARGS_INVALID
 
-                d[f"{jk}.{code}"] = to_bool(v).to_bool()
+                op_set[f"{jk}.{code}"] = to_bool(v).to_bool()
                 continue
 
-            if jk in self.data_model.model_json_keys():
-                fi = self.data_model.get_field_class_instance(self.data_model.json_key_to_field(jk))
-                if fi.read_only:
-                    return UpdateOutcome.X_UNEDITABLE
-
-                if fi.is_value_valid(v):
-                    d[jk] = v
-                else:
-                    outcome = UpdateOutcome.O_PARTIAL_ARGS_INVALID
-            else:
+            # Remove args that are not in the data model
+            if jk not in self.data_model.model_json_keys():
                 outcome = UpdateOutcome.O_PARTIAL_ARGS_REMOVED
+                continue
 
-        if not d:
+            # Check if the field is read only
+            field_instance = self.data_model.get_field_class_instance(self.data_model.json_key_to_field(jk))
+            if field_instance.read_only:
+                return UpdateOutcome.X_UNEDITABLE
+
+            # Check if the new value for the update is invalid
+            if not field_instance.is_value_valid(v):
+                outcome = UpdateOutcome.O_PARTIAL_ARGS_INVALID
+                continue
+
+            op_set[jk] = v
+
+        # Early termination if nothing to be updated
+        if not op_set:
             return UpdateOutcome.X_NOT_EXECUTED
 
-        update_outcome = self.update_many_outcome({OID_KEY: profile_oid}, {"$set": d})
+        update_outcome = self.update_many_outcome({OID_KEY: profile_oid}, {"$set": op_set})
 
-        if update_outcome == UpdateOutcome.O_UPDATED:
-            return outcome or update_outcome
-        else:
+        # Returns errored outcome if it's not `UpdateOutcome.O_UPDATED`
+        if update_outcome != UpdateOutcome.O_UPDATED:
             return update_outcome
 
+        # Returns marked `UpdateOutcome` to indicate if there's any additional operation performed
+        return outcome or update_outcome
+
     def delete_profile(self, profile_oid: ObjectId) -> bool:
+        """
+        Delete the profile with OID ``profile_oid``.
+
+        :param profile_oid: OID of the profile to be deleted
+        :return: if the profile has been deleted
+        """
         return self.delete_one({OID_KEY: profile_oid}).deleted_count > 0
 
     @arg_type_ensure
     def is_name_available(self, channel_oid: ObjectId, name: str):
+        """
+        Check if the profile name ``name`` is available in the channel ``channel_oid``.
+
+        ``name`` will be stipped before the check.
+
+        :param channel_oid: channel for the profile to check the availablility
+        :param name: name of the profile to be checked
+        :return: if the profile name is available
+        """
         name = name.strip()
 
         if not name:

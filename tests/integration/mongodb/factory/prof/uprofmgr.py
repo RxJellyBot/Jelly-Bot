@@ -177,7 +177,8 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         mdls = self._sample_channels()
         UserProfileManager.insert_many(mdls)
 
-        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(self.USER_OID), [mdls[3], mdls[1]])
+        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_prof_conns(self.USER_OID),
+                                      [mdls[3], mdls[1]])
 
     def test_get_user_starred_on_top(self):
         mdls = [
@@ -190,7 +191,7 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         ]
         UserProfileManager.insert_many(mdls)
 
-        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(self.USER_OID),
+        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_prof_conns(self.USER_OID),
                                       [mdls[2], mdls[0], mdls[1]])
 
     def test_get_user_channel_all(self):
@@ -198,11 +199,11 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         UserProfileManager.insert_many(mdls)
 
         self.assertModelSequenceEqual(
-            UserProfileManager.get_user_channel_profiles(self.USER_OID, inside_only=False),
+            UserProfileManager.get_user_channel_prof_conns(self.USER_OID, inside_only=False),
             [mdls[3], mdls[1], mdls[0]])
 
     def test_get_user_channel_no_data(self):
-        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(self.USER_OID, inside_only=False),
+        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_prof_conns(self.USER_OID, inside_only=False),
                                       [])
 
     def test_get_user_channel_all_outside(self):
@@ -220,16 +221,16 @@ class TestUserProfileManager(TestModelMixin, TestDatabaseMixin):
         ]
         UserProfileManager.insert_many(mdls)
 
-        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(self.USER_OID), [])
+        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_prof_conns(self.USER_OID), [])
         self.assertModelSequenceEqual(
-            UserProfileManager.get_user_channel_profiles(self.USER_OID, inside_only=False),
+            UserProfileManager.get_user_channel_prof_conns(self.USER_OID, inside_only=False),
             [mdls[3], mdls[1], mdls[0]])
 
     def test_get_user_channel_user_not_exists(self):
         mdls = self._sample_channels()
         UserProfileManager.insert_many(mdls)
 
-        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_profiles(ObjectId()), [])
+        self.assertModelSequenceEqual(UserProfileManager.get_user_channel_prof_conns(ObjectId()), [])
 
     def test_get_channel_member(self):
         mdls = self._sample_channels()

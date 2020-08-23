@@ -388,6 +388,8 @@ class OperationOutcome(BaseOutcome):
 
         413 - Missing channel OID
 
+        414 - Delete failed
+
     5xx - Problems related to model
         501 - Construction error
 
@@ -400,7 +402,7 @@ class OperationOutcome(BaseOutcome):
 
         902 - Not updated
 
-        903 - not deleted
+        903 - Not deleted
 
         904 - User integration failed
 
@@ -424,6 +426,7 @@ class OperationOutcome(BaseOutcome):
     O_COMPLETED = \
         -1, _("O: Completed"), \
         _("The operation was successfully completed.")
+
     X_EXECODE_NOT_FOUND = \
         101, _("X: Execode not found"), \
         _("No enqueued Execode found.")
@@ -448,9 +451,11 @@ class OperationOutcome(BaseOutcome):
     X_EXECODE_TYPE_MISMATCH = \
         108, _("X: Execode type mismatch"), \
         _("The type of the Execode does not match the desired one.")
+
     X_CHANNEL_NOT_FOUND = \
         201, _("X: Channel not found"), \
         _("Channel not found.")
+
     X_SAME_SRC_DEST = \
         301, _("X: Source = Destination"), \
         _("Source user data is identical to the destination user data.")
@@ -460,6 +465,7 @@ class OperationOutcome(BaseOutcome):
     X_DEST_DATA_NOT_FOUND = \
         303, _("X: Destination data not found"), \
         _("Destination user data not found.")
+
     X_INSUFFICIENT_PERMISSION = \
         401, _("X: Insufficient permission"), \
         _("Insufficient permission to execute this operation.")
@@ -499,6 +505,10 @@ class OperationOutcome(BaseOutcome):
     X_MISSING_CHANNEL_OID = \
         413, _("X: Missing channel OID"), \
         _("The value of the channel OID is missing.")
+    X_DELETE_FAILED = \
+        414, _("X: Delete failed"), \
+        _("Failed to delete the profile.")
+
     X_CONSTRUCTION_ERROR = \
         501, _("X: Construction error"), \
         _("An error occurred during model construction.")
@@ -508,6 +518,7 @@ class OperationOutcome(BaseOutcome):
     X_VALUE_INVALID = \
         503, _("X: Value invalid"), \
         _("Field value invalid.")
+
     X_NOT_EXECUTED = \
         901, _("X: Not executed"), \
         _("The operation had not been executed.")
