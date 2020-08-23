@@ -54,6 +54,14 @@ class _TimerManager(BaseCollection):
 
     @arg_type_ensure
     def list_all_timer(self, channel_oid: ObjectId) -> TimerListResult:
+        """
+        List all the timers in the channel ``channel_oid``.
+
+        All timers in the returned result will be sorted by its target time (ASC).
+
+        :param channel_oid: channel of the timers
+        :return: a `TimerListResult` containing the timers that match the conditions
+        """
         return TimerListResult(
             self.find_cursor_with_count(
                 {TimerModel.ChannelOid.key: channel_oid},
@@ -63,6 +71,17 @@ class _TimerManager(BaseCollection):
 
     @arg_type_ensure
     def get_timers(self, channel_oid: ObjectId, keyword: str) -> TimerListResult:
+        """
+        Get the timers in the channel ``channel_oid`` which keyword ``keyword``.
+
+        ``keyword`` needs to be an exact match, **NOT** partial match.
+
+        All timers in the returned result will be sorted by its target time (ASC).
+
+        :param channel_oid: channel of the timers
+        :param keyword: keyword of the timers
+        :return: a `TimerListResult` containing the timers that match the conditions
+        """
         return TimerListResult(
             self.find_cursor_with_count(
                 {TimerModel.Keyword.key: keyword, TimerModel.ChannelOid.key: channel_oid},
@@ -72,6 +91,15 @@ class _TimerManager(BaseCollection):
 
     @arg_type_ensure
     def get_notify(self, channel_oid: ObjectId, within_secs: Optional[int] = None) -> List[TimerModel]:
+        """
+        Get a list of unnotified timers which will timeup in ``within_secs`` seconds in ``channel_oid``.
+
+        Returned timers will be sorted by its target time (ASC).
+
+        :param channel_oid: channel of the timers
+        :param within_secs: timers that will timeup within this amount of seconds will be returned
+        :return: a list of timers that is not yet notified and will timeup in `within_secs` seconds
+        """
         now = now_utc_aware()
 
         filter_ = {
@@ -91,6 +119,14 @@ class _TimerManager(BaseCollection):
 
     @arg_type_ensure
     def get_time_up(self, channel_oid: ObjectId) -> List[TimerModel]:
+        """
+        Get a list of unnotified timers which timed up in ``channel_oid``.
+
+        All timers in the returned result will be sorted by its target time (ASC).
+
+        :param channel_oid: channel of the timers
+        :return: a list of timers that is not yet notified and already timed up
+        """
         now = now_utc_aware()
 
         filter_ = {

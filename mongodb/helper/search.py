@@ -17,10 +17,22 @@ class ChannelData:
 
 class IdentitySearcher:
     @staticmethod
-    def search_channel(keyword: str, root_oid: Optional[ObjectId] = None) -> List[ChannelData]:
-        """The keyword could be
-        - A piece of the message comes from a channel
-        - The name of the channel"""
+    def search_channel(keyword: str, root_oid: ObjectId) -> List[ChannelData]:
+        """
+        Search the channels that the user ``root_oid`` is inside using ``keyword``.
+
+        ``keyword`` can be:
+
+        - partial word from the message of a channel
+
+        - a part of the default name of a channel
+
+        - a part of the token of a channel
+
+        :param keyword: keyword to search the channel
+        :param root_oid: OID of the user inside the returned channels
+        :return: list of `ChannelData` that the user is in and match the conditions
+        """
         checked_choid: Set[ObjectId] = set()
         ret: List[ChannelData] = []
         missing = []

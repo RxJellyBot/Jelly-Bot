@@ -137,9 +137,11 @@ class TestHourlyResult(TestDatabaseMixin):
 
         for expected_value, kwargs in data:
             with self.subTest(expected_value=expected_value, kwargs=kwargs):
-                self.assertAlmostEqual(expected_value,
-                                       TestHourlyResult.TestSample1.data_days_collected(col, {}, **kwargs),
-                                       0)
+                self.assertAlmostEqual(
+                    expected_value,
+                    TestHourlyResult.TestSample1.data_days_collected(col, {}, **kwargs),
+                    0
+                )
 
     def test_data_days_collected_no_data(self):
         col = self.get_collection("AAAAA")

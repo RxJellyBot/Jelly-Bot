@@ -93,6 +93,14 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def get_user_record(self, creator_oid: ObjectId) -> ExtendedCursor[ShortUrlRecordModel]:
+        """
+        Get the short URLs created by ``creator_oid``.
+
+        The returned result will be sorted by its creation timestamp (ASC).
+
+        :param creator_oid: user who creates the returned short URLs
+        :return: a cursor yielding the short URL data created by `creator_oid`
+        """
         return self.find_cursor_with_count({ShortUrlRecordModel.CreatorOid.key: creator_oid},
                                            sort=[(ShortUrlRecordModel.Id.key, pymongo.ASCENDING)])
 

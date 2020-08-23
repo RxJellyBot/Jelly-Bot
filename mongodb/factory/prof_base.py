@@ -420,6 +420,8 @@ class _ProfileDataManager(BaseCollection):
 
         If ``name_keyword`` is ``None``, the cursor will yield all profiles in ``channel_oid``.
 
+        Returned result will be sorted by ID (ASC).
+
         :param channel_oid: channel of the profiles
         :param name_keyword: partial or exact name of the profiles to get
         :return: cursor yielding profiles according to the given conditions

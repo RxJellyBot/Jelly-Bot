@@ -77,6 +77,17 @@ class _MessageRecordStatisticsManager(BaseCollection):
     @arg_type_ensure
     def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> ExtendedCursor[MessageRecordModel]:
+        """
+        Get recent messages in the channel ``channel_oid``.
+
+        The returned messages will be sorted by its timestamp (DESC).
+
+        If ``limit`` is ``None``, return all messages in the channel.
+
+        :param channel_oid: channel of the returned messages
+        :param limit: max count of the results
+        :return: a cursor yielding messages in `channel_oid` from the most recent one
+        """
         return self.find_cursor_with_count({MessageRecordModel.ChannelOid.key: channel_oid},
                                            sort=[(OID_KEY, pymongo.DESCENDING)], limit=limit if limit else 0)
 

@@ -100,41 +100,53 @@ class HourlyResult(abc.ABC):
 
     @staticmethod
     def data_days_collected(collection, filter_, *, hr_range: Optional[int] = None,
-                            start: Optional[datetime] = None, end: Optional[datetime] = None):
+                            start: Optional[datetime] = None, end: Optional[datetime] = None) -> float:
         """
-        Returns the count of days collected in data.
+        Get the data collection time length in terms of days.
 
-        Notice that this is different from ``days_collected`` in ``__init__()`` because
-        this one connects to the database to calculate the actual days collected in the filtered dataset
-        while the one in ``__init__()`` will not be checked and assume that it is true.
+        Data query will not execute if there is a :class:`TimeRange` could be constructed and
+        not having an infinite length by taking ``hr_range``, ``start`` and ``end``.
 
-        ``hr_range`` will be ignored if both ``start`` and ``end`` is specified.
+        .. note::
+
+            This is different from ``days_collected`` in ``__init__()`` because
+            this connects to the database to calculate the actual days collected in the filtered dataset
+            while the one in ``__init__()`` assumes what is being passed is true.
+
+            ``hr_range`` will be ignored if both ``start`` and ``end`` is specified.
+
+        :param collection: collection class to apply `filter_` for calculation
+        :param filter_: condition to filter the data to be checked
+        :param hr_range: hour range to construct a time range
+        :param start: start timestamp to construct a time range
+        :param end: end timestamp to construct a time range
+        :return: time length in days of the collection of filtered data
         """
         trange = TimeRange(range_hr=hr_range, start=start, end=end, end_autofill_now=False)
 
-        if trange.is_inf:
-            oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
-
-            if not oldest:
-                return HourlyResult.DAYS_NONE
-
-            now = now_utc_aware()
-
-            if start:
-                start = make_tz_aware(start)
-
-            if start and start > now:
-                return HourlyResult.DAYS_NONE
-
-            if end:
-                end = make_tz_aware(end)
-
-            return max(
-                ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
-                0
-            )
-        else:
+        if not trange.is_inf:
             return trange.hr_length / 24
+
+        oldest = collection.find_one(filter_, sort=[(OID_KEY, pymongo.ASCENDING)])
+
+        if not oldest:
+            return HourlyResult.DAYS_NONE
+
+        now = now_utc_aware()
+
+        if start:
+            start = make_tz_aware(start)
+
+        if start and start > now:
+            return HourlyResult.DAYS_NONE
+
+        if end:
+            end = make_tz_aware(end)
+
+        return max(
+            ((end or now) - ObjectId(oldest[OID_KEY]).generation_time).total_seconds() / 86400,
+            0
+        )
 
 
 class DailyResult(abc.ABC):

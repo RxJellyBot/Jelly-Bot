@@ -1,5 +1,6 @@
 from typing import Optional, Dict, List
 
+import pymongo
 from bson import ObjectId
 from pymongo import ReturnDocument
 
@@ -160,8 +161,17 @@ class _ChannelManager(BaseCollection):
     @arg_type_ensure
     def get_channel_default_name(self, default_name: str, *, hide_private: bool = True) \
             -> ExtendedCursor[ChannelModel]:
-        filter_ = \
-            {"$or": [
+        """
+        Get a list of channels which default name or token contains a part or all of ``default_name``.
+
+        Returned result will be sorted by channel OID (DESC).
+
+        :param default_name: default name or part of the token of a channel
+        :param hide_private: hide private channel from this search
+        :return: a cursor yielding the channels that match the conditions
+        """
+        filter_ = {
+            "$or": [
                 {
                     f"{ChannelModel.Token.key}": {"$regex": default_name, "$options": "i"}
                 },
@@ -169,12 +179,13 @@ class _ChannelManager(BaseCollection):
                     f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}":
                         {"$regex": default_name, "$options": "i"}
                 }
-            ]}
+            ]
+        }
 
         if hide_private:
             filter_[f"{ChannelModel.Config.key}.{ChannelConfigModel.InfoPrivate.key}"] = False
 
-        return self.find_cursor_with_count(filter_)
+        return self.find_cursor_with_count(filter_, sort=[(ChannelModel.Id.key, pymongo.DESCENDING)])
 
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
         model = self.get_channel_token(platform, token)

@@ -286,12 +286,23 @@ class _AutoReplyModuleManager(BaseCollection):
 
         return ret
 
-    def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, *, active_only: bool = True) \
+    def get_conn_list(self, channel_oid: ObjectId, keyword: Optional[str] = None, *, active_only: bool = True) \
             -> ExtendedCursor[AutoReplyModuleModel]:
-        """Sort by used count (desc)."""
-        filter_ = {
-            AutoReplyModuleModel.ChannelOid.key: channel_oid
-        }
+        """
+        Get the auto-reply module list in ``channel_oid`` with ``keyword``.
+
+        ``keyword`` can be a part of the module keyword, but **NOT** the response.
+
+        If ``keyword`` is not set or ``None``, all modules in ``channel_oid`` will be returned.
+
+        Returned result will be sorted by module used count (DESC).
+
+        :param channel_oid: channel of the module(s)
+        :param keyword: keyword to filter the returning module(s)
+        :param active_only: if to return active modules only
+        :return: a cursor yielding the modules which match the given conditions
+        """
+        filter_ = {AutoReplyModuleModel.ChannelOid.key: channel_oid}
 
         if keyword:
             filter_[AutoReplyModuleModel.KEY_KW_CONTENT] = {"$regex": keyword, "$options": "i"}
@@ -302,16 +313,28 @@ class _AutoReplyModuleManager(BaseCollection):
         return self.find_cursor_with_count(filter_, sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> ExtendedCursor[AutoReplyModuleModel]:
+        """
+        Get a list of auto-reply modules sorted by used count (DESC) using the provided OIDs ``conn_oids``.
+
+        :param conn_oids: auto-reply module OIDs to be sorted
+        :return: a cursor yielding auto-reply modules which ID is one of `conn_oids` from the most-used one
+        """
         return self.find_cursor_with_count({OID_KEY: {"$in": conn_oids}},
                                            sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> ExtendedCursor[AutoReplyModuleModel]:
-        ret = self.find_cursor_with_count({AutoReplyModuleModel.ChannelOid.key: channel_oid},
-                                          sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)])
+        """
+        Get a list of modules in ``channel_oid`` sorted by used count (DESC) for stats.
 
-        if limit:
-            ret = ret.limit(limit)
+        :param channel_oid: channel of the modules to get
+        :param limit: maximum count of the result. No limit if not set or `None`
+        :return: a cursor yielding auto-reply module from the most-used module
+        """
+        ret = self.find_cursor_with_count(
+            {AutoReplyModuleModel.ChannelOid.key: channel_oid},
+            sort=[(AutoReplyModuleModel.CalledCount.key, pymongo.DESCENDING)], limit=limit if limit else 0
+        )
 
         return ret
 
@@ -368,7 +391,9 @@ class _AutoReplyModuleTagManager(BaseCollection):
 
     def search_tags(self, tag_keyword: str) -> ExtendedCursor[AutoReplyModuleTagModel]:
         """
-        Accepts a keyword to search. Case-insensitive. ``tag_keyword`` can be regex.
+        Search the tags which contains ``tag_keyword``.
+
+        The search is case-insensitive and ``tag_keyword`` can be a regex.
 
         :param tag_keyword: keyword to search the tag
         """
