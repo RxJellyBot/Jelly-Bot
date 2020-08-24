@@ -1,55 +1,40 @@
 @ECHO OFF
 
-SET LINTED=bot doc extdiscord extline extutils flags
+REM - Colors to be used
+SET RED=[31m
+SET GREEN=[32m
+SET BG_MAGENTA=[45m
+SET NC=[0m
+
+:intro
+
+ECHO.
+ECHO ======================================================================
+ECHO = %BG_MAGENTA%Invoked precommit checks using main precommit file (precommit.bat)%NC% =
+ECHO ======================================================================
+ECHO.
 
 :main
 
-SET MSG=Checking Flake8 error...
-ECHO %MSG%
-flake8 . --config .flake8-error --benchmark || GOTO error
-
-SET MSG=Checking Flake8 style...
-ECHO %MSG%
-flake8 . --config .flake8-style --benchmark || GOTO error
-
-SET MSG=Checking pydocstyle...
-ECHO %MSG%
-pydocstyle %LINTED% --count || GOTO error
-
-SET MSG=Checking pylint...
-ECHO %MSG%
-pylint %LINTED% || GOTO error
-
-SET MSG=Running tests (unit)...
-ECHO %MSG%
-py manage.py test tests.unit || GOTO error
-
-SET MSG=Running tests (integration)...
-ECHO %MSG%
-py manage.py test tests.integration || GOTO error
-
-SET MSG=Running tests (system)...
-ECHO %MSG%
-py manage.py test tests.system || GOTO error
+precommit-total || GOTO fail
 
 :pass
 
 ECHO.
-ECHO.
-ECHO.
 ECHO =============================================
-ECHO ============== GREEN TO COMMIT ==============
+ECHO ============== %GREEN%GREEN TO COMMIT%NC% ==============
 ECHO =============================================
-ECHO.
-ECHO.
 ECHO.
 
 GOTO end
 
-:error
+:fail
 
-ECHO ERROR @ %MSG%
-PAUSE
-EXIT /b
+ECHO.
+ECHO ==========================================
+ECHO ========= %RED%Precommit check FAILED%NC% =========
+ECHO ==========================================
+ECHO.
+EXIT /B 1
 
 :end
