@@ -48,7 +48,7 @@ class DiscordClient(Client):
 
     async def on_message(self, message):
         """Contains the code to be executed when a message is being received."""
-        # Prevent self reading and bot resonate
+        # Prevent self reading and bots to resonate
         if message.author == self.user \
                 or message.author.bot \
                 or BotConflictionPreventer.prioritized_bot_exists(message.guild):
@@ -61,54 +61,75 @@ class DiscordClient(Client):
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_delete(self, channel: Union[DMChannel, GroupChannel]):
         """Contains the code to be executed when a private channel is deleted."""
-        if not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
-            warn_txt = f"Private Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
+        outcome = ChannelManager.deregister(Platform.DISCORD, channel.id)
+
+        if not outcome.is_success:
+            warn_txt = f"Private channel DELETED but the deregistration was failed.\n" \
+                       f"Channel token: {channel.id}\n" \
+                       f"Outcome: {outcome}"
             DISCORD.logger.warning(warn_txt)
             MailSender.send_email_async(warn_txt, subject="Discord private channel deletion failed")
 
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_create(self, channel: Union[DMChannel, GroupChannel]):
         """Contains the code to be executed when a private channel is created."""
-        if not ChannelManager.ensure_register(Platform.DISCORD, channel.id, default_name=str(channel)).success:
-            warn_txt = f"Private Channel CREATED but the registration was failed. Channel token: {channel.id}"
+        outcome = ChannelManager.ensure_register(Platform.DISCORD, channel.id, default_name=str(channel)).outcome
+
+        if not outcome.success:
+            warn_txt = f"Private channel CREATED but the registration was failed.\n" \
+                       f"Channel token: {channel.id}\n" \
+                       f"Outcome: {outcome}"
             DISCORD.logger.warning(warn_txt)
             MailSender.send_email_async(warn_txt, subject="Discord private channel creation failed")
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     async def on_private_channel_update(self, before: GroupChannel, after: GroupChannel):
         """Contains the code to be executed when the info of a private channel is updated."""
-        if str(before) != str(after) \
-                and not ChannelManager.update_channel_default_name(Platform.DISCORD, after.id, str(after)).is_success:
-            warn_txt = f"Private Channel Name UPDATED but the name was not updated. Channel token: {after.id} / " \
-                       f"Name: {str(before)} to {str(after)}"
-            DISCORD.logger.warning(warn_txt)
-            MailSender.send_email_async(warn_txt, subject="Discord private channel name update failed")
+        if str(before) != str(after):
+            outcome = ChannelManager.update_channel_default_name(Platform.DISCORD, after.id, str(after))
+
+            if not outcome.is_success:
+                warn_txt = f"Private channel name UPDATED but the name was not updated.\n" \
+                           f"Channel token: {after.id}\n" \
+                           f"Name: {str(before)} to {str(after)}\n" \
+                           f"Outcome: {outcome}"
+                DISCORD.logger.warning(warn_txt)
+                MailSender.send_email_async(warn_txt, subject="Discord private channel name update failed")
 
     # noinspection PyMethodMayBeStatic
     async def on_guild_channel_delete(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
         """Contains the code to be executed when a channel of a Discord server is deleted."""
-        if channel.type == ChannelType.text \
-                and not ChannelManager.deregister(Platform.DISCORD, channel.id).is_success:
-            warn_txt = f"Guild Channel DELETED but the deregistration was failed. Channel token: {channel.id}"
-            DISCORD.logger.warning(warn_txt)
-            MailSender.send_email_async(warn_txt, subject="Discord guild channel deletion failed")
+        if channel.type == ChannelType.text:
+            outcome = ChannelManager.deregister(Platform.DISCORD, channel.id)
+
+            if not outcome.is_success:
+                warn_txt = f"Guild channel DELETED but the deregistration was failed.\n" \
+                           f"Channel token: {channel.id}\n" \
+                           f"Outcome: {outcome}"
+                DISCORD.logger.warning(warn_txt)
+                MailSender.send_email_async(warn_txt, subject="Discord guild channel deletion failed")
 
     # noinspection PyMethodMayBeStatic
     async def on_guild_channel_create(self, channel: Union[TextChannel, VoiceChannel, CategoryChannel]):
         """Contains the code to be executed when a channel of a Discord server is created."""
         if channel.type == ChannelType.text:
-            reg_result = ChannelManager.ensure_register(Platform.DISCORD, channel.id,
-                                                        default_name=channel_full_repr(channel))
+            reg_result = ChannelManager.ensure_register(
+                Platform.DISCORD, channel.id, default_name=channel_full_repr(channel))
 
             if not reg_result.success:
-                warn_txt = f"Guild Channel CREATED but the registration was failed. Channel token: {channel.id}"
+                warn_txt = f"Guild channel CREATED but the registration was failed.\n" \
+                           f"Channel token: {channel.id}\n" \
+                           f"Outcome: {reg_result.outcome}"
                 DISCORD.logger.warning(warn_txt)
                 MailSender.send_email_async(warn_txt, subject="Discord guild channel creation failed")
 
-            if not ChannelCollectionManager.ensure_register(
-                    Platform.DISCORD, channel.guild.id, reg_result.model.id, default_name=str(channel.guild)).success:
-                warn_txt = f"Guild Channel CREATED but the collection registration was failed. " \
-                           f"Channel token: {channel.id}"
+            reg_result = ChannelCollectionManager.ensure_register(
+                Platform.DISCORD, channel.guild.id, reg_result.model.id, default_name=str(channel.guild))
+
+            if not reg_result.success:
+                warn_txt = f"Guild channel CREATED but the collection registration was failed. " \
+                           f"Channel token: {channel.id}\n" \
+                           f"Outcome: {reg_result.outcome}"
                 DISCORD.logger.warning(warn_txt)
                 MailSender.send_email_async(warn_txt, subject="Discord channel collection creation failed")
 
@@ -119,12 +140,13 @@ class DiscordClient(Client):
             after: Union[TextChannel, VoiceChannel, CategoryChannel]):
         """Contains the code to be executed when the info of a channel of a Discord server is updated."""
         if str(before) != str(after):
-            update_result = ChannelCollectionManager.update_default_name(
+            outcome = ChannelCollectionManager.update_default_name(
                 Platform.DISCORD, after.guild.id, channel_full_repr(after))
 
-            if not update_result.is_success:
-                warn_txt = f"Guild Channel Name UPDATED but the name was not updated. " \
-                           f"Channel token: {after.id}"
+            if not outcome.is_success:
+                warn_txt = f"Guild channel name UPDATED but the name was not updated. " \
+                           f"Channel token: {after.id}\n" \
+                           f"Outcome: {outcome}"
                 DISCORD.logger.warning(warn_txt)
                 MailSender.send_email_async(warn_txt, subject="Discord guild channel name update failed")
 
