@@ -163,13 +163,25 @@ jobs:
         run: |
           py manage.py test tests.unit
 
+      - name: Unit tests (reversed)
+        run: |
+          py manage.py test tests.unit -r
+
       - name: Integration tests
         run: |
           py manage.py test tests.integration
 
+      - name: Integration tests (reversed)
+        run: |
+          py manage.py test tests.integration -r
+
       - name: System tests
         run: |
           py manage.py test tests.system
+
+      - name: System tests (reversed)
+        run: |
+          py manage.py test tests.system -r
 
   cleanup:
     name: Cleanup
