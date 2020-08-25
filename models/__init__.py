@@ -1,3 +1,4 @@
+"""Implementations of various data models including the data to be stored into MongoDB or the result objects."""
 # noinspection PyUnresolvedReferences
 from .field import OID_KEY, ModelDefaultValueExt
 # noinspection PyUnresolvedReferences
@@ -24,10 +25,16 @@ from .rpdata import PendingRepairDataModel
 from .shorturl import ShortUrlRecordModel
 # noinspection PyUnresolvedReferences
 from .stats import (
-    APIStatisticModel, MessageRecordModel, BotFeatureUsageModel, MemberMessageCountEntry,
-    HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
-    HourlyResult, BotFeaturePerUserUsageResult, MemberMessageByCategoryResult, MemberDailyMessageResult,
-    MemberMessageCountResult, MeanMessageResultGenerator, CountBeforeTimeResult, DailyResult
+    # result base
+    DailyResult, HourlyResult,
+    # bot feature usage
+    BotFeatureUsageResult, BotFeatureHourlyAvgResult, BotFeaturePerUserUsageResult,
+    # models
+    APIStatisticModel, MessageRecordModel, BotFeatureUsageModel,
+    # messages
+    MemberMessageCountEntry, MemberMessageCountResult, HourlyIntervalAverageMessageResult, DailyMessageResult,
+    MemberMessageByCategoryEntry, MemberMessageByCategoryResult, MemberDailyMessageResult, MeanMessageResultGenerator,
+    CountBeforeTimeResult
 )
 # noinspection PyUnresolvedReferences
 from .timer import TimerModel, TimerListResult

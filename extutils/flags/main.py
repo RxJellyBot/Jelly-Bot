@@ -307,6 +307,8 @@ class FlagEnumMixin:
 
         ``item`` can only be either ``code`` (:class:`str`) or ``name`` (:class:`int`).
 
+        If ``silent_fail`` is ``True``, returns ``None`` if not found. Otherwise, raises :class:`ValueError`.
+
         :param item: item to be casted
         :param silent_fail: if this function should fail silently
         :return: casted enum/flag

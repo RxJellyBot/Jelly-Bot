@@ -1,4 +1,5 @@
 """Module of various stats data manager."""
+import traceback
 from datetime import datetime, tzinfo, timedelta
 from threading import Thread
 from typing import Any, Optional, Union, List, Dict, Set
@@ -6,13 +7,14 @@ from typing import Any, Optional, Union, List, Dict, Set
 import pymongo
 from bson import ObjectId
 
-from JellyBot.systemconfig import Database
 from env_var import is_testing
 from extutils import dt_to_objectid
 from extutils.checker import arg_type_ensure
+from extutils.emailutils import MailSender
 from extutils.dt import now_utc_aware, localtime, TimeRange
 from extutils.locales import UTC, PytzInfo
 from flags import APICommand, MessageType, BotFeature
+from JellyBot.systemconfig import Database
 from models import (
     APIStatisticModel, MessageRecordModel, OID_KEY, BotFeatureUsageModel,
     HourlyIntervalAverageMessageResult, DailyMessageResult, BotFeatureUsageResult, BotFeatureHourlyAvgResult,
@@ -621,12 +623,24 @@ class _BotFeatureUsageDataManager(BaseCollection):
         """
         Record a bot feature usage if ``feature_used`` is not :class:`BotFeature.UNDEFINED`.
 
+        If :class:`BotFeature.UNDEFINED` is called, the activity will not be logged.
+        Instead, an email report will be sent.
+
         :param feature_used: bot feature used
         :param channel_oid: channel where the feature was used
         :param root_oid: user who uses the feature
         """
-        if feature_used != BotFeature.UNDEFINED:
-            self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
+        if feature_used == BotFeature.UNDEFINED:
+            content = f"Undefined bot command sent by:\n" \
+                      f"<code>{root_oid}</code> in channel <code>{channel_oid}</code>\n" \
+                      f"<hr>" \
+                      f"<pre>Traceback:\n" \
+                      f"{traceback.format_exc()}</pre>"
+
+            MailSender.send_email_async(content, subject="Undefined bot command called")
+            return
+
+        self.insert_one_data(Feature=feature_used, ChannelOid=channel_oid, SenderRootOid=root_oid)
 
     @arg_type_ensure
     def record_usage_async(self, feature_used: BotFeature, channel_oid: ObjectId, root_oid: ObjectId):
@@ -650,6 +664,8 @@ class _BotFeatureUsageDataManager(BaseCollection):
         """
         Get the bot feature usage in ``channel_oid``.
 
+        Returned data will be sorted by the usage count (DESC) then the feature code (ASC).
+
         :param channel_oid: channel to get the usage stats
         :param hours_within: hour range of the data
         :param incl_not_used: whether to include the features that are not used in `channel_oid`
@@ -663,9 +679,12 @@ class _BotFeatureUsageDataManager(BaseCollection):
             {"$match": filter_},
             {"$group": {
                 OID_KEY: "$" + BotFeatureUsageModel.Feature.key,
-                BotFeatureUsageResult.KEY: {"$sum": 1}
+                BotFeatureUsageResult.KEY_COUNT: {"$sum": 1}
             }},
-            {"$sort": {BotFeatureUsageResult.KEY: pymongo.DESCENDING}}
+            {"$sort": {
+                BotFeatureUsageResult.KEY_COUNT: pymongo.DESCENDING,
+                OID_KEY: pymongo.ASCENDING
+            }}
         ]
 
         return BotFeatureUsageResult(list(self.aggregate(pipeline)), incl_not_used)
@@ -677,6 +696,10 @@ class _BotFeatureUsageDataManager(BaseCollection):
             -> BotFeatureHourlyAvgResult:
         """
         Get hourly average use of the bot features in ``channel_oid``.
+
+        :class:`BotFeature.UNDEFINED` will **NOT** be included in the result even if ``incl_not_used`` is ``True``.
+
+        Returned data will be sorted by the feature code (ASC).
 
         :param channel_oid: channel to get the usage stats
         :param hours_within: hour range of the data
@@ -701,10 +724,16 @@ class _BotFeatureUsageDataManager(BaseCollection):
             }}
         ]
 
+        # Not using $sort stage because the data will be sorted locally.
+        #
+        # The reason of sorting it locally is because that if `incl_not_used` is enabled, a `set.difference()`
+        # operation will be executed to find the features that are not being used.
+
         return BotFeatureHourlyAvgResult(
             list(self.aggregate(pipeline)),
             incl_not_used,
-            HourlyResult.data_days_collected(self, filter_, hr_range=hours_within))
+            HourlyResult.data_days_collected(self, filter_, hr_range=hours_within)
+        )
 
     @arg_type_ensure
     def get_channel_per_user_usage(self, channel_oid: ObjectId, *,
@@ -716,7 +745,9 @@ class _BotFeatureUsageDataManager(BaseCollection):
         If ``member_oid_list`` is not ``None``, limit the result to only display the usage of the given users.
         Otherwise, return all usages from the members of ``channel_oid``.
 
-        This will **NOT** include features that are not being used by any of the members.
+        If there are any user that has not used any of the bot feature, they will **NOT** be included in the result.
+
+        Returned data will include the features that are not being used by the corresponding user.
 
         :param channel_oid: channel to get the usage stats
         :param hours_within: hour range of the data
@@ -740,10 +771,6 @@ class _BotFeatureUsageDataManager(BaseCollection):
                         "$" + BotFeatureUsageModel.SenderRootOid.key
                 },
                 BotFeaturePerUserUsageResult.KEY_COUNT: {"$sum": 1}
-            }},
-            {"$sort": {
-                f"{OID_KEY}.{BotFeaturePerUserUsageResult.KEY_UID}": pymongo.ASCENDING,
-                f"{OID_KEY}.{BotFeaturePerUserUsageResult.KEY_FEATURE}": pymongo.ASCENDING
             }}
         ]
 

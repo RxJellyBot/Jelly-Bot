@@ -230,7 +230,11 @@ def enumerate_ranking(iterable_sorted, start=1, t_prefix=True, is_tie: callable 
     """
     Generates the ranking and the corresponding data in ``iterable_sorted``.
 
-    If ``t_prefix`` is ``True``, the ranking
+    If ``t_prefix`` is ``True``:
+
+    - "T" will be prefixed to the rank where 2+ items are found the same.
+
+    - Returned rank (1st element) will always be ``str``.
 
     Example:
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-24 19:54-0500\n"
+"POT-Creation-Date: 2020-08-25 10:45-0500\n"
 "PO-Revision-Date: 2020-08-22 00:15-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
@@ -2454,6 +2454,11 @@ msgstr "無效的設定值。"
 msgid "Insufficient permission to complete the action."
 msgstr "因權限不足，無法執行。"
 
+# 遊戲地圖
+#: .\mongodb\helper\stats.py:105 .\strres\game_pk\map.py:7
+msgid "Unavailable"
+msgstr "無法使用"
+
 #: .\msghandle\botcmd\command\_base.py:126
 msgid "No description provided."
 msgstr "沒有敘述。"
@@ -3741,11 +3746,6 @@ msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 #, python-brace-format
 msgid "- {event} will time up after [{diff}]! (at {time})"
 msgstr "- {event} 將於 [{diff}] 後時間到！(於 {time})"
-
-# 遊戲地圖
-#: .\strres\game_pk\map.py:7
-msgid "Unavailable"
-msgstr "無法使用"
 
 # 遊戲地圖
 #: .\strres\game_pk\map.py:8

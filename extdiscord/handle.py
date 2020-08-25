@@ -35,7 +35,7 @@ def handle_error(ex: Exception):
     html = f"<h4>{ex}</h4>\n" \
            f"<hr>\n" \
            f"<pre>Traceback:\n" \
-           f"{traceback.format_exc()}</pre>\n"
+           f"{traceback.format_exc()}</pre>"
     MailSender.send_email_async(html, subject=subject)
 
     DISCORD.logger.error(subject, exc_info=True)

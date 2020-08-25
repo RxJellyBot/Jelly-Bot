@@ -14,7 +14,7 @@ from models import (
     MeanMessageResultGenerator, MemberDailyMessageResult, CountBeforeTimeResult, MemberMessageCountResult,
     MemberMessageCountEntry, BotFeatureUsageResult, BotFeaturePerUserUsageResult, BotFeatureHourlyAvgResult
 )
-from models.stats import MemberMessageByCategoryEntry
+from models import MemberMessageByCategoryEntry
 from strres.models import StatsResults
 from tests.base import TestCase
 
@@ -860,10 +860,10 @@ class TestBotFeatureUsageResult(TestCase):
     @staticmethod
     def get_cursor():
         return [
-            {"_id": BotFeature.TXT_AR_ADD, BotFeatureUsageResult.KEY: 100},
-            {"_id": BotFeature.TXT_AR_INFO, BotFeatureUsageResult.KEY: 20},
-            {"_id": BotFeature.TXT_AR_DEL, BotFeatureUsageResult.KEY: 20},
-            {"_id": BotFeature.TXT_CALCULATOR, BotFeatureUsageResult.KEY: 1},
+            {"_id": BotFeature.TXT_AR_ADD, BotFeatureUsageResult.KEY_COUNT: 100},
+            {"_id": BotFeature.TXT_AR_INFO, BotFeatureUsageResult.KEY_COUNT: 20},
+            {"_id": BotFeature.TXT_AR_DEL, BotFeatureUsageResult.KEY_COUNT: 20},
+            {"_id": BotFeature.TXT_CALCULATOR, BotFeatureUsageResult.KEY_COUNT: 1},
         ]
 
     def test_data_empty(self):

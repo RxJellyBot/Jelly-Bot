@@ -347,7 +347,7 @@ def extract_frames(apng_bin: bytes) -> List[Tuple[bytes, Fraction]]:
 
     main_data_chunks = _group_chunks(chunk)
 
-    for idx in range(len(main_data_chunks)):
+    for idx in range(len(main_data_chunks)):  # pylint: disable=consider-using-enumerate
         if image_data_prev:
             fcTL, fdAT_IDAT_list = main_data_chunks[idx - 2]
             image_data_prev = False
