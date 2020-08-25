@@ -14,6 +14,8 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/dev)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/dev)
 [![Codacy](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RxJellyBot/Jelly-Bot)
 
+#### Coding timer since Aug. 24, 2020
+[![Wakatime](https://wakatime.com/badge/github/RaenonX/Jelly-Bot.svg)](https://wakatime.com/badge/github/RaenonX/Jelly-Bot)
 
 Supported on Discord and LINE. Feel free to add it to your group!
 
