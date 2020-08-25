@@ -17,6 +17,9 @@
 #### Coding timer since Aug. 24, 2020
 [![Wakatime](https://wakatime.com/badge/github/RaenonX/Jelly-Bot.svg)](https://wakatime.com/badge/github/RaenonX/Jelly-Bot)
 
+#### Coding activity in 30 days
+[![Wakatime](https://wakatime.com/share/@RaenonX/dba9dda8-9ea7-40d3-98c1-be4ebfb8eb48.svg)](https://wakatime.com/badge/github/RaenonX/Jelly-Bot)
+
 Supported on Discord and LINE. Feel free to add it to your group!
 
 LINE Bot: http://rnnx.cc/Line
