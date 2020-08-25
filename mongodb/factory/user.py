@@ -121,6 +121,7 @@ class _RootUserManager(BaseCollection):
 
         APIUserManager.clear()
         OnPlatformIdentityManager.clear()
+        OnPlatformUserModel.clear_name_cache()
 
     def _register(self, u_reg_func, get_oid_func, root_from_oid_func, conn_arg_name,
                   oc_onconn_failed, oc_onreg_failed, args, hint="(Unknown)", conn_arg_list=False,

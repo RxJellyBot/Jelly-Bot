@@ -172,9 +172,10 @@ class TestRootUserManager(TestModelMixin):
     LINE_TOKEN = "U4c94d18c660743c963fd3a08a025b8b3"  # Actually exists
     LINE_TOKEN_2 = "U4c94d18c660743c963fd3a08a025b8b4"  # Dummy
     LINE_NAME = "RaenonX"  # Actual name
-    LINE_CHANNEL_MODEL = ChannelModel(Id=ObjectId("5dd1bd8290ff56e291b72e65"), Platform=Platform.LINE,
-                                      Token="C2525832a417beda4e9cde5c335620736",
-                                      Config=ChannelConfigModel(DefaultProfileOid=ObjectId()))  # Actually exists
+    LINE_CHANNEL_MODEL = ChannelModel(
+        Id=ObjectId("5dd1bd8290ff56e291b72e65"), Platform=Platform.LINE, Token="C2525832a417beda4e9cde5c335620736",
+        Config=ChannelConfigModel(DefaultProfileOid=ObjectId())
+    )  # Actually exists
 
     @staticmethod
     def obj_to_clear():
@@ -322,7 +323,7 @@ class TestRootUserManager(TestModelMixin):
                             Config=RootUserConfigModel.generate_default())
         RootUserManager.insert_one(mdl)
         OnPlatformIdentityManager.insert_one(
-            OnPlatformUserModel(Id=self.ONPLAT_OID, Platform=Platform.DISCORD, Token=self.DISCORD_TOKEN)
+            OnPlatformUserModel(Id=self.ONPLAT_OID, Platform=Platform.LINE, Token=self.LINE_TOKEN)
         )
 
         self.assertEqual(
@@ -349,6 +350,23 @@ class TestRootUserManager(TestModelMixin):
         self.assertEqual(
             RootUserManager.get_root_data_uname(self.ROOT_OID, self.LINE_CHANNEL_MODEL, on_not_found="N/A"),
             (self.ROOT_OID, "N/A")
+        )
+
+    def test_get_root_data_uname_has_both(self):
+        mdl = RootUserModel(Id=self.ROOT_OID, ApiOid=self.API_OID, OnPlatOids=[self.ONPLAT_OID],
+                            Config=RootUserConfigModel.generate_default())
+        RootUserManager.insert_one(mdl)
+        OnPlatformIdentityManager.insert_one(
+            OnPlatformUserModel(Id=self.ONPLAT_OID, Platform=Platform.LINE, Token=self.LINE_TOKEN)
+        )
+
+        self.assertEqual(
+            RootUserManager.get_root_data_uname(self.ROOT_OID),
+            (self.ROOT_OID, "RaenonX")
+        )
+        self.assertEqual(
+            RootUserManager.get_root_data_uname(self.ROOT_OID, on_not_found="N/A"),
+            (self.ROOT_OID, "RaenonX")
         )
 
     def test_get_root_data_uname_str_oid(self):

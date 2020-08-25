@@ -7,7 +7,7 @@ from mongodb.factory import APIStatisticsManager
 from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
 
-__all__ = ["TestAPIStatisticsManager"]
+__all__ = ("TestAPIStatisticsManager",)
 
 
 class TestAPIStatisticsManager(TestTimeComparisonMixin, TestModelMixin, TestDatabaseMixin):

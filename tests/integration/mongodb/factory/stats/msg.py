@@ -530,6 +530,66 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
             set()
         )
 
+    def test_get_channel_last_message_ts_single_channel(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_channel_last_message_ts(self.USER_OID, self.CHANNEL_OID)
+
+        self.assertEqual(
+            result,
+            {self.CHANNEL_OID: datetime(2020, 6, 4, tzinfo=pytz.utc)}
+        )
+
+    def test_get_channel_last_message_ts_multi_channel(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_channel_last_message_ts(
+            self.USER_OID,
+            [self.CHANNEL_OID, self.CHANNEL_OID_2]
+        )
+
+        self.assertEqual(
+            result,
+            {
+                self.CHANNEL_OID: datetime(2020, 6, 4, tzinfo=pytz.utc),
+                self.CHANNEL_OID_2: datetime(2020, 4, 1, tzinfo=pytz.utc)
+            }
+        )
+
+    def test_get_channel_last_message_ts_contains_no_message(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_channel_last_message_ts(
+            self.USER_OID,
+            [self.CHANNEL_OID, self.CHANNEL_OID_2, self.CHANNEL_OID_3]
+        )
+
+        self.assertEqual(
+            result,
+            {
+                self.CHANNEL_OID: datetime(2020, 6, 4, tzinfo=pytz.utc),
+                self.CHANNEL_OID_2: datetime(2020, 4, 1, tzinfo=pytz.utc)
+            }
+        )
+
+    def test_get_channel_last_message_ts_no_data(self):
+        result = MessageRecordStatisticsManager.get_channel_last_message_ts(
+            self.USER_OID,
+            [self.CHANNEL_OID, self.CHANNEL_OID_2]
+        )
+
+        self.assertEqual(result, {})
+
+    def test_get_channel_last_message_ts_user_no_message(self):
+        self._insert_messages()
+
+        result = MessageRecordStatisticsManager.get_channel_last_message_ts(
+            ObjectId(),
+            [self.CHANNEL_OID, self.CHANNEL_OID_2]
+        )
+
+        self.assertEqual(result, {})
+
     def _insert_messages_3(self):
         mdls = [
             MessageRecordModel(Id=ObjectId.from_datetime(datetime(2020, 6, 1, 1, tzinfo=pytz.utc)),

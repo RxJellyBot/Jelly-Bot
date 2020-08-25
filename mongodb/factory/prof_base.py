@@ -165,11 +165,14 @@ class _UserProfileManager(BaseCollection):
 
     def get_users_exist_channel_dict(self, user_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """
-        Get a :class:`dict` which for each element:
+        Get a dict which key is the user OID and value is the set of the channel OIDs they are in.
 
-            key is each user listed in ``user_oids`` and
+        If the user is in ``user_oids`` but not in any of the channels, the returned corresponding value
+        will be an empty set.
 
-            value is the OIDs of the channel they are in.
+        If the user does not have any profile connection created yet (joining and leaving a group leaves a profile
+        connection with no profile; user who never joined the group will **NOT** create profile connection),
+        the returned :class:`dict` will not have their OID as the key.
 
         :param user_oids: list of users to be checked
         :return: a `dict` containing the information described above
@@ -222,9 +225,7 @@ class _UserProfileManager(BaseCollection):
 
     def get_profiles_user_oids(self, profile_oids: List[ObjectId]) -> Dict[ObjectId, Set[ObjectId]]:
         """
-        Get a dict which
-            key is the profile OID
-            value is the user who have the corresponding profile
+        Get a :class:`dict` which key is the profile OID and value is the user OIDs who have the profile.
 
         This method does **NOT** check if the profile actually exists or not.
 
@@ -562,8 +563,7 @@ class _ProfileDataManager(BaseCollection):
     @arg_type_ensure
     def update_profile(self, profile_oid: ObjectId, **new_jkwargs) -> UpdateOutcome:
         """
-        Update a profile using the data in ``new_jkwargs``
-        which the key should be the json key of :class:`ChannelProfileModel`.
+        Update ``profile_oid`` ``new_jkwargs`` which key is the json key of :class:`ChannelProfileModel`.
 
         ``new_jkwargs`` will be validated.
 

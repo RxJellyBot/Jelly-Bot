@@ -1,19 +1,19 @@
 # Translation of Traditional Chinese (Taiwan) of Jelly Bot.
 # Copyright (C) 2019 RaenonX JELLYCAT
 # RaenonX JELLYCAT <raenonx0710@gmail.com>, 2019.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-24 06:09-0500\n"
+"POT-Creation-Date: 2020-08-24 19:54-0500\n"
 "PO-Revision-Date: 2020-08-22 00:15-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_TW\n"
 "X-Generator: Poedit 2.2.3\n"
 
 #: .\JellyBot\api\static\info.py:16
@@ -63,8 +63,8 @@ msgid ""
 "paste it in <a href=\"%(url1)s%(url2)s\">this page</a> to unlock the power "
 "of the bot!"
 msgstr ""
-"感謝使用小水母！輸入 <code>%(cmd)s</code> 獲取執行碼，然後到 <a href=\"%"
-"(url1)s%(url2)s\">this page</a> 貼上該執行碼解放機器人的力量吧！"
+"感謝使用小水母！輸入 <code>%(cmd)s</code> 獲取執行碼，然後到 <a href="
+"\"%(url1)s%(url2)s\">this page</a> 貼上該執行碼解放機器人的力量吧！"
 
 #: .\JellyBot\views\about.py:14 .\JellyBot\views\nav.py:25
 msgid "About"
@@ -2693,9 +2693,9 @@ msgstr ""
 #: .\msghandle\botcmd\command\ar.py:175
 msgid ""
 "The keyword of the module to delete. Note that this also deletes the keyword "
-"which type is NOT text. For example, if there is a module which keyword 100"
-"(Text) and another module which keyword is 100(Sticker), both modules will "
-"be deleted if this argument is 100."
+"which type is NOT text. For example, if there is a module which keyword "
+"100(Text) and another module which keyword is 100(Sticker), both modules "
+"will be deleted if this argument is 100."
 msgstr ""
 "要刪除的自動回覆組的關鍵字。請注意，此指令也會刪除關鍵字種類**並非**文字的回"
 "覆組。舉例來說，假設有一組回覆組的關鍵字是100(文字)，另一組回覆組的關鍵字是"
@@ -3729,6 +3729,7 @@ msgid "**{} timer(s) have timed up!**"
 msgstr "**{} 個計時器時間到！**"
 
 #: .\msghandle\text\timer.py:41
+#, python-brace-format
 msgid "- {event} has timed up! (at {time})"
 msgstr "- {event} 結束於 {time}！"
 
@@ -3737,6 +3738,7 @@ msgid "**{} timer(s) will time up in less than {:.0f} minutes!**"
 msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 
 #: .\msghandle\text\timer.py:55
+#, python-brace-format
 msgid "- {event} will time up after [{diff}]! (at {time})"
 msgstr "- {event} 將於 [{diff}] 後時間到！(於 {time})"
 
@@ -3780,14 +3782,17 @@ msgid "Message Count Before {}"
 msgstr "{} 前的訊息量"
 
 #: .\strres\models.py:15
+#, python-brace-format
 msgid "- [{diff}] past {event} (at {time})"
 msgstr "- 距 {event} 已經過 [{diff}] (時間: {time})"
 
 #: .\strres\models.py:16
+#, python-brace-format
 msgid "- {event} has ended (at {time})"
 msgstr "- {event} 已結束 (於 {time})"
 
 #: .\strres\models.py:17
+#, python-brace-format
 msgid "- [{diff}] to {event} (at {time})"
 msgstr "- 距 {event} 還有 [{diff}] (時間: {time})"
 
@@ -3820,8 +3825,8 @@ msgstr ""
 "如果您是在LINE上使用此機器人，請確認您已加入小水母好友。\n"
 "如果還是存在此問題，請至 %(host)s 聯絡開發者。\n"
 "\n"
-"此訊息於同一頻道內只會在有無法獲得代碼的使用者嘗試使用機器人功能時，每 %"
-"(nsec)d 秒內發送一次。"
+"此訊息於同一頻道內只會在有無法獲得代碼的使用者嘗試使用機器人功能時，每 "
+"%(nsec)d 秒內發送一次。"
 
 #: .\strres\msghandle.py:31
 msgid "Message length overlimit"
@@ -3944,14 +3949,15 @@ msgid ""
 "know how to check the channel token or channel id (The bot maker may not "
 "implement this).</small> </li> </ul>"
 msgstr ""
-"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href=\"%"
-"(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道如何"
-"確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href=\"%"
-"(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使用"
-"官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作者"
-"可能不會實作頻道資訊查詢功能。</small></li></ul>"
+"如果你:<br> <ul> <li> 沒有找到所要找的頻道: <br> <small>請到<a href="
+"\"%(reg_url)s\">頻道登錄頁面</a>登錄頻道成員身份。</small> </li> <li> 不知道"
+"如何確定要管理的頻道是哪個:<br> <small>如果是使用官方處理端口，請查閱<a href="
+"\"%(ch_info_url)s\">此頁面</a>以獲取查詢頻道代碼的方法。<br>如果<b>沒有</b>使"
+"用官方處理端口，請查閱處理端口的頻道代碼獲取說明或聯繫該端口作者。請注意，作"
+"者可能不會實作頻道資訊查詢功能。</small></li></ul>"
 
 #: .\templates\account\channel\list.html:119
+#, python-brace-format
 msgid "Are you sure to detach ${name}?"
 msgstr "確定要解除身份組: ${name}嗎？"
 
@@ -4432,10 +4438,12 @@ msgid "Update"
 msgstr "更新"
 
 #: .\templates\ar\add-js.html:222
+#, python-brace-format
 msgid "const msg = `The content of <strong>${name}</strong> is invalid.`;"
 msgstr "const msg = `<strong>${name}</strong>的內容無效。`;"
 
 #: .\templates\ar\add-js.html:254
+#, python-brace-format
 msgid ""
 "const msg = `The content length of <strong>${txtareaFor}</strong> is "
 "overlimit. (Limit: ${valMax} / Current: <strong>${valNow}</strong>)`;"
@@ -4444,6 +4452,7 @@ msgstr ""
 "${valMax} / 目前長度: <strong>${valNow})</strong>`;"
 
 #: .\templates\ar\add-js.html:259
+#, python-brace-format
 msgid ""
 "const msg = `The content length of <strong>${txtareaFor}</strong> cannot be "
 "0.`;"
@@ -4653,8 +4662,8 @@ msgstr "標籤關鍵字"
 #: .\templates\ar\add-props.html:86
 #, python-format
 msgid ""
-"Make sure that the Tag searching keyword does NOT contains '%(tag_splitter)"
-"s' and NOT empty."
+"Make sure that the Tag searching keyword does NOT contains "
+"'%(tag_splitter)s' and NOT empty."
 msgstr "請確認標籤搜尋關鍵字不包含 %(tag_splitter)s 並且不是空字串。"
 
 #: .\templates\ar\add-props.html:100 .\templates\ar\add-props.html:118
@@ -4954,8 +4963,8 @@ msgstr "指令前綴&nbsp;<strong>大小寫有別</strong>。"
 #: .\templates\doc\botcmd_main.html:28
 #, python-format
 msgid ""
-"The splitter(s) between the command code and its arguments is/are&nbsp;%"
-"(splhtml)s.&nbsp;"
+"The splitter(s) between the command code and its arguments is/are&nbsp;"
+"%(splhtml)s.&nbsp;"
 msgstr "指令參數和指令代碼的分隔子為&nbsp;%(splhtml)s。&nbsp;"
 
 #: .\templates\doc\botcmd_main.html:36
@@ -5070,8 +5079,8 @@ msgid ""
 "<strong>NOT the channel token</strong>. </li> <li>Channel ID - <strong><code>"
 "%(channel_oid)s</code></strong> appears on <a href=\"%(channel_list)s\">this "
 "page</a>. </li> <li>Channel info has not been set to be private.</li> </ul> "
-"If all the conditions match, but the error still occurs, please <a href=\"%"
-"(about_page)s\">contact the website developer.</a>"
+"If all the conditions match, but the error still occurs, please <a href="
+"\"%(about_page)s\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>的長度是24字元。</li> "
 "<li><code>%(channel_oid)s</code>是頻道ID，而<strong>不是</strong>頻道代碼。</"
@@ -5124,8 +5133,8 @@ msgid ""
 "\">contact the website developer.</a>"
 msgstr ""
 "請確認:<br> <ul> <li><code>%(channel_oid)s</code>是頻道ID，而<strong>不是頻道"
-"代碼</strong>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href=\"%"
-"(about_page)s\">聯絡網站開發者。</a>"
+"代碼</strong>。</li> </ul>如果所有條件已符合，但是還是發生錯誤，請<a href="
+"\"%(about_page)s\">聯絡網站開發者。</a>"
 
 #: .\templates\err\info\chcoll_not_found.html:19
 msgid ""
@@ -5575,6 +5584,7 @@ msgid "Control"
 msgstr "身份組控制"
 
 #: .\templates\info\profile.html:171
+#, python-brace-format
 msgid "Are you sure to detach ${profileName} from ${userName} ?"
 msgstr "確定要將身份組 ${profileName} 從 ${userName} 身上移除嗎？"
 
