@@ -73,7 +73,7 @@ class DiscordClient(Client):
     # noinspection PyMethodMayBeStatic
     async def on_private_channel_create(self, channel: Union[DMChannel, GroupChannel]):
         """Contains the code to be executed when a private channel is created."""
-        outcome = ChannelManager.ensure_register(Platform.DISCORD, channel.id, default_name=str(channel)).outcome
+        outcome = ChannelManager.ensure_register(Platform.DISCORD, channel.id, default_name=str(channel))
 
         if not outcome.success:
             warn_txt = f"Private channel CREATED but the registration was failed.\n" \

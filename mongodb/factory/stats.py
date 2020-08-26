@@ -120,7 +120,7 @@ class _MessageRecordStatisticsManager(BaseCollection):
     # pylint: enable=too-many-arguments
 
     @arg_type_ensure
-    def get_recent_messages(self, channel_oid: ObjectId, limit: Optional[int] = None) \
+    def get_recent_messages(self, channel_oid: ObjectId, *, limit: Optional[int] = None, skip: Optional[int] = None) \
             -> ExtendedCursor[MessageRecordModel]:
         """
         Get recent messages in the ``channel_oid``.
@@ -131,10 +131,21 @@ class _MessageRecordStatisticsManager(BaseCollection):
 
         :param channel_oid: channel of the returned messages
         :param limit: max count of the results
+        :param skip: count of the messages to skip
         :return: a cursor yielding messages in `channel_oid` from the most recent one
         """
+        addl_kwargs = {}
+
+        # Both `limit` and `skip` cannot accept ``None``, so only attach them if needed
+
+        if limit:
+            addl_kwargs["limit"] = limit
+
+        if skip:
+            addl_kwargs["skip"] = skip
+
         return self.find_cursor_with_count({MessageRecordModel.ChannelOid.key: channel_oid},
-                                           sort=[(OID_KEY, pymongo.DESCENDING)], limit=limit if limit else 0)
+                                           sort=[(OID_KEY, pymongo.DESCENDING)], **addl_kwargs)
 
     @arg_type_ensure
     def get_message_frequency(self, channel_oid: ObjectId, range_mins: Union[float, int, None] = None) -> float:

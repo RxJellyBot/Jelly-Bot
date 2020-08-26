@@ -846,6 +846,3 @@ class MemberMessageByCategoryResult:
         return MemberMessageByCategoryEntry(self.LABEL_CATEGORY)
 
 # endregion
-
-
-# pylint: enable=too-few-public-methods

@@ -11,7 +11,7 @@ from JellyBot.systemconfig import System
 from bot.user import perform_existence_check
 from bot.system import record_boot_dt
 from extutils.ddns import activate_ddns_update
-from msghandle import load_handling_functions
+from msghandle import HandlingFunctionBox
 
 __all__ = ["signal_discord_ready", "signal_django_ready"]
 
@@ -40,7 +40,7 @@ def _check_all_ready():
 
 def on_system_fully_ready():
     """Code to execute when the system is fully prepared (Discord bot and Django application ready)."""
-    load_handling_functions()
+    HandlingFunctionBox.load()
     record_boot_dt()
 
     if settings.PRODUCTION:

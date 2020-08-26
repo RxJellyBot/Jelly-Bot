@@ -15,7 +15,7 @@ from mongodb.factory.results import WriteOutcome
 from tests.base import TestDatabaseMixin, TestModelMixin, TestTimeComparisonMixin
 from strres.models import StatsResults
 
-__all__ = ["TestMessageRecordStatisticsManager"]
+__all__ = ("TestMessageRecordStatisticsManager",)
 
 
 class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin, TestDatabaseMixin):
@@ -92,12 +92,20 @@ class TestMessageRecordStatisticsManager(TestTimeComparisonMixin, TestModelMixin
         mdls = self._insert_messages()
 
         self.assertModelSequenceEqual(
-            MessageRecordStatisticsManager.get_recent_messages(self.CHANNEL_OID, 2),
+            MessageRecordStatisticsManager.get_recent_messages(self.CHANNEL_OID, limit=2),
             list(reversed(mdls[4:6]))
         )
         self.assertModelSequenceEqual(
-            MessageRecordStatisticsManager.get_recent_messages(self.CHANNEL_OID, 1),
+            MessageRecordStatisticsManager.get_recent_messages(self.CHANNEL_OID, limit=1),
             [mdls[5]]
+        )
+
+    def test_get_recent_skipped(self):
+        mdls = self._insert_messages()
+
+        self.assertModelSequenceEqual(
+            MessageRecordStatisticsManager.get_recent_messages(self.CHANNEL_OID, skip=2),
+            list(reversed(mdls[0:4]))
         )
 
     def test_get_recent_channel_miss(self):

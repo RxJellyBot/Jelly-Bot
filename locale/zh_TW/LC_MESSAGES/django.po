@@ -1,13 +1,13 @@
 # Translation of Traditional Chinese (Taiwan) of Jelly Bot.
 # Copyright (C) 2019 RaenonX JELLYCAT
 # RaenonX JELLYCAT <raenonx0710@gmail.com>, 2019.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-25 10:45-0500\n"
-"PO-Revision-Date: 2020-08-22 00:15-0500\n"
+"POT-Creation-Date: 2020-08-25 22:38-0500\n"
+"PO-Revision-Date: 2020-08-25 22:41-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -1168,8 +1168,8 @@ msgid "Text / Recent / Message"
 msgstr "文字 / 近期 / 訊息"
 
 #: .\flags\botfeature.py:183
-msgid "Get recent messages including the recalled ones."
-msgstr "獲取近期訊息。這些訊息中包含已經收回的訊息。"
+msgid "Get recent messages excluding the message that called this command."
+msgstr "獲取近期訊息。結果中並不包含呼叫此指令的訊息。"
 
 #: .\flags\botfeature.py:186
 msgid "Text / Remote / Activate"
@@ -3141,19 +3141,24 @@ msgstr "沒有找到名稱為 `{}` 的身份組。"
 msgid "Insufficient permission to delete profile."
 msgstr "因權限不足，無法刪除身份組。"
 
-#: .\msghandle\botcmd\command\rct.py:13
+#: .\msghandle\botcmd\command\rct.py:26
 msgid "Recent Activity"
 msgstr "近期活動"
 
-#: .\msghandle\botcmd\command\rct.py:14
+#: .\msghandle\botcmd\command\rct.py:27
 msgid "Check various types of recent activities."
 msgstr "查閱各種近期活動紀錄。"
 
-#: .\msghandle\botcmd\command\rct.py:36
+#: .\msghandle\botcmd\command\rct.py:48
 msgid "Visit {}{}?{} to see the most recent {} messages. Login required."
 msgstr "瀏覽 {}{}?{} 以查閱最新 {} 則訊息。此連結必須登入。"
 
-#: .\msghandle\botcmd\command\rct.py:50
+#: .\msghandle\botcmd\command\rct.py:62
+#, python-format
+msgid "This returns recent %d messages."
+msgstr "此指令會回覆最近的 %d 則訊息(包含已收回的訊息)。"
+
+#: .\msghandle\botcmd\command\rct.py:83
 msgid "Maximum count of the recent messages to see."
 msgstr "查閱近期訊息的最大數量。"
 
@@ -4819,8 +4824,7 @@ msgid "Auto-Reply Ranking"
 msgstr "自動回覆排行"
 
 #: .\templates\ar\rk-main.html:16 .\templates\info\botstats\main.html:17
-#: .\templates\info\channel\main.html:17
-#: .\templates\info\msgstats\main.html:17
+#: .\templates\info\channel\main.html:17 .\templates\info\msgstats\main.html:17
 #: .\templates\info\recent\message.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "

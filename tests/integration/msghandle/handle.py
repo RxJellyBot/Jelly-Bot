@@ -5,7 +5,7 @@ from flags import ChannelType, ImageContentType, MessageType, BotFeature
 from models import MessageRecordModel, BotFeatureUsageModel
 from mongodb.factory import MessageRecordStatisticsManager, BotFeatureUsageDataManager
 from msghandle.handle import (
-    handle_message_main, load_handling_functions, unload_handling_functions, HandlingFunctionsNotLoadedError
+    handle_message_main, HandlingFunctionBox, HandlingFunctionsNotLoadedError
 )
 from msghandle.models import ImageContent, LineStickerContent, HandledMessageEventsHolder, HandledMessageEventText
 from strres.msghandle import HandledResult
@@ -38,11 +38,11 @@ class TestHandleMessageMainEntryPoint(TestModelMixin):
     @classmethod
     def setUpTestClass(cls):
         EventFactory.prepare_data()
-        load_handling_functions()
+        HandlingFunctionBox.load()
 
     @classmethod
     def tearDownTestClass(cls):
-        unload_handling_functions()
+        HandlingFunctionBox.unload()
 
     def test_handle_line_prv_text(self):
         event = EventFactory.generate_text("TEST", EventFactory.CHANNEL_LINE_PRV_1_OID, EventFactory.USER_1_OID,

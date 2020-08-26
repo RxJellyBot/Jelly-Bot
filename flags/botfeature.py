@@ -180,7 +180,7 @@ class BotFeature(FlagDoubleEnum):
         _("Randomly pick an option among the provided options multiple times.")
 
     TXT_RCT_MESSAGE = \
-        1131, _("Text / Recent / Message"), _("Get recent messages including the recalled ones.")
+        1131, _("Text / Recent / Message"), _("Get recent messages excluding the message that called this command.")
 
     TXT_RMC_ACTIVATE = \
         1141, _("Text / Remote / Activate"), _("Activate the remote control system.")

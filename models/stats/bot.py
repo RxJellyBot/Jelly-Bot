@@ -271,5 +271,3 @@ class BotFeatureHourlyAvgResult(HourlyResult):
 
         entry = UsageEntry(feature=StatsResults.CATEGORY_TOTAL, data=hr_sum, color="#323232", hidden="false")
         self.data = [entry] + list(sorted(self.data, key=lambda i: i.feature.code))
-
-# pylint: enable=too-few-public-methods

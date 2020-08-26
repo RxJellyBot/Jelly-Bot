@@ -1,3 +1,16 @@
+"""
+Entry point of the bot command ``JC RCT`` - recent activity.
+
+--------
+
+For recent messages ``JC RCT M``, there are some defaults:
+
+``Bot.RecentActivity.DefaultLimitCountLink``
+    Default count of the messages that will be returned as the link to the recent activity page.
+
+``Bot.RecentActivity.DefaultLimitCountDirect``
+    Default count of the messages that will be directly output to the command.
+"""
 from django.urls import reverse
 from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +33,9 @@ def _content_recent_msgs(e: TextMessageEventObject, limit: int):
 
     ctnt = []
 
-    recent_messages = MessageStatsDataProcessor.get_recent_messages(e.channel_model, limit, e.user_model.config.tzinfo)
+    # Skip = 1 to skip the message that calls the command
+    recent_messages = MessageStatsDataProcessor.get_recent_messages(e.channel_model,
+                                                                    limit=limit, tz=e.user_model.config.tzinfo)
 
     for data in recent_messages.data:
         ctnt.append(f"{data.timestamp} - {data.model.message_content}")
@@ -29,9 +44,6 @@ def _content_recent_msgs(e: TextMessageEventObject, limit: int):
 
 
 def _link_recent_msgs(e: TextMessageEventObject, limit: int):
-    qd = QueryDict("", mutable=True)
-    qd.update({"limit": limit})
-
     return HandledMessageEventText(
         content=_("Visit {}{}?{} to see the most recent {} messages. Login required.").format(
             HostUrl,
@@ -39,9 +51,30 @@ def _link_recent_msgs(e: TextMessageEventObject, limit: int):
                 "info.channel.recent.message",
                 kwargs={"channel_oid": e.channel_oid}
             ),
-            qd.urlencode(),
-            limit)
+            QueryDict("", mutable=True).update({"limit": limit}).urlencode(),
+            limit
+        )
     )
+
+
+@cmd_msg.command_function(
+    feature=BotFeature.TXT_RCT_MESSAGE,
+    description=_("This returns recent %d messages.") % Bot.RecentActivity.DefaultLimitCountDirect,
+    cooldown_sec=Bot.RecentActivity.CooldownSeconds
+)
+def get_recent_messages_simple(e: TextMessageEventObject):
+    """
+    Command to get the most recent messages with default count.
+
+    This command has a cooldown of ``Bot.RecentActivity.CooldownSeconds`` seconds.
+
+    This command will get the most recent ``Bot.RecentActivity.DefaultLimitCountDirect`` messages without the message
+    that called this command.
+
+    :param e: message event that calls this command
+    :return: default count of most recent messages with a link to the recent activity page
+    """
+    return get_recent_messages(e, Bot.RecentActivity.DefaultLimitCountLink)
 
 
 @cmd_msg.command_function(
@@ -51,12 +84,11 @@ def _link_recent_msgs(e: TextMessageEventObject, limit: int):
     cooldown_sec=Bot.RecentActivity.CooldownSeconds
 )
 def get_recent_messages(e: TextMessageEventObject, limit: int):
+    """
+    Command to get the recent message with limited count ``limit``.
+
+    :param e: message event that calls this command
+    :param limit: max count of the result to return
+    :return: most recent `limit` message with a link to the recent activity page
+    """
     return [_content_recent_msgs(e, limit), _link_recent_msgs(e, limit)]
-
-
-@cmd_msg.command_function(
-    feature=BotFeature.TXT_RCT_MESSAGE,
-    cooldown_sec=Bot.RecentActivity.CooldownSeconds
-)
-def get_recent_messages_simple(e: TextMessageEventObject):
-    return get_recent_messages(e, Bot.RecentActivity.DefaultLimitCountLink)

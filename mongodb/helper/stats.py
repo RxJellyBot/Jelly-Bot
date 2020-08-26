@@ -375,7 +375,7 @@ class MessageStatsDataProcessor:
 
     @staticmethod
     def _get_user_msg_stats(msg_result: MemberMessageByCategoryResult,
-                            ch_data: Union[ChannelModel, ChannelCollectionModel] = None,
+                            ch_data: Union[ChannelModel, ChannelCollectionModel] = None, *,
                             available_only: bool = True) -> UserMessageStats:
         # pylint: disable=too-many-locals
 
@@ -518,8 +518,10 @@ class MessageStatsDataProcessor:
         """
         return MessageStatsDataProcessor._get_user_msg_stats(
             MessageRecordStatisticsManager.get_user_messages_by_category(
-                channel_data.id, hours_within=hours_within, start=start, end=end),
-            channel_data, available_only
+                channel_data.id, hours_within=hours_within, start=start, end=end
+            ),
+            channel_data,
+            available_only=available_only
         )
 
     @staticmethod
@@ -539,8 +541,10 @@ class MessageStatsDataProcessor:
         """
         return MessageStatsDataProcessor._get_user_msg_stats(
             MessageRecordStatisticsManager.get_user_messages_by_category(
-                chcoll_data.child_channel_oids, hours_within=hours_within, start=start, end=end),
-            chcoll_data, available_only=available_only
+                chcoll_data.child_channel_oids, hours_within=hours_within, start=start, end=end
+            ),
+            chcoll_data,
+            available_only=available_only
         )
 
     @staticmethod
@@ -580,18 +584,20 @@ class MessageStatsDataProcessor:
             chcoll_data.child_channel_oids, root_oid, hours_within=hours_within, start=start, end=end)
 
     @staticmethod
-    def get_recent_messages(channel_data: ChannelModel, limit: Optional[int] = None, tz: Optional[tzinfo] = None) \
+    def get_recent_messages(channel_data: ChannelModel, *,
+                            limit: Optional[int] = None, skip: Optional[int] = None, tz: Optional[tzinfo] = None) \
             -> HandledMessageRecords:
         """
         Get the most recent messages of ``channel_data``.
 
         :param channel_data: channel to get the recent messages
         :param limit: maximum count of the messages to be returned
+        :param skip: count of the messages to skip in the returned result
         :param tz: timezone info to apply on the message timestamps
         :return: a `HandledMessageRecords`
         """
         ret = []
-        msgs = list(MessageRecordStatisticsManager.get_recent_messages(channel_data.id, limit))
+        msgs = list(MessageRecordStatisticsManager.get_recent_messages(channel_data.id, limit=limit, skip=skip))
         uids = {msg.user_root_oid for msg in msgs}
         uids_handled = IdentitySearcher.get_batch_user_name(uids, channel_data)
 
@@ -689,5 +695,3 @@ class BotUsageStatsDataProcessor:
             )
 
         return PerMemberStats(data=data, features=features)
-
-    # pylint: enable=too-few-public-methods
