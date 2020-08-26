@@ -138,8 +138,8 @@ class Email:
     """configuration of various email-related controls."""
 
     EmailCacheExpirySeconds = 3600  # 60 mins
-    DefaultSubject = "Email Notification from Jelly BOT"
-    DefaultPrefix = "Jelly BOT - "
+    DefaultSubject = "[BOT] Email Notification"
+    DefaultPrefix = "[BOT] "
 
 
 class ExecodeManager:
