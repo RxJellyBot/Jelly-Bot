@@ -36,6 +36,8 @@ include-naming-hint=yes
 
 [DESIGN]
 
+min-public-methods=1
+
 max-parents=15
 
 max-args=5

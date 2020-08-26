@@ -4,9 +4,6 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ("DateTime",)
 
 
-# pylint: disable=too-few-public-methods
-
-
 class DateTime:
     """String resources for :class:`extutils.dt`."""
 

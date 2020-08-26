@@ -13,7 +13,7 @@ from models import OID_KEY  # pylint: disable=cyclic-import
 __all__ = ("HourlyResult", "DailyResult")
 
 
-class HourlyResult(abc.ABC):  # pylint: disable=too-few-public-methods
+class HourlyResult(abc.ABC):
     """
     Base hourly result object.
 

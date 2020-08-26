@@ -663,8 +663,6 @@ class PerMemberStats:
 class BotUsageStatsDataProcessor:
     """Class to integrate the operations of getting the bot usage stats and process them for webpage rendering."""
 
-    # pylint: disable=too-few-public-methods
-
     @staticmethod
     def get_per_user_bot_usage(channel_data: ChannelModel, *, hours_within: Optional[int] = None) \
             -> PerMemberStats:

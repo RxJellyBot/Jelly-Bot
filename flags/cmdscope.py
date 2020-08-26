@@ -43,10 +43,8 @@ class CommandScope:
         return ' / '.join([str(ctype.key) for ctype in self.available_ctypes])
 
 
-class CommandScopeCollection:
+class CommandScopeCollection:  # pylint: disable=too-few-public-methods
     """Defined available command scopes to be used."""
-
-    # pylint: disable=too-few-public-methods
 
     NOT_RESTRICTED = CommandScope(_("Not Restricted"))
     GROUP_ONLY = CommandScope(_("Group Only"), [ChannelType.GROUP_PUB_TEXT, ChannelType.GROUP_PRV_TEXT])

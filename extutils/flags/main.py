@@ -58,7 +58,7 @@ def is_flag_double(obj):
     return issubclass(obj, FlagDoubleMixin)
 
 
-class FlagMixin:  # pylint: disable=too-few-public-methods
+class FlagMixin:
     """Base class of a ``Flag``."""
 
     @classmethod
