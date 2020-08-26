@@ -6,7 +6,7 @@ from typing import Optional, Union, List
 
 from dateutil import parser
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from strres.extutils import DateTime
 
 
 def now_utc_aware(*, for_mongo: bool = False) -> datetime:
@@ -118,18 +118,7 @@ def t_delta_str(t_delta: timedelta) -> str:
     m = (t_delta.seconds - 3600 * h) // 60
     s = t_delta.seconds % 60
 
-    str_dict = {
-        "d": t_delta.days,
-        "h": h,
-        "m": m,
-        "s": s
-    }
-
-    if t_delta.days > 3:
-        return _("%(d)d Days %(h)d H %(m)02d M %(s)02d S") % str_dict
-
-    h += t_delta.days * 24
-    return _("%(h)d H %(m)02d M %(s)02d S") % str_dict
+    return DateTime.get_time_expr(h, m, s, t_delta.days)
 
 
 def parse_to_dt(dt_str: str, tzinfo_: Optional[tzinfo] = None) -> Optional[datetime]:

@@ -1,12 +1,12 @@
 # Translation of Traditional Chinese (Taiwan) of Jelly Bot.
 # Copyright (C) 2019 RaenonX JELLYCAT
 # RaenonX JELLYCAT <raenonx0710@gmail.com>, 2019.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-25 22:38-0500\n"
+"POT-Creation-Date: 2020-08-25 23:32-0500\n"
 "PO-Revision-Date: 2020-08-25 22:41-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
@@ -675,16 +675,6 @@ msgstr "%s 離開了群組。"
 #, python-format
 msgid "%s joined the group."
 msgstr "%s 加入了群組。"
-
-#: .\extutils\dt.py:129
-#, python-format
-msgid "%(d)d Days %(h)d H %(m)02d M %(s)02d S"
-msgstr "%(d)d 日 %(h)d 時 %(m)02d 分 %(s)02d 秒"
-
-#: .\extutils\dt.py:132
-#, python-format
-msgid "%(h)d H %(m)02d M %(s)02d S"
-msgstr "%(h)d 時 %(m)02d 分 %(s)02d 秒"
 
 #: .\extutils\linesticker\flag.py:16
 msgid "Animated Sticker"
@@ -3752,6 +3742,16 @@ msgstr "**{} 個計時器將於 {:.0f} 分鐘內時間到！**"
 msgid "- {event} will time up after [{diff}]! (at {time})"
 msgstr "- {event} 將於 [{diff}] 後時間到！(於 {time})"
 
+#: .\strres\extutils.py:38
+#, python-format
+msgid "%(d)d Days %(h)d H %(m)02d M %(s)02d S"
+msgstr "%(d)d 日 %(h)d 時 %(m)02d 分 %(s)02d 秒"
+
+#: .\strres\extutils.py:42
+#, python-format
+msgid "%(h)d H %(m)02d M %(s)02d S"
+msgstr "%(h)d 時 %(m)02d 分 %(s)02d 秒"
+
 # 遊戲地圖
 #: .\strres\game_pk\map.py:8
 msgid "Empty"
@@ -4824,7 +4824,8 @@ msgid "Auto-Reply Ranking"
 msgstr "自動回覆排行"
 
 #: .\templates\ar\rk-main.html:16 .\templates\info\botstats\main.html:17
-#: .\templates\info\channel\main.html:17 .\templates\info\msgstats\main.html:17
+#: .\templates\info\channel\main.html:17
+#: .\templates\info\msgstats\main.html:17
 #: .\templates\info\recent\message.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "

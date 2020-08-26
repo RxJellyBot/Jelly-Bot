@@ -20,6 +20,12 @@ class TestRemoteControlEntryModel(TestModel.TestClass, TestModelMixin):
     TGT_CID = ObjectId()
     EXPIRY = now_utc_aware()
 
+    PROF_OID = ObjectId()
+
+    @staticmethod
+    def obj_to_clear():
+        return [ChannelManager]
+
     @classmethod
     def get_model_class(cls) -> Type[Model]:
         return RemoteControlEntryModel
@@ -50,11 +56,12 @@ class TestRemoteControlEntryModel(TestModel.TestClass, TestModelMixin):
         self.assertEqual(mdl.expiry, exp_aware)
         self.assertEqual(mdl.expiry_str, "2020-05-15 08:00:00 (UTC+0800)")
 
-    @staticmethod
-    def prepare_channel_data():
+    @classmethod
+    def prepare_channel_data(cls):
         c_model = ChannelModel(
-            Platform=Platform.LINE, Token="ABC",
-            Config=ChannelConfigModel.generate_default(DefaultProfileOid=ObjectId()))
+            Id=cls.TGT_CID, Platform=Platform.LINE, Token="ABC",
+            Config=ChannelConfigModel.generate_default(DefaultProfileOid=cls.PROF_OID)
+        )
         ChannelManager.insert_one_model(c_model)
 
         return c_model
