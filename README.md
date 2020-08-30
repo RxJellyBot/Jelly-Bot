@@ -2,17 +2,17 @@
 
 #### GitHub Actions
 
-[![Jelly Bot - CI Test](https://github.com/RaenonX/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)](https://github.com/RaenonX/Jelly-Bot/actions)
+[![Jelly Bot - CI Test](https://github.com/RxJellyBot/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)](https://github.com/RxJellyBot/Jelly-Bot/actions)
 
 #### Master Branch - `master`
 
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/master)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/master)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=master)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+[![Codacy](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=master)](https://www.codacy.com/manual/RxJellyBot/Jelly-Bot)
 
 #### Development Branch - `dev`
 
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/dev)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/dev)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RaenonX/Jelly-Bot)
+[![Codacy](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RxJellyBot/Jelly-Bot)
 
 
 Supported on Discord and LINE. Feel free to add it to your group!
@@ -23,19 +23,19 @@ Discord Bot: http://rnnx.cc/Discord
 
 Website: http://rnnx.cc/Website
 
-### See [Latest Release](https://github.com/RaenonX/Jelly-Bot/releases/latest) for the latest features list!
+### See [Latest Release](https://github.com/RxJellyBot/Jelly-Bot/releases/latest) for the latest features list!
 
 <hr>
 
 ### Links
 
-[Features/Issues that has done implementing but not yet deployed](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+Awaiting+PR%22)
+[Features/Issues that has done implementing but not yet deployed](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+Awaiting+PR%22)
 
-[Features/Issues that is currently working on](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+In+Progress%22)
+[Features/Issues that is currently working on](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+In+Progress%22)
 
-[Features/Issues that should be started soon](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Priority%3A+9%22)
+[Features/Issues that should be started soon](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Priority%3A+9%22)
 
-[Known Bugs](https://github.com/RaenonX/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Type%3A+Bug%22)
+[Known Bugs](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Type%3A+Bug%22)
 
 <hr>
 

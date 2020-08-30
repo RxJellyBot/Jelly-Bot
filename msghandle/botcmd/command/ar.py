@@ -1,3 +1,4 @@
+"""Entry point of the bot command ``JC AR`` - auto-reply."""
 from typing import List
 
 from django.urls import reverse
@@ -16,10 +17,17 @@ from JellyBot.systemconfig import HostUrl, Bot
 
 from ._base import CommandNode
 
-__all__ = ("cmd_main",)
+__all__ = ("CMD_MAIN",)
+
+_description_str_dict = {
+    "default_pinned": Bot.AutoReply.DefaultPinned,
+    "default_private": Bot.AutoReply.DefaultPrivate,
+    "default_tags": Bot.AutoReply.DefaultTags,
+    "default_cd": Bot.AutoReply.DefaultCooldownSecs
+}
 
 # region Command Nodes
-cmd_main = CommandNode(
+CMD_MAIN = CommandNode(
     codes=["ar", "auto"], order_idx=0, name=_("Auto Reply"),
     brief_description=_("Perform operations related to the auto-reply feature."),
     description=_(
@@ -31,26 +39,24 @@ cmd_main = CommandNode(
         "The content type for both keyword and the response will be automatically determined.\n\n"
         "To specify more properties of the module which the related controls are not implemented / allowed here, "
         "please use the website to register.<hr>"
-        "The properties of the auto-reply module created here will be defaulted as below:\n\n"
-        "- Pinned: `{}`\n\n"
-        "- Private: `{}`\n\n"
-        "- Tags: `{}`\n\n"
-        "- Cooldown: `{}` secs").format(
-        Bot.AutoReply.DefaultPinned, Bot.AutoReply.DefaultPrivate, Bot.AutoReply.DefaultTags,
-        Bot.AutoReply.DefaultCooldownSecs)
+        "The default properties of a new auto-reply module are:\n\n"
+        "- Pinned: `%(default_pinned)s`\n\n"
+        "- Private: `%(default_private)s`\n\n"
+        "- Tags: `%(default_tags)s`\n\n"
+        "- Cooldown: `%(default_cd)d` secs") % _description_str_dict
 )
-cmd_add = cmd_main.new_child_node(codes=["a", "aa", "add"])
-cmd_del = cmd_main.new_child_node(codes=["d", "del"])
-cmd_list = cmd_main.new_child_node(codes=["q", "query", "l", "list"])
-cmd_info = cmd_main.new_child_node(codes=["i", "info"])
-cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
+CMD_ADD = CMD_MAIN.new_child_node(codes=["a", "aa", "add"])
+CMD_DEL = CMD_MAIN.new_child_node(codes=["d", "del"])
+CMD_LIST = CMD_MAIN.new_child_node(codes=["q", "query", "l", "list"])
+CMD_INFO = CMD_MAIN.new_child_node(codes=["i", "info"])
+CMD_RK = CMD_MAIN.new_child_node(codes=["k", "rk", "rank", "ranking"])
 
 
 # endregion
 
 
 # region Add
-@cmd_add.command_function(
+@CMD_ADD.command_function(
     feature=BotFeature.TXT_AR_ADD_EXECODE,
     arg_count=1,
     arg_help=[
@@ -59,6 +65,13 @@ cmd_rk = cmd_main.new_child_node(codes=["k", "rk", "rank", "ranking"])
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> List[HandledMessageEventText]:
+    """
+    Command to add an auto-reply module via Execode.
+
+    :param e: message event that called this command
+    :param execode: Execode to add the auto-reply module
+    :return: if the auto-reply module is successfully registered
+    """
     get_excde_result = ExecodeManager.get_execode_entry(execode, Execode.AR_ADD)
 
     if not get_excde_result.success:
@@ -102,7 +115,7 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
     return [HandledMessageEventText(content=_("Auto-reply module registered."))]
 
 
-@cmd_add.command_function(
+@CMD_ADD.command_function(
     feature=BotFeature.TXT_AR_ADD,
     arg_count=2,
     arg_help=[
@@ -121,11 +134,19 @@ def add_auto_reply_module_execode(e: TextMessageEventObject, execode: str) -> Li
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str) -> List[HandledMessageEventText]:
+    """
+    Command to add an auto-reply module with the provided ``keyword`` and ``response``.
+
+    :param e: message event that called this command
+    :param keyword: keyword of the new auto-reply module
+    :param response: response of the new auto-reply module
+    :return: if the auto-reply module was added successfully
+    """
     ret = []
 
     def determine_type(content, error_text):
         type_ = AutoReplyContentType.determine(content)
-        # https://github.com/RaenonX/Jelly-Bot/issues/124
+        # https://github.com/RxJellyBot/Jelly-Bot/issues/124
         if not AutoReplyValidator.is_valid_content(type_, content):
             type_ = AutoReplyContentType.TEXT
             ret.append(HandledMessageEventText(content=error_text))
@@ -149,18 +170,18 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
     if add_result.outcome.is_success:
         ret.append(HandledMessageEventText(
-            content=_(
-                "Auto-Reply module successfully registered.\n"
-                "Keyword Type: {}\n"
-                "Response Type: {}").format(
-                kw_type.key, resp_type.key),
+            content=_("Auto-Reply module successfully registered.\n"
+                      "Keyword Type: %(kw_type)s\n"
+                      "Response Type: %(resp_type)s") % {"kw_type": kw_type.key, "resp_type": resp_type.key},
             bypass_multiline_check=True))
     else:
+        str_dict = {"outcome": add_result.outcome.code_str,
+                    "url": f"{HostUrl}{reverse('page.doc.code.insert')}"}
+
         ret.append(HandledMessageEventText(
             content=_("Failed to register the Auto-Reply module.\n"
-                      "Code: `{}`\n"
-                      "Visit {} to see the code explanation.").format(
-                add_result.outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}")))
+                      "Code: `%(outcome)s`\n"
+                      "Visit %(url)s to see the code explanation.") % str_dict))
 
     return ret
 
@@ -169,7 +190,7 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
 
 
 # region Delete
-@cmd_del.command_function(
+@CMD_DEL.command_function(
     feature=BotFeature.TXT_AR_DEL,
     arg_count=1,
     arg_help=[_("The keyword of the module to delete. Note that this also deletes the keyword which type is NOT text. "
@@ -178,52 +199,68 @@ def add_auto_reply_module(e: TextMessageEventObject, keyword: str, response: str
     scope=CommandScopeCollection.GROUP_ONLY
 )
 def delete_auto_reply_module(e: TextMessageEventObject, keyword: str):
+    """
+    Command to delete an auto-reply module which keyword is ``keyword``.
+
+    :param e: message event object
+    :param keyword: keyword of the module to be deleted
+    """
     outcome = AutoReplyManager.del_conn(keyword, e.channel_oid, e.user_model.id)
 
-    if outcome.is_success:
+    if outcome == UpdateOutcome.X_INSUFFICIENT_PERMISSION:
+        return [HandledMessageEventText(content=_("Insufficient Permission to delete the auto-reply module."))]
+
+    if outcome == UpdateOutcome.X_NOT_FOUND:
         return [HandledMessageEventText(
-            content=_("Auto-Reply Module deleted.\nKeyword: {}").format(keyword))]
-    elif outcome == UpdateOutcome.X_INSUFFICIENT_PERMISSION:
-        return [HandledMessageEventText(
-            content=_("Insufficient Permission to delete the auto-reply module."))]
-    elif outcome == UpdateOutcome.X_NOT_FOUND:
-        return [HandledMessageEventText(
-            content=_("Active auto-reply module of the keyword `{}` not found.").format(keyword))]
-    else:
-        return [
-            HandledMessageEventText(
-                content=_("Failed to delete the Auto-Reply module.\n"
-                          "Code: {}\n"
-                          "Visit {} to see the code explanation.").format(
-                    outcome.code_str, f"{HostUrl}{reverse('page.doc.code.insert')}"))]
+            content=_("Active auto-reply module of the keyword `%s` not found.") % keyword)]
+
+    if not outcome.is_success:
+        str_dict = {
+            "code_str": outcome.code_str,
+            "code_url": f"{HostUrl}{reverse('page.doc.code.insert')}"
+        }
+
+        return [HandledMessageEventText(content=_("Failed to delete the Auto-Reply module.\n"
+                                                  "Code: {}\n"
+                                                  "Visit {} to see the code explanation.") % str_dict)]
+
+    return [HandledMessageEventText(content=_("Auto-Reply Module deleted.\nKeyword: %s") % keyword)]
 
 
 # endregion
 
 
 # region List / Query / Info / Ranking
-def get_list_of_keyword_html(conn_list: ExtendedCursor[AutoReplyModuleModel]) -> List[str]:
+def _get_list_of_keyword_html(conn_list: ExtendedCursor[AutoReplyModuleModel]) -> List[str]:
     return [f"- {conn.keyword.content_html}<br>" for conn in conn_list]
 
 
-@cmd_list.command_function(
+@CMD_LIST.command_function(
     feature=BotFeature.TXT_AR_LIST_USABLE,
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=10
 )
 def list_usable_auto_reply_module(e: TextMessageEventObject):
+    """
+    Command to get the list of all usable auto-reply modules by providing the link to see the list.
+
+    If there is no usable auto-reply modules, return a message indicating this instead.
+
+    :param e: text message event
+    :return: a link to the extra content page which contains the keywords of usable auto-reply modules
+    """
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid)
 
-    if not conn_list.empty:
-        ctnt = _("Usable Keywords ({}):").format(len(conn_list))
-        ctnt += "\n\n<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
-
-        return [HandledMessageEventText(content=ctnt, force_extra=True)]
-    else:
+    if conn_list.empty:
         return [HandledMessageEventText(content=_("No usable auto-reply module in this channel."))]
 
+    ctnt = _("Usable Keywords ({}):").format(len(conn_list))
+    ctnt += "\n\n<div class=\"ar-content\">" + "".join(_get_list_of_keyword_html(conn_list)) + "</div>"
 
-@cmd_list.command_function(
+    return [HandledMessageEventText(content=ctnt, force_extra=True)]
+
+
+@CMD_LIST.command_function(
     feature=BotFeature.TXT_AR_LIST_KEYWORD,
     arg_count=1,
     arg_help=[_("The search keyword to find the Auto-Reply module. "
@@ -232,20 +269,28 @@ def list_usable_auto_reply_module(e: TextMessageEventObject):
     cooldown_sec=10
 )
 def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: str):
+    """
+    Command to get the list of all auto-reply modules containing ``keyword`` by providing the link to see the list.
+
+    If there is no auto-reply modules matching the condition, return a message indicating this instead.
+
+    :param e: text message event
+    :param keyword: keyword of the auto-reply module
+    :return: a link to the extra content page
+    """
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
 
-    if not conn_list.empty:
-        ctnt = _("Usable Keywords ({}):").format(len(conn_list))
-        ctnt += "\n\n<div class=\"ar-content\">" + "".join(get_list_of_keyword_html(conn_list)) + "</div>"
-
-        return [HandledMessageEventText(content=ctnt, force_extra=True)]
-    else:
+    if conn_list.empty:
         return [HandledMessageEventText(
-            content=_("Cannot find any auto-reply module including the substring `{}` in their keyword.")
-                .format(keyword))]
+            content=_("Cannot find any auto-reply module with substring `%s` in their keyword.") % keyword)]
+
+    ctnt = _("Usable Keywords ({}):").format(len(conn_list))
+    ctnt += "\n\n<div class=\"ar-content\">" + "".join(_get_list_of_keyword_html(conn_list)) + "</div>"
+
+    return [HandledMessageEventText(content=ctnt, force_extra=True)]
 
 
-@cmd_info.command_function(
+@CMD_INFO.command_function(
     feature=BotFeature.TXT_AR_INFO,
     arg_count=1,
     arg_help=[_("The search keyword to find the Auto-Reply module. "
@@ -254,6 +299,13 @@ def list_usable_auto_reply_module_keyword(e: TextMessageEventObject, keyword: st
     cooldown_sec=10
 )
 def auto_reply_module_detail(e: TextMessageEventObject, keyword: str):
+    """
+    Command to get the details of the auto-reply modules with ``keyword`` by providing the link to view it.
+
+    :param e: text message event
+    :param keyword: keyword of the auto-reply module
+    :return: a link to the extra content page
+    """
     conn_list = AutoReplyManager.get_conn_list(e.channel_oid, keyword)
 
     if not conn_list.empty:
@@ -276,12 +328,20 @@ def auto_reply_module_detail(e: TextMessageEventObject, keyword: str):
     return [HandledMessageEventText(content=content)]
 
 
-@cmd_rk.command_function(
+@CMD_RK.command_function(
     feature=BotFeature.TXT_AR_RANKING,
     scope=CommandScopeCollection.GROUP_ONLY,
     cooldown_sec=120
 )
 def auto_reply_ranking(e: TextMessageEventObject):
+    """
+    Get the auto-reply module usage ranking.
+
+    This command directly output the result instead of redirecting it to extra content page.
+
+    :param e: text message event
+    :return: auto-reply module usage ranking
+    """
     ret = [_("Auto-Reply TOP{} ranking").format(Bot.AutoReply.RankingMaxCount)]
 
     # Attach module stats section
@@ -316,8 +376,8 @@ def auto_reply_ranking(e: TextMessageEventObject):
         HostUrl, reverse("page.ar.ranking.channel", kwargs={"channel_oid": e.channel_oid})
     ))
 
-    if len(ret) > 1:
-        return [HandledMessageEventText(content="\n".join([str(s) for s in ret]))]
-    else:
+    if len(ret) == 1:
         return [HandledMessageEventText(content=_("No ranking data available for now."))]
+
+    return [HandledMessageEventText(content="\n".join([str(s) for s in ret]))]
 # endregion

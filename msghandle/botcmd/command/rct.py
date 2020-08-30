@@ -33,7 +33,6 @@ def _content_recent_msgs(e: TextMessageEventObject, limit: int):
 
     ctnt = []
 
-    # Skip = 1 to skip the message that calls the command
     recent_messages = MessageStatsDataProcessor.get_recent_messages(e.channel_model,
                                                                     limit=limit, tz=e.user_model.config.tzinfo)
 
@@ -71,7 +70,7 @@ def get_recent_messages_simple(e: TextMessageEventObject):
     This command will get the most recent ``Bot.RecentActivity.DefaultLimitCountDirect`` messages without the message
     that called this command.
 
-    :param e: message event that calls this command
+    :param e: message event that called this command
     :return: default count of most recent messages with a link to the recent activity page
     """
     return get_recent_messages(e, Bot.RecentActivity.DefaultLimitCountLink)
@@ -87,7 +86,7 @@ def get_recent_messages(e: TextMessageEventObject, limit: int):
     """
     Command to get the recent message with limited count ``limit``.
 
-    :param e: message event that calls this command
+    :param e: message event that called this command
     :param limit: max count of the result to return
     :return: most recent `limit` message with a link to the recent activity page
     """

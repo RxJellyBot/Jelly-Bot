@@ -432,7 +432,7 @@ class TestExecodeManagerComplete(TestModelMixin, TestDatabaseMixin):
 
     def test_user_integrate_preserve_root_oid(self):
         """
-        See issue #332 <https://github.com/RaenonX/Jelly-Bot/issues/332> for more details on this test case.
+        See issue #332 <https://github.com/RxJellyBot/Jelly-Bot/issues/332> for more details on this test case.
         """
         # Register users
         result = RootUserManager.register_onplat(Platform.LINE, "U123456789")
