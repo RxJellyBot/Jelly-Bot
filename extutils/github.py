@@ -18,7 +18,8 @@ class GitHubWrapper:
         """
         Get the latest deployment data from GitHub API.
 
-        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``. For example: ``RaenonX/Jelly-Bot``.
+        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``.
+        For example: ``RxJellyBot/Jelly-Bot``.
 
         Returns ``None`` if not found.
 
@@ -47,7 +48,8 @@ class GitHubWrapper:
         """
         Get the latest commit data from GitHub API.
 
-        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``. For example: ``RaenonX/Jelly-Bot``.
+        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``.
+        For example: ``RxJellyBot/Jelly-Bot``.
 
         Returns ``None`` if not found.
 
@@ -73,7 +75,8 @@ class GitHubWrapper:
         """
         Get the URL of a commit. This method won't fail as it simply combines the arguments and generate an URL.
 
-        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``. For example: ``RaenonX/Jelly-Bot``.
+        ``repo_id_name`` needs to be in the format of ``{USER_NAME}/{REPO_NAME}``.
+        For example: ``RxJellyBot/Jelly-Bot``.
 
         :param repo_id_name: id and the name of the repo to get
         :param commit_sha: hash of the commit

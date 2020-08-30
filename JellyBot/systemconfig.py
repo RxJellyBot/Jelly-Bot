@@ -15,7 +15,7 @@ if "HTTP_HOST" in os.environ:
 class System:
     """System configuration."""
 
-    GitHubRepoIDName = "RaenonX/Jelly-Bot"
+    GitHubRepoIDName = "RxJellyBot/Jelly-Bot"
     GitHubRepoBranch = "master"
 
     MaxOneTimeResponses = 5

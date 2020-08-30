@@ -13,7 +13,7 @@ class TestImgurClient(TestCase):
         self.assertTrue(result, "Failed to delete the test image.")
 
     def test_image_upload_no_title_desc(self):
-        url = "https://raw.githubusercontent.com/RaenonX/Jelly-Bot/master/tests/res/1x1.png"
+        url = "https://raw.githubusercontent.com/RxJellyBot/Jelly-Bot/master/tests/res/1x1.png"
         type_ = ImageContentType.URL.key
 
         result = ImgurClient.upload_image(url, type_)
@@ -24,7 +24,7 @@ class TestImgurClient(TestCase):
         self.cleanup(result.delete_hash)
 
     def test_image_upload_url(self):
-        url = "https://raw.githubusercontent.com/RaenonX/Jelly-Bot/master/tests/res/1x1.png"
+        url = "https://raw.githubusercontent.com/RxJellyBot/Jelly-Bot/master/tests/res/1x1.png"
         type_ = ImageContentType.URL.key
         txt = f"Jelly Bot test upload on {datetime.now()}"
 

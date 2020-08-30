@@ -1,13 +1,15 @@
 {
   "name": "Jelly Bot",
-  "repository": "https://github.com/RaenonX/Jelly-Bot",
+  "repository": "https://github.com/RxJellyBot/Jelly-Bot",
   "description": "Multi-platform chatting bot.",
   "website": "https://bot.raenonx.com/",
   "env": {
     "SECRET_KEY": {
       "description": "The secret key for Django app.",
       "required": true,
-      "tag": ["django"]
+      "tag": [
+        "django"
+      ]
     },
     "DJANGO_SETTINGS_MODULE": {
       "description": "Module of Django settings.",
