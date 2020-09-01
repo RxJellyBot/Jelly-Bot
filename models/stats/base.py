@@ -8,7 +8,7 @@ import pymongo
 from bson import ObjectId
 
 from extutils.dt import now_utc_aware, TimeRange, make_tz_aware
-from models import OID_KEY  # pylint: disable=cyclic-import
+from models import OID_KEY
 
 __all__ = ("HourlyResult", "DailyResult")
 

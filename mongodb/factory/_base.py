@@ -1,3 +1,4 @@
+"""Base class for all factorial classes."""
 import os
 from abc import ABC
 from threading import Thread
@@ -20,6 +21,8 @@ __all__ = ("BaseCollection",)
 
 
 class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
+    """Base class for a collection instance."""
+
     def __init__(self):
         self._db = MONGO_CLIENT.get_database(self.get_db_name())
 
@@ -34,6 +37,7 @@ class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
 
     @final
     def on_init(self):
+        """Method to be executed after all initializations completed."""
         if not os.environ.get("NO_FIELD_CHECK") and not os.environ.get("TEST"):
             ModelFieldChecker.check_async(self)
 
@@ -44,11 +48,9 @@ class BaseCollection(ControlExtensionMixin, ClearableMixin, Collection, ABC):
 
     def on_init_async(self):
         """Hook method to be called asychronously on the initialization of this class."""
-        pass
 
     def build_indexes(self):
         """Method to be called when building the indexes of this collection."""
-        pass
 
     def clear(self):
         self.delete_many({})

@@ -7,16 +7,15 @@ from django.http import QueryDict  # pylint: disable=wrong-import-order
 
 from extutils.dt import now_utc_aware
 from flags import Execode, ExecodeCompletionOutcome, ExecodeCollationFailedReason
-from mongodb.factory.results import (
-    EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult,
-    OperationOutcome, GetOutcome
-)
 from models import ExecodeEntryModel, Model
 from models.exceptions import ModelConstructionError
 from mongodb.utils import ExtendedCursor
-from mongodb.helper import ExecodeCompletor, ExecodeRequiredKeys
-from mongodb.factory.results import WriteOutcome
 from mongodb.exceptions import NoCompleteActionError, ExecodeCollationError
+from mongodb.helper import ExecodeCompletor, ExecodeRequiredKeys
+from mongodb.factory.results import (
+    EnqueueExecodeResult, CompleteExecodeResult, GetExecodeEntryResult,
+    OperationOutcome, GetOutcome, WriteOutcome
+)
 from JellyBot.systemconfig import Database
 
 from ._base import BaseCollection
@@ -40,9 +39,9 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
         self.create_index(ExecodeEntryModel.Timestamp.key,
                           name="Timestamp (for TTL)", expireAfterSeconds=Database.ExecodeExpirySeconds)
 
-    def enqueue_execode(
-            self, root_uid: ObjectId, execode_type: Execode, data_cls: Type[Model] = None, **data_kw_args) -> \
-            EnqueueExecodeResult:
+    def enqueue_execode(self, root_uid: ObjectId, execode_type: Execode, data_cls: Type[Model] = None,
+                        **data_kw_args) \
+            -> EnqueueExecodeResult:
         """
         Enqueue an Execode action.
 
@@ -76,10 +75,25 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
             outcome, ex, model, execode, now + timedelta(seconds=Database.ExecodeExpirySeconds))
 
     def get_queued_execodes(self, root_uid: ObjectId) -> ExtendedCursor[ExecodeEntryModel]:
+        """
+        Get the queued Execodes of ``root_uid``.
+
+        :param root_uid: user OID to get the queued Execodes
+        :return: a cursor yielding queued Execodes of the user
+        """
         filter_ = {ExecodeEntryModel.CreatorOid.key: root_uid}
         return ExtendedCursor(self.find(filter_), self.count_documents(filter_), parse_cls=ExecodeEntryModel)
 
     def get_execode_entry(self, execode: str, action: Optional[Execode] = None) -> GetExecodeEntryResult:
+        """
+        Get the entry of an Execode action.
+
+        Limits the result to only return the Execode with the action type ``action`` if it is not ``None``.
+
+        :param execode: code of the Execode
+        :param action: action of the Execode
+        :return: result of getting the Execode
+        """
         cond = {ExecodeEntryModel.Execode.key: execode}
 
         if action:
@@ -87,15 +101,20 @@ class _ExecodeManager(GenerateTokenMixin, BaseCollection):
 
         ret: ExecodeEntryModel = self.find_one_casted(cond)
 
-        if ret:
-            return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, model=ret)
-        else:
+        if not ret:
             if self.count_documents({ExecodeEntryModel.Execode.key: execode}) > 0:
                 return GetExecodeEntryResult(GetOutcome.X_EXECODE_TYPE_MISMATCH)
-            else:
-                return GetExecodeEntryResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT)
+
+            return GetExecodeEntryResult(GetOutcome.X_NOT_FOUND_ABORTED_INSERT)
+
+        return GetExecodeEntryResult(GetOutcome.O_CACHE_DB, model=ret)
 
     def remove_execode(self, execode: str):
+        """
+        Delete the Execode entry.
+
+        :param execode: execode of the entry to be deleted
+        """
         self.delete_one({ExecodeEntryModel.Execode.key: execode})
 
     def _attempt_complete(self, execode: str, tk_model: ExecodeEntryModel, execode_kwargs: QueryDict) \

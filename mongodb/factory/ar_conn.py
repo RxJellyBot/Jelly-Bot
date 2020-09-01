@@ -1,5 +1,6 @@
+"""Data managers for the collection of auto-reply modules."""
 from datetime import datetime, timedelta
-from typing import Tuple, Optional, List, Generator, Union
+from typing import Tuple, Optional, List, Generator
 
 import math
 import pymongo
@@ -35,6 +36,8 @@ DB_NAME = "ar"
 
 
 class _AutoReplyModuleManager(BaseCollection):
+    """Class for managing the auto-reply modules."""
+
     database_name = DB_NAME
     collection_name = "conn"
     model_class = AutoReplyModuleModel
@@ -57,7 +60,9 @@ class _AutoReplyModuleManager(BaseCollection):
 
     def _validate_content(self, mdl: AutoReplyModuleModel, *, online_check=True) -> WriteOutcome:
         """
-        Perform the following checks and return the corresponding result:
+        Validate the content of the model ``mdl``.
+
+        Stepflow of the checks and the corresponding results:
 
         - Validity of the keyword
             - ``WriteOutcome.X_AR_INVALID_KEYWORD`` if invalid
@@ -109,8 +114,9 @@ class _AutoReplyModuleManager(BaseCollection):
             collation=case_insensitive_collation if AutoReply.CaseInsensitive else None
         )
 
+    @staticmethod
     @arg_type_ensure
-    def _remove_update_ops(self, remover_oid: ObjectId):
+    def _remove_update_ops(remover_oid: ObjectId):
         return {"$set": {
             AutoReplyModuleModel.Active.key: False,
             AutoReplyModuleModel.RemovedAt.key: now_utc_aware(),
@@ -152,7 +158,7 @@ class _AutoReplyModuleManager(BaseCollection):
             :class:`WriteOutcome.X_AR_INVALID_RESPONSE` will be returned as the outcome
 
         :param online_check: validate the content online
-        :param kwargs: kwargs to construct a `AutoReplyModuleModel`
+        :param kwargs: kwargs with field key to construct a `AutoReplyModuleModel`
         :return: serializable result of the connection addition
         """
         # Create a model
@@ -194,7 +200,7 @@ class _AutoReplyModuleManager(BaseCollection):
                 {AutoReplyModuleModel.Id.key: mdl.id},
                 {"$set": {AutoReplyModuleModel.Active.key: True}})
 
-        if outcome.is_success:
+        if outcome.is_success:  # pylint: disable=no-member
             # Set other module with the same keyword to be inactive
 
             self.update_many(
@@ -212,24 +218,33 @@ class _AutoReplyModuleManager(BaseCollection):
         return AutoReplyModuleAddResult(outcome, ex, mdl)
 
     def module_mark_inactive(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> UpdateOutcome:
-        q = {
+        """
+        Mark the module(s) with ``keyword`` as inactive/disabled.
+
+        :param keyword: keyword of the module(s) to be marked
+        :param channel_oid: channel of the module(s)
+        :param remover_oid: OID of the module remover
+        :return: if the marking process successfully completed
+        """
+        filter_ = {
             AutoReplyModuleModel.KEY_KW_CONTENT: keyword,
             AutoReplyModuleModel.ChannelOid.key: channel_oid,
             AutoReplyModuleModel.Active.key: True
         }
 
         if not _AutoReplyModuleManager._has_access_to_pinned(channel_oid, remover_oid):
-            q[AutoReplyModuleModel.Pinned.key] = False
+            filter_[AutoReplyModuleModel.Pinned.key] = False
 
-        ret = self.update_many_outcome(q, self._remove_update_ops(remover_oid), collation=case_insensitive_collation)
+        ret = self.update_many_outcome(filter_, self._remove_update_ops(remover_oid),
+                                       collation=case_insensitive_collation)
 
         if ret.is_success:
             self._delete_recent_module(keyword)
         elif ret == UpdateOutcome.X_NOT_FOUND:
             # If the `Pinned` property becomes True then something found,
             # then it must because of the insufficient permission. Otherwise, it's really not found
-            q[AutoReplyModuleModel.Pinned.key] = True
-            if self.count_documents(q) > 0:
+            filter_[AutoReplyModuleModel.Pinned.key] = True
+            if self.count_documents(filter_) > 0:
                 return UpdateOutcome.X_INSUFFICIENT_PERMISSION
 
         return ret
@@ -340,6 +355,15 @@ class _AutoReplyModuleManager(BaseCollection):
 
     def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> UniqueKeywordCountResult:
+        """
+        Get the stats of unique keyword count.
+
+        Example: if there's two modules with **A - C** and **A - D**, the returned data will contain **A: 2**.
+
+        :param channel_oid: OID of the channel to get the stats
+        :param limit: count of the result to get
+        :return: result object containing the stats
+        """
         pipeline = [
             {"$match": {AutoReplyModuleModel.ChannelOid.key: channel_oid}},
             {"$group": {
@@ -363,6 +387,8 @@ class _AutoReplyModuleManager(BaseCollection):
 
 
 class _AutoReplyModuleTagManager(BaseCollection):
+    """Class for managing the auto-reply module tags."""
+
     database_name = DB_NAME
     collection_name = "tag"
     model_class = AutoReplyModuleTagModel
@@ -371,6 +397,13 @@ class _AutoReplyModuleTagManager(BaseCollection):
         self.create_index(AutoReplyModuleTagModel.Name.key, name="Auto Reply Tag Identity", unique=True)
 
     def get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
+        """
+        Get the tag by its ``name``. If the tag does not exist, insert a new tag with ``name`` and its ``color``.
+
+        :param name: name of the tag to get or insert
+        :param color: color for the tag to insert
+        :return: result of getting the tag
+        """
         ex = None
         tag_data: Optional[AutoReplyModuleTagModel] = self.find_one_casted(
             {AutoReplyModuleTagModel.Name.key: name},
@@ -403,10 +436,20 @@ class _AutoReplyModuleTagManager(BaseCollection):
         )
 
     def get_tag_data(self, tag_oid: ObjectId) -> Optional[AutoReplyModuleTagModel]:
+        """
+        Get the tag as ``AutoReplyModuleTagModel`` by its ``tag_oid``.
+
+        Returns ``None`` if not exists.
+
+        :param tag_oid: OID of the tag to get
+        :return: `AutoReplyModuleTagModel` if found, `None` otherwise
+        """
         return self.find_one_casted({OID_KEY: tag_oid})
 
 
 class _AutoReplyManager(ClearableMixin):
+    """Main manager for auto-reply modules."""
+
     def __init__(self):
         self._mod = _AutoReplyModuleManager()
         self._tag = _AutoReplyModuleTagManager()
@@ -418,6 +461,8 @@ class _AutoReplyManager(ClearableMixin):
     def _get_tags_pop_score(self, filter_word: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[AutoReplyTagPopularityScore]:
         """
+        Get the tag popularity score.
+
         .. seealso::
             Time Past Weighting: https://www.desmos.com/calculator/db92kdecxa
             Appearance Weighting: https://www.desmos.com/calculator/a2uv5pqqku
@@ -491,18 +536,54 @@ class _AutoReplyManager(ClearableMixin):
         return [AutoReplyTagPopularityScore.parse(doc) for doc in self._mod.aggregate(pipeline)]
 
     def add_conn(self, **kwargs) -> AutoReplyModuleAddResult:
+        """
+        Add a auto-reply module to the database.
+
+        If any :class:`ModelConstructionError` occurred during the model construction
+            :class:`WriteOutcome.X_INVALID_MODEL` will be returned as the outcome
+
+        If any :class:`ModelKeyNotExistError` occurred during the model construction
+            :class:`WriteOutcome.X_MODEL_KEY_NOT_EXIST` will be returned as the outcome
+
+        If any :class:`ModelKeyNotExistError` occurred during the model construction
+            :class:`WriteOutcome.X_MODEL_KEY_NOT_EXIST` will be returned as the outcome
+
+        If the model is marked as **PINNED**, but the creator does not have the corresponding permission
+            :class:`WriteOutcome.X_INSUFFICIENT_PERMISSION` will be returned as the outcome
+
+        If the creator does not have the corresponding permission
+            :class:`WriteOutcome.X_PINNED_CONTENT_EXISTED` will be returned as the outcome
+
+        If the content of the keyword is invalid
+            :class:`WriteOutcome.X_AR_INVALID_KEYWORD` will be returned as the outcome
+
+        If the content of any of the responses is invalid
+            :class:`WriteOutcome.X_AR_INVALID_RESPONSE` will be returned as the outcome
+
+        :param kwargs: kwargs with field key to construct a `AutoReplyModuleModel`
+        :return: serializable result of the connection addition
+        """
         return self._mod.add_conn(**kwargs)
 
     def del_conn(self, keyword: str, channel_oid: ObjectId, remover_oid: ObjectId) -> UpdateOutcome:
+        """
+        Mark the module(s) with ``keyword`` as inactive/disabled.
+
+        :param keyword: keyword of the module(s) to be marked
+        :param channel_oid: channel of the module(s)
+        :param remover_oid: OID of the module remover
+        :return: if the marking process successfully completed
+        """
         return self._mod.module_mark_inactive(keyword, channel_oid, remover_oid)
 
-    def get_responses(
-            self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
-            update_async: bool = True) \
+    def get_responses(self, keyword: str, keyword_type: AutoReplyContentType, channel_oid: ObjectId, *,
+                      update_async: bool = True) \
             -> List[Tuple[AutoReplyContentModel, bool]]:
         """
-        Get the responses and a flag indicating
-        if the content can be displayed without redirecting the user to visit the webpage.
+        Get the responses and a flag which indicates if the content can be directly displayed.
+
+        If the content cannot be directly displayed, it means that the user should be redirected
+        to see it at the front end.
 
         The flag is determined by the cooldown of the module. The content is **NOT** checked for this flag.
 
@@ -520,7 +601,13 @@ class _AutoReplyManager(ClearableMixin):
     def get_popularity_scores(self, search_keyword: str = None, count: int = DataQuery.TagPopularitySearchCount) \
             -> List[str]:
         """
-        Get the :class:`list` of popular tag names sorted by the popularity score.
+        Get the :class:`list` of popular tag names sorted by its popularity score.
+
+        All tags will be considered if ``search_keyword`` is ``None``.
+
+        :param search_keyword: keyword to use for searching the tags
+        :param count: count of the tags to get
+        :return: list of the tag names
         """
         ret = []
 
@@ -532,22 +619,69 @@ class _AutoReplyManager(ClearableMixin):
         return ret
 
     def tag_get_insert(self, name, color=ColorFactory.DEFAULT) -> AutoReplyModuleTagGetResult:
+        """
+        Get the tag by its ``name``. If the tag does not exist, insert a new tag with ``name`` and its ``color``.
+
+        :param name: name of the tag to get or insert
+        :param color: color for the tag to insert
+        :return: result of getting the tag
+        """
         return self._tag.get_insert(name, color)
 
     def get_conn_list(self, channel_oid: ObjectId, keyword: str = None, active_only: bool = True) \
             -> ExtendedCursor[AutoReplyModuleModel]:
+        """
+        Get the auto-reply module list in ``channel_oid`` with ``keyword``.
+
+        ``keyword`` can be a part of the module keyword, but **NOT** the response.
+
+        If ``keyword`` is not set or ``None``, all modules in ``channel_oid`` will be returned.
+
+        Returned result will be sorted by module used count (DESC).
+
+        :param channel_oid: channel of the module(s)
+        :param keyword: keyword to filter the returning module(s)
+        :param active_only: if to return active modules only
+        :return: a cursor yielding the modules which match the given conditions
+        """
         return self._mod.get_conn_list(channel_oid, keyword, active_only=active_only)
 
     def get_conn_list_oids(self, conn_oids: List[ObjectId]) -> ExtendedCursor[AutoReplyModuleModel]:
+        """
+        Get a list of auto-reply modules sorted by used count (DESC) using the provided OIDs ``conn_oids``.
+
+        :param conn_oids: auto-reply module OIDs to be sorted
+        :return: a cursor yielding auto-reply modules which ID is one of `conn_oids` from the most-used one
+        """
         return self._mod.get_conn_list_oids(conn_oids)
 
     def get_module_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
-            -> Generator[Tuple[Union[int, str], AutoReplyModuleModel], None, None]:
+            -> Generator[Tuple[str, AutoReplyModuleModel], None, None]:
+        """
+        Get a generator of modules in ``channel_oid`` sorted by used count (DESC) for stats with its rank.
+
+        The first element being yielded is its rank in ``str`` and is T-prefixed.
+
+        The second element being yielded is the corresponding :class:`AutoReplyModuleModel`.
+
+        :param channel_oid: channel of the modules to get
+        :param limit: maximum count of the result. No limit if not set or `None`
+        :return: a cursor yielding auto-reply module from the most-used module
+        """
         return enumerate_ranking(self._mod.get_module_count_stats(channel_oid, limit),
                                  is_tie=lambda cur, prv: cur.called_count == prv.called_count)
 
     def get_unique_keyword_count_stats(self, channel_oid: ObjectId, limit: Optional[int] = None) \
             -> UniqueKeywordCountResult:
+        """
+        Get the stats of unique keyword count.
+
+        Example: if there's two modules with **A - C** and **A - D**, the returned data will contain **A: 2**.
+
+        :param channel_oid: OID of the channel to get the stats
+        :param limit: count of the result to get
+        :return: result object containing the stats
+        """
         return self._mod.get_unique_keyword_count_stats(channel_oid, limit)
 
 

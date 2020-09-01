@@ -13,9 +13,23 @@ __all__ = ("AutoReplyValidator",)
 
 
 class AutoReplyValidator:
-    # noinspection PyArgumentList
+    """Class to validate the auto-reply module."""
+
     @staticmethod
     def is_valid_content(type_: AutoReplyContentType, content: Any, *, online_check=True) -> bool:
+        """
+        Check if the content of the auto-reply module is valid.
+
+        ``online_check`` should be given wisely as it significantly improves the correctness but also drag down the
+        performance a lot because of the connection lag. It's recommended to check the content online during module
+        creation, but check it offline when getting the module. The caveat of this recommendation is that if the
+        content becomes invalid after the module creation, it cannot be detected.
+
+        :param type_: auto reply content type
+        :param content: content to be validated
+        :param online_check: if the check should be performed online
+        :return: if the content is valid
+        """
         if not isinstance(type_, AutoReplyContentType):
             type_ = AutoReplyContentType(type_)
 
@@ -64,13 +78,13 @@ class _BaseValidator:
             return False
 
     @staticmethod
-    def is_content_image(content: Any, online_check) -> bool:
+    def is_content_image(content: Any, online_check: bool) -> bool:
         """
-        Check if ``content`` is an image.
+        Check if the ``content`` is an image.
 
         :param content: content to be checked
-        :param online_check: if to perform online check (actually check if the content exists)
-        :return:
+        :param online_check: to perform online check (actually check if the content exists)
+        :return: check if `content` is an image
         """
         if online_check:
             return _BaseValidator._check_image_online(content)
@@ -79,7 +93,14 @@ class _BaseValidator:
 
     @staticmethod
     def is_content_sticker(content: Any, online_check) -> bool:
+        """
+        Check if the ``content`` is a sticker.
+
+        :param content: content to be checked
+        :param online_check: to perform online check (actually check if the content exists)
+        :return:
+        """
         if online_check:
             return LineStickerUtils.is_sticker_exists(content)
-        else:
-            return safe_cast(content, int) is not None
+
+        return safe_cast(content, int) is not None

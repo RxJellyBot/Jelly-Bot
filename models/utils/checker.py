@@ -1,6 +1,7 @@
+"""Implementations of the data checker."""
 from abc import ABC, abstractmethod
 from threading import Thread
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict
 
 from pymongo.cursor import Cursor
 
@@ -19,12 +20,16 @@ logger = LoggerSkeleton("mongo.modelcheck", logger_name_env="MODEL_CHECK")
 
 
 class DataRepairResult(FlagCodeEnum):
+    """Result of the data repairment."""
+
     REQUIRED_MISSING = 0
     NO_PATCH_NEEDED = 1
     REPAIRED = 2
 
 
 class FieldCheckerBase(ABC):
+    """Base class of the data field checker."""
+
     def __init__(self, col_inst):
         self._col_inst = col_inst
         self._model_cls = col_inst.get_model_cls()
@@ -36,28 +41,50 @@ class FieldCheckerBase(ABC):
         self.post_execute()
 
     def pre_execute(self):
-        logger.logger.info(f"Started executing `{self.__class__.__name__}` on <{self._col_inst.full_name}>...")
+        """Actions to be executed **before** the check."""
+        logger.logger.info("Started executing `%s` on <%s>...", self.__class__.__name__, self._col_inst.full_name)
 
     @abstractmethod
     def execute(self):
+        """Actual execution of the check."""
         raise NotImplementedError()
 
     def post_execute(self):
-        logger.logger.info(f"Done executing `{self.__class__.__name__}` on <{self._col_inst.full_name}>.")
+        """Actions to be executed **after** the check."""
+        logger.logger.info("Done executing `%s` on <%s>.", self.__class__.__name__, self._col_inst.full_name)
 
 
 class ModelFieldChecker:
+    """
+    Checker to check the if the data stored in the database matches the model defined in the code.
+
+    This checker will attempt to repair the data if it does not match the corresponding model.
+
+    If if fails to repair, the data will be moved to the designated temporary location for manual recovery.
+    An email report will be sent to notify the developer at the same time.
+    """
+
     @staticmethod
     def check_async(col_inst):
+        """
+        Perform the check asynchronously.
+
+        :param col_inst: collection instance to be checked
+        """
         Thread(target=ModelFieldChecker.check, args=(col_inst,)).start()
 
     @staticmethod
     def check(col_inst):
+        """
+        Method to start the check.
+
+        :param col_inst: collection instance to be checked
+        """
         ModelFieldChecker.CheckDefaultValue(col_inst).perform_check()
 
     class CheckDefaultValue(FieldCheckerBase):
         """
-        Checks the default values of the fields of a data model.
+        Check the default values of the fields of a data model.
 
         If the field does not match its given default value, then try to update it.
 
@@ -82,9 +109,9 @@ class ModelFieldChecker:
 
             If the update is failed, move that data entry to a specific database for repairment.
             """
-            from mongodb.factory import PendingRepairDataManager
+            from mongodb.factory import PendingRepairDataManager  # pylint: disable=import-outside-toplevel
 
-            find_query = self.build_find_query()
+            find_query = self._build_find_query()
 
             if not find_query:
                 self.post_execute()
@@ -99,26 +126,26 @@ class ModelFieldChecker:
             required_write_holder = PendingRepairDataManager.new_bulk_holder(self._col_inst)
             repaired_write_holder = BulkWriteDataHolder(self._col_inst)
 
-            logger.logger.warning(f"Scanning potential repairments required data "
-                                  f"in database <{self._col_inst.full_name}>...")
+            logger.logger.warning("Scanning potential repairments required data "
+                                  "in database <%s>...", self._col_inst.full_name)
 
-            self.scan_data(potential_repair_needed, required_write_holder, repaired_write_holder)
+            self._scan_data(potential_repair_needed, required_write_holder, repaired_write_holder)
 
             if repaired_write_holder.holding_data:
-                logger.logger.warning(f"Updating repaired data to database <{self._col_inst.full_name}>...")
+                logger.logger.warning("Updating repaired data to database <%s>...", self._col_inst.full_name)
                 repaired_write_holder.complete()
 
             if required_write_holder.holding_data:
-                logger.logger.warning(f"Manual repair required in database <{self._col_inst.full_name}>.")
+                logger.logger.warning("Manual repair required in database <%s>.", self._col_inst.full_name)
 
                 result = required_write_holder.complete()
                 logger.logger.warning("Sending notification email...")
-                self.send_mail_async(result, required_write_holder)
+                self._send_mail_async(result, required_write_holder)
 
             self.post_execute()
 
         @staticmethod
-        def build_key_filter(*, prefix: str = None, model_cls=None):
+        def _build_key_filter(*, prefix: str = None, model_cls=None):
             if prefix is not None:
                 prefix = prefix + "."
             else:
@@ -133,53 +160,55 @@ class ModelFieldChecker:
 
             return or_list
 
-        def build_find_query(self):
-            or_list = self.build_key_filter(model_cls=self._model_cls)
+        def _build_find_query(self):
+            or_list = self._build_key_filter(model_cls=self._model_cls)
 
             for key, model_cls in self._model_field_mdl_class:
-                or_list.extend(self.build_key_filter(prefix=key, model_cls=model_cls))
+                or_list.extend(self._build_key_filter(prefix=key, model_cls=model_cls))
 
-            if or_list:
-                return {"$or": or_list}
-            else:
+            if not or_list:
                 return None
 
-        def scan_data(self, potential_repair_needed: Cursor, required_write_holder: BulkWriteDataHolder,
-                      repaired_write_holder: BulkWriteDataHolder):
-            counter = {k: 0 for k in DataRepairResult}
+            return {"$or": or_list}
+
+        def _scan_data(self, potential_repair_needed: Cursor, required_write_holder: BulkWriteDataHolder,
+                       repaired_write_holder: BulkWriteDataHolder):
+            counter: Dict[FlagCodeEnum, int] = {k: 0 for k in DataRepairResult}
 
             for data in potential_repair_needed:
-                result, rpdata = self.repair_single_data(required_write_holder, data)
+                result, rpdata = self._repair_single_data(required_write_holder, data)
 
                 counter[result] += 1
 
                 if rpdata:
                     repaired_write_holder.replace_single(rpdata)
 
-            self.print_scanning_result(counter)
+            self._print_scanning_result(counter)
 
-        def repair_single_data(self, required_write_holder: BulkWriteDataHolder, data: dict) -> \
+        def _repair_single_data(self, required_write_holder: BulkWriteDataHolder, data: dict) -> \
                 Tuple[DataRepairResult, Optional[dict]]:
             missing = []
-            changed = self.repair_fields(data, self._model_cls, missing)
+            changed = self._repair_fields(data, self._model_cls, missing)
 
             # Check all fields of the model field
             for key, model_cls in self._model_field_mdl_class:
                 # `self.repair_fields()` first so it will always being executed (short circuit)
-                changed = self.repair_fields(data[key], model_cls, missing) or changed
+                changed = self._repair_fields(data[key], model_cls, missing) or changed
 
-            if len(missing) > 0:
+            if missing:
                 required_write_holder.repsert_single(
                     {f"{PendingRepairDataModel.Data.key}.{OID_KEY}": data[OID_KEY]},
                     PendingRepairDataModel(Data=data, MissingKeys=missing))
 
                 self._col_inst.delete_one({OID_KEY: data[OID_KEY]})
                 return DataRepairResult.REQUIRED_MISSING, None
-            else:
-                return DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED, \
-                       data if changed else None  # noqa: E126
 
-        def repair_fields(self, data: dict, model_cls, missing: List[str]) -> bool:
+            repair_result = DataRepairResult.REPAIRED if changed else DataRepairResult.NO_PATCH_NEEDED
+            repaired_data = data if changed else None
+
+            return repair_result, repaired_data
+
+        def _repair_fields(self, data: dict, model_cls, missing: List[str]) -> bool:
             changed = False
 
             for json_key, default_val in map(lambda f: (f.key, f.default_value), model_cls.model_fields()):
@@ -199,18 +228,18 @@ class ModelFieldChecker:
             return changed
 
         @staticmethod
-        def print_scanning_result(counter: dict):
+        def _print_scanning_result(counter: Dict[FlagCodeEnum, int]):
             if counter[DataRepairResult.NO_PATCH_NEEDED] > 0:
-                logger.logger.info(f"\t{counter[DataRepairResult.NO_PATCH_NEEDED]} do not need any patches.")
+                logger.logger.info("\t%d do not need any patches.", counter[DataRepairResult.NO_PATCH_NEEDED])
 
             if counter[DataRepairResult.REPAIRED] > 0:
-                logger.logger.info(f"\t{counter[DataRepairResult.REPAIRED]} data repaired.")
+                logger.logger.info("\t%d data repaired.", counter[DataRepairResult.REPAIRED])
 
             if counter[DataRepairResult.REQUIRED_MISSING] > 0:
                 logger.logger.info(
-                    f"\t{counter[DataRepairResult.REQUIRED_MISSING]} data missing some required fields.")
+                    "\t%d data missing some required fields.", counter[DataRepairResult.REQUIRED_MISSING])
 
-        def send_mail_async(self, result_list: list, required_write_holder: BulkWriteDataHolder):
+        def _send_mail_async(self, result_list: list, required_write_holder: BulkWriteDataHolder):
             content = f"<b>{required_write_holder.holded_count} data</b> need manual repairments.<br>" \
                       f"Data are originally stored in <code>{self._col_inst.full_name}</code>.<br>" \
                       f"<br>" \

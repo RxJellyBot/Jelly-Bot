@@ -1,9 +1,12 @@
+"""Various outcome types and codes of model operation."""
 from django.utils.translation import gettext_lazy as _
 
 from extutils.flags import FlagPrefixedDoubleEnum, FlagOutcomeMixin
 
 
 class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
+    """Base class for the model operation outcome."""
+
     @property
     def code_prefix(self) -> str:
         raise NotImplementedError()
@@ -19,6 +22,10 @@ class BaseOutcome(FlagOutcomeMixin, FlagPrefixedDoubleEnum):
 
 class WriteOutcome(BaseOutcome):
     """
+    Outcome of writing the data.
+
+    -------------
+
     # SUCCESS
 
     -2xx - Actually Inserted
@@ -110,6 +117,7 @@ class WriteOutcome(BaseOutcome):
 
         902 - Exception occurred
     """
+
     @property
     def code_prefix(self) -> str:
         return "W"
@@ -231,15 +239,29 @@ class WriteOutcome(BaseOutcome):
 
     @property
     def is_inserted(self):
+        """
+        If the data is inserted.
+
+        :return: data is inserted
+        """
         return self.code < -200
 
     @property
     def data_found(self):
+        """
+        If the data was found (already exists).
+
+        :return: data found
+        """
         return -199 < self.code < -100
 
 
 class GetOutcome(BaseOutcome):
     """
+    Outcome of getting the data.
+
+    -------------
+
     # SUCCESS
 
     -2 - Already exists
@@ -272,6 +294,7 @@ class GetOutcome(BaseOutcome):
     9xx - Problems related to execution
         901 - Not executed
     """
+
     @property
     def code_prefix(self) -> str:
         return "G"
@@ -321,6 +344,10 @@ class GetOutcome(BaseOutcome):
 
 class OperationOutcome(BaseOutcome):
     """
+    Outcome of the operations on data.
+
+    -------------
+
     # SUCCESS
 
     -1xx - Success with some potential problems
@@ -538,6 +565,10 @@ class OperationOutcome(BaseOutcome):
 
 class UpdateOutcome(BaseOutcome):
     """
+    Outcome of updating the data.
+
+    -------------
+
     # SUCCESS
 
     -1xx - Potentially problematic update

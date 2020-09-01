@@ -9,7 +9,7 @@ from bson import ObjectId
 
 from extutils.dt import TimeRange
 from flags import MessageType
-from models import OID_KEY  # pylint: disable=cyclic-import
+from models import OID_KEY
 from strres.models import StatsResults
 
 from .base import HourlyResult, DailyResult

@@ -1,3 +1,4 @@
+"""Data manager for extra contents."""
 from typing import Optional, Any, List, Tuple
 
 from bson import ObjectId
@@ -47,9 +48,17 @@ class _ExtraContentManager(BaseCollection):
 
         return self.record_content(ExtraContentType.EXTRA_MESSAGE, channel_oid, content, title)
 
-    def record_content(
-            self, type_: ExtraContentType, channel_oid: ObjectId, content: Any, title: str = None) \
+    def record_content(self, type_: ExtraContentType, channel_oid: ObjectId, content: Any, title: str = None) \
             -> RecordExtraContentResult:
+        """
+        Record the extra content.
+
+        :param type_: type of the extra content
+        :param channel_oid: channel of the extra content
+        :param content: content body of the extra content
+        :param title: title of the extra content
+        :return: result of the recording
+        """
         if not title:
             title = _ExtraContentManager.DefaultTitle
 
@@ -63,6 +72,14 @@ class _ExtraContentManager(BaseCollection):
 
     @arg_type_ensure
     def get_content(self, content_id: ObjectId) -> Optional[ExtraContentModel]:
+        """
+        Get the extra content by its ``content_id``.
+
+        Returns ``None`` if not found.
+
+        :param content_id: OID of the extra content to get
+        :return: a `ExtraContentModel` if found, `None` otherwise
+        """
         return self.find_one_casted({OID_KEY: content_id})
 
 

@@ -1,8 +1,9 @@
+"""Module for the result objects."""
 from ._outcome import WriteOutcome, GetOutcome, OperationOutcome, UpdateOutcome
 from ._base import BaseResult, ModelResult
 
 from .user import (
-    OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult,
+    APIUserRegistrationResult, OnPlatformUserRegistrationResult,
     RootUserRegistrationResult, RootUserUpdateResult, GetRootUserDataResult
 )
 from .ar import AutoReplyModuleAddResult, AutoReplyModuleTagGetResult

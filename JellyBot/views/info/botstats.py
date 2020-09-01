@@ -1,3 +1,4 @@
+"""View for bot usage stats."""
 from concurrent.futures.thread import ThreadPoolExecutor
 
 from django.utils.translation import gettext_lazy as _
@@ -32,7 +33,15 @@ def _member_usage(channel_oid, hours_within):
         channel_oid, hours_within=hours_within)
 
 
-def get_bot_stats_data_package(channel_data, hours_within, tzinfo):
+def get_bot_stats_data_package(channel_data, hours_within, tzinfo) -> dict:
+    """
+    Get the bot usage stats asynchronously and return these as a package.
+
+    :param channel_data: channel model of the bot stats
+    :param hours_within: time range to get the stats
+    :param tzinfo: timezone info to be used when getting the stats
+    :return: a `dict` containing the bot stats
+    """
     ret = {}
 
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="BotStats") as executor:
@@ -49,8 +58,15 @@ def get_bot_stats_data_package(channel_data, hours_within, tzinfo):
 
 
 class ChannelBotUsageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
+    """View of the page to see the bot usage stats."""
+
     # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
+        """
+        Page to view the bot usage stats.
+
+        There is an optional keyword ``hours_within`` for limiting the time range of the bot usage stats.
+        """
         channel_data = self.get_channel_data(*args, **kwargs)
         hours_within = safe_cast(request.GET.get("hours_within"), int)
 

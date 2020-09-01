@@ -1,5 +1,7 @@
 from bson import ObjectId
+from django.conf import settings
 
+from extutils.emailutils import EmailServer
 from extutils.gidentity import GoogleIdentityUserData
 from extutils.locales import DEFAULT_LOCALE, USA_CENT
 from flags import Platform
@@ -19,10 +21,10 @@ class TestAPIUserManager(TestModelMixin):
 
     @staticmethod
     def obj_to_clear():
-        return [APIUserManager]
+        return [APIUserManager, EmailServer]
 
     def test_register(self):
-        result = APIUserManager.register(self.GOO_IDENTITY)
+        result = APIUserManager.ensure_register(self.GOO_IDENTITY)
 
         self.assertTrue(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
@@ -37,7 +39,7 @@ class TestAPIUserManager(TestModelMixin):
         mdl = APIUserModel(Email="Fake2@email.com", GoogleUid="FakeUID", Token="Toke" * 8)
         APIUserManager.insert_one(mdl)
 
-        result = APIUserManager.register(self.GOO_IDENTITY)
+        result = APIUserManager.ensure_register(self.GOO_IDENTITY)
 
         self.assertTrue(result.outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(result.exception)
@@ -100,7 +102,7 @@ class TestOnPlatformIdentityManager(TestModelMixin):
         return [OnPlatformIdentityManager]
 
     def test_register(self):
-        result = OnPlatformIdentityManager.register(Platform.LINE, "U123456")
+        result = OnPlatformIdentityManager.ensure_register(Platform.LINE, "U123456")
 
         self.assertEqual(result.outcome, WriteOutcome.O_INSERTED)
         self.assertIsNone(result.exception)
@@ -111,7 +113,7 @@ class TestOnPlatformIdentityManager(TestModelMixin):
         mdl = OnPlatformUserModel(Token="U123456", Platform=Platform.LINE)
         OnPlatformIdentityManager.insert_one(mdl)
 
-        result = OnPlatformIdentityManager.register(Platform.LINE, "U123456")
+        result = OnPlatformIdentityManager.ensure_register(Platform.LINE, "U123456")
 
         self.assertEqual(result.outcome, WriteOutcome.O_DATA_EXISTS)
         self.assertIsNotNone(result.exception)
@@ -379,6 +381,21 @@ class TestRootUserManager(TestModelMixin):
             (self.ROOT_OID, "UserName")
         )
 
+    def test_get_root_data_uname_hanging_onplat(self):
+        mdl = RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID],
+                            Config=RootUserConfigModel.generate_default())
+        RootUserManager.insert_one(mdl)
+
+        self.assertEqual(
+            RootUserManager.get_root_data_uname(self.ROOT_OID, self.LINE_CHANNEL_MODEL),
+            (self.ROOT_OID, None)
+        )
+        self.assertEqual(
+            RootUserManager.get_root_data_uname(self.ROOT_OID, self.LINE_CHANNEL_MODEL, on_not_found="N/A"),
+            (self.ROOT_OID, "N/A")
+        )
+        self.assertEqual(len(EmailServer.get_mailbox(settings.EMAIL_HOST_USER).mails), 1)
+
     def test_get_root_data_uname_missed(self):
         mdl = RootUserModel(Id=self.ROOT_OID, ApiOid=self.API_OID,
                             Config=RootUserConfigModel.generate_default(Name="UserName"))
@@ -576,43 +593,6 @@ class TestRootUserManager(TestModelMixin):
 
     def test_get_onplat_data_dict_no_data(self):
         self.assertEqual(RootUserManager.get_onplat_data_dict(), {})
-
-    def test_get_onplat_to_root_dict(self):
-        mdl_onplat_1 = OnPlatformUserModel(Id=self.ONPLAT_OID, Platform=Platform.LINE, Token=self.LINE_TOKEN)
-        mdl_onplat_2 = OnPlatformUserModel(Id=self.ONPLAT_OID_2, Platform=Platform.LINE, Token=self.LINE_TOKEN_2)
-        OnPlatformIdentityManager.insert_many([mdl_onplat_1, mdl_onplat_2])
-        mdl_root_1 = RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID],
-                                   Config=RootUserConfigModel.generate_default())
-        mdl_root_2 = RootUserModel(Id=self.ROOT_OID_2, OnPlatOids=[self.ONPLAT_OID_2],
-                                   Config=RootUserConfigModel.generate_default())
-        RootUserManager.insert_many([mdl_root_1, mdl_root_2])
-
-        self.assertEqual(
-            RootUserManager.get_onplat_to_root_dict(),
-            {
-                mdl_onplat_1.id: mdl_root_1.id,
-                mdl_onplat_2.id: mdl_root_2.id
-            }
-        )
-
-    def test_get_onplat_to_root_dict_multi_to_one(self):
-        mdl_onplat_1 = OnPlatformUserModel(Id=self.ONPLAT_OID, Platform=Platform.LINE, Token=self.LINE_TOKEN)
-        mdl_onplat_2 = OnPlatformUserModel(Id=self.ONPLAT_OID_2, Platform=Platform.LINE, Token=self.LINE_TOKEN_2)
-        OnPlatformIdentityManager.insert_many([mdl_onplat_1, mdl_onplat_2])
-        mdl_root_1 = RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID, self.ONPLAT_OID_2],
-                                   Config=RootUserConfigModel.generate_default())
-        RootUserManager.insert_one(mdl_root_1)
-
-        self.assertEqual(
-            RootUserManager.get_onplat_to_root_dict(),
-            {
-                mdl_onplat_1.id: mdl_root_1.id,
-                mdl_onplat_2.id: mdl_root_1.id
-            }
-        )
-
-    def test_get_onplat_to_root_dict_no_data(self):
-        self.assertEqual(RootUserManager.get_onplat_to_root_dict(), {})
 
     def _get_root_to_onplat_dict_prep(self):
         mdl_root_1 = RootUserModel(Id=self.ROOT_OID, OnPlatOids=[self.ONPLAT_OID, self.ONPLAT_OID_2],

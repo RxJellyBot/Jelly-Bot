@@ -1,3 +1,4 @@
+"""Data manager for the timers."""
 from datetime import datetime, timedelta
 from typing import Optional, List
 
@@ -44,12 +45,18 @@ class _TimerManager(BaseCollection):
             mdl.deletion_time = target_time + timedelta(days=Bot.Timer.AutoDeletionDays)
             mdl.deletion_time = make_tz_aware(mdl.deletion_time, target_time.tzinfo)
 
-        outcome, ex = self.insert_one_model(mdl)
+        outcome, _ = self.insert_one_model(mdl)
 
         return outcome
 
     @arg_type_ensure
     def del_timer(self, timer_oid: ObjectId) -> bool:
+        """
+        Delete the timer by its OID.
+
+        :param timer_oid: OID of the timer to be deleted
+        :return: if the timer was successfully deleted
+        """
         return self.delete_one({OID_KEY: timer_oid}).deleted_count > 0
 
     @arg_type_ensure
@@ -143,6 +150,17 @@ class _TimerManager(BaseCollection):
 
     @staticmethod
     def get_notify_within_secs(message_frequency: float):
+        """
+        Get a time range calculated by ``message_frequency`` which can be used to get the timers for notification.
+
+        Calculate formula: **message frequency x 20 + 600**
+
+        If the calculated result is greater than ``Bot.Timer.MaxNotifyRangeSeconds``,
+        then ``Bot.Timer.MaxNotifyRangeSeconds`` will be returned instead.
+
+        :param message_frequency: message frequency in seconds per message
+        :return: time range to be used to get the timers for notification
+        """
         return min(message_frequency * 20 + 600, Bot.Timer.MaxNotifyRangeSeconds)
 
 

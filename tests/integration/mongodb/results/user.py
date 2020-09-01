@@ -6,7 +6,7 @@ from JellyBot.api.static import result
 from flags import Platform
 from models import Model, APIUserModel, OnPlatformUserModel, RootUserModel
 from mongodb.factory.results import (
-    ModelResult, OnSiteUserRegistrationResult, OnPlatformUserRegistrationResult, GetRootUserDataResult,
+    ModelResult, APIUserRegistrationResult, OnPlatformUserRegistrationResult, GetRootUserDataResult,
     RootUserRegistrationResult, RootUserUpdateResult, GetOutcome, WriteOutcome
 )
 from tests.base import TestOnModelResult
@@ -18,7 +18,7 @@ __all__ = ["TestOnSiteUserRegistrationResult", "TestOnPlatformUserRegistrationRe
 class TestOnSiteUserRegistrationResult(TestOnModelResult.TestClass):
     @classmethod
     def get_result_class(cls) -> Type[ModelResult]:
-        return OnSiteUserRegistrationResult
+        return APIUserRegistrationResult
 
     @classmethod
     def result_args_no_error(cls) -> Tuple[Any, ...]:
@@ -90,12 +90,11 @@ class TestRootUserRegistrationResult(TestOnModelResult.TestClass):
         return \
             WriteOutcome.O_INSERTED, \
             OnPlatformUserRegistrationResult(
-                WriteOutcome.O_MISC, None, OnPlatformUserModel(Token="ABC", Platform=Platform.LINE)), \
-            "ApiOid"
+                WriteOutcome.O_MISC, None, OnPlatformUserModel(Token="ABC", Platform=Platform.LINE))
 
     @classmethod
     def result_args_has_error(cls) -> Tuple[Any, ...]:
-        return WriteOutcome.X_NOT_EXECUTED, None, ""
+        return WriteOutcome.X_NOT_EXECUTED, None
 
     @classmethod
     def default_serialized(cls):
@@ -104,16 +103,14 @@ class TestRootUserRegistrationResult(TestOnModelResult.TestClass):
                   result.UserManagementResponse.REG_RESULT: OnPlatformUserRegistrationResult(
                       WriteOutcome.O_MISC,
                       None,
-                      OnPlatformUserModel(Token="ABC", Platform=Platform.LINE)).serialize(),
-                  result.UserManagementResponse.HINT: "ApiOid"})
+                      OnPlatformUserModel(Token="ABC", Platform=Platform.LINE)).serialize()})
         return d
 
     @classmethod
     def default_serialized_error(cls):
         d = super().default_serialized_error()
         d.update({result.UserManagementResponse.CONN_OUTCOME: WriteOutcome.X_NOT_EXECUTED,
-                  result.UserManagementResponse.REG_RESULT: None,
-                  result.UserManagementResponse.HINT: ""})
+                  result.UserManagementResponse.REG_RESULT: None})
         return d
 
 
