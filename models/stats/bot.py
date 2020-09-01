@@ -5,7 +5,7 @@ from typing import Optional
 
 from extutils.utils import enumerate_ranking
 from flags import BotFeature
-from models import OID_KEY  # pylint: disable=cyclic-import
+from models import OID_KEY
 from strres.models import StatsResults
 
 from .base import HourlyResult

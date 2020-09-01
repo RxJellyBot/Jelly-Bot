@@ -1,3 +1,4 @@
+"""Data managers for the channel-related connections."""
 from typing import Optional, Dict, List
 
 import pymongo
@@ -21,6 +22,8 @@ DB_NAME = "channel"
 
 
 class _ChannelManager(BaseCollection):
+    """Class to manage the channel data."""
+
     database_name = DB_NAME
     collection_name = "dict"
     model_class = ChannelModel
@@ -48,7 +51,7 @@ class _ChannelManager(BaseCollection):
             return ChannelRegistrationResult(WriteOutcome.O_DATA_EXISTS, model=mdl)
 
         # Inline import to avoid cyclic import
-        from mongodb.factory import ProfileManager
+        from mongodb.factory import ProfileManager  # pylint: disable=import-outside-toplevel
 
         channel_oid = ObjectId()
         create_result = ProfileManager.create_default_profile(
@@ -66,21 +69,44 @@ class _ChannelManager(BaseCollection):
 
     @arg_type_ensure
     def deregister(self, platform: Platform, token: str) -> UpdateOutcome:
+        """
+        Mark the channel as inaccessible.
+
+        :param platform: platform of the channel
+        :param token: token of the channel
+        :return: outcome of the marking
+        """
         return self.mark_accessibility(platform, token, False)
 
     @arg_type_ensure
     def mark_accessibility(self, platform: Platform, token: str, accessibility: bool) -> UpdateOutcome:
+        """
+        To mark the accessibility of a channel as ``accessibility``.
+
+        :param platform: platform of the channel
+        :param token: token of the channel
+        :param accessibility: new accessibility of the channel
+        :return: outcome of the marking
+        """
         result = self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {ChannelModel.BotAccessible.key: accessibility}}
         )
         if result == UpdateOutcome.X_NOT_FOUND:
             return UpdateOutcome.X_CHANNEL_NOT_FOUND
-        else:
-            return result
+
+        return result
 
     @arg_type_ensure
     def update_channel_default_name(self, platform: Platform, token: str, default_name: str) -> UpdateOutcome:
+        """
+        Update the default name of a channel.
+
+        :param platform: platform of the channel to be updated
+        :param token: token of the channel to be updated
+        :param default_name: new default name for the channel
+        :return: outcome of the update
+        """
         return self.update_many_outcome(
             {ChannelModel.Platform.key: platform, ChannelModel.Token.key: token},
             {"$set": {f"{ChannelModel.Config.key}.{ChannelConfigModel.DefaultName.key}": default_name}}
@@ -127,6 +153,15 @@ class _ChannelManager(BaseCollection):
     def get_channel_token(self, platform: Platform, token: str, *,
                           auto_register: bool = False, default_name: str = None) \
             -> Optional[ChannelModel]:
+        """
+        Get the :class:`ChannelModel` by channel token.
+
+        :param platform: platform of the channel to get
+        :param token: token of the channel to get
+        :param auto_register: automatically register the channel if not found
+        :param default_name: default name of the channel to use for registration if wanted
+        :return: `ChannelModel` matching the given condition. `None` otherwise
+        """
         ret = self.find_one_casted({ChannelModel.Token.key: token, ChannelModel.Platform.key: platform})
 
         if not ret and auto_register:
@@ -142,6 +177,15 @@ class _ChannelManager(BaseCollection):
 
     @arg_type_ensure
     def get_channel_oid(self, channel_oid: ObjectId, *, hide_private: bool = False) -> Optional[ChannelModel]:
+        """
+        Get the :class:`ChannelModel` by its OID.
+
+        Returns ``None`` if not found.
+
+        :param channel_oid: OID of the channel to get
+        :param hide_private: to hide private channel
+        :return: a `ChannelModel` which ID is `channel_oid`
+        """
         filter_ = {ChannelModel.Id.key: channel_oid}
 
         if hide_private:
@@ -151,6 +195,15 @@ class _ChannelManager(BaseCollection):
 
     def get_channel_dict(self, channel_oid_list: List[ObjectId], *, accessbible_only: bool = False) \
             -> Dict[ObjectId, ChannelModel]:
+        """
+        Get a :class:`dict` which key is the channel OID and value is its corresponding ``ChannelModel``.
+
+        The
+
+        :param channel_oid_list: list of OIDs of the channel to get
+        :param accessbible_only: to get accessible channels only
+        :return: a `dict` which key is channel OID and value is its corresponding `ChannelModel`
+        """
         filter_ = {OID_KEY: {"$in": channel_oid_list}}
 
         if accessbible_only:
@@ -188,6 +241,13 @@ class _ChannelManager(BaseCollection):
         return self.find_cursor_with_count(filter_, sort=[(ChannelModel.Id.key, pymongo.DESCENDING)])
 
     def get_channel_packed(self, platform: Platform, token: str) -> ChannelGetResult:
+        """
+        Get the channel by its token and pack the result.
+
+        :param platform: platform of the channel to get
+        :param token: token of the channel to get
+        :return: result of getting the channel
+        """
         model = self.get_channel_token(platform, token)
 
         if model is not None:
@@ -197,7 +257,17 @@ class _ChannelManager(BaseCollection):
 
         return ChannelGetResult(outcome, model=model)
 
-    def set_config(self, channel_oid: ObjectId, json_key, config_value) -> UpdateOutcome:
+    def set_config(self, channel_oid: ObjectId, json_key: str, config_value) -> UpdateOutcome:
+        """
+        Set/update the channel config.
+
+        The config model is :class:`ChannelConfigModel`. ``json_key`` correspondance can be found in this model.
+
+        :param channel_oid: OID of the channel to be updated
+        :param json_key: json key of the config to be updated
+        :param config_value: new config value
+        :return: outcome of the update
+        """
         if json_key not in ChannelConfigModel.model_json_keys():
             return UpdateOutcome.X_CONFIG_NOT_EXISTS
 
@@ -214,11 +284,20 @@ class _ChannelManager(BaseCollection):
 
         if result == UpdateOutcome.X_NOT_FOUND:
             return UpdateOutcome.X_CHANNEL_NOT_FOUND
-        else:
-            return result
+
+        return result
 
 
 class _ChannelCollectionManager(BaseCollection):
+    """
+    Channel to manage the channel collection data.
+
+    Currently, LINE does not have the concept of channel collection.
+    However, in Discord, this concept is called a server (guild in ``discord.py``).
+    """
+
+    # TEST: ChannelCollectionManager
+
     database_name = DB_NAME
     collection_name = "collection"
     model_class = ChannelCollectionModel
@@ -230,9 +309,28 @@ class _ChannelCollectionManager(BaseCollection):
         self.create_index(ChannelCollectionModel.ChildChannelOids.key, name="Child Channel Index")
 
     @arg_type_ensure
-    def ensure_register(
-            self, platform: Platform, token: str, child_channel_oid: ObjectId, default_name: Optional[str] = None) \
+    def ensure_register(self, platform: Platform, token: str,
+                        child_channel_oid: ObjectId, default_name: Optional[str] = None) \
             -> ChannelCollectionRegistrationResult:
+        """
+        Ensure that the channel collection is registered.
+
+        ``default_name`` will be used if the channel collection is not found.
+
+        If ``default_name`` is ``None``, it will be in the format of **<TOKEN> (<PLATFORM>)**.
+
+        If the channel collection has not been registered,
+        register it with ``platform``, ``token`` and ``default_name``.
+
+        If the channel collection has been registered, but not the ``child_channel_oid``,
+        append it to the channel collection.
+
+        :param platform: platform of the channel collection
+        :param token: token of the channel collection
+        :param child_channel_oid: OID of the current channel which belongs to the given channel connection
+        :param default_name: default name of the channel collection to use if not registered
+        :return: channel collection registration result
+        """
         if not default_name:
             default_name = f"{token} ({platform.key})"
 
@@ -247,30 +345,64 @@ class _ChannelCollectionManager(BaseCollection):
 
     @arg_type_ensure
     def get_chcoll(self, platform: Platform, token: str) -> Optional[ChannelCollectionModel]:
+        """
+        Get the channel collection by its ``platform`` and ``token``.
+
+        :param platform: platform of the channel collection to get
+        :param token: token of the channel collection to get
+        :return: `ChannelCollectionModel` if found, `None` otherwise
+        """
         return self.find_one_casted(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform}
         )
 
     @arg_type_ensure
     def get_chcoll_oid(self, chcoll_oid: ObjectId) -> Optional[ChannelCollectionModel]:
+        """
+        Get the channel collection by its ``chcoll_oid``.
+
+        :param chcoll_oid: OID of the channel collection to get
+        :return: `ChannelCollectionModel` if found, `None` otherwise
+        """
         return self.find_one_casted(
             {ChannelCollectionModel.Id.key: chcoll_oid}
         )
 
     @arg_type_ensure
     def get_chcoll_child_channel(self, child_channel_oid: ObjectId):
+        """
+        Get the channel collection by one of its ``child_channel_oid``.
+
+        :param child_channel_oid: one of the child channel OIDs of the channel collection to get
+        :return: `ChannelCollectionModel` if found, `None` otherwise
+        """
         return self.find_one_casted(
             {ChannelCollectionModel.ChildChannelOids.key: child_channel_oid}
         )
 
     @arg_type_ensure
     def append_child_channel(self, parent_oid: ObjectId, channel_oid: ObjectId) -> UpdateOutcome:
+        """
+        Append ``channel_oid`` to the channel collection ``parent_oid``.
+
+        :param parent_oid: OID of the channel collection to attach
+        :param channel_oid: OID of the channel to be attached to the channel collection
+        :return: outcome of the attachment
+        """
         return self.update_many_outcome(
             {ChannelCollectionModel.Id.key: parent_oid},
             {"$addToSet": {ChannelCollectionModel.ChildChannelOids.key: channel_oid}})
 
     @arg_type_ensure
     def update_default_name(self, platform: Platform, token: str, new_default_name: str) -> UpdateOutcome:
+        """
+        Update the default name of the channel collection.
+
+        :param platform: platform of the channel collection to update
+        :param token: token of the channel collection to update
+        :param new_default_name: new default name of the channel collection
+        :return: outcome of the update
+        """
         return self.update_many_outcome(
             {ChannelCollectionModel.Token.key: token, ChannelCollectionModel.Platform.key: platform},
             {"$set": {ChannelCollectionModel.DefaultName.key: new_default_name}})

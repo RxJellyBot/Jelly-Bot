@@ -13,6 +13,7 @@ from models import ChannelProfileModel
 @dataclass
 class ProfileControlEntry:
     """Single entry representing the profile control checking result."""
+
     root_oid: ObjectId
     name: str
     controllable: bool
@@ -20,6 +21,8 @@ class ProfileControlEntry:
 
 @dataclass
 class ChannelProfileEntry:
+    """Single entry representing a channel profile."""
+
     profile: ChannelProfileModel
     owner_names: List[str]
 
@@ -28,6 +31,8 @@ class ChannelProfileEntry:
 
 
 class ProfileHelper:
+    """Helper to process the profile data."""
+
     @staticmethod
     def get_user_profile_controls(
             channel_model, profile_oid: ObjectId, requester_oid: ObjectId, permissions: Set[ProfilePermission]) \
@@ -77,6 +82,15 @@ class ProfileHelper:
 
     @staticmethod
     def get_channel_profiles(channel_oid: ObjectId, partial_name: Optional[str] = None) -> List[ChannelProfileEntry]:
+        """
+        Get a list of the channel profiles in ``channel_oid``.
+
+        ``partial_name`` can be a part of the profile name.
+
+        :param channel_oid: channel to get the profiles
+        :param partial_name: keyword to get the profiles
+        :return: list of channel profiles
+        """
         ret = []
 
         # Get channel profiles. Terminate if no available profiles
@@ -92,8 +106,8 @@ class ProfileHelper:
         # Get user names, and the prof-channel dict
         user_oids_dict = ProfileManager.get_profiles_user_oids([prof.id for prof in profs])
         user_oids = []
-        for k, v in user_oids_dict.items():
-            user_oids.extend(v)
+        for _, onplat_oids in user_oids_dict.items():
+            user_oids.extend(onplat_oids)
         user_names = IdentitySearcher.get_batch_user_name(user_oids, channel_model)
 
         for prof in profs:

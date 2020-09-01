@@ -1,4 +1,6 @@
+"""View for message stats."""
 from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime
 
 from django.contrib import messages
 from django.utils.timezone import get_current_timezone
@@ -61,8 +63,20 @@ def _channel_user_msg(channel_data, available_only, *, hours_within=None, start=
         channel_data, hours_within=hours_within, start=start, end=end, available_only=available_only)
 
 
-def get_msg_stats_data_package(
-        channel_data, tzinfo, incl_unav, *, hours_within=None, start=None, end=None, period_count=None):
+def get_msg_stats_data_package(channel_data, tzinfo, incl_unav, *,
+                               hours_within=None, start=None, end=None, period_count=None) -> dict:
+    """
+    Get the message usage stats asynchronously and return these as a package.
+
+    :param channel_data: channel model of the bot stats
+    :param tzinfo: timezone info to be used when getting the stats
+    :param incl_unav: to include unavailable members
+    :param hours_within: time range to get the stats
+    :param start: starting timestamp of the stats
+    :param end: ending timestamp of the stats
+    :param period_count: count of the periods of the stats
+    :return: a `dict` containing the message stats
+    """
     ret = {}
 
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="MsgStats") as executor:
@@ -92,8 +106,19 @@ def get_msg_stats_data_package(
 
 
 class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, View):
+    """View to see the channel message stats."""
+
     @staticmethod
-    def get_timestamp(request, get_dict_key, *, msg_parse_failed=None, msg_out_of_range=None):
+    def get_timestamp(request, get_dict_key, *, msg_parse_failed=None, msg_out_of_range=None) -> datetime:
+        """
+        Get the timestamp string in URL GET params of key ``get_dict_key`` and parse it to :class:`datetime`.
+
+        :param request: web request to get URL param
+        :param get_dict_key: key of the param
+        :param msg_parse_failed: message to be displayed if failed to parse
+        :param msg_out_of_range: message to be displayed if the datetime is out of range
+        :return: parsed timestamp in `datetime`
+        """
         dt_str = request.GET.get(get_dict_key)
         dt_parsed = None
         if dt_str:
@@ -109,6 +134,13 @@ class ChannelMessageStatsView(ChannelOidRequiredMixin, TemplateResponseMixin, Vi
 
     # noinspection PyUnusedLocal, DuplicatedCode
     def get(self, request, *args, **kwargs):
+        """
+        Page to view the bot usage stats.
+
+        There is an optional keyword ``hours_within`` for limiting the time range of the message usage stats.
+        There is an optional keyword ``incl_unav`` to indicate if the unavailable members should be included.
+        There is an optional keyword ``period`` to indicate the period count for message stats.
+        """
         channel_data = self.get_channel_data(*args, **kwargs)
 
         hours_within = safe_cast(request.GET.get("hours_within"), int)

@@ -15,6 +15,8 @@ load-plugins=pylint_django
 #   often used as a file stream name
 # - i, j, k
 #   often used in for loops
+# - s
+#   often used to represent "string"
 # - v
 #   often used to represent "value"
 # - dt, tz
@@ -30,7 +32,7 @@ load-plugins=pylint_django
 # - id
 #   just ID
 
-good-names=_,e,f,i,j,k,v,dt,ex,fk,fi,fn,id,jk,tz
+good-names=_,e,f,i,j,k,s,v,dt,ex,fk,fi,fn,id,jk,tz
 
 include-naming-hint=yes
 
@@ -51,3 +53,4 @@ max-line-length=119
 [MESSAGES CONTROL]
 
 disable=broad-except,  # Almost always recording the error and there's a lot of codes catching `Exception`
+        cyclic-import  # Too-frequent false positive

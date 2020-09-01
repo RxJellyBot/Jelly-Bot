@@ -36,7 +36,7 @@ class ChannelType(FlagSingleEnum):
         :raises ChannelTypeUnidentifiableError: if the channel type cannot be identified
         """
         # To prevent looped import
-        from extline import LineApiUtils  # pylint: disable=import-outside-toplevel, cyclic-import
+        from extline import LineApiUtils  # pylint: disable=import-outside-toplevel
 
         if platform == Platform.LINE:
             return LineApiUtils.get_channel_type(token)

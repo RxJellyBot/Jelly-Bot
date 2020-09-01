@@ -1,3 +1,6 @@
+"""Various managers controlling different collections."""
+from typing import List, Type
+
 from .factory import MONGO_CLIENT, new_mongo_session
 from .rpdata import PendingRepairDataManager
 from .channel import ChannelManager, ChannelCollectionManager
@@ -17,5 +20,10 @@ from ._dbctrl import SINGLE_DB_NAME, is_test_db, get_single_db_name
 from .mixin import GenerateTokenMixin, ControlExtensionMixin
 
 
-def get_collection_subclasses():
+def get_collection_subclasses() -> List[Type[BaseCollection]]:
+    """
+    Get all classes that inherit ``BaseCollection``.
+
+    :return: list of classes that inherit `BaseCollection`
+    """
     return [cls for cls in BaseCollection.__subclasses__() if cls.__module__.split(".")[:2] == ["mongodb", "factory"]]

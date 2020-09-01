@@ -5,12 +5,19 @@ from flags import Execode, ExecodeCollationFailedReason
 
 
 class NoCompleteActionError(Exception):
+    """Raised if no corresponding action completion process."""
+
     def __init__(self, action: Execode):
         self._action = action
         super().__init__(f"No complete action implemented for {action}.")
 
     @property
     def action(self) -> Execode:
+        """
+        Get the action that raises this error.
+
+        :return: action that raises this error
+        """
         return self._action
 
 

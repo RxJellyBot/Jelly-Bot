@@ -23,7 +23,7 @@ from mongodb.factory.results import WriteOutcome, UpdateOutcome
 
 from .prop import CollectionPropertiesMixin
 
-T = TypeVar('T', bound=Model)
+T = TypeVar('T', bound=Model)  # pylint: disable=invalid-name
 
 
 class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
@@ -35,7 +35,7 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
 
     @staticmethod
     def _dup_doc_id_handle_compound_idx(filter_: dict, model_dict: dict, unique_key):
-        for key, order in unique_key:
+        for key, _ in unique_key:
             data = model_dict.get(key)
             if data is not None:
                 if isinstance(data, list):
@@ -45,7 +45,7 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
 
     @staticmethod
     def _dup_doc_id_handle_single_idx(or_list: list, model_dict: dict, unique_key):
-        key, order = unique_key[0]
+        key, _ = unique_key[0]
 
         data = model_dict.get(key)
         if data is not None:
@@ -136,6 +136,11 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
 
         This function constructs the model and if the construction succeed, executes ``insert_one_model()``.
 
+        If the constructed model has duplicated key, its OID will be updated. Consistency of the constructed model
+        and the data stored in database is not guaranteed, which means that the data of the constructed model and the
+        actual may have some difference. If you want to access the field of the data other than ID, consider getting
+        the data from the database using the attached ID instead.
+
         ``from_db`` determines the key type of ``model_args`` (json key or field key).
 
         .. seealso::
@@ -178,6 +183,15 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
         return model, outcome, ex
 
     def update_one_outcome(self, filter_, update, upsert=False, collation=None) -> UpdateOutcome:
+        """
+        Update one data matching ``filter_`` with the update statement ``update``.
+
+        :param filter_: condition of the data to be updated
+        :param update: mongo update statement
+        :param upsert: to insert the data if not found
+        :param collation: collation to be used against `filter_`
+        :return: outcome of the update
+        """
         update_result = self.update_one(filter_, update, upsert=upsert, collation=collation)
 
         if update_result.matched_count > 0:
@@ -191,6 +205,15 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
         return outcome
 
     def update_many_outcome(self, filter_, update, upsert=False, collation=None) -> UpdateOutcome:
+        """
+        Update one data matching ``filter_`` with the update statement ``update``.
+
+        :param filter_: condition of the data to be updated
+        :param update: mongo update statement
+        :param upsert: to insert the data if not found
+        :param collation: collation to be used against `filter_`
+        :return: outcome of the update
+        """
         update_result = self.update_many(filter_, update, upsert=upsert, collation=collation)
 
         if update_result.matched_count > 0:
@@ -204,6 +227,14 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
         return outcome
 
     def update_many_async(self, filter_, update, upsert=False, collation=None):
+        """
+        Same functionality as ``update_many()`` except that this function has return anything and run asynchronously.
+
+        :param filter_: condition of the data to be updated
+        :param update: mongo update statement
+        :param upsert: to insert the data if not found
+        :param collation: collation to be used against `filter_`
+        """
         if is_testing():
             self.update_many(filter_, update, upsert=upsert, collation=collation)
         else:
@@ -214,6 +245,14 @@ class ControlExtensionMixin(CollectionPropertiesMixin, Collection):
             ).start()
 
     def update_one_async(self, filter_, update, upsert=False, collation=None):
+        """
+        Same functionality as ``update_one()`` except that this function has return anything and run asynchronously.
+
+        :param filter_: condition of the data to be updated
+        :param update: mongo update statement
+        :param upsert: to insert the data if not found
+        :param collation: collation to be used against `filter_`
+        """
         if is_testing():
             self.update_one(filter_, update, upsert=upsert, collation=collation)
         else:

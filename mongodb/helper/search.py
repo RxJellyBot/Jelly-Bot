@@ -1,3 +1,4 @@
+"""Helper for searching various types of the data."""
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime
@@ -15,11 +16,15 @@ __all__ = ("IdentitySearcher",)
 
 @dataclass
 class ChannelData:
+    """A single entry representing a channel."""
+
     channel_model: ChannelModel
     channel_name: str
 
 
 class IdentitySearcher:
+    """Class to search for any types of identity data."""
+
     @staticmethod
     def search_channel(keyword: str, root_oid: ObjectId) -> List[ChannelData]:
         """
@@ -97,6 +102,14 @@ class IdentitySearcher:
     @staticmethod
     def get_batch_user_name(user_oids: Iterable[ObjectId], channel_data: Union[ChannelModel, ChannelCollectionModel],
                             *, on_not_found: Optional[str] = None) -> Dict[ObjectId, str]:
+        """
+        Get the user name as a :class:`dict` which key is their root OID and value is their name.
+
+        :param user_oids: OIDs of the user to get the name
+        :param channel_data: channel to perform the search
+        :param on_not_found: name to be used if not found
+        :return: a `dict` containing the user root OID as the key and user name as the valuee
+        """
         ret = {}
 
         with ThreadPoolExecutor(max_workers=10, thread_name_prefix="GetUserNames") as executor:

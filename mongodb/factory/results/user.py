@@ -1,3 +1,4 @@
+"""Result objects for user management."""
 from abc import ABC
 from dataclasses import dataclass
 from typing import List, Optional
@@ -11,27 +12,33 @@ from ._outcome import WriteOutcome
 
 @dataclass
 class IdentityRegistrationResult(ModelResult, ABC):
-    pass
+    """Base class for user identity registration result."""
 
 
 @dataclass
-class OnSiteUserRegistrationResult(IdentityRegistrationResult):
+class APIUserRegistrationResult(IdentityRegistrationResult):
+    """API user registration result object."""
+
     model: Optional[APIUserModel]
     token: Optional[str]
 
     def serialize(self) -> dict:
-        d = super().serialize()
-        d.update(**{result.UserManagementResponse.TOKEN: self.token})
-        return d
+        dict_ = super().serialize()
+        dict_.update(**{result.UserManagementResponse.TOKEN: self.token})
+        return dict_
 
 
 @dataclass
 class OnPlatformUserRegistrationResult(IdentityRegistrationResult):
+    """On-platform user registration result object."""
+
     model: Optional[OnPlatformUserModel]
 
 
 @dataclass
 class GetRootUserDataResult(ModelResult):
+    """Result of getting the root user data."""
+
     model: Optional[RootUserModel]
     model_api: Optional[APIUserModel] = None
     model_onplat_list: Optional[List[OnPlatformUserModel]] = None
@@ -39,24 +46,25 @@ class GetRootUserDataResult(ModelResult):
 
 @dataclass
 class RootUserRegistrationResult(ModelResult):
+    """Result of registrating the root user."""
+
     model: Optional[RootUserModel]
     conn_outcome: WriteOutcome
     idt_reg_result: IdentityRegistrationResult
-    hint: str
 
     def serialize(self) -> dict:
-        d = super().serialize()
-        d.update(**{
+        dict_ = super().serialize()
+        dict_.update(**{
             result.UserManagementResponse.CONN_OUTCOME:
                 self.conn_outcome,
             result.UserManagementResponse.REG_RESULT:
-                self.idt_reg_result.serialize() if self.idt_reg_result else None,
-            result.UserManagementResponse.HINT:
-                self.hint
+                self.idt_reg_result.serialize() if self.idt_reg_result else None
         })
-        return d
+        return dict_
 
 
 @dataclass
 class RootUserUpdateResult(ModelResult):
+    """Result of updating the root user properties."""
+
     model: Optional[RootUserModel]

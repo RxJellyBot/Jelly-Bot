@@ -1,3 +1,4 @@
+"""Data manager for the Short URL service."""
 import os
 import math
 import random
@@ -31,16 +32,21 @@ class _ShortUrlDataManager(BaseCollection):
 
     @staticmethod
     def check_service() -> bool:
+        """
+        Check if the service is up.
+
+        This assumes that the service is running on the URL set as ``SERVICE_SHORT_URL`` in the environment variables.
+
+        :return: if the service is up
+        """
         service_url = os.environ.get("SERVICE_SHORT_URL")
 
         if not service_url:
             SYSTEM.logger.warning("Short URL service URL not found. Specify it as SERVICE_SHORT_URL in env var.")
             SYSTEM.logger.warning("Service availability not checked.")
             return False
-        else:
-            service_url = f"{service_url}/test"
 
-        return is_valid_url(service_url)
+        return is_valid_url(f"{service_url}/test")
 
     def __init__(self):
         super().__init__()
@@ -60,6 +66,7 @@ class _ShortUrlDataManager(BaseCollection):
         return max(calc, _ShortUrlDataManager.MIN_CODE_LENGTH)
 
     def generate_code(self):
+        """Generate a code for the short URL."""
         def generate():
             return "".join([random.choice(_ShortUrlDataManager.AVAILABLE_CHARACTERS) for _ in range(self.code_length)])
 
@@ -72,6 +79,13 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def create_record(self, target: str, creator_oid: ObjectId) -> UrlShortenResult:
+        """
+        Create a short URL record.
+
+        :param target: target of the short URL record
+        :param creator_oid: OID of the creator
+        :return: short URL record creation result
+        """
         if not is_valid_url(target):
             return UrlShortenResult(WriteOutcome.X_INVALID_URL)
 
@@ -80,6 +94,12 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def get_target(self, code: str) -> Optional[str]:
+        """
+        Get the target of the short URL by its code.
+
+        :param code: code of the short URL
+        :return: target of the short URL record
+        """
         ret = self.get_record(code)
 
         if not ret:
@@ -89,6 +109,14 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def get_record(self, code: str) -> Optional[ShortUrlRecordModel]:
+        """
+        Get the short URL record by its ``code``.
+
+        Returns ``None`` if not found.
+
+        :param code: code of the short URL record to get
+        :return: `ShortUrlRecordModel` matching the condition if found, `None` otherwise
+        """
         return self.find_one_casted({ShortUrlRecordModel.Code.key: code})
 
     @arg_type_ensure
@@ -106,6 +134,16 @@ class _ShortUrlDataManager(BaseCollection):
 
     @arg_type_ensure
     def update_target(self, creator_oid: ObjectId, code: str, new_target: str) -> bool:
+        """
+        Update the target of the short URL.
+
+        Fail if ``new_target`` is not a valid URL.
+
+        :param creator_oid: OID of the short URL creator
+        :param code: code of the short URL to be updated
+        :param new_target: new target for the short URL
+        :return: if the update succeed
+        """
         if not is_valid_url(new_target):
             return False
 

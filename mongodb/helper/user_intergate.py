@@ -1,3 +1,4 @@
+"""Implementations for integrating user data."""
 from typing import List
 
 from bson import ObjectId
@@ -8,6 +9,8 @@ from mongodb.factory.results import OperationOutcome
 
 
 class UserDataIntegrationHelper:
+    """Class for helping the user data integration."""
+
     @staticmethod
     @arg_type_ensure
     def integrate(src_oid: ObjectId, dst_oid: ObjectId) -> OperationOutcome:
@@ -28,7 +31,10 @@ class UserDataIntegrationHelper:
         :return: outcome of the integration
         """
         # Inline import to prevent cyclic import
-        from mongodb.factory import new_mongo_session, get_collection_subclasses, BaseCollection, RootUserManager
+        # pylint: disable=import-outside-toplevel
+        from mongodb.factory import (
+            new_mongo_session, get_collection_subclasses, BaseCollection, RootUserManager
+        )
 
         merge_result = RootUserManager.merge_onplat_to_api(src_oid, dst_oid)
 
@@ -57,7 +63,7 @@ class UserDataIntegrationHelper:
                     f"Fields value replacements failed.<hr><pre>{'<br>'.join(failed_names)}</pre>",
                     subject="User Data Integration Failed.")
                 return OperationOutcome.X_INTEGRATION_FAILED
-            else:
-                session.commit_transaction()
+
+            session.commit_transaction()
 
         return OperationOutcome.O_COMPLETED

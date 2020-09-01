@@ -328,6 +328,23 @@ class TestChannelManager(TestModelMixin, TestDatabaseMixin):
 
         self.assertModelDictEqual(expected_d, actual_d)
 
+    def test_get_dict_partial_miss(self):
+        expected_d = self._add_channels()
+
+        actual_d = ChannelManager.get_channel_dict(list(expected_d) + [ObjectId(), ObjectId()])
+
+        self.assertModelDictEqual(expected_d, actual_d)
+
+    def test_get_dict_miss(self):
+        self._add_channels()
+
+        actual_d = ChannelManager.get_channel_dict([ObjectId(), ObjectId()], accessbible_only=True)
+
+        self.assertModelDictEqual({}, actual_d)
+
+    def test_get_dict_no_data(self):
+        self.assertModelDictEqual({}, ChannelManager.get_channel_dict([ObjectId(), ObjectId()]))
+
     def test_get_default_name_all(self):
         expected_s = set(self._add_channels().values())
 

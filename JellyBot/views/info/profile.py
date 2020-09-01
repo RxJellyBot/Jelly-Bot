@@ -1,3 +1,4 @@
+"""Views for profile control."""
 from enum import Enum
 
 from bson import ObjectId
@@ -20,32 +21,65 @@ from JellyBot.components.mixin import LoginRequiredMixin
 
 
 class InfoPageActionControl(Enum):
+    """Enum to represent the type of action to be performed."""
+
     UNKNOWN = -1
 
     DETACH = 0
     DELETE = 1
 
-    def is_argument_valid(self, target_uid):
+    def is_argument_valid(self, target_uid) -> bool:
+        """
+        Check if the argument for the action is valid.
+
+        :param target_uid: UID of the profile action target
+        :return: if the argument for the action is valid
+        :raises NotImplementedError: if the validating action is not yet implemented
+        """
         if self == InfoPageActionControl.UNKNOWN:
             return False
-        elif self == InfoPageActionControl.DETACH:
+
+        if self == InfoPageActionControl.DETACH:
             return target_uid is not None
-        elif self == InfoPageActionControl.DELETE:
+
+        if self == InfoPageActionControl.DELETE:
             return True
 
         raise NotImplementedError()
 
     @staticmethod
-    def parse(s: str):
+    def parse(s: str) -> 'InfoPageActionControl':
+        """
+        Parse the string ``s`` to :class:`InfoPageActionControl`.
+
+        :param s: string to be parsed
+        :return: parsed `InfoPageActionControl`
+        """
         if s == "detach":
             return InfoPageActionControl.DETACH
+
         if s == "delete":
             return InfoPageActionControl.DELETE
-        else:
-            return InfoPageActionControl.UNKNOWN
+
+        return InfoPageActionControl.UNKNOWN
 
     @staticmethod
-    def action_detach(request, channel_oid, sender_oid, target_uid, permissions, profile_oid):
+    def action_detach(request, channel_oid, sender_oid,
+                      target_uid, permissions, profile_oid):
+        """
+        Detach ``profile_oid`` from ``target_uid``.
+
+        Redirect to endpoint ``info.profile`` (original page) if success, return 403 if insufficient permission.
+
+        :param request: web request to be processed
+        :param channel_oid: channel OID of the profile
+        :param sender_oid: detachment executor OID
+        :param target_uid: detachment target OID
+        :param permissions: permissions that the executor has
+        :param profile_oid: profile to be detached from the target
+        :return: response of the detachment
+        """
+        # pylint: disable=too-many-arguments
         target_self = sender_oid == target_uid
 
         # Permission Check
@@ -69,26 +103,40 @@ class InfoPageActionControl(Enum):
 
     @staticmethod
     def action_delete(request, channel_model, profile_oid):
+        """
+        Delete ``profile_oid`` in ``channel_model``.
+
+        Redirect to the channel list page if succeed.
+        Otherwise, redirect to the info page of the profile to be deleted.
+
+        :param request: web request to be processed
+        :param channel_model: channel of the profile to be deleted
+        :param profile_oid: OID of the profile to be deleted
+        :return: page redirection according to the result
+        """
         # Terminate if the profile to be deleted is the default profile
         if channel_model.config.default_profile_oid == profile_oid:
             messages.warning(request, _("Attempted to delete the default profile which is not allowed."))
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
 
         # Detach profile from all users and delete the profile from the database
-        deleted = ProfileManager.delete_profile(channel_model.id, profile_oid, get_root_oid(request))
+        delete_outcome = ProfileManager.delete_profile(channel_model.id, profile_oid, get_root_oid(request))
 
         # Alert messages
-        if deleted:
-            messages.info(request, _("Profile deleted."))
-            return redirect(reverse("account.channel.list"))
-        else:
-            messages.warning(request, _("Failed to delete the profile."))
+        if not delete_outcome.is_success:
+            messages.warning(request, _("Failed to delete the profile. ({})") % delete_outcome)
             return redirect(reverse("info.profile", kwargs={"profile_oid": profile_oid}))
+
+        messages.info(request, _("Profile deleted."))
+        return redirect(reverse("account.channel.list"))
 
 
 class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
+    """View to see the profile info."""
+
     # noinspection PyMethodMayBeStatic
     def get(self, request, **kwargs):
+        """Page to see the profile info."""
         profile_result = get_profile_data(kwargs)
 
         if not profile_result.ok:
@@ -113,6 +161,7 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
 
     # noinspection PyMethodMayBeStatic
     def post(self, request, **kwargs):
+        """Handle the action request sent from the profile info page."""
         sender_oid = get_root_oid(request)
 
         profile_result = get_profile_data(kwargs)
@@ -141,8 +190,9 @@ class ProfileInfoView(LoginRequiredMixin, TemplateResponseMixin, View):
         if action == InfoPageActionControl.DETACH:
             return InfoPageActionControl.action_detach(
                 request, channel_model.id, sender_oid, target_uid, permissions, profile_oid)
-        elif action == InfoPageActionControl.DELETE:
+
+        if action == InfoPageActionControl.DELETE:
             return InfoPageActionControl.action_delete(
                 request, channel_model, profile_oid)
-        else:
-            return HttpResponse(status=501)
+
+        return HttpResponse(status=501)

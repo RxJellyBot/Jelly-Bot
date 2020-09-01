@@ -1,3 +1,4 @@
+"""Data manager for the remote control system."""
 from typing import Optional
 from datetime import datetime, timedelta
 
@@ -42,9 +43,9 @@ class _RemoteControlManager(BaseCollection):
             ExpiryUtc=datetime.utcnow() + timedelta(seconds=Bot.RemoteControl.IdleDeactivateSeconds),
             LocaleCode=locale_code)
 
-        outcome, exception = self.insert_one_model(model)
+        outcome, _ = self.insert_one_model(model)
 
-        return model if outcome.is_success else None
+        return model if outcome.is_success else None  # pylint: disable=no-member
 
     def deactivate(self, user_oid: ObjectId, source_channel_oid: ObjectId) -> bool:
         """
@@ -60,6 +61,7 @@ class _RemoteControlManager(BaseCollection):
                     *, update_expiry: bool = True) -> Optional[RemoteControlEntryModel]:
         """
         Get the current activating remote control.
+
         Upon found, update the expiry time if `update_expiry` is set to `True`.
 
         :return: Current activating remote control. `None` if not found.
@@ -84,10 +86,10 @@ class _RemoteControlManager(BaseCollection):
             self.update_one_async(filter_, {"$set": {RemoteControlEntryModel.ExpiryUtc.key: new_expiry}})
 
         # Ensure TTL - TTL may not work under millisecond scale
-        if now < ret.expiry_utc:
-            return RemoteControlEntryModel.cast_model(ret)
-        else:
+        if now > ret.expiry_utc:
             return None
+
+        return RemoteControlEntryModel.cast_model(ret)
 
 
 RemoteControlManager = _RemoteControlManager()

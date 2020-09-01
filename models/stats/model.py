@@ -1,6 +1,6 @@
 """Stats entry data model."""
 from extutils.dt import localtime
-from models import Model, ModelDefaultValueExt  # pylint: disable=cyclic-import
+from models import Model, ModelDefaultValueExt
 from models.field import (
     BooleanField, DictionaryField, APICommandField, DateTimeField, TextField, ObjectIDField,
     MessageTypeField, BotFeatureField, FloatField
