@@ -58,7 +58,7 @@ def check_po_file():
                 in_entry = False
 
             # Check for fuzzy line
-            if line == "#, fuzzy":
+            if line.startswith("#, fuzzy"):
                 invalid_found(line_no)
 
             # Check in-entry empty msgstr
