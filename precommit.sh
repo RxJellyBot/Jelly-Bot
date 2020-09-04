@@ -14,7 +14,19 @@ run_cmd_exit_on_err() {
   fi
 }
 
+check_rebase() {
+  BRANCH_NAME=$(git branch | sed "s/* //")
+
+  if [ "$BRANCH_NAME" = "(no branch)" ]; then
+    echo "Rebasing. Skipping the precommit checks."
+    exit 0
+  fi
+}
+
 # ------ Main
+
+# Early terminate if rebasing
+check_rebase
 
 # Activate venv
 # shellcheck disable=SC2039
