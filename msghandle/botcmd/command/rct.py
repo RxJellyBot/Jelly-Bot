@@ -50,7 +50,7 @@ def _link_recent_msgs(e: TextMessageEventObject, limit: int):
                 "info.channel.recent.message",
                 kwargs={"channel_oid": e.channel_oid}
             ),
-            QueryDict("", mutable=True).update({"limit": limit}).urlencode(),
+            QueryDict(f"limit={limit}", mutable=True).urlencode(),
             limit
         )
     )
