@@ -132,9 +132,9 @@ class TestTimerListResult(TestCase):
         self.assertEqual("", actual_str)
 
     def test_to_string(self):
-        now = now_utc_aware()
         taipei_tzinfo = LocaleInfo.get_tzinfo("Asia/Taipei")
 
+        now = now_utc_aware()
         actual_str = self.get_data().to_string(self.get_user_model())
 
         expected_str = [
