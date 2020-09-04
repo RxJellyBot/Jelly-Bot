@@ -8,6 +8,9 @@ webencodings  # Will be used for escaping characters
 # Static file handling
 whitenoise
 
+# GraphQL
+graphene
+
 # ---------------------
 
 ## Bot

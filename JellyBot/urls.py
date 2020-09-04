@@ -1,7 +1,9 @@
-"""JellyBot URL Configuration
+"""
+JellyBot URL Configuration.
 
 The ``urlpatterns`` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.2/topics/http/urls/
+
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -13,7 +15,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 
-Mapping with URL path parameter and GET parameter
+Mapping with URL path parameter and GET parameter:
     https://stackoverflow.com/a/150518
 """
 from django.contrib import admin
@@ -22,5 +24,6 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('JellyBot.views.urls')),
     path('api/', include('JellyBot.api.urls')),
+    path('api/v2/', include('JellyBot.apiv2proto.urls')),
     path('admin/', admin.site.urls)
 ]
