@@ -35,7 +35,7 @@ class RecentMessagesView(ChannelOidRequiredMixin, LoginRequiredMixin, TemplateRe
             "channel_data": channel_data.model,
             "recent_msg_limit": limit or "",
             "recent_msg_limit_max": Website.RecentActivity.MaxMessageCount,
-            "recent_msg_data": MessageStatsDataProcessor.get_recent_messages(channel_data.model, limit)
+            "recent_msg_data": MessageStatsDataProcessor.get_recent_messages(channel_data.model, limit=limit)
         }
 
         return render_template(
