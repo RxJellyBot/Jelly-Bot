@@ -1,13 +1,13 @@
 # Translation of Traditional Chinese (Taiwan) of Jelly Bot.
 # Copyright (C) 2019 RaenonX JELLYCAT
 # RaenonX JELLYCAT <raenonx0710@gmail.com>, 2019.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-09-01 01:23-0500\n"
-"PO-Revision-Date: 2020-08-25 22:41-0500\n"
+"PO-Revision-Date: 2020-09-03 19:49-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -4593,7 +4593,7 @@ msgid ""
 "command to lookup the sticker ID</small> </li> </ul>"
 msgstr ""
 "<small>必須是貼圖ID。通常來說，貼圖ID由 <strong>1~11 位數字組成</strong>。</"
-"small><br> <small>貼圖ID可以藉由以下方式獲取:<small><br> <ul> "
+"small><br> <small>貼圖ID可以藉由以下方式獲取:</small><br> <ul> "
 "<li><small><strong>透過私人頻道</strong>傳送貼圖 (在群組頻道中傳送貼圖並不會"
 "有任何效果)</small></li> <li><small>使用 <a href=\"%(rct_msg_url)s\">最近活動"
 "</a> 指令以查閱貼圖ID</small> </li> </ul>"
@@ -4618,11 +4618,11 @@ msgstr ""
 "<small>LINE貼圖相關說明請查閱\"LINE貼圖\"。</small><br><small> Discord的表情"
 "貼視為一般文字。這些表情貼的文字格式為 <code>&lt;:EMOJI_NAME:EMOJI_ID&gt;</"
 "code>，例如: <code>&lt;:neut:554302047038734366&gt;</code> </small><br> <ul> "
-"<li><code>EMOJI_NAME</code>: 通常在聊天的時候，要使用表情貼時會輸入的內容。冒"
-"號除外。如果你輸入的是 :neut: ，則 \"neut\" 就是這個表情貼的名字。</li> "
-"<li><code>EMOJI_ID</code>: 獲得表情貼連結時，網址中的數字。於PC端上，使用滑鼠"
-"右鍵點擊表情貼後，點擊 \"開啟連結\" 或 \"複製連結\" 以獲取表情貼ID。</li> </"
-"ul>"
+"<li><small> <code>EMOJI_NAME</code>: 通常在聊天的時候，要使用表情貼時會輸入的"
+"內容。冒號除外。如果你輸入的是 :neut: ，則 \"neut\" 就是這個表情貼的名字。</"
+"small></li> <li><small><code>EMOJI_ID</code>: 獲得表情貼連結時，網址中的數"
+"字。於PC端上，使用滑鼠右鍵點擊表情貼後，點擊 \"開啟連結\" 或 \"複製連結\" 以"
+"獲取表情貼ID。</small></li> </ul>"
 
 #: .\templates\ar\add-props.html:4
 msgid "Properties"
@@ -4874,8 +4874,7 @@ msgid "Auto-Reply Ranking"
 msgstr "自動回覆排行"
 
 #: .\templates\ar\rk-main.html:16 .\templates\info\botstats\main.html:17
-#: .\templates\info\channel\main.html:17
-#: .\templates\info\msgstats\main.html:17
+#: .\templates\info\channel\main.html:17 .\templates\info\msgstats\main.html:17
 #: .\templates\info\recent\message.html:17
 msgid ""
 "The channel is marked inaccessible for Jelly Bot, so the data of this "
