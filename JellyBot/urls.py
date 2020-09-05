@@ -24,6 +24,6 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('JellyBot.views.urls')),
     path('api/', include('JellyBot.api.urls')),
-    path('api/v2/', include('JellyBot.apiv2proto.urls')),
+    path('api/v2poroto/', include('JellyBot.apiv2proto.urls')),
     path('admin/', admin.site.urls)
 ]
