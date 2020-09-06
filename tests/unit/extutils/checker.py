@@ -1,4 +1,4 @@
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Dict
 
 from flags import MessageType
 from bson import ObjectId
@@ -6,7 +6,7 @@ from bson import ObjectId
 from extutils.checker import arg_type_ensure, NonSafeDataTypeConverter, TypeCastingFailedError
 from tests.base import TestCase
 
-__all__ = ["TestArgTypeEnsure"]
+__all__ = ("TestArgTypeEnsure",)
 
 
 # noinspection PyTypeChecker
@@ -160,32 +160,6 @@ class TestArgTypeEnsure(TestCase):
         self.assertEqual(MessageType.LOCATION, a2_out)
         self.assertEqual("1", a3_out)
 
-    def test_list(self):
-        l_out = 1
-
-        @arg_type_ensure
-        def fn(l: List[int]):  # noqa: E741
-            nonlocal l_out
-
-            l_out = l
-
-        fn(l_out)
-
-        self.assertListEqual([1], l_out)
-
-    def test_list_union_element(self):
-        l_out = [5, True, 3.7, "A"]
-
-        @arg_type_ensure
-        def fn(lst: List[Union[int, bool]]):
-            nonlocal l_out
-
-            l_out = lst
-
-        fn(l_out)
-
-        self.assertListEqual([5, True, 3, True], l_out)
-
     def test_normal_nested_union(self):
         a1_out = "1"
         a2_out = [1]
@@ -223,6 +197,155 @@ class TestArgTypeEnsure(TestCase):
         self.assertEqual(1, a1_out)
         self.assertEqual([1], a2_out)
         self.assertEqual(1, a3_out)
+
+    def test_normal_dict_notation(self):
+        a1_out = "1"
+        a2_out = [1]
+        a3_out = 1
+
+        @arg_type_ensure
+        def fn(a1: Union[List[int], int], a2: Union[List[int], int], a3: Union[List[int], int]):
+            nonlocal a1_out, a2_out, a3_out
+
+            a1_out = a1
+            a2_out = a2
+            a3_out = a3
+
+        fn(a1_out, a2_out, a3_out)
+
+        self.assertEqual(1, a1_out)
+        self.assertEqual([1], a2_out)
+        self.assertEqual(1, a3_out)
+
+    def test_list(self):
+        l_out = [1]
+
+        @arg_type_ensure
+        def fn(l: List[int]):  # noqa: E741
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertEqual([1], l_out)
+
+    def test_list_to_convert(self):
+        l_out = ["1"]
+
+        @arg_type_ensure
+        def fn(l: List[int]):  # noqa: E741
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertEqual([1], l_out)
+
+    def test_list_single_elem_not_list(self):
+        l_out = 1
+
+        @arg_type_ensure
+        def fn(l: List[int]):  # noqa: E741
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertEqual([1], l_out)
+
+    def test_list_empty(self):
+        l_out = []
+
+        @arg_type_ensure
+        def fn(l: List[int]):  # noqa: E741
+            nonlocal l_out
+
+            l_out = l
+
+        fn(l_out)
+
+        self.assertEqual([], l_out)
+
+    def test_list_union_element(self):
+        l_out = [5, True, 3.7, "A"]
+
+        @arg_type_ensure
+        def fn(lst: List[Union[int, bool]]):
+            nonlocal l_out
+
+            l_out = lst
+
+        fn(l_out)
+
+        self.assertEqual([5, True, 3, True], l_out)
+
+    def test_dict(self):
+        d_out = {1: 5}
+
+        @arg_type_ensure
+        def fn(d: Dict[int, int]):  # noqa: E741
+            nonlocal d_out
+
+            d_out = d
+
+        fn(d_out)
+
+        self.assertEqual({1: 5}, d_out)
+
+    def test_dict_to_convert(self):
+        d_out = {"1": "5"}
+
+        @arg_type_ensure
+        def fn(d: Dict[int, int]):  # noqa: E741
+            nonlocal d_out
+
+            d_out = d
+
+        fn(d_out)
+
+        self.assertEqual({1: 5}, d_out)
+
+    def test_dict_single_elem_not_list(self):
+        d_out = 5
+
+        @arg_type_ensure
+        def fn(d: Dict[int, int]):  # noqa: E741
+            nonlocal d_out
+
+            d_out = d
+
+        fn(d_out)
+
+        self.assertEqual(5, d_out)
+
+    def test_dict_empty(self):
+        d_out = {}
+
+        @arg_type_ensure
+        def fn(d: Dict[int, int]):  # noqa: E741
+            nonlocal d_out
+
+            d_out = d
+
+        fn(d_out)
+
+        self.assertEqual({}, d_out)
+
+    def test_dict_union_element(self):
+        d_out = {5: "7", True: "B", 3.7: 3, "A": "3"}
+
+        @arg_type_ensure
+        def fn(dct: Dict[Union[int, bool], Union[int, bool]]):
+            nonlocal d_out
+
+            d_out = dct
+
+        fn(d_out)
+
+        self.assertEqual({5: 7, 3: 3, True: 3}, d_out)
 
     def test_nonsafe_fail(self):
         l_out = 7

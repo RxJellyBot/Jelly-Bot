@@ -42,17 +42,21 @@ class BaseDataTypeConverter(ABC):
     @classmethod
     @abstractmethod
     def _convert(cls, data: Any, type_annt):
+        # pylint: disable=too-many-return-statements
         # Terminate if the type is already valid
         # type annotation cannot be used with instance checks (generic may be the type annotation)
         if type(data) == type_annt:  # pylint: disable=unidiomatic-typecheck
             return data
 
-        alias_origin_union = cls._typing_alias_origin(type_annt) is Union
-        alias_origin_list = cls._typing_alias_origin(type_annt) is list
+        origin = cls._typing_alias_origin(type_annt)
+
+        alias_origin_union = origin is Union
+        alias_origin_list = origin is list
+        alias_origin_dict = origin is dict
 
         if type_annt is not Parameter.empty \
                 and type_annt not in cls.valid_data_types + cls._ignore \
-                and not any([alias_origin_union, alias_origin_list]):
+                and not any([alias_origin_union, alias_origin_list, alias_origin_dict]):
             return cls.on_type_invalid(data, type_annt)
 
         try:
@@ -62,6 +66,9 @@ class BaseDataTypeConverter(ABC):
 
             if alias_origin_list:
                 return cls._cast_list(data, type_annt)
+
+            if alias_origin_dict:
+                return cls._cast_dict(data, type_annt)
 
             if type_annt not in cls._ignore:
                 return type_annt(data)
@@ -94,22 +101,41 @@ class BaseDataTypeConverter(ABC):
 
     @classmethod
     def _cast_list(cls, data: Any, type_annt):
-        ret = []
         cast_type = type_annt.__args__[0]
         annt_union = cls._typing_alias_origin(cast_type) is Union
 
         try:
             iterator = iter(data)
         except TypeError:
-            iterator = iter([1])
+            iterator = iter([data])
 
-        for obj in iterator:
-            if annt_union:
-                ret.append(cls._cast_union(obj, cast_type))
-            elif isinstance(data, cast_type):
-                ret.append(obj)
-            else:
-                ret.append(cast_type(obj))
+        if annt_union:
+            ret = [cls._cast_union(obj, cast_type) for obj in iterator]
+        else:
+            ret = [(obj if isinstance(obj, cast_type) else cast_type(obj)) for obj in iterator]
+
+        return ret
+
+    @classmethod
+    def _cast_dict(cls, data: Any, type_annt):
+        ret = {}
+        cast_key_type = type_annt.__args__[0]
+        cast_val_type = type_annt.__args__[1]
+        annt_key_union = cls._typing_alias_origin(cast_key_type) is Union
+        annt_val_union = cls._typing_alias_origin(cast_val_type) is Union
+
+        for k, v in data.items():
+            if annt_key_union:
+                k = cls._cast_union(k, cast_key_type)
+            elif not isinstance(k, cast_key_type):
+                k = cast_key_type(k)
+
+            if annt_val_union:
+                v = cls._cast_union(v, cast_val_type)
+            elif not isinstance(v, cast_val_type):
+                v = cast_key_type(v)
+
+            ret[k] = v
 
         return ret
 
@@ -162,7 +188,7 @@ class BaseDataTypeConverter(ABC):
         :param dtype: target type
         :return: post-processed data
         """
-        if is_flag_class(dtype):
+        if isinstance(dtype, type) and is_flag_class(dtype):
             return dtype(int(data))
 
         return data

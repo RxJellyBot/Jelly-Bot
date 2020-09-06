@@ -1,2 +1,2 @@
-from .extutils import *  # noqa
+from .ext import *  # noqa
 from .mdb import *  # noqa
