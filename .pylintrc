@@ -4,6 +4,9 @@
 
 load-plugins=pylint_django
 
+ignore=JellyBot\components\mixin\check.py,  # DEPRECATE: To be removed after JB-3 (webpage removal) - webpage checks
+       JellyBot\components\mixin\identity.py  # DEPRECATE: To be removed after JB-3 (webpage removal) - webpage checks
+
 [BASIC]
 
 # Reason of the good names:

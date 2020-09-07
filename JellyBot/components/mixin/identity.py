@@ -1,3 +1,4 @@
+# noqa
 from typing import Set
 
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -10,12 +11,14 @@ from flags import ProfilePermission, WebsiteError
 from mongodb.factory import ProfileManager
 
 
-class LoginRequiredMixin(UserPassesTestMixin, View):
+# DEPRECATE: To be removed after JB-3 (webpage removal) - Check login status of the webpage
+class LoginRequiredMixin(UserPassesTestMixin, View):  # noqa
     def test_func(self):
         return get_root_oid(self.request) is not None and keys.Cookies.USER_TOKEN in self.request.COOKIES
 
 
-class ChannelOidRequiredMixin(View):
+# DEPRECATE: To be removed after JB-3 (webpage removal) - Check channel_oid presence for the webpage
+class ChannelOidRequiredMixin(View):  # noqa
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -40,7 +43,8 @@ class ChannelOidRequiredMixin(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class PermissionRequiredMixin(ChannelOidRequiredMixin, LoginRequiredMixin, View):
+# DEPRECATE: To be removed after JB-3 (webpage removal) - Check permission for API v1 control
+class PermissionRequiredMixin(ChannelOidRequiredMixin, LoginRequiredMixin, View):  # noqa
     @staticmethod
     def required_permission() -> Set[ProfilePermission]:
         raise NotImplementedError()
@@ -48,7 +52,7 @@ class PermissionRequiredMixin(ChannelOidRequiredMixin, LoginRequiredMixin, View)
     def dispatch(self, request, *args, **kwargs):
         root_oid = get_root_oid(request)
 
-        pass_ = ProfileManager.get_user_permissions(self.get_channel_data(*args, **kwargs).model.id, root_oid)\
+        pass_ = ProfileManager.get_user_permissions(self.get_channel_data(*args, **kwargs).model.id, root_oid) \
             .issuperset(self.required_permission())
 
         if not pass_:

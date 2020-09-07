@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-06 16:12-0500\n"
+"POT-Creation-Date: 2020-09-06 21:24-0500\n"
 "PO-Revision-Date: 2020-09-03 19:49-0500\n"
 "Last-Translator: RaenonX JELLYCAT <raenonx0710@gmail.com>\n"
 "Language-Team: \n"
@@ -845,71 +845,71 @@ msgstr "(換行)"
 msgid "(Space)"
 msgstr "(空格)"
 
-#: .\flags\apiact.py:64
+#: .\flags\apicmd.py:64
 msgid "Unknown Action"
 msgstr "不明指令"
 
-#: .\flags\apiact.py:66
+#: .\flags\apicmd.py:66
 msgid "Auto-Reply - Addition"
 msgstr "自動回覆 - 新增"
 
-#: .\flags\apiact.py:67
+#: .\flags\apicmd.py:67
 msgid "Auto-Reply - Content Validation"
 msgstr "自動回覆 - 內容驗證"
 
-#: .\flags\apiact.py:68
+#: .\flags\apicmd.py:68
 msgid "Auto-Reply - Tag Popularity"
 msgstr "自動回覆 - 熱門標籤"
 
-#: .\flags\apiact.py:70
+#: .\flags\apicmd.py:70
 msgid "Execode - Auto-Reply Addition"
 msgstr "執行碼 - 自動回覆 - 新增"
 
-#: .\flags\apiact.py:71
+#: .\flags\apicmd.py:71
 msgid "Execode - List All"
 msgstr "執行碼 - 列出全部"
 
-#: .\flags\apiact.py:72
+#: .\flags\apicmd.py:72
 msgid "Execode - Complete Action"
 msgstr "執行碼 - 完成"
 
-#: .\flags\apiact.py:74
+#: .\flags\apicmd.py:74
 msgid "Data Query - Channel"
 msgstr "資料查詢 - 頻道"
 
-#: .\flags\apiact.py:75
+#: .\flags\apicmd.py:75
 msgid "Data Query - Permission"
 msgstr "資料查詢 - 權限"
 
-#: .\flags\apiact.py:77
+#: .\flags\apicmd.py:77
 msgid "Management - Issue Channel Registration Execode"
 msgstr "管理 - 發給頻道登錄用執行碼"
 
-#: .\flags\apiact.py:78
+#: .\flags\apicmd.py:78
 msgid "Management - Change Channel Star"
 msgstr "管理 - 更改頻道最愛"
 
-#: .\flags\apiact.py:79
+#: .\flags\apicmd.py:79
 msgid "Management - Change Channel Name"
 msgstr "管理 - 更改頻道名稱"
 
-#: .\flags\apiact.py:81
+#: .\flags\apicmd.py:81
 msgid "Management - Detach Profile"
 msgstr "管理 - 解除身份組"
 
-#: .\flags\apiact.py:82
+#: .\flags\apicmd.py:82
 msgid "Management - Profile Name Check"
 msgstr "管理 - 檢查身份組名稱"
 
-#: .\flags\apiact.py:83
+#: .\flags\apicmd.py:83
 msgid "Management - Attach Profile"
 msgstr "管理 - 附加身份組"
 
-#: .\flags\apiact.py:85
+#: .\flags\apicmd.py:85
 msgid "Services - Shorten URL"
 msgstr "服務 - 短網址"
 
-#: .\flags\apiact.py:86
+#: .\flags\apicmd.py:86
 msgid "Services - Update Target"
 msgstr "服務 - 更新目標網址"
 

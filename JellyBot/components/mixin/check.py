@@ -1,3 +1,4 @@
+# noqa
 from django.http import JsonResponse
 from django.views import View
 
@@ -5,7 +6,8 @@ from JellyBot.keys import Session
 from JellyBot.api.static import result
 
 
-class CheckParameterMixin(View):
+# DEPRECATE: To be removed after JB-3 (API v1 removal) - Check mandatory parameters for API
+class CheckParameterMixin(View):  # noqa
     def mandatory_keys(self) -> set:
         return set()
 
