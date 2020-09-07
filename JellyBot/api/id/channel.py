@@ -1,13 +1,17 @@
+# noqa
 from JellyBot.api.static import param
 from JellyBot.api.responses import (
     ChannelDataQueryResponse, ChannelIssueRegisterExecodeResponse, ChannelNameChangeResponse, ChannelStarChangeResponse
 )
-from JellyBot.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBot.components.mixin import CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBot.components.relay import CsrfExemptRelay
 from JellyBot.components.views import APIJsonResponseView
 from flags import APICommand
 
 
-class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ChannelDataQueryView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                           APIJsonResponseView):  # noqa
     get_response_class = ChannelDataQueryResponse
 
     def get_api_action(self):
@@ -17,8 +21,9 @@ class ChannelDataQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPara
         return {param.DataQuery.Channel.PLATFORM, param.DataQuery.Channel.CHANNEL_TOKEN}
 
 
-class ChannelIssueRegistrationExecodeView(
-        CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ChannelIssueRegistrationExecodeView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                                          APIJsonResponseView):  # noqa
     post_response_class = ChannelIssueRegisterExecodeResponse
 
     def get_api_action(self):
@@ -28,7 +33,9 @@ class ChannelIssueRegistrationExecodeView(
         return set()
 
 
-class ChannelNameChangeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ChannelNameChangeView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                            APIJsonResponseView):  # noqa
     post_response_class = ChannelNameChangeResponse
 
     def get_api_action(self):
@@ -38,7 +45,9 @@ class ChannelNameChangeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckPar
         return {param.Manage.Channel.NEW_NAME, param.Manage.Channel.CHANNEL_OID}
 
 
-class ChannelStarChangeView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ChannelStarChangeView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                            APIJsonResponseView):  # noqa
     post_response_class = ChannelStarChangeResponse
 
     def get_api_action(self):

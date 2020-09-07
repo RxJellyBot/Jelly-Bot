@@ -11,13 +11,13 @@ from flags import ProfilePermission, WebsiteError
 from mongodb.factory import ProfileManager
 
 
-# DEPRECATE: To be removed after JB-3 (webpage removal) - Check login status of the webpage
+# DEPRECATE: Remove after API v1 deprecation
 class LoginRequiredMixin(UserPassesTestMixin, View):  # noqa
     def test_func(self):
         return get_root_oid(self.request) is not None and keys.Cookies.USER_TOKEN in self.request.COOKIES
 
 
-# DEPRECATE: To be removed after JB-3 (webpage removal) - Check channel_oid presence for the webpage
+# DEPRECATE: Remove after API v1 deprecation
 class ChannelOidRequiredMixin(View):  # noqa
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -43,7 +43,7 @@ class ChannelOidRequiredMixin(View):  # noqa
         return super().dispatch(request, *args, **kwargs)
 
 
-# DEPRECATE: To be removed after JB-3 (webpage removal) - Check permission for API v1 control
+# DEPRECATE: Remove after API v1 deprecation
 class PermissionRequiredMixin(ChannelOidRequiredMixin, LoginRequiredMixin, View):  # noqa
     @staticmethod
     def required_permission() -> Set[ProfilePermission]:

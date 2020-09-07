@@ -1,4 +1,4 @@
-from .csrf import CsrfExemptMixin
+# noqa
 from .check import CheckParameterMixin
 from .identity import LoginRequiredMixin, PermissionRequiredMixin, ChannelOidRequiredMixin
 from .stats import APIStatisticsCollectMixin

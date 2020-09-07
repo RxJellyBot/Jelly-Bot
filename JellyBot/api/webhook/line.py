@@ -1,14 +1,17 @@
+"""Webhook endpoint for LINE."""
 from django.views import View
 
-from JellyBot.components.mixin import CsrfExemptMixin
+from JellyBot.components.relay import CsrfExemptRelay
 from JellyBot.views import simple_str_response
 from extline import line_handle_event
 from extline.logger import LINE
 
 
-class WebhookLineView(CsrfExemptMixin, View):
+class WebhookLineView(CsrfExemptRelay, View):
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post(self, request, *args, **kwargs):
+        """Handle LINE webhook requests."""
+
         # get X-Line-Signature header value
         signature = request.headers['X-Line-Signature']
 

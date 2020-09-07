@@ -1,15 +1,17 @@
+# noqa
 from JellyBot.api.static import param
 from JellyBot.api.responses import (
     PermissionQueryResponse, ProfileDetachResponse, ProfileNameCheckResponse, ProfileAttachResponse
 )
-from JellyBot.components.mixin import (
-    CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
-)
+from JellyBot.components.mixin import CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBot.components.relay import CsrfExemptRelay
 from JellyBot.components.views import APIJsonResponseView
 from flags import APICommand
 
 
-class PermissionQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class PermissionQueryView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                          APIJsonResponseView):  # noqa
     get_response_class = PermissionQueryResponse
 
     def get_api_action(self):
@@ -19,7 +21,8 @@ class PermissionQueryView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
         return {param.Manage.Channel.CHANNEL_OID}
 
 
-class ProfileDetachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ProfileDetachView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):  # noqa
     post_response_class = ProfileDetachResponse
 
     def get_api_action(self):
@@ -29,7 +32,8 @@ class ProfileDetachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamet
         return {param.Manage.Profile.PROFILE_OID}
 
 
-class ProfileAttachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ProfileAttachView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):  # noqa
     post_response_class = ProfileAttachResponse
 
     def get_api_action(self):
@@ -39,7 +43,9 @@ class ProfileAttachView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParamet
         return {param.Manage.Profile.PROFILE_OID, param.Manage.Profile.CHANNEL_OID}
 
 
-class ProfileNameCheckView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ProfileNameCheckView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                           APIJsonResponseView):  # noqa
     get_response_class = ProfileNameCheckResponse
 
     def get_api_action(self):

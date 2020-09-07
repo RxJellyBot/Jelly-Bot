@@ -1,11 +1,15 @@
+# noqa
 from flags import APICommand
 from JellyBot.api.responses import ExecodeCompleteApiResponse, ExecodeListApiResponse
 from JellyBot.api.static import param
-from JellyBot.components.mixin import CsrfExemptMixin, CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBot.components.mixin import CheckParameterMixin, APIStatisticsCollectMixin
+from JellyBot.components.relay import CsrfExemptRelay
 from JellyBot.components.views import APIJsonResponseView
 
 
-class ExecodeCompleteView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ExecodeCompleteView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin,
+                          APIJsonResponseView):  # noqa
     post_response_class = ExecodeCompleteApiResponse
 
     def get_api_action(self):
@@ -15,7 +19,8 @@ class ExecodeCompleteView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParam
         return set()
 
 
-class ExecodeListView(CsrfExemptMixin, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):
+# DEPRECATE: Remove after API v1 deprecation
+class ExecodeListView(CsrfExemptRelay, APIStatisticsCollectMixin, CheckParameterMixin, APIJsonResponseView):  # noqa
     get_response_class = ExecodeListApiResponse
 
     def get_api_action(self):

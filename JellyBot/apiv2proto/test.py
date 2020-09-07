@@ -6,7 +6,7 @@ from django.views import View
 from graphene import ObjectType, String, Schema
 
 from extutils.serializer import JellyBotSerializer
-from JellyBot.components.mixin import CsrfExemptMixin
+from JellyBot.components.relay import CsrfExemptRelay
 
 
 class Query(ObjectType):
@@ -24,7 +24,7 @@ class Query(ObjectType):
 schema = Schema(query=Query)
 
 
-class ApiV2PrototypeView(CsrfExemptMixin, View):
+class ApiV2PrototypeView(CsrfExemptRelay, View):
     """
     View for API v2 prototype.
 

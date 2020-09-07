@@ -6,7 +6,7 @@ from JellyBot.keys import Session
 from JellyBot.api.static import result
 
 
-# DEPRECATE: To be removed after JB-3 (API v1 removal) - Check mandatory parameters for API
+# DEPRECATE: Remove after API v1 deprecation
 class CheckParameterMixin(View):  # noqa
     def mandatory_keys(self) -> set:
         return set()
