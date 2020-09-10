@@ -30,7 +30,7 @@ check_rebase
 
 # Activate venv
 # shellcheck disable=SC2039
-source ./../JellyBot-venv/Scripts/activate
+source ./../Jelly-Bot-venv/Scripts/activate
 
 # Execute precommit check for files
 run_cmd_exit_on_err ./precommit-file.sh "Checks on changed files"
