@@ -1,5 +1,40 @@
 # Jelly Bot
 
+I am a bot centralized around auto-reply with a lot of useful side features!
+
+These side features include:
+
+- Image uploading 
+
+    - Simply send an image to the bot
+
+- Sticker downloading
+
+    - Utilize the command series `JC STK`
+    
+    - Check [here][stk-doc] for the documentation
+
+- Activity tracking
+
+    - Call `JC ID ME` in a channel where the bot exists
+    
+    - More info visible on the website
+
+- Keyword notification ([awaiting implementation][JB-5])
+
+### See [this page](https://github.com/RxJellyBot/Jelly-Bot/releases/latest) for the latest features list!
+
+[JB-5]: http://jira.raenonx.cc/browse/JB-5
+
+[stk-doc]: http://bot.raenonx.cc/doc/botcmd/stk/
+
+Note that the frontend links may go invalid or redirect you to the other pages 
+once the [new frontend][JB-3] has been done. 
+
+[JB-3]: http://jira.raenonx.cc/browse/JB-3
+
+----
+
 #### GitHub Actions
 
 [![Jelly Bot - CI Test](https://github.com/RxJellyBot/Jelly-Bot/workflows/Jelly%20Bot%20-%20CI%20Test/badge.svg)](https://github.com/RxJellyBot/Jelly-Bot/actions)
@@ -15,10 +50,10 @@
 [![Codacy](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RxJellyBot/Jelly-Bot)
 
 #### Coding timer since Aug. 24, 2020
-[![Wakatime](https://wakatime.com/badge/github/RaenonX/Jelly-Bot.svg)](https://wakatime.com/badge/github/RaenonX/Jelly-Bot)
+[![Wakatime](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot.svg)](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot)
 
 #### Coding activity in 30 days
-[![Wakatime](https://wakatime.com/share/@RaenonX/dba9dda8-9ea7-40d3-98c1-be4ebfb8eb48.svg)](https://wakatime.com/badge/github/RaenonX/Jelly-Bot)
+[![Wakatime](https://wakatime.com/share/@RaenonX/dba9dda8-9ea7-40d3-98c1-be4ebfb8eb48.svg)](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot)
 
 Supported on Discord and LINE. Feel free to add it to your group!
 
@@ -28,21 +63,18 @@ Discord Bot: http://rnnx.cc/Discord
 
 Website: http://rnnx.cc/Website
 
-### See [Latest Release](https://github.com/RxJellyBot/Jelly-Bot/releases/latest) for the latest features list!
-
-<hr>
+----
 
 ### Links
 
-[Features/Issues that has done implementing but not yet deployed](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+Awaiting+PR%22)
+Welcome to visit the [JIRA][JIRA-dash] of this bot!
 
-[Features/Issues that is currently working on](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Status%3A+In+Progress%22)
+List of the current known bugs can be found [here][JIRA-bugs].
 
-[Features/Issues that should be started soon](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Priority%3A+9%22)
+[JIRA-dash]: http://jira.raenonx.cc/secure/Dashboard.jspa
+[JIRA-bugs]: http://jira.raenonx.cc/browse/JB-107?jql=project%20%3D%20JB%20AND%20resolution%20%3D%20Unresolved%20AND%20issuetype%20%3D%20Bug
 
-[Known Bugs](https://github.com/RxJellyBot/Jelly-Bot/issues?q=is%3Aopen+is%3Aissue+label%3A%22Type%3A+Bug%22)
-
-<hr>
+----
 
 ### Timeline
 
@@ -58,11 +90,13 @@ Website: http://rnnx.cc/Website
 
 ### Miscellaneous information
 
-#### Code linter
+#### Code quality checker
 
 - `flake8`
 
 - `pylint`
+
+- `pydocstyle`
 
 #### Docstring framework
 
