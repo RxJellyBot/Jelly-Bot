@@ -94,7 +94,9 @@ class _LineApiWrapper:
 
             return self._core.get_profile(uid, timeout=1000)
         except LineBotApiError as ex:
-            if ex.status_code == 404:
+            # 404 seems to be the legacy status code upon user not found
+            # 400 is the status code returned upon user not found (2020/09/23)
+            if ex.status_code in (404, 400):
                 return None
 
             raise ex

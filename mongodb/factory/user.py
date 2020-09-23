@@ -196,6 +196,11 @@ class _RootUserManager(BaseCollection):
             return RootUserRegistrationResult(WriteOutcome.X_ON_CONN_ONPLAT, ex, model, outcome, user_reg_result)
 
         if outcome == WriteOutcome.O_DATA_EXISTS:
+            # `model` may not be as same as the one returned from `self.insert_one_data()`
+            model = self.get_root_data_oid(model.id)
+            if not model:
+                raise ValueError(f"Data of root OID {model.id} not found while it should be found.")
+
             return RootUserRegistrationResult(WriteOutcome.O_DATA_EXISTS, ex, model, outcome, user_reg_result)
 
         return RootUserRegistrationResult(WriteOutcome.O_INSERTED, ex, model, outcome, user_reg_result)
@@ -224,10 +229,15 @@ class _RootUserManager(BaseCollection):
             return RootUserRegistrationResult(WriteOutcome.X_ON_CONN_API, ex, model, outcome, user_reg_result)
 
         if outcome == WriteOutcome.O_DATA_EXISTS:
-            # Updating the email per the documentation
+            # Updating the email per the Google Identity documentation
             APIUserManager.update_many_async({APIUserModel.GoogleUid.key: id_data.uid,
                                               APIUserModel.Email.key: {"$ne": id_data.email}},
                                              {"$set": {APIUserModel.Email.key: id_data.email}})
+
+            # `model` may not be as same as the one returned from `self.insert_one_data()`
+            model = self.get_root_data_oid(model.id)
+            if not model:
+                raise ValueError(f"Data of root OID {model.id} not found while it should be found.")
 
             return RootUserRegistrationResult(WriteOutcome.O_DATA_EXISTS, ex, model, outcome, user_reg_result)
 
