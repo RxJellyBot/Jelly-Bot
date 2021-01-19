@@ -190,8 +190,8 @@ class OnPlatformUserModel(Model):
 
         if name:
             set_uname_cache(self.id, name)
-        else:
-            # Mark unavailable
+        elif channel_model.platform == self.platform:
+            # If the channel platform and the data platform is the same, check for the availability
             from mongodb.factory import ProfileManager, RootUserManager
 
             root_data_result = RootUserManager.get_root_data_onplat(self.platform, self.token, auto_register=False)
