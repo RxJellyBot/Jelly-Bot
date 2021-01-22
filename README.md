@@ -49,12 +49,6 @@ once the [new frontend][JB-3] has been done.
 [![CodeFactor](https://www.codefactor.io/repository/github/raenonx/jelly-bot/badge/dev)](https://www.codefactor.io/repository/github/raenonx/jelly-bot/overview/dev)
 [![Codacy](https://app.codacy.com/project/badge/Grade/ca77557007884126985561b06c5ec384?branch=dev)](https://www.codacy.com/manual/RxJellyBot/Jelly-Bot)
 
-#### Coding timer since Aug. 24, 2020
-[![Wakatime](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot.svg)](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot)
-
-#### Coding activity in 30 days
-[![Wakatime](https://wakatime.com/share/@RaenonX/dba9dda8-9ea7-40d3-98c1-be4ebfb8eb48.svg)](https://wakatime.com/badge/github/RxJellyBot/Jelly-Bot)
-
 Supported on Discord and LINE. Feel free to add it to your group!
 
 LINE Bot: http://rnnx.cc/Line
