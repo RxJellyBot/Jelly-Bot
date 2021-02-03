@@ -49,6 +49,10 @@ sympy
 
 ## Miscellaneous
 
+# Heroku deployment
+django-heroku
+gunicorn
+
 # Github API data
 dotmap
 
