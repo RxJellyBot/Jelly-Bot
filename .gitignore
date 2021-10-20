@@ -28,7 +28,6 @@ web.config
 sandbox*.py
 
 # Django files
-db.sqlite3
 staticfiles/
 
 # Test files
